@@ -215,13 +215,23 @@
     - workflow: first do log2fc subsetting, then clustering
 - spectrumSimilarity
     - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
-    - update MSPeakLists method and/or export new functions?
+        - allow optional groupName2/analysis2
+            - or groupName can be vector? --> matrix plot?
+            - or just 2 sized vector...
+        - do this also for formulas/compounds?
     - remove OrgMassSpecR and proxy dependency
-- Naming
+    - consistent defaults for minIntensity etc
+    - remove merged approach, possibly find other ways to customize averaging
+    - use spectrumSimilarity() for componentsTPs
+    - use spectrumSimilarity() for componentsSpecClust
+        - needs way to calculate as matrix (eg groupName2=NULL?)
+        - benchmark to see if this doesn't introduce too much overhead
+- Consistency
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
     - suspects() --> parents()?
+    - precursor diff: 1-2 or 2-1? 
 - misc
     - Make sure hash takes into account parent names
     - show method for new components classes
@@ -233,6 +243,7 @@
         - compound similarities
     - minMSMSPeaks filter
     - FCParams/plotVolcano
+    - update spectrumSimilarity()
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
     - minMSMSPeaks filter
@@ -241,6 +252,7 @@
 - tests
     - FC, plotVolcano
     - ensure peaklists are sorted
+    - spectrumSimilarity()
 
 
 ## features

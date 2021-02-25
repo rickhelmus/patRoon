@@ -21,6 +21,10 @@ specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight
     .Call(`_patRoon_specDistMatrix`, specList, method, shift, precMZs, mzWeight, intWeight, mzWindow)
 }
 
+specDistRect <- function(specList1, specList2, method, shift, precMZs1, precMZs2, mzWeight, intWeight, mzWindow) {
+    .Call(`_patRoon_specDistRect`, specList1, specList2, method, shift, precMZs1, precMZs2, mzWeight, intWeight, mzWindow)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

@@ -226,7 +226,6 @@
         - min, max
         - some kind of weighted average?
     - use spectrumSimilarity() for componentsSpecClust
-        - needs way to calculate as matrix (eg groupName2=NULL?)
         - benchmark to see if this doesn't introduce too much overhead
 - Consistency
     - More generic naming for predict etc to accommodate other sources for TPs

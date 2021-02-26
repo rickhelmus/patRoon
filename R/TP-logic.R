@@ -5,9 +5,15 @@ NULL
 
 # UNDONE: precursor --> parent?
 
-getTPLogicTransformations <- function()
+getTPLogicTransformations <- function(transformations)
 {
-    ret <- copy(patRoon:::TPsLogicReactions) # stored inside R/sysdata.rda
+    if (is.null(transformations))
+        ret <- patRoon:::TPsLogicReactions # stored inside R/sysdata.rda
+    
+    if (is.data.table(transformations))
+        ret <- copy(transformations)
+    else
+        ret <- as.data.table(transformations)
     
     ret[, deltaMZ := 0]
     ret[nzchar(add), deltaMZ := sapply(add, getFormulaMass)]
@@ -16,11 +22,12 @@ getTPLogicTransformations <- function()
     return(ret[])
 }
 
-doPredictTPsLogic <- function(fGroups, minMass, neutralMasses)
+doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
 {
     gInfo <- groupInfo(fGroups)
     suspects <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
-    transformations <- getTPLogicTransformations()
+    
+    transformations <- getTPLogicTransformations(transformations)
     
     prog <- openProgBar(0, nrow(suspects))
     
@@ -59,29 +66,41 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroup
 })
 
 #' @export
-setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL)
+setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
+    if (!is.null(transformations))
+    {
+        checkmate::assertDataFrame(transformations, col.names = "unique", add = ac)
+        checkmate::assertNames(colnames(transformations), permutation.of = c("reaction", "add", "sub", "RTDir"),
+                               what = "colnames", add = ac)
+    }
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
     neutralMasses <- groupInfo(fGroups)[, "mzs"] - sapply(fgAdd$grpAdducts, adductMZDelta)
     
-    res <- doPredictTPsLogic(fGroups, minMass, neutralMasses)
+    res <- doPredictTPsLogic(fGroups, minMass, neutralMasses, transformations)
     
     return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
 })
 
 #' @export
-setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40)
+setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
+    if (!is.null(transformations))
+    {
+        checkmate::assertDataFrame(transformations, col.names = "unique", add = ac)
+        checkmate::assertNames(colnames(transformations), permutation.of = c("reaction", "add", "sub", "RTDir"),
+                               what = "colnames", add = ac)
+    }
     checkmate::reportAssertions(ac)
     
-    res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"])
+    res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)
     
     return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
 })

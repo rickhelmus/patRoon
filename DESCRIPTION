@@ -160,7 +160,6 @@ Collate:
     'components-camera.R'
     'components-features.R'
     'components-cliquems.R'
-    'components-clust-set.R'
     'components-clust.R'
     'components-intclust.R'
     'components-nontarget.R'

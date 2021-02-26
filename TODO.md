@@ -189,7 +189,6 @@
     
 ## TPs
 - componentsTP
-    - allow input of new spectral similarity clustered components/predictions class
     - include precursor_formula in compInfo
     - include diff formula and reaction in components
     - argument order and defaults
@@ -200,11 +199,11 @@
 - metabolic logic
     - more logic reactions?
     - make configurable?
-    - use adduct annotations if present
 - predictTPsComponents
     - fix if empty cTab for MSMS components
     - doc that precursor should not occur in multiple components (is this relevant for users?)
     - caching
+    - remove? doesn't seem useful anymore
 - log2fc
     - mention Bas
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user

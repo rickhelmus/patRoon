@@ -6,4 +6,6 @@ adductsGF <- data.table::fread(system.file("data-raw", "adducts-genform.csv", pa
 # from http://ipb-halle.github.io/MetFrag/projects/metfragcl/ and Constants.java in MetFragLib
 adductsMF <- data.table::fread(system.file("data-raw", "adducts-metfrag.csv", package = "patRoon"))
 
-usethis::use_data(compScorings, adductsGF, adductsMF, internal = TRUE, overwrite = TRUE)
+TPsLogicReactions <- data.table::fread(system.file("data-raw", "TP-logic.csv", package = "patRoon"))
+
+usethis::use_data(compScorings, adductsGF, adductsMF, TPsLogicReactions, internal = TRUE, overwrite = TRUE)

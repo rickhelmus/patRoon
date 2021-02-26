@@ -199,6 +199,7 @@
 - metabolic logic
     - more logic reactions?
     - make configurable?
+    - cite 10.1021/acs.analchem.5b02905
 - predictTPsComponents
     - fix if empty cTab for MSMS components
     - doc that precursor should not occur in multiple components (is this relevant for users?)

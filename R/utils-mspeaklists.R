@@ -461,7 +461,7 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
 expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
 {
     nMissing <- length(groupName1) - nrow(sims)
-    if (length(nMissing) == 0) browser()
+    
     if (nMissing > 0)
     {
         # add missing rows

@@ -58,9 +58,7 @@ setGeneric("generateMSPeakLists", function(fGroups, algorithm, ...) standardGene
 setGeneric("generateMSPeakListsMzR", function(fGroups, ...) standardGeneric("generateMSPeakListsMzR"))
 setGeneric("generateMSPeakListsDA", function(fGroups, ...) standardGeneric("generateMSPeakListsDA"))
 setGeneric("generateMSPeakListsDAFMF", function(fGroups, ...) standardGeneric("generateMSPeakListsDAFMF"))
-setGeneric("spectrumSimilarity", function(obj, groupName1, groupName2,
-                                          analysis1 = NULL, analysis2 = NULL,
-                                          MSLevel = 1, ...) standardGeneric("spectrumSimilarity"))
+setGeneric("spectrumSimilarity", function(obj, ...) standardGeneric("spectrumSimilarity"))
 
 ### Components
 

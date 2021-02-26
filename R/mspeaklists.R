@@ -563,10 +563,10 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 #'   \code{\link{SpectrumSimilarity}}.
 
 #' @export
-setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1, analysis2, MSLevel, 
-                                                        method, shift = "none", removePrecursor = FALSE, mzWeight = 0,
-                                                        intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
-                                                        minPeaks = 0, drop = TRUE)
+setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1 = NULL, analysis2 = NULL,
+                                                        MSLevel = 1, method, shift = "none", removePrecursor = FALSE,
+                                                        mzWeight = 0, intWeight = 1, absMzDev = 0.005,
+                                                        relMinIntensity = 0.1, minPeaks = 0, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = FALSE,
@@ -593,10 +593,10 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     checkAndPrepAnaArg <- function(gn, ana, nr)
     {
         if (is.null(ana))
-            return(rep(list(NULL), length(gn)))
-        
-        if (!is.null(analysis1) && length(analysis1) != length(groupName1))
+            ana <- rep(list(NULL), length(gn))
+        else if (length(ana) != length(gn))
             stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
+        names(ana) <- gn
         return(ana)
     }
     
@@ -605,11 +605,6 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     
     specs1 <- pruneList(Map(getSpec, groupName1, analysis1, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
     specs2 <- pruneList(Map(getSpec, groupName2, analysis2, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
-    
-    specs1 <- pruneList(lapply(specs1, prepSpecSimilarityPL, removePrecursor = removePrecursor,
-                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
-    specs2 <- pruneList(lapply(specs2, prepSpecSimilarityPL, removePrecursor = removePrecursor,
-                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
     
     if (length(specs1) == 0 || length(specs2) == 0)
         return(NULL)
@@ -631,18 +626,24 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
             }
             return(if (length(ret) == 0) NA else ret)
         }
-
-        precs1 <- mapply(getPrecMZ, specs1, groupName1, analysis1)
-        precs2 <- mapply(getPrecMZ, specs2, groupName2, analysis2)
-        precs1NA <- names(which(is.na(prec1))); precs2NA <- names(which(is.na(prec2)))
-        if (length(precs1NA) != 0 || length(precs1NA) != 0)
+        
+        precs1 <- mapply(getPrecMZ, specs1, names(specs1), analysis1[names(specs1)])
+        precs2 <- mapply(getPrecMZ, specs2, names(specs2), analysis2[names(specs2)])
+        precs1NA <- names(which(is.na(precs1))); precs2NA <- names(which(is.na(precs2)))
+        if (length(precs1NA) != 0 || length(precs2NA) != 0)
             warning("Some pecursor ions are unknown, returning NAs")
         wh1 <- setdiff(names(precs1), precs1NA); wh2 <- setdiff(names(precs2), precs2NA)
         precs1 <- precs1[wh1]; specs1 <- specs1[wh1]
-        precs2 <- precs2[wh2]; specs2 <- specs1[wh2]
+        precs2 <- precs2[wh2]; specs2 <- specs2[wh2]
     }
 
-    sims <- specDistRect(specs1, specs2, method, shift, precs1, precs2, mzWeight, intWeight, absMzDev)
+    specs1 <- pruneList(lapply(specs1, prepSpecSimilarityPL, removePrecursor = removePrecursor,
+                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+    specs2 <- pruneList(lapply(specs2, prepSpecSimilarityPL, removePrecursor = removePrecursor,
+                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+    
+    sims <- specDistRect(specs1, specs2, method, shift, precs1[names(specs1)], precs2[names(specs2)], mzWeight,
+                         intWeight, absMzDev)
     rownames(sims) <- names(specs1); colnames(sims) <- names(specs2)
     
     sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)

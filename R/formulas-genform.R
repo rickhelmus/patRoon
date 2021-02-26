@@ -47,18 +47,9 @@ makeGenFormCmdQueue <- function(groupPeakLists, annTable, baseHash, MSMode, isol
 {
     gNames <- names(groupPeakLists)
     
-    if (!is.null(adduct))
-    {
-        grpAdducts <- rep(list(adduct), length(groupPeakLists))
-        grpAdductsChr <- rep(as.character(adduct, format = "genform"), length(groupPeakLists))
-    }
-    else
-    {
-        grpAdducts <- lapply(annTable$adduct, as.adduct)
-        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNames, "genform")
-    }
+    fgAdd <- getFGroupAdducts(gNames, annTable, adduct, "genform")
     
-    pruneList(mapply(gNames, grpAdducts, grpAdductsChr, FUN = function(grp, add, addChr)
+    pruneList(mapply(gNames, fgAdd$grpAdducts, fgAdd$grpAdductsChr, FUN = function(grp, add, addChr)
     {
         if (is.null(groupPeakLists[[grp]]) || is.null(groupPeakLists[[grp]][["MS"]]))
             return(NULL) # MS or MSMS spectrum probably filtered away

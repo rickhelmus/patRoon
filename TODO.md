@@ -198,7 +198,7 @@
     - do we still need to check for non-calculated formulae?
 - metabolic logic
     - more logic reactions?
-    - make configurable?
+    - assert types of custom reactions DF
     - cite 10.1021/acs.analchem.5b02905
 - predictTPsComponents
     - fix if empty cTab for MSMS components
@@ -230,6 +230,7 @@
     - consistency for spectrum/peaklist
     - suspects() --> parents()?
     - precursor diff: 1-2 or 2-1? --> verify all
+    - TP logic: reaction/transformation
 - misc
     - Make sure hash takes into account parent names
     - show method for new components classes

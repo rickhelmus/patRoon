@@ -223,7 +223,8 @@
     - remove OrgMassSpecR and proxy dependency
     - consistent defaults for minIntensity etc
     - remove merged approach, possibly find other ways to customize averaging
-    - use spectrumSimilarity() for componentsTPs
+        - min, max
+        - some kind of weighted average?
     - use spectrumSimilarity() for componentsSpecClust
         - needs way to calculate as matrix (eg groupName2=NULL?)
         - benchmark to see if this doesn't introduce too much overhead
@@ -232,7 +233,7 @@
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
     - suspects() --> parents()?
-    - precursor diff: 1-2 or 2-1? 
+    - precursor diff: 1-2 or 2-1? --> verify all
 - misc
     - Make sure hash takes into account parent names
     - show method for new components classes

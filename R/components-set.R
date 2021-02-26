@@ -29,41 +29,14 @@ setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..
     
     assertSets(x, sets, TRUE)
     if (!is.null(sets))
-        x@setObjects <- x@setObjects[sets]
-
-    if (!missing(i) || !missing(j))
     {
-        # NOTE: assume that subsetting with non-existing i/j will not result in errors
-        
-        args <- list()
-        if (!missing(j))
-            args <- c(args, list(j = assertSubsetArgAndToChr(j, groupNames(x))))
-        
-        if (!missing(i))
-        {
-            i <- assertSubsetArgAndToChr(i, names(x))
-            
-            # figure out corresponding sets and revert names of i to non-set names
-            isets <- componentInfo(x)[match(i, name)]$set
-            i <- mapply(i, isets, FUN = function(x, s) sub(paste0("-", s, "$"), "", x))
-            
-            unisets <- unique(isets)
-            x@setObjects <- Map(x@setObjects, names(x@setObjects), f = function(o, s)
-            {
-                if (s %in% unisets)
-                    do.call("[", args = c(list(x = o, i = i[isets == s]), args))
-                else
-                    o[FALSE] # not in i, remove all
-            })
-            
-        }
-        else
-            x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
+        x@setObjects <- x@setObjects[sets]
+        x <- syncComponentsSetObjects(x)
     }
     
-    if (!is.null(sets) || !missing(i) || !missing(j))
-        x <- syncComponentsSetObjects(x)
-    
+    if (!missing(i) || !missing(j))
+        x <- callNextMethod(x, i, j, ..., drop = drop)
+
     return(x)
 })
 

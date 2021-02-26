@@ -566,7 +566,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1 = NULL, analysis2 = NULL,
                                                         MSLevel = 1, method, shift = "none", removePrecursor = FALSE,
                                                         mzWeight = 0, intWeight = 1, absMzDev = 0.005,
-                                                        relMinIntensity = 0.1, minPeaks = 0, drop = TRUE)
+                                                        relMinIntensity = 0.1, minPeaks = 0, NAToZero = FALSE,
+                                                        drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
@@ -576,7 +577,7 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertChoice(method, c("cosine", "jaccard"), add = ac)
     checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    aapply(checkmate::assertFlag, . ~ removePrecursor + drop, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ removePrecursor + NAToZero + drop, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertCount(minPeaks, add = ac)
@@ -654,6 +655,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
         sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
     }
+    
+    if (NAToZero)
+        sims[is.na(sims)] <- 0
     
     return(if (drop && length(sims) == 1) drop(sims) else sims)
 })

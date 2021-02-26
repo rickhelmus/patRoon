@@ -225,8 +225,6 @@
     - remove merged approach, possibly find other ways to customize averaging
         - min, max
         - some kind of weighted average?
-    - use spectrumSimilarity() for componentsSpecClust
-        - benchmark to see if this doesn't introduce too much overhead
 - Consistency
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
@@ -245,6 +243,8 @@
     - minMSMSPeaks filter
     - FCParams/plotVolcano
     - update spectrumSimilarity()
+    - document that relative intensity filter for spec sim is applied after removing precursors
+
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
     - minMSMSPeaks filter

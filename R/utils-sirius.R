@@ -221,18 +221,9 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
     
     gNamesTBD <- unique(flPLMeta$group)
-    if (!is.null(adduct))
-    {
-        grpAdducts <- rep(list(adduct), length(gNamesTBD))
-        grpAdductsChr <- rep(as.character(adduct, format = "sirius"), length(gNamesTBD))
-    }
-    else
-    {
-        grpAdducts <- lapply(annotations(fGroups)[match(gNamesTBD, group)]$adduct, as.adduct)
-        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNamesTBD, "sirius")
-    }
-    names(grpAdducts) <- names(grpAdductsChr) <- gNamesTBD
-    flPLMeta[, c("adduct", "adductChr") := .(grpAdducts[group], grpAdductsChr[group])]
+    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
+    
+    flPLMeta[, c("adduct", "adductChr") := .(fgAdd$grpAdducts[group], fgAdd$grpAdductsChr[group])]
     
     flPLMeta[, hash := mapply(flattenedPLists, flPLMeta$adductChr, FUN = makeHash, MoreArgs = list(baseHash))]
     if (is.null(cachedSet))

@@ -76,6 +76,23 @@ makeAlgoAdducts <- function(adducts, gNames, format)
     return(ret)
 }
 
+getFGroupAdducts <- function(gNames, annTable, adduct, format)
+{
+    if (!is.null(adduct))
+        grpAdducts <- rep(list(adduct), length(gNames))
+    else
+        grpAdducts <- lapply(annTable$adduct, as.adduct)
+    
+    if (format != "generic")
+        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNames, format)
+    else
+        grpAdductsChr <- sapply(grpAdducts, as.character)
+    
+    names(grpAdducts) <- names(grpAdductsChr) <- gNames
+    
+    return(list(grpAdducts = grpAdducts, grpAdductsChr = grpAdductsChr))
+}
+
 # NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
 doAsAdduct <- memoise(function(x, format, isPositive, charge)
 {

@@ -285,18 +285,9 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     if (!is.null(extDB))
         baseHash <- makeHash(baseHash, extDB)
 
-    if (!is.null(adduct))
-    {
-        grpAdducts <- rep(list(adduct), length(fGroups))
-        grpAdductsChr <- rep(as.character(adduct, format = "metfrag"), length(fGroups))
-    }
-    else
-    {
-        grpAdducts <- lapply(annotations(fGroups)$adduct, as.adduct)
-        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNames, "metfrag")
-    }
-    
-    ret <- Map(gNames, grpAdducts, grpAdductsChr, f = function(grp, add, addChr)
+    fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "metfrag")
+
+    ret <- Map(gNames, fgAdd$grpAdducts, fgAdd$grpAdductsChr, f = function(grp, add, addChr)
     {
         if (!is.null(identifiers) && is.null(identifiers[[grp]]))
             return(NULL)

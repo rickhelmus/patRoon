@@ -220,7 +220,6 @@
             - or groupName can be vector? --> matrix plot?
             - or just 2 sized vector...
         - do this also for formulas/compounds?
-    - remove OrgMassSpecR and proxy dependency
     - consistent defaults for minIntensity etc
     - remove merged approach, possibly find other ways to customize averaging
         - min, max

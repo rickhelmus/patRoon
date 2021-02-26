@@ -5,93 +5,158 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-genTPSpecSimilarities <- function(...)
+genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
 {
-    getSim <- function(shift) drop(do.call(spectrumSimilarity, list(shift = shift, MSLevel = 2, drop = FALSE, ...)))
-
+    gn1 <- intersect(groupName1, groupNames(obj))
+    gn2 <- intersect(groupName2, groupNames(obj))
+    otherGN2 <- setdiff(groupName2, groupNames(obj))
+    
+    getSim <- function(shift)
+    {
+        if (length(gn1) == 0)
+            return(NA_real_)
+        
+        ret <- numeric()
+        if (length(gn2) > 0)
+        {
+            ret <- drop(do.call(spectrumSimilarity, list(obj, gn1, gn2, shift = shift, MSLevel = 2, drop = FALSE, ...)))
+            names(ret) <- gn2
+        }
+        if (length(otherGN2) > 0)
+        {
+            ret <- c(ret, setNames(rep(NA_real_, length(otherGN2)), otherGN2))
+            ret <- ret[groupName2]
+        }
+        
+        return(ret)
+    }
+    
     return(list(specSimilarity = getSim("none"), specSimilarityPrec = getSim("precursor"),
                 specSimilarityBoth = getSim("both")))
 }
 
-doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, specSimArgs)
+doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
+                               minSpecSimBoth, specSimArgs)
 {
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, specSimArgs)
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
+                     minSpecSimBoth, specSimArgs)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
     
-    # for every precursor:
-    #   - check for any matching fGroups (based on mass)
-    #   - if none, skip
-    #   - similarly, check which precursors are present (only mz)
-    #   - for any fGroup that matches the precursor:
-    #       - filter TPs (retention, intensity, ...)
-    
-    precFGMapping <- linkPrecursorsToFGroups(pred, fGroups)
-    TPFGMapping <- linkTPsToFGroups(pred, fGroupsTPs)
     gInfoPrec <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
     
     cat("Linking precursors and TPs ...\n")
-    precCount <- length(names(pred))
-    prog <- openProgBar(0, precCount)
     
-    compTab <- rbindlist(Map(names(pred), predictions(pred), seq_len(precCount), f = function(pname, preds, i)
+    prepareComponent <- function(cmp, precFG)
     {
-        precFGs <- precFGMapping[name == pname][["group"]]
-        TPs <- TPFGMapping[TP_name %in% preds$name]
+        # UNDONE: do more checks etc
         
-        if (length(precFGs) == 0 || nrow(TPs) == 0)
-            return(NULL)
+        # dummy intensity value so e.g. plotSpec works            
+        cmp[, intensity := 1]
         
-        # limit columns a bit to not bloat components too much
-        # UNDONE: column selection OK?
-        predCols <- c("name", "InChIKey", "formula", "mass", "RTDir",
-                      "reaction_add", "reaction_sub", "deltaMZ")
-        preds <- preds[, intersect(names(preds), predCols), with = FALSE]
+        cmp[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
+        cmp[, mzDiff := gInfoPrec[precFG, "mzs"] - mz]
         
-        comps <- rbindlist(sapply(precFGs, function(precFG)
+        if (minRTDiff > 0)
         {
-            # UNDONE: do more checks etc
-            
-            ret <- merge(TPs, preds, by.x = "TP_name", by.y = "name")
-            
-            # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
-            ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
-            ret <- unique(ret, by = "group")
-            
-            # dummy intensity value so e.g. plotSpec works            
-            ret[, intensity := 1]
-            
-            ret[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
-            ret[, mzDiff := gInfoPrec[precFG, "mzs"] - mz]
-            
-            if (minRTDiff > 0)
-            {
-                rtDiffs <- gInfoTPs[ret$group, "rts"] - gInfoPrec[precFG, "rts"]
-                ret <- ret[RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
-            }
-            
-            if (nrow(ret) > 0 && !is.null(MSPeakLists[[precFG]][["MSMS"]]))
-            {
-                sims <- do.call(genTPSpecSimilarities, c(list(MSPeakLists, precFG, ret$group), specSimArgs))
-                ret[, (names(sims)) := sims]
-            }
-            else
-                ret[, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth") := NA_real_]
-            
-            return(ret)
-        }, simplify = FALSE), idcol = "precursor_group")
+            rtDiffs <- gInfoTPs[cmp$group, "rts"] - gInfoPrec[precFG, "rts"]
+            cmp <- cmp[RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
+        }
         
-        setTxtProgressBar(prog, i)
+        if (nrow(cmp) > 0 && !is.null(MSPeakLists[[precFG]][["MSMS"]]))
+        {
+            sims <- do.call(genTPSpecSimilarities, c(list(MSPeakLists, precFG, cmp$group), specSimArgs))
+            cmp[, (names(sims)) := sims]
+            
+            checkSim <- function(x, thr) !is.na(x) & numGTE(x, thr)
+            cmp <- cmp[checkSim(specSimilarity, minSpecSim) & checkSim(specSimilarityPrec, minSpecSimPrec) &
+                           checkSim(specSimilarityBoth, minSpecSimBoth)]
+        }
+        else
+            cmp[, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth") := NA_real_]
         
-        return(comps)
-    }), idcol = "precursor_name")
+        return(cmp)
+    }
     
-    setTxtProgressBar(prog, precCount)
-    close(prog)
+    compTab <- NULL
+    if (is.null(pred))
+    {
+        # simply link each given parent with all given TPs, while relying on the filtering of prepareComponent() to get
+        # sensible components
+        
+        precCount <- length(fGroups)
+        prog <- openProgBar(0, precCount)
+        
+        compTab <- rbindlist(Map(names(fGroups), seq_len(precCount), f = function(grp, i)
+        {
+            grpsTPs <- setdiff(names(fGroupsTPs), names(fGroups))
+            
+            comp <- data.table(group = grpsTPs, RTDir = 0, precursor_group = grp)
+            comp <- prepareComponent(comp, grp)
+            
+            # NOTE: name afterwards as the component may have been filtered
+            comp[, TP_name := paste0(grp, "-TP", seq_len(nrow(comp)))]
+            
+            setTxtProgressBar(prog, i)
+            
+            return(comp)
+        }), idcol = "precursor_name")
+        
+        close(prog)
+    }
+    else
+    {
+        # for every precursor:
+        #   - check for any matching fGroups (based on mass)
+        #   - if none, skip
+        #   - similarly, check which precursors are present (only mz)
+        #   - for any fGroup that matches the precursor:
+        #       - filter TPs (retention, intensity, ...)
+        
+        precFGMapping <- linkPrecursorsToFGroups(pred, fGroups)
+        TPFGMapping <- linkTPsToFGroups(pred, fGroupsTPs)
+        
+        precCount <- length(names(pred))
+        prog <- openProgBar(0, precCount)
+        
+        compTab <- rbindlist(Map(names(pred), predictions(pred), seq_len(precCount), f = function(pname, preds, i)
+        {
+            precFGs <- precFGMapping[name == pname][["group"]]
+            TPs <- TPFGMapping[TP_name %in% preds$name]
+            
+            if (length(precFGs) == 0 || nrow(TPs) == 0)
+                comps <- NULL
+            else
+            {
+                # limit columns a bit to not bloat components too much
+                # UNDONE: column selection OK?
+                predCols <- c("name", "InChIKey", "formula", "mass", "RTDir",
+                              "reaction_add", "reaction_sub", "deltaMZ")
+                preds <- preds[, intersect(names(preds), predCols), with = FALSE]
+                
+                comps <- rbindlist(sapply(precFGs, function(precFG)
+                {
+                    ret <- merge(TPs, preds, by.x = "TP_name", by.y = "name")
+                    
+                    # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
+                    ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
+                    ret <- unique(ret, by = "group")
+                    
+                    return(prepareComponent(ret, precFG))
+                }, simplify = FALSE), idcol = "precursor_group")
+            }
+            
+            setTxtProgressBar(prog, i)
+            
+            return(comps)
+        }), idcol = "precursor_name")
+        
+        close(prog)
+    }
     
     if (nrow(compTab) > 0)
     {
@@ -229,8 +294,10 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, pred,
-                                                             MSPeakLists, minRTDiff = 20, simMethod,
-                                                             removePrecursor = FALSE, mzWeight = 0,
+                                                             MSPeakLists, minRTDiff = 20,
+                                                             minSpecSim = 0, minSpecSimPrec = 0,
+                                                             minSpecSimBoth = 0,
+                                                             simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                              intWeight = 1, absMzDev = 0.005,
                                                              relMinIntensity = 0.05, minSimMSMSPeaks = 0)
 {
@@ -240,19 +307,20 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroups", "TPPredictions", "MSPeakLists"), fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
-           lower = 0, finite = TRUE, fixed = list(add = ac))
+           c("featureGroups", "TPPredictions", "MSPeakLists"), null.ok = c(FALSE, TRUE, FALSE), fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
+               mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::assertCount(minSimMSMSPeaks, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (needsScreening(pred) &&
+    if (!is.null(pred) && needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
         stop("Input feature groups need to be screened for (TP) suspects!")
 
-    return(doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff,
+    return(doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
+                              minSpecSimBoth,
                               specSimArgs = list(method = simMethod, removePrecursor = removePrecursor,
                               mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
                               relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)))
@@ -261,21 +329,24 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, pred,
                                                                 MSPeakLists, minRTDiff = 20,
+                                                                minSpecSim = 0, minSpecSimPrec = 0,
+                                                                minSpecSimBoth = 0,
                                                                 simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                                 intWeight = 1, absMzDev = 0.005,
                                                                 relMinIntensity = 0.05, minSimMSMSPeaks = 0)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroupsSet", "TPPredictions", "MSPeakListsSet"), fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
-           lower = 0, finite = TRUE, fixed = list(add = ac))
+           c("featureGroupsSet", "TPPredictions", "MSPeakListsSet"), null.ok = c(FALSE, TRUE, FALSE),
+           fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
+               mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::assertCount(minSimMSMSPeaks, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (needsScreening(pred) &&
+    if (!is.null(pred) && needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
         stop("Input feature groups need to be screened for (TP) suspects!")
     
@@ -283,9 +354,11 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                         intWeight = intWeight, absMzDev = absMzDev, relMinIntensity = relMinIntensity,
                         minPeaks = minSimMSMSPeaks)
     
-    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, specSimArgs = specSimArgs)
+    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
+                              minSpecSimBoth, specSimArgs = specSimArgs)
     
     # UNDONE: more efficient method to get set specific fGroups?
+    # UNDONE: also filter separate similarities?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
     unsetMSPeakLists <- sapply(sets(MSPeakLists), unset, obj = MSPeakLists, simplify = FALSE)
     ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
@@ -300,8 +373,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
             grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
             if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[precFG]][["MSMS"]]))
             {
-                sims <- do.call(genTPSpecSimilarities, c(list(obj = unsetMSPeakLists[[s]], groupName1 = precFG,
-                                                              groupName2 = grpsInSet), specSimArgs))
+                sims <- do.call(genTPSpecSimilarities, c(list(unsetMSPeakLists[[s]], precFG, grpsInSet), specSimArgs))
                 cmp[match(grpsInSet, group), (simColNames) := sims]
             }
             else

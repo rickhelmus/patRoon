@@ -639,21 +639,33 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         # calculate dist matrix
         PLP <- getPLAndPrec(groupName1, analysis1, 1)
         if (is.null(PLP))
-            return(NULL)
-        sims <- specDistMatrix(PLP$specs, method, shift, PLP$precs, mzWeight, intWeight, absMzDev)
-        rownames(sims) <- colnames(sims) <- names(PLP$specs)
-        sims <- expandFillSpecSimilarities(sims, groupName1, groupName1)
+        {
+            sims <- matrix(NA_real_, length(groupName1), length(groupName1))
+            rownames(sims) <- colnames(sims) <- names(groupName1)
+        }
+        else
+        {
+            sims <- specDistMatrix(PLP$specs, method, shift, PLP$precs, mzWeight, intWeight, absMzDev)
+            rownames(sims) <- colnames(sims) <- names(PLP$specs)
+            sims <- expandFillSpecSimilarities(sims, groupName1, groupName1)
+        }
     }
     else
     {
         PLP1 <- getPLAndPrec(groupName1, analysis1, 1)
         PLP2 <- getPLAndPrec(groupName2, analysis2, 2)
         if (is.null(PLP1) || is.null(PLP2))
-            return(NULL)
-        sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight,
-                             absMzDev)
-        rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
-        sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
+        {
+            sims <- matrix(NA_real_, length(groupName1), length(groupName2))
+            rownames(sims) <- names(groupName1); colnames(sims) <- names(groupName2)
+        }
+        else
+        {
+            sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight,
+                                 absMzDev)
+            rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
+            sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
+        }
     }
     
     if (NAToZero)

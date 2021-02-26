@@ -219,8 +219,9 @@
         - allow optional groupName2/analysis2
             - or groupName can be vector? --> matrix plot?
             - or just 2 sized vector...
+        - mark overlapping peaks? needs all the similarity params to do binning though...
         - do this also for formulas/compounds?
-    - consistent defaults for minIntensity etc
+    - consistent and proper defaults for minIntensity etc
     - remove merged approach, possibly find other ways to customize averaging
         - min, max
         - some kind of weighted average?

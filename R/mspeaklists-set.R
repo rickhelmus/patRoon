@@ -204,7 +204,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
 setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2, ..., drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = FALSE,
+    aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
            fixed = list(choices = groupNames(obj), add = ac))
     checkmate::assertFlag(drop, add = ac)
     checkmate::reportAssertions(ac)
@@ -212,12 +212,12 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
     sims <- pruneList(lapply(setObjects(obj), function(so)
     {
         gn1 <- intersect(groupName1, groupNames(so))
-        gn2 <- intersect(groupName2, groupNames(so))
-        if (length(gn1) == 0 || length(gn2) == 0)
+        gn2 <- if (is.null(groupName2)) NULL else intersect(groupName2, groupNames(so))
+        if (length(gn1) == 0 || (!is.null(groupName2) && length(gn2) == 0))
             return(NULL)
         
         ret <- spectrumSimilarity(so, gn1, gn2, ..., drop = FALSE)
-        return(expandFillSpecSimilarities(ret, groupName1, groupName2))
+        return(expandFillSpecSimilarities(ret, groupName1, if (is.null(groupName2)) groupName1 else groupName2))
     }))
 
     if (length(sims) == 0)
@@ -231,8 +231,8 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
         simsNONA <- lapply(sims, function(s) { s[is.na(s)] <- 0; return(s) })
         noNACounts <- lapply(sims, function(s) matrix(!is.na(s), nrow(s), ncol(s)))
         noNACounts <- Reduce("+", noNACounts)
-        
         sims <- Reduce("+", simsNONA) / noNACounts
+        sims[is.nan(sims)] <- NA # may be introduced for noNACounts==0
     }
     else
         sims <- sims[[1]]

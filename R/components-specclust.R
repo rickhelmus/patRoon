@@ -12,8 +12,6 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                                                    maxTreeHeight = 1, deepSplit = TRUE,
                                                                    minModuleSize = 1)
 {
-    # UNDONE: document that relative intensity filter is applied after removing precursors
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(method, add = ac)
@@ -31,43 +29,25 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                    properties = list(), maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                    minModuleSize = minModuleSize, algorithm = "specclust"))
 
-    MSPeakLists <- MSPeakLists[, intersect(groupNames(MSPeakLists), groupNames(fGroups))]
-    allMSMS <- pruneList(sapply(averagedPeakLists(MSPeakLists), "[[", "MSMS", simplify = FALSE))
+    gNames <- names(fGroups)
     
-    if (removePrecursor || relMinIntensity > 0)
-    {
-        allMSMS <- pruneList(lapply(allMSMS, function(pl)
-        {
-            if (removePrecursor)
-                pl <- pl[precursor == FALSE]
-            if (relMinIntensity > 0 && nrow(pl) > 0)
-            {
-                thr <- relMinIntensity * max(pl$intensity)
-                pl <- pl[intensity >= thr]
-            }
-            return(pl)
-        }), checkZeroRows = TRUE)
-    }
-    
-    if (minSimMSMSPeaks > 0)
-        allMSMS <- allMSMS[sapply(allMSMS, nrow) >= minSimMSMSPeaks]
-    
-    gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
-    
-    precMZs <- gInfo[names(allMSMS), "mzs"]
     cat("Calculating distance matrix... ")
+    sims <- spectrumSimilarity(MSPeakLists, gNames, NULL, MSLevel = 2, method = simMethod,
+                               shift = shift, removePrecursor = removePrecursor,
+                               mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
+                               relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks,
+                               NAToZero = TRUE, drop = FALSE)
     
-    if (F)
-    {
-        # UNDONE: parameters for spec similarity
-        distm <- 1 - proxy::simil(allMSMS, method = function(x, y) specSimilarityR(x, y, simMethod, shift, FALSE, mzWeight,
-                                                                                   intWeight, absMzDev, 0))
-        class(distm) <- "dist" # has both simul and dist, which confuses S4 validity checks
-    }
-    else
-        distm <- 1 - as.dist(specDistMatrix(allMSMS, simMethod, shift, precMZs, mzWeight, intWeight, absMzDev))
+    # figure out fGroups with results: these must have non-zero columns (or rows), since there must be at least a 1.0
+    # similarity with itself.
+    grpsResults <- gNames[colSums(sims) > 0]
+    sims <- sims[grpsResults, grpsResults]
+    
+    distm <- 1 - as.dist(sims)
     cat("Done!\n")
     
+    gInfo <- groupInfo(fGroups)[grpsResults, ]
+
     return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
                                properties = list(simMethod = simMethod, shift = shift,
                                                  removePrecursor = removePrecursor,
@@ -75,16 +55,4 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                                  absMzDev = absMzDev),
                                maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                minModuleSize = minModuleSize, algorithm = "specclust"))
-})
-
-componentsSpecClustSet <- setClass("componentsSpecClustSet", contains = "componentsClustSet")
-
-#' @export
-setMethod("generateComponentsSpecClust", "featureGroupsSet", function(fGroups, MSPeakLists, ...)
-{
-    msplArgs <- assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
-    cset <- generateComponentsSet(fGroups, generateComponentsSpecClust, setIonization = FALSE, ...,
-                                  setArgs = msplArgs)
-    return(componentsSpecClustSet(setObjects = setObjects(cset), components = componentTable(cset),
-                                  componentInfo = componentInfo(cset), algorithm = "specclust-set"))
 })

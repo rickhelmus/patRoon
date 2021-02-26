@@ -192,7 +192,7 @@
     - allow input of new spectral similarity clustered components/predictions class
     - include precursor_formula in compInfo
     - include diff formula and reaction in components
-    - spec sim filter
+    - argument order and defaults
 - predictTPsBioTransformer()
     - filter on stability/persistence/toxicity of TP?
     - Include BT in installation script and verifyDependencies()
@@ -205,7 +205,6 @@
     - fix if empty cTab for MSMS components
     - doc that precursor should not occur in multiple components (is this relevant for users?)
     - caching
-- new componentization method which links all parent fGroups with TP fGroups based on min spec similarity
 - log2fc
     - mention Bas
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user

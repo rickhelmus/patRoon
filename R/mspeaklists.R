@@ -569,7 +569,7 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
                                                         relMinIntensity = 0.1, minPeaks = 0, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = FALSE,
+    aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
            fixed = list(choices = groupNames(obj), add = ac))
     aapply(checkmate::assertSubset, . ~ analysis1 + analysis2, empty.ok = TRUE,
            fixed = list(choices = analyses(obj), add = ac))
@@ -633,15 +633,27 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         return(list(specs = specs, precs = precs))
     }
     
-    PLP1 <- getPLAndPrec(groupName1, analysis1, 1)
-    PLP2 <- getPLAndPrec(groupName2, analysis2, 2)
-    
-    if (is.null(PLP1) || is.null(PLP2))
-        return(NULL)
-    
-    sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight, absMzDev)
-    rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
-    sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
+    if (is.null(groupName2))
+    {
+        # calculate dist matrix
+        PLP <- getPLAndPrec(groupName1, analysis1, 1)
+        if (is.null(PLP))
+            return(NULL)
+        sims <- specDistMatrix(PLP$specs, method, shift, PLP$precs, mzWeight, intWeight, absMzDev)
+        rownames(sims) <- colnames(sims) <- names(PLP$specs)
+        sims <- expandFillSpecSimilarities(sims, groupName1, groupName1)
+    }
+    else
+    {
+        PLP1 <- getPLAndPrec(groupName1, analysis1, 1)
+        PLP2 <- getPLAndPrec(groupName2, analysis2, 2)
+        if (is.null(PLP1) || is.null(PLP2))
+            return(NULL)
+        sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight,
+                             absMzDev)
+        rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
+        sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
+    }
     
     return(if (drop && length(sims) == 1) drop(sims) else sims)
 })

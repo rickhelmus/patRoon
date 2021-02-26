@@ -37,22 +37,17 @@ getTPLogicTransformations <- function()
     return(ret[])
 }
 
-doPredictTPsLogic <- function(fGroups, minMass, adduct)
+doPredictTPsLogic <- function(fGroups, minMass, neutralMasses)
 {
-    if (!is.null(adduct))
-        adductMZ <- adductMZDelta(adduct)
-    
     gInfo <- groupInfo(fGroups)
-    neutralMasses <- if (!is.null(adduct)) gInfo$mzs - adductMZ else gInfo$mzs
-    suspects <- data.table(name = rownames(gInfo), rt = gInfo$rts, neutralMass = neutralMasses)
+    suspects <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
     transformations <- getTPLogicTransformations()
     
     prog <- openProgBar(0, nrow(suspects))
     
     predictions <- lapply(seq_len(nrow(suspects)), function(si)
     {
-        ret <- data.table(name = paste0(suspects$name[si], "-",
-                                        transformations$reaction),
+        ret <- data.table(name = paste0(suspects$name[si], "-", transformations$reaction),
                           neutralMass = neutralMasses[si] + transformations$deltaMZ,
                           deltaMZ = transformations$deltaMZ,
                           reaction_add = transformations$add,
@@ -85,15 +80,17 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroup
 })
 
 #' @export
-setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct)
+setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    adduct <- checkAndToAdduct(adduct)
+    adduct <- checkAndToAdduct(adduct, fGroups)
+    fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
+    neutralMasses <- groupInfo(fGroups)[, "mzs"] - sapply(fgAdd$grpAdducts, adductMZDelta)
     
-    res <- doPredictTPsLogic(fGroups, minMass, adduct)
+    res <- doPredictTPsLogic(fGroups, minMass, neutralMasses)
     
     return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
 })
@@ -105,7 +102,7 @@ setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40)
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    res <- doPredictTPsLogic(fGroups, minMass, NULL)
+    res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"])
     
     return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
 })

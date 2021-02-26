@@ -47,8 +47,9 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
-    adduct <- checkAndToAdduct(adduct)
-
+    adduct <- checkAndToAdduct(adduct, fGroups)
+    fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
+    
     DA <- getDAApplication()
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
@@ -171,7 +172,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
                                 next
 
                             form <- simplifyDAFormula(parent[["SumFormula"]])
-                            nform <- calculateNeutralFormula(form, adduct)
+                            nform <- calculateNeutralFormula(form, fgAdd$grpAdducts[grp])
 
                             dt <- data.table(neutral_formula = nform, formula = form, formula_mz = parent[["m_over_z"]],
                                              error = parent[["Error"]], mSigma = parent[["Sigma"]] * 1000,

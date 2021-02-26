@@ -585,67 +585,62 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     if (length(obj) == 0)
         return(NULL)
     
-    if (!is.null(analysis1) && length(analysis1) != length(groupName1))
-        stop("Length of analysis1 must equal the length of groupName1")
-    if (!is.null(analysis2) && length(analysis2) != length(groupName1))
-        stop("Length of analysis2 must equal the length of groupName2")
+    # get precursor ions: if MSLevel==2 try MSLevel==1 as fallback
+    getPrecMZ <- function(spec, gn, ana)
+    {
+        ret <- spec[precursor == TRUE]$mz
+        if (length(ret) == 0)
+        {
+            if (MSLevel == 2)
+            {
+                precSpec <- getSpec(obj, gn, 1, ana)
+                ret <- precSpec[precursor == TRUE]$mz
+            }
+        }
+        return(if (length(ret) == 0) NA else ret)
+    }
     
-    checkAndPrepAnaArg <- function(gn, ana, nr)
+    getPLAndPrec <- function(gn, ana, nr)
     {
         if (is.null(ana))
             ana <- rep(list(NULL), length(gn))
         else if (length(ana) != length(gn))
             stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
         names(ana) <- gn
-        return(ana)
+        
+        specs <- pruneList(Map(getSpec, gn, ana, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
+        if (length(specs) == 0)
+            return(NULL)
+        
+        ana <- ana[names(specs)]
+        
+        precs <- NULL
+        if (shift != "none")
+        {
+            precs <- mapply(getPrecMZ, specs, names(specs), ana)
+            precsNA <- names(which(is.na(precs)))
+            if (length(precsNA) != 0)
+                warning("Some pecursor ions are unknown, returning NAs")
+            wh <- setdiff(names(precs), precsNA)
+            precs <- precs[wh]; specs <- specs[wh]
+        }
+        else
+            precs <- setNames(rep(0, length(specs)), names(specs))
+        
+        specs <- pruneList(lapply(specs, prepSpecSimilarityPL, removePrecursor = removePrecursor,
+                                  relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+        
+        return(list(specs = specs, precs = precs))
     }
     
-    analysis1 <- checkAndPrepAnaArg(groupName1, analysis1, 1)
-    analysis2 <- checkAndPrepAnaArg(groupName2, analysis2, 2)
+    PLP1 <- getPLAndPrec(groupName1, analysis1, 1)
+    PLP2 <- getPLAndPrec(groupName2, analysis2, 2)
     
-    specs1 <- pruneList(Map(getSpec, groupName1, analysis1, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
-    specs2 <- pruneList(Map(getSpec, groupName2, analysis2, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
-    
-    if (length(specs1) == 0 || length(specs2) == 0)
+    if (is.null(PLP1) || is.null(PLP2))
         return(NULL)
     
-    precs1 <- precs2 <- 0
-    if (shift != "none")
-    {
-        # get precursor ions: if MSLevel==2 try MSLevel==1 as fallback
-        getPrecMZ <- function(spec, gn, ana)
-        {
-            ret <- spec[precursor == TRUE]$mz
-            if (length(ret) == 0)
-            {
-                if (MSLevel == 2)
-                {
-                    precSpec <- getSpec(obj, gn, 1, ana)
-                    ret <- precSpec[precursor == TRUE]$mz
-                }
-            }
-            return(if (length(ret) == 0) NA else ret)
-        }
-        
-        precs1 <- mapply(getPrecMZ, specs1, names(specs1), analysis1[names(specs1)])
-        precs2 <- mapply(getPrecMZ, specs2, names(specs2), analysis2[names(specs2)])
-        precs1NA <- names(which(is.na(precs1))); precs2NA <- names(which(is.na(precs2)))
-        if (length(precs1NA) != 0 || length(precs2NA) != 0)
-            warning("Some pecursor ions are unknown, returning NAs")
-        wh1 <- setdiff(names(precs1), precs1NA); wh2 <- setdiff(names(precs2), precs2NA)
-        precs1 <- precs1[wh1]; specs1 <- specs1[wh1]
-        precs2 <- precs2[wh2]; specs2 <- specs2[wh2]
-    }
-
-    specs1 <- pruneList(lapply(specs1, prepSpecSimilarityPL, removePrecursor = removePrecursor,
-                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
-    specs2 <- pruneList(lapply(specs2, prepSpecSimilarityPL, removePrecursor = removePrecursor,
-                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
-    
-    sims <- specDistRect(specs1, specs2, method, shift, precs1[names(specs1)], precs2[names(specs2)], mzWeight,
-                         intWeight, absMzDev)
-    rownames(sims) <- names(specs1); colnames(sims) <- names(specs2)
-    
+    sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight, absMzDev)
+    rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
     sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
     
     return(if (drop && length(sims) == 1) drop(sims) else sims)

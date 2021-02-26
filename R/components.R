@@ -107,12 +107,13 @@ setMethod("show", "components", function(object)
     printf("Components: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), length(object))
 
     if (length(object@components) == 0)
-        gCounts <- 0
+        rowCounts <- 0
     else
-        gCounts <- sapply(object@components, nrow)
+        rowCounts <- sapply(object@components, nrow)
 
-    printf("Number of feature groups in components: %d (total), %.1f (mean), %d - %d (min - max)\n",
-           sum(gCounts), mean(gCounts), min(gCounts), max(gCounts))
+    printf("Number of unique feature groups in this object: %d\n", length(groupNames(object)))
+    printf("Size of components: %d (total), %.1f (mean), %d - %d (min - max)\n", sum(rowCounts), mean(rowCounts),
+           min(rowCounts), max(rowCounts))
 })
 
 #' @describeIn components Subset on components/feature groups.

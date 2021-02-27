@@ -293,7 +293,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (!is.null(cd))
         return(cd)
     
-    IDLevelRules <- yaml::yaml.load_file(IDFile, eval.expr = FALSE)
+    IDLevelRules <- readYAML(IDFileE)
     
     if (!checkmate::test_named(IDLevelRules))
         stop("No valid rules could be loaded")
@@ -732,7 +732,7 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
         file.copy(defFile, out, overwrite = TRUE)
     else
     {
-        rules <- yaml::yaml.load_file(defFile)
+        rules <- readYAML(defFile)
         if (!is.null(inLevels))
             rules <- rules[grepl(inLevels, names(rules))]
         if (!is.null(exLevels))

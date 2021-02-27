@@ -263,7 +263,8 @@ runCheckUI <- function(UIInterface)
             rValues$currentPrimSel <- new
             
             # update secondary selection if needed
-            if (!setequal(rValues$removePartially[[old]], rValues$removePartially[[new]]))
+            rpo <- rValues$removePartially[[old]]; rpn <- rValues$removePartially[[new]]
+            if (is.null(rpo) != is.null(rpn) || (!is.null(rpo) && !setequal(rpo, rpn)))
                 rValues$triggerSecondaryHotUpdate <- rValues$triggerSecondaryHotUpdate + 1
         }
         
@@ -437,8 +438,7 @@ runCheckUI <- function(UIInterface)
         })
         
         observeEvent(input$resetAllSecondary, {
-            rValues$removePartially <- setNames(replicate(length(UIInterface$primarySelections), character(),
-                                                          simplify = FALSE), UIInterface$primarySelections)
+            rValues$removePartially <- list()
             rValues$triggerSecondaryHotUpdate <- rValues$triggerSecondaryHotUpdate + 1
             setSessionChanged(TRUE)
         })
@@ -451,13 +451,13 @@ runCheckUI <- function(UIInterface)
                 oldsel <- rValues$removePartially[[rValues$currentPrimSel]]
                 rValues$removePartially[[rValues$currentPrimSel]] <-
                     UIInterface$getSecondarySelections(rValues$currentPrimSel)[!tbl$keep]
-                if (!setequal(oldsel, rValues$removePartially[[rValues$currentPrimSel]]))
+                if (is.null(oldsel) || !setequal(oldsel, rValues$removePartially[[rValues$currentPrimSel]]))
                     setSessionChanged(TRUE)
             }
         })
         
         observeEvent(input$enableAllSecondary, {
-            rValues$removePartially[[rValues$currentPrimSel]] <- character()
+            rValues$removePartially[[rValues$currentPrimSel]] <- NULL
             rValues$triggerSecondaryHotUpdate <- rValues$triggerSecondaryHotUpdate + 1
             setSessionChanged(TRUE)
         })
@@ -551,8 +551,9 @@ runCheckUI <- function(UIInterface)
             rValues$triggerSecondaryHotUpdate
             
             tabData <- secondaryTable()
-            isolate(tabData[, keep := !UIInterface$getSecondarySelections(rValues$currentPrimSel) %in%
-                                rValues$removePartially[[rValues$currentPrimSel]]])
+            isolate(rp <- rValues$removePartially[[rValues$currentPrimSel]])
+            isolate(tabData[, keep := is.null(rp) |
+                                !UIInterface$getSecondarySelections(rValues$currentPrimSel) %in% rp])
             setcolorder(tabData, c(names(tabData)[1], "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,

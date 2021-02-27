@@ -86,7 +86,8 @@ checkComponentsInterface$methods(
     
     plotMain = function(input, rValues)
     {
-        cmp <- delete(components, j = rValues$removePartially[[rValues$currentPrimSel]])
+        rp <- rValues$removePartially[[rValues$currentPrimSel]]
+        cmp <- if (!is.null(rp)) delete(components, j = rp) else components
         
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
             if ("plotSpec" %in% input$plotSpec)
@@ -171,11 +172,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     if (file.exists(sessionPath))
         curSession <- readRDS(sessionPath)
     else
-    {
-        curSession <- list(removeFully = character(),
-                           removePartially = setNames(replicate(length(components), character(), simplify = FALSE),
-                                                      cmpNames))
-    }
+        curSession <- list(removeFully = character(), removePartially = list())
     
     int <- checkComponentsInterface$new(components = components, fGroups = fGroups, EICs = EICs,
                                         primarySelections = cmpNames, curSession = curSession,

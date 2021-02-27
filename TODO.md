@@ -72,6 +72,8 @@
         - test session import
         - change column names for both tables?
         - update filter
+        - does it work with componentsNT (duplicate fGroups)? same for delete()
+            - doc limitation
 - misc
     - handle errors when object has <=1 set
         - groupFeaturesScreening()
@@ -270,11 +272,16 @@
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - Check: units of plotChord() rt/mz graphs seems off
-- checkFeatures()
+- checkUI
     - filter negate: don't remove kept fGroups if features were changed?
-    - update filter for delete()
+    - update filters for delete()
     - yml file format
         - include feature properties to allow file import with different group names?
+        - finish asserts (only warn for missing analyses/fGroups/components?)
+        - actually save yml files instead of Rds
+        - save file type in yml
+        - default session filename
+    - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters

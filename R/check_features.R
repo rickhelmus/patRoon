@@ -79,6 +79,12 @@ checkFeaturesInterface$methods(
     },
     UISettingsFileName = function() "check_features.yml",
     
+    getSecondarySelections = function(primSel)
+    {
+        fti <- groupFeatIndex(fGroups)[[primSel]]
+        return(analyses(fGroups)[fti != 0])
+    },
+    
     initReactiveValues = function(rValues)
     {
         rValues$fGroupPlotMode <- "topMost"
@@ -228,7 +234,8 @@ checkFeaturesInterface$methods(
         
         fg <- fGroups[, rValues$currentPrimSel]
         if (rValues$fGroupPlotMode == "all") # UNDONE: also for rGroups top most somehow?
-            fg <- fg[rValues$secondarySelections[[rValues$currentPrimSel]]]
+            fg <- fg[setdiff(getSecondarySelections(rValues$currentPrimSel),
+                             rValues$removePartially[[rValues$currentPrimSel]])]
         
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
             plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
@@ -333,9 +340,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         curSession <- readRDS(sessionPath)
     else
     {
-        ef <- data.frame(name = analyses(fGroups))
-        ef[, gNames] <- TRUE
-        curSession <- list(primarySelections = gNames, secondarySelections = ef)
+        curSession <- list(removeFully = character(),
+                           removePartially = setNames(replicate(length(gNames), character(), simplify = FALSE), gNames))
     }
     
     int <- checkFeaturesInterface$new(fGroups = fGroups, EICsTopMost = EICsTopMost,
@@ -379,7 +385,7 @@ getMCTrainData <- function(fGroups, session)
     session <- readRDS(getCheckFeaturesSessionPath(session))
     ret <- convertQualitiesToMCData(fGroups)
     gNames <- names(fGroups)
-    ret[, Class := fifelse(gNames[EICNo] %in% session$primarySelections, "GOOD", "BAD")]
+    ret[, Class := fifelse(gNames[EICNo] %chin% session$removeFully, "BAD", "GOOD")]
     
     return(as.data.frame(ret))
 }
@@ -408,11 +414,10 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
     preds <- MetaClean::getPredicitons(model = model, testData = testd, eicColumn = "EICNo")
     
     gNames <- names(fGroups)
-    ef <- data.frame(analysis = analyses(fGroups))
-    ef[, gNames] <- TRUE
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
-    saveRDS(list(primarySelections = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
-                 secondarySelections = ef, version = 1), path)
+    saveRDS(list(removeFully = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
+                 removePartially = setNames(replicate(length(gNames), character(), simplify = FALSE), gNames),
+                 version = 1), path)
     
     invisible(NULL)
 }

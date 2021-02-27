@@ -40,6 +40,8 @@ checkComponentsInterface$methods(
     },
     UISettingsFileName = function() "check_components.yml",
     
+    getSecondarySelections = function(primSel) components[[primSel]]$group,
+
     settingsChangedExpression = function(input)
     {
         input$retUnit
@@ -84,8 +86,7 @@ checkComponentsInterface$methods(
     
     plotMain = function(input, rValues)
     {
-        enFGroups <- rValues$secondarySelections$name[rValues$secondarySelections[[rValues$currentPrimSel]]]
-        cmp <- components[, enFGroups]
+        cmp <- delete(components, j = rValues$removePartially[[rValues$currentPrimSel]])
         
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
             if ("plotSpec" %in% input$plotSpec)
@@ -171,9 +172,9 @@ setMethod("checkComponents", "components", function(components, fGroups, session
         curSession <- readRDS(sessionPath)
     else
     {
-        eg <- data.frame(name = names(fGroups))
-        eg[, cmpNames] <- TRUE
-        curSession <- list(primarySelections = cmpNames, secondarySelections = eg)
+        curSession <- list(removeFully = character(),
+                           removePartially = setNames(replicate(length(components), character(), simplify = FALSE),
+                                                      cmpNames))
     }
     
     int <- checkComponentsInterface$new(components = components, fGroups = fGroups, EICs = EICs,

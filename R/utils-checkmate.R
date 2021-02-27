@@ -382,7 +382,7 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
 
 assertCheckSession <- function(x, what, primSels, secSels, primName, secName, importName, mustExist, canClearSession,
                                didClearSession, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
-{
+{return(NULL) # UNDONE
     if (null.ok && is.null(x))
         return(NULL)
     

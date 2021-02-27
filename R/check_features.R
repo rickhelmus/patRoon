@@ -310,8 +310,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     checkmate::assertFlag(clearSession)
     
     ac <- checkmate::makeAssertCollection()
-    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, canClearSession = TRUE,
-                               didClearSession = clearSession, add = ac)
+    assertCheckSession(session, mustExist = FALSE, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -378,8 +377,7 @@ getMCTrainData <- function(fGroups, session)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups")
-    assertCheckFeaturesSession(session, fGroups, mustExist = TRUE, canClearSession = FALSE, didClearSession = FALSE,
-                               null.ok = FALSE, add = ac)
+    assertCheckSession(session, mustExist = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     session <- readRDS(getCheckFeaturesSessionPath(session))

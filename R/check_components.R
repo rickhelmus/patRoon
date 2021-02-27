@@ -48,7 +48,7 @@ checkComponentsInterface$methods(
         extraComps <- !all(curSession$removeFully %in% cNames) ||
             (length(curSession$removePartially) > 0 && !all(names(curSession$removePartially) %in% cNames))
         allSessionFGroups <- unlist(curSession$removePartially)
-        extraFGroups <- length(allSessionAnas) > 0 && !all(allSessionFGroups %in% groupNames(components))
+        extraFGroups <- length(allSessionFGroups) > 0 && !all(allSessionFGroups %in% groupNames(components))
         
         if (extraComps || extraFGroups)
         {
@@ -131,6 +131,14 @@ checkComponentsInterface$methods(
                 close.screen(scr)
             }
         })
+    },
+    
+    saveSession = function(s)
+    {
+        sessionGrps <- character()
+        if (length(s$removePartially) > 0)
+            sessionGrps <- unlist(s$removePartially)
+        saveCheckSession(s, session, fGroups[, sessionGrps])
     }
 )
 
@@ -178,11 +186,8 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    sessionPath <- getCheckSessionPath(session, "components")
-    checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
-
-    if (clearSession && file.exists(sessionPath))
-        file.remove(sessionPath)
+    if (clearSession && file.exists(session))
+        file.remove(session)
     
     fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
     
@@ -192,13 +197,13 @@ setMethod("checkComponents", "components", function(components, fGroups, session
                               topMostByRGroup = FALSE, onlyPresent = TRUE)
     
     curSession <- NULL
-    if (file.exists(sessionPath))
-        curSession <- readRDS(sessionPath)
+    if (file.exists(session))
+        curSession <- readCheckSession(session)
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
     int <- checkComponentsInterface$new(components = components, fGroups = fGroups, EICs = EICs,
                                         primarySelections = cmpNames, curSession = curSession,
-                                        sessionPath = sessionPath)
+                                        session = session)
     return(runCheckUI(int))
 })

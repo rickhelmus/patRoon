@@ -2,7 +2,7 @@
 
 checkUIInterface <- setRefClass("checkUIInterface", contains = "VIRTUAL",
                                 fields = list(primarySelections = "character", curSession = "list",
-                                              sessionPath = "character"))
+                                              session = "character"))
 
 checkUIInterface$methods(
 
@@ -31,7 +31,9 @@ checkUIInterface$methods(
     
     doObserveEvents = function(input, rValues) NULL,
     
-    plotMain = function(input, rValues) stop("VIRTUAL")
+    plotMain = function(input, rValues) stop("VIRTUAL"),
+    
+    saveSession = function(s) stop("VIRTUAL")
 )
 
 getUISettingsPath <- function(fileName)
@@ -66,6 +68,20 @@ getCheckSessionPath <- function(session, what)
     outp <- file.path("sessions", what)
     mkdirp(outp)
     return(file.path(outp, paste0(session, ".Rds")))
+}
+
+readCheckSession <- function(session) readYAML(session)
+
+saveCheckSession <- function(session, path, fGroups)
+{
+    session$version <- 1
+    
+    gInfo <- groupInfo(fGroups)
+    session$featureGroups <- sapply(names(fGroups),
+                                    function(grp) list(ret = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"]),
+                                    simplify = FALSE)
+    
+    yaml::write_yaml(session, path)
 }
 
 importCheckUISession <- function(pathIn, pathOut, primaryName, secondaryName,
@@ -344,9 +360,7 @@ runCheckUI <- function(UIInterface)
         })
         
         observeEvent(input$saveSession, {
-            saveRDS(list(removeFully = rValues$removeFully,
-                         removePartially = rValues$removePartially,
-                         version = 1), UIInterface$sessionPath)
+            UIInterface$saveSession(list(removeFully = rValues$removeFully, removePartially = rValues$removePartially))
             setSessionChanged(FALSE)
         })
         

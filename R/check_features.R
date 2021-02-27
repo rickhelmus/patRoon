@@ -234,8 +234,11 @@ checkFeaturesInterface$methods(
         
         fg <- fGroups[, rValues$currentPrimSel]
         if (rValues$fGroupPlotMode == "all") # UNDONE: also for rGroups top most somehow?
-            fg <- fg[setdiff(getSecondarySelections(rValues$currentPrimSel),
-                             rValues$removePartially[[rValues$currentPrimSel]])]
+        {
+            rp <- rValues$removePartially[[rValues$currentPrimSel]]
+            if (!is.null(rp))
+                fg <- fg[setdiff(getSecondarySelections(rValues$currentPrimSel), rp)]
+        }
         
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
             plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
@@ -339,10 +342,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     if (file.exists(sessionPath))
         curSession <- readRDS(sessionPath)
     else
-    {
-        curSession <- list(removeFully = character(),
-                           removePartially = setNames(replicate(length(gNames), character(), simplify = FALSE), gNames))
-    }
+        curSession <- list(removeFully = character(), removePartially = list())
     
     int <- checkFeaturesInterface$new(fGroups = fGroups, EICsTopMost = EICsTopMost,
                                       EICsTopMostRG = EICsTopMostRG, EICsAll = EICsAll,
@@ -416,8 +416,7 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
     gNames <- names(fGroups)
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
     saveRDS(list(removeFully = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
-                 removePartially = setNames(replicate(length(gNames), character(), simplify = FALSE), gNames),
-                 version = 1), path)
+                 removePartially = list(), version = 1), path)
     
     invisible(NULL)
 }

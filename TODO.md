@@ -277,7 +277,6 @@
     - update filters for delete()
     - yml file format
         - file import with different group names
-        - save and check file type in yml
         - default session filename
         - remove getCheckSessionPath() and clearSession
     - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections

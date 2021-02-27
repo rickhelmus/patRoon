@@ -138,7 +138,7 @@ checkComponentsInterface$methods(
         sessionGrps <- character()
         if (length(s$removePartially) > 0)
             sessionGrps <- unlist(s$removePartially)
-        saveCheckSession(s, session, fGroups[, sessionGrps])
+        saveCheckSession(s, session, fGroups[, sessionGrps], "components")
     }
 )
 
@@ -198,7 +198,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     curSession <- NULL
     if (file.exists(session))
-        curSession <- readCheckSession(session)
+        curSession <- readCheckSession(session, "components")
     else
         curSession <- list(removeFully = character(), removePartially = list())
     

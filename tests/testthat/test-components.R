@@ -22,7 +22,7 @@ withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel 
 withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0, parallel = FALSE))
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none", componentInfo = data.table()))
-browser()
+
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
     # For RC: don't check attributes as they seem irreproducible

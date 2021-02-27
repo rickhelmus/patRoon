@@ -277,8 +277,6 @@
     - update filters for delete()
     - yml file format
         - file import with different group names
-        - default session filename
-        - remove getCheckSessionPath()
     - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections
 - misc
     - topMostByRGroup: make default? or only for reporting?

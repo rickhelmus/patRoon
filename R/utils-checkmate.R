@@ -380,55 +380,18 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
     assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
 }
 
-assertCheckSession <- function(x, what, primSels, secSels, primName, secName, importName, mustExist, canClearSession,
-                               didClearSession, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
-{return(NULL) # UNDONE
+assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
     if (null.ok && is.null(x))
         return(NULL)
     
-    if (!is.null(add))
-        mc <- length(add$getMessages())
-    
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
-    if (!didClearSession && (is.null(add) || length(add$getMessages()) == mc))
-    {
-        sessionPath <- getCheckSessionPath(x, what)
-        if (mustExist)
-            checkmate::assertFileExists(sessionPath, "r", .var.name = .var.name, add = add)
-        
-        if (file.exists(sessionPath))
-        {
-            session <- readRDS(sessionPath)
-            msg <- character()
-            if (!setequal(c("name", primSels), names(session$secondarySelections)))
-                msg <- sprintf("Session has different %s! Please use %s to import.", primName, importName)
-            if (!setequal(secSels, session$secondarySelections$name))
-                msg <- sprintf("Session has different %s! Please use %s to import.", secName, importName)
-            if (length(msg) > 0)
-            {
-                if (canClearSession)
-                    msg <- paste0(msg, " Alternatively, set clearSession=TRUE to remove the session and ",
-                                  "start with a new one.")
-                stop(msg, call. = FALSE)
-            }
-        }
-    }
-}
-
-assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, didClearSession, null.ok = FALSE,
-                                       .var.name = checkmate::vname(x), add = NULL)
-{
-    assertCheckSession(x, "features", names(fGroups), analyses(fGroups), "feature groups", "analyses",
-                       "importCheckFeaturesSession()", mustExist, canClearSession, didClearSession, null.ok,
-                       .var.name, add)
-}
-
-assertCheckComponentsSession <- function(x, components, mustExist, canClearSession, didClearSession, null.ok = FALSE,
-                                         .var.name = checkmate::vname(x), add = NULL)
-{
-    assertCheckSession(x, "components", names(components), groupNames(components), "components", "feature groups",
-                       "importCheckComponentsSession()", mustExist, canClearSession, didClearSession, null.ok,
-                       .var.name, add)
+    if (mustExist)
+        checkmate::assertFileExists(x, "r", .var.name = .var.name, add = add)
+    else
+        checkmate::assertPathForOutput(x, overwrite = TRUE, .var.name = .var.name, add = ac)
+    
+    # UNDONE: validate YAML?
 }
 
 assertSets <- function(obj, s, multiple, null.ok = multiple, .var.name = checkmate::vname(s), add = NULL)

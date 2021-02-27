@@ -150,8 +150,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
              "You may need to sync the components object, eg: components <- components[, names(fGroups)]")
     
     ac <- checkmate::makeAssertCollection()
-    assertCheckComponentsSession(session, components, mustExist = FALSE, canClearSession = TRUE,
-                                 didClearSession = clearSession, add = ac)
+    assertCheckSession(session, mustExist = FALSE, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     

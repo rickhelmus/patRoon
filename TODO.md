@@ -277,9 +277,9 @@
     - update filters for delete()
     - yml file format
         - include feature properties to allow file import with different group names?
-        - finish asserts (only warn for missing analyses/fGroups/components?)
+        - warn for extra analyses/fGroups/components with popup (disable via settings?)
         - actually save yml files instead of Rds
-        - save file type in yml
+        - save and check file type in yml
         - default session filename
     - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections
 - misc

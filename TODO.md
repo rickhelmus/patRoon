@@ -277,7 +277,6 @@
     - update filters for delete()
     - yml file format
         - include feature properties to allow file import with different group names?
-        - warn for extra analyses/fGroups/components with popup (disable via settings?)
         - actually save yml files instead of Rds
         - save and check file type in yml
         - default session filename

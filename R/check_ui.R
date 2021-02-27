@@ -19,7 +19,7 @@ checkUIInterface$methods(
     
     getSecondarySelections = function(primSel) stop("VIRTUAL"),
     
-    initReactiveValues = function(rValues) rValues,
+    init = function(rValues) rValues,
     
     settingsChangedExpression = function(input) stop("VIRTUAL"),
     primarySettingsChanged = function(cur, new) stop("VIRTUAL"),
@@ -246,7 +246,8 @@ runCheckUI <- function(UIInterface)
                                   # NOTE: should be data.frame not data.table, as Shiny doesn't register changes with the latter
                                   removePartially = UIInterface$curSession$removePartially,
                                   settings = settings)
-        rValues <- UIInterface$initReactiveValues(rValues)
+        
+        rValues <- UIInterface$init(rValues)
         
         getCurPrimaryRow <- function()
         {

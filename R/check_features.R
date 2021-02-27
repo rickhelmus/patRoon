@@ -85,8 +85,27 @@ checkFeaturesInterface$methods(
         return(analyses(fGroups)[fti != 0])
     },
     
-    initReactiveValues = function(rValues)
+    init = function(rValues)
     {
+        gNames <- names(fGroups)
+        extraFGroups <- !all(curSession$removeFully %in% gNames) ||
+            (length(curSession$removePartially) > 0 && !all(names(curSession$removePartially) %in% gNames))
+        allSessionAnas <- unlist(curSession$removePartially)
+        extraAnas <- length(allSessionAnas) > 0 && !all(allSessionAnas %in% analyses(fGroups))
+        
+        if (extraFGroups || extraAnas)
+        {
+            extraWhat <- if (extraFGroups && extraAnas) "feature groups and analyses" else if (extraFGroups) "feature groups" else "analyses"
+            showModal(modalDialog(title = "Session data",
+                                  easyClose = TRUE,
+                                  paste(sprintf("Some additional selection data for %s is present in the loaded session.",
+                                                extraWhat),
+                                        "This can occur if the feature groups object was e.g. subset or filtered",
+                                        "or the session was made for another feature groups object.",
+                                        "In the latter case you probably want to use importCheckFeaturesSession() first.",
+                                        "When you save the session now the additional selection data will be removed!")))
+        }
+        
         rValues$fGroupPlotMode <- "topMost"
         return(rValues)
     },

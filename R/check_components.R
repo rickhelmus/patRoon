@@ -42,6 +42,30 @@ checkComponentsInterface$methods(
     
     getSecondarySelections = function(primSel) components[[primSel]]$group,
 
+    init = function(rValues)
+    {
+        cNames <- names(components)
+        extraComps <- !all(curSession$removeFully %in% cNames) ||
+            (length(curSession$removePartially) > 0 && !all(names(curSession$removePartially) %in% cNames))
+        allSessionFGroups <- unlist(curSession$removePartially)
+        extraFGroups <- length(allSessionAnas) > 0 && !all(allSessionFGroups %in% groupNames(components))
+        
+        if (extraComps || extraFGroups)
+        {
+            extraWhat <- if (extraComps && extraFGroups) "components and feature groups" else if (extraComps) "components" else "feature groups"
+            showModal(modalDialog(title = "Session data",
+                                  easyClose = TRUE,
+                                  paste(sprintf("Some additional selection data for %s is present in the loaded session.",
+                                                extraWhat),
+                                        "This can occur if the components object was e.g. subset or filtered",
+                                        "or the session was made for another components object.",
+                                        "In the latter case you probably want to use importCheckComponentsSession() first.",
+                                        "When you save the session now the additional selection data will be removed!")))
+        }
+        
+        return(rValues)
+    },
+    
     settingsChangedExpression = function(input)
     {
         input$retUnit

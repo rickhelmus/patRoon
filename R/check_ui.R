@@ -50,7 +50,7 @@ getUISettings <- function(fileName, default)
         saveUISettings(fileName, ret)
     }
     else
-        ret <- yaml::read_yaml(path, eval.expr = FALSE)
+        ret <- readYAML(path)
     ret <- ret[setdiff(names(ret), "version")]
     return(ret)
 }

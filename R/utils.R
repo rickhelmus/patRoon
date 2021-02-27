@@ -591,3 +591,5 @@ getHighestAbsValue <- function(abs, rel, size)
     abs <- NULLToZero(abs); rel <- NULLToZero(rel)
     return(max(abs, rel * size))
 }
+
+readYAML <- function(f) yaml::read_yaml(f, eval.expr = FALSE)

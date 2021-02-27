@@ -339,12 +339,12 @@ setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
                                       minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 
 
-setGeneric("checkFeatures", function(fGroups, session, rtWindow = 30,
+setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", rtWindow = 30,
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
 setGeneric("getEICsForFGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                          onlyPresent) standardGeneric("getEICsForFGroups"))
 setGeneric("getEICsForFeatures", function(features) standardGeneric("getEICsForFeatures"))
-setGeneric("checkComponents", function(components, fGroups, session, rtWindow = 30,
+setGeneric("checkComponents", function(components, fGroups, session = "checked-components.yml", rtWindow = 30,
                                        clearSession = FALSE) standardGeneric("checkComponents"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,

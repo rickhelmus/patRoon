@@ -70,11 +70,20 @@ getCheckSessionPath <- function(session, what)
     return(file.path(outp, paste0(session, ".Rds")))
 }
 
-readCheckSession <- function(session) readYAML(session)
+readCheckSession <- function(session, type)
+{
+    ret <- readYAML(session)
+    if (is.null(ret[["type"]]))
+        ret$type <- "unknown" # for error below
+    if (ret$type != type)
+        stop("The specified session file type is incorrect: ", ret$type)
+    return(ret)
+}
 
-saveCheckSession <- function(session, path, fGroups)
+saveCheckSession <- function(session, path, fGroups, type)
 {
     session$version <- 1
+    session$type <- type
     
     gInfo <- groupInfo(fGroups)
     session$featureGroups <- sapply(names(fGroups),

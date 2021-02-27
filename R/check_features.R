@@ -273,7 +273,7 @@ checkFeaturesInterface$methods(
         sessionGrps <- s$removeFully
         if (length(s$removePartially) > 0)
             sessionGrps <- union(sessionGrps, names(s$removePartially))
-        saveCheckSession(s, session, fGroups[, sessionGrps])
+        saveCheckSession(s, session, fGroups[, sessionGrps], "featureGroups")
     }
 )
 
@@ -363,7 +363,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     
     curSession <- NULL
     if (file.exists(session))
-        curSession <- readCheckSession(session)
+        curSession <- readCheckSession(session, "featureGroups")
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
@@ -404,7 +404,7 @@ getMCTrainData <- function(fGroups, session)
     assertCheckSession(session, mustExist = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    session <- readCheckSession(session)
+    session <- readCheckSession(session, "featureGroups")
     ret <- convertQualitiesToMCData(fGroups)
     gNames <- names(fGroups)
     ret[, Class := fifelse(gNames[EICNo] %chin% session$removeFully, "BAD", "GOOD")]

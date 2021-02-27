@@ -266,6 +266,14 @@ checkFeaturesInterface$methods(
                        topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup",
                        retMin = rValues$settings$retUnit == "min")
         })
+    },
+    
+    saveSession = function(s)
+    {
+        sessionGrps <- s$removeFully
+        if (length(s$removePartially) > 0)
+            sessionGrps <- union(sessionGrps, names(s$removePartially))
+        saveCheckSession(s, session, fGroups[, sessionGrps])
     }
 )
 
@@ -333,11 +341,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    sessionPath <- getCheckSessionPath(session, "features")
-    checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
-    
-    if (clearSession && file.exists(sessionPath))
-        file.remove(sessionPath)
+    if (clearSession && file.exists(session))
+        file.remove(session)
     
     gNames <- names(fGroups)
     fTable <- featureTable(fGroups)
@@ -357,15 +362,15 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     })
     
     curSession <- NULL
-    if (file.exists(sessionPath))
-        curSession <- readRDS(sessionPath)
+    if (file.exists(session))
+        curSession <- readCheckSession(session)
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
     int <- checkFeaturesInterface$new(fGroups = fGroups, EICsTopMost = EICsTopMost,
                                       EICsTopMostRG = EICsTopMostRG, EICsAll = EICsAll,
                                       EICPreviews = EICPreviews, primarySelections = gNames,
-                                      curSession = curSession, sessionPath = sessionPath)
+                                      curSession = curSession, session = session)
     return(runCheckUI(int))
 })
 
@@ -399,7 +404,7 @@ getMCTrainData <- function(fGroups, session)
     assertCheckSession(session, mustExist = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    session <- readRDS(getCheckFeaturesSessionPath(session))
+    session <- readCheckSession(session)
     ret <- convertQualitiesToMCData(fGroups)
     gNames <- names(fGroups)
     ret[, Class := fifelse(gNames[EICNo] %chin% session$removeFully, "BAD", "GOOD")]
@@ -411,20 +416,17 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
 {
     checkPackage("MetaClean")
     
-    checkmate::assertString(session, min.chars = 1)
-    path <- getCheckFeaturesSessionPath(session)
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups")
     checkmate::assertClass(model, "train", add = ac)
-    checkmate::assertPathForOutput(path, overwrite = TRUE, .var.name = "session", add = ac)
+    assertCheckSession(session, mustExist = TRUE, add = ac)
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to do...")
     
-    if (file.exists(path) && !overWrite)
+    if (file.exists(session) && !overWrite)
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
     testd <- convertQualitiesToMCData(fGroups)
@@ -433,7 +435,7 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
     gNames <- names(fGroups)
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
     saveRDS(list(removeFully = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
-                 removePartially = list(), version = 1), path)
+                 removePartially = list(), version = 1), session)
     
     invisible(NULL)
 }

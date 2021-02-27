@@ -276,10 +276,10 @@
     - filter negate: don't remove kept fGroups if features were changed?
     - update filters for delete()
     - yml file format
-        - include feature properties to allow file import with different group names?
-        - actually save yml files instead of Rds
+        - file import with different group names
         - save and check file type in yml
         - default session filename
+        - remove getCheckSessionPath() and clearSession
     - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections
 - misc
     - topMostByRGroup: make default? or only for reporting?

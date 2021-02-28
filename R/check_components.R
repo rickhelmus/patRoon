@@ -114,21 +114,29 @@ checkComponentsInterface$methods(
         cmp <- if (!is.null(rp)) delete(components, j = rp) else components
         
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
-            if ("plotSpec" %in% input$plotSpec)
+            if (!rValues$currentPrimSel %in% names(cmp))
             {
-                scr <- split.screen(c(2, 1))
-                screen(scr[1])
+                # may happen if all fGroups are disabled
+                noDataPlot()
             }
-            
-            plotChroms(cmp, index = rValues$currentPrimSel, fGroups = fGroups, EICs = EICs,
-                       title = "", retMin = rValues$settings$retUnit == "min")
-
-            if ("plotSpec" %in% input$plotSpec)
+            else
             {
-                screen(scr[2])
-                plotSpectrum(cmp, index = rValues$currentPrimSel)
+                if ("plotSpec" %in% input$plotSpec)
+                {
+                    scr <- split.screen(c(2, 1))
+                    screen(scr[1])
+                }
                 
-                close.screen(scr)
+                plotChroms(cmp, index = rValues$currentPrimSel, fGroups = fGroups, EICs = EICs,
+                           title = "", retMin = rValues$settings$retUnit == "min")
+                
+                if ("plotSpec" %in% input$plotSpec)
+                {
+                    screen(scr[2])
+                    plotSpectrum(cmp, index = rValues$currentPrimSel)
+                    
+                    close.screen(scr)
+                }
             }
         })
     },

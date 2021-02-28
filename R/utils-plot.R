@@ -446,3 +446,13 @@ doPlotSilhouettes <- function(clust, distm, kSeq, pch = 16, type = "b", ...)
     axis(1, kSeq)
     abline(v = kSeq[which.max(meanws)], lty = 2)
 }
+
+textPlot <- function(txt)
+{
+    withr::with_par(list(mar = c(0, 2, 0, 0)), {
+        plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
+        text(1, 5, txt, adj = 0, cex = 0.8)
+    })
+}
+
+noDataPlot <- function() textPlot("no data to plot")

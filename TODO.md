@@ -71,7 +71,6 @@
         - more settings?
         - test session import
         - change column names for both tables?
-        - update filter
         - does it work with componentsNT (duplicate fGroups)? same for delete()
             - doc limitation
 - misc
@@ -274,7 +273,6 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - checkUI
     - filter negate: don't remove kept fGroups if features were changed?
-    - update filters for delete()
     - yml file format
         - file import with different group names
 - misc

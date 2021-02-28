@@ -233,20 +233,25 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 
 checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 {
-    sessionPath <- getCheckSessionPath(checkFeaturesSession, "features")
-    return(doFGroupsFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "checked features session", c(makeFileHash(checkFeaturesSession), negate), function(fGroups)
     {
-        session <- readRDS(sessionPath)
+        session <- readCheckSession(checkFeaturesSession, "featureGroups")
         if (negate)
-            fGroups <- fGroups[, setdiff(names(fGroups), session$primarySelections)]
+            fGroups <- fGroups[, session$removeFully]
         else
-            fGroups <- fGroups[, session$primarySelections]
+            fGroups <- delete(fGroups, j = session$removeFully)
         
-        gNames <- names(fGroups)
-        pred <- if (negate) function(ef) !ef else function(ef) ef
-        fGroups@groups[, (gNames) := Map(.SD, session$secondarySelections[gNames],
-                                         f = function(fg, ef) ifelse(pred(ef), fg, 0))]
-        return(cleanGroups(fGroups, TRUE))
+        if (length(session$removePartially) > 0)
+        {
+            anas <- analyses(fGroups)
+            fGroups <- delete(fGroups, j = function(x, grp)
+            {
+                if (is.null(session$removePartially[[grp]]))
+                    return(FALSE)
+                anaRm <- anas %chin% session$removePartially[[grp]]
+                return(if (negate) !anaRm else anaRm)
+            })
+        }
     }, "checkedFeatures"))
 }
 

@@ -800,7 +800,7 @@ setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "
     checkmate::reportAssertions(ac)
 
     if (length(x) == 0)
-        plot(0, type = "n", ...)
+        noDataPlot()
     else
     {
         if (colourBy == "fGroups" || colourBy == "none")
@@ -902,7 +902,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, t
 
     if (length(obj) == 0)
     {
-        plot(0, type = "n")
+        noDataPlot()
         invisible(return(NULL))
     }
 
@@ -1178,7 +1178,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
 
     if (length(obj) == 0)
     {
-        plot(0, type = "n")
+        noDataPlot()
         invisible(return(NULL))
     }
 

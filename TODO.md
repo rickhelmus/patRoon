@@ -277,7 +277,6 @@
     - update filters for delete()
     - yml file format
         - file import with different group names
-    - plotChroms()/plotSpectrum() for components: doesn't allow empty selections at the moment, plot empty plot if no secondary selections
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
@@ -307,6 +306,7 @@
     - don't subtract blanks from each other
     - syncing XCMS objects
     - print feature counts in show(fGroups) and filter()
+    - noDataPlot() for empty plots, eg by plot(), plotChroms()...
 - tests
     - topMostByRGroup
     - xcms3 comparison

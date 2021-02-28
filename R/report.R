@@ -122,14 +122,6 @@ makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", parSetti
     }
 }
 
-textPlot <- function(txt)
-{
-    withr::with_par(list(mar = c(0, 2, 0, 0)), {
-        plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
-        text(1, 5, txt, adj = 0, cex = 0.8)
-    })
-}
-
 reportFGroupTable <- function(fGroups, path, retMin)
 {
     printf("Exporting feature group tables...")

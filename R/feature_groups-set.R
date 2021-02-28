@@ -330,27 +330,27 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
-setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
+setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose = TRUE)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
     
     otherArgs <- list(...)
     
-    fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
-    feat <- getFeatures(fGroups) # may have been changed (eg in initialize())
+    fGroups <- do.call(callNextMethod, c(list(obj = obj, algorithm = algorithm, verbose = verbose), otherArgs))
+    obj <- getFeatures(fGroups) # may have been changed (eg in initialize())
     
     ret <- featureGroupsSet(groupAlgo = algorithm, groupArgs = otherArgs, groupVerbose = verbose,
                             groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
-                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
+                            analysisInfo = analysisInfo(fGroups), features = obj, ftindex = groupFeatIndex(fGroups),
                             algorithm = makeSetAlgorithm(list(fGroups)))
     
     anaInfo <- analysisInfo(ret)
     ftind <- groupFeatIndex(ret)
     fTable <- featureTable(ret)
 
-    if (length(feat) > 0)
+    if (length(obj) > 0)
     {
-        ret@annotations <- rbindlist(sapply(sets(feat), function(s)
+        ret@annotations <- rbindlist(sapply(sets(obj), function(s)
         {
             anaInds <- which(anaInfo$set == s)
             anas <- anaInfo[anaInds, "analysis"]

@@ -182,6 +182,7 @@
     - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
     - as.data.table() for formulas: formula column removed if average=T
     - unset(fGroups) will get adduct annotated fGroups
+    - session filters: TRUE will use default yml file name
 - tests
     - handle/test empty objects
     - test DA algorithms

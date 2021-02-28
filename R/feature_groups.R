@@ -1787,7 +1787,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @rdname feature-grouping
 #' @aliases groupFeatures
 #' @export
-setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = TRUE)
+setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
@@ -1800,7 +1800,20 @@ setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = 
                 xcms3 = groupFeaturesXCMS3,
                 kpic2 = groupFeaturesKPIC2)
 
-    f(feat, ..., verbose = verbose)
+    f(obj, ..., verbose = verbose)
+})
+
+setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(algorithm, c("sirius"), add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    f <- switch(algorithm,
+                sirius = groupFeaturesSIRIUS)
+    
+    f(obj, ..., verbose = verbose)
 })
 
 #' @details \code{importFeatureGroups} is a generic function to import feature

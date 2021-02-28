@@ -24,7 +24,7 @@ setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 
-setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
+setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
 setGeneric("groupFeaturesOpenMS", function(feat, ...) standardGeneric("groupFeaturesOpenMS"))
 setGeneric("groupFeaturesXCMS", function(feat, ...) standardGeneric("groupFeaturesXCMS"))
 setGeneric("groupFeaturesXCMS3", function(feat, ...) standardGeneric("groupFeaturesXCMS3"))

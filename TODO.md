@@ -279,15 +279,11 @@
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
     - updatePICSet(): also sync peaks list? otherwise doc
-    - update docs and checkChromatograms() for mzWindow --> mzExpWindow
     - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
-    - groupFeatures(algorithm="sirius")
-        - need to rename first argument of methods to something more generic (now feat)
-        - or different function name? Also needed for future CSV/DF import
     - delete for features and fGroups
         - XCMS: also update groups data?
     - load OpenMS intensities in parallel
@@ -304,6 +300,8 @@
     - syncing XCMS objects
     - print feature counts in show(fGroups) and filter()
     - noDataPlot() for empty plots, eg by plot(), plotChroms()...
+    - mzWindow --> mzExpWindow
+    - groupFeatures: feat arg --> obj
 - tests
     - topMostByRGroup
     - xcms3 comparison
@@ -313,6 +311,7 @@
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
 - docs
+    - mzWindow --> mzExpWindow
     - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?
     - session filter: argument and its order
@@ -327,6 +326,7 @@
     - update IPO docs for kpic2 (and mention min/max_width split and others)
     - ... for findFeaturesXCMS3
     - progressr
+    - groupFeatures: feat arg --> obj
 
 ## MSPeakLists
 - isotope tagging is lost after averaging

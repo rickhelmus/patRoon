@@ -292,7 +292,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
         session <- readCheckSession(checkComponentsSession, "components")
         
         if (negate)
-            obj <- obj[session$removeFully]
+            obj <- obj[union(session$removeFully, names(session$removePartially))]
         else
             obj <- delete(obj, i = session$removeFully)
         

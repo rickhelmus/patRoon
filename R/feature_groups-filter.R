@@ -237,7 +237,7 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
     {
         session <- readCheckSession(checkFeaturesSession, "featureGroups")
         if (negate)
-            fGroups <- fGroups[, session$removeFully]
+            fGroups <- fGroups[, union(session$removeFully, names(session$removePartially))]
         else
             fGroups <- delete(fGroups, j = session$removeFully)
         

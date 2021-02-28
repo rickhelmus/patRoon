@@ -273,7 +273,6 @@
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - Check: units of plotChord() rt/mz graphs seems off
 - checkUI
-    - filter negate: don't remove kept fGroups if features were changed?
     - yml file format
         - file import with different group names
 - misc

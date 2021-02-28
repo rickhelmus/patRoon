@@ -289,7 +289,6 @@
     - groupFeatures(algorithm="sirius")
         - need to rename first argument of methods to something more generic (now feat)
         - or different function name? Also needed for future CSV/DF import
-    - don't key quality/score tables?
     - delete for features and fGroups
         - XCMS: also update groups data?
     - load OpenMS intensities in parallel
@@ -313,6 +312,7 @@
     - syncing of XCMS/KPIC2 objects
     - delete()
     - check if featindex and groups slots are in sync with features
+    - subsetting and groupScores
 - docs
     - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?

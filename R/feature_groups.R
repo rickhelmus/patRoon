@@ -415,8 +415,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         obj@groupInfo <- obj@groupInfo[-ginds, ]
         if (hasFGroupScores(obj))
         {
-            obj@groupQualities <- setkey(obj@groupQualities[names(obj@groups)], "group")
-            obj@groupScores <- setkey(obj@groupScores[names(obj@groups)], "group")
+            obj@groupQualities <- obj@groupQualities[group %in% names(obj@groups)]
+            obj@groupScores <- obj@groupScores[group %in% names(obj@groups)]
         }
     }
     
@@ -624,14 +624,14 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
         if (addQualities)
         {
-            gq <- groupQualities(x)[ret$group, -"group"]
+            gq <- groupQualities(x)[match(ret$group, group), -"group"]
             ret[, (paste0("group_", names(gq))) := gq]
         }
         else if (hasFGroupScores(x))
             ret[, (intersect(featureQualityNames(), names(ret))) := NULL]
         if (addScores)
         {
-            gs <- groupScores(x)[ret$group, -"group"]
+            gs <- groupScores(x)[match(ret$group, group), -"group"]
             ret[, (paste0("group_", names(gs))) := gs]
         }
         else if (hasFGroupScores(x))
@@ -767,9 +767,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         setcolorder(ret, c("group", "ret", "mz"))
         
         if (addQualities)
-            ret <- cbind(ret, groupQualities(x)[ret$group, -"group"])
+            ret <- cbind(ret, groupQualities(x)[match(ret$group, group), -"group"])
         if (addScores)
-            ret <- cbind(ret, groupScores(x)[ret$group, -"group"])
+            ret <- cbind(ret, groupScores(x)[match(ret$group, group), -"group"])
     }
 
     annTable <- annotations(x)
@@ -1658,7 +1658,6 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     
     groupQualitiesScores[, (featureGroupScoreNames()) := Map(scoreFeatQuality, fgQualities, .SD),
                          .SDcols = featureGroupQualityNames()]
-    setkeyv(groupQualitiesScores, "group")
     
     obj@groupQualities <- groupQualitiesScores[, c("group", featureQualityNames(), featureGroupQualityNames()), with = FALSE]
     obj@groupScores <- groupQualitiesScores[, c("group", allScores), with = FALSE]

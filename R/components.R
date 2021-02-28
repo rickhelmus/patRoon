@@ -263,6 +263,9 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
                                            mzIncrement = NULL, checkComponentsSession = NULL, negate = FALSE,
                                            verbose = TRUE)
 {
+    if (isTRUE(checkComponentsSession))
+        checkComponentsSession <- "checked-components.yml"
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(size, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkFlag(isotopes, null.ok = TRUE),
@@ -270,7 +273,8 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
                       .var.name = isotopes)
     checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
-    assertCheckSession(checkComponentsSession, mustExist = TRUE, null.ok = TRUE, add = ac)
+    if (!is.logical(checkComponentsSession))
+        assertCheckSession(checkComponentsSession, mustExist = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)

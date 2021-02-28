@@ -285,20 +285,21 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
 
     if (!is.null(checkComponentsSession))
     {
-        session <- readRDS(getCheckSessionPath(checkComponentsSession, "components"))
+        session <- readCheckSession(checkComponentsSession, "components")
+        
         if (negate)
-            obj <- obj[, setdiff(names(obj), session$primarySelections)]
+            obj <- obj[session$removeFully]
         else
-            obj <- obj[session$primarySelections]
-
-        cNames <- names(obj)
-        obj@components <- pruneList(Map(obj@components, session$secondarySelections[cNames], f = function(cmp, ec)
+            obj <- delete(obj, i = session$removeFully)
+        
+        if (length(session$removePartially) > 0)
         {
-            wh <- ec[match(cmp$group, session$secondarySelections$name)]
-            if (negate)
-                return(cmp[!wh])
-            return(cmp[wh])
-        }))
+            obj <- delete(obj, i = names(session$removePartially), j = function(cmp, cName)
+            {
+                gRm <- cmp$group %chin% session$removePartially[[cName]]
+                return(if (negate) !gRm else gRm)
+            })
+        }
     }
     
     inRange <- function(x, range) x >= range[1] & x <= range[2]

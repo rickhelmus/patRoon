@@ -359,6 +359,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               chromWidthRange = NULL, rGroups = NULL, removeBlanks = FALSE,
                                               checkFeaturesSession = NULL, negate = FALSE)
 {
+    if (isTRUE(checkFeaturesSession))
+        checkFeaturesSession <- "checked-features.yml"
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
@@ -368,7 +371,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
-    assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
+    if (!is.logical(checkFeaturesSession))
+        assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)

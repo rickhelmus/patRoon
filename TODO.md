@@ -104,6 +104,7 @@
     - include diff formula and reaction in components
     - argument order and defaults
     - report matching frags/neutral losses using annotatedPeakList()
+    - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

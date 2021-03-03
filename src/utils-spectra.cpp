@@ -204,8 +204,8 @@ Rcpp::List makeSAFDInput(Rcpp::List spectra, Rcpp::NumericVector mzRange)
     return Rcpp::List::create(Rcpp::Named("mzM") = mzM, Rcpp::Named("intM") = intM);
 }
 
-BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
-                          const std::string &shift, double precDiff, double mzWindow)
+BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
+                            const std::string &shift, double precDiff, double mzWindow)
 {
     // assumptions: specs are ordered on mz
     
@@ -218,7 +218,7 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
     else if (shift == "both") // UNDONE: other name for "both"?
     {
         // first bin as normal (recursive call)
-        const BinnedSpectrum binNone = binSpectra(specLeft, specRight, "none", precDiff, mzWindow);
+        const BinnedSpectrum binNone = doBinSpectra(specLeft, specRight, "none", precDiff, mzWindow);
         Spectrum specLeftUn, specRightUn;
         BinnedSpectrum binOverlap;
         for (size_t i=0; i<binNone.mzs.size(); ++i)
@@ -243,7 +243,7 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
         }
         
         // bin missing with shift
-        BinnedSpectrum binShift = binSpectra(specLeftUn, specRightUn, "precursor", precDiff, mzWindow);
+        BinnedSpectrum binShift = doBinSpectra(specLeftUn, specRightUn, "precursor", precDiff, mzWindow);
         
         // merge both: add missing from binNone
         binShift.mzs.insert(binShift.mzs.end(), binOverlap.mzs.begin(), binOverlap.mzs.end());
@@ -322,32 +322,17 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
     return ret;
 }
 
-// UNDONE: remove
 // [[Rcpp::export]]
-Rcpp::DataFrame binSpecCPP(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift,
-                           Rcpp::NumericVector mzWindow)
+Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift,
+                           Rcpp::NumericVector precDiff, Rcpp::NumericVector mzWindow)
 {
     Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
     Spectrum specRight{ sp2["mz"], sp2["intensity"] };
     
     normalizeNums(specLeft.intensities); normalizeNums(specRight.intensities);
-    
-    // figure out precursor masses
-    const std::vector<int> isPrecLeft = sp1["precursor"];
-    const std::vector<int> isPrecRight = sp2["precursor"];
-    
-    double precDiff = 0.0;
-    auto itl = std::find(isPrecLeft.begin(), isPrecLeft.end(), TRUE);
-    auto itr = std::find(isPrecRight.begin(), isPrecRight.end(), TRUE);
-    if (itl == isPrecLeft.end() || itr == isPrecRight.end())
-    {
-        // UNDONE
-        // Rcpp::stop("Cannot shift spectra: one or both lack precursor ion!");
-    }
-    else
-        precDiff = specRight.mzs[itr - isPrecRight.begin()] - specLeft.mzs[itl - isPrecLeft.begin()];
-    
-    BinnedSpectrum binnedSpec = binSpectra(specLeft, specRight, Rcpp::as<std::string>(shift), precDiff, Rcpp::as<double>(mzWindow));
+
+    BinnedSpectrum binnedSpec = doBinSpectra(specLeft, specRight, Rcpp::as<std::string>(shift),
+                                             Rcpp::as<double>(precDiff), Rcpp::as<double>(mzWindow));
     
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = binnedSpec.mzs,
                                    Rcpp::Named("intensity_1") = binnedSpec.intsLeft,
@@ -360,7 +345,7 @@ double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &metho
 {
     normalizeNums(sp1.intensities); normalizeNums(sp2.intensities);
     
-    BinnedSpectrum binnedSpec = binSpectra(sp1, sp2, shift, precDiff, mzWindow);
+    BinnedSpectrum binnedSpec = doBinSpectra(sp1, sp2, shift, precDiff, mzWindow);
     
     // UNDONE: pearsons/spearman? needs sorting?
     if (method == "cosine")

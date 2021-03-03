@@ -127,17 +127,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// binSpecCPP
-Rcpp::DataFrame binSpecCPP(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift, Rcpp::NumericVector mzWindow);
-RcppExport SEXP _patRoon_binSpecCPP(SEXP sp1SEXP, SEXP sp2SEXP, SEXP shiftSEXP, SEXP mzWindowSEXP) {
+// binSpectra
+Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff, Rcpp::NumericVector mzWindow);
+RcppExport SEXP _patRoon_binSpectra(SEXP sp1SEXP, SEXP sp2SEXP, SEXP shiftSEXP, SEXP precDiffSEXP, SEXP mzWindowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type sp1(sp1SEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type sp2(sp2SEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type shift(shiftSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type precDiff(precDiffSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(binSpecCPP(sp1, sp2, shift, mzWindow));
+    rcpp_result_gen = Rcpp::wrap(binSpectra(sp1, sp2, shift, precDiff, mzWindow));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -170,7 +171,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},
-    {"_patRoon_binSpecCPP", (DL_FUNC) &_patRoon_binSpecCPP, 4},
+    {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {NULL, NULL, 0}
 };

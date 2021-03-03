@@ -514,11 +514,22 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                  useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                                  specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
+                                                  mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    if (!is.null(specSimParams))
+    {
+        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
+        checkmate::assertCharacter(analysis, len = 2, min.chars = 1, null.ok = TRUE, add = ac)
+        assertSpecSimParams(specSimParams, add = ac)
+        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    }
+    else
+    {
+        checkmate::assertString(groupName, min.chars = 1, add = ac)
+        checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    }
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
@@ -528,17 +539,68 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     if (length(obj) == 0)
         return(NULL)
 
-    spec <- getSpec(obj, groupName, MSLevel, analysis)
-    if (is.null(spec))
-        return(NULL)
-
-    if (is.null(title))
+    setTitle <- is.null(title)
+    if (setTitle)
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
-    if (useGGPlot2)
-        return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
-
-    makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
+    if (is.null(specSimParams))
+    {
+        spec <- getSpec(obj, groupName, MSLevel, analysis)
+        if (is.null(spec))
+            return(NULL)
+        
+        if (useGGPlot2)
+            return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
+        
+        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
+    }
+    else
+    {
+        PLP1 <- getSimPLAndPrec(obj, groupName[1], analysis[1], MSLevel, specSimParams, shift, 1)
+        PLP2 <- getSimPLAndPrec(obj, groupName[2], analysis[2], MSLevel, specSimParams, shift, 2)
+        if (is.null(PLP1))
+            stop("Could not obtain first spectrum")
+        if (is.null(PLP2))
+            stop("Could not obtain second spectrum")
+        
+        precDiff <- 0
+        if (shift != "none")
+        {
+            if (is.na(PLP1$precs) || is.na(PLP2$precs))
+                stop("One or both pecursor ions are unknown, can't calculate shift")
+            precDiff <- PLP2$precs - PLP1$precs
+        }
+        
+        bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], shift, precDiff, specSimParams$absMzDev))
+        bin[, mergedBy := fifelse(intensity_1 != 0 & intensity_2 != 0, "overlap", "unique")]
+        
+        sp1 <- setnames(bin[intensity_1 != 0, -"intensity_2"], "intensity_1", "intensity")
+        sp2 <- setnames(bin[intensity_2 != 0, -"intensity_1"], "intensity_2", "intensity")
+        sp2[, intensity := -intensity]
+        
+        spec <- rbind(sp1, sp2)
+        spec[, precursor := FALSE] # UNDONE
+        
+        if (setTitle)
+        {
+            sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2],
+                                      MSLevel, specSimParams, shift = shift, NAToZero = TRUE, drop = TRUE)
+            title <- c(title, sprintf("Similarity: %.2f", sim))
+        }
+        
+        plotData <- getMSPlotData(spec, 1)
+        plotData[legend == "overlap", lwd := 2] # UNDONE
+        ticks <- pretty(c(-spec$intensity, spec$intensity))
+        if (useGGPlot2)
+        {
+            # NOTE: suppress message about replacing y axis
+            return(suppressMessages(makeMSPlotGG(plotData) + ggtitle(title) +
+                                        ggplot2::scale_y_continuous(labels = abs(ticks))))
+        }
+        
+        makeMSPlot(plotData, mincex, xlim, ylim, main = title, yaxt = "n", ...)
+        axis(2, at = ticks, labels = abs(ticks))
+    }
 })
 
 #' @describeIn MSPeakLists Calculates the spectral similarity between
@@ -581,59 +643,10 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     if (length(obj) == 0)
         return(NULL)
     
-    # get precursor ions: if MSLevel==2 try MSLevel==1 as fallback
-    getPrecMZ <- function(spec, gn, ana)
-    {
-        ret <- spec[precursor == TRUE]$mz
-        if (length(ret) == 0)
-        {
-            if (MSLevel == 2)
-            {
-                precSpec <- getSpec(obj, gn, 1, ana)
-                ret <- precSpec[precursor == TRUE]$mz
-            }
-        }
-        return(if (length(ret) == 0) NA else ret)
-    }
-    
-    getPLAndPrec <- function(gn, ana, nr)
-    {
-        if (is.null(ana))
-            ana <- rep(list(NULL), length(gn))
-        else if (length(ana) != length(gn))
-            stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
-        names(ana) <- gn
-        
-        specs <- pruneList(Map(getSpec, gn, ana, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
-        if (length(specs) == 0)
-            return(NULL)
-        
-        ana <- ana[names(specs)]
-        
-        precs <- NULL
-        if (shift != "none")
-        {
-            precs <- mapply(getPrecMZ, specs, names(specs), ana)
-            precsNA <- names(which(is.na(precs)))
-            if (length(precsNA) != 0)
-                warning("Some pecursor ions are unknown, returning NAs")
-            wh <- setdiff(names(precs), precsNA)
-            precs <- precs[wh]; specs <- specs[wh]
-        }
-        else
-            precs <- setNames(rep(0, length(specs)), names(specs))
-        
-        specs <- pruneList(lapply(specs, prepSpecSimilarityPL, removePrecursor = specSimParams$removePrecursor,
-                                  relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks),
-                           checkZeroRows = TRUE)
-        
-        return(list(specs = specs, precs = precs))
-    }
-    
     if (is.null(groupName2))
     {
         # calculate dist matrix
-        PLP <- getPLAndPrec(groupName1, analysis1, 1)
+        PLP <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, shift, 1)
         if (is.null(PLP))
         {
             sims <- matrix(NA_real_, length(groupName1), length(groupName1))
@@ -649,8 +662,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     }
     else
     {
-        PLP1 <- getPLAndPrec(groupName1, analysis1, 1)
-        PLP2 <- getPLAndPrec(groupName2, analysis2, 2)
+        PLP1 <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, shift, 1)
+        PLP2 <- getSimPLAndPrec(obj, groupName2, analysis2, MSLevel, specSimParams, shift, 2)
         if (is.null(PLP1) || is.null(PLP2))
         {
             sims <- matrix(NA_real_, length(groupName1), length(groupName2))

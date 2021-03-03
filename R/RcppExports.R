@@ -37,8 +37,8 @@ makeSAFDInput <- function(spectra, mzRange) {
     .Call(`_patRoon_makeSAFDInput`, spectra, mzRange)
 }
 
-binSpecCPP <- function(sp1, sp2, shift, mzWindow) {
-    .Call(`_patRoon_binSpecCPP`, sp1, sp2, shift, mzWindow)
+binSpectra <- function(sp1, sp2, shift, precDiff, mzWindow) {
+    .Call(`_patRoon_binSpectra`, sp1, sp2, shift, precDiff, mzWindow)
 }
 
 calcSpecSimilarity <- function(sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow) {

@@ -455,6 +455,52 @@ specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, r
     return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }
 
+getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams, shift, nr)
+{
+    if (is.null(analysis))
+        analysis <- rep(list(NULL), length(group))
+    else if (length(analysis) != length(group))
+        stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
+    names(analysis) <- group
+    
+    specs <- pruneList(Map(getSpec, group, analysis, MoreArgs = list(MSPeakLists = MSPeakLists, MSLevel = MSLevel)))
+    if (length(specs) == 0)
+        return(NULL)
+    
+    analysis <- analysis[names(specs)]
+    
+    precs <- NULL
+    if (shift != "none")
+    {
+        precs <- mapply(specs, names(specs), analysis, FUN = function(spec, gn, ana)
+        {
+            ret <- spec[precursor == TRUE]$mz
+            if (length(ret) == 0)
+            {
+                if (MSLevel == 2)
+                {
+                    precSpec <- getSpec(MSPeakLists, group, 1, ana)
+                    ret <- precSpec[precursor == TRUE]$mz
+                }
+            }
+            return(if (length(ret) == 0) NA_real_ else ret)            
+        })
+        precsNA <- names(which(is.na(precs)))
+        if (length(precsNA) != 0)
+            warning("Some pecursor ions are unknown, returning NAs")
+        wh <- setdiff(names(precs), precsNA)
+        precs <- precs[wh]; specs <- specs[wh]
+    }
+    else
+        precs <- setNames(rep(0, length(specs)), names(specs))
+    
+    specs <- pruneList(lapply(specs, prepSpecSimilarityPL, removePrecursor = specSimParams$removePrecursor,
+                              relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks),
+                       checkZeroRows = TRUE)
+    
+    return(list(specs = specs, precs = precs))
+}
+
 prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
 {
     if (removePrecursor)

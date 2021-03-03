@@ -250,6 +250,17 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         compList <- split(compTab[, -"name"], by = c("precursor_name", "precursor_group"), keep.by = FALSE)
         
         compInfo <- unique(compTab[, c("name", "precursor_name", "precursor_group")])
+        
+        if (!is.null(pred))
+        {
+            susps <- suspects(pred)
+            cols <- c("formula", "SMILES", "InChI", "InChIKey", "neutralMass", "rt", "mz") # more/less?
+            cols <- intersect(names(susps), cols)
+            cols <- cols[sapply(cols, function(cl) any(!is.na(susps[[cl]])))]
+            targetCols <- paste0("precursor_", cols)
+            compInfo[, (targetCols) := susps[match(precursor_name, susps$name), cols, with = FALSE]]
+        }
+        
         compInfo[, size := sapply(compList, nrow)]
         compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overal links
         setcolorder(compInfo, "name")

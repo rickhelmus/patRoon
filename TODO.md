@@ -101,7 +101,6 @@
 ## TPs
 
 - componentsTP
-    - include precursor_formula in compInfo
     - argument order and defaults
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
     - actual RTDir in components, move filter

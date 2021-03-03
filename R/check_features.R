@@ -412,19 +412,27 @@ getMCTrainData <- function(fGroups, session)
     return(as.data.frame(ret))
 }
 
-predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FALSE)
+predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrite = FALSE)
 {
     checkPackage("MetaClean")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups")
-    checkmate::assertClass(model, "train", add = ac)
-    assertCheckSession(session, mustExist = TRUE, add = ac)
+    checkmate::assertClass(model, "train", null.ok = TRUE, add = ac)
+    assertCheckSession(session, mustExist = FALSE, add = ac)
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to do...")
+    
+    if (is.null(model))
+    {
+        if (!requireNamespace("MetaCleanData", quietly = TRUE))
+            stop("Please install MetaCleanData to use the default example model")
+        data("example_model", package = "MetaCleanData", envir = environment())
+        model <- example_model
+    }
     
     if (file.exists(session) && !overWrite)
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
@@ -434,8 +442,8 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
     
     gNames <- names(fGroups)
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
-    saveRDS(list(removeFully = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
-                 removePartially = list(), version = 1), session)
+    rmf <- gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]]
+    saveCheckSession(list(removeFully = rmf, removePartially = list()), session, fGroups[, rmf], "featureGroups")
     
     invisible(NULL)
 }

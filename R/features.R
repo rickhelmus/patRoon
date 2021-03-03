@@ -325,9 +325,9 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     printf("Calculating feature peak qualities and scores...\n")
 
     if (parallel)
-        fTable <- withProg(length(EICs), future.apply::future_Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
+        fTable <- withProg(length(EICs), TRUE, future.apply::future_Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
     else
-        fTable <- withProg(length(EICs), Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
+        fTable <- withProg(length(EICs), FALSE, Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
     
     if (!is.null(weights))
     {

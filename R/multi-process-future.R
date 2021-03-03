@@ -48,7 +48,7 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
     if (is.null(procTimeout))
         procTimeout <- Inf
     
-    results <- withProg(length(commandQueue),
+    results <- withProg(length(commandQueue), TRUE,
                         future.apply::future_lapply(commandQueue, patRoon:::executeFutureCmd,
                                                     finishHandler = finishHandler, timeoutHandler = timeoutHandler,
                                                     errorHandler = errorHandler, prepareHandler = prepareHandler,

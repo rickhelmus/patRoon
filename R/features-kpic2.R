@@ -114,9 +114,9 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel 
     if (length(anasTBD) > 0)
     {
         if (parallel)
-            allPics <- withProg(length(anasTBD), future.apply::future_lapply(filePaths[anasTBD], doKP))
+            allPics <- withProg(length(anasTBD), TRUE, future.apply::future_lapply(filePaths[anasTBD], doKP))
         else
-            allPics <- withProg(length(anasTBD), lapply(filePaths[anasTBD], doKP))
+            allPics <- withProg(length(anasTBD), FALSE, lapply(filePaths[anasTBD], doKP))
         
         for (a in anasTBD)
             saveCacheData("featuresKPIC2", allPics[[a]], hashes[[a]])

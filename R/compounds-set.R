@@ -54,15 +54,17 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             # re-sort
             setorderv(merged, "score", order = -1)
             
-            merged[, fragInfo := lapply(fragInfo, function(fi) fi[, c("PLIndex", "PLIndexSet") := .(PLIndexSet, NULL)])]
-            
             return(merged)
         })
     }, simplify = FALSE)
     
-    # convert absolute merge counts to coverage
-    cons <- lapply(cons, function(ct) ct[, c("setCoverageAnn", "setCoverage") :=
-                                             .(setCoverageAnn / setCoverage, setCoverage / sCount)])
+    # update fragInfos and convert absolute merge counts to coverage
+    cons <- lapply(cons, function(ct)
+    {
+        ct[, fragInfo := lapply(fragInfo, function(fi) fi[, c("PLIndex", "PLIndexSet") := .(PLIndexSet, NULL)])]
+        ct[, c("setCoverageAnn", "setCoverage") := .(setCoverageAnn / setCoverage, setCoverage / sCount)]
+        return(ct)
+    })
 
     if (setThreshold > 0 || setThresholdAnn > 0)
         cons <- pruneList(lapply(cons,

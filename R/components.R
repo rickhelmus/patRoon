@@ -282,7 +282,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     if (!is.null(adducts) && !is.logical(adducts))
         adducts <- sapply(adducts, function(a) as.character(checkAndToAdduct(a)))
 
-    oldn <- length(obj); oldresn <- if (oldn > 0) sum(sapply(obj@components, nrow)) else 0
+    old <- obj
     
     if (verbose)
         cat("Filtering components... ")
@@ -352,13 +352,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     })
     
     if (verbose)
-    {
-        newn <- length(obj); newresn <- if (newn > 0) sum(sapply(obj@components, nrow)) else 0
-        printf("Done! Filtered %d (%.2f%%) components and %d (%.2f%%) feature groups. Remaining: %d components with %d feature groups\n",
-               oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100,
-               oldresn - newresn, if (oldresn == 0) 0 else (1-(newresn/oldresn))*100,
-               newn, newresn)
-    }
+        printComponentsFiltered(old, obj)
 
     return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
 })

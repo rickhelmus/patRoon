@@ -96,3 +96,13 @@ makeGraph <- function(components, onlyLinked, titles)
     
     visNetwork::visNetwork(nodes = nodes, edges = edges)
 }
+
+printComponentsFiltered <- function(old, new)
+{
+    oldn <- length(old); newn <- length(new)
+    oldresn <- if (oldn > 0) sum(sapply(old@components, nrow)) else 0
+    newresn <- if (newn > 0) sum(sapply(new@components, nrow)) else 0
+    printf("Done! Filtered %d (%.2f%%) components and %d (%.2f%%) feature groups. Remaining: %d components with %d feature groups\n",
+           oldn - newn, if (oldn == 0) 0 else (1 - (newn / oldn)) * 100,
+           oldresn - newresn, if (oldresn == 0) 0 else (1 - (newresn / oldresn)) * 100, newn, newresn)
+}

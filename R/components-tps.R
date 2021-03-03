@@ -447,7 +447,9 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     unsetFormulas <- unsetORNULL(formulas)
     unsetCompounds <- unsetORNULL(compounds)
 
-    ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
+    cat("Adding sets related data...\n")
+    ret@components <- withProg(length(ret), FALSE,
+                               Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {
         for (s in sets(fGroupsTPs))
         {
@@ -481,10 +483,12 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
             # move similarity columns to end
             setcolorder(cmp, setdiff(names(cmp), c(grep("^specSimilarity", names(cmp), value = TRUE),
                                                    grep("Matches", names(cmp), fixed = TRUE, value = TRUE))))
+            
+            doProgress()
         }
         
         return(cmp)
-    })
+    }))
         
     return(ret)
 })

@@ -1,0 +1,14 @@
+reaction,add,sub,RTDir
+hydroxylation,O,,-1
+demethylation,,CH2,-1
+deethylation,,C2H4,-1
+dehydrogenation,H2,,-1
+hydrogenation,,H2,-1
+dehydration,,H2O,-1
+chlorine_reduction,H,Cl,-1
+acetylation,C2H2O,,-1
+deacetylation,,C2H2O,-1
+glucuronidation,C6H8O6,,-1
+deglucuronidation,,C8H8O6,0
+sulfonation,SO3,,-1
+desulfonation,,SO3,-1

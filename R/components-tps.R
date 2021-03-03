@@ -19,7 +19,7 @@ genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
         ret <- numeric()
         if (length(gn2) > 0)
         {
-            ret <- drop(do.call(spectrumSimilarity, list(obj, gn1, gn2, shift = shift, MSLevel = 2, drop = FALSE, ...)))
+            ret <- drop(spectrumSimilarity(obj, gn1, gn2, shift = shift, MSLevel = 2, drop = FALSE, ...))
             names(ret) <- gn2
         }
         if (length(otherGN2) > 0)
@@ -92,12 +92,12 @@ genTPAnnSimilarities <- function(precFG, TPFGs, MSPeakLists, formulas, compounds
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
-                               specSimArgs)
+                               specSimParams)
 {
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, formulas, compounds, minRTDiff, specSimArgs)
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, formulas, compounds, minRTDiff, specSimParams)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -138,7 +138,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         {
             if (nrow(cmp) > 0 && !is.null(MSPeakLists[[precFG]][["MSMS"]]))
             {
-                sims <- do.call(genTPSpecSimilarities, c(list(MSPeakLists, precFG, cmp$group), specSimArgs))
+                sims <- genTPSpecSimilarities(MSPeakLists, precFG, cmp$group, specSimParams = specSimParams)
                 cmp[, (names(sims)) := sims]
             }
             else
@@ -431,9 +431,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
                                                              pred = NULL, MSPeakLists = NULL, formulas = NULL,
                                                              compounds = NULL, minRTDiff = 20,
-                                                             simMethod, removePrecursor = FALSE, mzWeight = 0,
-                                                             intWeight = 1, absMzDev = 0.005,
-                                                             relMinIntensity = 0.05, minSimMSMSPeaks = 0)
+                                                             specSimParams = getDefSpecSimParams())
 {
     # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     # UNDONE: doc when fGroups/fGroupsTPs needs to be fGroupsScreening
@@ -442,11 +440,9 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists + formulas + compounds,
            c("featureGroups", "TPPredictions", "MSPeakLists", "formulas", "compounds"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
-           lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
-    checkmate::assertCount(minSimMSMSPeaks, add = ac)
+    checkmate::assertFlag(ignorePrecursors, add = ac)
+    checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(pred) && needsScreening(pred) &&
@@ -454,41 +450,30 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         stop("Input feature groups need to be screened for (TP) suspects!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
-                              specSimArgs = list(method = simMethod, removePrecursor = removePrecursor,
-                              mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
-                              relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)))
+                              specSimParams = specSimParams))
 })
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
                                                                 pred = NULL, MSPeakLists = NULL, formulas = NULL,
                                                                 compounds = NULL, minRTDiff = 20,
-                                                                simMethod, removePrecursor = FALSE, mzWeight = 0,
-                                                                intWeight = 1, absMzDev = 0.005,
-                                                                relMinIntensity = 0.05, minSimMSMSPeaks = 0)
+                                                                specSimParams = getDefSpecSimParams())
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists + formulas + compounds,
            c("featureGroupsSet", "TPPredictions", "MSPeakListsSet", "formulasSet", "compoundsSet"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
-    aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
-    checkmate::assertCount(minSimMSMSPeaks, add = ac)
+    checkmate::assertFlag(ignorePrecursors, add = ac)
+    checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(pred) && needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
         stop("Input feature groups need to be screened for (TP) suspects!")
     
-    specSimArgs <- list(method = simMethod, removePrecursor = removePrecursor, mzWeight = mzWeight,
-                        intWeight = intWeight, absMzDev = absMzDev, relMinIntensity = relMinIntensity,
-                        minPeaks = minSimMSMSPeaks)
-    
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds,
-                              minRTDiff, specSimArgs = specSimArgs)
+                              minRTDiff, specSimParams = specSimParams)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
@@ -516,7 +501,8 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 
                 if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[precFG]][["MSMS"]]))
                 {
-                    sims <- do.call(genTPSpecSimilarities, c(list(unsetMSPeakLists[[s]], precFG, grpsInSet), specSimArgs))
+                    sims <- genTPSpecSimilarities(unsetMSPeakLists[[s]], precFG, grpsInSet,
+                                                  specSimParams = specSimParams)
                     cmp[match(grpsInSet, group), (simColNames) := sims]
                 }
                 else

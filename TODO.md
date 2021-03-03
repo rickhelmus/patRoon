@@ -103,7 +103,6 @@
 - componentsTP
     - argument order and defaults
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
-    - actual RTDir in components, move filter
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -247,6 +246,7 @@
     - update spectrumSimilarity()
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
         - min peaks always applied lastly
+    - mention that RTDirMatch filter ignores any zero values for TP_RTDir/RTDir (ie to be safe)
 
 ## NEWS
 

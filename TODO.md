@@ -1,227 +1,136 @@
-# Release
+# Priority
 
-## general
-- test negative subset indices
-- refs to OpenBabel?
-- convertMSFiles()
-    - Agilent .d is also a directory?
-    - Remove necessity to have different input/output formats? (at least OK for pwiz)
-    - Support OpenMS vendor conversion? (eg thermo)
-- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
-- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
+## General
+
+- ggplot: remove? Otherwise fix plotSpectrum() (sets) for title and possibly others
+- patRoonData
+    - rename patRoonData::targets?
+    - update data files?
+- update newProject for new feature and component algos and sets
 
 
-## AutoID
+## Features
 
-- ID level rules
-    - add scorings for SIRIUS/DA
-- interface
-    - also convert TASQ?
-    - newProject()
-        - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
-    - annotateSuspects()
-        - check why it's is sometimes slow
-            - seems to be logging, disable by default? --> only slow with testthat?
-    - filter():
-        - cache?
-    - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
-    - spec similarity:
-        - port from TPs someday
+- checkFeatures:
+    - annotation column setting
+    - session import
+- neutralizing / ionization
+    - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
+    - what to do with unsupported adducts for annotation?
+	    - skip calculation with a warning?
+		    - default to M+H/M-H for now with warning...
+	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
+	    - check better for what is supported by SIRIUS?
+- importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
+- Check: units of plotChord() rt/mz graphs seems off
+- checkUI
+    - file import with different group names
 - misc
-    - prepareSuspectList(): export?
-        - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
-            - could also fix column names, replace "-" with NAs etc
-        - if yes, mention in ref docs for screenSuspects()
-- expand reporting
-    - eg include suspect name in EICs
-    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
-    - optionally report with collapsed suspects
-- update docs and handbook
-    - mention that components should be done prior to onlyHits=T?
+    - topMostByRGroup: make default? or only for reporting?
+    - quality/score filters
+    - updatePICSet(): also sync peaks list? otherwise doc
+    - newProject(): new algorithms
+    - getEICsForFeatures method for kpic2?
+    - optimize hashing? Or further avoid hashing big objects/objects with lists?
+    - rename exportedData, update docs (also handbook)
+    - remove featuresOpenMS method for getXCMSSet(), update docs
+    - delete for features and fGroups
+        - XCMS: also update groups data? --> use new function once it hits BC
+    - load OpenMS intensities in parallel
+        - either with futures or with MP and cache intensities afterwards
+    - use new example model by default from MC
+    
+
+## Annotation
+
+- getFormInfoList(): take care of consensus results like getPrecursorFormScores()
 
 
-## docs
-- improve instructions for MF and SIRIUS installation?
-- ref docs and exports for getXCMSnSet
-- ffOpenMS etc: analyses also needs to be available for hashing
+## Suspects
 
+- spec similarity: use C++ code?
+
+
+## Components
+
+- get rid of duplicated fGroup rows for nontarget so that they can work with delete/checkComponents
+- extraOpts --> `...` for nontarget?
+- checkComponents
+    - more settings?
+    - session import
+    - change column names for both tables?
+- feature components
+    - cliqueMS
+        - change checkPackage GH link once PRs are merged
+        - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
+            - Perhaps just document limitation?
+    - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
+    - other consensus approaches (super meeting)
 
 ## sets
+
 - methods to implement
     - consensus / comparison()
         - could first make consensus of setObjects and then make new set object from that
         - for compounds (and formulas?) need proper way to average scorings
         - or for later?
             - if not add tests
-    - more sub class specific methods
-        - compoundsSetMF sub-class (for settings slot)?
-        - --> or just doc that setObjects() can be used
     - provide methods for non-implemented functionality
         - consensus()/comparison()? (see above)
         - IPO
         - importFeatures()
             - or make method with set arg? --> re-enable tests then
         - makeSet()
-- check UIs
-    - checkFeatures:
-        - requires version bump of session
-        - annotation column setting
-            - requires version bump for settings
-    - checkComponents
-        - more settings?
-        - test session import
-        - change column names for both tables?
-        - does it work with componentsNT (duplicate fGroups)? same for delete()
-            - doc limitation
+        - TASQ
+            - or is it easy to add?
 - misc
-    - handle errors when object has <=1 set
-        - groupFeaturesScreening()
-        - mergeScreeningSetInfos()
-    - fix empty MS(MS) peaklists if unavailable during merging sets
-        - already fixed?
-    - calculatePeakQualities() --> seems fine now
     - import XCMS features: verify anaInfo (or remove necessity)
     - plotSpectrum(): show horizontal line in mirrored plot?
-    - ggplot: remove? Otherwise fix plotSpectrum() for title and possibly others
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
-    - delete(, sets)?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
     -componentsSetReduced necessary? eg for NT components with plotGraph
-- suspect screening
-    - implement TASQ?
-    - support recursive screening? or throw error otherwise
-- neutralizing / ionization
-    - selectIons()
-	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
-	- makeSet()
-	    - fGroups: also support method via comparison?
-    - what to do with unsupported adducts for annotation?
-	    - skip calculation with a warning?
-		    - default to M+H/M-H for now with warning...
-	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
-	    - check better for what is supported by SIRIUS?
-	- feature components
-	    - cliqueMS
-	        - change checkPackage GH link once PRs are merged
-            - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
-                - Perhaps just document limitation?
-        - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
-- NEWS
-    - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
-    - Fixed Hill ordering: H wasn't alphabetical if no C is present
-    - MetFrag
-        - formula_MF in MF FragInfo
-        - useSmiles=true
-    - SIRIUS
-        - Fixed: as.data.table() and possibly others didn't handle empty fragInfos from SIRIUS
-        - More fixes to correctly handle 'adduct fragments'
-    - Fixed: as.data.table(compounds, fragments=TRUE) not output anything with missing fragInfo
-    - adducts
-        - GenForm/MetFragAdducts()
-            - now report generic format
-            - load from cached R data --> faster as.adduct()
-        - adduct as.character: err argument
-        - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
-        - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
-    - OpenMS adducts?
-    - susp_ prefix in as.data.table
-    - suspFormRank/suspCompRank --> formRank/compRank
-    - RC components: ensure that columns are the right type if all values are NA
-    - changed "rt" to "ret" for component columns for consistency
-    - changed formula feature consensus thresholding
-        - featThreshold and featThresholdAnn
-        - former follows original definition but is now actually working properly, as pruning before could lead too high abundances
-        - latter only takes annotated features into account
-        - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
-    - renamed analysis column from feature consensus formulae results to analysis_from
-    - added analyses column in feature consensus formulae results
-    - formulas as.data.table(average=TRUE): remove analysis_from column
-    - plotGraph: better error if if object is empty
-    - show() for components: show unique fGroup counts
-- docs
-    - filter() for features/fGroups: apply to neutral masses
-    - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
-    - intclust is not a componentsSet
-    - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
-    - find nice way to re-use docs
-    - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
-    - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
-        - this could mean really different results if subsetting on sets is done prior to filtering
-        - put message() in sync function?
-    - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
-        - put message() in sync function?
-    - document for every object how consensus/merge is done
-    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
-    - update/check version nr mentioned in filter() for MSPeakLists
-    - explain xlim/ylim behavior for annotations/mols for plotSpec()
-    - update/add aliases
-    - SIRIUS: batch calculations done per adduct
-    - suspect screening
-        - explain three mass matching methods (see comments doScreenSuspects())
-        - mention mz column can now be NA
-    - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
-    - OpenMS adducts?
-    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
-    - update/check version nr mentioned in filter() for MSPeakLists
-    - explain xlim/ylim behavior for annotations/mols for plotSpec()
-    - update for featThreshold and featThresholdAnn
-        - put featThreshold in common arguments handbook table?
-    - remove some aliases for generics now not unique to one class (eg unique/overlap)
-    - overlap/unique/plotVenn for sets: sets arg overrides which
-    - adducts<-
-        - for sets: make clear that order/names are taken from annTab[set == s]
-        - for sets: example with reGroup
-    - OpenMS components
-        - qTry == "feature" currently not supported
-        - adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
-    - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
-    - as.data.table() for formulas: formula column removed if average=T
-    - unset(fGroups) will get adduct annotated fGroups
-    - session filters: TRUE will use default yml file name
-- tests
-    - handle/test empty objects
-    - test DA algorithms
-    - fGroups/components: disable comparison/consensus?
-    - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
-    
-    
+        - probably yes
+- support recursive screening? or throw error otherwise
+
 ## TPs
+
 - componentsTP
     - include precursor_formula in compInfo
     - include diff formula and reaction in components
     - argument order and defaults
+    - report matching frags/neutral losses using annotatedPeakList()
 - predictTPsBioTransformer()
-    - filter on stability/persistence/toxicity of TP?
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
 - metabolic logic
     - more logic reactions?
     - assert types of custom reactions DF
-    - cite 10.1021/acs.analchem.5b02905
+    - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents
     - fix if empty cTab for MSMS components
     - doc that precursor should not occur in multiple components (is this relevant for users?)
     - caching
     - remove? doesn't seem useful anymore
 - log2fc
-    - mention Bas
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
     - plotVolcano()
         - more plot parameters?
         - move legend outside graph
     - P values are calculated properly?
     - workflow: first do log2fc subsetting, then clustering
+        - not relevant anymore?
 - spectrumSimilarity
     - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
         - allow optional groupName2/analysis2
             - or groupName can be vector? --> matrix plot?
             - or just 2 sized vector...
         - mark overlapping peaks? needs all the similarity params to do binning though...
+            - use param list for plotting, specclust etc
         - do this also for formulas/compounds?
     - consistent and proper defaults for minIntensity etc
     - remove merged approach, possibly find other ways to customize averaging
@@ -238,201 +147,286 @@
     - Make sure hash takes into account parent names
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
-- document
+
+## Reporting
+
+- featInfo: finished?
+- componentsTPs
+    - similar format as annotation tab for all TPs for each parent
+    - plot structure (if possible), intensity profiles, EIC and specs for both parents and TPss
+
+
+## tests
+
+- test DA algorithms
+- MSPeakLists and others?: also test object that is fully empty (now still has analyses)
+- sets
+    - fGroups/components: disable comparison/consensus?
+- FC, plotVolcano
+- ensure peaklists are sorted
+- spectrumSimilarity()
+- delete()
+- features
+    - topMostByRGroup
+    - xcms3 comparison
+    - new multiple blank filtering
+    - syncing of XCMS/KPIC2 objects
+    - check if featindex and groups slots are in sync with features
+    - subsetting and groupScores
+
+## docs
+
+- ffOpenMS etc: analyses also needs to be available for hashing
+- update/add aliases
+- remove some aliases for generics now not unique to one class (eg unique/overlap)
+- session filters: TRUE will use default yml file name
+- minMSMSPeaks filter
+- check UIs and import functions
+- features
+    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
+    - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
+    - mzWindow --> mzExpWindow
+    - clarify reportCSV() now only reports remaining features?
+    - topMostByRGroup: handbook?
+    - session filter: argument and its order
+    - groupQualities/Scores slots
+    - GaussianSimilarity: NAs are made zero
+    - as.data.table: qualities argument
+    - calculatePeakQualities(), also generic
+    - reportHTML: EICs made if annotations, even if not specified in reportPlots
+    - update IPO docs for kpic2 (and mention min/max_width split and others)
+    - ... for findFeaturesXCMS3
+    - progressr
+    - groupFeatures: feat arg --> obj
+    - MC import/export
+- suspect screening
+    - explain three mass matching methods (see comments doScreenSuspects())
+    - mention mz column can now be NA
+- sets
+    - setObjects() can be used for specific slots such as algo objects and MF settings
+    - filter() for features/fGroups: apply to neutral masses
+    - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
+    - intclust/specclust/TPs is not a componentsSet
+    - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
+    - find nice way to re-use docs
+    - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
+    - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
+        - this could mean really different results if subsetting on sets is done prior to filtering
+        - put message() in sync function?
+    - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
+        - put message() in sync function?
+        - although subsetting doesn't sync anymore --> clearly document all this!
+    - document for every object how consensus/merge is done
+    - update/check version nr mentioned in filter() for MSPeakLists
+    - explain xlim/ylim behavior for annotations/mols for plotSpec()
+    - SIRIUS: batch calculations done per adduct
+    - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
+    - update/check version nr mentioned in filter() for MSPeakLists
+    - explain xlim/ylim behavior for annotations/mols for plotSpec()
+    - update for featThreshold and featThresholdAnn
+        - put featThreshold in common arguments handbook table?
+    - overlap/unique/plotVenn for sets: sets arg overrides `which`
+    - adducts<-
+        - for sets: make clear that order/names are taken from annTab[set == s]
+        - for sets: example with reGroup
+    - as.data.table() for formulas: formula column removed if average=T
+    - unset(fGroups) will get adduct annotated fGroups
+- components
+    - OpenMS: qTry == "feature" currently not supported
+    - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
+    - OpenMS/cliqueMS adducts?
+- TPs
+    - mention Bas as author for log2fc, spec similarity etc
     - predictTPsBioTransformer
         - use identifier as fallback for naming when no compoundName is present
         - citations, also EnviPath
         - compound similarities
-    - minMSMSPeaks filter
     - FCParams/plotVolcano
     - update spectrumSimilarity()
-    - document that relative intensity filter for spec sim is applied after removing precursors
+    - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
+        - min peaks always applied lastly
 
-- NEWS
+## NEWS
+
+- progressr
+- Features
     - as.data.table(fGroups): normalization, FC, averageFunc
-    - minMSMSPeaks filter
-    - fixed: withMSMS now applied after all other filters
-    - fixed: topX peaks for MSPeakLists would re-order peaklists
-- tests
-    - FC, plotVolcano
-    - ensure peaklists are sorted
-    - spectrumSimilarity()
-
-
-## features
-- feature optim:
-    - docs
-        - mention parameters default unless specified
-    - keep retcor_done?
-    - get rid of getXCMSSet() calls?
-- suspect screening
-    - rename patRoonData::targets?
-- filter()
-    - document which filters work on feature level (e.g. chromWidth)
-    - remove zero values for maxReplicateIntRSD?
-- importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
-- Check: units of plotChord() rt/mz graphs seems off
-- checkUI
-    - yml file format
-        - file import with different group names
-- misc
-    - topMostByRGroup: make default? or only for reporting?
-    - quality/score filters
-    - updatePICSet(): also sync peaks list? otherwise doc
-    - newProject(): new algorithms
-    - getEICsForFeatures method for kpic2?
-    - optimize hashing? Or further avoid hashing big objects/objects with lists?
-    - rename exportedData, update docs (also handbook)
-    - remove featuresOpenMS method for getXCMSSet(), update docs
-    - delete for features and fGroups
-        - XCMS: also update groups data?
-    - load OpenMS intensities in parallel
-        - either with futures or with MP and cache intensities afterwards
-- NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
     - optimized feature group filters
     - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
     - ... for findFeaturesXCMS3
     - XCMS3 grouping/import with exportedData and comparison() supports xcms3
-    - progressr
     - don't subtract blanks from each other
     - syncing XCMS objects
     - print feature counts in show(fGroups) and filter()
     - noDataPlot() for empty plots, eg by plot(), plotChroms()...
     - mzWindow --> mzExpWindow
     - groupFeatures: feat arg --> obj
-- tests
-    - topMostByRGroup
-    - xcms3 comparison
-    - new multiple blank filtering
-    - syncing of XCMS/KPIC2 objects
-    - delete()
-    - check if featindex and groups slots are in sync with features
-    - subsetting and groupScores
-- docs
-    - mzWindow --> mzExpWindow
-    - clarify reportCSV() now only reports remaining features?
-    - topMostByRGroup: handbook?
-    - session filter: argument and its order
-    - importCheckFeaturesSession()
-    - groupQualities/Scores slots
-    - GaussianSimilarity: NAs are made zero
-    - as.data.table: qualities argument
-    - calculatePeakQualities(), also generic
-    - reportHTML: EICs made if annotations, even if not specified in reportPlots
-    - handbook
-        - checkFeatures()
-    - update IPO docs for kpic2 (and mention min/max_width split and others)
-    - ... for findFeaturesXCMS3
-    - progressr
-    - groupFeatures: feat arg --> obj
+- Annotation
+    - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
+    - Fixed Hill ordering: H wasn't alphabetical if no C is present
+    - minMSMSPeaks filter
+    - fixed: withMSMS now applied after all other filters
+    - fixed: topX peaks for MSPeakLists would re-order peaklists
+    - MetFrag
+        - formula_MF in MF FragInfo
+        - useSmiles=true
+    - SIRIUS
+        - Fixed: as.data.table() and possibly others didn't handle empty fragInfos from SIRIUS
+        - More fixes to correctly handle 'adduct fragments'
+    - Fixed: as.data.table(compounds, fragments=TRUE) not outputting anything with missing fragInfo
+    - changed formula feature consensus
+        - featThreshold and featThresholdAnn
+        - former follows original definition but is now actually working properly, as pruning before could lead too high abundances
+        - latter only takes annotated features into account
+        - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
+        - renamed analysis column from feature consensus formulae results to analysis_from
+        - added analyses column in feature consensus formulae results
+        - formulas as.data.table(average=TRUE): remove analysis_from column
+- adducts
+    - GenForm/MetFragAdducts()
+        - now report generic format
+        - load from cached R data --> faster as.adduct()
+    - adduct as.character: err argument
+    - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
+    - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
+    - OpenMS and cliqueMS formats
+- suspects
+    - susp_ prefix in as.data.table
+    - suspFormRank/suspCompRank --> formRank/compRank
+- components
+    - RC components: ensure that columns are the right type if all values are NA
+    - changed "rt" to "ret" for component columns for consistency
+    - show(): show unique fGroup counts
+- plotGraph: better error if if object is empty
 
-## MSPeakLists
-- isotope tagging is lost after averaging
-- collapse averagedPeakLists
-- test avg params
-- metadata() generic?
 
+# Lower priority
 
-## compounds
-- SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
-- test score normalization?
-- timeouts for SIRIUS?
-- do something about negative H explained fragments by MF?
+## General
+
+- convertMSFiles()
+    - Agilent .d is also a directory?
+    - Remove necessity to have different input/output formats? (at least OK for pwiz)
+- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
+- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
+- delete() for other classes
 - SusDat MF support
-- MetFrag: auto-include suspect results if suspectListScore is selected?
-- SIRIUS: message/progress bar when processing a large batch in singular mode?
 
+## Components
 
-## formulas
-- customize/document ranking column order? (only do rank for sirius?)
-- getFormInfoList(): take care of consensus results like getPrecursorFormScores()
-
-## components
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
-- int: also use calculateComponentIntensities() for intensities?
+- int and others: also use calculateComponentIntensities() for intensities?
 - plot doesnt work for componentsReduced that originates from cluster components
     - maybe drop reduced mechanism?
-
-
-## reporting
-- add more options to reportPlots argument of reportHTML()?
-- onlyAnnotated argument
-
-
-## Cleanup
-- Reduce non-exported class only methods
-
-## MP
-
-- future MP
-    - delayBetweenProc?
+- intclust
+    - optionally take areas instead of intensities
+    - cache results
 
 
 # Future
 
+
 ## General
 
+- test negative subset indices
+- convertMSFiles(): Support OpenMS vendor conversion? (eg thermo)
+- newProject()
+    - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
+- Reduce non-exported class only methods
+- future MP
+    - delayBetweenProc?
+    - batch mode
 - msPurity integration
-- suspect screening: add MS/MS qualifiers
-- fillPeaks for CAMERA (and RAMClustR?)
-- support fastcluster for compounds clustering/int component clusters?
 - algorithmObject() generic: for xset, xsa, rc, ...
-- newProject(): fix multi line delete (when possible)
 - more withr wrapping? (dev, par)
-- improve default plotting for plotInt and cluster plot functions
 - newProject()
     - concentration column for anaInfo
     - generate more detailed script with e.g. commented examples of subsetting, extraction etc
-- support more of the new SIRIUS functionality
-	- newProject(): import Bruker seq file?
+	- import Bruker seq file?
+    - fix multi line delete (when possible)
 
 
 ## Features
 
+- makeSet(): also support fGroups method via comparison?
+- feature optim:
+    - keep retcor_done?
+    - get rid of getXCMSSet() calls?
+- filter()
+    - document which filters work on feature level (e.g. chromWidth)
+    - remove zero values for maxReplicateIntRSD?
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
-- parallel enviPick
-- OpenMS MetaboliteAdductDecharger support?
 - OpenMS: Support KD grouper?
-- Integration of mzMine features (package pending...), MS-DIAL and KPIC2, peakonly, SIRIUS?
+- Integration of mzMine features (package pending...), MS-DIAL and peakonly?
 - suspect screening
-    - tag fGroups with suspect instead of converting fGroups object (and add filter to remove non-hits)
-    - automatic SMILES conversion if mz data is lacking in suspect list (and automatic name assignment of that's lacking too? might be handy for some NORMAN lists)
+    - automatic suspect list name assignment if that's lacking? might be handy for some NORMAN lists
 - topMost filter that accepts rGroups, either as AND or OR
 
+## Annotation
 
-## MSPeakLists
-
-- DA
-    - generateMSPeakListsDA: find precursor masses with larger window
-    - tests
-        - utils? EICs with export/vdiffr?
-        - test MS peak lists deisotoping?
+- MSPeakLists
+    - isotope tagging is lost after averaging
+    - test avg params
+    - metadata() generic?
+    - DA
+        - generateMSPeakListsDA: find precursor masses with larger window
+        - tests
+            - utils? EICs with export/vdiffr?
+            - test MS peak lists deisotoping?
 - metadata for Bruker peaklists?
-
-
-## Formulas
-
-- DBE calculation for SIRIUS?
-- OM reporting
-- as.data.table: option to average per replicate group?
-
-
-## Compounds
-
+- SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
+- test score normalization?
+- timeouts for SIRIUS?
+- do something about negative H explained fragments by MF?
+- MetFrag: auto-include suspect results if suspectListScore is selected?
 - do something with sirius fingerprints? --> comparison?
 - fix compoundViewer
 - add new MF HD scorings and make sure default normalization equals that of MF web
 - CFM-ID and MS-FINDER integration
 - utility functions to make custom DBs for MetFrag and SIRIUS and support to use them with the latter
+- DBE calculation for SIRIUS?
+- OM reporting
+- as.data.table: option to average per replicate group?
+
+
+## Suspects
+
+- ID level rules: add scorings for SIRIUS/DA
+- interface
+    - also convert TASQ?
+    - annotateSuspects()
+        - check why it's is sometimes slow
+            - seems to be logging, disable by default? --> only slow with testthat?
+    - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
+- misc
+    - prepareSuspectList(): export?
+        - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
+            - could also fix column names, replace "-" with NAs etc
+        - if yes, mention in ref docs for screenSuspects()
+- expand reporting
+    - eg include suspect name in EICs
+        - already now in featInfo
+    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
+    - optionally report with collapsed suspects
+
 
 
 ## components
 - mass defect components
-- CliqueMS
 - split peak correlation and adduct etc annotation? would allow better non-target integration
-- intclust
-    - optionally take areas instead of intensities
-    - cache results
+- fillPeaks for CAMERA (and RAMClustR?)
+
+
+## TPs
+
+- filter on stability/persistence/toxicity of TP?
+
+
+## Reporting
+
+- add more options to reportPlots argument of reportHTML()?
+- onlyAnnotated argument
+

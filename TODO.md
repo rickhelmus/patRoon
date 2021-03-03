@@ -89,6 +89,7 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
+    - unset(compounds): remove sets columns (PLIndexSet, set) from fragInfos
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -103,8 +104,8 @@
     - include precursor_formula in compInfo
     - include diff formula and reaction in components
     - argument order and defaults
-    - report matching frags/neutral losses using annotatedPeakList()
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
+    - move min spec sim to filter()? and add filters for annotation matches
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

@@ -35,13 +35,69 @@ genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
                 specSimilarityBoth = getSim("both")))
 }
 
-doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, minRTDiff, minSpecSim,
-                               minSpecSimPrec, minSpecSimBoth, specSimArgs)
+genTPAnnSimilarities <- function(precFG, TPFGs, MSPeakLists, formulas, compounds)
+{
+    getAllAnnPLs <- function(grp)
+    {
+        annPLsForm <- annPLsComp <- NULL
+        
+        if (!is.null(formulas) && !is.null(formulas[[grp]]))
+        {
+            precs <- unique(formulas[[grp]]$neutral_formula)
+            annPLsForm <- rbindlist(pruneList(lapply(precs, function(p)
+            {
+                ret <- annotatedPeakList(formulas, precursor = p, groupName = grp, MSPeakLists = MSPeakLists,
+                                         onlyAnnotated = TRUE)
+            })))
+        }
+        
+        if (!is.null(compounds) && !is.null(compounds[[grp]]))
+        {
+            annPLsComp <- rbindlist(pruneList(lapply(seq_len(nrow(compounds[[grp]])), function(i)
+            {
+                # NOTE: we don't set formulas as we handle them separately in order to get all their results as well
+                annotatedPeakList(compounds, index = i, groupName = grp, MSPeakLists = MSPeakLists, formulas = NULL,
+                                  onlyAnnotated = TRUE)
+            })), fill = TRUE)
+        }
+        
+        # NOTE: use rbindlist to force DT method, which has the fill argument we need
+        # NOTE: rbind/rbindlist deals with NULLs
+        return(rbindlist(list(annPLsForm, annPLsComp), fill = TRUE)) 
+    }
+    
+    annPLPrec <- getAllAnnPLs(precFG)
+    
+    if (is.null(annPLPrec))
+        return(list(fragmentMatches = rep(NA_integer_, length(TPFGs)),
+                    neutralLossMatches = rep(NA_integer_, length(TPFGs))))
+    
+    precFrags <- unique(annPLPrec$formula); precNLs <- unique(annPLPrec$neutral_loss)
+    annPLTPs <- lapply(TPFGs, getAllAnnPLs)
+    fragMatches <- lapply(annPLTPs, function(ann)
+    {
+        if (is.null(ann))
+            return(NA_integer_)
+        return(sum(unique(ann$formula) %chin% precFrags))
+    })
+    NLMatches <- lapply(annPLTPs, function(ann)
+    {
+        if (is.null(ann))
+            return(NA_integer_)
+        return(sum(unique(ann$neutral_loss) %chin% precNLs))
+    })
+    
+    return(list(fragmentMatches = fragMatches,
+                neutralLossMatches = NLMatches))
+}
+
+doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
+                               minSpecSim, minSpecSimPrec, minSpecSimBoth, specSimArgs)
 {
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, formulas, compounds, minRTDiff, minSpecSim, minSpecSimPrec,
                      minSpecSimBoth, specSimArgs)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
@@ -93,6 +149,12 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
             }
             else
                 cmp[, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth") := NA_real_]
+
+            if (!is.null(formulas) || !is.null(compounds))
+            {
+                sims <- genTPAnnSimilarities(precFG, cmp$group, MSPeakLists, formulas, compounds)
+                cmp[, (names(sims)) := sims]
+            }
         }
         
         return(cmp)
@@ -310,7 +372,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
-                                                             pred = NULL, MSPeakLists = NULL, minRTDiff = 20,
+                                                             pred = NULL, MSPeakLists = NULL, formulas = NULL,
+                                                             compounds = NULL, minRTDiff = 20,
                                                              minSpecSim = 0, minSpecSimPrec = 0, minSpecSimBoth = 0,
                                                              simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                              intWeight = 1, absMzDev = 0.005,
@@ -320,8 +383,9 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     # UNDONE: doc when fGroups/fGroupsTPs needs to be fGroupsScreening
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroups", "TPPredictions", "MSPeakLists"), null.ok = c(FALSE, TRUE, TRUE), fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists + formulas + compounds,
+           c("featureGroups", "TPPredictions", "MSPeakLists", "formulas", "compounds"),
+           null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
                mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -333,8 +397,8 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
         stop("Input feature groups need to be screened for (TP) suspects!")
 
-    return(doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
-                              minSpecSimBoth,
+    return(doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
+                              minSpecSim, minSpecSimPrec, minSpecSimBoth,
                               specSimArgs = list(method = simMethod, removePrecursor = removePrecursor,
                               mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
                               relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)))
@@ -342,7 +406,8 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
-                                                                pred = NULL, MSPeakLists = NULL, minRTDiff = 20,
+                                                                pred = NULL, MSPeakLists = NULL, formulas = NULL,
+                                                                compounds = NULL, minRTDiff = 20,
                                                                 minSpecSim = 0, minSpecSimPrec = 0, minSpecSimBoth = 0,
                                                                 simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                                 intWeight = 1, absMzDev = 0.005,
@@ -351,9 +416,9 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     # UNDONE: also filter separate similarities?
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroupsSet", "TPPredictions", "MSPeakListsSet"), null.ok = c(FALSE, TRUE, TRUE),
-           fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists + formulas + compounds,
+           c("featureGroupsSet", "TPPredictions", "MSPeakListsSet", "formulasSet", "compoundsSet"),
+           null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
                mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -370,16 +435,18 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                         intWeight = intWeight, absMzDev = absMzDev, relMinIntensity = relMinIntensity,
                         minPeaks = minSimMSMSPeaks)
     
-    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, minRTDiff, minSpecSim, minSpecSimPrec,
-                              minSpecSimBoth, specSimArgs = specSimArgs)
+    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds,
+                              minRTDiff, minSpecSim, minSpecSimPrec, minSpecSimBoth, specSimArgs = specSimArgs)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
     
-    unsetMSPeakLists <- NULL
-    if (!is.null(MSPeakLists))
-        unsetMSPeakLists <- sapply(sets(MSPeakLists), unset, obj = MSPeakLists, simplify = FALSE)
+    unsetORNULL <- function(x) if (!is.null(x)) sapply(sets(x), unset, obj = x, simplify = FALSE) else NULL
     
+    unsetMSPeakLists <- unsetORNULL(MSPeakLists)
+    unsetFormulas <- unsetORNULL(formulas)
+    unsetCompounds <- unsetORNULL(compounds)
+
     ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {
         for (s in sets(fGroupsTPs))
@@ -392,6 +459,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 # calculate per set spectrum similarities
                 simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
                 grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
+                
                 if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[precFG]][["MSMS"]]))
                 {
                     sims <- do.call(genTPSpecSimilarities, c(list(unsetMSPeakLists[[s]], precFG, grpsInSet), specSimArgs))
@@ -399,10 +467,20 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 }
                 else
                     cmp[, (simColNames) := NA_real_]
+                
+                if (!is.null(unsetFormulas) || !is.null(unsetCompounds))
+                {
+                    # calculate per set spectrum similarities
+                    sims <- genTPAnnSimilarities(precFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
+                                                 unsetCompounds[[s]])
+                    annColNames <- paste0(c("fragMatches", "neutralLossMatches"), "-", s)
+                    cmp[, (annColNames) := sims]
+                }
             }
-        
-            # move spec similarity columns to end
-            setcolorder(cmp, setdiff(names(cmp), grep("^specSimilarity", names(cmp), value = TRUE)))
+            
+            # move similarity columns to end
+            setcolorder(cmp, setdiff(names(cmp), c(grep("^specSimilarity", names(cmp), value = TRUE),
+                                                   grep("Matches", names(cmp), fixed = TRUE, value = TRUE))))
         }
         
         return(cmp)

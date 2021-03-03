@@ -623,7 +623,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
         }
     }
 
-    if (!is.null(fragInfo) && nrow(fragInfo) > 0)
+    if (!is.null(fragInfo))
         spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
 
     spec <- spec[, PLIndex := NULL]

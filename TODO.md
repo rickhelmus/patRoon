@@ -105,7 +105,6 @@
     - include diff formula and reaction in components
     - argument order and defaults
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
-    - move min spec sim to filter()? and add filters for annotation matches
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -175,6 +174,8 @@
     - syncing of XCMS/KPIC2 objects
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
+- TPs
+    - filter() for componentsTPs
 
 ## docs
 
@@ -316,6 +317,8 @@
 - somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
 - delete() for other classes
 - SusDat MF support
+- parallel MSPeakLists generation?
+
 
 ## Components
 

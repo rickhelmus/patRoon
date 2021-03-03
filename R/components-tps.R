@@ -92,13 +92,12 @@ genTPAnnSimilarities <- function(precFG, TPFGs, MSPeakLists, formulas, compounds
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
-                               minSpecSim, minSpecSimPrec, minSpecSimBoth, specSimArgs)
+                               specSimArgs)
 {
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, formulas, compounds, minRTDiff, minSpecSim, minSpecSimPrec,
-                     minSpecSimBoth, specSimArgs)
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, formulas, compounds, minRTDiff, specSimArgs)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -142,10 +141,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
             {
                 sims <- do.call(genTPSpecSimilarities, c(list(MSPeakLists, precFG, cmp$group), specSimArgs))
                 cmp[, (names(sims)) := sims]
-                
-                checkSim <- function(x, thr) !is.na(x) & numGTE(x, thr)
-                cmp <- cmp[checkSim(specSimilarity, minSpecSim) & checkSim(specSimilarityPrec, minSpecSimPrec) &
-                               checkSim(specSimilarityBoth, minSpecSimBoth)]
             }
             else
                 cmp[, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth") := NA_real_]
@@ -285,63 +280,102 @@ setMethod("as.data.table", "componentsTPs", function(x)
 })
 
 #' @export
-setMethod("filter", "componentsTPs", function(obj, ..., formulas = NULL, negate = FALSE)
+setMethod("filter", "componentsTPs", function(obj, ..., minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
+                                              minFragMatches = NULL, minNLMatches = NULL, formulas = NULL,
+                                              verbose = TRUE, negate = FALSE)
 {
     # UNDONE: if formulas is set, also remove fGroups without assignment? Otherwise document!
+    # UNDONE: also filter set separate similarities?
     
     ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ minSpecSim + minSpecSimPrec + minSpecSimBoth + minFragMatches + minNLMatches,
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    checkmate::assertFlag(negate, add = ac)
+    aapply(checkmate::assertFlag, . ~ verbose + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(obj)
     
-    if (!is.null(formulas))
+    if (!is.null(formulas) && is.null(obj[[1]][["reaction_add"]]))
+        stop("formula filter is only available for logic TP predictions")
+    
+    old <- obj
+    
+    minColFilter <- function(ct, col, val)
     {
-        if (is.null(obj[[1]][["reaction_add"]]))
-            stop("formula filter is only available for logic TP predictions")
-        
-        oldn <- length(obj)
-        
-        obj@components <- Map(componentTable(obj), componentInfo(obj)$precursor_group, f = function(cmp, gName)
+        if (!is.null(val) && val > 0)
         {
-            # check if subtracting is possible, ie by checking if
-            # subtraction doesn't lead to negative element counts
-            canSub <- function(f, fg)
+            if (!is.null(ct[[col]]))
             {
-                if (is.null(formulas[[fg]]) || length(f) == 0 || !nzchar(f))
-                    return(TRUE) # UNDONE?
-                candidateForms <- unique(formulas[[fg]]$neutral_formula)
-                for (cf in candidateForms)
-                {
-                    fl <- splitFormulaToList(subtractFormula(cf, f))
-                    if (all(fl >= 0))
-                        return(TRUE)
-                }
-                return(FALSE)
+                if (negate)
+                    pred <- function(x, v) is.na(x) | x < v
+                else
+                    pred <- function(x, v) !is.na(x) & numGTE(x, v)
+                ct[keep == TRUE, keep := pred(get(col), val)]
             }
-            if (negate)
-                canSub <- Negate(canSub)
-            
-            # filter results where subtraction of any of the precursor formulas is impossible
-            cmp <- cmp[!nzchar(reaction_sub) | sapply(reaction_sub, canSub, gName)]
-            
-            # filter results where addition is not part of TP candidate formulas
-            if (nrow(cmp) > 0)
-                cmp <- cmp[!nzchar(reaction_add) | mapply(reaction_add, group, FUN = canSub)]
-
-            return(cmp)
-        })
-        
-        obj@components <- pruneList(obj@components, checkZeroRows = TRUE)
-        
-        newn <- length(obj)
-        printf("Done! Filtered %d (%.2f%%) components. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+        }
+        return(ct)
     }
     
+    anyTPFilters <- !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
+        !is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas)
+    
+    if (anyTPFilters)
+    {
+        obj <- delete(obj, j = function(ct, cmp, ...)
+        {
+            ct <- copy(ct)
+            ct[, keep := TRUE]
+            
+            ct <- minColFilter(ct, "specSimilarity", minSpecSim)
+            ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)
+            ct <- minColFilter(ct, "minSpecSimBoth", minSpecSimBoth)
+            ct <- minColFilter(ct, "fragMatches", minFragMatches)
+            ct <- minColFilter(ct, "neutralLossMatches", minNLMatches)
+            
+            if (!is.null(formulas))
+            {
+                # check if subtracting is possible, ie by checking if subtraction doesn't lead to negative element
+                # counts
+                canSub <- function(f, ft)
+                {
+                    if (is.null(ft) || length(f) == 0 || !nzchar(f))
+                        return(TRUE) # UNDONE?
+                    candidateForms <- unique(ft$neutral_formula)
+                    for (cf in candidateForms)
+                    {
+                        fl <- splitFormulaToList(subtractFormula(cf, f))
+                        if (all(fl >= 0))
+                            return(TRUE)
+                    }
+                    return(FALSE)
+                }
+                if (negate)
+                    canSub <- Negate(canSub)
+                
+                precFG <- componentInfo(obj)[name == cmp]$precursor_group
+                if (!is.null(formulas[[precFG]]))
+                {
+                    # filter results where subtraction of any of the precursor formulas is impossible
+                    ct[keep == TRUE & nzchar(reaction_sub), keep := sapply(reaction_sub, canSub, formulas[[precFG]])]
+                }
+                
+                # filter results where addition is not part of TP candidate formulas
+                ct[keep == TRUE & nzchar(reaction_add), keep := mapply(reaction_add, formulaTable(formulas)[group],
+                                                                       FUN = canSub)]
+            }
+            
+            return(!ct$keep)
+        })
+        
+        if (verbose)
+            printComponentsFiltered(old, obj)
+    }
+    
+    
     if (...length() > 0)
-        return(callNextMethod(obj, ..., negate = negate))
+        return(callNextMethod(obj, ..., verbose = verbose, negate = negate))
     
     return(obj)
 })
@@ -374,7 +408,6 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
                                                              pred = NULL, MSPeakLists = NULL, formulas = NULL,
                                                              compounds = NULL, minRTDiff = 20,
-                                                             minSpecSim = 0, minSpecSimPrec = 0, minSpecSimBoth = 0,
                                                              simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                              intWeight = 1, absMzDev = 0.005,
                                                              relMinIntensity = 0.05, minSimMSMSPeaks = 0)
@@ -387,8 +420,8 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
            c("featureGroups", "TPPredictions", "MSPeakLists", "formulas", "compounds"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
-               mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     checkmate::assertCount(minSimMSMSPeaks, add = ac)
     checkmate::reportAssertions(ac)
@@ -398,7 +431,6 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         stop("Input feature groups need to be screened for (TP) suspects!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
-                              minSpecSim, minSpecSimPrec, minSpecSimBoth,
                               specSimArgs = list(method = simMethod, removePrecursor = removePrecursor,
                               mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
                               relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)))
@@ -408,20 +440,17 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, ignorePrecursors = FALSE,
                                                                 pred = NULL, MSPeakLists = NULL, formulas = NULL,
                                                                 compounds = NULL, minRTDiff = 20,
-                                                                minSpecSim = 0, minSpecSimPrec = 0, minSpecSimBoth = 0,
                                                                 simMethod, removePrecursor = FALSE, mzWeight = 0,
                                                                 intWeight = 1, absMzDev = 0.005,
                                                                 relMinIntensity = 0.05, minSimMSMSPeaks = 0)
 {
-    # UNDONE: also filter separate similarities?
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists + formulas + compounds,
            c("featureGroupsSet", "TPPredictions", "MSPeakListsSet", "formulasSet", "compoundsSet"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minRTDiff + minSpecSim + minSpecSimPrec + minSpecSimBoth +
-               mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0,
+           finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     aapply(checkmate::assertFlag, . ~ ignorePrecursors + removePrecursor, fixed = list(add = ac))
     checkmate::assertCount(minSimMSMSPeaks, add = ac)
@@ -436,7 +465,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                         minPeaks = minSimMSMSPeaks)
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds,
-                              minRTDiff, minSpecSim, minSpecSimPrec, minSpecSimBoth, specSimArgs = specSimArgs)
+                              minRTDiff, specSimArgs = specSimArgs)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)

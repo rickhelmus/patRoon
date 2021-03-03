@@ -127,6 +127,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         cmp[, intensity := 1]
         
         cmp[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
+        cmp[, retDiff := gInfoPrec[precFG, "rts"] - ret]
         cmp[, mzDiff := gInfoPrec[precFG, "mzs"] - mz]
         
         if (minRTDiff > 0)
@@ -192,6 +193,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         
         precFGMapping <- linkPrecursorsToFGroups(pred, fGroups)
         TPFGMapping <- linkTPsToFGroups(pred, fGroupsTPs)
+        susps <- suspects(pred)
         
         precCount <- length(names(pred))
         prog <- openProgBar(0, precCount)
@@ -219,7 +221,15 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
                     ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
                     ret <- unique(ret, by = "group")
                     
-                    return(prepareComponent(ret, precFG))
+                    ret <- prepareComponent(ret, precFG)
+                    
+                    if (!is.null(ret[["formula"]])) # eg TRUE for BT
+                    {
+                        precForm <- susps[name == pname]$formula
+                        ret[, formulaDiff := sapply(formula, subtractFormula, formula1 = precForm)]
+                    }
+                    
+                    return(ret)
                 }, simplify = FALSE), idcol = "precursor_group")
             }
             

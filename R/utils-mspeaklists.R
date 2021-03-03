@@ -49,6 +49,20 @@ getDefIsolatePrecParamsRD <- function()
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
+#' @export
+getDefSpecSimParams <- function(...)
+{
+    def <- list(method = "cosine",
+                removePrecursor = TRUE,
+                mzWeight = 0,
+                intWeight = 1,
+                absMzDev = 0.005,
+                relMinIntensity = 0.05,
+                minPeaks = 1)
+
+    return(modifyList(def, list(...)))
+}
+
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
 averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,

@@ -380,6 +380,21 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
     assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
 }
 
+assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
+    
+    assertVal(checkmate::assertChoice, "method", choices = c("cosine", "jaccard"))
+    assertVal(checkmate::assertFlag, "removePrecursor")
+    assertVal(checkmate::assertNumber, "mzWeight", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "intWeight", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "absMzDev", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "relMinIntensity", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertCount, "minPeaks", positive = TRUE)
+}
+
 assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))

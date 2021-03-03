@@ -10,10 +10,10 @@ getTPLogicTransformations <- function(transformations)
     if (is.null(transformations))
         ret <- patRoon:::TPsLogicReactions # stored inside R/sysdata.rda
     
-    if (is.data.table(transformations))
-        ret <- copy(transformations)
+    if (is.data.table(ret))
+        ret <- copy(ret)
     else
-        ret <- as.data.table(transformations)
+        ret <- as.data.table(ret)
     
     ret[, deltaMZ := 0]
     ret[nzchar(add), deltaMZ := sapply(add, getFormulaMass)]

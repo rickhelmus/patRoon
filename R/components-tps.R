@@ -130,11 +130,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         cmp[, retDiff := gInfoPrec[precFG, "rts"] - ret]
         cmp[, mzDiff := gInfoPrec[precFG, "mzs"] - mz]
         
-        if (minRTDiff > 0)
-        {
-            rtDiffs <- gInfoTPs[cmp$group, "rts"] - gInfoPrec[precFG, "rts"]
-            cmp <- cmp[RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
-        }
+        cmp[, RTDir := fcase((retDiff + minRTDiff) < 0, -1,
+                             (retDiff - minRTDiff) > 0, 1,
+                             default = 0)]
         
         if (!is.null(MSPeakLists))
         {
@@ -169,7 +167,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         {
             grpsTPs <- names(fGroupsTPs)
             
-            comp <- data.table(group = grpsTPs, RTDir = 0, precursor_group = grp)
+            comp <- data.table(group = grpsTPs, precursor_group = grp)
             comp <- prepareComponent(comp, grp)
             
             # NOTE: name afterwards as the component may have been filtered
@@ -209,8 +207,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                predCols <- c("name", "InChIKey", "formula", "mass", "RTDir",
-                              "reaction_add", "reaction_sub", "deltaMZ")
+                predCols <- c("name", "InChIKey", "formula", "mass", "RTDir", "reaction_add", "reaction_sub", "deltaMZ")
                 preds <- preds[, intersect(names(preds), predCols), with = FALSE]
                 
                 comps <- rbindlist(sapply(precFGs, function(precFG)
@@ -220,6 +217,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
                     # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
                     ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
                     ret <- unique(ret, by = "group")
+                    setnames(ret, "RTDir", "TP_RTDir")
                     
                     ret <- prepareComponent(ret, precFG)
                     
@@ -301,7 +299,8 @@ setMethod("as.data.table", "componentsTPs", function(x)
 })
 
 #' @export
-setMethod("filter", "componentsTPs", function(obj, ..., minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
+setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
+                                              minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
                                               minFragMatches = NULL, minNLMatches = NULL, formulas = NULL,
                                               verbose = TRUE, negate = FALSE)
 {
@@ -312,7 +311,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., minSpecSim = NULL, minSp
     aapply(checkmate::assertNumber, . ~ minSpecSim + minSpecSimPrec + minSpecSimBoth + minFragMatches + minNLMatches,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ verbose + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ RTDirMatch + verbose + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -339,7 +338,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., minSpecSim = NULL, minSp
         return(ct)
     }
     
-    anyTPFilters <- !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
+    anyTPFilters <- RTDirMatch || !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
         !is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas)
     
     if (anyTPFilters)
@@ -348,6 +347,9 @@ setMethod("filter", "componentsTPs", function(obj, ..., minSpecSim = NULL, minSp
         {
             ct <- copy(ct)
             ct[, keep := TRUE]
+            
+            if (RTDirMatch)
+                ct[TP_RTDir != 0 & RTDir != 0, keep := TP_RTDir == RTDir]
             
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)

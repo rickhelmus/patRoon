@@ -564,10 +564,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 
 #' @export
 setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1 = NULL, analysis2 = NULL,
-                                                        MSLevel = 1, method, shift = "none", removePrecursor = FALSE,
-                                                        mzWeight = 0, intWeight = 1, absMzDev = 0.005,
-                                                        relMinIntensity = 0.1, minPeaks = 0, NAToZero = FALSE,
-                                                        drop = TRUE)
+                                                        MSLevel = 1, specSimParams = getDefSpecSimParams(),
+                                                        shift = "none", NAToZero = FALSE, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
@@ -575,12 +573,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     aapply(checkmate::assertSubset, . ~ analysis1 + analysis2, empty.ok = TRUE,
            fixed = list(choices = analyses(obj), add = ac))
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
-    checkmate::assertChoice(method, c("cosine", "jaccard"), add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    aapply(checkmate::assertFlag, . ~ removePrecursor + NAToZero + drop, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE,
-           fixed = list(add = ac))
-    checkmate::assertCount(minPeaks, add = ac)
+    aapply(checkmate::assertFlag, . ~ NAToZero + drop, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -628,8 +623,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         else
             precs <- setNames(rep(0, length(specs)), names(specs))
         
-        specs <- pruneList(lapply(specs, prepSpecSimilarityPL, removePrecursor = removePrecursor,
-                                  relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+        specs <- pruneList(lapply(specs, prepSpecSimilarityPL, removePrecursor = specSimParams$removePrecursor,
+                                  relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks),
+                           checkZeroRows = TRUE)
         
         return(list(specs = specs, precs = precs))
     }
@@ -645,7 +641,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         }
         else
         {
-            sims <- specDistMatrix(PLP$specs, method, shift, PLP$precs, mzWeight, intWeight, absMzDev)
+            sims <- specDistMatrix(PLP$specs, specSimParams$method, shift, PLP$precs, specSimParams$mzWeight,
+                                   specSimParams$intWeight, specSimParams$absMzDev)
             rownames(sims) <- colnames(sims) <- names(PLP$specs)
             sims <- expandFillSpecSimilarities(sims, groupName1, groupName1)
         }
@@ -661,8 +658,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         }
         else
         {
-            sims <- specDistRect(PLP1$specs, PLP2$specs, method, shift, PLP1$precs, PLP2$precs, mzWeight, intWeight,
-                                 absMzDev)
+            sims <- specDistRect(PLP1$specs, PLP2$specs, specSimParams$method, shift, PLP1$precs, PLP2$precs,
+                                 specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
             rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
             sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
         }

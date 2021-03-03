@@ -475,14 +475,16 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                     # calculate per set spectrum similarities
                     sims <- genTPAnnSimilarities(precFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
                                                  unsetCompounds[[s]])
-                    annColNames <- paste0(c("fragMatches", "neutralLossMatches"), "-", s)
+                    annColNames <- paste0(c("fragmentMatches", "neutralLossMatches"), "-", s)
                     cmp[, (annColNames) := sims]
                 }
             }
             
-            # move similarity columns to end
-            setcolorder(cmp, setdiff(names(cmp), c(grep("^specSimilarity", names(cmp), value = TRUE),
-                                                   grep("Matches", names(cmp), fixed = TRUE, value = TRUE))))
+            # move spec similarity columns to end
+            setcolorder(cmp, setdiff(names(cmp), grep("^specSimilarity", names(cmp), value = TRUE)))
+            
+            # ... and annotation sim columns after that
+            setcolorder(cmp, setdiff(names(cmp), grep("Matches", names(cmp), fixed = TRUE, value = TRUE)))
             
             doProgress()
         }

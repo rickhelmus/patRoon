@@ -225,8 +225,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         checkmate::assertCount(index, positive = TRUE, add = ac)
         checkmate::assertString(groupName, min.chars = 1, add = ac)
     }
-    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
+    checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
@@ -240,7 +240,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     if (plotStruct)
     {
         if (!is.null(specSimParams))
-            stop("Cannot plot structure when compariing spectra") # UNDONE?
+            stop("Cannot plot structure when comparing spectra") # UNDONE?
     }
     
     if (is.null(specSimParams))
@@ -297,10 +297,10 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         
         mergeBinnedAnn <- function(nr)
         {
-            binnedPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
+            binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
             annPLs <- Map(usObj, usMSPL, usForm, f = annotatedPeakList,
                           MoreArgs = list(index = index[nr], groupName = groupName[nr]))
-            annPLs <- Map(annPLs, binnedPLs, f = function(apl, bpl)
+            annPLs <- Map(annPLs, binPLs, f = function(apl, bpl)
             {
                 # get rid of duplicate columns
                 apl <- apl[, setdiff(names(apl), names(bpl)), with = FALSE]
@@ -320,7 +320,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         specs <- split(allSpectra, by = "group")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ..., mol = mol,
+                          maxMolSize = maxMolSize, molRes = molRes)
     }
 })
 

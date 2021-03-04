@@ -39,8 +39,7 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
-    - use new example model by default from MC
-    
+
 
 ## Annotation
 
@@ -129,7 +128,8 @@
         - formulas/compounds
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
             - put similarity in title (like for MSPL)?
-            - implement method for formulas, formulasSet, compounds
+            - implement method for formulas, formulasSet
+            - fix title for compounds/compoundsSet
             - remove makeMSPlotSets()
     - defaults OK for sim params?
         - precursor FALSE?

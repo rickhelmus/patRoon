@@ -253,12 +253,15 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
                 ylim <- c(0, max(plotData$intensity))
         }
     }
+
+    ticks <- pretty(c(-plotData$intensity, plotData$intensity))
     
-    plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim,
-         type = "n", bty = "l", ...)
+    plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim, yaxt = "n", type = "n", bty = "l", ...)
     
-    segments(plotData[["mz"]], 0, plotData[["mz"]], plotData[["intensity"]],
-             col = plotData[["colour"]], lwd = plotData[["lwd"]])
+    segments(plotData[["mz"]], 0, plotData[["mz"]], plotData[["intensity"]], col = plotData[["colour"]],
+             lwd = plotData[["lwd"]])
+
+    axis(2, at = ticks, labels = abs(ticks))
     
     annPlotData <- NULL
     if (!is.null(plotData[["formula"]]))
@@ -411,18 +414,17 @@ getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
 makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL, maxMolSize = NULL,
                               molRes = NULL)
 {
-    ticks <- pretty(c(-plotData$intensity, plotData$intensity))
+    
     if (useGGPlot2)
     {
+        stop("Not yet supported") # UNDONE
         # NOTE: suppress message about replacing y axis
         return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
                                     ggplot2::scale_y_continuous(labels = abs(ticks))))
     }
     
     makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
-               main = title, yaxt = "n", ..., mol = mol, maxMolSize = maxMolSize,
-               molRes = molRes)
-    axis(2, at = ticks, labels = abs(ticks))
+               main = title, ..., mol = mol, maxMolSize = maxMolSize, molRes = molRes)
 }
 
 makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL,
@@ -439,18 +441,16 @@ makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGP
         spec[mergedBy == sets[2], intensity := -intensity]
     
     plotData <- getMSPlotData(spec, 1)
-    ticks <- pretty(c(-spec$intensity, spec$intensity))
     if (useGGPlot2)
     {
+        stop("Not yet supported") # UNDONE
         # NOTE: suppress message about replacing y axis
         return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
                                     ggplot2::scale_y_continuous(labels = abs(ticks))))
     }
     
-    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
-               main = title, yaxt = "n", ..., mol = mol, maxMolSize = maxMolSize,
-               molRes = molRes)
-    axis(2, at = ticks, labels = abs(ticks))
+    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity", main = title, ..., mol = mol,
+               maxMolSize = maxMolSize, molRes = molRes)
 }
 
 plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, ...)

@@ -2,7 +2,8 @@
 
 ## General
 
-- ggplot: remove? Otherwise fix plotSpectrum() (sets) for title and possibly others
+- ggplot: remove?
+    - Otherwise fix plotSpectrum() (sets) for title and ticks and possibly others
 - patRoonData
     - rename patRoonData::targets?
     - update data files?

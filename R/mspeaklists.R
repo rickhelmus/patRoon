@@ -586,16 +586,10 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             # re-add precursor
             ret[, precursor := if (nr == 1) PLP1$specs[[1]]$precursor else PLP2$specs[[1]]$precursor]
             
-            if (nr == 2)
-                ret[, intensity := -intensity]
-            
             ret <- ret[, !grepl("index_", names(ret), fixed = TRUE), with = FALSE]
             
             return(ret)
         }
-        
-        sp1 <- getSpecFromBin(1); sp2 <- getSpecFromBin(2);
-        spec <- rbind(sp1, sp2)
         
         if (setTitle)
         {
@@ -604,17 +598,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        plotData <- getMSPlotData(spec, 2, spec$mergedBy == "overlap")
-        ticks <- pretty(c(-spec$intensity, spec$intensity))
-        if (useGGPlot2)
-        {
-            # NOTE: suppress message about replacing y axis
-            return(suppressMessages(makeMSPlotGG(plotData) + ggtitle(title) +
-                                        ggplot2::scale_y_continuous(labels = abs(ticks))))
-        }
-        
-        makeMSPlot(plotData, mincex, xlim, ylim, main = title, yaxt = "n", ...)
-        axis(2, at = ticks, labels = abs(ticks))
+        plotData <- getMSPlotDataOverlay(list(getSpecFromBin(1), getSpecFromBin(2)), TRUE, FALSE, 2, "overlap")
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
 

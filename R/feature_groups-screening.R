@@ -293,7 +293,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (!is.null(cd))
         return(cd)
     
-    IDLevelRules <- readYAML(IDFileE)
+    IDLevelRules <- readYAML(IDFile)
     
     if (!checkmate::test_named(IDLevelRules))
         stop("No valid rules could be loaded")

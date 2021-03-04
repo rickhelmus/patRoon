@@ -90,6 +90,7 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
+    - check if all plot methods have a Hash version
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -124,14 +125,16 @@
     - workflow: first do log2fc subsetting, then clustering
         - not relevant anymore?
 - spectrumSimilarity
-    - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
-        - allow optional groupName2/analysis2
-            - or groupName can be vector? --> matrix plot?
-            - or just 2 sized vector...
-        - mark overlapping peaks?
-        - do this also for formulas/compounds?
+    - plotting
+        - formulas/compounds
+            - doesn't work with structures at the moment, either fix or doc and set default to FALSE
+            - put similarity in title (like for MSPL)?
+            - implement method for formulas, formulasSet, compounds
+            - remove makeMSPlotSets()
     - defaults OK for sim params?
         - precursor FALSE?
+        - thresholds not really handy for formulas/compounds
+            - at least doc that annotation results may disappear
     - remove merged approach, possibly find other ways to customize averaging
         - min, max
         - some kind of weighted average?

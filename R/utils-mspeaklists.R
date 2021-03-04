@@ -503,6 +503,10 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
 
 prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
 {
+    pl <- copy(pl)
+    # keep original indices, which may come in handy when eg merging annotation data later on
+    pl[, indexOrig := seq_len(nrow(pl))]
+    
     if (removePrecursor)
         pl <- pl[precursor == FALSE]
     
@@ -516,6 +520,45 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
         return(pl[FALSE])
     
     return(pl)
+}
+
+getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, shift, uniqueName)
+{
+    PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, shift, 1)
+    PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, shift, 2)
+    if (is.null(PLP1))
+        stop("Could not obtain first spectrum")
+    if (is.null(PLP2))
+        stop("Could not obtain second spectrum")
+    
+    precDiff <- 0
+    if (shift != "none")
+    {
+        if (is.na(PLP1$precs) || is.na(PLP2$precs))
+            stop("One or both pecursor ions are unknown, can't calculate shift")
+        precDiff <- PLP2$precs - PLP1$precs
+    }
+    
+    bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], shift, precDiff, specSimParams$absMzDev))
+    bin[, mergedBy := fifelse(intensity_1 != 0 & intensity_2 != 0, "overlap", uniqueName)]
+    
+    getSpecFromBin <- function(nr)
+    {
+        othernr <- if (nr == 1) 2 else 1
+        # remove other columns and rename intensity
+        rmCols <- paste0(c("intensity_", "index_"), othernr)
+        ret <- setnames(bin[get(paste0("intensity_", nr)) != 0, setdiff(names(bin), rmCols), with = FALSE],
+                        paste0(c("intensity_", "index_"), nr), c("intensity", "index"))
+        setorderv(ret, "index") # restore order
+        
+        # re-add precursor / original indices
+        ret[, precursor := if (nr == 1) PLP1$specs[[1]]$precursor else PLP2$specs[[1]]$precursor]
+        ret[, indexOrig := if (nr == 1) PLP1$specs[[1]]$indexOrig else PLP2$specs[[1]]$indexOrig]
+        
+        return(ret)
+    }
+    
+    return(list(spec1 = getSpecFromBin(1), spec2 = getSpecFromBin(2)))
 }
 
 expandFillSpecSimilarities <- function(sims, groupName1, groupName2)

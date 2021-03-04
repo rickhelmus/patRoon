@@ -556,41 +556,6 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     }
     else
     {
-        PLP1 <- getSimPLAndPrec(obj, groupName[1], analysis[1], MSLevel, specSimParams, shift, 1)
-        PLP2 <- getSimPLAndPrec(obj, groupName[2], analysis[2], MSLevel, specSimParams, shift, 2)
-        if (is.null(PLP1))
-            stop("Could not obtain first spectrum")
-        if (is.null(PLP2))
-            stop("Could not obtain second spectrum")
-        
-        precDiff <- 0
-        if (shift != "none")
-        {
-            if (is.na(PLP1$precs) || is.na(PLP2$precs))
-                stop("One or both pecursor ions are unknown, can't calculate shift")
-            precDiff <- PLP2$precs - PLP1$precs
-        }
-        
-        bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], shift, precDiff, specSimParams$absMzDev))
-        bin[, mergedBy := fifelse(intensity_1 != 0 & intensity_2 != 0, "overlap", "unique")]
-        
-        getSpecFromBin <- function(nr)
-        {
-            othernr <- if (nr == 1) 2 else 1
-            # remove other columns and rename intensity
-            rmCols <- paste0(c("intensity_", "index_"), othernr)
-            ret <- setnames(bin[get(paste0("intensity_", nr)) != 0, setdiff(names(bin), rmCols), with = FALSE],
-                            paste0("intensity_", nr), "intensity")
-            setorderv(ret, paste0("index_", nr)) # restore order
-            
-            # re-add precursor
-            ret[, precursor := if (nr == 1) PLP1$specs[[1]]$precursor else PLP2$specs[[1]]$precursor]
-            
-            ret <- ret[, !grepl("index_", names(ret), fixed = TRUE), with = FALSE]
-            
-            return(ret)
-        }
-        
         if (setTitle)
         {
             sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2],
@@ -598,7 +563,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        plotData <- getMSPlotDataOverlay(list(getSpecFromBin(1), getSpecFromBin(2)), TRUE, FALSE, 2, "overlap")
+        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, shift, "unique")
+        plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })

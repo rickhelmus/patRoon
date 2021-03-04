@@ -207,13 +207,24 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, mincex = 0.9,
+                                                   plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                   shift = "none", useGGPlot2 = FALSE, mincex = 0.9,
                                                    xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
                                                    molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCount(index, positive = TRUE, add = ac)
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    if (!is.null(specSimParams))
+    {
+        checkmate::assertIntegerish(index, lower = 1, len = 2, any.missing = FALSE, add = ac)
+        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
+        assertSpecSimParams(specSimParams, add = ac)
+        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    }
+    else
+    {
+        checkmate::assertCount(index, positive = TRUE, add = ac)
+        checkmate::assertString(groupName, min.chars = 1, add = ac)
+    }
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
@@ -225,25 +236,92 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     if (!perSet || length(sets(obj)) == 1)
         return(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
                               plotStruct, title, useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
-    
-    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
-    if (is.null(spec))
-        return(NULL)
 
-    compr <- obj[[groupName]][index, ]    
-    mol <- NULL
     if (plotStruct)
     {
-        mol <- getMoleculesFromSMILES(compr$SMILES)
-        if (!isValidMol(mol))
-            mol <- NULL
+        if (!is.null(specSimParams))
+            stop("Cannot plot structure when compariing spectra") # UNDONE?
     }
     
-    if (is.null(title))
-        title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
-    
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), mincex, xlim, ylim, useGGPlot2, ..., mol = mol,
-                          maxMolSize = maxMolSize, molRes = molRes))
+    if (is.null(specSimParams))
+    {
+        compr <- obj[[groupName]][index, ]
+        mol <- NULL
+        if (plotStruct)
+        {
+            if (!is.null(specSimParams))
+                stop("Cannot plot structure when compariing spectra") # UNDONE?
+            mol <- getMoleculesFromSMILES(compr$SMILES)
+            if (!isValidMol(mol))
+                mol <- NULL
+        }
+        
+        if (is.null(title))
+            title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
+        
+        spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
+        if (is.null(spec))
+            return(NULL)
+        
+        specs <- split(spec, by = "set")
+        specs <- lapply(specs, setnames, "set", "mergedBy")
+        
+        plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...,  mol = mol,
+                                 maxMolSize = maxMolSize, molRes = molRes))
+    }
+    else
+    {
+        if (is.null(title))
+        {
+            compr1 <- obj[[groupName[1]]][index[1], ]; compr2 <- obj[[groupName[2]]][index[2], ]
+            cName <- if (!is.null(compr1[["compoundName"]]) && !is.null(compr2[["compoundName"]]))
+                paste0(compr1[["compoundName"]], "/", compr2[["compoundName"]])
+            else
+                NULL
+            title <- getCompoundsSpecPlotTitle(cName, paste0(compr1$formula, "/", compr1$formula))
+        }
+        
+        theSets <- sets(obj)
+        
+        usMSPL <- sapply(theSets, unset, obj = MSPeakLists, simplify = FALSE)
+        binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
+                         MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
+                                         specSimParams = specSimParams, shift = shift))
+        usObj <- sapply(theSets, unset, obj = obj, simplify = FALSE)
+        
+        if (!is.null(formulas))
+            usForm <- sapply(theSets, unset, obj = formulas, simplify = FALSE)
+        else
+            usForm <- rep(list(NULL), length(theSets))
+        
+        mergeBinnedAnn <- function(nr)
+        {
+            binnedPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
+            annPLs <- Map(usObj, usMSPL, usForm, f = annotatedPeakList,
+                          MoreArgs = list(index = index[nr], groupName = groupName[nr]))
+            annPLs <- Map(annPLs, binnedPLs, f = function(apl, bpl)
+            {
+                # get rid of duplicate columns
+                apl <- apl[, setdiff(names(apl), names(bpl)), with = FALSE]
+                
+                apl[, index := seq_len(nrow(apl))] # for merging
+                merge(bpl, apl, by.x = "indexOrig", by.y = "index")
+            })
+            
+            annPLs <- rbindlist(annPLs, idcol = "set")
+            annPLs[, group := groupName[nr]]
+            return(annPLs)
+        }
+        
+        topSpec <- mergeBinnedAnn(1); bottomSpec <- mergeBinnedAnn(2)
+        allSpectra <- rbind(topSpec, bottomSpec)
+        
+        specs <- split(allSpectra, by = "group")
+        plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
+        
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+    }
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,

@@ -604,8 +604,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        plotData <- getMSPlotData(spec, 1)
-        plotData[legend == "overlap", lwd := 2] # UNDONE
+        plotData <- getMSPlotData(spec, 2, spec$mergedBy == "overlap")
         ticks <- pretty(c(-spec$intensity, spec$intensity))
         if (useGGPlot2)
         {

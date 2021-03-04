@@ -89,7 +89,6 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
-    - unset(compounds): remove sets columns (PLIndexSet, set) from fragInfos
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

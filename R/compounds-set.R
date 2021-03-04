@@ -61,7 +61,11 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
     # update fragInfos and convert absolute merge counts to coverage
     cons <- lapply(cons, function(ct)
     {
-        ct[, fragInfo := lapply(fragInfo, function(fi) fi[, c("PLIndex", "PLIndexSet") := .(PLIndexSet, NULL)])]
+        ct[, fragInfo := lapply(fragInfo, function(fi)
+        {
+            fi <- copy(fi) # avoid DT warning/bug
+            fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
+        })]
         ct[, c("setCoverageAnn", "setCoverage") := .(setCoverageAnn / setCoverage, setCoverage / sCount)]
         return(ct)
     })
@@ -343,7 +347,13 @@ setMethod("unset", "compoundsSet", function(obj, set)
     # ... and in fragInfos
     cList <- lapply(cList, function(ct)
     {
-        ct[, fragInfo := lapply(fragInfo, data.table::set, j = "set", value = NULL)]
+        ct[, fragInfo := lapply(fragInfo, function(fi)
+        {
+            fi <- copy(fi)
+            fi <- fi[set == ..set]
+            set(fi, j = c("set", "PLIndex"), value = NULL)
+            setnames(fi, "PLIndexOrig", "PLIndex") # restore original index
+        })]
     })
     
     return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,

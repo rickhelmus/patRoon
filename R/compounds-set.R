@@ -336,7 +336,15 @@ setMethod("unset", "compoundsSet", function(obj, set)
     obj <- obj[, sets = set]
     
     cList <- lapply(compoundTable(obj), copy)
+    
+    # get rid of sets specific columns
     cList <- lapply(cList, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)
+    
+    # ... and in fragInfos
+    cList <- lapply(cList, function(ct)
+    {
+        ct[, fragInfo := lapply(fragInfo, data.table::set, j = "set", value = NULL)]
+    })
     
     return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
                           algorithm = paste0(algorithm(obj), "_unset")))

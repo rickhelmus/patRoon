@@ -175,32 +175,76 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                     useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
-                                                     ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
+                                                     specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
+                                                     mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
+                                                     mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    if (!is.null(specSimParams))
+    {
+        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
+        checkmate::assertCharacter(analysis, len = 2, min.chars = 1, null.ok = TRUE, add = ac)
+        assertSpecSimParams(specSimParams, add = ac)
+        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    }
+    else
+    {
+        checkmate::assertString(groupName, min.chars = 1, add = ac)
+        checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    }
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, mincex, xlim, ylim, ...))
+    argsParent <- list(groupName = groupName, analysis = analysis, MSLevel = MSLevel, title = title,
+                       specSimParams = specSimParams, shift = shift, useGGPlot2 = useGGPlot2,
+                       mincex = mincex, xlim = xlim, ylim = ylim, ...)
     
-    spec <- getSpec(obj, groupName, MSLevel, NULL)
-    if (is.null(spec))
-        return(NULL)
-
-    if (is.null(title))
+    if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
+        return(do.call(callNextMethod, c(list(obj), argsParent)))
+    
+    setTitle <- is.null(title)
+    if (setTitle)
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
-    specs <- split(spec, by = "set")
-    specs <- lapply(specs, setnames, "set", "mergedBy")
-    plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-    return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...))
+    if (is.null(specSimParams))
+    {
+        spec <- getSpec(obj, groupName, MSLevel, NULL)
+        if (is.null(spec))
+            return(NULL)
+        
+        specs <- split(spec, by = "set")
+        specs <- lapply(specs, setnames, "set", "mergedBy")
+        
+        plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...))
+    }
+    else
+    {
+        if (setTitle)
+        {
+            sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2],
+                                      MSLevel, specSimParams, shift = shift, NAToZero = TRUE, drop = TRUE)
+            title <- c(title, sprintf("Similarity: %.2f", sim))
+        }
+        
+        usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+        binnedPLs <- Map(usObj, sets(obj), f = getBinnedPLPair,
+                         MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
+                                         specSimParams = specSimParams, shift = shift))
+        topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
+        topSpec[, group := groupName[1]]
+        bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
+        bottomSpec[, group := groupName[2]]
+        allSpectra <- rbind(topSpec, bottomSpec)
+  
+        specs <- split(allSpectra, by = "group")
+        plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
+        
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+    }
 })
 
 #' @export

@@ -131,6 +131,7 @@
         - mark overlapping peaks?
         - do this also for formulas/compounds?
     - defaults OK for sim params?
+        - precursor FALSE?
     - remove merged approach, possibly find other ways to customize averaging
         - min, max
         - some kind of weighted average?

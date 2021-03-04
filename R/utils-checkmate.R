@@ -107,7 +107,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     if (!is.null(add))
         mc <- length(add$getMessages())
 
-    if (!is.null(x) && checkmate::checkDataFrame(x) && is.null(x[["blank"]]) && !is.null(x[["ref"]]))
+    if (!is.null(x) && checkmate::testDataFrame(x) && is.null(x[["blank"]]) && !is.null(x[["ref"]]))
     {
         warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
         setnames(x, "ref", "blank")

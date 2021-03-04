@@ -11,6 +11,7 @@
 - Fixed: intensity filter failed if previous filters lead to zero feature groups.
 - Fixed: `reportHTML()` annotation table was paged.
 - Fixed: Check final path lengths of log files and truncate where necessary (reported by Corey Griffith)
+- Fixed: in some cases the checking of `analysisInfo` validity may result in an error (reported by Tiago Sobreira)
 
 
 # patRoon 1.2.0

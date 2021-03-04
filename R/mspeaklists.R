@@ -574,12 +574,28 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], shift, precDiff, specSimParams$absMzDev))
         bin[, mergedBy := fifelse(intensity_1 != 0 & intensity_2 != 0, "overlap", "unique")]
         
-        sp1 <- setnames(bin[intensity_1 != 0, -"intensity_2"], "intensity_1", "intensity")
-        sp2 <- setnames(bin[intensity_2 != 0, -"intensity_1"], "intensity_2", "intensity")
-        sp2[, intensity := -intensity]
+        getSpecFromBin <- function(nr)
+        {
+            othernr <- if (nr == 1) 2 else 1
+            # remove other columns and rename intensity
+            rmCols <- paste0(c("intensity_", "index_"), othernr)
+            ret <- setnames(bin[get(paste0("intensity_", nr)) != 0, setdiff(names(bin), rmCols), with = FALSE],
+                            paste0("intensity_", nr), "intensity")
+            setorderv(ret, paste0("index_", nr)) # restore order
+            
+            # re-add precursor
+            ret[, precursor := if (nr == 1) PLP1$specs[[1]]$precursor else PLP2$specs[[1]]$precursor]
+            
+            if (nr == 2)
+                ret[, intensity := -intensity]
+            
+            ret <- ret[, !grepl("index_", names(ret), fixed = TRUE), with = FALSE]
+            
+            return(ret)
+        }
         
+        sp1 <- getSpecFromBin(1); sp2 <- getSpecFromBin(2);
         spec <- rbind(sp1, sp2)
-        spec[, precursor := FALSE] # UNDONE
         
         if (setTitle)
         {

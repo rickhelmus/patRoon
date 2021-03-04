@@ -65,6 +65,7 @@ double getTotMZIntFromSpec(const Rcpp::NumericVector &peakMZs, const Rcpp::Numer
 struct BinnedSpectrum
 {
     std::vector<double> mzs, intsLeft, intsRight;
+    std::vector<int> indexLeft, indexRight;
 };
     
 
@@ -263,6 +264,7 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
     {
         const double leftMZ = specLeft.mzs[i];
         double rightMZ = 0, rightInt;
+        int rightInd;
         bool foundRight = false;
         
         while (lastRightInd < specRight.mzs.size())
@@ -281,7 +283,7 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
             if (leftMZ >= rmzmin && leftMZ <= rmzmax)
             {
                 // overlap
-                rightMZ = rmz; rightInt = specRight.intensities[lastRightInd];
+                rightMZ = rmz; rightInt = specRight.intensities[lastRightInd]; rightInd = lastRightInd;
                 foundRight = true;
                 usedRightInds.push_back(lastRightInd);
             }
@@ -296,13 +298,16 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
         {
             ret.mzs.push_back((leftMZ + rightMZ) / 2.0);
             ret.intsRight.push_back(rightInt);
+            ret.indexRight.push_back(rightInd + 1);
         }
         else
         {
             ret.mzs.push_back(leftMZ);
             ret.intsRight.push_back(0);
+            ret.indexRight.push_back(0);
         }
         ret.intsLeft.push_back(specLeft.intensities[i]);
+        ret.indexLeft.push_back(i + 1);
     }
     
     // add missing from right
@@ -313,7 +318,9 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
         {
             ret.mzs.push_back(specRight.mzs[j]);
             ret.intsLeft.push_back(0);
+            ret.indexLeft.push_back(0);
             ret.intsRight.push_back(specRight.intensities[j]);
+            ret.indexRight.push_back(j + 1);
         }
     }
     
@@ -336,7 +343,9 @@ Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::Chara
     
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = binnedSpec.mzs,
                                    Rcpp::Named("intensity_1") = binnedSpec.intsLeft,
-                                   Rcpp::Named("intensity_2") = binnedSpec.intsRight);
+                                   Rcpp::Named("intensity_2") = binnedSpec.intsRight,
+                                   Rcpp::Named("index_1") = binnedSpec.indexLeft,
+                                   Rcpp::Named("index_2") = binnedSpec.indexRight);
 }
 
 double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &method,

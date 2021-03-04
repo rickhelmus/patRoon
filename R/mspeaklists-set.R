@@ -197,7 +197,10 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     if (is.null(title))
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), mincex, xlim, ylim, useGGPlot2, ...))
+    specs <- split(spec, by = "set")
+    specs <- lapply(specs, setnames, "set", "mergedBy")
+    plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
+    return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...))
 })
 
 #' @export

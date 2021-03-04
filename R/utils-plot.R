@@ -94,6 +94,8 @@ getMSPlotData <- function(spec, marklwd, markWhich = NULL)
     
     if (is.null(markWhich))
         markWhich <- if (hasFragInfo) plotData[!is.na(formula), which = TRUE] else seq_len(nrow(plotData))
+    else
+        markWhich <- plotData[mergedBy %in% markWhich, which = TRUE]
     
     if (!is.null(spec[["mergedBy"]]))
     {
@@ -373,6 +375,39 @@ makeMSPlotGG <- function(plotData, ..., mol = NULL)
     }
     
     return(ret)
+}
+
+getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
+{
+    specs <- lapply(specs, copy)
+    if (normalize)
+        specs <- lapply(specs, function(sp) sp[, intensity := normalize(intensity, minMax = FALSE)])
+    
+    if (mirror && length(specs) == 2)
+        specs[[2]][, intensity := -intensity]
+    
+    combinedSpec <- rbindlist(specs)
+    setorderv(combinedSpec, "intensity")
+    
+    plotData <- getMSPlotData(combinedSpec, marklwd, markWhich)
+    return(plotData)
+}
+
+makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL, maxMolSize = NULL,
+                              molRes = NULL)
+{
+    ticks <- pretty(c(-plotData$intensity, plotData$intensity))
+    if (useGGPlot2)
+    {
+        # NOTE: suppress message about replacing y axis
+        return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
+                                    ggplot2::scale_y_continuous(labels = abs(ticks))))
+    }
+    
+    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
+               main = title, yaxt = "n", ..., mol = mol, maxMolSize = maxMolSize,
+               molRes = molRes)
+    axis(2, at = ticks, labels = abs(ticks))
 }
 
 makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL,

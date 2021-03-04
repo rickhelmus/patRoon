@@ -286,6 +286,7 @@
         - added analyses column in feature consensus formulae results
         - formulas as.data.table(average=TRUE): remove analysis_from column
     - annotatedPeakList(): also add annotation columns for missing results (for consistency)
+    - Fixed: plotSpectrum() if `xlim` is set and this yields no data then an empty plot is shown
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

@@ -405,7 +405,7 @@ getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
     if (mirror && length(specs) == 2)
         specs[[2]][, intensity := -intensity]
     
-    combinedSpec <- rbindlist(specs)
+    combinedSpec <- rbindlist(specs, fill = TRUE) # columns may be different due to fragInfos
     setorderv(combinedSpec, "intensity")
     
     plotData <- getMSPlotData(combinedSpec, marklwd, markWhich)

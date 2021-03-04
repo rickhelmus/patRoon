@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-02-15" />
+<meta name="date" content="2021-03-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -72,6 +72,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -330,17 +331,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="inspecting-results.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Feature table (only first columns for readability)</span></span>
 <span id="cb29-2"><a href="inspecting-results.html#cb29-2" aria-hidden="true" tabindex="-1"></a>fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_1912593330220733435  19.00698  78.99684  65793.390  13.01202  29.99700
-#&gt;   2: f_15731475182674798897  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3: f_14693859246879137517   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4:  f_6010742268596889167 112.34220  79.02103  71168.990 106.55400 147.51600
-#&gt;   5:  f_1831055687085484307 111.64380  84.95950  54875.130 105.15180 599.87400
+#&gt;   1:  f_4601658023187690891  19.00698  78.99684  65793.390  13.01202  29.99700
+#&gt;   2:  f_3159361997431834014  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3:  f_9829337814659476239   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_2458503083396486083 112.34220  79.02103  71168.990 106.55400 147.51600
+#&gt;   5: f_12238698402979945590 111.64380  84.95950  54875.130 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433: f_13503044652906434547  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434:  f_5252979752189534416  13.01202 296.92038  37753.420  10.01502  15.01098
-#&gt; 435:  f_1120267597767832478  12.01302 297.16751  17366.130   9.01602  15.01098
-#&gt; 436: f_17765026816930807254  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437: f_16922960460063773040  12.01302 299.12581  13630.380   9.01602  15.01098</code></pre>
+#&gt; 433:  f_2768240958115117213  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_16978308944405302765  13.01202 296.92038  37753.420  10.01502  15.01098
+#&gt; 435:  f_9917111591776208682  12.01302 297.16751  17366.130   9.01602  15.01098
+#&gt; 436:  f_7260160543950699629  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_16868675825793133348  12.01302 299.12581  13630.380   9.01602  15.01098</code></pre>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="inspecting-results.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
 <span id="cb31-2"><a href="inspecting-results.html#cb31-2" aria-hidden="true" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R328_81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -388,17 +389,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="inspecting-results.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb43-2"><a href="inspecting-results.html#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_17005905772314134542  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1   f_815897335797362282  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_16585178100075256080 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1    f_73704535587087004  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1 f_11150552387615248857   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1 f_15659998781269133767  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1  f_9408496232836181942  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1 f_13328644743115165639 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_10855568130418034115  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1  f_4213006855291847901   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3 f_13799815413147643327  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3 f_13367872201324780260  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3  f_5862424985036894239  13.14798 296.92039  42195.85  10.150980
-#&gt; 2443: standard-3 f_14642673839019177969  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_13401059266184834199  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3 f_16207539686040879566  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3  f_9906135879528349833  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3 f_13708915480536679917  13.14798 296.92039  42195.85  10.150980
+#&gt; 2443: standard-3  f_5879167617044028437  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_9588531210183401591  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="inspecting-results.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb45-2"><a href="inspecting-results.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
@@ -420,7 +421,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>#&gt;            group             name suspCompRank annSimBoth estIDLevel
 #&gt; 1:  M120_R328_81 1H-benzotriazole            1  0.9194948         2a
 #&gt; 2: M137_R303_127      phenyl urea            1  0.9959918         3c
-#&gt; 3: M146_R185_153       2-quinolol            3  0.7827895         3c</code></pre>
+#&gt; 3: M146_R185_153       2-quinolol           18  0.7827895         3c</code></pre>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="inspecting-results.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
 <span id="cb49-2"><a href="inspecting-results.html#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists)</span></code></pre></div>
 <pre><code>#&gt;              group type        mz intensity precursor
@@ -459,11 +460,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt;   4:  M120_R328_81              1 1.522632    119.0483
 #&gt;   5:  M120_R328_81              1 1.490700    119.0483
 #&gt;  ---                                                  
-#&gt; 496: M146_R185_153              3 1.533663    145.0528
-#&gt; 497: M146_R185_153              3 1.532748    145.0528
-#&gt; 498: M146_R185_153              3 1.531075    145.0528
-#&gt; 499: M146_R185_153              3 1.524293    145.0528
-#&gt; 500: M146_R185_153              3 1.524285    145.0528</code></pre>
+#&gt; 496: M146_R185_153              2 1.557046    145.0528
+#&gt; 497: M146_R185_153              3 1.555828    145.0528
+#&gt; 498: M146_R185_153              3 1.554854    145.0528
+#&gt; 499: M146_R185_153              3 1.551151    145.0528
+#&gt; 500: M146_R185_153              3 1.549153    145.0528</code></pre>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="inspecting-results.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
 <span id="cb55-2"><a href="inspecting-results.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size

@@ -211,7 +211,11 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
     else
+    {
         plotData <- plotData[numGTE(mz, xlim[1]) & numLTE(mz, xlim[2])] # remove any peaks outside plotting range
+        if (nrow(plotData) == 0)
+            return(noDataPlot())
+    }
     
     doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)

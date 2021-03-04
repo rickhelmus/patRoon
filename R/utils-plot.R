@@ -84,7 +84,7 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }
 
-getMSPlotData <- function(spec, marklwd)
+getMSPlotData <- function(spec, marklwd, markWhich = NULL)
 {
     hasFragInfo <- !is.null(spec[["formula"]])
     plotData <- copy(spec)
@@ -92,7 +92,8 @@ getMSPlotData <- function(spec, marklwd)
     # default colour/line width
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
     
-    markWhich <- if (hasFragInfo) plotData[!is.na(formula), which = TRUE] else seq_len(nrow(plotData))
+    if (is.null(markWhich))
+        markWhich <- if (hasFragInfo) plotData[!is.na(formula), which = TRUE] else seq_len(nrow(plotData))
     
     if (!is.null(spec[["mergedBy"]]))
     {

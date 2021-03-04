@@ -53,7 +53,7 @@ getDefIsolatePrecParamsRD <- function()
 getDefSpecSimParams <- function(...)
 {
     def <- list(method = "cosine",
-                removePrecursor = TRUE,
+                removePrecursor = FALSE,
                 mzWeight = 0,
                 intWeight = 1,
                 absMzDev = 0.005,

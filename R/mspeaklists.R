@@ -563,7 +563,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, shift, "unique")
+        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, shift, "unique",
+                                     mustExist = TRUE)
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }

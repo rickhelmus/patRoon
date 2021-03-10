@@ -230,10 +230,15 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
-        binnedPLs <- Map(usObj, sets(obj), f = getBinnedPLPair,
+        theSets <- sets(obj)
+        usObj <- sapply(theSets, unset, obj = obj, simplify = FALSE)
+        
+        binnedPLs <- Map(usObj, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
-                                         specSimParams = specSimParams, shift = shift))
+                                         specSimParams = specSimParams, shift = shift, mustExist = FALSE))
+        if (all(sapply(binnedPLs, is.null)))
+            return(NULL)
+        
         topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
         topSpec[, group := groupName[1]]
         bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
@@ -242,7 +247,6 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
   
         specs <- split(allSpectra, by = "group")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
-        
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })

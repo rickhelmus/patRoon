@@ -252,11 +252,7 @@ getCompoundsSpecPlotTitle <- function(compoundName, formula, compoundName2 = NUL
 {
     hasCName <- !is.null(compoundName) && !is.na(compoundName) && nzchar(compoundName)
     hasCName2 <- !is.null(compoundName2) && !is.na(compoundName2) && nzchar(compoundName2)
-    
     if (hasCName && hasCName2)
         compoundName <- paste0(compoundName, "/", compoundName2)
-    if (!is.null(formula2))
-        formula <- paste0(formula, "*'/'*", formula2)
-
-    return(subscriptFormula(formula, over = if (hasCName) compoundName else NULL))
+    return(subscriptFormula(formula, over = if (hasCName) compoundName else NULL, formulas2 = formula2))
 }

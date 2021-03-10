@@ -682,12 +682,6 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    if (plotStruct)
-    {
-        if (!is.null(specSimParams))
-            stop("Cannot plot structure when comparing spectra") # UNDONE?
-    }
-    
     if (is.null(specSimParams))
     {
         spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
@@ -714,14 +708,13 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     }
     else
     {
+        if (plotStruct)
+            stop("Cannot plot structure when comparing spectra") # UNDONE?
+
         if (is.null(title))
         {
             compr1 <- obj[[groupName[1]]][index[1], ]; compr2 <- obj[[groupName[2]]][index[2], ]
-            cName <- if (!is.null(compr1[["compoundName"]]) && !is.null(compr2[["compoundName"]]))
-                paste0(compr1[["compoundName"]], "/", compr2[["compoundName"]])
-            else
-                NULL
-            title <- getCompoundsSpecPlotTitle(cName, paste0(compr1$formula, " ", compr1$formula))
+            title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$formula, compr2$compoundName, compr2$formula)
         }
         
         binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, shift, "unique")

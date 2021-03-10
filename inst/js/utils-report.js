@@ -3,13 +3,13 @@ function getAnnotationPageElement()
     return document.getElementById("feature-groups").parentElement.parentElement;
 }
 
-function showEICs(group)
+function showEICs(group, cl, clNoSel)
 {
-    el = document.getElementById("EIC");
+    el = document.getElementById(cl);
     el.style.display = "flex";
     el.style.maxWidth = "100%";
     el.src = chromPaths[parseInt(group) - 1];
-    document.getElementById("noAnnotationSelected").style.display = 'none';
+    document.getElementById(clNoSel).style.display = 'none';
 }
 
 function showAnnotation(group, type)
@@ -18,13 +18,13 @@ function showAnnotation(group, type)
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
 
-    showEICs(group);
+    showEICs(group, "EICAnn", "noAnnotationSelected");
 
     qu = "#" + type + "Table .dataTable";
     $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
 
-    selectFGroupRow(group);
+    selectFGroupRow(group, "fGroupsTable");
 }
 
 function showCompoundsCluster(group)
@@ -34,21 +34,21 @@ function showCompoundsCluster(group)
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
 
-    showEICs(group);
-    selectFGroupRow(group);
+    showEICs(group, "EICAnn", "noAnnotationSelected");
+    selectFGroupRow(group, "fGroupsTable");
 }
 
-function disableAllAnnotations()
+function disableAllAnnotations(cl)
 {
-    var comps = document.getElementsByClassName('annotationClass');
+    var comps = document.getElementsByClassName(cl);
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
     //$(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
 }
 
-function selectFGroupRow(group)
+function selectFGroupRow(group, cl)
 {
-    var table = $("#fGroupsTable .dataTable").DataTable();
+    var table = $("#" + cl + " .dataTable").DataTable();
     
     table.$('tr.selected').removeClass('selected'); // remove any current selections
     
@@ -61,8 +61,29 @@ function selectFGroupRow(group)
 
 function initAnnotation()
 {
-    disableAllAnnotations();
+    disableAllAnnotations("annotationClass");
     $('.dataTable').DataTable().columns.adjust().draw();
+}
+
+function initTPs()
+{
+    disableAllAnnotations("TPsClass");
+    $('.dataTable').DataTable().columns.adjust().draw();
+}
+
+function showTPs(group)
+{
+    const elements = document.getElementsByClassName("TPsClass");
+    for (var i=0; i<elements.length; i++)
+        elements[i].style.display = 'flex';
+
+    showEICs(group, "EICTP", "noPrecSelected");
+
+    qu = "#TPsTable .dataTable";
+    $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
+    $(qu).DataTable().columns.adjust().draw();
+
+    selectFGroupRow(group, "precursorsTable");
 }
 
 $(document).ready(function()

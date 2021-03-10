@@ -234,8 +234,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1)
-        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                              plotStruct, title, useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
+        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams, shift,
+                              useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
 
     if (is.null(specSimParams))
     {

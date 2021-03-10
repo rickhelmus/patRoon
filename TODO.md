@@ -8,6 +8,7 @@
     - rename patRoonData::targets?
     - update data files?
 - update newProject for new feature and component algos and sets
+- decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 
 
 ## Features

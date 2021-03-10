@@ -218,7 +218,7 @@ DT::datatable(fGroupsSpecDT,
 
 ### EIC { data-width=100 }
 
-<img id=EIC style="display:none;"></img>
+<img id=EICAnn style="display:none;"></img>
 <div id=noAnnotationSelected>Push a **show** button to view annotation data for a feature group.</div>
 
 

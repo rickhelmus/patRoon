@@ -56,6 +56,7 @@ if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
 doAnnotation <- !is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) ||
     !is.null(rmdVars$components) || inherits(rmdVars$fGroups, "featureGroupsScreening")
 doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
+isComponentsTP <- !is.null(rmdVars$components) && inherits(rmdVars$components, "componentsTPs")
 rmdText <- NULL
 ```
 
@@ -169,9 +170,11 @@ cat(sprintf("![%s](%s)", names(rmdVars$fGroups), chromPaths), sep = "\n")
 ```
 
 
-```{r child="components.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0}
+```{r child="components.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0 && !isComponentsTP}
 ```
 
 
 ```{r child="annotation.Rmd", eval=doAnnotation }
 ```
+
+```{r child="TPs.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0 && isComponentsTP}

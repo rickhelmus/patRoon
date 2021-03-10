@@ -136,7 +136,6 @@
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
     - remove merged approach, possibly find other ways to customize averaging
-        - min, max
         - some kind of weighted average?
 - Consistency
     - More generic naming for predict etc to accommodate other sources for TPs

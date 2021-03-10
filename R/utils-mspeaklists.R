@@ -58,7 +58,8 @@ getDefSpecSimParams <- function(...)
                 intWeight = 1,
                 absMzDev = 0.005,
                 relMinIntensity = 0.05,
-                minPeaks = 1)
+                minPeaks = 1,
+                setCombineMethod = "mean")
 
     return(modifyList(def, list(...)))
 }

@@ -596,6 +596,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
                                                         MSLevel = 1, specSimParams = getDefSpecSimParams(),
                                                         shift = "none", NAToZero = FALSE, drop = TRUE)
 {
+    # NOTE: keep args in sync with sets method
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
            fixed = list(choices = groupNames(obj), add = ac))

@@ -106,6 +106,7 @@
 - componentsTP
     - argument order and defaults
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
+    - precursor_rt etc are from suspect list, not really clear --> also for reporting
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

@@ -428,32 +428,6 @@ makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, useGGPlot2, .
                main = title, ..., mol = mol, maxMolSize = maxMolSize, molRes = molRes)
 }
 
-makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL,
-                           maxMolSize = NULL, molRes = NULL)
-{
-    spec <- copy(spec)
-    
-    # UNDONE: provide normalize functionality elsewhere?
-    spec[, intensity := normalize(intensity, minMax = FALSE), by = "set"]
-    setnames(spec, "set", "mergedBy") # to get labelling
-    setorderv(spec, "mz")
-    
-    if (mirror && length(sets) == 2)
-        spec[mergedBy == sets[2], intensity := -intensity]
-    
-    plotData <- getMSPlotData(spec, 1)
-    if (useGGPlot2)
-    {
-        stop("Not yet supported") # UNDONE
-        # NOTE: suppress message about replacing y axis
-        return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
-                                    ggplot2::scale_y_continuous(labels = abs(ticks))))
-    }
-    
-    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity", main = title, ..., mol = mol,
-               maxMolSize = maxMolSize, molRes = molRes)
-}
-
 plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, ...)
 {
     if (colourBranches)

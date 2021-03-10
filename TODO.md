@@ -8,7 +8,6 @@
     - rename patRoonData::targets?
     - update data files?
 - update newProject for new feature and component algos and sets
-- decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 
 
 ## Features
@@ -45,6 +44,9 @@
 ## Annotation
 
 - getFormInfoList(): take care of consensus results like getPrecursorFormScores()
+- decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
+- plotSpectrum/annotatedPeakList formula methods: check if formula exist?
+    - if so, check if this doesn't interfere with compounds methods somehow
 
 
 ## Suspects
@@ -129,9 +131,6 @@
         - formulas/compounds
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
             - put similarity in title (like for MSPL)?
-            - implement method for formulas, formulasSet
-            - fix title for compounds/compoundsSet
-            - remove makeMSPlotSets()
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds

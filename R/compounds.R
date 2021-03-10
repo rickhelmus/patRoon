@@ -717,23 +717,14 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
             title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$formula, compr2$compoundName, compr2$formula)
         }
         
-        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, shift, "unique")
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, shift, "unique",
+                                     mustExist = TRUE)
         
-        mergeBinnedAnn <- function(nr)
-        {
-            binPL <- binnedPLs[[nr]]
-            annPL <- annotatedPeakList(obj, index[nr], groupName[nr], MSPeakLists, formulas)
-            
-            # get rid of duplicate columns
-            annPL <- annPL[, setdiff(names(annPL), names(binPL)), with = FALSE]
-            
-            annPL[, index := seq_len(nrow(annPL))] # for merging
-            annPL <- merge(binPL, annPL, by.x = "indexOrig", by.y = "index")
-            
-            annPL[, group := groupName[nr]]
-            return(annPL)
-        }
-        topSpec <- mergeBinnedAnn(1); bottomSpec <- mergeBinnedAnn(2)
+        topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], MSPeakLists,
+                                                                         formulas), groupName[1])
+        
+        bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2], MSPeakLists,
+                                                                            formulas), groupName[2])
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }

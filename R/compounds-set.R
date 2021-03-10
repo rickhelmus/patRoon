@@ -300,17 +300,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
             binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
             annPLs <- Map(usObj, usMSPL, usForm, f = annotatedPeakList,
                           MoreArgs = list(index = index[nr], groupName = groupName[nr]))
-            annPLs <- Map(annPLs, binPLs, f = function(apl, bpl)
-            {
-                # get rid of duplicate columns
-                apl <- apl[, setdiff(names(apl), names(bpl)), with = FALSE]
-                
-                apl[, index := seq_len(nrow(apl))] # for merging
-                merge(bpl, apl, by.x = "indexOrig", by.y = "index")
-            })
-            
+            annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(gName = groupName[nr]))
             annPLs <- rbindlist(annPLs, idcol = "set")
-            annPLs[, group := groupName[nr]]
             return(annPLs)
         }
         
@@ -320,8 +311,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         specs <- split(allSpectra, by = "group")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ..., mol = mol,
-                          maxMolSize = maxMolSize, molRes = molRes)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
 

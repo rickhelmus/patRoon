@@ -584,3 +584,15 @@ expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
     
     return(sims)
 }
+
+mergeBinnedAndAnnPL <- function(binPL, annPL, gName)
+{
+    # get rid of duplicate columns
+    annPL <- annPL[, setdiff(names(annPL), names(binPL)), with = FALSE]
+    
+    annPL[, index := seq_len(nrow(annPL))] # for merging
+    annPL <- merge(binPL, annPL, by.x = "indexOrig", by.y = "index")
+    
+    annPL[, group := gName]
+    return(annPL)
+}

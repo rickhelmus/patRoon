@@ -522,14 +522,21 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
     return(pl)
 }
 
-getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, shift, uniqueName)
+getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, shift, uniqueName,
+                            mustExist)
 {
     PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, shift, 1)
     PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, shift, 2)
-    if (is.null(PLP1))
-        stop("Could not obtain first spectrum")
-    if (is.null(PLP2))
-        stop("Could not obtain second spectrum")
+    if (is.null(PLP1) || is.null(PLP2))
+    {
+        if (!mustExist)
+            return(NULL)
+        
+        if (is.null(PLP1))
+            stop("Could not obtain first spectrum")
+        if (is.null(PLP2))
+            stop("Could not obtain second spectrum")
+    }
     
     precDiff <- 0
     if (shift != "none")

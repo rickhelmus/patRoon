@@ -567,13 +567,24 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
-                                               ylim = NULL, ...)
+                                               title = NULL, specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
+                                               mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(precursor, min.chars = 1, add = ac)
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    if (!is.null(specSimParams))
+    {
+        checkmate::assertCharacter(precursor, len = 2, min.chars = 1, add = ac)
+        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
+        checkmate::assertCharacter(analysis, len = 2, min.chars = 1, null.ok = TRUE, add = ac)
+        assertSpecSimParams(specSimParams, add = ac)
+        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    }
+    else
+    {
+        checkmate::assertString(precursor, min.chars = 1, add = ac)
+        checkmate::assertString(groupName, min.chars = 1, add = ac)
+        checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    }
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
@@ -581,17 +592,36 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (is.null(title))
-        title <- subscriptFormula(precursor)
-
-    spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
-    if (is.null(spec))
-        return(NULL)
-
-    if (useGGPlot2)
-        return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
-
-    makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, ..., main = title)
+    if (is.null(specSimParams))
+    {
+        if (is.null(title))
+            title <- subscriptFormula(precursor)
+        
+        spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
+        if (is.null(spec))
+            return(NULL)
+        
+        if (useGGPlot2)
+            return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
+        
+        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, ..., main = title)
+    }
+    else
+    {
+        if (is.null(title))
+            title <- subscriptFormula(precursor[1], formulas2 = precursor[2])
+        
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, shift, "unique",
+                                     mustExist = TRUE)
+        
+        topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, precursor[1], groupName[1], analysis[1],
+                                                                         MSPeakLists), groupName[1])
+        
+        bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, precursor[2], groupName[2],
+                                                                            analysis[2], MSPeakLists), groupName[2])
+        plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+    }
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,

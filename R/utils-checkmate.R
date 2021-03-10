@@ -393,6 +393,7 @@ assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertVal(checkmate::assertNumber, "absMzDev", lower = 0, finite = TRUE)
     assertVal(checkmate::assertNumber, "relMinIntensity", lower = 0, finite = TRUE)
     assertVal(checkmate::assertCount, "minPeaks", positive = TRUE)
+    assertVal(checkmate::assertChoice, "setCombineMethod", choices = c("mean", "min", "max"))
 }
 
 assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)

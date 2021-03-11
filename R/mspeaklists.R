@@ -570,6 +570,17 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     }
 })
 
+setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
+                                                      specSimParams = NULL, ...)
+{
+    if (is.null(specSimParams))
+        sp <- getSpec(obj, groupName, MSLevel, analysis)
+    else
+        sp <- c(getSpec(obj, groupName[1], MSLevel, analysis[1]),
+                getSpec(obj, groupName[2], MSLevel, analysis[2]))
+    return(makeHash(sp, title, specSimParams, ...))
+})
+
 #' @describeIn MSPeakLists Calculates the spectral similarity between
 #'   two spectra.
 #'

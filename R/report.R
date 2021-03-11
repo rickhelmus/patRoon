@@ -105,7 +105,7 @@ optimizePngPlots <- function(plotFiles)
 
 makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", parSettings = NULL, cacheDB)
 {
-    hash <- do.call(paste0(plotFunc, "Hash"), plotArgs)
+    hash <- makeHash(do.call(paste0(plotFunc, "Hash"), plotArgs), w, h, bg, parSettings)
     cache <- loadCacheData("reportPlots", hash, cacheDB)
 
     if (!is.null(cache))

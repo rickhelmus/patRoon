@@ -30,16 +30,21 @@ getPlotPath <- function(link)
     return(ret)
 }
 
-imgTags <- function(img) 
+imgTags <- function(img, style = "") 
 {
     if (rmdVars$selfContained)
-        ret <- sprintf("<img src=%s></img>", img)
+        ret <- sprintf("<img src=%s style='%s'></img>", img, style)
     else
     {
         # return(sprintf("<img src=file://%s></img>", img))
-        ret <- sprintf("<img src='%s'></img>", img)
+        ret <- sprintf("<img src='%s' style='%s'></img>", img, style)
     }
     return(ifelse(nzchar(img), ret, ""))
+}
+
+makeInfoBox <- function(txt)
+{
+    sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", txt)
 }
 
 rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))

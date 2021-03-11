@@ -5,7 +5,7 @@ Transformation Products {data-orientation=rows}
     
 ##
     
-### Precursors { data-width=300 .precursors }
+### Precursors { data-width=400 .precursors }
     
 <style> .precursors { overflow-x: auto; } </style>
     
@@ -24,14 +24,14 @@ precDT[, neutralMass := round(neutralMass, 5)]
 
 precDT[, groupInd := match(group, names(rmdVars$fGroups))]
 
-precDT[, show := { sprintf("<button onclick=\"showTPs(%d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
-                           match(group, names(rmdVars$fGroups))) }]
+precDT[, show := { sprintf("<button onclick=\"showTPs(%d, %d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
+                           match(component, names(rmdVars$components)), match(group, names(rmdVars$fGroups))) }]
 
 setcolorder(precDT, "groupInd")
 
 DT::datatable(precDT,
               extensions = "Buttons",
-              options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "200px",
+              options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "300px",
                              dom = "Bfrtip",
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initTPs, 25); }"),
@@ -46,137 +46,269 @@ DT::datatable(precDT,
               escape = FALSE, rownames = FALSE, elementId = "precursorsTable")
 ```
 
-### EIC { data-width=100 }
 
-<img id=EICTP style="display:none;"></img>
-<div id=noPrecSelected>Push a **show** button to view transformation data for a precursor.</div>
     
-    
-```{r TPPlots, fig.keep='none',eval=F}
+```{r TPPlots, fig.keep='none'}
 # Generate all plots in advance, since having many code chunks will cause a lot of overhead.
-
-message("Generating spectra...")
-prog <- openProgBar(0, length(plotGroups))
 
 plotPathFull <- getPlotPath(FALSE)
 plotPathLink <- getPlotPath(TRUE)
+cInfo <- componentInfo(rmdVars$components)
 
-allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
+message("Generating precursor plots...")
+prog <- openProgBar(0, nrow(cInfo))
+
+precPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(precRow, i)
 {
-    grp <- plotGroups[i]
-    grpi <- match(grp, names(rmdVars$fGroups))
-    grpPlots <- list()
+    grpi <- match(precRow$precursor_group, names(rmdVars$fGroups))
+    plots <- list()
+    fg <- rmdVars$fGroups[, precRow$precursor_group]
     
-    if (grp %in% compFGroups)
+    plots[["int"]] <- file.path(plotPathLink, sprintf("int-prec_%d.png", grpi))
+    makeCachedPlot(plots[["int"]], "plotInt", list(fg, average = TRUE), 3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
+
+    if (!is.null(precRow[["precursor_SMILES"]]))
     {
-        cTable <- compTable[[grp]]
-        compsSeq <- seq_len(nrow(cTable))
-        grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
-        {
-            ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotScores", list(rmdVars$compounds, compi, grp, rmdVars$compoundsNormalizeScores,
-                                                   rmdVars$compoundsExclNormScores, rmdVars$compoundsOnlyUsedScorings),
-                           4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-            return(ret)
-        })
-        
-        grpPlots[["compoundSpectra"]] <- sapply(compsSeq, function(compi)
-        {
-            ret <- file.path(plotPathFull, sprintf("compspec_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotSpectrum", list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
-                                                     rmdVars$formulas, FALSE),
-                           7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-            return(ret)
-        })
-        
-        grpPlots[["compoundStructs"]] <- sapply(compsSeq, function(compi)
-        {
-            ret <- file.path(plotPathFull, sprintf("compstruct_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotStructure", list(rmdVars$compounds, compi, grp, width = 150, height = 150),
-                           3, 3, bg = NA, cacheDB = rmdVars$cacheDB)
-            return(ret)
+        plots[["struct"]] <- file.path(plotPathLink, sprintf("struct-prec_%d.png", grpi))
+        mol <- getMoleculesFromSMILES(precRow$precursor_SMILES, emptyIfFails = TRUE)[[1]]
+        withr::with_png(plots[["struct"]], width = 3.3, height = 3.3, units = "in", res = 72, bg = NA, code = {
+            plot(getRCDKStructurePlot(mol, 500, 500))
         })
     }
-    
-    if (grp %in% compsClustFGroups)
-    {
-        plotf <- file.path(plotPathFull, sprintf("dendro_%d.png", grpi))
-        makeCachedPlot(plotf, "plot", list(rmdVars$compsCluster, groupName = grp), 8, 4.5, cacheDB = rmdVars$cacheDB)
-        grpPlots[["compClustDendro"]] <- plotf
-        
-        ct <- cutClusters(rmdVars$compsCluster)[[grp]]
-        grpPlots[["compClustMCS"]] <- sapply(seq_along(unique(ct)), function(cli)
-        {
-            ret <- file.path(plotPathFull, sprintf("mcs_%d_%d.png", grpi, cli))
-            makeCachedPlot(ret, "plotStructure", list(rmdVars$compsCluster, grp, cli, 100, 100),
-                           3, 3, cacheDB = rmdVars$cacheDB)
-            return(ret)
-        })
-    }
-    
-    if (grp %in% formFGroups)
-    {
-        precursors <- unique(rmdVars$formulas[[grp]][["neutral_formula"]])
-        
-        grpPlots[["formulaScores"]] <- sapply(precursors, function(prec)
-        {
-            ret <- file.path(plotPathFull, sprintf("formscore_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotScores", list(rmdVars$formulas, prec, grp,
-                                                   normalizeScores = rmdVars$formulasNormalizeScores,
-                                                   excludeNormScores = rmdVars$formulasExclNormScores),
-                           4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-            return(ret)
-        })
-        
-        grpPlots[["formulaSpecs"]] <- sapply(precursors, function(prec)
-        {
-            anPList <- annotatedPeakList(rmdVars$formulas, prec, grp,
-                                         MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
-            if (is.null(anPList))
-                return("") # No MS/MS data available
-            
-            ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotSpectrum", list(rmdVars$formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists),
-                           6, 4.5, cacheDB = rmdVars$cacheDB)
-            return(ret)
-        })
-    }
-    
+
     setTxtProgressBar(prog, i)
     
-    return(grpPlots)
-}), plotGroups)
-close(prog)
+    return(plots)
+}), cInfo$group)
 
-ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
-if (rmdVars$optimizePng && length(ap > 0))
-    optimizePngPlots(ap)
+message("Generating TP plots...")
+prog <- openProgBar(0, length(rmdVars$components))
+cmpTab <- as.data.table(rmdVars$components)
+# isFGScrAnnotated <- isScreening(rmdVars$fGroups) && screenInfo(rmdVars$fGroups)[[""]]
+# fgTab <- if (isScreening(rmdVars$fGroups)) as.data.table(rmdVars$fGroups, collapseSuspects = NULL) else NULL
 
-if (rmdVars$selfContained)
-    allPlots <- rapply(allPlots, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
+TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), f = function(ctRow, i)
+{
+    grpi <- match(ctRow$group, names(rmdVars$fGroups))
+    plots <- list()
+    fg <- rmdVars$fGroups[, ctRow$group]
+    
+    plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
+    makeCachedPlot(plots[["int"]], "plotInt", list(fg, average = TRUE), 3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
+
+    if (!is.null(ctRow[["SMILES"]]))
+    {
+        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-prec_%d.png", grpi))
+        mol <- getMoleculesFromSMILES(ctRow$SMILES, emptyIfFails = TRUE)[[1]]
+        withr::with_png(plots[["struct"]], width = 3.3, height = 3.3, units = "in", res = 72, bg = NA, code = {
+            plot(getRCDKStructurePlot(mol, 500, 500))
+        })
+    }
+    
+    plSpecArgs <- list()
+    
+    # UNDONE: handle compounds/formulas somehow. Needs non set specific ranks
+    # if (!is.null(fgTab) && !is.null(rmdVars$compounds) && all(c(ctRow$precursor_group, ctRow$group) %chin% names(rmdVars$compounds)))
+    # {
+    #     plSpecArgs <- list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
+    #                        rmdVars$formulas, FALSE)
+    #     makeCachedPlot(ret, "plotSpectrum", list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
+    #                                              rmdVars$formulas, FALSE),
+    #                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
+    # }
+    if (!is.null(rmdVars[["MSPeakLists"]]) && !is.null(rmdVars$MSPeakLists[[ctRow$precursor_group]][["MSMS"]]) &&
+        !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
+    {
+        plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
+        # UNDONE: specSimParams in rmdVars
+        makeCachedPlot(plots[["spec"]], "plotSpectrum", list(rmdVars$MSPeakLists, groupName = c(ctRow$precursor_group, ctRow$group),
+                                                             MSLevel = 2, specSimParams = getDefSpecSimParams(), title = ""),
+                       4, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
+    }
+
+    setTxtProgressBar(prog, i)
+    
+    return(plots)
+}), cmpTab$group)
+
+prepPlots <- function(pl)
+{
+    ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
+    if (rmdVars$optimizePng && length(ap > 0))
+        optimizePngPlots(ap)
+    
+    if (rmdVars$selfContained)
+        pl <- rapply(pl, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
+    return(pl)
+}
+
+rmdText <- ""
+
+precPlots <- prepPlots(precPlots); TPPlots <- prepPlots(TPPlots)
+
+precIntPlots <- sapply(precPlots, "[[", "int")
+rmdText <- sprintf("<script>var precIntPaths = [ %s ];</script>", paste0("'", precIntPlots, "'", collapse = ", "))
+
+precStructPlots <- sapply(precPlots, "[[", "struct")
+
+if (any(!sapply(precStructPlots, is.null)))
+    rmdText <- paste0(rmdText, "\n", sprintf("<script>var precStructPaths = [ %s ];</script>",
+                                             paste0("'", precStructPlots, "'", collapse = ", ")))
 ```
 
+`r rmdText`
 
-## { .TPsClass }
+
+### Plots { data-width=100 }
+
+<img id=precEIC style="display:none; width: auto; height: 150px;"></img>
+<img id=precStruct style="display:none; width: auto; height: 150px;"></img>
+<img id=precInt style="display:none; width: auto; height: 150px;"></img>
+<div id=noPrecSelected>Push a **show** button to view transformation data for a precursor.</div>
+
+
+##
 
 ### { .TPsClass }
 
 <style> .TPsClass { overflow-x: auto; } </style>
     
 ```{r echo=FALSE}
+
+makeTPTab <- function(cr, cols)
+{
+    allCols <- unique(unlist(lapply(cols, function(cl) grep(paste0("^", cl), names(cr), value = TRUE))))
+    
+    if (!isTRUE(all.equal(cols, allCols, check.attributes = FALSE)))
+    {
+        sets <- unique(sub(".+\\-(.+)$", "\\1", allCols[grepl("-", allCols, fixed = TRUE)]))
+        
+        ret <- rbindlist(lapply(c("", sets), function(s)
+        {
+            takeCols <- if (!nzchar(s)) cols else paste0(cols, "-", s)
+            whCols <- which(takeCols %in% names(cr))
+            if (length(whCols) == 0)
+                return(data.table())
+            
+            t <- cr[, takeCols, with = FALSE]
+            setnames(t, cols[whCols])
+            t[, set := s]
+            setcolorder(t, "set")
+            return(t)
+        }))
+    }
+    else
+        ret <- cr[, cols, with = FALSE]
+    
+    return(knitr::kable(ret, "html", escape = FALSE) %>%
+               kableExtra::kable_styling(font_size = 11) %>%
+               kableExtra::scroll_box(extra_css = "overflow-x: auto;"))
+
+}
+
+makeSimTab <- function(cr)
+{
+    cols <- c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth")
+    allCols <- grep("^specSimilarity", names(cr), value = TRUE)
+    
+    if (!isTRUE(all.equal(cols, allCols, check.attributes = FALSE)))
+    {
+        sets <- unique(sub(".+\\-(.+)$", "\\1", allCols[grepl("-", allCols, fixed = TRUE)]))
+        ret <- rbindlist(lapply(c("", sets), function(s)
+        {
+            ret <- if (!nzchar(s))
+                cr[, cols, with = FALSE]
+            else
+                setnames(cr[, paste0(cols, "-", s), with = FALSE], cols)
+            ret[, set := s]
+            setcolorder(ret, "set")
+        }))
+    }
+    else
+        ret <- cr[, cols, with = FALSE]
+    
+    return(knitr::kable(ret, "html", escape = FALSE) %>%
+               kableExtra::kable_styling(font_size = 11) %>%
+               kableExtra::scroll_box(extra_css = sprintf("overflow: auto; height: %dpx;", 80 + nrow(ret) * 30)))
+}
+
 cTable <- componentTable(rmdVars$components)[precDT$component]
+
+if (isScreening(rmdVars$fGroups))
+{
+    suspTbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
+    suspTbl <- suspTbl[, grepl("^susp_|group", names(suspTbl)), with = FALSE]
+    setnames(suspTbl, sub("^susp_", "", names(suspTbl)))
+}
+
 TPsDT <- rbindlist(Map(cTable, precDT$group, f = function(cmp, prec)
 {
-    ret <- copy(cmp)
-    ret[, prec := match(prec, names(rmdVars$fGroups))]
-    ret[, ("#") := seq_len(nrow(..ret))]
-    setcolorder(ret, c("prec", "#"))
+    ret <- data.table(prec = match(prec, names(rmdVars$fGroups)), "#" = seq_len(nrow(cmp)))
+    
+    trCols <- intersect(c("RTDir", "retDiff", "mzDiff", "formulaDiff"), names(cmp))
+    ret[, TP := sapply(split(cmp, seq_len(nrow(cmp))), function(cr)
+    {
+        tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]
+        if (rmdVars$retMin)
+            tpInfo[, retDiff := retDiff / 60]
+        tpInfo[, c("retDiff", "mzDiff") := .(round(retDiff, 2), round(mzDiff, 5))]
+        setnames(tpInfo, "TP_name", "name")
+        
+        tp <- makeInfoBox(paste0(names(tpInfo), ": ", tpInfo, collapse = "<br>"))
+        
+        if (!is.null(TPPlots[[cr$group]][["struct"]]))
+            tp <- paste0(imgTags(TPPlots[[cr$group]][["struct"]]), "<br>", tp)
+        
+        return(tp)
+    })]
+    
+    ret[, group := imgTags(chromPaths[match(cmp$group, names(rmdVars$fGroups))], style = "width: auto; height: 175px;")]
+    if (isScreening(rmdVars$fGroups))
+    {
+        suspCols <- c("formRank", "compRank", "annSimBoth", "estIDLevel")
+        if (any(sapply(suspCols, grepl, names(suspTbl))))
+        {
+            ret[, group := mapply(split(suspTbl[match(cmp$group, group)], by = "group"), group, FUN = function(sr, g)
+            {
+                paste0(g, "<br>", makeTPTab(sr, suspCols))
+            })]
+        }
+    }
+    
+    specSimCols <- grep("^specSimilarity", names(cmp), value = TRUE)
+    if (any(grepl("^specSimilarity", names(cmp))))
+    {
+        ret[, similarity := sapply(split(cmp, seq_len(nrow(cmp))), function(cr)
+        {
+            simt <- tryCatch(makeTPTab(cr, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth")), error = function(...) F)
+            if (isFALSE(simt)) browser()
+            if (!is.null(TPPlots[[cr$group]][["spec"]]))
+                simt <- paste0(imgTags(TPPlots[[cr$group]][["spec"]]), "<br>", simt)
+            return(simt)
+        })]
+    }
+
+    # ret <- copy(cmp)[, c("TP_name", "group", "formula"), with = FALSE] # UNDONE
+    # ret[, prec := match(prec, names(rmdVars$fGroups))]
+    # ret[, ("#") := seq_len(nrow(..ret))]
+    # setcolorder(ret, c("prec", "#"))
+    # ret[, EIC := imgTags(chromPaths[match(group, names(rmdVars$fGroups))], style = "width: auto; height: 150px;")]
+    # ret[, struct := sapply(group, function(g)
+    # {
+    #     if (!is.null(TPPlots[[g]][["struct"]])) imgTags(TPPlots[[g]][["struct"]]) else ""
+    # })]
+    # ret[, spec := sapply(group, function(g)
+    # {
+    #     if (!is.null(TPPlots[[g]][["spec"]])) imgTags(TPPlots[[g]][["spec"]]) else ""
+    # })]
+    ret[, "intensity profile" := imgTags(sapply(TPPlots[cmp$group], "[[", "int"))]
     return(ret)
 }))
 
-DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "400px", deferRender = TRUE,
                                     dom = "lrtp", pageLength = 25, autoWidth = TRUE,
-                                    ordering = FALSE
-                                    ),# columnDefs = list(list(visible = FALSE, targets = 0))),
+                                    ordering = FALSE,
+                                    columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "TPsTable")
 ```
+

@@ -3,13 +3,12 @@ function getAnnotationPageElement()
     return document.getElementById("feature-groups").parentElement.parentElement;
 }
 
-function showEICs(group, cl, clNoSel)
+function showPlot(group, cl, paths)
 {
     el = document.getElementById(cl);
     el.style.display = "flex";
     el.style.maxWidth = "100%";
-    el.src = chromPaths[parseInt(group) - 1];
-    document.getElementById(clNoSel).style.display = 'none';
+    el.src = paths[parseInt(group) - 1];
 }
 
 function showAnnotation(group, type)
@@ -18,13 +17,15 @@ function showAnnotation(group, type)
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
 
-    showEICs(group, "EICAnn", "noAnnotationSelected");
+    showPlot(group, "EICAnn", chromPaths);
 
     qu = "#" + type + "Table .dataTable";
     $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
 
     selectFGroupRow(group, "fGroupsTable");
+    
+    document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 
 function showCompoundsCluster(group)
@@ -34,8 +35,9 @@ function showCompoundsCluster(group)
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
 
-    showEICs(group, "EICAnn", "noAnnotationSelected");
+    showPlot(group, "EICAnn", chromPaths);
     selectFGroupRow(group, "fGroupsTable");
+    document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 
 function disableAllAnnotations(cl)
@@ -71,19 +73,22 @@ function initTPs()
     $('.dataTable').DataTable().columns.adjust().draw();
 }
 
-function showTPs(group)
+function showTPs(cmp, group)
 {
     const elements = document.getElementsByClassName("TPsClass");
     for (var i=0; i<elements.length; i++)
         elements[i].style.display = 'flex';
 
-    showEICs(group, "EICTP", "noPrecSelected");
+    showPlot(group, "precEIC", chromPaths);
+    showPlot(cmp, "precStruct", precStructPaths); // UNDONE: this may not be there
+    showPlot(cmp, "precInt", precIntPaths);
 
     qu = "#TPsTable .dataTable";
     $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
 
     selectFGroupRow(group, "precursorsTable");
+    document.getElementById("noPrecSelected").style.display = 'none';
 }
 
 $(document).ready(function()

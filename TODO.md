@@ -107,6 +107,8 @@
     - argument order and defaults
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
+    - replace set columns with one set and put this in reporting
+    - formulaDiff: reverse subtraction?
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -145,10 +147,28 @@
     - suspects() --> parents()?
     - precursor diff: 1-2 or 2-1? --> verify all
     - TP logic: reaction/transformation
+    - RTDir --> retDir?
 - misc
     - Make sure hash takes into account parent names
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
+- reporting
+    - column visibility buttons
+    - precs
+        - select proper columns
+        - better align plots? or make them inline as well?
+    - TPs
+        - proper image size, properly align columns
+        - plot annotation spec sims if possible
+    - add SMILES to BT TPs
+    - add non set specific ranks to set screening results so that formula/compound results can be obtained
+        - for formula the rank is not necessary if present in component?
+    - plotInt for sets not really useful?
+        - could overlay per set, which works if order if rGroups is equal
+            - although tricky with legend, or in this case number it
+    - handle fGroup subsets
+    - JS: handle if structs are not there
+    - 
 
 ## Reporting
 

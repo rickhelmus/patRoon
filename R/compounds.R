@@ -721,24 +721,35 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
                                      mustExist = TRUE)
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], MSPeakLists,
-                                                                         formulas), groupName[1])
+                                                                         formulas), 1)
         
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2], MSPeakLists,
-                                                                            formulas), groupName[2])
+                                                                            formulas), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                    plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE,
+                                                    plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                    shift = "none", useGGPlot2 = FALSE,
                                                     mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
+    if (!is.null(specSimParams))
+    {
+        # recursive call for both candidates
+        args <- list(obj, MSPeakLists, formulas, plotStruct, title, specSimParams = NULL, shift, useGGPlot2,
+                     mincex, xlim, ylim, maxMolSize, molRes, ...)
+        return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
+                        do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
+    }
+    
     compTable <- compoundTable(obj)[[groupName]]
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
+    
     return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
-                    plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
+                    plotStruct, title, shift, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})

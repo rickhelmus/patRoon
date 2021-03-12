@@ -480,7 +480,7 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
             {
                 if (MSLevel == 2)
                 {
-                    precSpec <- getSpec(MSPeakLists, group, 1, ana)
+                    precSpec <- getSpec(MSPeakLists, gn, 1, ana)
                     ret <- precSpec[precursor == TRUE]$mz
                 }
             }
@@ -593,7 +593,7 @@ expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
     return(sims)
 }
 
-mergeBinnedAndAnnPL <- function(binPL, annPL, gName)
+mergeBinnedAndAnnPL <- function(binPL, annPL, which)
 {
     # get rid of duplicate columns
     annPL <- annPL[, setdiff(names(annPL), names(binPL)), with = FALSE]
@@ -601,6 +601,6 @@ mergeBinnedAndAnnPL <- function(binPL, annPL, gName)
     annPL[, index := seq_len(nrow(annPL))] # for merging
     annPL <- merge(binPL, annPL, by.x = "indexOrig", by.y = "index")
     
-    annPL[, group := gName]
+    annPL[, which := which]
     return(annPL)
 }

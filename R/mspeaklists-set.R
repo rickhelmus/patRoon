@@ -211,7 +211,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     
     if (is.null(specSimParams))
     {
-        spec <- getSpec(obj, groupName, MSLevel, NULL)
+        spec <- getSpec(obj, groupName, MSLevel, analysis)
         if (is.null(spec))
             return(NULL)
         
@@ -237,16 +237,27 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
                                          specSimParams = specSimParams, shift = shift, mustExist = FALSE))
         if (all(sapply(binnedPLs, is.null)))
-            return(NULL)
+        {
+            # either no peak lists are available or no peak lists within the same sets were available. In the latter
+            # case nothing could be binned, hence, just mirror plot both spectra within binning
+            
+            topSpec <- copy(getSpec(obj, groupName[1], MSLevel, analysis[1]))
+            bottomSpec <- copy(getSpec(obj, groupName[2], MSLevel, analysis[2]))
+            
+            if (is.null(topSpec) || is.null(bottomSpec)) # really not there :-( ...
+                return(NULL)
+            
+            # topSpec[, mergedBy := "unique"]; bottomSpec[, mergedBy := "unique"]
+            if (is.null(topSpec[["set"]]) || is.null(bottomSpec[["set"]])) browser()
+            setnames(topSpec, "set", "mergedBy"); setnames(bottomSpec, "set", "mergedBy")
+        }
+        else
+        {
+            topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
+            bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
+        }
         
-        topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
-        topSpec[, group := groupName[1]]
-        bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
-        bottomSpec[, group := groupName[2]]
-        allSpectra <- rbind(topSpec, bottomSpec)
-  
-        specs <- split(allSpectra, by = "group")
-        plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
+        plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), mirror, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
@@ -269,7 +280,6 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
         gn2 <- if (is.null(groupName2)) NULL else intersect(groupName2, groupNames(so))
         if (length(gn1) == 0 || (!is.null(groupName2) && length(gn2) == 0))
             return(NULL)
-        
         # NOTE: don't drop NAs/dimensions here yet
         ret <- spectrumSimilarity(so, gn1, gn2, analysis1, analysis2, MSLevel, specSimParams, shift,
                                   NAToZero = FALSE, drop = FALSE)

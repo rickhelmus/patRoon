@@ -615,19 +615,30 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
                                      mustExist = TRUE)
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, precursor[1], groupName[1], analysis[1],
-                                                                         MSPeakLists), groupName[1])
+                                                                         MSPeakLists), 1)
         
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, precursor[2], groupName[2],
-                                                                            analysis[2], MSPeakLists), groupName[2])
+                                                                            analysis[2], MSPeakLists), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                   title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
-                                                   ylim = NULL, ...)
+                                                   title = NULL, specSimParams = NULL, shift = "none",
+                                                   useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
+    if (!is.null(specSimParams))
+    {
+        # recursive call for both candidates
+        args <- list(obj, MSPeakLists, title, specSimParams = NULL, shift, useGGPlot2,
+                     mincex, xlim, ylim, ...)
+        return(makeHash(do.call(plotSpectrumHash, c(args, list(precursor = precursor[1], groupName = groupName[1],
+                                                               analysis = analysis[1]))),
+                        do.call(plotSpectrumHash, c(args, list(precursor = precursor[2], groupName = groupName[2],
+                                                               analysis = analysis[2])))))
+    }
+    
     return(makeHash(precursor, annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists),
                     title, useGGPlot2, mincex, xlim, ylim, ...))
 })

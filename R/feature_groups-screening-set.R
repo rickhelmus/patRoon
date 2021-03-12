@@ -108,7 +108,17 @@ syncScreeningSetObjects <- function(obj)
     # BUG? can't call "[" directly here to subset??
     # obj@setObjects <- lapply(obj@setObjects, "[", i = analyses(obj), j = groupNames(obj))
     obj@setObjects <- lapply(obj@setObjects, function(x) x[analyses(obj), groupNames(obj)])
-    obj@screenInfo <- mergeScreeningSetInfos(obj@setObjects, obj@setThreshold)
+    newsi <- mergeScreeningSetInfos(obj@setObjects, obj@setThreshold)
+
+    # retain form/comp ranks    
+    oldsi <- screenInfo(obj)
+    for (col in c("formRank", "compRank"))
+    {
+        if (!is.null(oldsi[[col]]))
+            newsi[, (col) := oldsi[group %in% newsi$group][[col]]]
+    }
+
+    obj@screenInfo <- newsi[]
     return(obj)
 }
 
@@ -126,6 +136,7 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
                                                                                  drop = TRUE)
 {
     checkmate::assertCharacter(suspects, null.ok = TRUE)
+    assertSets(x, sets, TRUE)
     
     x <- callNextMethod(x, i, j, ..., rGroups = rGroups, sets = sets, drop = drop)
     
@@ -135,6 +146,12 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
         # --> groups may have been removed
         x <- x[, unique(unlist(lapply(x@setObjects, groupNames)))]
     }    
+
+    if (!is.null(sets))
+    {
+        x@setObjects <- x@setObjects[sets]
+        x <- syncScreeningSetObjects(x)
+    }
     
     return(x)
 })
@@ -160,8 +177,7 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
     return(ret)    
 })
 
-setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas,
-                                                                    compounds, ...)
+setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
@@ -177,7 +193,35 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     fGroups@setObjects <- mapply(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
                                  FUN = annotateSuspects, MoreArgs = list(...), SIMPLIFY = FALSE)
     
-    return(syncScreeningSetObjects(fGroups))
+    # clear old rank cols if present
+    rankCols <- c("formRank", "compRank")
+    if (any(rankCols %in% names(screenInfo(fGroups))))
+        fGroups@screenInfo[, intersect(rankCols, names(screenInfo(fGroups))) := NULL]
+    
+    fGroups <- syncScreeningSetObjects(fGroups)
+    
+    # add non set specific ranks
+    allRankCols <- getAllSuspSetCols(c("formRank", "compRank"), names(screenInfo(fGroups)), sets(fGroups))
+    if (any(grepl("^formRank", allRankCols)))
+    {
+        fGroups@screenInfo[!is.na(formula) & group %in% groupNames(formulas), formRank := mapply(group, formula, FUN = function(g, f)
+        {
+            unFTable <- unique(formulas[[g]], by = "neutral_formula")
+            r <- which(f == unFTable$neutral_formula)
+            return(if (length(r) > 0) r[1] else NA_integer_)
+        })][]
+    }
+
+    if (any(grepl("^compRank", allRankCols)))
+    {
+        fGroups@screenInfo[!is.na(InChIKey) & group %in% groupNames(compounds), compRank := mapply(group, InChIKey, FUN = function(g, ik)
+        {
+            r <- which(getIKBlock1(ik) == compounds[[g]]$InChIKey1)
+            return(if (length(r) > 0) r[1] else NA_integer_)
+        })][]
+    }
+
+    return(fGroups)
 })
 
 setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = NULL,

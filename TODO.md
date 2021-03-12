@@ -39,6 +39,9 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
+- plotInt
+    - more clear lines by default?
+    - no box?
 
 
 ## Annotation
@@ -169,7 +172,7 @@
             - although tricky with legend, or in this case number it
     - handle fGroup subsets
     - JS: handle if structs are not there
-    - 
+    - specSimParams in rmdVars
 
 ## Reporting
 

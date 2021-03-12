@@ -4,8 +4,19 @@ Transformation Products {data-orientation=rows}
 ===
 
 ```{r TPPlots, fig.keep='none'}
-components <- rmdVars$components[, names(rmdVars$fGroups)]
+
+# sync objects
+components <- rmdVars$components[, intersect(names(rmdVars$fGroups), groupNames(rmdVars$components))]
+components <- delete(components, i = !componentInfo(components)$precursor_group %chin% names(rmdVars$fGroups))
+
 cInfo <- componentInfo(components)
+
+if (isScreening(rmdVars$fGroups))
+{
+    suspTbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
+    suspTbl <- suspTbl[, grepl("^susp_|group", names(suspTbl)), with = FALSE]
+    setnames(suspTbl, sub("^susp_", "", names(suspTbl)))
+}
 
 plotPathFull <- getPlotPath(FALSE)
 
@@ -63,27 +74,53 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
         makeStructPlot(SMI, plots[["struct"]])
     }
     
-    plSpecArgs <- list()
-    
-    # UNDONE: handle compounds/formulas somehow. Needs non set specific ranks
-    # if (!is.null(fgTab) && !is.null(rmdVars$compounds) && all(c(ctRow$precursor_group, ctRow$group) %chin% names(rmdVars$compounds)))
-    # {
-    #     plSpecArgs <- list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
-    #                        rmdVars$formulas, FALSE)
-    #     makeCachedPlot(ret, "plotSpectrum", list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
-    #                                              rmdVars$formulas, FALSE),
-    #                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-    # }
-    if (!is.null(rmdVars[["MSPeakLists"]]) && !is.null(rmdVars$MSPeakLists[[ctRow$precursor_group]][["MSMS"]]) &&
-        !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
+    if (!is.null(rmdVars[["MSPeakLists"]]))
     {
-        plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
-        # UNDONE: specSimParams in rmdVars
-        makeCachedPlot(plots[["spec"]], "plotSpectrum", list(rmdVars$MSPeakLists, groupName = c(ctRow$precursor_group, ctRow$group),
-                                                             MSLevel = 2, specSimParams = getDefSpecSimParams(), title = ""),
-                       5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
+        # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
+        plSpecArgs <- list()
+        
+        if (isScreening(rmdVars$fGroups))
+        {
+            suspPrecRow <- suspTbl[name == ctRow$precursor_name & group == ctRow$precursor_group]
+            suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
+            # message(sprintf("i: %d\n", i))
+            # if (i == 6) browser()
+            if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
+                all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
+                nrow(suspTPRow) == 1 && # UNDONE: can be zero if TPs were merged
+                !is.na(suspPrecRow$compRank) && !is.na(suspTPRow$compRank))
+            {
+                plSpecArgs <- list(obj = rmdVars$compounds, formulas = rmdVars[["formulas"]],
+                                   index = c(suspPrecRow$compRank, suspTPRow$compRank),
+                                   MSPeakLists = rmdVars$MSPeakLists, plotStruct = FALSE)
+            }
+            else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
+                     all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
+                     nrow(suspTPRow) == 1 && # UNDONE: can be zero if TPs were merged
+                     !is.na(suspPrecRow$formRank) && !is.na(suspTPRow$formRank))
+            {
+                plSpecArgs <- list(obj = rmdVars$formulas, precursor = c(suspPrecRow$formula, suspTPRow$formula),
+                                   MSPeakLists = rmdVars$MSPeakLists)
+            }
+        }
+        
+        if (length(plSpecArgs) == 0 && !is.null(rmdVars$MSPeakLists[[ctRow$precursor_group]][["MSMS"]]) &&
+            !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
+        {
+            # no formulas/compounds, try peak lists
+            plSpecArgs <- list(obj = rmdVars$MSPeakLists, MSLevel = 2)
+        }
+        
+        if (length(plSpecArgs) > 0)
+        {
+            plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
+            # UNDONE: specSimParams in rmdVars
+            makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$precursor_group, ctRow$group),
+                                                                               specSimParams = getDefSpecSimParams(), title = "")),
+                           5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
+        }
     }
-
+    
     setTxtProgressBar(prog, i)
     
     return(plots)
@@ -126,7 +163,7 @@ makeTPTab <- function(cr, cols)
             if (length(whCols) == 0)
                 return(data.table())
             
-            t <- cr[, takeCols, with = FALSE]
+            t <- cr[, takeCols[whCols], with = FALSE]
             setnames(t, cols[whCols])
             
             t[, (names(t)) := lapply(.SD, function(x) if (is.double(x)) round(x, 2) else x)]
@@ -135,7 +172,7 @@ makeTPTab <- function(cr, cols)
             setcolorder(t, "set")
             
             return(t)
-        }))
+        }), fill = TRUE)
     }
     else
         ret <- cr[, cols, with = FALSE]
@@ -147,13 +184,6 @@ makeTPTab <- function(cr, cols)
 }
 
 chromPlotStyle <- "width: auto; height: 250px;"
-
-if (isScreening(rmdVars$fGroups))
-{
-    suspTbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
-    suspTbl <- suspTbl[, grepl("^susp_|group", names(suspTbl)), with = FALSE]
-    setnames(suspTbl, sub("^susp_", "", names(suspTbl)))
-}
 
 precDT <- data.table(compInd = seq_len(nrow(cInfo)))
 
@@ -251,12 +281,12 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         }
     }
     
-    specSimCols <- grep("^specSimilarity", names(cmp), value = TRUE)
-    if (any(grepl("^specSimilarity", names(cmp))))
+    if (any(grepl("^(specSimilarity|fragmentMatches|neutralLossMatches)", names(cmp))))
     {
         ret[, similarity := sapply(splitCmp, function(cr)
         {
-            simt <- makeTPTab(cr, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"))
+            simt <- makeTPTab(cr, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth",
+                                    "fragmentMatches", "neutralLossMatches"))
             return(simt)
         })]
     }
@@ -274,7 +304,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     return(ret)
 }))
 
-DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "400px", deferRender = TRUE,
+DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                     dom = "Blrtp", pageLength = 25, autoWidth = TRUE,
                                     ordering = FALSE,
                                     columnDefs = list(list(visible = FALSE, targets = 0),

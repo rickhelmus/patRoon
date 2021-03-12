@@ -114,7 +114,6 @@
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
     - formulaDiff: reverse subtraction?
-    - keep precursor subsetting? if yes, doc otherwise move it to TPs.Rmd
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -160,11 +159,13 @@
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - reporting
     - TPs
-        - plot annotation spec sims if possible
+        - add frag/NL losses: transpose?
     - add SMILES to BT TPs
     - plotInt for sets not really useful?
         - could overlay per set, which works if order if rGroups is equal
             - although tricky with x axis, or in this case number it
+    - padding between two tables?
+    - default TP columns OK?
     - specSimParams in rmdVars
 
 ## Reporting

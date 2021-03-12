@@ -19,11 +19,8 @@ function showAnnotation(group, type)
 
     showPlot(group, "EICAnn", chromPaths);
 
-    qu = "#" + type + "Table .dataTable";
-    $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
-    $(qu).DataTable().columns.adjust().draw();
-
-    selectFGroupRow(group, "fGroupsTable");
+    filterDTRows(group, type + "Table");
+    selectDTRow(group, "fGroupsTable");
     
     document.getElementById("noAnnotationSelected").style.display = 'none';
 }
@@ -36,7 +33,7 @@ function showCompoundsCluster(group)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
 
     showPlot(group, "EICAnn", chromPaths);
-    selectFGroupRow(group, "fGroupsTable");
+    selectDTRow(group, "fGroupsTable");
     document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 
@@ -48,17 +45,28 @@ function disableAllAnnotations(cl)
     //$(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
 }
 
-function selectFGroupRow(group, cl)
+function filterDTRows(what, cl)
+{
+    qu = "#" + cl + " .dataTable";
+    $(qu).DataTable().column(0).search("^" + what + "$", true, false).draw();
+    $(qu).DataTable().columns.adjust().draw();
+}
+
+function selectDTRow(index, cl, cell = null)
 {
     var table = $("#" + cl + " .dataTable").DataTable();
     
-    table.$('tr.selected').removeClass('selected'); // remove any current selections
+    table.$((cell) ? "td.selected" : "tr.selected").removeClass("selected"); // remove any current selections
     
     var indexes = table.rows().eq(0).filter(function(ind)
     {
-        return table.cell(ind, 0).data() == group ? true : false;
+        return table.cell(ind, 0).data() == index ? true : false;
     });
-    table.rows(indexes).nodes().to$().addClass("selected");
+    
+    if (cell)
+        table.cells(indexes, cell).nodes().to$().addClass("selected");
+    else
+        table.rows(indexes).nodes().to$().addClass("selected");
 }
 
 function initAnnotation()
@@ -69,26 +77,13 @@ function initAnnotation()
 
 function initTPs()
 {
-    disableAllAnnotations("TPsClass");
-    $('.dataTable').DataTable().columns.adjust().draw();
+    filterDTRows("nothing", "TPsTable");
 }
 
 function showTPs(cmp, group)
 {
-    const elements = document.getElementsByClassName("TPsClass");
-    for (var i=0; i<elements.length; i++)
-        elements[i].style.display = 'flex';
-
-    showPlot(group, "precEIC", chromPaths);
-    showPlot(cmp, "precStruct", precStructPaths); // UNDONE: this may not be there
-    showPlot(cmp, "precInt", precIntPaths);
-
-    qu = "#TPsTable .dataTable";
-    $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
-    $(qu).DataTable().columns.adjust().draw();
-
-    selectFGroupRow(group, "precursorsTable");
-    document.getElementById("noPrecSelected").style.display = 'none';
+    filterDTRows(cmp, "TPsTable");
+    selectDTRow(cmp, "precursorsTable", 1);
 }
 
 $(document).ready(function()

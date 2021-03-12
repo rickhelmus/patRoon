@@ -120,14 +120,20 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, precursor, groupName
     ac <- checkmate::makeAssertCollection()
     assertChoiceSilent(groupName, groupNames(obj), add = ac)
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::reportAssertions(ac)
     
-    return(rbindlist(Map(setObjects(obj), lapply(sets(obj), unset, obj = MSPeakLists), f = function(so, mspl)
+    ret <- rbindlist(Map(setObjects(obj), lapply(sets(obj), unset, obj = MSPeakLists), f = function(so, mspl)
     {
         if (!groupName %in% groupNames(so) || (!is.null(analysis) && !analysis %in% analyses(so)))
-            return(data.table())
+            return(NULL)
         annotatedPeakList(so, precursor, groupName, analysis, mspl, onlyAnnotated)
-    }), fill = TRUE, idcol = "set"))
+    }), fill = TRUE, idcol = "set")
+    
+    if (nrow(ret) == 0)
+        return(NULL)
+    
+    return(ret)
 })
 
 #' @export
@@ -202,7 +208,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
             binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
             annPLs <- Map(usObj, usMSPL, f = annotatedPeakList,
                           MoreArgs = list(precursor = precursor[nr], groupName = groupName[nr], analysis = analysis[nr]))
-            annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(gName = groupName[nr]))
+            annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
             annPLs <- rbindlist(annPLs, idcol = "set")
             return(annPLs)
         }
@@ -210,7 +216,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
         topSpec <- mergeBinnedAnn(1); bottomSpec <- mergeBinnedAnn(2)
         allSpectra <- rbind(topSpec, bottomSpec)
         
-        specs <- split(allSpectra, by = "group")
+        specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
@@ -218,11 +224,12 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
 })
 
 setMethod("plotSpectrumHash", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                      title = NULL, useGGPlot2 = FALSE, mincex = 0.9,
-                                                      xlim = NULL, ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
+                                                      title = NULL, specSimParams = NULL, shift = "none",
+                                                      useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                      perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists,
-                                   title, useGGPlot2, mincex, xlim, ylim, ...),
+                                   title, specSimParams, shift, useGGPlot2, mincex, xlim, ylim, ...),
                     perSet, mirror))
 })
 

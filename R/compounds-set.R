@@ -300,15 +300,15 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
             binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
             annPLs <- Map(usObj, usMSPL, usForm, f = annotatedPeakList,
                           MoreArgs = list(index = index[nr], groupName = groupName[nr]))
-            annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(gName = groupName[nr]))
-            annPLs <- rbindlist(annPLs, idcol = "set")
+            annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
+            annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
             return(annPLs)
         }
         
         topSpec <- mergeBinnedAnn(1); bottomSpec <- mergeBinnedAnn(2)
-        allSpectra <- rbind(topSpec, bottomSpec)
+        allSpectra <- rbind(topSpec, bottomSpec, fill = TRUE)
         
-        specs <- split(allSpectra, by = "group")
+        specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
@@ -316,14 +316,14 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE,
+                                                       plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                       shift = "none", useGGPlot2 = FALSE,
                                                        mincex = 0.9, xlim = NULL, ylim = NULL,
                                                        maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
                                                        perSet = TRUE, mirror = TRUE, ...)
 {
-    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                                   plotStruct, title, useGGPlot2, mincex, xlim,
-                                   ylim, maxMolSize, molRes, ...),
+    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams,
+                                   shift, useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...),
                     perSet, mirror))
 })
 

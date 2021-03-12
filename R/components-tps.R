@@ -285,6 +285,19 @@ setMethod("initialize", "componentsTPs",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "tp"))
 
 
+#' @export
+setMethod("[", c("componentsTPs", "ANY", "ANY", "missing"), function(x, i, j, ...)
+{
+    x <- callNextMethod()
+    if (!missing(j))
+    {
+        # also subset on precursor groups
+        j <- assertSubsetArgAndToChr(j, groupNames(x))
+        cInfo <- componentInfo(x)
+        x <- delete(x, i = cInfo[!precursor_group %chin% j]$name)
+    }
+})
+
 #' @describeIn componentsTPs Returns all component data in a table.
 #' @export
 setMethod("as.data.table", "componentsTPs", function(x)

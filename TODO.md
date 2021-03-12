@@ -109,6 +109,7 @@
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
     - formulaDiff: reverse subtraction?
+    - keep precursor subsetting? if yes, doc otherwise move it to TPs.Rmd
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

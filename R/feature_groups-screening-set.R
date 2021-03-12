@@ -9,6 +9,17 @@ mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(set
     rmCols <- c("mz", "fragments_mz")
     unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",  "d_rt", "d_mz", "fragments_formula")
     
+    renameDupCols <- function(si, suf)
+    {
+        cols <- setdiff(names(si), c("name", "group", unCols))
+        if (length(cols) > 0)
+        {
+            si <- copy(si)
+            setnames(si, cols, paste0(cols, suf))
+        }
+        return(si)
+    }
+    
     if (length(setObjects) > 1)
     {
         sets <- names(setObjects)
@@ -17,17 +28,6 @@ mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(set
         {
             cols <- unlist(lapply(cols, paste0, "-", sets))
             return(cols[sapply(cols, function(x) !is.null(scrInfo[[x]]))])
-        }
-        
-        renameDupCols <- function(si, suf)
-        {
-            cols <- setdiff(names(si), c("name", "group", unCols))
-            if (length(cols) > 0)
-            {
-                si <- copy(si)
-                setnames(si, cols, paste0(cols, suf))
-            }
-            return(si)
         }
         
         scrInfo <- ReduceWithArgs(x = sInfos, paste0("-", names(setObjects)), f = function(l, r, sl, sr)
@@ -74,6 +74,7 @@ mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(set
     else if (length(sInfos) == 1)
     {
         scrInfo <- copy(sInfos[[1]])
+        scrInfo <- renameDupCols(scrInfo, paste0("-", names(setObjects)[1]))
         if (rmSetCols)
         {
             rmc <- intersect(rmCols, names(scrInfo))

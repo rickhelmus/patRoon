@@ -96,13 +96,15 @@
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
     - check if all plot methods have a Hash version
+- screening
+    - support recursive screening? or throw error otherwise
+    - form/compRanks: update when subsetting on sets? otherwise doc
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
     -componentsSetReduced necessary? eg for NT components with plotGraph
         - probably yes
-- support recursive screening? or throw error otherwise
 
 ## TPs
 
@@ -157,21 +159,12 @@
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - reporting
-    - column visibility buttons
-    - precs
-        - select proper columns
-        - better align plots? or make them inline as well?
     - TPs
-        - proper image size, properly align columns
         - plot annotation spec sims if possible
     - add SMILES to BT TPs
-    - add non set specific ranks to set screening results so that formula/compound results can be obtained
-        - for formula the rank is not necessary if present in component?
     - plotInt for sets not really useful?
         - could overlay per set, which works if order if rGroups is equal
-            - although tricky with legend, or in this case number it
-    - handle fGroup subsets
-    - JS: handle if structs are not there
+            - although tricky with x axis, or in this case number it
     - specSimParams in rmdVars
 
 ## Reporting

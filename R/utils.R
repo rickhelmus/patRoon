@@ -52,20 +52,14 @@ mkdirp <- function(path)
     }
 }
 
-insertDTColumn <- function(dt, col, d, before)
+moveLastDTColumn <- function(dt, before)
 {
-    dt <- copy(dt)
-
-    dt[, (col) := d]
-
     if (before < ncol(dt))
     {
-        ind <- c()
-
-        if (before > 1)
-            ind <- append(ind, 1:(before-1))
-
-        ind <- append(ind, c(ncol(dt), before:(ncol(dt)-1)))
+        dt <- copy(dt)
+        
+        ind <- if (before > 1) seq_len(before - 1) else NULL
+        ind <- append(ind, c(ncol(dt), seq(before, ncol(dt) - 1)))
         setcolorder(dt, ind)
     }
 

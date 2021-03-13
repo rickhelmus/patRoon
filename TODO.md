@@ -65,6 +65,10 @@
     - more settings?
     - session import
     - change column names for both tables?
+    - somehow handle partial removing of componentsTPs
+        - add extra column identifier and use that instead of group column?
+        - or add specific code that also involves the TP_name
+        - or simply don't support it for now?
 - feature components
     - cliqueMS
         - change checkPackage GH link once PRs are merged
@@ -114,6 +118,7 @@
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
     - formulaDiff: reverse subtraction?
+    - don't merge TPs anymore, doc that this could be done with suspect screening
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

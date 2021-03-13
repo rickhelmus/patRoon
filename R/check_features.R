@@ -334,11 +334,10 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
     
-    checkmate::assertFlag(clearSession)
-    
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(session, mustExist = FALSE, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
     if (clearSession && file.exists(session))

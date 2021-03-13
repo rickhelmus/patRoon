@@ -70,6 +70,10 @@ readCheckSession <- function(session, type)
         ret$type <- "unknown" # for error below
     if (ret$type != type)
         stop("The specified session file type is incorrect: ", ret$type)
+    
+    if (length(ret$removeFully) == 0)
+        ret$removeFully <- character() # YAML converts to empty list
+    
     return(ret)
 }
 
@@ -466,9 +470,12 @@ runCheckUI <- function(UIInterface)
             {
                 tbl <- rhandsontable::hot_to_r(input$secondaryHot)
                 oldsel <- rValues$removePartially[[rValues$currentPrimSel]]
-                rValues$removePartially[[rValues$currentPrimSel]] <-
-                    UIInterface$getSecondarySelections(rValues$currentPrimSel)[!tbl$keep]
-                if (is.null(oldsel) || !setequal(oldsel, rValues$removePartially[[rValues$currentPrimSel]]))
+                newsel <- UIInterface$getSecondarySelections(rValues$currentPrimSel)[!tbl$keep]
+                if (length(newsel) == 0)
+                    newsel <- NULL
+                rValues$removePartially[[rValues$currentPrimSel]] <- newsel
+                if (is.null(oldsel) != is.null(newsel) ||
+                    (!is.null(oldsel) && !setequal(oldsel, newsel)))
                     setSessionChanged(TRUE)
             }
         })

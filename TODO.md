@@ -14,7 +14,6 @@
 
 - checkFeatures:
     - annotation column setting
-    - session import
 - neutralizing / ionization
     - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
     - what to do with unsupported adducts for annotation?
@@ -26,6 +25,9 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - checkUI
     - file import with different group names
+        - for features: handle overWrite
+        - implement components
+        - harmonize code with features
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters

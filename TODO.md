@@ -12,8 +12,6 @@
 
 ## Features
 
-- checkFeatures:
-    - annotation column setting
 - neutralizing / ionization
     - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
     - what to do with unsupported adducts for annotation?
@@ -27,7 +25,7 @@
     - file import with different group names
         - for features: handle overWrite
         - implement components
-        - harmonize code with features
+            - harmonize code with features
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
@@ -178,9 +176,6 @@
 ## Reporting
 
 - featInfo: finished?
-- componentsTPs
-    - similar format as annotation tab for all TPs for each parent
-    - plot structure (if possible), intensity profiles, EIC and specs for both parents and TPss
 
 
 ## tests

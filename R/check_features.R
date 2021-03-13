@@ -50,6 +50,7 @@ checkFeaturesInterface$methods(
                                      "Suspect properties (RT, m/z, fragments)" = "suspProp",
                                      "Estimated suspect identification level" = "estIDLevel",
                                      "Other suspect annotations" = "suspOther",
+                                     "Ion annotations" = "ionAnn",
                                      "Total score" = "totalScore",
                                      "Other scores" = "otherScores"),
                                    settings$fGroupColumns)
@@ -170,6 +171,14 @@ checkFeaturesInterface$methods(
                 gData[, (intersect(names(gData),
                                    c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
                                      "maxFrags", "maxFragMatches", "maxFragMatchesRel"))) := NULL]
+        }
+        
+        if (!"ionAnn" %in% rValues$settings$fGroupColumns)
+        {
+            if (!is.null(gData[["adduct"]]))
+                gData[, adduct := NULL]
+            if (!is.null(gData[["neutralMass"]]))
+                gData[, neutralMass := NULL]
         }
         
         if (getScores && hasFGroupScores(fGroups))

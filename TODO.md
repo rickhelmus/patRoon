@@ -328,6 +328,7 @@
     - changed "rt" to "ret" for component columns for consistency
     - show(): show unique fGroup counts
 - plotGraph: better error if if object is empty
+- Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 
 
 # Lower priority

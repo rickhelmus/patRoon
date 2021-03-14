@@ -40,6 +40,8 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
     else
         db <- dbArg
 
+    RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
+    
     ret <- NULL
 
     if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
@@ -70,6 +72,29 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
     return(ret)
 }
 
+# taken from https://blog.r-hub.io/2021/03/13/rsqlite-parallel/
+dbWithWriteTransaction <- function(conn, code)
+{
+    DBI::dbExecute(conn, "BEGIN IMMEDIATE")
+    rollback <- function(e)
+    {
+        call <- DBI::dbExecute(conn, "ROLLBACK")
+        if (identical(call, FALSE))
+        {
+            stop(paste(
+                "Failed to rollback transaction.",
+                "Tried to roll back because an error occurred:",
+                conditionMessage(e)
+            ), call. = FALSE)
+        }
+        if (inherits(e, "error"))
+            stop(e)
+    }
+    
+    tryCatch({res <- force(code);  DBI::dbExecute(conn, "COMMIT"); res },
+             db_abort = rollback, error = rollback, interrupt = rollback)
+}
+
 saveCacheData <- function(category, data, hash, dbArg = NULL)
 {
     if (getCacheMode() == "load" || getCacheMode() == "none")
@@ -80,18 +105,22 @@ saveCacheData <- function(category, data, hash, dbArg = NULL)
     else
         db <- dbArg
 
-    DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
+    RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
 
     df <- data.frame(d = I(list(fst::compress_fst(serialize(data, NULL, xdr = FALSE)))))
-
-    # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
-    DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
-    DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
-
-    # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
-    # too many rows
-    if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
-        DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
+    
+    dbWithWriteTransaction(db, {
+        DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
+        
+        # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
+        DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
+        DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
+        
+        # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
+        # too many rows
+        if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
+            DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
+    })    
 }
 
 loadCacheSet <- function(category, setHash, dbArg = NULL)

@@ -56,7 +56,7 @@ Imports:
     digest,
     enviPick,
     DBI,
-    RSQLite,
+    RSQLite (>= 2.2.4),
     fst,
     processx,
     tools,

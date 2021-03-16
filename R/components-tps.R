@@ -7,6 +7,9 @@ NULL
 
 genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
 {
+    # NOTE: groupName2 may have duplicate group names, which will be removed by intersect below. We don't need to repeat
+    # their calculation. Just re-add them below.
+    
     gn1 <- intersect(groupName1, groupNames(obj))
     gn2 <- intersect(groupName2, groupNames(obj))
     otherGN2 <- setdiff(groupName2, groupNames(obj))
@@ -23,10 +26,9 @@ genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
             names(ret) <- gn2
         }
         if (length(otherGN2) > 0)
-        {
             ret <- c(ret, setNames(rep(NA_real_, length(otherGN2)), otherGN2))
-            ret <- ret[groupName2]
-        }
+        
+        ret <- ret[groupName2] # re-order and re-add duplicate group columns if needed
         
         return(ret)
     }
@@ -214,10 +216,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
                 comps <- rbindlist(sapply(precFGs, function(precFG)
                 {
                     ret <- merge(TPs, preds, by.x = "TP_name", by.y = "name")
-                    
-                    # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
-                    ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
-                    ret <- unique(ret, by = "group")
                     setnames(ret, "RTDir", "TP_RTDir")
                     
                     ret <- prepareComponent(ret, precFG)

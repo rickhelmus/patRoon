@@ -118,10 +118,10 @@
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
     - formulaDiff: reverse subtraction?
-    - don't merge TPs anymore, doc that this could be done with suspect screening
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
+    - filter equal formula/structure candidates
 - metabolic logic
     - more logic reactions?
     - assert types of custom reactions DF
@@ -169,6 +169,9 @@
             - although tricky with x axis, or in this case number it
     - padding between two tables?
     - default TP columns OK?
+    - fragMatches/NLMatches: doc that it's _not_ candidate specific
+        --> also add for candidate specific if possible? although this could be taken from suspect annotations
+        - otherwise maybe rename to eg allFragmentMatches
 
 ## Reporting
 
@@ -267,6 +270,7 @@
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
         - min peaks always applied lastly
     - mention that RTDirMatch filter ignores any zero values for TP_RTDir/RTDir (ie to be safe)
+    - doc that merging TPs (same fGroup/TP) could be done with suspect screening
 
 ## NEWS
 

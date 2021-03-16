@@ -165,7 +165,6 @@
 - reporting
     - TPs
         - add frag/NL losses: transpose?
-    - add SMILES to BT TPs
     - plotInt for sets not really useful?
         - could overlay per set, which works if order if rGroups is equal
             - although tricky with x axis, or in this case number it

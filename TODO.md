@@ -156,6 +156,7 @@
     - consistency for spectrum/peaklist
     - suspects() --> parents()?
     - precursor diff: 1-2 or 2-1? --> verify all
+        - same for formulaDiff, retDiff, RTDir etc
     - TP logic: reaction/transformation
     - RTDir --> retDir?
 - misc
@@ -163,8 +164,6 @@
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - reporting
-    - TPs
-        - add frag/NL losses: transpose?
     - plotInt for sets not really useful?
         - could overlay per set, which works if order if rGroups is equal
             - although tricky with x axis, or in this case number it

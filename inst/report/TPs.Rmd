@@ -154,9 +154,11 @@ makeTPTab <- function(cr, cols)
     {
         sets <- unique(sub(".+\\-(.+)$", "\\1", allCols[grepl("-", allCols, fixed = TRUE)]))
         
-        ret <- rbindlist(lapply(c("", sets), function(s)
+        # NOTE: " " (a space) results in an unnamed column
+        
+        ret <- rbindlist(lapply(c(" ", sets), function(s)
         {
-            takeCols <- if (!nzchar(s)) cols else paste0(cols, "-", s)
+            takeCols <- if (s == " ") cols else paste0(cols, "-", s)
             whCols <- which(takeCols %in% names(cr))
             if (length(whCols) == 0)
                 return(data.table())
@@ -171,9 +173,14 @@ makeTPTab <- function(cr, cols)
             
             return(t)
         }), fill = TRUE)
+        ret <- transpose(ret, keep.names = " ", make.names = "set")
     }
     else
-        ret <- cr[, cols, with = FALSE]
+    {
+        ret <- setnames(transpose(cr[, cols, with = FALSE], keep.names = " "), 2, "value")
+        if (is.double(ret$value))
+            ret[, value := round(value, 2)]
+    }
     
     return(knitr::kable(ret, "html", escape = FALSE) %>%
                kableExtra::kable_styling(font_size = 11) %>%

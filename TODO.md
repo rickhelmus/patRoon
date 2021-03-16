@@ -165,9 +165,6 @@
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - reporting
-    - plotInt for sets not really useful?
-        - could overlay per set, which works if order if rGroups is equal
-            - although tricky with x axis, or in this case number it
     - padding between two tables?
     - default TP columns OK?
     - fragMatches/NLMatches: doc that it's _not_ candidate specific

@@ -31,6 +31,15 @@ makeStructPlot <- function(SMI, out)
     })
 }
 
+plotIntMainArgs <- list(average = TRUE)
+if (isFGSet(rmdVars$fGroups))
+{
+    plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))
+} else
+{
+    plotIntMainArgs <- c(plotIntMainArgs, list(col = "black"))
+}
+
 precPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(precRow, i)
 {
     grpi <- match(precRow$precursor_group, names(rmdVars$fGroups))
@@ -38,7 +47,8 @@ precPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo
     fg <- rmdVars$fGroups[, precRow$precursor_group]
     
     plots[["int"]] <- file.path(plotPathFull, sprintf("int-prec_%d.png", grpi))
-    makeCachedPlot(plots[["int"]], "plotInt", list(fg, average = TRUE), 3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
+    makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3,
+                   bg = NA, cacheDB = rmdVars$cacheDB)
 
     if (!is.null(precRow[["precursor_SMILES"]]))
     {
@@ -65,7 +75,8 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
     fg <- rmdVars$fGroups[, ctRow$group]
     
     plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
-    makeCachedPlot(plots[["int"]], "plotInt", list(fg, average = TRUE), 3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
+    makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3, bg = NA,
+                   cacheDB = rmdVars$cacheDB)
 
     SMI <- ctRow[["SMILES"]]
     if (!is.null(SMI))

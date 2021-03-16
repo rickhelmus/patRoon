@@ -156,9 +156,10 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         )
         
     }
+    
     assertCharField("name", minChars = 1)
     assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula"); assertCharField("InChIKey")
-    assertCharField("adduct", null.ok = !needsAdduct || !is.null(x[["mz"]]))
+    assertCharField("adduct", null.ok = !needsAdduct || (!is.null(x[["mz"]]) && !any(is.na(x$mz))))
     assertCharField("fragments_mz"); assertCharField("fragments_formula")
 
     assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),

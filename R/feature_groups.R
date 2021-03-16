@@ -895,10 +895,14 @@ setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "
 
 #' @describeIn featureGroups Generates a line plot for the (averaged) intensity
 #'   of feature groups within all analyses
+#' @param xnames Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.
 #' @export
-setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, xnames = TRUE, showLegend = FALSE, pch = 20,
+                                               type = "b", lty = 3, col = NULL, ...)
 {
-    checkmate::assertFlag(average)
+    # NOTE: keep in sync with sets method
+    
+    aapply(checkmate::assertFlag, . ~ average + xnames + showLegend)
 
     if (length(obj) == 0)
     {
@@ -906,30 +910,50 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, t
         invisible(return(NULL))
     }
 
-    anaInfo <- analysisInfo(obj)
-
     if (average)
     {
         gTable <- averageGroups(obj)
-        snames <- unique(anaInfo$group)
+        snames <- replicateGroups(obj)
     }
     else
     {
         gTable <- groupTable(obj)
-        snames <- anaInfo$analysis
+        snames <- analyses(obj)
     }
 
     nsamp <- length(snames)
 
-    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
-    axis(1, seq_len(nsamp), snames, las = 2)
-
     if (is.null(col))
         col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(gTable))
+    
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, names(obj), col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+    
+    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "Intensity",
+         xaxt = if (xnames) "n" else "s")
+    
+    if (xnames)
+        axis(1, seq_len(nsamp), snames, las = 2)
 
-    px <- seq_len(nsamp)
     for (i in seq_along(gTable))
-        lines(x = px, y = gTable[[i]], type = type, pch = pch, lty = lty, col = col[i], ...)
+        lines(x = seq_len(nsamp), y = gTable[[i]], type = type, pch = pch, lty = lty, col = col[i], ...)
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

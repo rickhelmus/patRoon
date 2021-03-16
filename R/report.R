@@ -766,7 +766,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                                   compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
-                                                  MSPeakLists, retMin, EICRtWindow, EICMzExpWindow,
+                                                  MSPeakLists, specSimParams, retMin, EICRtWindow, EICMzExpWindow,
                                                   EICTopMost, EICTopMostByRGroup, EICOnlyPresent, selfContained,
                                                   optimizePng, clearPath, openReport, noDate)
 {
@@ -788,6 +788,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     aapply(checkmate::assertCount, . ~ formulasTopMost + compoundsTopMost + EICTopMost,
            positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -848,8 +849,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                     formulasExclNormScores = formulasExclNormScores, compoundsNormalizeScores = compoundsNormalizeScores,
                     compoundsExclNormScores = compoundsExclNormScores,
                     compoundsOnlyUsedScorings = compoundsOnlyUsedScorings,
-                    components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
-                    optimizePng = optimizePng, noDate = noDate)
+                    components = components, interactiveHeat = interactiveHeat, specSimParams = specSimParams,
+                    selfContained = selfContained, optimizePng = optimizePng, noDate = noDate)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

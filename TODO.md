@@ -51,6 +51,14 @@
 - decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
+- annotatedBy MSPeakLists filter
+    - BUG: formulas with calculateFeatures=T: final consensus should check if annotated MS/MS peaks are also present in group MS/MS peaklist, eg to avoid wrong indices with getFragmentInfoFromForms()/annotatedPeakList()
+        - this needs tolerances to find masses back?
+            - consider getting rid of PLIndex for compounds and also work with tolerances...
+        - or only filter in getFragmentInfoFromForms()?
+    - don't apply to averaged peak lists (shouldn't be needed)?
+    - test further, eg negate and both formulas/compounds
+    - make sets code, needed for unsetting annotation objects
 
 
 ## Suspects
@@ -101,6 +109,7 @@
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
     - check if all plot methods have a Hash version
+    - annotatedPeakList (and maybe others): use unset instead of setObjects()?
 - screening
     - support recursive screening? or throw error otherwise
     - form/compRanks: update when subsetting on sets? otherwise doc
@@ -118,11 +127,10 @@
     - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
-    - formulaDiff: reverse subtraction?
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
-    - filter equal formula/structure candidates
+    - filters for equal formula/structure candidates
 - metabolic logic
     - more logic reactions?
     - assert types of custom reactions DF
@@ -149,6 +157,7 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
+    - move shift to params?
     - remove merged approach, possibly find other ways to customize averaging
         - some kind of weighted average?
 - Consistency
@@ -195,6 +204,8 @@
     - subsetting and groupScores
 - TPs
     - filter() for componentsTPs
+- annotatedBy MSPeakLists filter
+
 
 ## docs
 
@@ -202,7 +213,7 @@
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - session filters: TRUE will use default yml file name
-- minMSMSPeaks filter
+- minMSMSPeaks and annotatedBy MSPeakLists filters
 - check UIs and import functions
 - features
     - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
@@ -292,7 +303,7 @@
 - Annotation
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present
-    - minMSMSPeaks filter
+    - minMSMSPeaks and annotatedBy MSPeakLists filters
     - fixed: withMSMS now applied after all other filters
     - fixed: topX peaks for MSPeakLists would re-order peaklists
     - MetFrag

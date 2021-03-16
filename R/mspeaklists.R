@@ -396,8 +396,8 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
                                             minMSMSPeaks = NULL, isolatePrec = NULL, deIsotopeMS = FALSE,
-                                            deIsotopeMSMS = FALSE, withMSMS = FALSE, retainPrecursorMSMS = TRUE,
-                                            negate = FALSE)
+                                            deIsotopeMSMS = FALSE, withMSMS = FALSE, annotatedBy = NULL,
+                                            absMzDev = 0.002, retainPrecursorMSMS = TRUE, negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -409,6 +409,14 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
            null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
     aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + withMSMS + retainPrecursorMSMS + negate, fixed = list(add = ac))
+    checkmate::assert(
+        checkmate::checkNull(annotatedBy),
+        checkmate::checkClass(annotatedBy, "formulas"),
+        checkmate::checkClass(annotatedBy, "compounds"),
+        checkmate::checkList(annotatedBy, c("formulas", "compounds"), any.missing = FALSE, min.len = 1, unique = TRUE),
+        .var.name = "annotatedBy"
+    )
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -416,11 +424,18 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                      topMSPeaks, topMSMSPeaks, minMSMSPeaks, isolatePrec, deIsotopeMS, deIsotopeMSMS,
-                     withMSMS, retainPrecursorMSMS, negate)
+                     withMSMS, annotatedBy, absMzDev, retainPrecursorMSMS, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
+    
+    if (!is.null(annotatedBy) && !is.list(annotatedBy))
+        annotatedBy <- list(annotatedBy)
 
+    mzWithin <- function(mz, otherMZs) any(numLTE(abs(mz - otherMZs), absMzDev))
+    if (negate)
+        mzWithin <- Negate(mzWithin)
+    
     doFilterGroups <- function(pl)
     {
         gCount <- length(pl)
@@ -437,8 +452,50 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, NULL,
                                              deIsotopeMS, TRUE, negate)
             if (!is.null(pl[[grpi]][["MSMS"]]))
-                ret$MSMS <- doMSPeakListFilter(pl[[grpi]]$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
+            {
+                ret$MSMS <- copy(pl[[grpi]]$MSMS)
+                
+                if (!is.null(annotatedBy))
+                {
+                    grp <- pln[grpi]
+                    
+                    allFragMZs <- unique(unlist(lapply(annotatedBy, function(ab)
+                    {
+                        if (is.null(ab[[grp]]))
+                            return(numeric())
+                        
+                        if (inherits(ab, "formulas"))
+                        {
+                            fTable <- ab[[grp]][byMSMS == TRUE]
+                            if (nrow(fTable) == 0)
+                                return(numeric())
+                            return(fTable$frag_mz)
+                        }
+                        
+                        # compounds
+                        return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "mz")))
+                    })))
+                    
+                    if (length(allFragMZs) == 0)
+                    {
+                        if (!negate)
+                            ret$MSMS <- ret$MSMS[retainPrecursorMSMS & precursor == TRUE]
+                    }
+                    else
+                    {
+                        ret$MSMS <- ret$MSMS[, keep := sapply(mz, mzWithin, otherMZs = allFragMZs)]
+                        if (retainPrecursorMSMS)
+                            ret$MSMS[precursor == TRUE, keep := TRUE]
+                        
+                        precInd <- ret$MSMS[precursor == TRUE, which = TRUE]
+                        
+                        ret$MSMS <- ret$MSMS[keep == TRUE][, -"keep"]
+                    }
+                }
+                
+                ret$MSMS <- doMSPeakListFilter(ret$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
                                                minMSMSPeaks, deIsotopeMSMS, retainPrecursorMSMS, negate)
+            }
 
             if (!is.null(isolatePrec))
                 ret$MS <- isolatePrecInMSPeakList(ret$MS, isolatePrec, negate)

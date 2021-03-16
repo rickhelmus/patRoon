@@ -190,8 +190,10 @@ chromPlotStyle <- "width: auto; height: 250px;"
 
 precDT <- data.table(compInd = seq_len(nrow(cInfo)))
 
+splitCI <- split(cInfo, seq_len(nrow(cInfo)))
+
 precInfoCols <- intersect(c("name", "precursor_name", "precursor_group", "precursor_formula"), names(cInfo))
-precDT[, precursor := sapply(split(cInfo, seq_len(nrow(cInfo))), function(cir)
+precDT[, precursor := sapply(splitCI, function(cir)
 {
     precInfo <- cir[, precInfoCols, with = FALSE]
     setnames(precInfo, sub("^precursor_", "", names(precInfo)))
@@ -211,9 +213,13 @@ if (isScreening(rmdVars$fGroups))
     suspCols <- c("formRank", "compRank", "annSimBoth", "estIDLevel")
     if (any(sapply(suspCols, grepl, names(suspTbl))))
     {
-        precDT[, screening := sapply(split(suspTbl[match(cInfo$precursor_group, group)], seq_len(nrow(precDT))), function(sr)
+        precDT[, screening := sapply(splitCI, function(cir)
         {
-            makeTPTab(sr, suspCols)
+            sr <- suspTbl[name == cir$precursor_name & group == cir$precursor_group]
+            if (nrow(sr) > 0)
+                makeTPTab(sr, suspCols)
+            else
+                ""
         })]
     }
 }

@@ -147,6 +147,8 @@ makeTPTab <- function(cr, cols)
 {
     allCols <- unique(unlist(lapply(cols, function(cl) grep(paste0("^", cl), names(cr), value = TRUE))))
     
+    roundCols <- function(t) t[, (names(t)) := lapply(.SD, function(x) if (is.double(x)) round(x, 2) else x)]
+    
     if (!isTRUE(all.equal(cols, allCols, check.attributes = FALSE)))
     {
         sets <- unique(sub(".+\\-(.+)$", "\\1", allCols[grepl("-", allCols, fixed = TRUE)]))
@@ -163,7 +165,7 @@ makeTPTab <- function(cr, cols)
             t <- cr[, takeCols[whCols], with = FALSE]
             setnames(t, cols[whCols])
             
-            t[, (names(t)) := lapply(.SD, function(x) if (is.double(x)) round(x, 2) else x)]
+            t <- roundCols(t)
             
             t[, set := s]
             setcolorder(t, "set")
@@ -174,9 +176,8 @@ makeTPTab <- function(cr, cols)
     }
     else
     {
-        ret <- setnames(transpose(cr[, cols, with = FALSE], keep.names = " "), 2, "value")
-        if (is.double(ret$value))
-            ret[, value := round(value, 2)]
+        ret <- roundCols(cr[, cols, with = FALSE])
+        ret <- setnames(transpose(ret, keep.names = " "), 2, "value")
     }
     
     return(knitr::kable(ret, "html", escape = FALSE) %>%

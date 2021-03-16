@@ -67,7 +67,7 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
     plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
     makeCachedPlot(plots[["int"]], "plotInt", list(fg, average = TRUE), 3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
 
-    SMI <- ctRow$precursor_SMILES # ctRow[["SMILES"]] UNDONE
+    SMI <- ctRow[["SMILES"]]
     if (!is.null(SMI))
     {
         plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-prec_%d.png", grpi))
@@ -83,8 +83,6 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
         {
             suspPrecRow <- suspTbl[name == ctRow$precursor_name & group == ctRow$precursor_group]
             suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
-            # message(sprintf("i: %d\n", i))
-            # if (i == 6) browser()
             if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
                 all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
                 nrow(suspTPRow) == 1 && # UNDONE: can be zero if TPs were merged

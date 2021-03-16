@@ -207,7 +207,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                predCols <- c("name", "InChIKey", "formula", "mass", "RTDir", "reaction_add", "reaction_sub", "deltaMZ")
+                predCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "mass", "RTDir", "reaction_add",
+                              "reaction_sub", "deltaMZ")
                 preds <- preds[, intersect(names(preds), predCols), with = FALSE]
                 
                 comps <- rbindlist(sapply(precFGs, function(precFG)

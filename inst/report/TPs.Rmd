@@ -85,8 +85,7 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
             suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
             if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
                 all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
-                nrow(suspTPRow) == 1 && # UNDONE: can be zero if TPs were merged
-                !is.na(suspPrecRow$compRank) && !is.na(suspTPRow$compRank))
+                nrow(suspTPRow) == 1 && !is.na(suspPrecRow$compRank) && !is.na(suspTPRow$compRank))
             {
                 plSpecArgs <- list(obj = rmdVars$compounds, formulas = rmdVars[["formulas"]],
                                    index = c(suspPrecRow$compRank, suspTPRow$compRank),
@@ -94,8 +93,7 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
             }
             else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
                      all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
-                     nrow(suspTPRow) == 1 && # UNDONE: can be zero if TPs were merged
-                     !is.na(suspPrecRow$formRank) && !is.na(suspTPRow$formRank))
+                     nrow(suspTPRow) == 1 && !is.na(suspPrecRow$formRank) && !is.na(suspTPRow$formRank))
             {
                 plSpecArgs <- list(obj = rmdVars$formulas, precursor = c(suspPrecRow$formula, suspTPRow$formula),
                                    MSPeakLists = rmdVars$MSPeakLists)
@@ -279,9 +277,13 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         suspCols <- c("formRank", "compRank", "annSimBoth", "estIDLevel")
         if (any(sapply(suspCols, grepl, names(suspTbl))))
         {
-            ret[, screening := sapply(split(suspTbl[match(cmp$group, group)], by = "group"), FUN = function(sr)
+            ret[, screening := sapply(splitCmp, function(cr)
             {
-                makeTPTab(sr, suspCols)
+                sr <- suspTbl[name == cr$TP_name & group == cr$group]
+                if (nrow(sr) > 0)
+                    makeTPTab(sr, suspCols)
+                else
+                    ""
             })]
         }
     }

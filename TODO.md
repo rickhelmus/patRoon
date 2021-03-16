@@ -8,6 +8,7 @@
     - rename patRoonData::targets?
     - update data files?
 - update newProject for new feature and component algos and sets
+- return(invisible(NULL))
 
 
 ## Features
@@ -330,6 +331,7 @@
     - show(): show unique fGroup counts
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
+- xnames/showLegend args for plotInt
 
 
 # Lower priority
@@ -344,6 +346,7 @@
 - delete() for other classes
 - SusDat MF support
 - parallel MSPeakLists generation?
+- generalize makeLegend() to new plot util
 
 
 ## Components

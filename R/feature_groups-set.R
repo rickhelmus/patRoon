@@ -296,8 +296,9 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames =
         par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
     
-    plot(x = c(0, max(table(gTable$set))), y = c(0, max(gTable[, -"set"])), type = "n", xlab = "",
-         ylab = "Intensity")
+    maxs <- max(table(gTable$set))
+    plot(x = c(0, maxs), y = c(0, max(gTable[, -"set"])), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
+    axis(1, seq_len(maxs), seq_len(maxs))
     
     for (s in seq_along(sets(obj)))
     {

@@ -74,13 +74,13 @@ genTPAnnSimilarities <- function(precFG, TPFGs, MSPeakLists, formulas, compounds
     
     precFrags <- unique(annPLPrec$formula); precNLs <- unique(annPLPrec$neutral_loss)
     annPLTPs <- lapply(TPFGs, getAllAnnPLs)
-    fragMatches <- lapply(annPLTPs, function(ann)
+    fragMatches <- sapply(annPLTPs, function(ann)
     {
         if (is.null(ann))
             return(NA_integer_)
         return(sum(unique(ann$formula) %chin% precFrags))
     })
-    NLMatches <- lapply(annPLTPs, function(ann)
+    NLMatches <- sapply(annPLTPs, function(ann)
     {
         if (is.null(ann))
             return(NA_integer_)

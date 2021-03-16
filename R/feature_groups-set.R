@@ -186,7 +186,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     
     if (nrow(ann) > 0)
     {
-        if (features)
+        if (features && !average)
             ret <- merge(ret, ann, by = c("group", "set"))
         else
         {

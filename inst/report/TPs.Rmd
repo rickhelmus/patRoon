@@ -185,10 +185,11 @@ chromPlotStyle <- "width: auto; height: 250px;"
 
 precDT <- data.table(compInd = seq_len(nrow(cInfo)))
 
+precInfoCols <- intersect(c("name", "precursor_name", "precursor_group", "precursor_formula"), names(cInfo))
 precDT[, precursor := sapply(split(cInfo, seq_len(nrow(cInfo))), function(cir)
 {
-    precInfo <- cir[, c("name", "precursor_name", "precursor_group"), with = FALSE]
-    setnames(precInfo, c("component", "name", "group"))
+    precInfo <- cir[, precInfoCols, with = FALSE]
+    setnames(precInfo, sub("^precursor_", "", names(precInfo)))
     
     prec <- makeInfoBox(paste0(names(precInfo), ": ", precInfo, collapse = "<br>"))
     
@@ -248,7 +249,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("RTDir", "retDiff", "mzDiff", "formulaDiff"), names(cmp))
+    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff"), names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]

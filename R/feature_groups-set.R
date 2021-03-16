@@ -250,6 +250,69 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
 })
 
 #' @export
+setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames = !sets, showLegend = sets, pch = 20,
+                                                  type = "b", lty = 3, col = NULL, ..., sets = FALSE)
+{
+    aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
+    
+    if (!sets)
+        return(callNextMethod(obj, average, xnames, pch, type, lty, col, ...))
+    else if (xnames)
+        warning("xnames option is ignored if sets=TRUE")
+
+    if (length(obj) == 0)
+    {
+        noDataPlot()
+        invisible(return(NULL))
+    }
+
+    anaInfo <- analysisInfo(obj)    
+    if (average)
+    {
+        gTable <- copy(averageGroups(obj))
+        gTable[, set := anaInfo[match(replicateGroups(obj), anaInfo$group), "set"]]
+    }
+    else
+    {
+        gTable <- copy(groupTable(obj))
+        gTable[, set := anaInfo$set]
+    }
+    
+    if (is.null(col))
+        col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(sets(obj)))
+    
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, sets(obj), col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+    
+    plot(x = c(0, max(table(gTable$set))), y = c(0, max(gTable[, -"set"])), type = "n", xlab = "",
+         ylab = "Intensity")
+    
+    for (s in seq_along(sets(obj)))
+    {
+        gt <- gTable[set == sets(obj)[s]]
+        for (g in names(obj))
+            lines(x = seq_len(nrow(gt)), y = gt[[g]], type = type, pch = pch, lty = lty, col = col[s], ...)
+    }
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
+})
+
+#' @export
 setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets = FALSE)
 {
     checkmate::assertFlag(sets)

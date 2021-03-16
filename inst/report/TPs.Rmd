@@ -112,9 +112,8 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
         if (length(plSpecArgs) > 0)
         {
             plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
-            # UNDONE: specSimParams in rmdVars
             makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$precursor_group, ctRow$group),
-                                                                               specSimParams = getDefSpecSimParams(), title = "")),
+                                                                               specSimParams = rmdVars$specSimParams, title = "")),
                            5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
         }
     }

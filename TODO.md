@@ -169,7 +169,6 @@
             - although tricky with x axis, or in this case number it
     - padding between two tables?
     - default TP columns OK?
-    - specSimParams in rmdVars
 
 ## Reporting
 

@@ -72,8 +72,7 @@ BTMPFinishHandler <- function(cmd)
     # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
     ret[!nzchar(formula), formula :=
             {
-                SMI <- patRoon:::babelConvert(InChI, "inchi", "smi")
-                mols <- patRoon:::getMoleculesFromSMILES(SMI)
+                mols <- patRoon:::getMoleculesFromSMILES(SMILES)
                 return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
             }]
     

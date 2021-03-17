@@ -145,12 +145,32 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 })
 
 #' @export
-setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = NULL)
+setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, absMzDev = 0.002,
+                                               retainPrecursorMSMS = TRUE, negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
+    checkmate::assert(
+        checkmate::checkNull(annotatedBy),
+        checkmate::checkClass(annotatedBy, "formulas"),
+        checkmate::checkClass(annotatedBy, "compounds"),
+        checkmate::checkList(annotatedBy, c("formulas", "compounds"), any.missing = FALSE, min.len = 1, unique = TRUE),
+        .var.name = "annotatedBy"
+    )
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    annotatedByList <- NULL
+    if (!is.null(annotatedBy))
+    {
+        # unset objects before passing them to parent method
+        
+        if (!is.list(annotatedBy))
+            annotatedByList <- lapply(sets(obj), unset, obj = annotatedBy)
+        else
+            annotatedByList <- lapply(sets(obj), function(s) lapply(annotatedBy, unset, set = s))
+    }
     
     if (!is.null(sets) && length(sets) > 0)
     {
@@ -159,9 +179,19 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
         obj <- obj[, sets = sets]
     }
     
-    if (...length() > 0)
+    if (...length() > 0 || !is.null(annotatedBy))
     {
-        obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
+        if (is.null(annotatedByList))
+            obj@setObjects <- lapply(obj@setObjects, filter, ..., absMzDev = absMzDev,
+                                     retainPrecursorMSMS = retainPrecursorMSMS, negate = negate)
+        else
+        {
+            obj@setObjects <- Map(obj@setObjects, annotatedByList, f = function(so, ab)
+            {
+                filter(so, ..., annotatedBy = ab, absMzDev = absMzDev, retainPrecursorMSMS = retainPrecursorMSMS,
+                       negate = negate)
+            })
+        }
         obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
         
         # synchronize other objects

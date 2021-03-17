@@ -58,7 +58,6 @@
         - or only filter in getFragmentInfoFromForms()?
     - don't apply to averaged peak lists (shouldn't be needed)?
     - test further, eg negate and both formulas/compounds
-    - make sets code, needed for unsetting annotation objects
 
 
 ## Suspects

@@ -377,7 +377,8 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
 }
 
 generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
-                                             fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol)
+                                             fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, MSPeakLists,
+                                             absAlignMzDev)
 {
     cat("Generating formula consensus...\n")
 
@@ -408,6 +409,34 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
         # fix order
         formCons <- formCons[intersect(origGNames, names(formCons))]
 
+        # sync with group averaged peak lists: the fragments may either have a slightly different m/z than what was used
+        # to get the feature formula, or it may simply be removed.
+        if (!is.null(MSPeakLists)) # NULL for sets, not needed there
+        {
+            formCons <- Map(formCons, lapply(averagedPeakLists(MSPeakLists)[names(formCons)], "[[", "MSMS"), f = function(fc, spec)
+            {
+                # NOTE: ignore non MS/MS formulae
+                
+                if (is.null(fc[["frag_mz"]]))
+                    return(fc)
+                
+                fc <- fc[byMSMS == FALSE | sapply(frag_mz, function(mz)
+                {
+                    wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
+                    if (length(wh) > 1)
+                        warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
+                                "Consider lowering absAlignMzDev.", call. = FALSE)
+                    return(length(wh) > 0)
+                })]
+                
+                # align remaining mzs
+                fc[byMSMS == TRUE, frag_mz := spec$mz[sapply(frag_mz, function(mz) which.min(abs(mz - spec$mz)))]]
+                
+                return(fc)
+            })
+            formCons <- pruneList(formCons, checkZeroRows = TRUE)
+        }
+        
         setTxtProgressBar(prog, resCount)
         close(prog)
 

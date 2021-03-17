@@ -312,17 +312,19 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                                                calculateFeatures = TRUE, featThreshold = 0,
-                                                               featThresholdAnn = 0.75, MSMode = "both",
-                                                               isolatePrec = TRUE, timeout = 120, topMost = 50,
-                                                               batchSize = 8)
+                                                               featThresholdAnn = 0.75, absAlignMzDev = 0.002,
+                                                               MSMode = "both", isolatePrec = TRUE, timeout = 120,
+                                                               topMost = 50, batchSize = 8)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn, lower = 0, upper = 1, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
+           fixed = list(add = ac))
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
@@ -410,7 +412,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
             groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn,
                                                               gNames, "analysis_from", "analyses", "featCoverage",
-                                                              "featCoverageAnn")
+                                                              "featCoverageAnn", MSPeakLists, absAlignMzDev)
         else
             groupFormulas <- list()
     }

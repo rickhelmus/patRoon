@@ -21,7 +21,7 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
                                                                      formulasSet@setThresholdAnn,
                                                                      formulasSet@origFGNames, "set_from", "sets",
-                                                                     "setCoverage", "setCoverageAnn")
+                                                                     "setCoverage", "setCoverageAnn", NULL, NULL)
         }
         else
         {
@@ -249,7 +249,7 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
     mc <- setNames(rep(length(setObjects), length(fGroupsSet)), names(fGroupsSet))
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, names(fGroupsSet),
-                                                   "set_from", "sets", "setCoverage", "setCoverageAnn")
+                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL)
     
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,

@@ -436,8 +436,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     if (negate)
         mzWithin <- Negate(mzWithin)
     
-    doFilterGroups <- function(pl)
+    doFilterGroups <- function(pl, onAvg)
     {
+        # onAvg: skip some filters unneeded for averaged peak lists
+        
         gCount <- length(pl)
         if (gCount == 0)
             return(pl)
@@ -455,7 +457,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             {
                 ret$MSMS <- copy(pl[[grpi]]$MSMS)
                 
-                if (!is.null(annotatedBy))
+                if (!onAvg && !is.null(annotatedBy))
                 {
                     grp <- pln[grpi]
                     
@@ -503,7 +505,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             ret <- pruneList(ret, checkZeroRows = TRUE)
             
             # apply after other filters as these may have removed all MSMS peaks
-            if (withMSMS)
+            if (!onAvg && withMSMS)
             {
                 if (!negate && is.null(ret[["MSMS"]]))
                     return(list())
@@ -532,7 +534,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     {
         printf("Filtering MS peak lists for %d feature groups in analysis '%s'...\n", length(pLists[[anai]]),
                names(pLists)[anai])
-        pLists[[anai]] <- doFilterGroups(pLists[[anai]])
+        pLists[[anai]] <- doFilterGroups(pLists[[anai]], FALSE)
     }
 
     obj@peakLists <- pLists
@@ -542,7 +544,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
     # and filter them as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
-    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
+    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists, TRUE)
     
     saveCacheData("filterMSPeakLists", obj, hash)
 

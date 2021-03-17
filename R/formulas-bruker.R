@@ -37,13 +37,15 @@ simplifyDAFormula <- function(formula)
 #' @export
 setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSearchWindow = 0.002,
                                                           MSMode = "both", adduct, featThreshold = 0,
-                                                          featThresholdAnn = 0.75, save = TRUE, close = save)
+                                                          featThresholdAnn = 0.75, absAlignMzDev = 0.002, save = TRUE,
+                                                          close = save)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn, lower = 0, upper = 1, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
+           fixed = list(add = ac))
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -253,7 +255,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
         groupFormulas <- generateGroupFormulasByConsensus(fTable, lapply(ftind, function(x) sum(x > 0)),
                                                           featThreshold, featThresholdAnn,
                                                           gNames, "analysis_from", "analyses", "featCoverage",
-                                                          "featCoverageAnn")
+                                                          "featCoverageAnn", MSPeakLists, absAlignMzDev)
     else
         groupFormulas <- list()
 

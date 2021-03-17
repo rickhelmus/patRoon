@@ -56,8 +56,6 @@
         - this needs tolerances to find masses back?
             - consider getting rid of PLIndex for compounds and also work with tolerances...
         - or only filter in getFragmentInfoFromForms()?
-    - don't apply to averaged peak lists (shouldn't be needed)?
-    - test further, eg negate and both formulas/compounds
 
 
 ## Suspects

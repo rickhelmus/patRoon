@@ -51,11 +51,6 @@
 - decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
-- annotatedBy MSPeakLists filter
-    - BUG: formulas with calculateFeatures=T: final consensus should check if annotated MS/MS peaks are also present in group MS/MS peaklist, eg to avoid wrong indices with getFragmentInfoFromForms()/annotatedPeakList()
-        - this needs tolerances to find masses back?
-            - consider getting rid of PLIndex for compounds and also work with tolerances...
-        - or only filter in getFragmentInfoFromForms()?
 
 
 ## Suspects
@@ -209,8 +204,6 @@
 - ffOpenMS etc: analyses also needs to be available for hashing
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
-- session filters: TRUE will use default yml file name
-- minMSMSPeaks and annotatedBy MSPeakLists filters
 - check UIs and import functions
 - features
     - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
@@ -229,9 +222,14 @@
     - progressr
     - groupFeatures: feat arg --> obj
     - MC import/export
+    - session filters: TRUE will use default yml file name
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
+- annotation
+    - minMSMSPeaks and annotatedBy MSPeakLists filters
+    - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
+    - absAlignMzDev
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -321,6 +319,8 @@
     - annotatedPeakList(): also add annotation columns for missing results (for consistency)
     - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown
     - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown
+    - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peaklists
+    - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format
@@ -354,6 +354,7 @@
 - SusDat MF support
 - parallel MSPeakLists generation?
 - generalize makeLegend() to new plot util
+- Get rid of PLIndex and harmonize approach with linking annotated peaks for formulas/compounds using tolerances, which eg allows altered MSPeakLists after annotation
 
 
 ## Components

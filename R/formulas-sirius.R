@@ -116,7 +116,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               cores = NULL, topMost = 100, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
-                                                              verbose = TRUE, splitBatches = FALSE)
+                                                              absAlignMzDev = 0.002, verbose = TRUE,
+                                                              splitBatches = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -129,7 +130,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(calculateFeatures, add = ac)
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn, lower = 0, upper = 1, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
+           fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
@@ -155,7 +157,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
             groupFormulas <- generateGroupFormulasByConsensus(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn, gNames, "analysis_from",
-                                                              "analyses", "featCoverage", "featCoverageAnn")
+                                                              "analyses", "featCoverage", "featCoverageAnn",
+                                                              MSPeakLists, absAlignMzDev)
         }
         else
             groupFormulas <- list()

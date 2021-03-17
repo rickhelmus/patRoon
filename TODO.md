@@ -102,6 +102,8 @@
     - fix MapAligner exception with test-components
     - check if all plot methods have a Hash version
     - annotatedPeakList (and maybe others): use unset instead of setObjects()?
+    - check/sync sets between different input set objects (eg formulas/MSPeakLists)
+        - make util
 - screening
     - support recursive screening? or throw error otherwise
     - form/compRanks: update when subsetting on sets? otherwise doc
@@ -126,6 +128,7 @@
 - metabolic logic
     - more logic reactions?
     - assert types of custom reactions DF
+        - maybe make new assert function that can check types, columns etc for DFs. Can then also be used by library TPs etc
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents
     - fix if empty cTab for MSMS components
@@ -145,6 +148,8 @@
         - formulas/compounds
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
             - put similarity in title (like for MSPL)?
+            - default specSimParams if >1 groupName
+            - handle invalid comp index, also in reporting (eg when its out of range for topMost)
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
@@ -156,7 +161,7 @@
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
-    - suspects() --> parents()?
+    - suspects --> parents?
     - precursor diff: 1-2 or 2-1? --> verify all
         - same for formulaDiff, retDiff, RTDir etc
     - TP logic: reaction/transformation
@@ -165,12 +170,18 @@
     - Make sure hash takes into account parent names
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
+    - generic predictTPs() function
+        - rename predict to generate?
 - reporting
     - padding between two tables?
     - default TP columns OK?
     - fragMatches/NLMatches: doc that it's _not_ candidate specific
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
+    - subscript formulae
+    - include more prec/TP infos?
+        - CIDs? --> URLs
+        - TP_RTDir? (maybe as one line)
 
 ## Reporting
 

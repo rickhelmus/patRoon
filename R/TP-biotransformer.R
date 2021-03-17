@@ -105,10 +105,9 @@ BTMPPrepareHandler <- function(cmd)
 }
 
 #' @export
-predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpts = NULL, skipInvalid = TRUE,
-                                     fpType = "extended", fpSimMethod = "tanimoto")
+predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
+                                     skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
 {
-    checkmate::assertFlag(skipInvalid)
     checkmate::assert(
         checkmate::checkClass(suspects, "data.frame"),
         checkmate::checkClass(suspects, "compounds"),
@@ -123,34 +122,12 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(skipInvalid, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    if (is.data.frame(suspects))
-        suspects <- prepareSuspectList(suspects, adduct, skipInvalid, calcMZs = FALSE)
-    else if (is(suspects, "compounds"))
-    {
-        compTab <- as.data.table(suspects)
-        if (!is.null(compTab[["compoundName"]]))
-            compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
-        else
-            setnames(compTab, "Identifier", "name")
-        suspects <- compTab[, c("name", "SMILES"), with = FALSE]
-    }
-    else # suspect screening
-        suspects <- copy(screenInfo(suspects)) # UNDONE: keep all columns?
+    suspects <- getTPSuspects(suspects, adduct, skipInvalid)
 
-    if (is.null(suspects[["SMILES"]]))
-        stop("No SMILES information available for suspects. Please include either SMILES or InChI columns.")
-    
-    noSM <- is.na(suspects$SMILES) | !nzchar(suspects$SMILES)
-    if (any(noSM))
-    {
-        do.call(if (skipInvalid) warning else stop,
-                "The following suspects miss mandatory SMILES: ", paste0(suspects$name[noSM], collapse = ","))
-        suspects <- suspects[!noSM]
-    }
-    
     baseHash <- makeHash(type, steps, extraOpts)
     setHash <- makeHash(suspects, baseHash)
     
@@ -175,8 +152,6 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
 #' @export
 setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 {
-    # UNDONE: cache?
-
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::assertFlag(includePrec, add = ac)
@@ -186,43 +161,7 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     predAll <- collapseBTResults(pred@predictions)
     cat("Done!\n")
 
-    # set to MetFrag style names
-    setnames(predAll,
-             c("name", "formula", "neutralMass", "Precursor Major Isotope Mass"),
-             c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
-
-
-    cat("Calculating SMILES... ")
-    predAll[, SMILES := babelConvert(InChI, "inchi", "smi")]
-    cat("Done!\n")
-
-    if (includePrec)
-    {
-        # NOTE: we can assume that InChIs, formulas etc are available as input suspect list must have SMILES
-        
-        cat("Adding and calculating precursor information... ")
-
-        precs <- copy(suspects(pred))
-        setnames(precs,
-                 c("name", "formula", "neutralMass"),
-                 c("Identifier", "MolecularFormula", "MonoisotopicMass"))
-        precs[, CompoundName := Identifier]
-
-        predAll <- rbind(precs, predAll, fill = TRUE)
-
-        cat("Done!\n")
-    }
-
-    # Add required InChIKey1 column
-    predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
-
-    # equalize identifiers and names
-    predAll[, CompoundName := Identifier]
-
-    keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
-                  "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
-
-    fwrite(predAll[, keepCols, with = FALSE], out)
+    doConvertToMFDB(predAll, suspects(pred), out, includePrec)
 })
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups)

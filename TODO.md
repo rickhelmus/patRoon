@@ -276,7 +276,7 @@
     - mention that RTDirMatch filter ignores any zero values for TP_RTDir/RTDir (ie to be safe)
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - doc somewhere plotInt order with sets
-
+    - refs for PC transformations
 
 ## NEWS
 

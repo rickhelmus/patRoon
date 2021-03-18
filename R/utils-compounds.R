@@ -147,6 +147,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
                 return(character())
 
             # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
+            # set consensus results can also merge multiple identifiers
             idlist <- unlist(strsplit(ident, ";| "))
 
             if (grepl("pubchem", tolower(db)))

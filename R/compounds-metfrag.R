@@ -360,7 +360,8 @@ processMFResults <- function(comptab, runData, lfile = "")
             comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
         
         # sometimes these can be interpreted as dates!
-        for (col in c("compoundName", "compoundName2", "CASRN"))
+        # also convert identifiers to characters, which comes in handy for set consensus merging
+        for (col in c("compoundName", "compoundName2", "CASRN", "identifier", "relatedCIDs"))
         {
             if (!is.null(comptab[[col]]))
                 comptab[, (col) := as.character(get(col))]

@@ -3,13 +3,19 @@
 #' @include workflow-step-set.R
 NULL
 
-makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn)
+makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mCompNames)
 {
     # generate consensus by...
     # - checking setThreshold/setThresholdAnn
-    # - merging by identifier
+    # - merging by IK1
     # - average scores
     # - merge fragInfos and update PLIndex
+    
+
+    sumMergedScoreRows <- function(sc, m) .rowSums(unlist(sc), na.rm = TRUE, m = m, n = 2)
+    
+    # used for merging below
+    otherCols <- function(col) if (length(col) > 0) paste0("i.", col) else character()
     
     # get all annotated fGroup names with original order
     allAnnGNames <- intersect(origFGNames, unique(unlist(lapply(setObjects, groupNames))))
@@ -19,46 +25,76 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
     cons <- sapply(allAnnGNames, function(gName)
     {
         allResults <- pruneList(sapply(setObjects, "[[", gName, simplify = FALSE))
-        if (length(allResults) == 1)
-            return(copy(allResults[[1]])[, c("set", "setCoverage", "setCoverageAnn") := .(names(allResults)[1], 1, 1)])
-        
-        allResults <- lapply(allResults, copy)
-        
-        # init set names
-        allResults <- mapply(allResults, names(allResults), FUN = set, SIMPLIFY = FALSE,
-                             MoreArgs = list(i = NULL, j = "set"))
 
+        # init some columns before merging
+        allResults <- Map(allResults, names(allResults), f = function(ct, s)
+        {
+            ct <- copy(ct)
+            rname <- paste0("rank-", s)
+            ct[, c("set", "setCoverage", "setCoverageAnn", rname) := .(s, 1, 1, seq_len(.N))]
+            ct[, rankScore := (.N - (get(rname) - 1)) / .N] # for sorting
+            
+            # rename cols that are specific to a set or algo consensus or should otherwise not be combined
+            cols <- getAllCompCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mCompNames)
+            if (length(cols) > 0)
+                setnames(ct, cols, paste0(cols, "-", s))
+            
+            return(ct)
+        })
+        
+        if (length(allResults) == 1)
+            return(allResults[[1]])
+        
         Reduce(x = allResults, f = function(left, right)
         {
-            merged <- copy(left)
+            scoreColsLeft <- getAllCompCols(getCompScoreColNames(), names(left), mCompNames)
+            scoreColsRight <- getAllCompCols(getCompScoreColNames(), names(right), mCompNames)
+            scoreColsBoth <- c(intersect(scoreColsLeft, scoreColsRight), "rankScore") # also include rank scores
+            combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
+            combineColsBoth <- intersect(getAllCompCols(combineCols, names(left), mCompNames),
+                                         getAllCompCols(combineCols, names(right), mCompNames))
+            otherColsBoth <- setdiff(intersect(names(left), names(right)),
+                                     c(scoreColsBoth, combineColsBoth, "set", "fragInfo", "rankScore"))
+            colsOnlyRight <- setdiff(names(right), names(left))
             
-            if (is.null(merged[["setCoverage"]]))
-                merged[, c("setCoverage", "setCoverageAnn") := .(1, 1)]
-            
-            # UNDONE: assume score cols are same for left/right, should always be the case?
+            left[right, (c(scoreColsBoth, combineColsBoth, otherColsBoth, colsOnlyRight, "set", "fragInfo")) :=
+                       # sum scores (they are averaged later below)
+                       c(lapply(scoreColsBoth, function(col) sumMergedScoreRows(mget(c(col, otherCols(col)),
+                                                                                     inherits = TRUE), .N)),
+                         # combine some other overlapping columns
+                         lapply(combineColsBoth, function(col)
+                         {
+                             vals <- mget(c(col, otherCols(col)), inherits = TRUE)
+                             vals <- lapply(vals, function(v) strsplit(v, ";"))
+                             return(mapply(vals[[1]], vals[[2]], FUN = function(l, r)
+                             {
+                                 l <- l[!is.na(l)]; r <- r[!is.na(r)]
+                                 if (length(l) == 0 && length(r) == 0)
+                                     return(NA)
+                                 return(paste0(union(l, r), collapse = ";"))
+                             }))
+                         }),
+                         # handle all other overlapping columns: select non NA
+                         fifelse(is.na(mget(otherColsBoth)), mget(otherColsBoth), mget(otherCols(otherColsBoth))),
+                         # add missing columns from right (if any)
+                         mget(otherCols(colsOnlyRight)),
+                         # mark set presence
+                         .(paste0(set, ",", i.set)),
+                         # combine fragInfos
+                         .(Map(fragInfo, i.fragInfo, f = rbind, MoreArgs = list(fill = TRUE)))),
+                   on = "InChIKey1"]
 
-            # merge overlapping candidates: average scores, combine set names and merge fragInfos
-            scoreCols <- getAllCompCols(getCompScoreColNames(), names(left), NULL)
-            merged[right, (c(scoreCols, "set", "fragInfo")) :=
-                       c(lapply(scoreCols, function(sc) .rowMeans(unlist(mget(c(sc, paste0("i.", sc)), inherits = TRUE)), na.rm = TRUE, m = .N, n = 2)),
-                         list(paste0(set, ",", i.set),
-                              mapply(fragInfo, i.fragInfo, SIMPLIFY = FALSE, FUN = rbind, MoreArgs = list(fill = TRUE)))),
-                   on = "identifier"]
-            
             # add missing candidates from right
-            merged <- rbind(merged, right[!identifier %in% merged$identifier], fill = TRUE)
+            left <- rbind(left, right[!InChIKey1 %chin% left$InChIKey1], fill = TRUE)
             
-            merged[, setCoverage := setCoverage + 1]
-            merged[identifier %in% right$identifier, setCoverageAnn := setCoverageAnn + 1]
+            left[, setCoverage := setCoverage + 1]
+            left[InChIKey1 %chin% right$InChIKey1, setCoverageAnn := setCoverageAnn + 1]
             
-            # re-sort
-            setorderv(merged, "score", order = -1)
-            
-            return(merged)
+            return(left)
         })
     }, simplify = FALSE)
     
-    # update fragInfos and convert absolute merge counts to coverage
+    # update fragInfos, average scores and convert absolute merge counts to coverage
     cons <- lapply(cons, function(ct)
     {
         ct[, fragInfo := lapply(fragInfo, function(fi)
@@ -66,6 +102,14 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             fi <- copy(fi) # avoid DT warning/bug
             fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
         })]
+        
+        scCols <- c(getAllCompCols(getCompScoreColNames(), names(ct), mCompNames), "rankScore")
+        ct[, (scCols) := lapply(.SD, function(x) x / setCoverageAnn), .SDcols = scCols]
+
+        # re-sort by avg rankScores
+        setorderv(ct, "rankScore", -1)
+        ct[, rankScore := NULL]
+        
         ct[, c("setCoverageAnn", "setCoverage") := .(setCoverageAnn / setCoverage, setCoverage / sCount)]
         return(ct)
     })
@@ -118,7 +162,8 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     {
         if (makeCons)
             compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
-                                                                compoundsSet@setThreshold, compoundsSet@setThresholdAnn)
+                                                                compoundsSet@setThreshold, compoundsSet@setThresholdAnn,
+                                                                mergedCompoundNames(compoundsSet))
         else
         {
             # sync available feature groups
@@ -146,6 +191,12 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
 compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", setThresholdAnn = "numeric",
                                                    origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
+
+#' @rdname compounds-class
+compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedCompNames = "character"),
+                                  contains = "compoundsSet")
+setMethod("mergedCompoundNames", "compoundsConsensusSet", function(compounds) compounds@mergedCompNames)
+
 
 #' @describeIn compoundsSet Shows summary information for this object.
 #' @export
@@ -256,7 +307,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
             return(NULL)
         
         specs <- split(spec, by = "set")
-        specs <- lapply(specs, setnames, "set", "mergedBy")
+        # UNDONE: this will overwrite consensus algo if present, OK?
+        specs <- lapply(specs, function(x) x[!is.na(formula), mergedBy := set])
         
         plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
         return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...,  mol = mol,
@@ -358,6 +410,51 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     return(compounds)
 })
 
+#' @export
+setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
+                                                uniqueFrom = NULL, uniqueOuter = FALSE, minMaxNormalization = FALSE,
+                                                rankWeights = 1, labels = NULL, setThreshold = 0,
+                                                setThresholdAnn = 0.75)
+{
+    # make consensus of shared setObjects
+    # add unique setObjects
+    # make 'regular' set consensus from new results
+    
+    allCompounds <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allCompounds, types = "compoundsSet", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumeric(rankWeights, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!allSame(lapply(allCompounds, sets)))
+        stop("All objects must have the same sets.")
+    
+    # NOTE: don't want to keep -set suffix
+    compNames <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allCompounds, algorithm))
+    
+    setObjects <- sapply(sets(obj), function(set)
+    {
+        return(do.call(consensus, c(lapply(lapply(allCompounds, setObjects), "[[", set),
+                                    list(absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
+                                         uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter,
+                                         minMaxNormalization = minMaxNormalization, rankWeights = rankWeights,
+                                         labels = compNames))))
+    }, simplify = FALSE)
+    
+    cons <- makeCompoundsSetConsensus(setObjects, obj@origFGNames, setThreshold, setThresholdAnn, compNames)
+    sc <- makeCompoundsSetScorings(setObjects, obj@origFGNames)
+    
+    return(compoundsConsensusSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                                 origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
+                                 scoreRanges = sc$scRanges,
+                                 algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
+                                 mergedCompNames = compNames))
+})
+
+
 generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold, setThresholdAnn)
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1.0, finite = TRUE)
@@ -391,7 +488,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         }
     }
     
-    cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn)
+    cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, NULL)
     sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
     return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,

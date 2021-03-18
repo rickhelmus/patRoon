@@ -51,6 +51,8 @@
 - decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
+- compound consensus
+    - ranks: calc rankScores with original candidate size or final?
 
 
 ## Suspects
@@ -82,8 +84,18 @@
 
 - methods to implement
     - consensus / comparison()
-        - could first make consensus of setObjects and then make new set object from that
-        - for compounds (and formulas?) need proper way to average scorings
+        - compounds(/formulas?)
+            - merge by identifier for non sets?
+                - is merging by IK1 in generally reasonable anyway?
+                    - seems unique
+            - check mergedBy clashes between algos/sets
+                - seems OK, but algo mergedBy removed for plotSpectrum --> OK?
+            - keep setThreshold for consensus?
+                - probably yes?
+        - components: make set specific methods/classes to wrap existing code
+        - fGroups
+            - warn that adduct annotations will be removed if present
+            - sets method: cannot work because of ^: maybe just throw error saying that consensus should be made first and passed to makeSet()
         - or for later?
             - if not add tests
     - provide methods for non-implemented functionality
@@ -104,6 +116,8 @@
     - annotatedPeakList (and maybe others): use unset instead of setObjects()?
     - check/sync sets between different input set objects (eg formulas/MSPeakLists)
         - make util
+    - compound set consensus: weights for ranking (like compound consensus)?
+    - annotatedPeakList compounds: remove PLIndexOrig column?
 - screening
     - support recursive screening? or throw error otherwise
     - form/compRanks: update when subsetting on sets? otherwise doc
@@ -150,6 +164,7 @@
             - put similarity in title (like for MSPL)?
             - default specSimParams if >1 groupName
             - handle invalid comp index, also in reporting (eg when its out of range for topMost)
+                - currently index is not corrected for setObjects
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
@@ -193,7 +208,7 @@
 - test DA algorithms
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
-    - fGroups/components: disable comparison/consensus?
+    - thoroughly test consensus for compounds
 - FC, plotVolcano
 - ensure peaklists are sorted
 - spectrumSimilarity()
@@ -350,7 +365,7 @@
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt
-
+    
 
 # Lower priority
 

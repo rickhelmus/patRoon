@@ -84,7 +84,7 @@
 
 - methods to implement
     - consensus / comparison()
-        - compounds(/formulas?)
+        - compounds
             - merge by identifier for non sets?
                 - is merging by IK1 in generally reasonable anyway?
                     - seems unique
@@ -92,6 +92,16 @@
                 - seems OK, but algo mergedBy removed for plotSpectrum --> OK?
             - keep setThreshold for consensus?
                 - probably yes?
+        - formulas
+            - regular consensus fixes
+                - formula_algo columns
+                - SIRIUS ionization/adduct column --> merge or remove
+                    - or is this used somewhere?
+                    - also for compounds?
+            - rename columns like compounds, eg rank, mergedBy
+            - verify ranking and score averaging for regular/set consensus
+                - score averaging doesn't work in generateFormConsensusForGroup: doesn't check merged colnames
+            - getAllMergedFormulasCols()/getAllFormulasCols(): make set aware
         - components: make set specific methods/classes to wrap existing code
         - fGroups
             - warn that adduct annotations will be removed if present
@@ -118,6 +128,7 @@
         - make util
     - compound set consensus: weights for ranking (like compound consensus)?
     - annotatedPeakList compounds: remove PLIndexOrig column?
+    - as.data.table(formulas, average=T): remove more cols?
 - screening
     - support recursive screening? or throw error otherwise
     - form/compRanks: update when subsetting on sets? otherwise doc

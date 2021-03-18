@@ -233,6 +233,61 @@ setMethod("plotSpectrumHash", "formulasSet", function(obj, precursor, groupName,
                     perSet, mirror))
 })
 
+#' @export
+setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
+                                               relMinAbundance = NULL,
+                                               uniqueFrom = NULL, uniqueOuter = FALSE,
+                                               rankWeights = 1, labels = NULL, setThreshold = 0,
+                                               setThresholdAnn = 0.75)
+{
+    # make consensus of shared setObjects
+    # add unique setObjects
+    # make 'regular' set consensus from new results
+    
+    allFormulas <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allFormulas, types = "formulasSet", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumeric(rankWeights, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allFormulas), null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!allSame(lapply(allFormulas, sets)))
+        stop("All objects must have the same sets.")
+    
+    # NOTE: don't want to keep -set suffix
+    formNames <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allFormulas, algorithm))
+    
+    setObjects <- sapply(sets(obj), function(set)
+    {
+        return(do.call(consensus, c(lapply(lapply(allFormulas, setObjects), "[[", set),
+                                    list(absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
+                                         uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter,
+                                         rankWeights = rankWeights, labels = formNames))))
+    }, simplify = FALSE)
+
+    combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
+    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
+    gNames <- allFormulas[[1]]@origFGNames # UNDONE? at least verify all objects are equal
+    mc <- setNames(rep(length(setObjects), length(gNames)), gNames)
+    groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, gNames,
+                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL)
+    browser()
+    return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
+                       setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
+                       algorithm = makeSetAlgorithm(setObjects)))
+    
+    cons <- makeCompoundsSetConsensus(setObjects, obj@origFGNames, setThreshold, setThresholdAnn, formNames)
+    sc <- makeCompoundsSetScorings(setObjects, obj@origFGNames)
+    
+    return(compoundsConsensusSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                                 origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
+                                 scoreRanges = sc$scRanges,
+                                 algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
+                                 mergedCompNames = formNames))
+})
+
 
 generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold, setThresholdAnn)
 {

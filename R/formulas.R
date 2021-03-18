@@ -745,6 +745,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
                                             uniqueFrom = NULL, uniqueOuter = FALSE,
                                             rankWeights = 1, labels = NULL)
 {
+    # NOTE: keep args in sync with formulasSet method
+    
     allFormulas <- c(list(obj), list(...))
 
     ac <- checkmate::makeAssertCollection()

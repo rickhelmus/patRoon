@@ -1073,7 +1073,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
         mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
 
     return(compoundsConsensus(compounds = mCompList, scoreTypes = scoreTypes, scoreRanges = scRanges,
-                              algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ", "),
+                              algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
                               mergedCompNames = compNames))
 })
 

@@ -99,7 +99,7 @@ getMSPlotData <- function(spec, marklwd, markWhich = NULL)
     
     if (!is.null(spec[["mergedBy"]]))
     {
-        plotData[nzchar(mergedBy), legend := sapply(mergedBy, wrapStr, width = 10)]
+        plotData[nzchar(mergedBy) & !is.na(mergedBy), legend := sapply(mergedBy, wrapStr, width = 10)]
         plotData[markWhich, lwd := marklwd]
         
         mbsUnique <- unique(plotData$legend)
@@ -107,7 +107,7 @@ getMSPlotData <- function(spec, marklwd, markWhich = NULL)
         mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
         mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
         
-        plotData[nzchar(mergedBy), colour := mbCombCols[match(legend, mbsUnique)]]
+        plotData[, colour := mbCombCols[match(legend, mbsUnique)]]
     }
     else if (hasFragInfo)
         plotData[markWhich, c("colour", "lwd", "legend") := .("blue", marklwd, "assigned")] # nothing merged, just mark all annotated blue

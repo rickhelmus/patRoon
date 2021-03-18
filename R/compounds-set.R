@@ -243,8 +243,6 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         mol <- NULL
         if (plotStruct)
         {
-            if (!is.null(specSimParams))
-                stop("Cannot plot structure when compariing spectra") # UNDONE?
             mol <- getMoleculesFromSMILES(compr$SMILES)
             if (!isValidMol(mol))
                 mol <- NULL

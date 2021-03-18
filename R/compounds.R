@@ -862,6 +862,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
                                              minMaxNormalization = FALSE,
                                              rankWeights = 1, labels = NULL)
 {
+    # NOTE: keep args in sync with compoundsSet method
+    
     allCompounds <- c(list(obj), list(...))
 
     ac <- checkmate::makeAssertCollection()

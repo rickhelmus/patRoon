@@ -3,6 +3,49 @@
 #' @include workflow-step-set.R
 NULL
 
+makeFormulasSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mConsNames)
+{
+    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
+    
+    # prep set form tables
+    groupFormsList <- Map(groupFormsList, names(setObjects), f = function(fTableG, set)
+    {
+        ft <- lapply(fTableG, function(ft)
+        {
+            ft <- copy(ft)
+            rname <- paste0("rank-", set)
+            uflen <- length(unique(ft$neutral_formula))
+            ranks <- seq_len(uflen)
+            ft[, (rname) := ranks[.GRP], by = "neutral_formula"]
+            ft[, rankScore := (uflen - (get(rname) - 1)) / uflen] # for sorting
+            
+            # rename cols that are specific to a set or algo consensus or should otherwise not be combined
+            # UNDONE: needed? can be inferred from set_from (although not so clear...)
+            cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage"), names(ft), mConsNames)
+            if (length(cols) > 0)
+                setnames(ft, cols, paste0(cols, "-", set))
+            
+            return(ft)
+        })
+    })
+    
+    mc <- setNames(rep(length(groupFormsList), length(origFGNames)), origFGNames)
+    ret <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, origFGNames, "set_from",
+                                            "sets", "setCoverage", "setCoverageAnn", NULL, NULL, mConsNames,
+                                            "rankScore")
+    
+    # fix ranking
+    
+    ret <- lapply(ret, function(ft)
+    {
+        setorderv(ft, "rankScore", -1)
+        # ft[, rankScore := NULL]
+        return(ft)
+    })
+    
+    return(ret[])
+}
+
 syncFormulasSetObjects <- function(formulasSet, makeCons)
 {
     # update/initialize from setObjects
@@ -14,16 +57,9 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             formulasSet@featureFormulas <- formulaTable(setObjects(formulasSet)[[1]], features = TRUE)
         
         if (makeCons)
-        {
-            groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
-            gNames <- groupNames(formulasSet)
-            mc <- setNames(rep(length(groupFormsList), length(gNames)), gNames)
-            formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
-                                                                     formulasSet@setThresholdAnn,
-                                                                     formulasSet@origFGNames, "set_from", "sets",
-                                                                     "setCoverage", "setCoverageAnn", NULL, NULL,
-                                                                     mergedConsensusNames(formulasSet))
-        }
+            formulasSet@formulas <- makeFormulasSetConsensus(setObjects(formulasSet), formulasSet@setThreshold,
+                                                             formulasSet@setThresholdAnn, formulasSet@origFGNames,
+                                                             mergedConsensusNames(formulasSet))
         else
         {
             # sync available feature groups
@@ -269,12 +305,10 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     }, simplify = FALSE)
 
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
-    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
+    
     gNames <- allFormulas[[1]]@origFGNames # UNDONE? at least verify all objects are equal
-    mc <- setNames(rep(length(setObjects), length(gNames)), gNames)
-    groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, gNames,
-                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL,
-                                                   formNames)
+    groupForms <- makeFormulasSetConsensus(setObjects, gNames, setThreshold, setThresholdAnn, formNames)
+    
     browser()
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
@@ -287,7 +321,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
                                  origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
                                  scoreRanges = sc$scRanges,
                                  algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
-                                 mergedCompNames = formNames))
+                                 mergedConsensusNames = formNames))
 })
 
 
@@ -303,12 +337,8 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     
-    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
-    mc <- setNames(rep(length(setObjects), length(fGroupsSet)), names(fGroupsSet))
-    groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, names(fGroupsSet),
-                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL,
-                                                   character())
-    
+    groupForms <- makeFormulasSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, character())
+
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
                        algorithm = makeSetAlgorithm(setObjects)))

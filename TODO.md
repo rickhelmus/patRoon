@@ -51,8 +51,10 @@
 - decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
-- compound consensus
+- compound/formula consensus
     - ranks: calc rankScores with original candidate size or final?
+        - in the latter case it's not necessary to scale? just do weighted mean of rank and inverse sort
+        - keep penalizing NAs?
 
 
 ## Suspects
@@ -121,7 +123,10 @@
     - annotatedPeakList (and maybe others): use unset instead of setObjects()?
     - check/sync sets between different input set objects (eg formulas/MSPeakLists)
         - make util
-    - compound set consensus: weights for ranking (like compound consensus)?
+    - compound/formula set consensus
+        - weights for ranking (like compound consensus)?
+        - also penalize NA ranks?
+            - if scaling is removed, scoring can be done afterwards for formulas
     - annotatedPeakList compounds: remove PLIndexOrig column?
     - as.data.table(formulas, average=T): remove more cols?
 - screening
@@ -264,6 +269,7 @@
     - absAlignMzDev
     - compounds vs formulas formats?
         - formulas: each line is the best candidate from an analysis/set
+    - set ranking: same as compounds consensus (but no weights (yet))
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -385,12 +391,16 @@
     - Agilent .d is also a directory?
     - Remove necessity to have different input/output formats? (at least OK for pwiz)
 - allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
-- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
 - delete() for other classes
+- generalize makeLegend() to new plot util
+
+## Annotation
+
+- Get rid of PLIndex and harmonize approach with linking annotated peaks for formulas/compounds using tolerances, which eg allows altered MSPeakLists after annotation
 - SusDat MF support
 - parallel MSPeakLists generation?
-- generalize makeLegend() to new plot util
-- Get rid of PLIndex and harmonize approach with linking annotated peaks for formulas/compounds using tolerances, which eg allows altered MSPeakLists after annotation
+- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
+- DA formulas: also rank formula results like GF/SIRIUS?
 
 
 ## Components

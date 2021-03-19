@@ -275,11 +275,14 @@ formulaScorings <- function()
 
 formulaRankingColumns <- function() c("byMSMS", "score", "combMatch", "isoScore", "mSigma", "MSMSScore")
 
-rankFormulaTable <- function(formTable, mConsNames)
+rankFormulaTable <- function(formTable, mConsNames, rankCols = NULL)
 {
     # order from best to worst
 
-    rankCols <- getAllMergedConsCols(formulaRankingColumns(), names(formTable), mConsNames)
+    if (is.null(rankCols))
+        rankCols <- formulaRankingColumns()
+    
+    rankCols <- getAllMergedConsCols(rankCols, names(formTable), mConsNames)
 
     colorder <- rep(-1, length(rankCols))
 
@@ -333,7 +336,7 @@ calculateFormScoreRanges <- function(formTable, mConsNames)
 }
 
 generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, fromCol, mergedAllCol,
-                                          mergeCovCol, mergeCovAnnCol, mConsNames)
+                                          mergeCovCol, mergeCovAnnCol, mConsNames, rankCols)
 {
     # merge all together
     formTable <- rbindlist(formList, fill = TRUE, idcol = fromCol)
@@ -365,15 +368,15 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
             formTable[, (fragAvgCols) := lapply(.SD, mean), by = c("neutral_formula", "frag_formula", fromCol),
                       .SDcols = fragAvgCols]
         
-        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median"), names(formTable),
-                                        mConsNames)
+        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median", rankCols),
+                                        names(formTable), mConsNames)
         formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean),
                   by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
         
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
         
-        formTable <- rankFormulaTable(formTable, mConsNames)
+        formTable <- rankFormulaTable(formTable, mConsNames, rankCols)
     }
 
     return(formTable)
@@ -381,11 +384,12 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
 
 generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
                                              fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, MSPeakLists,
-                                             absAlignMzDev, mConsNames)
+                                             absAlignMzDev, mConsNames, rankCols = NULL)
 {
     cat("Generating formula consensus...\n")
 
-    hash <- makeHash(formList, formThreshold, formThresholdAnn)
+    hash <- makeHash(formList, formThreshold, formThresholdAnn, origGNames, fromCol, mergedAllCol, mergeCovCol,
+                     mergeCovAnnCol, MSPeakLists, absAlignMzDev, mConsNames, rankCols)
     formCons <- loadCacheData("formulasFGroupConsensus", hash)
 
     # figure out names
@@ -402,7 +406,8 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
         {
             fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
             ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn,
-                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, mConsNames)
+                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, mConsNames,
+                                                 rankCols)
             setTxtProgressBar(prog, i)
             return(ret)
         })

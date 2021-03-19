@@ -344,6 +344,19 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
 
     if (nrow(formTable) > 0)
     {
+        if (!is.null(rankCols)) # HACK: needed by set consensus
+        {
+            # get rank scores. NOTE: do this before removing any candidates as otherwise ranking will be messed up
+            
+            rcols <- intersect(rankCols, names(formTable))
+            formTable[, rankScore := {
+                allRanks <- unlist(getPrecursorFormScores(.SD, rcols)[, rcols, with = FALSE])
+                invRanks <- (.NGRP - (allRanks - 1)) / .NGRP
+                invRanks[is.na(invRanks)] <- 0
+                mean(invRanks)
+            }, .SDcols = c(rcols, "neutral_formula"), by = "neutral_formula"]
+        }
+        
         # Determine coverage of precursor formulas.
         formTable[, (mergeCovCol) := uniqueN(get(fromCol)) / mergeCount, by = "neutral_formula"]
         formTable[, (mergeCovAnnCol) := uniqueN(get(fromCol)) / length(formList), by = "neutral_formula"]
@@ -355,8 +368,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         if (formThreshold > 0 || formThresholdAnn > 0)
             formTable <- formTable[get(mergeCovCol) >= formThreshold & get(mergeCovAnnCol) >= formThresholdAnn]
 
-        # remove MS only formulas if MS/MS candidate is also present (do after
-        # coverage filter).
+        # remove MS only formulas if MS/MS candidate is also present (do after coverage filter).
         MSMSForms <- unique(formTable[byMSMS == TRUE, neutral_formula])
         formTable <- formTable[byMSMS == TRUE | !neutral_formula %in% MSMSForms]
 
@@ -368,7 +380,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
             formTable[, (fragAvgCols) := lapply(.SD, mean), by = c("neutral_formula", "frag_formula", fromCol),
                       .SDcols = fragAvgCols]
         
-        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median", rankCols),
+        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median"),
                                         names(formTable), mConsNames)
         formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean),
                   by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
@@ -376,7 +388,13 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
         
-        formTable <- rankFormulaTable(formTable, mConsNames, rankCols)
+        if (!is.null(rankCols))
+        {
+            setorderv(formTable, "rankScore", order = -1)
+            formTable[, rankScore := NULL] # UNDONE
+        }
+        else
+            formTable <- rankFormulaTable(formTable, mConsNames)
     }
 
     return(formTable)

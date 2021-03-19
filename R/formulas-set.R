@@ -17,7 +17,6 @@ makeFormulasSetConsensus <- function(setObjects, origFGNames, setThreshold, setT
             uflen <- length(unique(ft$neutral_formula))
             ranks <- seq_len(uflen)
             ft[, (rname) := ranks[.GRP], by = "neutral_formula"]
-            ft[, rankScore := (uflen - (get(rname) - 1)) / uflen] # for sorting
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             # UNDONE: needed? can be inferred from set_from (although not so clear...)
@@ -32,17 +31,8 @@ makeFormulasSetConsensus <- function(setObjects, origFGNames, setThreshold, setT
     mc <- setNames(rep(length(groupFormsList), length(origFGNames)), origFGNames)
     ret <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, origFGNames, "set_from",
                                             "sets", "setCoverage", "setCoverageAnn", NULL, NULL, mConsNames,
-                                            "rankScore")
-    
-    # fix ranking
-    
-    ret <- lapply(ret, function(ft)
-    {
-        setorderv(ft, "rankScore", -1)
-        # ft[, rankScore := NULL]
-        return(ft)
-    })
-    
+                                            paste0("rank-", names(setObjects)))
+
     return(ret[])
 }
 

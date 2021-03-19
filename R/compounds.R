@@ -918,7 +918,6 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
             ret[, mergedBy := compNames[cmpi]]
             ret[, rank := seq_len(.N)]
-            ret[, rankscore := (.N - (rank - 1)) / .N * rankWeights[cmpi]]
 
             setnames(ret, paste0(names(ret), "-", compNames[[cmpi]]))
 
@@ -1059,8 +1058,17 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
             mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
         }
 
-        rnames <- getAllMergedConsCols("rankscore", names(mCompList[[grpi]]), compNames)
-        mCompList[[grpi]][, rankscore := rowSums(.SD, na.rm = TRUE) / length(rnames), .SDcols = rnames]
+        rnames <- getAllMergedConsCols("rank", names(mCompList[[grpi]]), compNames)
+        # get relevant weights with correct order
+        rwInds <- unlist(lapply(compNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
+        rWeights <- rankWeights[rwInds]
+        ncand <- nrow(mCompList[[grpi]])
+        mCompList[[grpi]][, rankscore := {
+            invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
+            invRanks[is.na(invRanks)] <- 0
+            weighted.mean(invRanks, rWeights)
+        }, .SDcols = rnames, by = seq_len(ncand)]
+        
         setorderv(mCompList[[grpi]], "rankscore", order = -1)
         mCompList[[grpi]][, c(rnames, "rankscore") := NULL]
     }

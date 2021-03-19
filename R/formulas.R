@@ -781,7 +781,6 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
             uflen <- length(unique(ret$neutral_formula))
             ranks <- seq_len(uflen)
             ret[, rank := ranks[.GRP], by = "neutral_formula"]
-            ret[, rankscore := (uflen - (rank - 1)) / uflen * rankWeights[fi]]
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
         }))
@@ -892,10 +891,15 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "neutral_formula"][[2]]]
         }
 
-        rnames <- getAllMergedConsCols("rankscore", names(consFormulaList[[grpi]]), allFormNames)
+        rnames <- getAllMergedConsCols("rank", names(consFormulaList[[grpi]]), allFormNames)
+        # get relevant weights with correct order
+        rwInds <- unlist(lapply(allFormNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
+        rWeights <- rankWeights[rwInds]
         consFormulaList[[grpi]][, rankscore := {
-            rscores <- getPrecursorFormScores(.SD, rnames)
-            rowSums(rscores[, rnames, with = FALSE], na.rm = TRUE) / length(rnames)
+            allRanks <- unlist(getPrecursorFormScores(.SD, rnames)[, rnames, with = FALSE])
+            invRanks <- (.NGRP - (allRanks - 1)) / .NGRP
+            invRanks[is.na(invRanks)] <- 0
+            weighted.mean(invRanks, rWeights)
         }, .SDcols = c(rnames, "neutral_formula"), by = "neutral_formula"]
         setorderv(consFormulaList[[grpi]], "rankscore", order = -1)
         consFormulaList[[grpi]][, c(rnames, "rankscore") := NULL]

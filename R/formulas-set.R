@@ -74,6 +74,11 @@ formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
                                                  origFGNames = "character"),
                         contains = c("formulas", "workflowStepSet"))
 
+formulasConsensusSet <- setClass("formulasConsensusSet", slots = c(mergedConsensusNames = "character"),
+                                 contains = "formulasSet")
+setMethod("mergedConsensusNames", "formulasConsensusSet", function(obj) obj@mergedConsensusNames)
+
+
 #' @describeIn formulasSet Shows summary information for this object.
 #' @export
 setMethod("show", "formulasSet", function(object)
@@ -282,6 +287,8 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     
     if (!allSame(lapply(allFormulas, sets)))
         stop("All objects must have the same sets.")
+    if (!allSame(lapply(allFormulas, slot, "origFGNames")))
+        stop("All objects must have been generated from the same feature groups.")
     
     # NOTE: don't want to keep -set suffix
     formNames <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allFormulas, algorithm))
@@ -296,22 +303,13 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
 
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     
-    gNames <- allFormulas[[1]]@origFGNames # UNDONE? at least verify all objects are equal
+    gNames <- allFormulas[[1]]@origFGNames
     groupForms <- makeFormulasSetConsensus(setObjects, gNames, setThreshold, setThresholdAnn, formNames)
     
-    browser()
-    return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
-                       setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
-                       algorithm = makeSetAlgorithm(setObjects)))
-    
-    cons <- makeCompoundsSetConsensus(setObjects, obj@origFGNames, setThreshold, setThresholdAnn, formNames)
-    sc <- makeCompoundsSetScorings(setObjects, obj@origFGNames)
-    
-    return(compoundsConsensusSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                                 origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
-                                 scoreRanges = sc$scRanges,
-                                 algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
-                                 mergedConsensusNames = formNames))
+    return(formulasConsensusSet(setObjects = setObjects, origFGNames = gNames, setThreshold = setThreshold,
+                                setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
+                                algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
+                                mergedConsensusNames = formNames))
 })
 
 

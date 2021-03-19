@@ -3,7 +3,7 @@
 #' @include workflow-step-set.R
 NULL
 
-makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mCompNames)
+makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mConsNames)
 {
     # generate consensus by...
     # - checking setThreshold/setThresholdAnn
@@ -35,7 +35,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             ct[, rankScore := (.N - (get(rname) - 1)) / .N] # for sorting
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
-            cols <- getAllCompCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mCompNames)
+            cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mConsNames)
             if (length(cols) > 0)
                 setnames(ct, cols, paste0(cols, "-", s))
             
@@ -47,12 +47,12 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
         
         Reduce(x = allResults, f = function(left, right)
         {
-            scoreColsLeft <- getAllCompCols(getCompScoreColNames(), names(left), mCompNames)
-            scoreColsRight <- getAllCompCols(getCompScoreColNames(), names(right), mCompNames)
+            scoreColsLeft <- getAllMergedConsCols(getCompScoreColNames(), names(left), mConsNames)
+            scoreColsRight <- getAllMergedConsCols(getCompScoreColNames(), names(right), mConsNames)
             scoreColsBoth <- c(intersect(scoreColsLeft, scoreColsRight), "rankScore") # also include rank scores
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
-            combineColsBoth <- intersect(getAllCompCols(combineCols, names(left), mCompNames),
-                                         getAllCompCols(combineCols, names(right), mCompNames))
+            combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
+                                         getAllMergedConsCols(combineCols, names(right), mConsNames))
             otherColsBoth <- setdiff(intersect(names(left), names(right)),
                                      c(scoreColsBoth, combineColsBoth, "set", "fragInfo", "rankScore"))
             colsOnlyRight <- setdiff(names(right), names(left))
@@ -103,7 +103,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
         })]
         
-        scCols <- c(getAllCompCols(getCompScoreColNames(), names(ct), mCompNames), "rankScore")
+        scCols <- c(getAllMergedConsCols(getCompScoreColNames(), names(ct), mConsNames), "rankScore")
         ct[, (scCols) := lapply(.SD, function(x) x / setCoverageAnn), .SDcols = scCols]
 
         # re-sort by avg rankScores
@@ -163,7 +163,7 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
         if (makeCons)
             compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
                                                                 compoundsSet@setThreshold, compoundsSet@setThresholdAnn,
-                                                                mergedCompoundNames(compoundsSet))
+                                                                mergedConsensusNames(compoundsSet))
         else
         {
             # sync available feature groups
@@ -193,9 +193,9 @@ compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", set
                         contains = c("compounds", "workflowStepSet"))
 
 #' @rdname compounds-class
-compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedCompNames = "character"),
+compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedConsensusNames = "character"),
                                   contains = "compoundsSet")
-setMethod("mergedCompoundNames", "compoundsConsensusSet", function(compounds) compounds@mergedCompNames)
+setMethod("mergedConsensusNames", "compoundsConsensusSet", function(obj) obj@mergedConsensusNames)
 
 
 #' @describeIn compoundsSet Shows summary information for this object.
@@ -451,7 +451,7 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
                                  origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
                                  scoreRanges = sc$scRanges,
                                  algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
-                                 mergedCompNames = compNames))
+                                 mergedConsensusNames = compNames))
 })
 
 

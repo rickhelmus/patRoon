@@ -337,7 +337,7 @@ if (rmdVars$selfContained)
 ```{r echo=FALSE, eval=length(compFGroups) > 0}
 compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
-    mn <- mergedCompoundNames(rmdVars$compounds)
+    mn <- mergedConsensusNames(rmdVars$compounds)
 
     ct <- compTable[[grp]]
     

@@ -327,14 +327,14 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
     gNames <- names(fGroups)
     anaInfo <- analysisInfo(fGroups)
     compTable <- compoundTable(compounds)
-    mcn <- mergedCompoundNames(compounds)
+    mcn <- mergedConsensusNames(compounds)
 
     if (!is.null(compsCluster))
         cutcl <- cutClusters(compsCluster)
 
     if (normalizeScores != "none")
         compTable <- mapply(compTable, compounds@scoreRanges, FUN = normalizeCompScores,
-                            MoreArgs = list(mCompNames = mcn, minMaxNormalization = normalizeScores == "minmax",
+                            MoreArgs = list(mConsNames = mcn, minMaxNormalization = normalizeScores == "minmax",
                                             exclude = excludeNormScores),
                             SIMPLIFY = FALSE)
 
@@ -343,8 +343,8 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
         if (grp %in% gNames && nrow(compTable[[grp]]) > 0)
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
-            tab <- compTable[[grp]][, -getAllCompCols("fragInfo", names(compTable[[grp]]), mergedCompoundNames(compounds)),
-                                    with = FALSE]
+            tab <- compTable[[grp]][, -getAllMergedConsCols("fragInfo", names(compTable[[grp]]),
+                                                      mergedConsensusNames(compounds)), with = FALSE]
             if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
                 tab[, cluster := cutcl[[grp]]]
             write.csv(tab, out)
@@ -413,7 +413,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 screen(scr[4])
 
                 # draw text info
-                txt <- paste0(getCompInfoList(compTable[[grp]], idi, FALSE, mergedCompoundNames(compounds)),
+                txt <- paste0(getCompInfoList(compTable[[grp]], idi, FALSE, mergedConsensusNames(compounds)),
                               collapse = "\n")
                 if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
                     txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")

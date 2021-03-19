@@ -255,7 +255,8 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
         groupFormulas <- generateGroupFormulasByConsensus(fTable, lapply(ftind, function(x) sum(x > 0)),
                                                           featThreshold, featThresholdAnn,
                                                           gNames, "analysis_from", "analyses", "featCoverage",
-                                                          "featCoverageAnn", MSPeakLists, absAlignMzDev)
+                                                          "featCoverageAnn", MSPeakLists, absAlignMzDev,
+                                                          character())
     else
         groupFormulas <- list()
 

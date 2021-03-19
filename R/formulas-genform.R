@@ -216,7 +216,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     if (is.null(forms) || nrow(forms) == 0)
         return(NULL)
 
-    forms <- patRoon:::rankFormulaTable(forms)
+    forms <- patRoon:::rankFormulaTable(forms, character())
     
     # select topMost after ranking
     if (!is.null(topMost) && data.table::uniqueN(forms, by = "neutral_formula") > topMost)
@@ -412,7 +412,8 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
             groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn,
                                                               gNames, "analysis_from", "analyses", "featCoverage",
-                                                              "featCoverageAnn", MSPeakLists, absAlignMzDev)
+                                                              "featCoverageAnn", MSPeakLists, absAlignMzDev,
+                                                              character())
         else
             groupFormulas <- list()
     }

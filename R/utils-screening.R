@@ -266,7 +266,7 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, formTable, formRank,
+                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames,
                                         formScoreRanges, formulasNormalizeScores, compTable,
                                         compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
                                         absMzDev, IDLevelRules)
@@ -274,7 +274,8 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
-        formTableNorm <- normalizeFormScores(formTable, formScoreRanges, formulasNormalizeScores == "minmax")
+        formTableNorm <- normalizeFormScores(formTable, formScoreRanges, mFormNames,
+                                             formulasNormalizeScores == "minmax")
         unFTable <- unique(formTable, by = "formula"); unFTableNorm <- unique(formTableNorm, by = "formula")
         if (!is.na(formRank))
         {
@@ -458,7 +459,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                 
                 if (isForm)
                     levelOK <- checkAnnotationScore(val, type, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
-                                                    getAllFormulasCols(type, names(formTable)))
+                                                    getAllMergedConsCols(type, names(formTable), mFormNames))
                 else
                     levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
                                                     getAllMergedConsCols(type, names(compTable), mCompNames))

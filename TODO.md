@@ -58,6 +58,7 @@
 ## Suspects
 
 - spec similarity: use C++ code?
+- estimateIdentificationLevel(): scores are not checked for consensus columns
 
 
 ## Components
@@ -95,7 +96,6 @@
         - formulas
             - rename columns like compounds, eg rank, mergedBy
             - verify ranking and score averaging for regular/set consensus
-                - score averaging doesn't work in generateFormConsensusForGroup: doesn't check merged colnames
             - getAllMergedFormulasCols()/getAllFormulasCols(): make set aware
         - components: make set specific methods/classes to wrap existing code
         - fGroups

@@ -360,12 +360,15 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         # average scorings
         
         # frag_error is unique per fragment, while other scorings are per precursor candidate
-        if (haveMSMS && "frag_error" %in% names(formTable))
-            formTable[, frag_error := mean(frag_error), by = c("neutral_formula", "frag_formula")]
+        fragAvgCols <- getAllMergedConsCols("frag_error", names(formTable), mConsNames)
+        if (haveMSMS && length(fragAvgCols) > 0)
+            formTable[, (fragAvgCols) := lapply(.SD, mean), by = c("neutral_formula", "frag_formula", fromCol),
+                      .SDcols = fragAvgCols]
         
-        avCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
-        formTable[, (avCols) := lapply(unique(.SD, by = fromCol)[, avCols, with = FALSE], mean),
-                  by = "neutral_formula", .SDcols = c(avCols, fromCol)]
+        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median"), names(formTable),
+                                        mConsNames)
+        formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean),
+                  by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
         
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))

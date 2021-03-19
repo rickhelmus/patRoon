@@ -63,8 +63,9 @@ setMethod("initialize", "compounds", function(.Object, ...)
 
 #' @rdname compounds-class
 compoundsConsensus <- setClass("compoundsConsensus",
-                               slots = c(mergedCompNames = "character"),
+                               slots = c(mergedConsensusNames = "character"),
                                contains = "compounds")
+setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@mergedConsensusNames)
 
 
 #' @describeIn compounds Accessor method to obtain generated compounds.
@@ -97,7 +98,7 @@ setMethod("show", "compounds", function(object)
 {
     callNextMethod()
 
-    mn <- mergedCompoundNames(object)
+    mn <- mergedConsensusNames(object)
     if (length(mn) > 1)
         printf("Merged: %s\n", paste0(mn, collapse = ", "))
 
@@ -155,7 +156,7 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    mcn <- mergedCompoundNames(x)
+    mcn <- mergedConsensusNames(x)
     cTable <- compoundTable(x)
     if (normalizeScores != "none")
     {
@@ -254,10 +255,10 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 
     cat("Filtering compounds... ")
 
-    mCompNames <- mergedCompoundNames(obj)
+    mConsNames <- mergedConsensusNames(obj)
     filterMinCols <- function(cmpTable, col, minVal)
     {
-        cols <- getAllCompCols(col, names(cmpTable), mCompNames)
+        cols <- getAllMergedConsCols(col, names(cmpTable), mConsNames)
         pred <- function(cl) is.na(cl) | cl >= minVal
         if (negate)
             pred <- Negate(pred)
@@ -280,7 +281,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
         {
             for (sc in names(scoreLimits))
             {
-                cols <- getAllCompCols(sc, names(cmpTable), mCompNames)
+                cols <- getAllMergedConsCols(sc, names(cmpTable), mConsNames)
                 if (length(cols) == 0)
                     next
 
@@ -371,7 +372,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     cGNames <- names(cTable)
 
     # UNDONE?
-    if (length(mergedCompoundNames(compounds)) > 0)
+    if (length(mergedConsensusNames(compounds)) > 0)
         stop("Currently formula scoring cannot be calculated for consensus results. Please add the scorings before calling consensus()")
     
     calculateScores <- function(cr, forms)
@@ -543,12 +544,12 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
         return(NULL)
 
-    mcn <- mergedCompoundNames(obj)
+    mcn <- mergedConsensusNames(obj)
 
     if (normalizeScores != "none")
         compTable <- normalizeCompScores(compTable, obj@scoreRanges[[groupName]], mcn, normalizeScores == "minmax", excludeNormScores)
 
-    scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
+    scoreCols <- getAllMergedConsCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
 
@@ -837,10 +838,6 @@ setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = le
     do.call(UpSetR::upset, c(list(compTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
-
-setMethod("mergedCompoundNames", "compounds", function(compounds) character(0))
-setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compounds@mergedCompNames)
-
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
@@ -1062,7 +1059,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
             mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
         }
 
-        rnames <- getAllCompCols("rankscore", names(mCompList[[grpi]]), compNames)
+        rnames <- getAllMergedConsCols("rankscore", names(mCompList[[grpi]]), compNames)
         mCompList[[grpi]][, rankscore := rowSums(.SD, na.rm = TRUE) / length(rnames), .SDcols = rnames]
         setorderv(mCompList[[grpi]], "rankscore", order = -1)
         mCompList[[grpi]][, c(rnames, "rankscore") := NULL]
@@ -1076,7 +1073,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
     return(compoundsConsensus(compounds = mCompList, scoreTypes = scoreTypes, scoreRanges = scRanges,
                               algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
-                              mergedCompNames = compNames))
+                              mergedConsensusNames = compNames))
 })
 
 #' @templateVar func generateCompounds

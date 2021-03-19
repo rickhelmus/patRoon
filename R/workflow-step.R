@@ -70,3 +70,6 @@ setMethod("show", "workflowStep", function(object)
     printf("Algorithm: %s\n", algorithm(object))
     invisible(NULL)
 })
+
+setMethod("mergedConsensusNames", "workflowStep", function(obj) character())
+

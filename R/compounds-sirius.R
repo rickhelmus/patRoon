@@ -29,6 +29,9 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
                 results <- results[seq_len(topMost)] # results should already be sorted on score
         }
         
+        # identifiers to characters, as they sometimes are and sometimes aren't depending on if multiple are present
+        results[, identifier := as.character(identifier)]
+
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for
         # candidates with the same formula.

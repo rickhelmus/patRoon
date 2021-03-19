@@ -778,9 +778,10 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
         {
             ret <- copy(ft)
             ret[, mergedBy := allFormNames[fi]]
-            ranks <- seq_len(length(unique(ret$neutral_formula)))
+            uflen <- length(unique(ret$neutral_formula))
+            ranks <- seq_len(uflen)
             ret[, rank := ranks[.GRP], by = "neutral_formula"]
-            ret[, rankscore := (.N - (rank - 1)) / .N * rankWeights[fi]]
+            ret[, rankscore := (uflen - (rank - 1)) / uflen * rankWeights[fi]]
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
         }))

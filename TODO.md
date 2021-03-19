@@ -355,6 +355,7 @@
     - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown
     - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peaklists
     - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
+    - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

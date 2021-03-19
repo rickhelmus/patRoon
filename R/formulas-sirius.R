@@ -91,7 +91,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                  "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss", "explainedPeaks",
                                  "explainedIntensity"))
             
-            forms <- rankFormulaTable(forms)
+            forms <- rankFormulaTable(forms, character())
         }
     }
     return(forms)
@@ -158,7 +158,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn, gNames, "analysis_from",
                                                               "analyses", "featCoverage", "featCoverageAnn",
-                                                              MSPeakLists, absAlignMzDev)
+                                                              MSPeakLists, absAlignMzDev, character())
         }
         else
             groupFormulas <- list()

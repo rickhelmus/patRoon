@@ -21,7 +21,8 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
                                                                      formulasSet@setThresholdAnn,
                                                                      formulasSet@origFGNames, "set_from", "sets",
-                                                                     "setCoverage", "setCoverageAnn", NULL, NULL)
+                                                                     "setCoverage", "setCoverageAnn", NULL, NULL,
+                                                                     mergedConsensusNames(formulasSet))
         }
         else
         {
@@ -272,7 +273,8 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     gNames <- allFormulas[[1]]@origFGNames # UNDONE? at least verify all objects are equal
     mc <- setNames(rep(length(setObjects), length(gNames)), gNames)
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, gNames,
-                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL)
+                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL,
+                                                   formNames)
     browser()
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
@@ -304,7 +306,8 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
     mc <- setNames(rep(length(setObjects), length(fGroupsSet)), names(fGroupsSet))
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, names(fGroupsSet),
-                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL)
+                                                   "set_from", "sets", "setCoverage", "setCoverageAnn", NULL, NULL,
+                                                   character())
     
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,

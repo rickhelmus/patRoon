@@ -402,9 +402,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         
         estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
                                                   annSimForm, annSimComp, annSimBoth,
-                                                  maxSuspFrags, maxFragMatches, fTable, formRank, fScRanges,
-                                                  formulasNormalizeScores, cTable, compRank,
-                                                  mConsNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else NULL,
+                                                  maxSuspFrags, maxFragMatches, fTable, formRank,
+                                                  mFormNames = if (!is.null(formulas)) mergedConsensusNames(compounds) else character(),
+                                                  fScRanges, formulasNormalizeScores, cTable, compRank,
+                                                  mConsNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
         
         set(si, i,

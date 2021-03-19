@@ -237,7 +237,8 @@ reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, exclude
 
             ft <- formulas[[grp]]
             if (normalizeScores != "none")
-                ft <- normalizeFormScores(ft, formulas@scoreRanges[[grp]], normalizeScores == "minmax", excludeNormScores)
+                ft <- normalizeFormScores(ft, formulas@scoreRanges[[grp]], mergedConsensusNames(formulas),
+                                          normalizeScores == "minmax", excludeNormScores)
             write.csv(ft, out)
         }
     }
@@ -305,7 +306,8 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
 
                 screen(scr[4])
 
-                textPlot(paste0(getFormInfoList(formulas[[grp]], precursor), collapse = "\n"))
+                textPlot(paste0(getFormInfoList(formulas[[grp]], precursor, mergedConsensusNames(formulas)),
+                                collapse = "\n"))
 
                 close.screen(scr)
             }

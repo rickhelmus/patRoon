@@ -275,11 +275,11 @@ formulaScorings <- function()
 
 formulaRankingColumns <- function() c("byMSMS", "score", "combMatch", "isoScore", "mSigma", "MSMSScore")
 
-rankFormulaTable <- function(formTable)
+rankFormulaTable <- function(formTable, mConsNames)
 {
     # order from best to worst
 
-    rankCols <- getAllFormulasCols(formulaRankingColumns(), names(formTable))
+    rankCols <- getAllMergedConsCols(formulaRankingColumns(), names(formTable), mConsNames)
 
     colorder <- rep(-1, length(rankCols))
 
@@ -302,13 +302,13 @@ getPrecursorFormScores <- function(formTable, scoreCols)
                      by = "neutral_formula", .SDcols = scoreCols])
 }
 
-normalizeFormScores <- function(formResults, scoreRanges, minMaxNormalization, exclude = NULL)
+normalizeFormScores <- function(formResults, scoreRanges, mConsNames, minMaxNormalization, exclude = NULL)
 {
     columns <- names(formResults)
-    scoreCols <- getAllFormulasCols(formulaScorings()$name, columns)
+    scoreCols <- getAllMergedConsCols(formulaScorings()$name, columns, mConsNames)
     
     if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% getAllFormulasCols(exclude, columns)]
+        scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]
     
     if (length(scoreCols) > 0)
     {
@@ -324,16 +324,16 @@ normalizeFormScores <- function(formResults, scoreRanges, minMaxNormalization, e
     return(formResults)
 }
 
-calculateFormScoreRanges <- function(formTable)
+calculateFormScoreRanges <- function(formTable, mConsNames)
 {
-    scoreCols <- getAllFormulasCols(formulaScorings()$name, names(formTable))
+    scoreCols <- getAllMergedConsCols(formulaScorings()$name, names(formTable), mConsNames)
     return(setNames(lapply(scoreCols,
                            function(sc) if (any(!is.na(formTable[[sc]]))) range(formTable[[sc]], na.rm = TRUE) else c(NA, NA)),
                     scoreCols))
 }
 
 generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, fromCol, mergedAllCol,
-                                          mergeCovCol, mergeCovAnnCol)
+                                          mergeCovCol, mergeCovAnnCol, mConsNames)
 {
     # merge all together
     formTable <- rbindlist(formList, fill = TRUE, idcol = fromCol)
@@ -370,7 +370,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
         
-        formTable <- rankFormulaTable(formTable)
+        formTable <- rankFormulaTable(formTable, mConsNames)
     }
 
     return(formTable)
@@ -378,7 +378,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
 
 generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
                                              fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, MSPeakLists,
-                                             absAlignMzDev)
+                                             absAlignMzDev, mConsNames)
 {
     cat("Generating formula consensus...\n")
 
@@ -399,7 +399,7 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
         {
             fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
             ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn,
-                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol)
+                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, mConsNames)
             setTxtProgressBar(prog, i)
             return(ret)
         })
@@ -464,34 +464,7 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     return(fi)
 }
 
-# get a vector of all (merged) columns
-getAllFormulasCols <- function(targetCols, allCols)
-{
-    # find regular (non-merged) columns
-    reg <- intersect(targetCols, allCols)
-
-    mCols <- getAllMergedFormulasCols(allCols)
-    if (length(mCols) > 0)
-    {
-        merged <- lapply(targetCols, function(tc) grep(paste0("^", tc, "\\-"), mCols, value = TRUE))
-        merged <- merged[lengths(merged) > 0]
-        merged <- unlist(merged)
-    }
-    else
-        merged <- character()
-
-    return(c(reg, merged))
-}
-
-getAllMergedFormulasCols <- function(allCols)
-{
-    # NOTE: we simply assume that merged columns have "-X" (X is name of merged
-    # object) appended. This means that regular columns should never contain
-    # dashes!
-    return(grep("^.+\\-.+", allCols, value = TRUE))
-}
-
-getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
+getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
 {
     formTable <- formTable[neutral_formula == precursor]
 
@@ -505,7 +478,7 @@ getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
 
     addValText <- function(curText, fmt, col)
     {
-        cols <- getAllFormulasCols(col, names(precInfo))
+        cols <- getAllMergedConsCols(col, names(precInfo), mConsNames)
 
         ret <- character()
         for (cl in cols)

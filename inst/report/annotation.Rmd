@@ -401,8 +401,8 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     
     infoTexts <- sapply(seq_along(precursors), function(preci)
     {
-        it <- paste0(getFormInfoList(rmdVars$formulas[[grp]], precursors[preci], useHTML = TRUE),
-                     collapse = "<br>")
+        it <- paste0(getFormInfoList(rmdVars$formulas[[grp]], precursors[preci], mergedConsensusNames(rmdVars$formulas),
+                                     useHTML = TRUE), collapse = "<br>")
         if (isSusp)
         {
             # insert suspect names (if any)

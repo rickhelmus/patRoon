@@ -199,7 +199,6 @@ compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", set
                                                    origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
 
-#' @rdname compounds-class
 compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedConsensusNames = "character"),
                                   contains = "compoundsSet")
 setMethod("mergedConsensusNames", "compoundsConsensusSet", function(obj) obj@mergedConsensusNames)

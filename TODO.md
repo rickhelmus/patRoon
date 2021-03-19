@@ -51,10 +51,6 @@
 - decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
-- compound/formula consensus
-    - ranks: calc rankScores with original candidate size or final?
-        - in the latter case it's not necessary to scale? just do weighted mean of rank and inverse sort
-        - keep penalizing NAs?
 
 
 ## Suspects
@@ -97,14 +93,13 @@
                 - probably yes?
         - formulas
             - rename columns like compounds, eg rank, mergedBy
-            - verify ranking and score averaging for regular/set consensus
-            - getAllMergedFormulasCols()/getAllFormulasCols(): make set aware
+                - finished?
+        - verify ranking and score averaging for regular/set consensus
+        - getAllMergedConsCols(): make set aware?
         - components: make set specific methods/classes to wrap existing code
         - fGroups
             - warn that adduct annotations will be removed if present
             - sets method: cannot work because of ^: maybe just throw error saying that consensus should be made first and passed to makeSet()
-        - or for later?
-            - if not add tests
     - provide methods for non-implemented functionality
         - consensus()/comparison()? (see above)
         - IPO
@@ -125,8 +120,6 @@
         - make util
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
-        - also penalize NA ranks?
-            - if scaling is removed, scoring can be done afterwards for formulas
     - annotatedPeakList compounds: remove PLIndexOrig column?
     - as.data.table(formulas, average=T): remove more cols?
 - screening
@@ -220,6 +213,7 @@
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
     - thoroughly test consensus for compounds
+    - enable annotation consensus tests
 - new ranking for formulas/compounds consensus (and sets)
 - FC, plotVolcano
 - ensure peaklists are sorted

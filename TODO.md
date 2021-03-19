@@ -220,6 +220,7 @@
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
     - thoroughly test consensus for compounds
+- new ranking for formulas/compounds consensus (and sets)
 - FC, plotVolcano
 - ensure peaklists are sorted
 - spectrumSimilarity()
@@ -362,7 +363,7 @@
     - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peaklists
     - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
     - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
-    - Fixed: formula algorithm consensus did not scale rankScores properly
+    - formula/compound annotation consensus: ranking is properly scaled
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

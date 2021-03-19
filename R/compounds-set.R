@@ -32,8 +32,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             ct <- copy(ct)
             rname <- paste0("rank-", s)
             ct[, c("set", "setCoverage", "setCoverageAnn", rname) := .(s, 1, 1, seq_len(.N))]
-            ct[, rankScore := (.N - (get(rname) - 1)) / .N] # for sorting
-            
+
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mConsNames)
             if (length(cols) > 0)
@@ -49,12 +48,12 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
         {
             scoreColsLeft <- getAllMergedConsCols(getCompScoreColNames(), names(left), mConsNames)
             scoreColsRight <- getAllMergedConsCols(getCompScoreColNames(), names(right), mConsNames)
-            scoreColsBoth <- c(intersect(scoreColsLeft, scoreColsRight), "rankScore") # also include rank scores
+            scoreColsBoth <- intersect(scoreColsLeft, scoreColsRight)
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
             combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
                                          getAllMergedConsCols(combineCols, names(right), mConsNames))
             otherColsBoth <- setdiff(intersect(names(left), names(right)),
-                                     c(scoreColsBoth, combineColsBoth, "set", "fragInfo", "rankScore"))
+                                     c(scoreColsBoth, combineColsBoth, "set", "fragInfo"))
             colsOnlyRight <- setdiff(names(right), names(left))
             
             left[right, (c(scoreColsBoth, combineColsBoth, otherColsBoth, colsOnlyRight, "set", "fragInfo")) :=
@@ -65,7 +64,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
                          lapply(combineColsBoth, function(col)
                          {
                              vals <- mget(c(col, otherCols(col)), inherits = TRUE)
-                             vals <- lapply(vals, function(v) strsplit(v, ";"))
+                             vals <- lapply(vals, strsplit, ";")
                              return(mapply(vals[[1]], vals[[2]], FUN = function(l, r)
                              {
                                  l <- l[!is.na(l)]; r <- r[!is.na(r)]
@@ -103,10 +102,18 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
         })]
         
-        scCols <- c(getAllMergedConsCols(getCompScoreColNames(), names(ct), mConsNames), "rankScore")
+        scCols <- getAllMergedConsCols(getCompScoreColNames(), names(ct), mConsNames)
         ct[, (scCols) := lapply(.SD, function(x) x / setCoverageAnn), .SDcols = scCols]
 
-        # re-sort by avg rankScores
+        # re-sort by avg rank scores
+        rnames <- getAllMergedConsCols("rank", names(ct), names(setObjects))
+        ncand <- nrow(ct)
+        ct[, rankScore := {
+            invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
+            invRanks[is.na(invRanks)] <- 0
+            mean(invRanks)
+        }, .SDcols = rnames, by = seq_len(ncand)]
+        
         setorderv(ct, "rankScore", -1)
         ct[, rankScore := NULL]
         

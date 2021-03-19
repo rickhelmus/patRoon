@@ -895,7 +895,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
         rnames <- getAllMergedConsCols("rankscore", names(consFormulaList[[grpi]]), allFormNames)
         consFormulaList[[grpi]][, rankscore := {
             rscores <- getPrecursorFormScores(.SD, rnames)
-            rowMeans(rscores[, rnames, with = FALSE], na.rm = TRUE)
+            rowSums(rscores[, rnames, with = FALSE], na.rm = TRUE) / length(rnames)
         }, .SDcols = c(rnames, "neutral_formula"), by = "neutral_formula"]
         setorderv(consFormulaList[[grpi]], "rankscore", order = -1)
         consFormulaList[[grpi]][, c(rnames, "rankscore") := NULL]

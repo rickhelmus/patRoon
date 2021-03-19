@@ -778,10 +778,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
 
     }, simplify = FALSE)
 
-    # UNDONE: remove old style columns?
-    uniqueCols <- c("neutral_formula", "formula_mz", "error", "error_median", "dbe", "frag_mz", "frag_neutral_formula",
-                    "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
-                    "ana_min_intensity", "ana_max_intensity")
+    uniqueCols <- c("formula", "formula_mz", "error", "error_median", "dbe", "frag_mz", "frag_neutral_formula",
+                    "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe")
 
     consFormulaList <- allFormulasLists[[1]]
     leftName <- allFormNames[1]
@@ -857,7 +855,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, "byMSMS", "frag_formula", "mergedBy")
+        deDupCols <- c(uniqueCols, "neutral_formula", "byMSMS", "frag_formula", "mergedBy")
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]

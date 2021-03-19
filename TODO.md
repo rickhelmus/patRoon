@@ -93,11 +93,6 @@
             - keep setThreshold for consensus?
                 - probably yes?
         - formulas
-            - regular consensus fixes
-                - formula_algo columns
-                - SIRIUS ionization/adduct column --> merge or remove
-                    - or is this used somewhere?
-                    - also for compounds?
             - rename columns like compounds, eg rank, mergedBy
             - verify ranking and score averaging for regular/set consensus
                 - score averaging doesn't work in generateFormConsensusForGroup: doesn't check merged colnames
@@ -267,6 +262,8 @@
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
     - absAlignMzDev
+    - compounds vs formulas formats?
+        - formulas: each line is the best candidate from an analysis/set
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses

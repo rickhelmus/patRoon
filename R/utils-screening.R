@@ -461,7 +461,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                                                     getAllFormulasCols(type, names(formTable)))
                 else
                     levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
-                                                    getAllCompCols(type, names(compTable), mCompNames))
+                                                    getAllMergedConsCols(type, names(compTable), mCompNames))
                 
                 if (!isTRUE(levelOK))
                 {

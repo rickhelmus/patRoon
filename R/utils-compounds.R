@@ -6,14 +6,6 @@ NULL
 
 getIKBlock1 <- function(IK) strtrim(IK, 14)
 
-# get a vector of all (merged) columns
-getAllCompCols <- function(targetCols, allCols, mCompNames)
-{
-    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mCompNames),
-                                       USE.NAMES = FALSE))
-    return(intersect(targetCols, allCols))
-}
-
 mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
 {
     # UNDONE: what about multiple formula candidates?
@@ -92,14 +84,14 @@ getCompScoreColNames <- function() unique(compoundScorings(includeSuspectLists =
 getCompSuspectListColNames <- function() setdiff(unique(compoundScorings(includeSuspectLists = TRUE)$name),
                                                  getCompScoreColNames())
 
-normalizeCompScores <- function(compResults, scoreRanges, mCompNames, minMaxNormalization, exclude = NULL)
+normalizeCompScores <- function(compResults, scoreRanges, mConsNames, minMaxNormalization, exclude = NULL)
 {
     compResults <- copy(compResults)
     columns <- names(compResults)
-    scoreCols <- getAllCompCols(getCompScoreColNames(), columns, mCompNames)
+    scoreCols <- getAllMergedConsCols(getCompScoreColNames(), columns, mConsNames)
 
     if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% getAllCompCols(exclude, columns, mCompNames)]
+        scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]
 
     if (length(scoreCols) > 0)
     {
@@ -112,7 +104,7 @@ normalizeCompScores <- function(compResults, scoreRanges, mCompNames, minMaxNorm
     return(compResults)
 }
 
-getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
+getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
 {
     columns <- names(compResults)
 
@@ -120,7 +112,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
 
     addValText <- function(curText, fmt, cols)
     {
-        cols <- getAllCompCols(cols, columns, mCompNames)
+        cols <- getAllMergedConsCols(cols, columns, mConsNames)
         ret <- character()
         for (cl in cols)
         {
@@ -162,13 +154,13 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             return(sprintf("%s: %s", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
         }
 
-        dbcols <- getAllCompCols("database", columns, mCompNames)
+        dbcols <- getAllMergedConsCols("database", columns, mConsNames)
         
         if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
             ctext <- c(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
-            idcols <- getAllCompCols("identifier", columns, mCompNames)
+            idcols <- getAllMergedConsCols("identifier", columns, mConsNames)
 
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- c(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
@@ -179,7 +171,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             }
         }
         
-        relatedIDCols <- getAllCompCols("relatedCIDs", columns, mCompNames)
+        relatedIDCols <- getAllMergedConsCols("relatedCIDs", columns, mConsNames)
         for (i in seq_along(relatedIDCols))
             ctext <- c(ctext, addIdURL(relatedIDCols[i], resultRow[[relatedIDCols[i]]], resultRow[[dbcols[i]]]))
     }
@@ -191,7 +183,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
 
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
 
-    if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
+    if (length(getAllMergedConsCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))

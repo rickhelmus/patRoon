@@ -8,18 +8,18 @@
 NULL
 
 # nocov start
-getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mCompNames)
+getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mConsNames)
 {
     columns <- names(compResults)
     
     if (normalizeScores)
-        compResults <- normalizeCompScores(compResults, mCompNames, FALSE) # UNDONE: select normalization method? Add scoreranges
+        compResults <- normalizeCompScores(compResults, mConsNames, FALSE) # UNDONE: select normalization method? Add scoreranges
     
     resultRow <- compResults[compIndex, ]
     
     addValText <- function(curText, fmt, cols)
     {
-        cols <- getAllCompCols(cols, columns, mCompNames)
+        cols <- getAllMergedConsCols(cols, columns, mConsNames)
         ret <- ""
         for (cl in cols)
         {
@@ -62,8 +62,8 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
             ctext <- paste0(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
-            idcols <- getAllCompCols("identifier", columns, mCompNames)
-            dbcols <- getAllCompCols("database", columns, mCompNames)
+            idcols <- getAllMergedConsCols("identifier", columns, mConsNames)
+            dbcols <- getAllMergedConsCols("database", columns, mConsNames)
             
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- paste0(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
@@ -79,7 +79,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
     
-    if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
+    if (length(getAllMergedConsCols("InChIKey", columns, mConsNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
@@ -264,7 +264,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             
             ct <- compTable[[rValues$currentFGroup]]
             if (input$normalizeScores)
-                ct <- normalizeCompScores(ct, mergedCompoundNames(compounds), FALSE) # UNDONE: select normalization method? Add scoreranges
+                ct <- normalizeCompScores(ct, mergedConsensusNames(compounds), FALSE) # UNDONE: select normalization method? Add scoreranges
             
             ret <- ct[pr[1]:pr[2], ]
             
@@ -288,7 +288,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             allCols <- names(ret)
             getCols <- function(col)
             {
-                ret <- getAllCompCols(col, allCols, mergedCompoundNames(compounds))
+                ret <- getAllMergedConsCols(col, allCols, mergedConsensusNames(compounds))
                 return(ret[sapply(ret, function(cl) !all(is.na(cl)))])
             }
             
@@ -415,7 +415,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
         
         output$compInfo <- renderText({
             return(getCompInfoText(compTable[[rValues$currentFGroup]], rValues$currentResult, TRUE, input$normalizeScores,
-                                   mergedCompoundNames(compounds)))
+                                   mergedConsensusNames(compounds)))
         })
     }
     

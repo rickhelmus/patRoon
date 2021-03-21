@@ -1,7 +1,7 @@
 #' @include main.R
 NULL
 
-getScriptCode <- function(input, analyses)
+getScriptCode2 <- function(input, analyses)
 {
     optionalCodeBlock <- function(e) if (e) "<<startCodeBlock>>" else "<<skipCodeBlock>>"
     endCodeBlock <- function() "<<endCodeBlock>>"
@@ -74,7 +74,7 @@ getScriptCode <- function(input, analyses)
     return(ret)
 }
 
-getScriptCode2 <- function(input, analyses)
+getScriptCode <- function(input, analyses)
 {
     txtCon <- withr::local_connection(textConnection(NULL, "w"))
     
@@ -90,12 +90,7 @@ getScriptCode2 <- function(input, analyses)
         addComment(c(hd, title, hd))
         addNL()
     }
-    addAssignment <- function(var, val, quote = FALSE)
-    {
-        addText(paste(var, "<-", if (quote) doQuote(val) else val))
-        
-        # UNDONE: conditional commenting: use formatr, either directly or first to preformat
-    }
+    addAssignment <- function(var, val, quote = FALSE) addText(paste(var, "<-", if (quote) doQuote(val) else val))
     addCall <- function(var, func, args, condition = TRUE)
     {
         if (!condition)
@@ -112,19 +107,21 @@ getScriptCode2 <- function(input, analyses)
             #   - handle strings
             #   - handle conditional NULLs
             
-            if (!is.null(a[["condition"]]) && !a$condition && is.null(a[["value"]]))
+            if (!is.null(a[["condition"]]) && !a$condition)
                 return(NULL)
-            if ((!is.null(a[["isNULL"]]) && a$isNULL) || (!is.null(a[["zeroToNULL"]]) && a$zeroToNULL && a$value == 0))
-                return("NULL")
             
             ret <- a$value
-            if (!is.null(a[["quote"]]) && a$quote)
+            if (is.null(a[["value"]]) || (!is.null(a[["isNULL"]]) && a$isNULL) ||
+                (!is.null(a[["zeroToNULL"]]) && a$zeroToNULL && a$value == 0))
+                ret <- "NULL"
+            else if (!is.null(a[["quote"]]) && a$quote)
                 ret <- doQuote(ret)
-            if (!is.null(a[["name"]]))
-                ret <- paste(a$name, "=", ret)
             
             if (length(ret) > 1)
                 ret <- paste0("c(", paste0(ret, collapse = ", "), ")")
+            
+            if (!is.null(a[["name"]]))
+                ret <- paste(a$name, "=", ret)
             
             return(ret)
         })
@@ -188,7 +185,7 @@ getScriptCode2 <- function(input, analyses)
             addCall(NULL, "setDAMethod", list(
                 list(value = "anaInfo"),
                 list(value = input$DAMethod, quote = TRUE)
-            ), condition = nzchar(preTreatOpts$DAMethod))
+            ), condition = nzchar(input$DAMethod))
             addCall(NULL, "recalibrarateDAFiles", list(value = "anaInfo"), condition = input$doDACalib)
             if (nzchar(input$convAlgo))
             {
@@ -201,10 +198,10 @@ getScriptCode2 <- function(input, analyses)
                 {
                     addCall(NULL, "convertMSFiles", list(
                         list(name = "anaInfo", value = "anaInfo"),
-                        list(name = "from", input$convFrom, quote = TRUE),
+                        list(name = "from", value = input$convFrom, quote = TRUE),
                         list(name = "to", value = of, quote = TRUE),
                         list(name = "algorithm", value = input$convAlgo, quote = TRUE),
-                        list(name = "centroid", centroid)))
+                        list(name = "centroid", value = centroid)))
                 }
             }
         })
@@ -245,7 +242,7 @@ getScriptCode2 <- function(input, analyses)
     else if (mzRange[2] == 0)
         mzRange[2] <- Inf
     addComment("Basic rule based filtering")
-    addCall(fGroups, "filter", list(
+    addCall("fGroups", "filter", list(
         list(value = "fGroups"),
         list(name = "preAbsMinIntensity", value = input$preIntThr, zeroToNULL = TRUE),
         list(name = "absMinIntensity", value = input$intThr, zeroToNULL = TRUE),
@@ -276,10 +273,13 @@ getScriptCode2 <- function(input, analyses)
         ))
     }
     
+    doMSPL <- (nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent)
+    
     if (nzchar(input$formulaGen) || nzchar(input$compIdent) || nzchar(input$components))
     {
         addHeader("annotation")
-        if ((nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent))
+        
+        if (doMSPL)
         {
             useFMF <- input$featFinder == "Bruker" && input$peakListGen == "Bruker"
             addComment("Retrieve MS peak lists")
@@ -295,12 +295,126 @@ getScriptCode2 <- function(input, analyses)
                 list(name = "avgFeatParams", value = "avgMSListParams", condition = input$peakListGen == "mzR"),
                 list(name = "avgFGroupParams", value = "avgMSListParams")
             ))
-            addComment("uncomment and configure for extra filtering of MS peak lists")
-            
+            addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
+            addCall("mslists", "filter", list(
+                list(value = "mslists"),
+                list(name = "absMSIntThr", value = "NULL"),
+                list(name = "absMSMSIntThr", value = "NULL"),
+                list(name = "relMSIntThr", value = "NULL"),
+                list(name = "relMSMSIntThr", value = 0.05),
+                list(name = "topMSPeaks", value = "NULL"),
+                list(name = "topMSMSPeaks", value = 25)
+            ))
+        }
+        if (nzchar(input$formulaGen))
+        {
+            addNL()
+            addComment("Calculate formula candidates")
+            addCall("formulas", "generateFormulas", list(
+                list(value = "fGroups"),
+                list(value = tolower(input$formulaGen), quote = TRUE),
+                list(value = "mslists", condition = input$formulaGen != "Bruker"),
+                list(name = "relMzDev", value = 5, condition = input$formulaGen != "Bruker"),
+                list(name = "precursorMzSearchWindow", value = 0.002, condition = input$formulaGen == "Bruker"),
+                list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),
+                list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$formulaGen != "Bruker"),
+                list(name = "profile", value = "qtof", quote = TRUE, condition = input$formulaGen == "SIRIUS"),
+                list(name = "featThresholdAnn", value = 0.75)
+            ))
+        }
+        
+        if (nzchar(input$compIdent))
+        {
+            addNL()
+            addComment("Calculate compound structure candidates")
+            addCall("compounds", "generateCompounds", list(
+                list(value = "fGroups"),
+                list(value = "mslists"),
+                list(value = tolower(input$formulaGen), quote = TRUE),
+                list(name = "dbRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
+                list(name = "fragRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
+                list(name = "fragAbsMzDev", value = 0.002, condition = input$compIdent == "MetFrag"),
+                list(name = "relMzDev", value = 5, condition = input$compIdent == "SIRIUS"),
+                list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),
+                list(name = "database", value = "pubchem", quote = TRUE, condition = input$compIdent == "MetFrag"),
+                list(name = "maxCandidatesToStop", value = 2500, condition = input$compIdent == "MetFrag"),
+                list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
+                list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$compIdent == "SIRIUS"),
+                list(name = "profile", value = "qtof", quote = TRUE, condition = input$compIdent == "SIRIUS")
+            ))
+            if (input$compIdent == "MetFrag")
+            {
+                addCall("compounds", "addFormulaScoring", list(
+                    list(value = "compounds"),
+                    list(value = "formulas"),
+                    list(name = "updateScore", value = TRUE)
+                ))
+            }
+        }
+        
+        if (nzchar(input$components))
+        {
+            addNL()
+            addComment("Perform automatic generation of components")
+            addCall("components", "generateComponents", list(
+                list(value = "fGroups"),
+                list(value = tolower(input$components), quote = TRUE),
+                list(name = "ionization", value = input$polarity, quote = TRUE),
+                list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
+                list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
+                list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
+                list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
+                list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
+            ))
+        }
+        
+        if (nzchar(input$suspectList) && input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)))
+        {
+            addNL()
+            addComment("Annotate suspects")
+            addCall("fGroups", "annotateSuspects", list(
+                list(value = "fGroups"),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+                list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE, condition = input$genIDLevelFile)
+            ))
         }
     }
     
-    return(textConnectionValue(txtCon))
+    if (length(input$report) > 0)
+    {
+        addHeader("reporting")
+        addCall(NULL, "reportCSV", condition = "CSV" %in% input$report, list(
+            list(value = "fGroups"),
+            list(name = "path", value = "report", quote = TRUE),
+            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+            list(name = "components", value = "components", isNULL = !nzchar(input$components))
+        ))
+        addCall(NULL, "reportPDF", condition = "PDF" %in% input$report, list(
+            list(value = "fGroups"),
+            list(name = "path", value = "report", quote = TRUE),
+            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+            list(name = "components", value = "components", isNULL = !nzchar(input$components))
+        ))
+        addCall(NULL, "reportHTML", condition = "HTML" %in% input$report, list(
+            list(value = "fGroups"),
+            list(name = "path", value = "report", quote = TRUE),
+            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+            list(name = "components", value = "components", isNULL = !nzchar(input$components)),
+            list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
+            list(name = "selfContained", value = FALSE),
+            list(name = "openReport", value = TRUE)
+        ))
+    }
+    
+    return(paste0(textConnectionValue(txtCon), collapse = "\n"))
 }
 
 doCreateProject <- function(input, analyses)

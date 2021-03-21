@@ -74,6 +74,235 @@ getScriptCode <- function(input, analyses)
     return(ret)
 }
 
+getScriptCode2 <- function(input, analyses)
+{
+    txtCon <- withr::local_connection(textConnection(NULL, "w"))
+    
+    # helper functions
+    doQuote <- function(txt) paste0("\"", txt, "\"")
+    addText <- function(txt) writeLines(txt, txtCon)
+    addNL <- function(count = 1) addText(rep("", count))
+    addComment <- function(txt, condition = TRUE) { if (condition) addText(paste("#", txt)) }
+    addHeader <- function(title)
+    {
+        hd <- strrep("-", 25)
+        addNL()
+        addComment(c(hd, title, hd))
+        addNL()
+    }
+    addAssignment <- function(var, val, quote = FALSE)
+    {
+        addText(paste(var, "<-", if (quote) doQuote(val) else val))
+        
+        # UNDONE: conditional commenting: use formatr, either directly or first to preformat
+    }
+    addCall <- function(var, func, args, condition = TRUE)
+    {
+        if (!condition)
+            return(NULL)
+        
+        if (!is.list(args[[1]]))
+            args <- list(args) # HACK: allow unnested lists for cases with one arg
+        
+        args <- lapply(args, function(a)
+        {
+            # handle args
+            #   - add names if necessary
+            #   - handle conditional args
+            #   - handle strings
+            #   - handle conditional NULLs
+            
+            if (!is.null(a[["condition"]]) && !a$condition && is.null(a[["value"]]))
+                return(NULL)
+            if ((!is.null(a[["isNULL"]]) && a$isNULL) || (!is.null(a[["zeroToNULL"]]) && a$zeroToNULL && a$value == 0))
+                return("NULL")
+            
+            ret <- a$value
+            if (!is.null(a[["quote"]]) && a$quote)
+                ret <- doQuote(ret)
+            if (!is.null(a[["name"]]))
+                ret <- paste(a$name, "=", ret)
+            
+            if (length(ret) > 1)
+                ret <- paste0("c(", paste0(ret, collapse = ", "), ")")
+            
+            return(ret)
+        })
+        args <- pruneList(args)
+        
+        cl <- paste0(func, "(", paste0(args, collapse = ", "), ")")
+        if (!is.null(var))
+            addAssignment(var, cl)
+        else
+            addText(cl)
+    }
+    addIfBlock <- function(condition, e)
+    {
+        addText(paste0("if (", condition, ") {"))
+        force(e)
+        addText(" }")
+    }
+    
+    
+    addComment(paste("Script automatically generated on", date()))
+    addHeader("initialization")
+    
+    if (input$generateAnaInfo == "table")
+    {
+        addComment("Load analysis table")
+        addCall("anaInfo", "read.csv", list(value = input$analysisTableFile, quote = TRUE))
+    }
+    else if (input$generateAnaInfo == "script")
+    {
+        addCall("anaInfo", "generateAnalysisInfo", list(
+            list(name = "paths", value = unique(analyses$path), quote = TRUE),
+            list(name = "groups", value = analyses$group, quote = TRUE),
+            list(name = "blanks", value = analyses$blank, quote = TRUE)
+        ))
+    }
+    else if (input$generateAnaInfo == "example")
+    {
+        addComment("Take example data from patRoonData package (triplicate solvent blank + triplicate standard)")
+        addCall("anaInfo", "generateAnalysisInfo", list(
+            list(name = "paths", value = "patRoonData::exampleDataPath()"),
+            list(name = "groups", value = c(rep("solvent", 3), rep("standard", 3)), quote = TRUE),
+            list(name = "blanks", value = "solvent", quote = TRUE)
+        ))
+    }
+    else # none
+    {
+        addComment("NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.")
+        addCall("anaInfo", "data.frame", list(
+            list(name = "path", value = "character()"),
+            list(name = "analysis", value = "character()"),
+            list(name = "groups", value = "character()"),
+            list(name = "blanks", value = "character()")
+        ))
+    }
+    
+    if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
+    {
+        addComment("Set to FALSE to skip data pre-treatment")
+        addAssignment("doDataPretreatment", TRUE)
+        addIfBlock("doDataPretreatment", {
+            addCall(NULL, "setDAMethod", list(
+                list(value = "anaInfo"),
+                list(value = input$DAMethod, quote = TRUE)
+            ), condition = nzchar(preTreatOpts$DAMethod))
+            addCall(NULL, "recalibrarateDAFiles", list(value = "anaInfo"), condition = input$doDACalib)
+            if (nzchar(input$convAlgo))
+            {
+                if (input$peakPicking)
+                    centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
+                else
+                    centroid <- FALSE
+                
+                for (of in input$convTo)
+                {
+                    addCall(NULL, "convertMSFiles", list(
+                        list(name = "anaInfo", value = "anaInfo"),
+                        list(name = "from", input$convFrom, quote = TRUE),
+                        list(name = "to", value = of, quote = TRUE),
+                        list(name = "algorithm", value = input$convAlgo, quote = TRUE),
+                        list(name = "centroid", centroid)))
+                }
+            }
+        })
+    }
+    
+    addHeader("features")
+    
+    addComment("Find all features")
+    addComment(sprintf("NOTE: see the %s manual for many more options",
+                       if (input$featFinder == "OpenMS") "reference" else input$featFinder),
+               condition = input$featFinder != "Bruker")
+    addCall("fList", "findFeatures", list(
+        list(value = "anaInfo"),
+        list(value = tolower(input$featFinder), quote = TRUE),
+        list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
+    ))
+    
+    addNL()
+    
+    addComment("Group and align features between analysis")
+    addCall("fGroups", "groupFeatures", list(
+        list(value = "fList"),
+        list(value = tolower(input$featGrouper), quote = TRUE),
+        list(name = "rtalign", value = TRUE),
+        list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$group)",
+             condition = input$featGrouper == "XCMS"),
+        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = input$featGrouper == "XCMS")
+    ))
+    
+    retRange <- c(input[["retention-min"]], input[["retention-max"]])
+    if (all(retRange == 0))
+        retRange <- NULL
+    else if (retRange[2] == 0)
+        retRange[2] <- Inf
+    mzRange <- c(input[["mz-min"]], input[["mz-max"]])
+    if (all(mzRange == 0))
+        mzRange <- NULL
+    else if (mzRange[2] == 0)
+        mzRange[2] <- Inf
+    addComment("Basic rule based filtering")
+    addCall(fGroups, "filter", list(
+        list(value = "fGroups"),
+        list(name = "preAbsMinIntensity", value = input$preIntThr, zeroToNULL = TRUE),
+        list(name = "absMinIntensity", value = input$intThr, zeroToNULL = TRUE),
+        list(name = "relMinReplicateAbundance", value = input$repAbundance, zeroToNULL = TRUE),
+        list(name = "maxReplicateIntRSD", value = input$maxRepRSD, zeroToNULL = TRUE),
+        list(name = "blankThreshold", value = input$blankThr, zeroToNULL = TRUE),
+        list(name = "removeBlanks", value = input$removeBlanks),
+        list(name = "retentionRange", value = retRange),
+        list(name = "mzRange", value = mzRange)
+    ))
+    
+    if (nzchar(input$suspectList))
+    {
+        addHeader("suspect screening")
+        addComment("Load suspect list")
+        addCall("suspFile", "read.csv", list(
+            list(value = input$suspectList, quote = TRUE),
+            list(value = stringsAsFactors, value = FALSE)
+        ))
+        addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
+        addCall("fGroups", "screenSuspects", list(
+            list(value = "fGroups"),
+            list(value = "suspFile"),
+            list(name = "rtWindow", value = 12),
+            list(name = "mzWindow", value = 0.005),
+            list(name = "adduct", value = input$suspectAdduct, quote = TRUE, isNULL = !nzchar(input$suspectAdduct)),
+            list(name = "onlyHits", value = TRUE)
+        ))
+    }
+    
+    if (nzchar(input$formulaGen) || nzchar(input$compIdent) || nzchar(input$components))
+    {
+        addHeader("annotation")
+        if ((nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent))
+        {
+            useFMF <- input$featFinder == "Bruker" && input$peakListGen == "Bruker"
+            addComment("Retrieve MS peak lists")
+            addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
+            addCall("mslists", "generateMSPeakLists", list(
+                list(value = "fGroups"),
+                list(value = "mzr", condition = input$peakListGen == "mzR"),
+                list(value = if (useFMF) "brukerfmf" else "bruker", condition = input$peakListGen == "Bruker"),
+                list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
+                list(name = "precursorMzWindow", value = input$precursorMzWindow, zeroToNULL = TRUE),
+                list(name = "bgsubtr", value = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
+                list(name = "MSMSType", value = "MSMS", quote = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
+                list(name = "avgFeatParams", value = "avgMSListParams", condition = input$peakListGen == "mzR"),
+                list(name = "avgFGroupParams", value = "avgMSListParams")
+            ))
+            addComment("uncomment and configure for extra filtering of MS peak lists")
+            
+        }
+    }
+    
+    return(textConnectionValue(txtCon))
+}
+
 doCreateProject <- function(input, analyses)
 {
     mkdirp(input$destinationPath)

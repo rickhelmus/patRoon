@@ -7,7 +7,9 @@
 - patRoonData
     - rename patRoonData::targets?
     - update data files?
-- update newProject for new feature and component algos and sets
+- newProject
+    - update for new feature and component algos and sets
+    - DA mslists: MSMSType should be bbCID if precursorMzWindow == 0?
 - return(invisible(NULL))
 
 

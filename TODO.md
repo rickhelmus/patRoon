@@ -98,7 +98,6 @@
                 - finished?
         - verify ranking and score averaging for regular/set consensus
         - getAllMergedConsCols(): make set aware?
-        - components: make set specific methods/classes to wrap existing code
         - fGroups
             - warn that adduct annotations will be removed if present
             - sets method: cannot work because of ^: maybe just throw error saying that consensus should be made first and passed to makeSet()
@@ -214,7 +213,7 @@
 - test DA algorithms
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
-    - thoroughly test consensus for compounds
+    - thoroughly test consensus for compounds/formulas and ranking with both set and algo consensus
     - enable annotation consensus tests
 - new ranking for formulas/compounds consensus (and sets)
 - FC, plotVolcano

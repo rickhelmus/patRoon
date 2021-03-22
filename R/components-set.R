@@ -87,6 +87,29 @@ setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
+#' @export
+setMethod("consensus", "componentsSet", function(obj, ...)
+{
+    allComponents <- c(list(obj), list(...))
+    
+    checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...")
+    
+    allComponents <- allComponents[lengths(allComponents) > 0]
+    if (length(allComponents) < 2)
+        stop("Need at least two non-empty components objects")
+    
+    setObjects <- sapply(sets(obj), function(set)
+    {
+        return(do.call(consensus, lapply(lapply(allComponents, setObjects), "[[", set)))
+    }, simplify = FALSE)
+    
+    mcmp <- mergeComponents(setObjects, names(setObjects), "set")
+    
+    return(componentsSet(setObjects = setObjects, components = mcmp$components, componentInfo = mcmp$componentInfo,
+                         algorithm = paste0(unique(sapply(allComponents, algorithm)), collapse = ",")))
+})
+
 generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., setArgs = list(),
                                   classGenerator = componentsSet)
 {

@@ -437,6 +437,8 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     
     if (!allSame(lapply(allCompounds, sets)))
         stop("All objects must have the same sets.")
+    if (!allSame(lapply(allCompounds, slot, "origFGNames")))
+        stop("All objects must have been generated from the same feature groups.")
     
     # NOTE: don't want to keep -set suffix
     compNames <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allCompounds, algorithm))

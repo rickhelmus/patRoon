@@ -449,7 +449,7 @@ utils <- setRefClass("utilsInst", methods = list(
         present <- nzchar(extDeps$path) & file.exists(extDeps$path)
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
         choices <- c(instChoices, "Missing", "All", "None")
-        instWhat <- select.list(choices, instChoices[!present], TRUE, graphics = FALSE,
+        instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,
                                 title = "Which external tools should be installed?")
         
         if ("All" %in% instWhat)
@@ -470,7 +470,7 @@ utils <- setRefClass("utilsInst", methods = list(
             if ("OpenMS" %in% instWhat)
             {
                 # NOTE: set keep_install_file to avoid long delays after installation
-                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.5.0/OpenMS-2.5.0-Win64.exe",
+                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.6.0/OpenMS-2.6.0-Win64.exe",
                                       message = FALSE, keep_install_file = TRUE)
             }
             
@@ -510,7 +510,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("OpenBabel" %in% instWhat)
             {
-                installr::install.URL("https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0.exe",
+                installr::install.URL("https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe",
                                       message = FALSE)
             }
             

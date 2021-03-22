@@ -95,6 +95,9 @@ setMethod("consensus", "componentsSet", function(obj, ...)
     checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...")
     
+    if (!allSame(lapply(allComponents, sets)))
+        stop("All objects must have the same sets.")
+    
     allComponents <- allComponents[lengths(allComponents) > 0]
     if (length(allComponents) < 2)
         stop("Need at least two non-empty components objects")

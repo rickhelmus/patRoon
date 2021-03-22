@@ -97,6 +97,9 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
     checkmate::reportAssertions(ac)
+    
+    if (inherits(features, "featuresSet"))
+        stop("This is currently not yet supported for sets.")
 
     go <- switch(algorithm,
                  openms = featureGroupsOptimizerOpenMS,

@@ -500,6 +500,11 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
 })
 
+#' @export
+setMethod("makeSet", "featureGroupsSet", function(obj, ...)
+{
+    stop("Making a set from set objects is not supported", call. = FALSE)
+})
 
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
 setMethod("unset", "featureGroupsSet", function(obj, set)

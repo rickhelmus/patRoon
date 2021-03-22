@@ -137,7 +137,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
 })
 
 #' @export
-setMethod("makeSet", "features", function(obj, ..., adducts, labels)
+setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
 {
     # UNDONE: cache
     

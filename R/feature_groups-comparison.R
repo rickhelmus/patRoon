@@ -272,6 +272,13 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     fGroupsList <- obj@fGroupsList
     comparedFGroups <- obj@comparedFGroups
     
+    if (any(sapply(lapply(fGroupsList, slot, "annotations"), nrow) > 0))
+        warning("Any adduct annotations from the input feature group objects will not persists in the final consensus object!",
+                call. = FALSE)
+    if (any(sapply(fGroupsList, hasFGroupScores)))
+        warning("Any peak quality scores from the input feature group objects will not persists in the final consensus object!",
+                call. = FALSE)
+    
     if (!is.null(absMinAbundance) || !is.null(relMinAbundance))
         comparedFGroups <- minAnalysesFilter(comparedFGroups, absMinAbundance, relMinAbundance, verbose = FALSE)
 

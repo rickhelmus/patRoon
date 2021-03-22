@@ -251,7 +251,7 @@ setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 #' @templateVar func makeSet
 #' @templateVar desc creates a set from given workflow objects.
 #' @template generics
-setGeneric("makeSet", function(obj, ..., adducts, labels = NULL) standardGeneric("makeSet"))
+setGeneric("makeSet", function(obj, ...) standardGeneric("makeSet"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.

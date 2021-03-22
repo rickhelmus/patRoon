@@ -98,10 +98,8 @@
                 - finished?
         - getAllMergedConsCols(): make set aware?
 - misc
-    - import XCMS features: verify anaInfo (or remove necessity)
     - plotSpectrum(): show horizontal line in mirrored plot?
     - formulas/compounds: update set column when subsetting on sets?
-    - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
     - check if all plot methods have a Hash version
     - annotatedPeakList (and maybe others): use unset instead of setObjects()?
@@ -112,7 +110,6 @@
     - annotatedPeakList compounds: remove PLIndexOrig column?
     - as.data.table(formulas, average=T): remove more cols?
 - screening
-    - support recursive screening? or throw error otherwise
     - form/compRanks: update when subsetting on sets? otherwise doc
 - merging setObjects
     - check if more has to be cached and may need status messages
@@ -377,6 +374,11 @@
 - allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
 - delete() for other classes
 - generalize makeLegend() to new plot util
+
+## Features
+
+- import XCMS features: verify anaInfo (or remove necessity)
+
 
 ## Annotation
 

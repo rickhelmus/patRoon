@@ -438,7 +438,7 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
 
 #' @export
 setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
-                                               adducts, labels)
+                                               adducts = NULL, labels = NULL)
 {
     if (is.null(labels) && is.null(adducts))
         stop("The labels and adducts arguments are not set (NULL). ",

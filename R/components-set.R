@@ -146,7 +146,10 @@ setMethod("unset", "componentsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
-    return(componentsUnset(components = componentTable(obj), componentInfo = componentInfo(obj),
-                           algorithm = paste0(algorithm(obj), "_unset")))
+    cInfo <- copy(componentInfo(obj))
+    cInfo[, set := NULL]
+    cInfo[, name := sub(paste0("\\-", set), "", name)][] # get rid of set specific names
+    cTable <- setNames(componentTable(obj), cInfo$name)
+    return(componentsUnset(components = cTable, componentInfo = cInfo, algorithm = paste0(algorithm(obj), "_unset")))
 })
 

@@ -64,6 +64,11 @@ setMethod("$", "featureGroupsComparison", function(x, name)
     eval(substitute(x@fGroupsList$NAME_ARG, list(NAME_ARG = name)))
 })
 
+# dummy class to differentiate between (non-)sets objects
+#' @export
+featureGroupsComparisonSet <- setClass("featureGroupsComparisonSet", contains = "featureGroupsComparison")
+
+
 #' Comparing feature groups
 #'
 #' Functionality to compare feature groups and make a consensus.
@@ -393,4 +398,19 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
                                   groupInfo = groupInfo(comparedFGroups), features = retFeatures,
                                   ftindex = consFeatInds, algorithm = allAlgos))
+})
+
+#' @export
+setMethod("comparison", "featureGroupsSet", function(..., groupAlgo, groupArgs = list(rtalign = FALSE))
+{
+    retns <- callNextMethod()
+    return(featureGroupsComparisonSet(fGroupsList = retns@fGroupsList, comparedFGroups = retns@comparedFGroups))
+})
+
+#' @rdname featureGroups-compare
+#' @export
+setMethod("consensus", "featureGroupsComparisonSet", function(obj, ...)
+{
+    stop("This is not yet supported for sets. Please make a consensus first with regular non-set objects ",
+         "(eg per polarity) and combine these in a set with makeSet().")
 })

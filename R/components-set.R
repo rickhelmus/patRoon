@@ -15,6 +15,11 @@ syncComponentsSetObjects <- function(componentsSet)
 componentsSet <- setClass("componentsSet", slots = c(setObjects = "list"),
                           contains = c("components", "workflowStepSet"))
 
+componentsReducedSet <- setClass("componentsReducedSet", contains = "componentsSet")
+setMethod("initialize", "componentsReducedSet",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "reduced-set", ...))
+
+
 #' @describeIn componentsSet Shows summary information for this object.
 #' @export
 setMethod("show", "componentsSet", function(object)
@@ -66,7 +71,8 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
         cat("Done!\n")
     }
     
-    return(obj)
+    return(componentsReducedSet(setObjects = setObjects(obj), components = obj@components,
+                                componentInfo = obj@componentInfo))
 })
 
 #' @export
@@ -84,7 +90,8 @@ setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
     
     obj <- syncComponentsSetObjects(obj)
     
-    return(obj)
+    return(componentsReducedSet(setObjects = setObjects(obj), components = obj@components,
+                                componentInfo = obj@componentInfo))
 })
 
 #' @export

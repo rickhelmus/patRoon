@@ -115,8 +115,6 @@
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
-    -componentsSetReduced necessary? eg for NT components with plotGraph
-        - probably yes
 
 ## TPs
 

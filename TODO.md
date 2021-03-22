@@ -360,6 +360,7 @@
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt
+- newProject: switch to new system and tweaks
     
 
 # Lower priority

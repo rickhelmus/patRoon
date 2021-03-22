@@ -1,79 +1,6 @@
 #' @include main.R
 NULL
 
-getScriptCode2 <- function(input, analyses)
-{
-    optionalCodeBlock <- function(e) if (e) "<<startCodeBlock>>" else "<<skipCodeBlock>>"
-    endCodeBlock <- function() "<<endCodeBlock>>"
-    optionalLine <- function(e) if (!e) "<<skipThisLine>>" else ""
-    header <- function(title)
-    {
-        hd <- paste("#", strrep("-", 25))
-        paste(hd, paste("#", title), hd, sep = "\n")
-    }
-
-    if (input$peakPicking)
-        centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
-    else
-        centroid <- FALSE
-
-    # Can't set lists in template() call (bug?)
-    preTreatOpts = list(convAlgo = input$convAlgo,
-                        convFrom = input$convFrom,
-                        convTo = input$convTo, centroid = centroid,
-                        DAMethod = input$DAMethod, doDACalib = input$doDACalib,
-                        do = nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
-    featFinderOpts = list(algo = input$featFinder)
-    featGrouperOpts = list(algo = input$featGrouper)
-
-    filterFGroupsOpts = list(preIntThr = input$preIntThr, intThr = input$intThr,
-                             repAbundance = input$repAbundance, maxRepRSD = input$maxRepRSD,
-                             blankThr = input$blankThr, removeBlanks = input$removeBlanks)
-    filterFGroupsOpts <- lapply(filterFGroupsOpts, function(x) if (is.numeric(x) && x == 0) "NULL" else x)
-
-    retRange <- c(input[["retention-min"]], input[["retention-max"]])
-    if (all(retRange == 0))
-        retRange <- NULL
-    else if (retRange[2] == 0)
-        retRange[2] <- Inf
-    mzRange <- c(input[["mz-min"]], input[["mz-max"]])
-    if (all(mzRange == 0))
-        mzRange <- NULL
-    else if (mzRange[2] == 0)
-        mzRange[2] <- Inf
-    filterFGroupsOpts$retRange <- retRange; filterFGroupsOpts$mzRange <- mzRange
-
-    peakListOpts = list(algo = input$peakListGen)
-    formulaOpts = list(algo = input$formulaGen)
-    identOpts = list(algo = input$compIdent)
-    componentOpts = list(algo = input$components)
-    sldest <- gsub("\\", "/", input$destinationPath, fixed = TRUE) # BUG: tmpl() seems to eat backslashes!? Convert to forward slashes for now
-
-    template <- templates::tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
-                                destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
-                                analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
-                                doMSPeakFind = (nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent),
-                                precursorMzWindow = input$precursorMzWindow, polarity = input$polarity,
-                                annotateSus = input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)),
-                                genIDLevelFile = input$genIDLevelFile, reportFormats = input$report)
-
-    ret <- template
-
-    # remove blocks marked as '<<skipCodeBlock>>' till <<endCodeBlock>> + leading whitespace
-    ret <- gsub("[\t ]*<<skipCodeBlock>>[\\s\\S]*?<<endCodeBlock>>[.\r]*\n?", "", ret, perl = TRUE)
-
-    # remove remaining startCodeBlock and endCodeBlock markers
-    ret <- gsub("[\t ]*(<<startCodeBlock>>|<<endCodeBlock>>)[.\r]*\n?", "", ret, perl = TRUE)
-
-    # remove disabled optional lines
-    ret <- gsub("([\n]*).*<<skipThisLine>>[.\r]*\n?", "\\1", ret, perl = TRUE)
-
-    # carriage returns seem to mess up cat when writing code
-    ret <- gsub("[\r]", "", ret)
-
-    return(ret)
-}
-
 getScriptCode <- function(input, analyses)
 {
     txtCon <- withr::local_connection(textConnection(NULL, "w"))
@@ -179,6 +106,7 @@ getScriptCode <- function(input, analyses)
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
     {
+        addNL()
         addComment("Set to FALSE to skip data pre-treatment")
         addAssignment("doDataPretreatment", TRUE)
         addIfBlock("doDataPretreatment", {
@@ -215,7 +143,7 @@ getScriptCode <- function(input, analyses)
                condition = input$featFinder != "Bruker")
     addCall("fList", "findFeatures", list(
         list(value = "anaInfo"),
-        list(value = tolower(input$featFinder), quote = TRUE),
+        list(value = if (input$featFinder == "XCMS") "xcms3" else tolower(input$featFinder), quote = TRUE),
         list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
     ))
     
@@ -224,7 +152,7 @@ getScriptCode <- function(input, analyses)
     addComment("Group and align features between analysis")
     addCall("fGroups", "groupFeatures", list(
         list(value = "fList"),
-        list(value = tolower(input$featGrouper), quote = TRUE),
+        list(value = if (input$featGrouper == "XCMS") "xcms3" else tolower(input$featGrouper), quote = TRUE),
         list(name = "rtalign", value = TRUE),
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$group)",
              condition = input$featGrouper == "XCMS"),
@@ -241,6 +169,7 @@ getScriptCode <- function(input, analyses)
         mzRange <- NULL
     else if (mzRange[2] == 0)
         mzRange[2] <- Inf
+    addNL()
     addComment("Basic rule based filtering")
     addCall("fGroups", "filter", list(
         list(value = "fGroups"),
@@ -260,7 +189,7 @@ getScriptCode <- function(input, analyses)
         addComment("Load suspect list")
         addCall("suspFile", "read.csv", list(
             list(value = input$suspectList, quote = TRUE),
-            list(value = stringsAsFactors, value = FALSE)
+            list(name = "stringsAsFactors", value = FALSE)
         ))
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
         addCall("fGroups", "screenSuspects", list(
@@ -414,7 +343,11 @@ getScriptCode <- function(input, analyses)
         ))
     }
     
-    return(paste0(textConnectionValue(txtCon), collapse = "\n"))
+    addNL()
+    
+    return(paste0(formatR::tidy_source(text = textConnectionValue(txtCon), brace.newline = TRUE,
+                                       width.cutoff = 120, wrap = FALSE)$text.tidy,
+                  collapse = "\n"))
 }
 
 doCreateProject <- function(input, analyses)

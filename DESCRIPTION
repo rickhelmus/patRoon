@@ -83,7 +83,6 @@ Imports:
     htmlwidgets,
     shiny,
     shinyjs,
-    templates,
     CAMERA,
     enviPat,
     nontarget,
@@ -107,7 +106,8 @@ Imports:
     yaml,
     keys,
     backports,
-    shinyjs
+    shinyjs,
+    formatR
 Suggests: 
     RDCOMClient,
     metfRag,

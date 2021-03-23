@@ -276,7 +276,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID"), names(cmp))
+    trCols <- intersect(c("formula", "RTDir", "TP_RTDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID"), names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]
@@ -285,6 +285,11 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         tpInfo[, c("retDiff", "mzDiff") := .(round(retDiff, 2), round(mzDiff, 5))]
         setnames(tpInfo, "TP_name", "name")
         
+        if (!is.null(tpInfo[["RTDir"]]) && !is.null(tpInfo[["RTDir"]]))
+        {
+            tpInfo[, "RTDir (predicted/actual)" := paste0(TP_RTDir, "/", RTDir)]
+            tpInfo[, c("RTDir", "TP_RTDir") := NULL]
+        }
         if (!is.null(tpInfo[["formula"]]))
             tpInfo[, formula := subscriptFormulaHTML(formula)]
         if (!is.null(tpInfo[["formulaDiff"]]))

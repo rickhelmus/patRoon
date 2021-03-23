@@ -108,11 +108,9 @@
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
-    - filters for equal formula/structure candidates
 - metabolic logic
     - more logic reactions?
     - assert types of custom reactions DF
-        - maybe make new assert function that can check types, columns etc for DFs. Can then also be used by library TPs etc
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents
     - fix if empty cTab for MSMS components
@@ -167,6 +165,7 @@
     - include more prec/TP infos?
         - CIDs? --> URLs
         - TP_RTDir? (maybe as one line)
+    - handle cases for when formulas/compounds were filtered away due to topMost
 
 ## Reporting
 

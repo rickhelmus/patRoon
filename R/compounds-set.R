@@ -264,9 +264,9 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
-                                                   shift = "none", useGGPlot2 = FALSE, mincex = 0.9,
-                                                   xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
+                                                   plotStruct = TRUE, title = NULL,
+                                                   specSimParams = getDefSpecSimParams(), useGGPlot2 = FALSE,
+                                                   mincex = 0.9, xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
                                                    molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -275,7 +275,6 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     if (length(index) != length(groupName))
         stop("Lengths of index and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
@@ -285,7 +284,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1)
-        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams, shift,
+        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams,
                               useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
 
     if (length(groupName) == 1)
@@ -348,7 +347,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
-                                         specSimParams = specSimParams, shift = shift, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE))
         
         if (!is.null(formulas))
             usForm <- checkAndUnSetOther(theSets, formulas, "formulas")
@@ -378,14 +377,14 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
-                                                       shift = "none", useGGPlot2 = FALSE,
+                                                       plotStruct = TRUE, title = NULL,
+                                                       specSimParams = getDefSpecSimParams(), useGGPlot2 = FALSE,
                                                        mincex = 0.9, xlim = NULL, ylim = NULL,
                                                        maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
                                                        perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams,
-                                   shift, useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...),
+                                   useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...),
                     perSet, mirror))
 })
 

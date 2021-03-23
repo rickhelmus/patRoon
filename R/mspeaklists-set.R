@@ -205,7 +205,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, abs
 
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                     specSimParams = getDefSpecSimParams(), shift = "none",
+                                                     specSimParams = getDefSpecSimParams(),
                                                      useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
                                                      perSet = TRUE, mirror = TRUE, ...)
 {
@@ -215,7 +215,6 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
@@ -223,8 +222,8 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     checkmate::reportAssertions(ac)
     
     argsParent <- list(groupName = groupName, analysis = analysis, MSLevel = MSLevel, title = title,
-                       specSimParams = specSimParams, shift = shift, useGGPlot2 = useGGPlot2,
-                       mincex = mincex, xlim = xlim, ylim = ylim, ...)
+                       specSimParams = specSimParams, useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim,
+                       ylim = ylim, ...)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(do.call(callNextMethod, c(list(obj), argsParent)))
@@ -250,7 +249,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         if (setTitle)
         {
             sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2],
-                                      MSLevel, specSimParams, shift = shift, NAToZero = TRUE, drop = TRUE)
+                                      MSLevel, specSimParams, NAToZero = TRUE, drop = TRUE)
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
@@ -259,7 +258,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         
         binnedPLs <- Map(usObj, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
-                                         specSimParams = specSimParams, shift = shift, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE))
         if (all(sapply(binnedPLs, is.null)))
         {
             # either no peak lists are available or no peak lists within the same sets were available. In the latter
@@ -287,11 +286,11 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
 })
 
 setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                         specSimParams = getDefSpecSimParams(), shift = "none",
+                                                         specSimParams = getDefSpecSimParams(),
                                                          useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
                                                          perSet = TRUE, mirror = TRUE, ...)
 {
-    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, shift, useGGPlot2, mincex,
+    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, useGGPlot2, mincex,
                                    xlim, ylim, ...),
                     perSet, mirror))
 })
@@ -299,8 +298,8 @@ setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysi
 #' @export
 setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2, analysis1 = NULL,
                                                            analysis2 = NULL, MSLevel = 1,
-                                                           specSimParams = getDefSpecSimParams(), shift = "none",
-                                                           NAToZero = FALSE, drop = TRUE)
+                                                           specSimParams = getDefSpecSimParams(), NAToZero = FALSE,
+                                                           drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
@@ -315,8 +314,8 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
         if (length(gn1) == 0 || (!is.null(groupName2) && length(gn2) == 0))
             return(NULL)
         # NOTE: don't drop NAs/dimensions here yet
-        ret <- spectrumSimilarity(so, gn1, gn2, analysis1, analysis2, MSLevel, specSimParams, shift,
-                                  NAToZero = FALSE, drop = FALSE)
+        ret <- spectrumSimilarity(so, gn1, gn2, analysis1, analysis2, MSLevel, specSimParams, NAToZero = FALSE,
+                                  drop = FALSE)
         return(expandFillSpecSimilarities(ret, groupName1, if (is.null(groupName2)) groupName1 else groupName2))
     }))
 

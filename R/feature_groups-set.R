@@ -228,28 +228,6 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
 })
 
 #' @export
-setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
-{
-    # UNDONE: find a neat way to keep both argument order and also override title if not specified
-    
-    # ac <- checkmate::makeAssertCollection()
-    # checkmate::assertFlag(retMin, add = ac)
-    # checkmate::assertString(title, null.ok = TRUE, add = ac)
-    # checkmate::reportAssertions(ac)
-    # 
-    # if (is.null(title) && length(obj) == 1)
-    # {
-    #     # override default title
-    #     gInfo <- groupInfo(obj)
-    #     title <- sprintf("Group '%s'\nrt: %.1f - neutralized mass: %.4f", names(obj)[1],
-    #                      if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
-    #                      gInfo[1, "mzs"])
-    # }
-    
-    callNextMethod(obj, ...)
-})
-
-#' @export
 setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames = !sets, showLegend = sets, pch = 20,
                                                   type = "b", lty = 3, col = NULL, ..., sets = FALSE)
 {

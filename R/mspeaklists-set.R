@@ -292,6 +292,16 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     }
 })
 
+setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
+                                                         specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
+                                                         mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
+                                                         mirror = TRUE, ...)
+{
+    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, shift, useGGPlot2, mincex,
+                                   xlim, ylim, ...),
+                    perSet, mirror))
+})
+
 #' @export
 setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2, analysis1 = NULL,
                                                            analysis2 = NULL, MSLevel = 1,

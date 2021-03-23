@@ -104,6 +104,29 @@ normalizeCompScores <- function(compResults, scoreRanges, mConsNames, minMaxNorm
     return(compResults)
 }
 
+makeDBIdentLink <- function(db, ident)
+{
+    ident <- as.character(ident)
+    
+    if (is.na(ident) || !nzchar(ident))
+        return(character())
+    
+    # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
+    # set consensus results can also merge multiple identifiers
+    idlist <- unlist(strsplit(ident, ";| "))
+    
+    if (grepl("pubchem", tolower(db)))
+        fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
+    else if (tolower(db) == "chemspider")
+        fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
+    else if (startsWith(idlist[1], "DTX"))
+        fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
+    else
+        fmt <- "%s"
+    
+    return(paste0(sprintf(fmt, idlist, idlist), collapse = "; "))
+}
+
 getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
 {
     columns <- names(compResults)
@@ -131,32 +154,11 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
 
     if (addHTMLURL)
     {
-        addIdURL <- function(param, ident, db)
-        {
-            ident <- as.character(ident)
-
-            if (is.na(ident) || !nzchar(ident))
-                return(character())
-
-            # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
-            # set consensus results can also merge multiple identifiers
-            idlist <- unlist(strsplit(ident, ";| "))
-
-            if (grepl("pubchem", tolower(db)))
-                fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
-            else if (tolower(db) == "chemspider")
-                fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
-            else if (startsWith(idlist[1], "DTX"))
-                fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
-            else
-                fmt <- "%s"
-
-            return(sprintf("%s: %s", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
-        }
+        addIdURL <- function(param, ident, db) return(sprintf("%s: %s", param, makeDBIdentLink(db, ident)))
 
         dbcols <- getAllMergedConsCols("database", columns, mConsNames)
         
-        if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
+        if (!is.null(resultRow[["identifier"]])) # compounds were not merged, can use 'regular' column
             ctext <- c(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
@@ -183,7 +185,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
 
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
 
-    if (length(getAllMergedConsCols("InChIKey", columns, mCompNames)) > 0)
+    if (length(getAllMergedConsCols("InChIKey", columns, mConsNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))

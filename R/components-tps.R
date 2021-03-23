@@ -208,7 +208,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                predCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "mass", "RTDir", "reaction_add",
+                predCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "RTDir", "reaction_add",
                               "reaction_sub", "deltaMZ")
                 preds <- preds[, intersect(names(preds), predCols), with = FALSE]
                 
@@ -250,7 +250,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         if (!is.null(pred))
         {
             susps <- suspects(pred)
-            cols <- c("formula", "SMILES", "InChI", "InChIKey", "neutralMass", "rt", "mz") # more/less?
+            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "rt", "mz") # more/less?
             cols <- intersect(names(susps), cols)
             cols <- cols[sapply(cols, function(cl) any(!is.na(susps[[cl]])))]
             targetCols <- paste0("precursor_", cols)

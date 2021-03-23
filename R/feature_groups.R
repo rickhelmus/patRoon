@@ -1498,10 +1498,12 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 })
 
 #' @export
-setMethod("plotVolcano", "featureGroups", function(obj, FCParams, averageFunc = mean, col = NULL, pch = 19, ...)
+setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean, col = NULL,
+                                                   pch = 19, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    assertFCParams(FCParams, x, null.ok = FALSE, add = ac)
+    assertFCParams(FCParams, obj, null.ok = FALSE, add = ac)
+    checkmate::assertFlag(showLegend, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -1518,10 +1520,29 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, averageFunc = 
     gt <- as.data.table(obj, FCParams = FCParams, averageFunc = averageFunc)
     gt[, colour := col[classification]]
     
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, names(col), col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+    
     plot(gt$FC_log, gt$PV_log, xlab = "log2 fold change", ylab = "-log10 p-value", 
          col = gt$colour, pch = pch, ...)
     abline(v = c(-FCParams$thresholdFC, FCParams$thresholdFC), col = "red", lty = 2, lwd = 1, h = -log10(FCParams$thresholdPV))
-    legend("topright", legend = names(col), col = col, cex = 0.8, pch = pch)
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
     
     invisible(NULL)
 })

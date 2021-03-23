@@ -481,14 +481,16 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     unsetCompounds <- checkAndUnSetOther(sets(fGroupsTPs), compounds, "compounds", TRUE)
 
     cat("Adding sets related data...\n")
-    ret@components <- withProg(length(ret), FALSE,
-                               Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
+    ret@components <- withProg(length(ret), FALSE, Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {
+        # mark set presence
+        cmp[, set := sapply(group, function(g)
+        {
+            paste0(names(which(sapply(gNamesTPsSets, function(n) g %chin% n))), collapse = ",")
+        })]
+        
         for (s in sets(fGroupsTPs))
         {
-            # mark set presence
-            set(cmp, j = s, value = cmp$group %in% gNamesTPsSets[[s]])
-            
             if (!is.null(unsetMSPeakLists))
             {
                 # calculate per set spectrum similarities

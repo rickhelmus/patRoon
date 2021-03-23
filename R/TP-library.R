@@ -25,9 +25,16 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
     )
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(TPLibrary, any.missing = FALSE, min.rows = 1, null.ok = TRUE, add = ac)
     if (!is.null(TPLibrary))
-        assertHasNames(TPLibrary, c("precursor_name", "precursor_SMILES", "TP_name", "TP_SMILES"), add = ac)
+    {
+        checkmate::assertDataFrame(TPLibrary, any.missing = FALSE, min.rows = 1, add = ac)
+        libCols <- c("precursor_name", "precursor_SMILES", "TP_name", "TP_SMILES")
+        assertHasNames(TPLibrary, libCols, add = ac)
+        for (cl in libCols)
+            assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE,
+                          unique = cl == "precursor_name", add = ac)
+    }
+        
     if (is.data.frame(suspects))
         assertSuspectList(suspects, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertFlag(skipInvalid, add = ac)

@@ -110,7 +110,6 @@
     - do we still need to check for non-calculated formulae?
 - metabolic logic
     - more logic reactions?
-    - assert types of custom reactions DF
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents
     - fix if empty cTab for MSMS components

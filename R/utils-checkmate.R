@@ -38,6 +38,20 @@ checkChoiceSilent <- function(x, ch)
 }
 assertChoiceSilent <- checkmate::makeAssertionFunction(checkChoiceSilent)
 
+assertListVal <- function(x, field, assertFunc, ..., .var.name = checkmate::vname(x))
+{
+    assertFunc(x[[field]], ..., .var.name = sprintf("%s[[\"%s\"]]", .var.name, field))
+}
+
+assertCharOrFactor <- function(x, empty.ok = FALSE, null.ok = FALSE, ..., .var.name = .var.name)
+{
+    checkmate::assert(
+        checkmate::checkFactor(x, empty.levels.ok = empty.ok, any.missing = empty.ok, null.ok = null.ok),
+        checkmate::checkCharacter(x, min.chars = if (empty.ok) 0 else 1, any.missing = empty.ok, null.ok = null.ok),
+        .var.name = .var.name
+    )
+}
+
 assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (is.null(x) && null.ok)
@@ -49,17 +63,16 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
     checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, c("path", "analysis", "group", "blank"), .var.name = .var.name, add = add)
 
-    assertCharField <- function(f) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f), add = add)
-    assertCharField("path")
-    assertCharField("analysis")
-    assertCharField("group")
-    assertCharField("blank")
-
+    assertListVal(x, "path", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    assertListVal(x, "blank", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    
     checkmate::assert(
         checkmate::checkNull(x[["conc"]]),
         checkmate::checkCharacter(x[["conc"]]),
         checkmate::checkNumeric(x[["conc"]]),
-        .var.name = sprintf("%s[[\"conc\"", .var.name)
+        .var.name = sprintf("%s[[\"conc\"]]", .var.name)
     )
 
     # only continue if previous assertions didn't fail: x needs to be used as list which otherwise gives error
@@ -145,37 +158,17 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 
-    assertCharField <- function(f, null.ok = TRUE, minChars = if (skipInvalid) 0 else 1)
+    needsAdduct <- needsAdduct && (is.null(x[["mz"]]) || any(is.na(x$mz)))
+    for (col in c("name", "SMILES", "InChI", "formula", "InChIKey", "adduct", "fragments_mz", "fragments_formula"))
     {
-        checkmate::assert(
-            checkmate::checkFactor(x[[f]], empty.levels.ok = skipInvalid,
-                                   any.missing = skipInvalid, null.ok = null.ok),
-            checkmate::checkCharacter(x[[f]], min.chars = minChars,
-                                      null.ok = null.ok),
-            .var.name = sprintf("%s[\"%s\"]", .var.name, f)    
-        )
-        
+        emptyOK <- col != "name" && (col != "adduct" || !needsAdduct) && skipInvalid
+        assertListVal(x, col, assertCharOrFactor, empty.ok = emptyOK, null.ok = emptyOK, add = add)
     }
-    
-    assertCharField("name", minChars = 1)
-    assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula"); assertCharField("InChIKey")
-    assertCharField("adduct", null.ok = !needsAdduct || (!is.null(x[["mz"]]) && !any(is.na(x$mz))))
-    assertCharField("fragments_mz"); assertCharField("fragments_formula")
 
-    assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
-                                                           lower = 0, finite = TRUE,
-                                                           null.ok = TRUE, add = add)
-    assertNumField("mz"); assertNumField("neutralMass"); assertNumField("rt")
+    for (col in c("mz", "neutralMass", "rt"))
+        assertListVal(x, col, checkmate::assertNumeric, empty.ok = emptyOK, null.ok = emptyOK, lower = 0, finite = TRUE,
+                      add = add)
 
-    invisible(NULL)
-}
-
-assertScreeningResults <- function(x, fromFGroups, .var.name = checkmate::vname(x), add = NULL)
-{
-    checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
-    assertHasNames(x, c("name", "name_unique", "mz"), .var.name = .var.name, add = add)
-    if (fromFGroups && is.null(x[["group"]]))
-        stop("The screening results should be obtained from feature groups (thus not from features objects)")
     invisible(NULL)
 }
 
@@ -338,31 +331,27 @@ assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::v
     
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-    
-    assertVal(checkmate::assertCharacter, "rGroups", any.missing = FALSE, len = 2)
-    assertVal(checkmate::assertSubset, "rGroups", choices = replicateGroups(fGroups))
-    assertVal(checkmate::assertNumber, "thresholdFC", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "thresholdPV", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "zeroValue", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertChoice, "zeroMethod", choices = c("add", "fixed", "omit"))
-    assertVal(checkmate::assertFunction, "PVTestFunc")
-    assertVal(checkmate::assertFunction, "PVAdjFunc")
+    assertListVal(x, "rGroups", checkmate::assertCharacter, any.missing = FALSE, len = 2, add = add)
+    assertListVal(x, "rGroups", checkmate::assertSubset, choices = replicateGroups(fGroups), add = add)
+    assertListVal(x, "thresholdFC", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "thresholdPV", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "zeroValue", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "zeroMethod", checkmate::assertChoice, choices = c("add", "fixed", "omit"), add = add)
+    assertListVal(x, "PVTestFunc", checkmate::assertFunction, add = add)
+    assertListVal(x, "PVAdjFunc", checkmate::assertFunction, add = add)
 }
 
 assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
 
-    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-
-    assertVal(checkmate::assertNumber, "clusterMzWindow", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertCount, "topMost", positive = TRUE)
-    assertVal(checkmate::assertNumber, "minIntensityPre", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "minIntensityPost", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertFunction, "avgFun")
-    assertVal(checkmate::assertChoice, "method", choices = c("distance", "hclust"))
-    assertVal(checkmate::assertFlag, "retainPrecursorMSMS")
+    assertListVal(x, "clusterMzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, add = add)
+    assertListVal(x, "minIntensityPre", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "minIntensityPost", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "avgFun", checkmate::assertFunction, add = add)
+    assertListVal(x, "method", checkmate::assertChoice, choices = c("distance", "hclust"), add = add)
+    assertListVal(x, "retainPrecursorMSMS", checkmate::assertFlag, add = add)
 }
 
 assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
@@ -372,29 +361,25 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
 
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
 
-    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-
-    assertVal(checkmate::assertCount, "maxIsotopes")
-    assertVal(checkmate::assertNumeric, "mzDefectRange", any.missing = FALSE, len = 2, finite = TRUE)
-    assertVal(checkmate::assertNumeric, "intRange", any.missing = FALSE, len = 2, finite = TRUE)
-    assertVal(checkmate::assertCount, "z", positive = TRUE)
-    assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
+    assertListVal(x, "maxIsotopes", checkmate::assertCount, add = add)
+    assertListVal(x, "mzDefectRange", checkmate::assertNumeric, any.missing = FALSE, len = 2, finite = TRUE, add = add)
+    assertListVal(x, "intRange", checkmate::assertNumeric, any.missing = FALSE, len = 2, finite = TRUE, add = add)
+    assertListVal(x, "z", checkmate::assertCount, positive = TRUE, add = add)
+    assertListVal(x, "maxGap", checkmate::assertCount, positive = TRUE, add = add)
 }
 
 assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-    
-    assertVal(checkmate::assertChoice, "method", choices = c("cosine", "jaccard"))
-    assertVal(checkmate::assertFlag, "removePrecursor")
-    assertVal(checkmate::assertNumber, "mzWeight", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "intWeight", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "absMzDev", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertNumber, "relMinIntensity", lower = 0, finite = TRUE)
-    assertVal(checkmate::assertCount, "minPeaks", positive = TRUE)
-    assertVal(checkmate::assertChoice, "setCombineMethod", choices = c("mean", "min", "max"))
+    assertListVal(x, "method", checkmate::assertChoice, choices = c("cosine", "jaccard"), add = add)
+    assertListVal(x, "removePrecursor", checkmate::assertFlag, add = add)
+    assertListVal(x, "mzWeight", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "intWeight", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "absMzDev", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "relMinIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, add = add)
+    assertListVal(x, "minPeaks", checkmate::assertCount, positive = TRUE, add = add)
+    assertListVal(x, "setCombineMethod", checkmate::assertChoice, choices = c("mean", "min", "max"), add = add)
 }
 
 assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)

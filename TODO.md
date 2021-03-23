@@ -96,8 +96,6 @@
     - fix MapAligner exception with test-components
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
-- screening
-    - form/compRanks: update when subsetting on sets? otherwise doc
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -106,8 +104,6 @@
 ## TPs
 
 - componentsTP
-    - argument order and defaults
-    - if pred is NULL ensure that some sensible arguments are there (eg unique fGroupsTPs, MSPeakLists etc)
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - replace set columns with one set and put this in reporting
 - predictTPsBioTransformer()
@@ -229,6 +225,7 @@
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
+    - form/compRanks: not updated when subsetting on sets
 - annotation
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
@@ -284,6 +281,8 @@
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - doc somewhere plotInt order with sets
     - refs for PC transformations
+    - generateComponentsTPs(): if pred is NULL using filter() is crucial
+    
 
 ## NEWS
 

@@ -127,8 +127,6 @@
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
             - put similarity in title (like for MSPL)?
             - default specSimParams if >1 groupName
-            - handle invalid comp index, also in reporting (eg when its out of range for topMost)
-                - currently index is not corrected for setObjects
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds

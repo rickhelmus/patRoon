@@ -363,9 +363,11 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         
         mergeBinnedAnn <- function(nr)
         {
+            # convert candidate index to non set version by using the ranks
+            usInds <- lapply(theSets, function(s) obj[[groupName[nr]]][[paste0("rank-", s)]][index[nr]])
             binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
-            annPLs <- Map(usObj, usMSPL, usForm, f = annotatedPeakList,
-                          MoreArgs = list(index = index[nr], groupName = groupName[nr]))
+            annPLs <- Map(usObj, usInds, usMSPL, usForm, f = annotatedPeakList,
+                          MoreArgs = list(groupName = groupName[nr]))
             annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
             annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
             return(annPLs)

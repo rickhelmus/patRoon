@@ -377,13 +377,18 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         # frag_error is unique per fragment, while other scorings are per precursor candidate
         fragAvgCols <- getAllMergedConsCols("frag_error", names(formTable), mConsNames)
         if (haveMSMS && length(fragAvgCols) > 0)
-            formTable[, (fragAvgCols) := lapply(.SD, mean), by = c("neutral_formula", "frag_formula", fromCol),
+            formTable[, (fragAvgCols) := lapply(.SD, mean, na.rm = TRUE),
+                      by = c("neutral_formula", "frag_formula", fromCol),
                       .SDcols = fragAvgCols]
         
         avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median"),
                                         names(formTable), mConsNames)
-        formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean),
+        formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean, na.rm = TRUE),
                   by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
+        
+        # remove NaNs that may have been introduced due to mean(..., na.RM=TRUE)
+        numCols <- names(which(sapply(formTable, is.numeric)))
+        formTable[, (numCols) := lapply(.SD, nafill), .SDcols = numCols]
         
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
@@ -391,7 +396,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         if (!is.null(rankCols))
         {
             setorderv(formTable, "rankScore", order = -1)
-            formTable[, rankScore := NULL] # UNDONE
+            formTable[, rankScore := NULL]
         }
         else
             formTable <- rankFormulaTable(formTable, mConsNames)

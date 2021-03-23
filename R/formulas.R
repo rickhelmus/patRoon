@@ -261,23 +261,15 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
     {
         # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
         ret[, byMSMS := any(byMSMS), by = "group"]
-
+        
         ret[, formula_avg_count := length(unique(neutral_formula)), by = "group"]
 
         avgCols <- c("formula", "neutral_formula")
         ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
 
-        # remove columns which don't really make sense anymore
-        rmCols <- c("neutral_loss", "error", "error_median", "formula_mz", "dbe", "featCoverage", "featCoverageAnn",
-                    "adduct", "rank", "explainedPeaks", "explainedIntensity", "analysis_from",
-                    # add any fragment columns
-                    grep("^frag_", names(ret), value = TRUE),
-                    formulaScorings()$name)
-
-        rmCols <- getAllMergedConsCols(rmCols, names(ret), mergedConsensusNames(x))
-        if (length(rmCols) > 0)
-            ret[, (rmCols) := NULL]
-
+        # just keep the essential columns as the rest doesn't make too much sense anymore
+        keepCols <- c("group", "formula", "neutral_formula", "byMSMS")
+        ret <- ret[, keepCols, with = FALSE]
         ret <- unique(ret, by = c("group", "neutral_formula"))
     }
     else

@@ -96,7 +96,6 @@
     - fix MapAligner exception with test-components
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
-    - as.data.table(formulas, average=T): remove more cols?
 - screening
     - form/compRanks: update when subsetting on sets? otherwise doc
 - merging setObjects
@@ -237,6 +236,7 @@
     - compounds vs formulas formats?
         - formulas: each line is the best candidate from an analysis/set
     - set ranking: same as compounds consensus (but no weights (yet))
+    - as.data.table(formulas, average=T): now removes most cols
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -349,7 +349,8 @@
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt
 - newProject: switch to new system and tweaks
-    
+- as.data.table(formulas, average=T): now removes most cols
+
 
 # Lower priority
 

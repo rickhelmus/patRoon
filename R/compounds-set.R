@@ -264,24 +264,18 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                   plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
                                                    shift = "none", useGGPlot2 = FALSE, mincex = 0.9,
                                                    xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
                                                    molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    if (!is.null(specSimParams))
-    {
-        checkmate::assertIntegerish(index, lower = 1, len = 2, any.missing = FALSE, add = ac)
-        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
-        assertSpecSimParams(specSimParams, add = ac)
-        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    }
-    else
-    {
-        checkmate::assertCount(index, positive = TRUE, add = ac)
-        checkmate::assertString(groupName, min.chars = 1, add = ac)
-    }
+    checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
+    checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    if (length(index) != length(groupName))
+        stop("Lengths of index and groupName should be equal.")
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
@@ -294,7 +288,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams, shift,
                               useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
 
-    if (is.null(specSimParams))
+    if (length(groupName) == 1)
     {
         if (index > nrow(obj[[groupName]]))
             stop(sprintf("Specified candidate index out of range %d/%d", index, nrow(obj[[groupName]])), call. = FALSE)
@@ -384,7 +378,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                       plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
                                                        shift = "none", useGGPlot2 = FALSE,
                                                        mincex = 0.9, xlim = NULL, ylim = NULL,
                                                        maxMolSize = c(0.2, 0.4), molRes = c(100, 100),

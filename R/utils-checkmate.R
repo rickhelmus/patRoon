@@ -166,8 +166,8 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
     }
 
     for (col in c("mz", "neutralMass", "rt"))
-        assertListVal(x, col, checkmate::assertNumeric, empty.ok = emptyOK, null.ok = emptyOK, lower = 0, finite = TRUE,
-                      add = add)
+        assertListVal(x, col, checkmate::assertNumeric, any.missing = emptyOK, null.ok = emptyOK, lower = 0,
+                      finite = TRUE, add = add)
 
     invisible(NULL)
 }

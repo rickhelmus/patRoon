@@ -18,7 +18,8 @@ getBaseBTCmd <- function(precursor, SMILES, type, steps, fpType, fpSimMethod, ex
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", precursor, ".txt"), precursor = precursor,
-                SMILES = SMILES, fpType = fpType, fpSimMethod = fpSimMethod, hash = makeHash(SMILES, baseHash)))
+                SMILES = SMILES, fpType = fpType, fpSimMethod = fpSimMethod,
+                hash = makeHash(precursor, SMILES, baseHash)))
 }
 
 collapseBTResults <- function(pred)
@@ -128,11 +129,12 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
 
     suspects <- getTPSuspects(suspects, adduct, skipInvalid)
 
-    baseHash <- makeHash(type, steps, extraOpts)
+    baseHash <- makeHash(type, steps, extraOpts, adduct, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(suspects, baseHash)
     
     cmdQueue <- Map(suspects$name, suspects$SMILES, f = getBaseBTCmd,
-                    MoreArgs = list(type = type, steps = steps, extraOpts = extraOpts, fpType, fpSimMethod, baseHash))
+                    MoreArgs = list(type = type, steps = steps, extraOpts = extraOpts, fpType = fpType,
+                                    fpSimMethod = fpSimMethod, baseHash = baseHash))
 
     results <- list()
 

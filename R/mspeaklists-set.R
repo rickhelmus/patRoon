@@ -205,23 +205,17 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, abs
 
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                     specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
-                                                     mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
-                                                     mirror = TRUE, ...)
+                                                     specSimParams = getDefSpecSimParams(), shift = "none",
+                                                     useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                     perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    if (!is.null(specSimParams))
-    {
-        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
-        checkmate::assertCharacter(analysis, len = 2, min.chars = 1, null.ok = TRUE, add = ac)
-        assertSpecSimParams(specSimParams, add = ac)
-        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    }
-    else
-    {
-        checkmate::assertString(groupName, min.chars = 1, add = ac)
-        checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
-    }
+    checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    checkmate::assertCharacter(analysis, min.len = 1, max.len = 2, min.chars = 1, null.ok = TRUE, add = ac)
+    if (!is.null(analysis) && length(analysis) != length(groupName))
+        stop("Lengths of analysis and groupName should be equal.")
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
@@ -239,7 +233,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     if (setTitle)
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
-    if (is.null(specSimParams))
+    if (length(groupName) == 1)
     {
         spec <- getSpec(obj, groupName, MSLevel, analysis)
         if (is.null(spec))
@@ -293,9 +287,9 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
 })
 
 setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                         specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
-                                                         mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
-                                                         mirror = TRUE, ...)
+                                                         specSimParams = getDefSpecSimParams(), shift = "none",
+                                                         useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                         perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, shift, useGGPlot2, mincex,
                                    xlim, ylim, ...),

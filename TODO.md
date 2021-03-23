@@ -126,7 +126,6 @@
         - formulas/compounds
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
             - put similarity in title (like for MSPL)?
-            - default specSimParams if >1 groupName
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds

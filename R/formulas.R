@@ -568,24 +568,19 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, specSimParams = NULL, shift = "none", useGGPlot2 = FALSE,
-                                               mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                               title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
+                                               useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    if (!is.null(specSimParams))
-    {
-        checkmate::assertCharacter(precursor, len = 2, min.chars = 1, add = ac)
-        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
-        checkmate::assertCharacter(analysis, len = 2, min.chars = 1, null.ok = TRUE, add = ac)
-        assertSpecSimParams(specSimParams, add = ac)
-        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    }
-    else
-    {
-        checkmate::assertString(precursor, min.chars = 1, add = ac)
-        checkmate::assertString(groupName, min.chars = 1, add = ac)
-        checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
-    }
+    checkmate::assertCharacter(precursor, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    checkmate::assertCharacter(analysis, min.len = 1, max.len = 2, min.chars = 1, null.ok = TRUE, add = ac)
+    if (length(precursor) != length(groupName))
+        stop("Lengths of precursor and groupName should be equal.")
+    if (!is.null(analysis) && length(analysis) != length(groupName))
+        stop("Lengths of analysis and groupName should be equal.")
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
@@ -593,7 +588,7 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (is.null(specSimParams))
+    if (length(groupName) == 1)
     {
         if (is.null(title))
             title <- subscriptFormula(precursor)
@@ -626,14 +621,14 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                   title = NULL, specSimParams = NULL, shift = "none",
+                                                   title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
                                                    useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     if (!is.null(specSimParams))
     {
         # recursive call for both candidates
-        args <- list(obj, MSPeakLists, title, specSimParams = NULL, shift, useGGPlot2,
-                     mincex, xlim, ylim, ...)
+        args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,
+                     shift = shift, useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim, ylim = ylim, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(precursor = precursor[1], groupName = groupName[1],
                                                                analysis = analysis[1]))),
                         do.call(plotSpectrumHash, c(args, list(precursor = precursor[2], groupName = groupName[2],

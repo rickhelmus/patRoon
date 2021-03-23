@@ -658,23 +658,17 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
                                                 shift = "none", useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
                                                 ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
-    if (!is.null(specSimParams))
-    {
-        checkmate::assertIntegerish(index, lower = 1, len = 2, any.missing = FALSE, add = ac)
-        checkmate::assertCharacter(groupName, len = 2, min.chars = 1, add = ac)
-        assertSpecSimParams(specSimParams, add = ac)
-        checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
-    }
-    else
-    {
-        checkmate::assertCount(index, positive = TRUE, add = ac)
-        checkmate::assertString(groupName, min.chars = 1, add = ac)
-    }
+    checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
+    checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    if (length(index) != length(groupName))
+        stop("Lengths of index and groupName should be equal.")
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
@@ -683,7 +677,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    if (is.null(specSimParams))
+    if (length(groupName) == 1)
     {
         spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
         if (is.null(spec))
@@ -742,16 +736,17 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                    plotStruct = TRUE, title = NULL, specSimParams = NULL,
+                                                    plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
                                                     shift = "none", useGGPlot2 = FALSE,
                                                     mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
-    if (!is.null(specSimParams))
+    if (length(groupName) > 1)
     {
         # recursive call for both candidates
-        args <- list(obj, MSPeakLists, formulas, plotStruct, title, specSimParams = NULL, shift, useGGPlot2,
-                     mincex, xlim, ylim, maxMolSize, molRes, ...)
+        args <- list(obj = obj, MSPeakLists = MSPeakLists, formulas = formulas, plotStruct = plotStruct, title = title,
+                     specSimParams = specSimParams(), shift = shift, useGGPlot2 = useGGPlot2, mincex = mincex,
+                     xlim = xlim, ylim = ylim, maxMolSize = maxMolSize, molRes = molRes, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
     }

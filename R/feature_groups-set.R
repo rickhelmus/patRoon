@@ -263,7 +263,7 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames =
     if (length(obj) == 0)
     {
         noDataPlot()
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     anaInfo <- analysisInfo(obj)    

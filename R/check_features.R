@@ -303,7 +303,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
     if (length(fGroups) == 0)
     {
         printf("No feature groups, nothing to do...\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
     
     # UNDONE: handle overWrite

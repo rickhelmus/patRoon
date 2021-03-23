@@ -238,18 +238,25 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
     
     if (is.null(ylim))
     {
+        expand <- if (!is.null(mol))
+            1.75
+        else if (!is.null(plotData[["formula"]]) && any(!is.na(plotData$formula)))
+            1.5
+        else
+            1.2
+        
         if (min(plotData$intensity) < 0) # mirror plot?
         {
             # extend both vertical directions 
             if (nrow(plotData) > 1)
-                ylim <- range(plotData$intensity) * 1.75
+                ylim <- range(plotData$intensity) * expand
             else
                 ylim <- c(min(plotData$intensity), abs(min(plotData$intensity)))
         }
         else
         {
             if (nrow(plotData) > 1)
-                ylim <- range(plotData$intensity) * c(1, 1.75)
+                ylim <- range(plotData$intensity) * c(1, expand)
             else
                 ylim <- c(0, max(plotData$intensity))
         }

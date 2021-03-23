@@ -203,7 +203,7 @@ precDT <- data.table(compInd = seq_len(nrow(cInfo)))
 
 splitCI <- split(cInfo, seq_len(nrow(cInfo)))
 
-precInfoCols <- intersect(c("name", "precursor_name", "precursor_group", "precursor_formula"), names(cInfo))
+precInfoCols <- intersect(c("name", "precursor_name", "precursor_group", "precursor_formula", "precursor_CID"), names(cInfo))
 precDT[, precursor := sapply(splitCI, function(cir)
 {
     precInfo <- cir[, precInfoCols, with = FALSE]
@@ -211,6 +211,8 @@ precDT[, precursor := sapply(splitCI, function(cir)
     
     if (!is.null(precInfo[["formula"]]))
         precInfo[, formula := subscriptFormulaHTML(formula)]
+    if (!is.null(precInfo[["CID"]]))
+        precInfo[, CID := makeDBIdentLink("pubchem", CID)]
 
     prec <- makeInfoBox(paste0(names(precInfo), ": ", precInfo, collapse = "<br>"))
     
@@ -274,7 +276,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff", "set"), names(cmp))
+    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID"), names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]
@@ -287,6 +289,8 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
             tpInfo[, formula := subscriptFormulaHTML(formula)]
         if (!is.null(tpInfo[["formulaDiff"]]))
             tpInfo[, formulaDiff := subscriptFormulaHTML(formulaDiff)]
+        if (!is.null(tpInfo[["CID"]]))
+            tpInfo[, CID := makeDBIdentLink("pubchem", CID)]
         
         tp <- makeInfoBox(paste0(names(tpInfo), ": ", tpInfo, collapse = "<br>"))
         

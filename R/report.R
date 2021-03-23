@@ -837,18 +837,15 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
         cat("Done!\n")
     }
 
-    if (!is.null(formulas) && !is.null(formulasTopMost))
-        formulas <- filter(formulas, topMost = formulasTopMost)
-    if (!is.null(compounds) && !is.null(compoundsTopMost))
-        compounds <- filter(compounds, topMost = compoundsTopMost)
-
     rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups),
                     reportPlots = reportPlots, EICRtWindow = EICRtWindow, EICMzExpWindow = EICMzExpWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICTopMostByRGroup = EICTopMostByRGroup,
                     EICOnlyPresent = EICOnlyPresent, EICs = EICs, compounds = compounds,
-                    compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
-                    MSPeakLists = MSPeakLists, formulas = formulas, formulasNormalizeScores = formulasNormalizeScores,
-                    formulasExclNormScores = formulasExclNormScores, compoundsNormalizeScores = compoundsNormalizeScores,
+                    compoundsTopMost = compoundsTopMost, compsCluster = compsCluster,
+                    includeMFWebLinks = includeMFWebLinks, MSPeakLists = MSPeakLists, formulas = formulas,
+                    formulasTopMost = formulasTopMost, formulasNormalizeScores = formulasNormalizeScores,
+                    formulasExclNormScores = formulasExclNormScores,
+                    compoundsNormalizeScores = compoundsNormalizeScores,
                     compoundsExclNormScores = compoundsExclNormScores,
                     compoundsOnlyUsedScorings = compoundsOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, specSimParams = specSimParams,

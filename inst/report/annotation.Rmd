@@ -1,3 +1,11 @@
+```{r echo=FALSE, results="hide"}
+formulas <- rmdVars$formulas; compounds <- rmdVars$compounds
+if (!is.null(formulas) && !is.null(rmdVars$formulasTopMost))
+    formulas <- filter(formulas, topMost = rmdVars$formulasTopMost)
+if (!is.null(compounds) && !is.null(rmdVars$compoundsTopMost))
+    compounds <- filter(compounds, topMost = rmdVars$compoundsTopMost)
+```
+
 <script>`r readAllFile(system.file("js", "utils-report.js", package = "patRoon"))`</script>
 
 Annotation {data-orientation=rows}
@@ -11,9 +19,9 @@ Annotation {data-orientation=rows}
 
 ```{r echo=FALSE}
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
-if (!is.null(rmdVars$compounds))
+if (!is.null(compounds))
 {
-    compTable <- compoundTable(rmdVars$compounds)
+    compTable <- compoundTable(compounds)
     compFGroups <- rmdVars$groupNames[sapply(rmdVars$groupNames,
                                              function(grp) !is.null(compTable[[grp]]) && nrow(compTable[[grp]]) > 0)]
 }
@@ -34,7 +42,7 @@ if (rmdVars$includeMFWebLinks != "none")
                                                   USE.NAMES = FALSE)]
     mfWebLinks <- sapply(mfWebFGroups, function(grp)
     {
-        if (grp %in% compFGroups && is(rmdVars$compounds, "compoundsMF"))
+        if (grp %in% compFGroups && is(compounds, "compoundsMF"))
         {
             # make link with used MF settings
             set <- settings(compounds)
@@ -46,9 +54,9 @@ if (rmdVars$includeMFWebLinks != "none")
                                  rmdVars$gInfo[grp, "mzs"]))
     })
 }
-if (!is.null(rmdVars$formulas) && "formulas" %in% rmdVars$reportPlots)
+if (!is.null(formulas) && "formulas" %in% rmdVars$reportPlots)
 {
-    formFGroups <- groupNames(rmdVars$formulas)
+    formFGroups <- groupNames(formulas)
     formFGroups <- intersect(formFGroups, rmdVars$groupNames)
 }
 if (!is.null(rmdVars$components))
@@ -245,7 +253,7 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
         grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotScores", list(rmdVars$compounds, compi, grp, rmdVars$compoundsNormalizeScores,
+            makeCachedPlot(ret, "plotScores", list(compounds, compi, grp, rmdVars$compoundsNormalizeScores,
                                                    rmdVars$compoundsExclNormScores, rmdVars$compoundsOnlyUsedScorings),
                            4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
@@ -254,8 +262,8 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
         grpPlots[["compoundSpectra"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compspec_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotSpectrum", list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
-                                                     rmdVars$formulas, FALSE),
+            makeCachedPlot(ret, "plotSpectrum", list(compounds, compi,  grp, rmdVars$MSPeakLists,
+                                                     formulas, FALSE),
                            7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
@@ -263,7 +271,7 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
         grpPlots[["compoundStructs"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compstruct_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotStructure", list(rmdVars$compounds, compi, grp, width = 150, height = 150),
+            makeCachedPlot(ret, "plotStructure", list(compounds, compi, grp, width = 150, height = 150),
                            3, 3, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
@@ -287,12 +295,12 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
     
     if (grp %in% formFGroups)
     {
-        precursors <- unique(rmdVars$formulas[[grp]][["neutral_formula"]])
+        precursors <- unique(formulas[[grp]][["neutral_formula"]])
         
         grpPlots[["formulaScores"]] <- sapply(precursors, function(prec)
         {
             ret <- file.path(plotPathFull, sprintf("formscore_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotScores", list(rmdVars$formulas, prec, grp,
+            makeCachedPlot(ret, "plotScores", list(formulas, prec, grp,
                                                    normalizeScores = rmdVars$formulasNormalizeScores,
                                                    excludeNormScores = rmdVars$formulasExclNormScores),
                            4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
@@ -301,13 +309,13 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
         
         grpPlots[["formulaSpecs"]] <- sapply(precursors, function(prec)
         {
-            anPList <- annotatedPeakList(rmdVars$formulas, prec, grp,
+            anPList <- annotatedPeakList(formulas, prec, grp,
                                          MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
             if (is.null(anPList))
                 return("") # No MS/MS data available
             
             ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotSpectrum", list(rmdVars$formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists),
+            makeCachedPlot(ret, "plotSpectrum", list(formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists),
                            6, 4.5, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
@@ -337,7 +345,7 @@ if (rmdVars$selfContained)
 ```{r echo=FALSE, eval=length(compFGroups) > 0}
 compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
-    mn <- mergedConsensusNames(rmdVars$compounds)
+    mn <- mergedConsensusNames(compounds)
 
     ct <- compTable[[grp]]
     
@@ -358,8 +366,8 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     fiTables <- sapply(seq_len(nrow(ct)), function(compi)
     {
-        apl <- annotatedPeakList(rmdVars$compounds, index = compi, groupName = grp,
-                                 MSPeakLists = rmdVars$MSPeakLists, formulas = rmdVars$formulas,
+        apl <- annotatedPeakList(compounds, index = compi, groupName = grp,
+                                 MSPeakLists = rmdVars$MSPeakLists, formulas = formulas,
                                  onlyAnnotated = TRUE)
         
         if (is.null(apl) || nrow(apl) == 0)
@@ -397,11 +405,11 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 ```{r echo=FALSE, eval=length(formFGroups) > 0}
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 {
-    precursors <- unique(rmdVars$formulas[[grp]][["neutral_formula"]])
+    precursors <- unique(formulas[[grp]][["neutral_formula"]])
     
     infoTexts <- sapply(seq_along(precursors), function(preci)
     {
-        it <- paste0(getFormInfoList(rmdVars$formulas[[grp]], precursors[preci], mergedConsensusNames(rmdVars$formulas),
+        it <- paste0(getFormInfoList(formulas[[grp]], precursors[preci], mergedConsensusNames(formulas),
                                      useHTML = TRUE), collapse = "<br>")
         if (isSusp)
         {
@@ -417,7 +425,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     
     fiTables <- sapply(precursors, function(prec)
     {
-        apl <- annotatedPeakList(rmdVars$formulas, precursor = prec, groupName = grp,
+        apl <- annotatedPeakList(formulas, precursor = prec, groupName = grp,
                                  MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
         if (is.null(apl) || nrow(apl) == 0)
             return("<div align=\"center\">No annotation available.</div>")

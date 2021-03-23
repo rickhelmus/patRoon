@@ -194,7 +194,7 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
     {
         if (removeEqualFormulas)
         {
-            obj@predictions <- mapply(suspects(obj)$formula, obj@predictions, SIMPLIFY = FALSE, FUN = function(pform, pred)
+            obj@predictions <- Map(suspects(obj)$formula, obj@predictions, f = function(pform, pred)
             {
                 if (negate)
                     return(pred[formula == pform])

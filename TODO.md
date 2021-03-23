@@ -140,7 +140,6 @@
     - TP logic: reaction/transformation
     - RTDir --> retDir?
 - misc
-    - Make sure hash takes into account parent names
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - generic predictTPs() function

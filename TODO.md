@@ -151,9 +151,8 @@
     - fragMatches/NLMatches: doc that it's _not_ candidate specific
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
-    - include more prec/TP infos?
-        - TP_RTDir? (maybe as one line)
     - handle cases for when formulas/compounds were filtered away due to topMost
+    - fix alignment of TP table columns
 
 ## Reporting
 

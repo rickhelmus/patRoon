@@ -94,7 +94,6 @@
 - misc
     - formulas/compounds: update set column when subsetting on sets?
     - fix MapAligner exception with test-components
-    - check if all plot methods have a Hash version
     - annotatedPeakList (and maybe others): use unset instead of setObjects()?
     - check/sync sets between different input set objects (eg formulas/MSPeakLists)
         - make util

@@ -155,12 +155,14 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, precursor, groupName
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::reportAssertions(ac)
     
-    ret <- rbindlist(Map(setObjects(obj), lapply(sets(obj), unset, obj = MSPeakLists), f = function(so, mspl)
+    usobj <- lapply(sets(obj), unset, obj = obj)
+    usmspl <- lapply(sets(obj), unset, obj = MSPeakLists)
+    ret <- rbindlist(setNames(Map(usobj, usmspl, f = function(so, mspl)
     {
         if (!groupName %in% groupNames(so) || (!is.null(analysis) && !analysis %in% analyses(so)))
             return(NULL)
         annotatedPeakList(so, precursor, groupName, analysis, mspl, onlyAnnotated)
-    }), fill = TRUE, idcol = "set")
+    }), sets(obj)), fill = TRUE, idcol = "set")
     
     if (nrow(ret) == 0)
         return(NULL)

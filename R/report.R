@@ -129,7 +129,7 @@ reportFGroupTable <- function(fGroups, path, retMin)
     if (length(fGroups) == 0)
     {
         printf("No feature groups!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     # UNDONE: inheritance...
@@ -150,7 +150,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
     if (length(fGroups) == 0)
     {
         printf("No feature groups!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     gTable <- groupTable(fGroups)
@@ -255,11 +255,11 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
     if (length(formulas) == 0)
     {
         printf("No formulas!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     if (length(formulas) == 0)
-        invisible(return(NULL))
+        return(invisible(NULL))
 
     if (!is.null(topMost))
         formulas <- filter(formulas, topMost = topMost)
@@ -267,7 +267,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
     formGroups <- intersect(groupNames(formulas), names(fGroups))
     fcount <- length(formGroups)
     if (fcount == 0)
-        invisible(return(NULL))
+        return(invisible(NULL))
     
     prog <- openProgBar(0, fcount)
 
@@ -371,7 +371,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     if (length(compounds) == 0)
     {
         printf("No compounds!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     if (!is.null(topMost))
@@ -446,7 +446,7 @@ reportCompoundClusters <- function(fGroups, compsCluster, path)
     if (ccount == 0)
     {
         printf("No compound clusters!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     prog <- openProgBar(0, ccount)
@@ -497,7 +497,7 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzEx
     if (length(components) == 0)
     {
         printf("No components!\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     gInfo <- groupInfo(fGroups)
@@ -587,7 +587,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, 
     if (length(fGroups) == 0)
     {
         cat("No feature groups, nothing to report...\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
     
     prepareReportPath(path, clearPath)
@@ -660,7 +660,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if ((!reportFGroups && is.null(formulas) && is.null(compounds) && is.null(components)) || length(fGroups) == 0)
     {
         cat("No feature groups, nothing to report...\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     if (is.null(MSPeakLists) &&
@@ -797,7 +797,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     if (length(fGroups) == 0)
     {
         cat("No feature groups, nothing to report...\n")
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
     
     if ("none" %in% reportPlots)

@@ -907,7 +907,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, xnames = TR
     if (length(obj) == 0)
     {
         noDataPlot()
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     if (average)
@@ -1204,7 +1204,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     if (length(obj) == 0)
     {
         noDataPlot()
-        invisible(return(NULL))
+        return(invisible(NULL))
     }
 
     if (showLegend && colourBy == "none")

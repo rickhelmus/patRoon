@@ -376,7 +376,7 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
     fTable <- featureTable(fGroups)
 
     if (gCount == 0)
-        invisible(return(NULL))
+        return(invisible(NULL))
 
     DA <- getDAApplication()
 

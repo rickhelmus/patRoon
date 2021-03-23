@@ -256,7 +256,7 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames =
     aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
     
     if (!sets)
-        return(callNextMethod(obj, average, xnames, pch, type, lty, col, ...))
+        return(callNextMethod(obj, average, xnames, showLegend, pch, type, lty, col, ...))
     else if (xnames)
         warning("xnames option is ignored if sets=TRUE")
 

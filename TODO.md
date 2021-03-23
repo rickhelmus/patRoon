@@ -41,9 +41,6 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
-- plotInt
-    - more clear lines by default?
-    - no box?
 
 
 ## Annotation

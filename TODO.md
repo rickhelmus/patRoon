@@ -48,7 +48,6 @@
 
 ## Annotation
 
-- getFormInfoList(): take care of consensus results like getPrecursorFormScores()
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
 

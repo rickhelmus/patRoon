@@ -532,7 +532,7 @@ setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis
                                          normalizeScores == "minmax", excludeNormScores)
 
     scoreCols <- getAllMergedConsCols(formulaScorings()$name, names(formTable), mergedConsensusNames(obj))
-    scoreTable <- getPrecursorFormScores(formTable[neutral_formula == precursor], scoreCols)[, scoreCols, with = FALSE]
+    scoreTable <- getPrecursorFormData(formTable[neutral_formula == precursor], scoreCols)[, scoreCols, with = FALSE]
     makeScoresPlot(scoreTable, mcn, useGGPlot2)
 })
 
@@ -896,7 +896,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
         rwInds <- unlist(lapply(allFormNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
         rWeights <- rankWeights[rwInds]
         consFormulaList[[grpi]][, rankscore := {
-            allRanks <- unlist(getPrecursorFormScores(.SD, rnames)[, rnames, with = FALSE])
+            allRanks <- unlist(getPrecursorFormData(.SD, rnames)[, rnames, with = FALSE])
             invRanks <- (.NGRP - (allRanks - 1)) / .NGRP
             invRanks[is.na(invRanks)] <- 0
             weighted.mean(invRanks, rWeights)

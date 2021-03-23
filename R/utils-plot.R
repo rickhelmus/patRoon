@@ -271,6 +271,9 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
 
     axis(2, at = ticks, labels = abs(ticks))
     
+    if (min(plotData$intensity) < 0) # add horizontal line for mirror plots
+        abline(h = 0, col = "darkgrey")
+    
     annPlotData <- NULL
     if (!is.null(plotData[["formula"]]))
     {

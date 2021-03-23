@@ -31,8 +31,7 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
         libCols <- c("precursor_name", "precursor_SMILES", "TP_name", "TP_SMILES")
         assertHasNames(TPLibrary, libCols, add = ac)
         for (cl in libCols)
-            assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE,
-                          unique = cl == "precursor_name", add = ac)
+            assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, add = ac)
     }
         
     if (is.data.frame(suspects))
@@ -119,7 +118,7 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
     
     if (!is.null(TPLibrary[["precursor_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
     {
-        results <- Map(results, TPLibrary$precursor_LogP,
+        results <- Map(results, TPLibrary[match(names(results), precursor_name)]$precursor_LogP,
                        f = function(r, pLogP) set(r, j = "RTDir", value = fifelse(r$LogP < pLogP, -1, 1)))
     }
     

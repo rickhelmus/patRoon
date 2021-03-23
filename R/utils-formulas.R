@@ -293,7 +293,7 @@ rankFormulaTable <- function(formTable, mConsNames, rankCols = NULL)
     return(formTable)
 }
 
-getPrecursorFormScores <- function(formTable, scoreCols)
+getPrecursorFormData <- function(formTable, cols)
 {
     # formula tables may contain multiple lines for a precursor candidate: each
     # for every annotated fragment. The scorings, however, should be the same
@@ -302,7 +302,7 @@ getPrecursorFormScores <- function(formTable, scoreCols)
     # algorithms. For this reason try to find the first non-NA value from all
     # rows.
     return(formTable[, lapply(.SD, function(x) { xn <- x[!is.na(x)]; if (length(xn) > 0) xn[1] else x[1] }),
-                     by = "neutral_formula", .SDcols = scoreCols])
+                     by = "neutral_formula", .SDcols = cols])
 }
 
 normalizeFormScores <- function(formResults, scoreRanges, mConsNames, minMaxNormalization, exclude = NULL)
@@ -316,7 +316,7 @@ normalizeFormScores <- function(formResults, scoreRanges, mConsNames, minMaxNorm
     if (length(scoreCols) > 0)
     {
         scoreRanges <- scoreRanges[scoreCols]
-        sc <- getPrecursorFormScores(formResults, scoreCols)
+        sc <- getPrecursorFormData(formResults, scoreCols)
         sc[, (scoreCols) := mapply(.SD, scoreRanges, SIMPLIFY = FALSE,
                                    FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
            .SDcols = scoreCols]
@@ -350,7 +350,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
             
             rcols <- intersect(rankCols, names(formTable))
             formTable[, rankScore := {
-                allRanks <- unlist(getPrecursorFormScores(.SD, rcols)[, rcols, with = FALSE])
+                allRanks <- unlist(getPrecursorFormData(.SD, rcols)[, rcols, with = FALSE])
                 invRanks <- (.NGRP - (allRanks - 1)) / .NGRP
                 invRanks[is.na(invRanks)] <- 0
                 mean(invRanks)
@@ -502,8 +502,8 @@ getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
     if (nrow(formTable) == 0)
         return(NULL)
 
-    precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
-    
+    precInfo <- getPrecursorFormData(formTable, names(formTable))
+
     if (useHTML)
         precInfo[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
 

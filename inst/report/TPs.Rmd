@@ -209,6 +209,9 @@ precDT[, precursor := sapply(splitCI, function(cir)
     precInfo <- cir[, precInfoCols, with = FALSE]
     setnames(precInfo, sub("^precursor_", "", names(precInfo)))
     
+    if (!is.null(precInfo[["formula"]]))
+        precInfo[, formula := subscriptFormulaHTML(formula)]
+
     prec <- makeInfoBox(paste0(names(precInfo), ": ", precInfo, collapse = "<br>"))
     
     if (!is.null(precPlots[[cir$name]][["struct"]]))
@@ -279,6 +282,11 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
             tpInfo[, retDiff := retDiff / 60]
         tpInfo[, c("retDiff", "mzDiff") := .(round(retDiff, 2), round(mzDiff, 5))]
         setnames(tpInfo, "TP_name", "name")
+        
+        if (!is.null(tpInfo[["formula"]]))
+            tpInfo[, formula := subscriptFormulaHTML(formula)]
+        if (!is.null(tpInfo[["formulaDiff"]]))
+            tpInfo[, formulaDiff := subscriptFormulaHTML(formulaDiff)]
         
         tp <- makeInfoBox(paste0(names(tpInfo), ": ", tpInfo, collapse = "<br>"))
         

@@ -477,11 +477,9 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
     
-    unsetORNULL <- function(x) if (!is.null(x)) sapply(sets(x), unset, obj = x, simplify = FALSE) else NULL
-    
-    unsetMSPeakLists <- unsetORNULL(MSPeakLists)
-    unsetFormulas <- unsetORNULL(formulas)
-    unsetCompounds <- unsetORNULL(compounds)
+    unsetMSPeakLists <- checkAndUnSetOther(sets(fGroupsTPs), MSPeakLists, "MSPeakLists", TRUE)
+    unsetFormulas <- checkAndUnSetOther(sets(fGroupsTPs), formulas, "formulas", TRUE)
+    unsetCompounds <- checkAndUnSetOther(sets(fGroupsTPs), compounds, "compounds", TRUE)
 
     cat("Adding sets related data...\n")
     ret@components <- withProg(length(ret), FALSE,

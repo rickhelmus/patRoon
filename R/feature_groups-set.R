@@ -363,8 +363,7 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
     
     # annotate and merge ions for all set objects
     usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-    usComponents <- sapply(sets(components), unset, obj = components, simplify = FALSE)
-    usComponents <- usComponents[sets(fGroups)]
+    usComponents <- checkAndUnSetOther(sets(fGroups), components, "components")
     usFGroups <- Map(usFGroups, usComponents, prefAdduct, f = selectIons, MoreArgs = list(...))
     
     # and re-group with new adduct information

@@ -271,7 +271,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff"), names(cmp))
+    trCols <- intersect(c("formula", "RTDir", "retDiff", "mzDiff", "formulaDiff", "set"), names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]

@@ -105,7 +105,6 @@
 
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
-    - replace set columns with one set and put this in reporting
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

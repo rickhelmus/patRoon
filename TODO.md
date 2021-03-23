@@ -52,7 +52,7 @@
 ## Suspects
 
 - spec similarity: use C++ code?
-- estimateIdentificationLevel(): scores are not checked for consensus columns
+    - probably not ... many things such as alignment not relevant
 
 
 ## Components
@@ -92,7 +92,6 @@
                 - finished?
         - getAllMergedConsCols(): make set aware?
 - misc
-    - plotSpectrum(): show horizontal line in mirrored plot?
     - formulas/compounds: update set column when subsetting on sets?
     - fix MapAligner exception with test-components
     - check if all plot methods have a Hash version

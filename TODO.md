@@ -106,6 +106,7 @@
 
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
+    - show status after finishing
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -151,7 +152,6 @@
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
     - include more prec/TP infos?
-        - CIDs? --> URLs
         - TP_RTDir? (maybe as one line)
     - handle cases for when formulas/compounds were filtered away due to topMost
 

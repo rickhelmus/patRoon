@@ -150,7 +150,6 @@
     - fragMatches/NLMatches: doc that it's _not_ candidate specific
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
-    - subscript formulae
     - include more prec/TP infos?
         - CIDs? --> URLs
         - TP_RTDir? (maybe as one line)

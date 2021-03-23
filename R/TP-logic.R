@@ -70,12 +70,7 @@ setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, ad
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
-    if (!is.null(transformations))
-    {
-        checkmate::assertDataFrame(transformations, col.names = "unique", add = ac)
-        checkmate::assertNames(colnames(transformations), permutation.of = c("reaction", "add", "sub", "RTDir"),
-                               what = "colnames", add = ac)
-    }
+    assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct, fGroups)
@@ -92,12 +87,7 @@ setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40,
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
-    if (!is.null(transformations))
-    {
-        checkmate::assertDataFrame(transformations, col.names = "unique", add = ac)
-        checkmate::assertNames(colnames(transformations), permutation.of = c("reaction", "add", "sub", "RTDir"),
-                               what = "colnames", add = ac)
-    }
+    assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)

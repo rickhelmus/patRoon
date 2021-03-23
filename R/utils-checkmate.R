@@ -172,6 +172,22 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
     invisible(NULL)
 }
 
+assertLogicTransformations <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(NULL)
+    
+    checkmate::assertDataFrame(x, col.names = "unique", .var.name = .var.name, add = add)
+    checkmate::assertNames(colnames(x), permutation.of = c("reaction", "add", "sub", "RTDir"), what = "colnames",
+                           add = add)
+
+    assertListVal(x, "reaction", checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, unique = TRUE,
+                  add = add)
+    assertListVal(x, "add", checkmate::assertCharacter, add = add)
+    assertListVal(x, "sub", checkmate::assertCharacter, add = add)
+    assertListVal(x, "RTDir", checkmate::assertSubset, c(-1, 0, 1), add = add)
+}
+
 assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     if (!is.null(add))

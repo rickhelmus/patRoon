@@ -568,7 +568,7 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
+                                               title = NULL, specSimParams = getDefSpecSimParams(),
                                                useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -580,7 +580,6 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
@@ -607,8 +606,7 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
         if (is.null(title))
             title <- subscriptFormula(precursor[1], formulas2 = precursor[2])
         
-        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, shift, "unique",
-                                     mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, "unique", mustExist = TRUE)
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, precursor[1], groupName[1], analysis[1],
                                                                          MSPeakLists), 1)
@@ -621,14 +619,14 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                   title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
+                                                   title = NULL, specSimParams = getDefSpecSimParams(),
                                                    useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     if (!is.null(specSimParams))
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,
-                     shift = shift, useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim, ylim = ylim, ...)
+                     useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim, ylim = ylim, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(precursor = precursor[1], groupName = groupName[1],
                                                                analysis = analysis[1]))),
                         do.call(plotSpectrumHash, c(args, list(precursor = precursor[2], groupName = groupName[2],

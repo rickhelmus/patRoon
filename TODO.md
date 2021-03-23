@@ -130,7 +130,6 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
-    - move shift to params?
     - remove merged approach, possibly find other ways to customize averaging
         - some kind of weighted average?
 - Consistency

@@ -659,8 +659,8 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                 plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
-                                                shift = "none", useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
-                                                ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
+                                                useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -668,7 +668,6 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     if (length(index) != length(groupName))
         stop("Lengths of index and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
@@ -722,8 +721,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
             title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$formula, compr2$compoundName, compr2$formula)
         }
         
-        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, shift, "unique",
-                                     mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, "unique", mustExist = TRUE)
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], MSPeakLists,
                                                                          formulas), 1)
@@ -736,8 +734,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                    plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
-                                                    shift = "none", useGGPlot2 = FALSE,
+                                                    plotStruct = TRUE, title = NULL,
+                                                    specSimParams = getDefSpecSimParams(), useGGPlot2 = FALSE,
                                                     mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
@@ -745,7 +743,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, formulas = formulas, plotStruct = plotStruct, title = title,
-                     specSimParams = specSimParams(), shift = shift, useGGPlot2 = useGGPlot2, mincex = mincex,
+                     specSimParams = specSimParams(), useGGPlot2 = useGGPlot2, mincex = mincex,
                      xlim = xlim, ylim = ylim, maxMolSize = maxMolSize, molRes = molRes, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
@@ -755,7 +753,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
     
     return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
-                    plotStruct, title, shift, useGGPlot2, mincex, xlim, ylim, ...))
+                    plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})

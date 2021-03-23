@@ -172,7 +172,7 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, precursor, groupName
 
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                  title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
+                                                  title = NULL, specSimParams = getDefSpecSimParams(),
                                                   useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
                                                   ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
@@ -185,7 +185,6 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
@@ -194,7 +193,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title, specSimParams = NULL, shift,
+        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title, specSimParams = NULL,
                               useGGPlot2, mincex, xlim, ylim, ...))
     
     if (length(groupName) == 1)
@@ -230,7 +229,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
         usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
-                                         specSimParams = specSimParams, shift = shift, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE))
 
         mergeBinnedAnn <- function(nr)
         {
@@ -253,12 +252,12 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
 })
 
 setMethod("plotSpectrumHash", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                      title = NULL, specSimParams = getDefSpecSimParams(), shift = "none",
+                                                      title = NULL, specSimParams = getDefSpecSimParams(),
                                                       useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
                                                       perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists,
-                                   title, specSimParams, shift, useGGPlot2, mincex, xlim, ylim, ...),
+                                   title, specSimParams, useGGPlot2, mincex, xlim, ylim, ...),
                     perSet, mirror))
 })
 

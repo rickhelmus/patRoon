@@ -573,7 +573,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                  specSimParams = getDefSpecSimParams(), shift = "none",
+                                                  specSimParams = getDefSpecSimParams(),
                                                   useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -582,7 +582,6 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
@@ -611,13 +610,12 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     {
         if (setTitle)
         {
-            sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2],
-                                      MSLevel, specSimParams, shift = shift, NAToZero = TRUE, drop = TRUE)
+            sim <- spectrumSimilarity(obj, groupName[1], groupName[2], analysis[1], analysis[2], MSLevel, specSimParams,
+                                      NAToZero = TRUE, drop = TRUE)
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, shift, "unique",
-                                     mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE)
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
@@ -658,7 +656,7 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 #' @export
 setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1 = NULL, analysis2 = NULL,
                                                         MSLevel = 1, specSimParams = getDefSpecSimParams(),
-                                                        shift = "none", NAToZero = FALSE, drop = TRUE)
+                                                        NAToZero = FALSE, drop = TRUE)
 {
     # NOTE: keep args in sync with sets method
     
@@ -669,7 +667,6 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
            fixed = list(choices = analyses(obj), add = ac))
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     aapply(checkmate::assertFlag, . ~ NAToZero + drop, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
@@ -679,7 +676,7 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     if (is.null(groupName2))
     {
         # calculate dist matrix
-        PLP <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, shift, 1)
+        PLP <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, 1)
         if (is.null(PLP))
         {
             sims <- matrix(NA_real_, length(groupName1), length(groupName1))
@@ -687,16 +684,16 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         }
         else
         {
-            sims <- specDistMatrix(PLP$specs, specSimParams$method, shift, PLP$precs, specSimParams$mzWeight,
-                                   specSimParams$intWeight, specSimParams$absMzDev)
+            sims <- specDistMatrix(PLP$specs, specSimParams$method, specSimParams$shift, PLP$precs,
+                                   specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
             rownames(sims) <- colnames(sims) <- names(PLP$specs)
             sims <- expandFillSpecSimilarities(sims, groupName1, groupName1)
         }
     }
     else
     {
-        PLP1 <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, shift, 1)
-        PLP2 <- getSimPLAndPrec(obj, groupName2, analysis2, MSLevel, specSimParams, shift, 2)
+        PLP1 <- getSimPLAndPrec(obj, groupName1, analysis1, MSLevel, specSimParams, 1)
+        PLP2 <- getSimPLAndPrec(obj, groupName2, analysis2, MSLevel, specSimParams, 2)
         if (is.null(PLP1) || is.null(PLP2))
         {
             sims <- matrix(NA_real_, length(groupName1), length(groupName2))
@@ -704,8 +701,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         }
         else
         {
-            sims <- specDistRect(PLP1$specs, PLP2$specs, specSimParams$method, shift, PLP1$precs, PLP2$precs,
-                                 specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
+            sims <- specDistRect(PLP1$specs, PLP2$specs, specSimParams$method, specSimParams$shift, PLP1$precs,
+                                 PLP2$precs, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
             rownames(sims) <- names(PLP1$specs); colnames(sims) <- names(PLP2$specs)
             sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
         }

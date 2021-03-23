@@ -7,13 +7,12 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    specSimParams = getDefSpecSimParams(),
-                                                                   shift = "none", maxTreeHeight = 1, deepSplit = TRUE,
+                                                                   maxTreeHeight = 1, deepSplit = TRUE,
                                                                    minModuleSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
     
@@ -25,8 +24,8 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     gNames <- names(fGroups)
     
     cat("Calculating distance matrix... ")
-    sims <- spectrumSimilarity(MSPeakLists, gNames, NULL, MSLevel = 2, specSimParams = specSimParams,
-                               shift = shift, NAToZero = TRUE, drop = FALSE)
+    sims <- spectrumSimilarity(MSPeakLists, gNames, NULL, MSLevel = 2, specSimParams = specSimParams, NAToZero = TRUE,
+                               drop = FALSE)
     
     # figure out fGroups with results: these must have non-zero columns (or rows), since there must be at least a 1.0
     # similarity with itself.
@@ -39,7 +38,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     gInfo <- groupInfo(fGroups)[grpsResults, ]
 
     return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
-                               properties = list(specSimParams = specSimParams, shift = shift),
+                               properties = list(specSimParams = specSimParams),
                                maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                minModuleSize = minModuleSize, algorithm = "specclust"))
 })

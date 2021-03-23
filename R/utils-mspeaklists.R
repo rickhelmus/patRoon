@@ -59,6 +59,7 @@ getDefSpecSimParams <- function(...)
                 absMzDev = 0.005,
                 relMinIntensity = 0.05,
                 minPeaks = 1,
+                shift = "none",
                 setCombineMethod = "mean")
 
     return(modifyList(def, list(...)))
@@ -456,7 +457,7 @@ specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, r
     return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }
 
-getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams, shift, nr)
+getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams, nr)
 {
     if (is.null(analysis))
         analysis <- rep(list(NULL), length(group))
@@ -471,7 +472,7 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
     analysis <- analysis[names(specs)]
     
     precs <- NULL
-    if (shift != "none")
+    if (specSimParams$shift != "none")
     {
         precs <- mapply(specs, names(specs), analysis, FUN = function(spec, gn, ana)
         {
@@ -523,11 +524,10 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
     return(pl)
 }
 
-getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, shift, uniqueName,
-                            mustExist)
+getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, uniqueName, mustExist)
 {
-    PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, shift, 1)
-    PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, shift, 2)
+    PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, 1)
+    PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, 2)
     if (is.null(PLP1) || is.null(PLP2))
     {
         if (!mustExist)
@@ -540,14 +540,14 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
     }
     
     precDiff <- 0
-    if (shift != "none")
+    if (specSimParams$shift != "none")
     {
         if (is.na(PLP1$precs) || is.na(PLP2$precs))
             stop("One or both pecursor ions are unknown, can't calculate shift")
         precDiff <- PLP2$precs - PLP1$precs
     }
     
-    bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], shift, precDiff, specSimParams$absMzDev))
+    bin <- as.data.table(binSpectra(PLP1$specs[[1]], PLP2$specs[[1]], specSimParams$shift, precDiff, specSimParams$absMzDev))
     bin[, mergedBy := fifelse(intensity_1 != 0 & intensity_2 != 0, "overlap", uniqueName)]
     
     getSpecFromBin <- function(nr)

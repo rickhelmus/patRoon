@@ -184,14 +184,12 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
            c("MSPeakListsSet", "formulasSet", "compoundsSet"), null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    unsetOrNULL <- function(o) if (is.null(o)) rep(list(NULL), length(sets(fGroups))) else lapply(sets(fGroups), unset, obj = o)
+    unsetMSPeakLists <- checkAndUnSetOther(sets(fGroups), MSPeakLists, "MSPeakLists", TRUE)
+    unsetFormulas <- checkAndUnSetOther(sets(fGroups), formulas, "formulas", TRUE)
+    unsetCompounds <- checkAndUnSetOther(sets(fGroups), compounds, "compounds", TRUE)
     
-    unsetMSPeakLists <- unsetOrNULL(MSPeakLists)
-    unsetFormulas <- unsetOrNULL(formulas)
-    unsetCompounds <- unsetOrNULL(compounds)
-    
-    fGroups@setObjects <- mapply(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
-                                 FUN = annotateSuspects, MoreArgs = list(...), SIMPLIFY = FALSE)
+    fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
+                              f = annotateSuspects, MoreArgs = list(...))
     
     # clear old rank cols if present
     rankCols <- c("formRank", "compRank")

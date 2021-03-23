@@ -156,7 +156,7 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, precursor, groupName
     checkmate::reportAssertions(ac)
     
     usobj <- lapply(sets(obj), unset, obj = obj)
-    usmspl <- lapply(sets(obj), unset, obj = MSPeakLists)
+    usmspl <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
     ret <- rbindlist(setNames(Map(usobj, usmspl, f = function(so, mspl)
     {
         if (!groupName %in% groupNames(so) || (!is.null(analysis) && !analysis %in% analyses(so)))
@@ -232,7 +232,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
             return(NULL)
         usObj <- usObj[theSets]
         
-        usMSPL <- sapply(theSets, unset, obj = MSPeakLists, simplify = FALSE)
+        usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
                                          specSimParams = specSimParams, shift = shift, mustExist = FALSE))

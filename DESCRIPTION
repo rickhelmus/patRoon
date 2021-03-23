@@ -233,6 +233,7 @@ Collate:
     'utils-optimize.R'
     'utils-plot.R'
     'utils-progress.R'
+    'utils-sets.R'
     'utils-xcms.R'
     'zzz.R'
 VignetteBuilder: knitr

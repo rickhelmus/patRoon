@@ -130,8 +130,6 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
-    - remove merged approach, possibly find other ways to customize averaging
-        - some kind of weighted average?
 - Consistency
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
@@ -258,7 +256,8 @@
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - OpenMS/cliqueMS adducts?
 - TPs
-    - mention Bas as author for log2fc, spec similarity etc
+    - mention Bas as author for log2fc, spec similarity/shift etc
+        - cosine based on OrgMassSpecR
     - predictTPsBioTransformer
         - use identifier as fallback for naming when no compoundName is present
         - citations, also EnviPath
@@ -271,7 +270,9 @@
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - doc somewhere plotInt order with sets
     - refs for PC transformations
-    - generateComponentsTPs(): if pred is NULL using filter() is crucial
+    - generateComponentsTPs()
+        - if pred is NULL using filter() is crucial
+        - shift ignored from specSimParams
     
 
 ## NEWS

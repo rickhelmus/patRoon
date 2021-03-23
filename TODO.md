@@ -49,7 +49,6 @@
 ## Annotation
 
 - getFormInfoList(): take care of consensus results like getPrecursorFormScores()
-- decrease plotSpectrum height space if no structure is plotted? and even more w/out annotations?
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
 

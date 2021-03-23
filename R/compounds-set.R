@@ -392,6 +392,9 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)
         setnames(ret, "set.x", "set")
         ret[, set.y := NULL]
     }
+    if (!is.null(ret[["PLIndexOrig"]]))
+        ret[, PLIndexOrig := NULL]
+    
     return(ret[])
 })
 

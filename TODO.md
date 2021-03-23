@@ -96,7 +96,6 @@
     - fix MapAligner exception with test-components
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
-    - annotatedPeakList compounds: remove PLIndexOrig column?
     - as.data.table(formulas, average=T): remove more cols?
 - screening
     - form/compRanks: update when subsetting on sets? otherwise doc

@@ -341,13 +341,13 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
             return(NULL)
         usObj <- usObj[theSets]
         
-        usMSPL <- sapply(theSets, unset, obj = MSPeakLists, simplify = FALSE)
+        usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
                                          specSimParams = specSimParams, shift = shift, mustExist = FALSE))
         
         if (!is.null(formulas))
-            usForm <- sapply(theSets, unset, obj = formulas, simplify = FALSE)
+            usForm <- checkAndUnSetOther(theSets, formulas, "formulas")
         else
             usForm <- rep(list(NULL), length(theSets))
         
@@ -400,17 +400,9 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
 {
     checkmate::assertClass(formulas, "formulasSet")
     
-    setsInBoth <- intersect(sets(compounds), sets(formulas))
-    setsInComps <- sets(compounds)
-    if (length(setsInBoth) < length(setsInComps))
-        warning(paste("Following sets not present in formulas:",
-                      paste0(setdiff(setsInComps, setsInBoth), collapse = ", ")))
-    
-    unsetFormulas <- sapply(setsInBoth, unset, obj = formulas, simplify = FALSE)
-    compounds@setObjects[setsInBoth] <- mapply(setObjects(compounds)[setsInBoth], unsetFormulas,
-                                               FUN = addFormulaScoring, SIMPLIFY = FALSE,
-                                               MoreArgs = list(updateScore = updateScore,
-                                                               formulaScoreWeight = formulaScoreWeight))
+    unsetFormulas <- checkAndUnSetOther(sets(compounds), formulas, "formulas")
+    compounds@setObjects <- Map(setObjects(compounds), unsetFormulas, f = addFormulaScoring,
+                                MoreArgs = list(updateScore = updateScore, formulaScoreWeight = formulaScoreWeight))
     compounds <- syncCompoundsSetObjects(compounds, TRUE)
     
     return(compounds)

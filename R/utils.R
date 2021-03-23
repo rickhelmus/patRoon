@@ -515,39 +515,6 @@ RUserDir <- function(...)
     return(backports:::R_user_dir(...))
 }
 
-makeSetAlgorithm <- function(setObjects)
-{
-    if (length(setObjects) == 0)
-        setAlgo <- "empty"
-    else
-        setAlgo <- paste0(unique(sapply(setObjects, algorithm)), collapse = ",")
-    return(paste(setAlgo, "set", sep = "-"))
-}
-
-assertAndGetMSPLSetsArgs <- function(fGroupsSet, MSPeakListsSet)
-{
-    checkmate::assertClass(MSPeakListsSet, "MSPeakListsSet")
-    sd <- setdiff(sets(fGroupsSet), sets(MSPeakListsSet))
-    if (length(sd) > 0)
-        stop(paste("The following sets in fGroups are missing in MSPeakLists:"), paste0(sd, collapse = ", "))
-    
-    unsetMSPeaksList <- lapply(sets(MSPeakListsSet), unset, obj = MSPeakListsSet)
-    return(lapply(unsetMSPeaksList, function(x) list(MSPeakLists = x)))
-}
-
-prepareMakeSetAdducts <- function(objects, adducts, labels)
-{
-    adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
-    adducts <- rep(adducts, length.out = length(objects))
-    
-    if (!is.null(labels))
-        names(adducts) <- labels
-    else
-        names(adducts) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
-    
-    return(adducts)
-}
-
 ReduceWithArgs <- function(f, x, ..., fixedArgs = list())
 {
     ret <- x[[1]]

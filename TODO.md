@@ -47,6 +47,7 @@
 
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
+    - also for compounds?
 
 
 ## Suspects
@@ -117,9 +118,6 @@
     - caching
     - remove? doesn't seem useful anymore
 - log2fc
-    - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
-    - plotVolcano()
-        - more plot parameters?
     - P values are calculated properly?
     - workflow: first do log2fc subsetting, then clustering
         - not relevant anymore?

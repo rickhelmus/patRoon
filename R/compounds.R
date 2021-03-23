@@ -601,34 +601,34 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 
     compTable <- compoundTable(obj)[[groupName]]
     fragInfo <- NULL
-    if (!is.null(compTable) && nrow(compTable) > 0)
+    if (!is.null(compTable) && nrow(compTable) >= index)
     {
-        compr <- compTable[index, ]
+        compr <- compTable[index]
         fragInfo <- compr$fragInfo[[1]]
-    }
 
-    formTable <- if (!is.null(formulas)) formulas[[groupName]] else NULL
-    if (!is.null(formTable))
-    {
-        formTable <- formTable[byMSMS == TRUE & neutral_formula == compr$formula]
-        if (nrow(formTable) > 0)
+        formTable <- if (!is.null(formulas)) formulas[[groupName]] else NULL
+        if (!is.null(formTable))
         {
-            formFragInfo <- getFragmentInfoFromForms(spec, formTable)
-            if (is.null(fragInfo))
+            formTable <- formTable[byMSMS == TRUE & neutral_formula == compr$formula]
+            if (nrow(formTable) > 0)
             {
-                fragInfo <- formFragInfo
-                fragInfo[, mergedBy := algorithm(formulas)]
+                formFragInfo <- getFragmentInfoFromForms(spec, formTable)
+                if (is.null(fragInfo))
+                {
+                    fragInfo <- formFragInfo
+                    fragInfo[, mergedBy := algorithm(formulas)]
+                }
+                else
+                    fragInfo <- mergeFragInfo(fragInfo, formFragInfo, algorithm(obj), algorithm(formulas))
             }
-            else
-                fragInfo <- mergeFragInfo(fragInfo, formFragInfo, algorithm(obj), algorithm(formulas))
         }
+        
+        if (!is.null(fragInfo))
+            spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
+        
+        spec <- spec[, PLIndex := NULL]
     }
-
-    if (!is.null(fragInfo))
-        spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
-
-    spec <- spec[, PLIndex := NULL]
-
+    
     if (onlyAnnotated)
     {
         if (is.null(spec[["formula"]]))
@@ -688,7 +688,10 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
         if (is.null(spec))
             return(NULL)
-        
+
+        if (index > nrow(obj[[groupName]]))
+            stop(sprintf("Specified candidate index out of range %d/%d", index, nrow(obj[[groupName]])), call. = FALSE)
+                
         compr <- obj[[groupName]][index, ]
         mol <- NULL
         if (plotStruct)
@@ -711,6 +714,13 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     {
         if (plotStruct)
             stop("Cannot plot structure when comparing spectra") # UNDONE?
+
+        for (i in seq_len(2))
+        {
+            if (index[i] > nrow(obj[[groupName[i]]]))
+                stop(sprintf("Specified candidate index out of range %d/%d", index[i], nrow(obj[[groupName[i]]])),
+                     call. = FALSE)
+        }
 
         if (is.null(title))
         {

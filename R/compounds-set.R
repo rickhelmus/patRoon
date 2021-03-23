@@ -296,6 +296,9 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
 
     if (is.null(specSimParams))
     {
+        if (index > nrow(obj[[groupName]]))
+            stop(sprintf("Specified candidate index out of range %d/%d", index, nrow(obj[[groupName]])), call. = FALSE)
+        
         compr <- obj[[groupName]][index, ]
         mol <- NULL
         if (plotStruct)
@@ -324,6 +327,13 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     {
         if (plotStruct)
             stop("Cannot plot structure when comparing spectra") # UNDONE?
+        
+        for (i in seq_len(2))
+        {
+            if (index[i] > nrow(obj[[groupName[i]]]))
+                stop(sprintf("Specified candidate index out of range %d/%d", index[i], nrow(obj[[groupName[i]]])),
+                     call. = FALSE)
+        }
         
         if (is.null(title))
         {

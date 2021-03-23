@@ -125,7 +125,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
     {
         # UNDONE: do more checks etc
         
-        # dummy intensity value so e.g. plotSpec works            
+        # dummy intensity value so e.g. plotSpectrum works            
         cmp[, intensity := 1]
         
         cmp[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
@@ -159,8 +159,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
     compTab <- NULL
     if (is.null(pred))
     {
-        # simply link each given parent with all given TPs, while relying on the filtering of prepareComponent() to get
-        # sensible components
+        # simply link each given parent with all given TPs, while relying on filter() to get sensible components
         
         precCount <- length(fGroups)
         prog <- openProgBar(0, precCount)
@@ -303,6 +302,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
                                               minFragMatches = NULL, minNLMatches = NULL, formulas = NULL,
                                               verbose = TRUE, negate = FALSE)
 {
+    # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     # UNDONE: if formulas is set, also remove fGroups without assignment? Otherwise document!
     # UNDONE: also filter set separate similarities?
     
@@ -432,7 +432,6 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
                                                              compounds = NULL, minRTDiff = 20,
                                                              specSimParams = getDefSpecSimParams())
 {
-    # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     # UNDONE: doc when fGroups/fGroupsTPs needs to be fGroupsScreening
     
     ac <- checkmate::makeAssertCollection()

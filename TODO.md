@@ -111,7 +111,6 @@
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
 - metabolic logic
-    - more logic reactions?
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents
     - fix if empty cTab for MSMS components
@@ -151,7 +150,6 @@
     - fragMatches/NLMatches: doc that it's _not_ candidate specific
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
-    - handle cases for when formulas/compounds were filtered away due to topMost
     - fix alignment of TP table columns
 
 ## Reporting

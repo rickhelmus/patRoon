@@ -1,4 +1,4 @@
-reaction,add,sub,RTDir
+reaction,add,sub,retDir
 hydroxylation,O,,-1
 demethylation,,CH2,-1
 deethylation,,C2H4,-1

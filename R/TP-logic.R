@@ -36,7 +36,7 @@ doGenerateTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
                           deltaMZ = transformations$deltaMZ,
                           reaction_add = transformations$add,
                           reaction_sub = transformations$sub,
-                          RTDir = transformations$RTDir)
+                          retDir = transformations$retDir)
         ret <- ret[neutralMass >= minMass]
         
         setTxtProgressBar(prog, si)

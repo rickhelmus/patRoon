@@ -74,7 +74,8 @@
         - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
             - Perhaps just document limitation?
     - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
-    - other consensus approaches (super meeting)
+    - OpenMS: handle potentialAdducts per set
+    - prefAdducts: also include eg Na by default?
 
 ## sets
 

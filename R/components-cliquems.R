@@ -16,6 +16,9 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                                                                   adductInfo = NULL,
                                                                   mzWindow = 0.005, minSize = 2,
                                                                   relMinAdductAbundance = 0.75,
+                                                                  adductConflictsUsePref = TRUE,
+                                                                  NMConflicts = c("preferential", "mostAbundant", "mostIntense"),
+                                                                  prefAdducts = c("[M+H]+", "[M-H]-"),
                                                                   extraOptsCli = NULL, extraOptsIso = NULL,
                                                                   extraOptsAnn = NULL, parallel = TRUE)
 {
@@ -27,6 +30,9 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     aapply(checkmate::assertNumber, . ~ ppm + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertDataFrame(adductInfo, any.missing = FALSE, col.names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(adductConflictsUsePref, add = ac)
+    checkmate::assertSubset(NMConflicts, c("preferential", "mostAbundant", "mostIntense"), empty.ok = FALSE, add = ac)
+    checkmate::assertCharacter(prefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     aapply(checkmate::assertList, . ~ extraOptsCli + extraOptsIso + extraOptsAnn, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(parallel, add = ac)
@@ -153,7 +159,9 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     }
     
     return(componentsCliqueMS(cliques = allCliques, fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
-                              relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
+                              relMinAdductAbundance = relMinAdductAbundance,
+                              adductConflictsUsePref = adductConflictsUsePref, NMConflicts = NMConflicts,
+                              prefAdducts = prefAdducts, featureComponents = featComponents))
 })
 
 #' @rdname component-generation

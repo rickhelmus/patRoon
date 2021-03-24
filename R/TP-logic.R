@@ -1,6 +1,6 @@
 #' @include main.R
 #' @include TP.R
-#' @include feature_groups-screening-set.R
+#' @include feature_groups-set.R
 NULL
 
 getTPLogicTransformations <- function(transformations)

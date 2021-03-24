@@ -348,7 +348,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
 }))
 
 DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                    dom = "Blrtp", pageLength = 25, autoWidth = TRUE,
+                                    dom = "Blrtp", pageLength = 25, autoWidth = FALSE,
                                     ordering = FALSE,
                                     columnDefs = list(list(visible = FALSE, targets = 0),
                                                       list(className = "dt-center",

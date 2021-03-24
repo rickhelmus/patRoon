@@ -133,13 +133,12 @@
 - Consistency
     - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
-        - same for formulaDiff, retDiff, RTDir etc
+        - same for formulaDiff, retDiff, retDir etc
     - TP logic: reaction/transformation
-    - RTDir --> retDir?
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
-    - RTDir: convert to character?
+    - retDir: convert to character?
     - doConvertToMFDB: works fully for both BT and Lib columns?
 - reporting
     - padding between two tables?
@@ -258,7 +257,7 @@
     - update spectrumSimilarity()
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
         - min peaks always applied lastly
-    - mention that RTDirMatch filter ignores any zero values for TP_RTDir/RTDir (ie to be safe)
+    - mention that retDirMatch filter ignores any zero values for TP_retDir/retDir (ie to be safe)
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - doc somewhere plotInt order with sets
     - refs for PC transformations

@@ -107,6 +107,7 @@
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - show status after finishing
+    - add to generateComponents generic
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -133,7 +134,6 @@
 - Consistency
     - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
-        - same for formulaDiff, retDiff, retDir etc
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT

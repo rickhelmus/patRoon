@@ -6,7 +6,7 @@ NULL
 getTPLogicTransformations <- function(transformations)
 {
     if (is.null(transformations))
-        ret <- patRoon:::TPsLogicReactions # stored inside R/sysdata.rda
+        ret <- patRoon:::TPsLogicTransformations # stored inside R/sysdata.rda
     
     if (is.data.table(ret))
         ret <- copy(ret)
@@ -31,11 +31,11 @@ doGenerateTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
     
     products <- lapply(seq_len(nrow(parents)), function(si)
     {
-        ret <- data.table(name = paste0(parents$name[si], "-", transformations$reaction),
+        ret <- data.table(name = paste0(parents$name[si], "-", transformations$transformation),
                           neutralMass = neutralMasses[si] + transformations$deltaMZ,
                           deltaMZ = transformations$deltaMZ,
-                          reaction_add = transformations$add,
-                          reaction_sub = transformations$sub,
+                          trans_add = transformations$add,
+                          trans_sub = transformations$sub,
                           retDir = transformations$retDir)
         ret <- ret[neutralMass >= minMass]
         

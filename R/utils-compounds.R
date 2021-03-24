@@ -202,7 +202,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
     ctext <- addValText(ctext, "%s", c("tonnage", "categories"))
 
     # TP prediction DB
-    ctext <- addValText(ctext, "%s", c("precursor", "reaction", "enzymes"))
+    ctext <- addValText(ctext, "%s", c("precursor", "transformation", "enzymes"))
 
     return(ctext)
 }

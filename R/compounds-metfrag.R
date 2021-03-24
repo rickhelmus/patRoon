@@ -146,7 +146,7 @@ unifyMFNames <- function(mfr)
                  # database generated from TP prediction
                  precursor = "precursor",
                  ALogP = "ALogP",
-                 Reaction = "reaction",
+                 transformation = "transformation",
                  "Enzyme(s)" = "enzymes",
                  Biosystem = "biosystem",
                  "Precursor InChI" = "precursorInChI",

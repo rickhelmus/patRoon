@@ -27,7 +27,7 @@ collapseBTResults <- function(prod)
     prod <- lapply(prod, function(p)
     {
         # merge duplicate compound rows, which can occur due to consecutive
-        # reactions giving the same TP
+        # transformation giving the same TP
         p <- copy(p)
         col <- "parent_ID"
         p[!nzchar(get(col)), (col) := "parent"]
@@ -37,7 +37,7 @@ collapseBTResults <- function(prod)
 
     prodAll <- rbindlist(prod, idcol = "parent")
 
-    # merge parent and sub-parent (ie from consecutive reactions)
+    # merge parent and sub-parent (ie from consecutive transformation)
     prodAll[, parent := paste0(parent, " (", parent_ID, ")")]
 
     # combine equal TPs from different parents
@@ -64,6 +64,7 @@ BTMPFinishHandler <- function(cmd)
              c("Molecular formula", "Major Isotope Mass"),
              c("formula", "neutralMass"))
     setnames(ret, sub("^Precursor ", "parent_", names(ret)))
+    setnames(ret, c("Reaction", "Reaction ID"), c("transformation", "transformation_ID"))
     
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)

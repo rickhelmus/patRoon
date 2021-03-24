@@ -134,12 +134,11 @@
     - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
         - same for formulaDiff, retDiff, retDir etc
-    - TP logic: reaction/transformation
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - retDir: convert to character?
-    - doConvertToMFDB: works fully for both BT and Lib columns?
+    - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
 - reporting
     - padding between two tables?
     - default TP columns OK?

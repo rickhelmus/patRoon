@@ -17,6 +17,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                                                                 minRTOverlap = 0.66, retWindow = 1,
                                                                 mzWindow = 0.005, minSize = 2,
                                                                 relMinAdductAbundance = 0.75,
+                                                                adductConflictsUsePref = TRUE,
+                                                                NMConflicts = c("preferential", "mostAbundant", "mostIntense"),
+                                                                prefAdducts = c("[M+H]+", "[M-H]-"),
                                                                 extraOpts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
@@ -29,6 +32,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     aapply(checkmate::assertNumber, . ~ retWindow + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertNumber(minRTOverlap, lower = 0, upper = 1, add = ac)
+    checkmate::assertFlag(adductConflictsUsePref, add = ac)
+    checkmate::assertSubset(NMConflicts, c("preferential", "mostAbundant", "mostIntense"), empty.ok = FALSE, add = ac)
+    checkmate::assertCharacter(prefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -91,7 +97,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     }, logSubDir = "openms", cacheName = "componentsOpenMS")
     
     return(componentsOpenMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
-                            relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
+                            relMinAdductAbundance = relMinAdductAbundance,
+                            adductConflictsUsePref = adductConflictsUsePref, NMConflicts = NMConflicts,
+                            prefAdducts = prefAdducts, featureComponents = featComponents))
 })
 
 #' @rdname component-generation
@@ -139,10 +147,11 @@ defaultOpenMSAdducts <- function(ionization)
 {
     checkmate::assertChoice(ionization, c("positive", "negative"))
     if (ionization == "positive")
-        return(c("[M+H]+" = 0.5,
+        return(c("[M+H]+" = 0.4,
                  "[M+Na]+" = 0.2,
                  "[M+NH4]+" = 0.2,
-                 "[M+K]+" = 0.1))
+                 "[M+K]+" = 0.1,
+                 "[M-H2O]+" = 0.1))
     # UNDONE: more for neg?
     return(c("[M-H]-" = 0.8,
              "[M-H2O-H]-" = 0.2))

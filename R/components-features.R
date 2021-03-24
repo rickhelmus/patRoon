@@ -7,6 +7,7 @@ componentsFeatures <- setClass("componentsFeatures", slots = c(featureComponents
                                contains = "components")
 
 setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize, mzWindow, relMinAdductAbundance,
+                                                       adductConflictsUsePref, NMConflicts, prefAdducts,
                                                        featureComponents = list(), ...)
 {
     if (length(fGroups) == 0)
@@ -16,6 +17,8 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     ftindex <- groupFeatIndex(fGroups)
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
+    anas <- analyses(fGroups)
+    gTable <- groupTable(fGroups)
     
     featureComponents <- Map(featureComponents, split(ftindex, seq_len(nrow(ftindex))), f = function(fCmpL, fti)
     {
@@ -46,9 +49,11 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # Filter adducts not abundantly assigned to same feature group
     cmpTab <- cmpTab[is.na(abundance) | numGTE(abundance, relMinAdductAbundance)]
     
-    # Only keep the most abundantly assigned adduct for each feature group
+    # Only keep the preferential or most abundantly assigned adduct for each feature group
     # UNDONE: handle ties?
-    cmpTab[!is.na(adduct_ion), keep := adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
+    cmpTab[!is.na(adduct_ion), keep :=
+               uniqueN(adduct_ion) == 1 | (adductConflictsUsePref & adduct_ion %chin% prefAdducts) |
+               adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
     cmpTab <- cmpTab[is.na(adduct_ion) | keep == TRUE][, keep := NULL]
 
     # Start making group components; for each feature group:
@@ -75,12 +80,49 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
         {
             # conflict in neutral masses --> only retain those with most abundant neutral mass
             # UNDONE: handle ties?
+
+            nrowPrior <- nrow(ct)
+            colsPrior <- names(ct)
             
             # since we must work with mass tolerances, first cluster presumably masses together
             hc <- fastcluster::hclust(dist(ct$neutralMass))
-            tr <- cutree(hc, h = mzWindow)
-            mostAbundantCL <- as.integer(names(which.max(table(tr))))
-            ct <- ct[tr == mostAbundantCL]
+            ct[, clust := cutree(hc, h = mzWindow)]
+            ct[, clust_size := .N, by = "clust"]
+            
+            for (cnf in NMConflicts)
+            {
+                bestCL <- integer()
+                if (cnf == "preferential")
+                {
+                    ct[, prefAdductMatch := match(adduct_ion, prefAdducts, nomatch = length(prefAdducts) + 1),
+                       by = "clust"]
+                    ct[, topRankedMatch := min(prefAdductMatch), by = "clust"]
+                    
+                    if (uniqueN(ct$topRankedMatch) == max(ct$clust)) # all clusters ranked differently?
+                        bestCL <- ct[which.min(topRankedMatch)]$clust
+                }
+                else if (cnf == "mostAbundant")
+                    bestCL <- ct[which.max(clust_size)]$clust
+                else # mostIntense
+                {
+                    ct[, intensity := mapply(analysis, group, FUN = function(a, g) gTable[[g]][match(a, anas)])]
+                    ct[, maxClustInt := max(intensity) / clust_size, by = "clust"]
+                    bestCL <- ct[which.max(intensity)]$clust
+                }
+                
+                if (length(bestCL) == 1)
+                {
+                    ct <- ct[clust == bestCL]
+                    break
+                }
+            }
+            if (nrow(ct) == nrowPrior)
+            {
+                # Could not resolve neutral mass conflict --> just default to first cluster...
+                ct <- ct[clust == 1]
+            }
+            
+            ct <- ct[, colsPrior, with = FALSE] # remove temporary work columns
         }
         
         return(ct)

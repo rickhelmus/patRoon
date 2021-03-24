@@ -132,8 +132,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         cmp[, intensity := 1]
         
         cmp[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
-        cmp[, retDiff := gInfoParents[parentFG, "rts"] - ret]
-        cmp[, mzDiff := gInfoParents[parentFG, "mzs"] - mz]
+        cmp[, retDiff := ret - gInfoParents[parentFG, "rts"]]
+        cmp[, mzDiff := mz - gInfoParents[parentFG, "mzs"]]
         
         cmp[, retDir := fcase((retDiff + minRTDiff) < 0, -1,
                              (retDiff - minRTDiff) > 0, 1,
@@ -225,7 +225,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                     if (!is.null(ret[["formula"]])) # eg TRUE for BT
                     {
                         parentForm <- pars[name == pname]$formula
-                        ret[, formulaDiff := sapply(formula, subtractFormula, formula1 = parentForm)]
+                        ret[, formulaDiff := sapply(formula, subtractFormula, formula2 = parentForm)]
                     }
                     
                     return(ret)

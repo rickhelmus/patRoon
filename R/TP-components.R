@@ -5,27 +5,27 @@
 NULL
 
 #' @export
-TPPredictionsComponents <- setClass("TPPredictionsComponents", contains = "TPPredictions")
+transformationProductsComponents <- setClass("transformationProductsComponents", contains = "transformationProducts")
 
-setMethod("initialize", "TPPredictionsComponents",
+setMethod("initialize", "transformationProductsComponents",
           function(.Object, ...) callNextMethod(.Object, algorithm = "components", ...))
 
-setMethod("needsScreening", "TPPredictionsComponents", function(pred) FALSE)
+setMethod("needsScreening", "transformationProductsComponents", function(TPs) FALSE)
 
-setMethod("linkParentsToFGroups", "TPPredictionsComponents", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "transformationProductsComponents", function(TPs, fGroups)
 {
-    fg <- intersect(names(pred), names(fGroups))
+    fg <- intersect(names(TPs), names(fGroups))
     return(data.table(name = fg, group = fg))
 })
 
-setMethod("linkTPsToFGroups", "TPPredictionsComponents", function(pred, fGroups)
+setMethod("linkTPsToFGroups", "transformationProductsComponents", function(TPs, fGroups)
 {
-    TPNames <- intersect(as.data.table(pred)$name, names(fGroups))
+    TPNames <- intersect(as.data.table(TPs)$name, names(fGroups))
     return(data.table(group = TPNames, TP_name = TPNames))
 })
 
 #' @export
-setMethod("predictTPsComponents", "components", function(components, fGroupsPrecursors, fGroupsTPs)
+setMethod("generateTPsComponents", "components", function(components, fGroupsPrecursors, fGroupsTPs)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsPrecursors + fGroupsTPs, "featureGroups", fixed = list(add = ac))
@@ -38,7 +38,7 @@ setMethod("predictTPsComponents", "components", function(components, fGroupsPrec
     
     prog <- openProgBar(0, nrow(suspects))
     
-    predictions <- pruneList(setNames(lapply(seq_len(nrow(suspects)), function(si)
+    products <- pruneList(setNames(lapply(seq_len(nrow(suspects)), function(si)
     {
         precGName <- suspects$name[si]
         precCMP <- cTab[group == precGName]$name
@@ -68,13 +68,13 @@ setMethod("predictTPsComponents", "components", function(components, fGroupsPrec
     setTxtProgressBar(prog, nrow(suspects))
     close(prog)
     
-    suspects <- suspects[name %in% names(predictions)]
+    suspects <- suspects[name %in% names(products)]
     
-    return(TPPredictionsComponents(suspects = suspects, predictions = predictions))
+    return(transformationProductsComponents(suspects = suspects, products = products))
 })
 
 #' @export
-setMethod("predictTPsComponents", "componentsSet", function(components, fGroupsPrecursors, fGroupsTPs)
+setMethod("generateTPsComponents", "componentsSet", function(components, fGroupsPrecursors, fGroupsTPs)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertList, . ~ fGroupsPrecursors + fGroupsTPs,
@@ -94,10 +94,10 @@ setMethod("predictTPsComponents", "componentsSet", function(components, fGroupsP
     unsetFGroupsTPs <- Map(unset, fGroupsTPs, names(fGroupsTPs))
     
     # first calculate for each set
-    predictSets <- Map(predictTPsComponents, setObjects(components)[theSets], unsetFGroupsPrec, unsetFGroupsTPs)
+    predictSets <- Map(generateTPsComponents, setObjects(components)[theSets], unsetFGroupsPrec, unsetFGroupsTPs)
     TPListSets <- Map(predictSets, theSets, f = function(p, s)
     {
-        ret <- lapply(predictions(p), function(tps)
+        ret <- lapply(products(p), function(tps)
         {
             tps <- copy(tps)
             tps[, (theSets) := as.list(theSets == s)]
@@ -131,5 +131,5 @@ setMethod("predictTPsComponents", "componentsSet", function(components, fGroupsP
     for (s in theSets)
         suspects[, (s) := name %in% names(fGroupsPrecursors[[s]])][]
     
-    return(TPPredictionsComponents(suspects = suspects, predictions = pred))
+    return(transformationProductsComponents(suspects = suspects, products = pred))
 })

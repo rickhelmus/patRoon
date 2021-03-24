@@ -3,9 +3,9 @@
 NULL
 
 #' @export
-TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")
+transformationProductsBT <- setClass("transformationProductsBT", contains = "transformationProducts")
 
-setMethod("initialize", "TPPredictionsBT",
+setMethod("initialize", "transformationProductsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
@@ -22,9 +22,9 @@ getBaseBTCmd <- function(parent, SMILES, type, steps, fpType, fpSimMethod, extra
                 hash = makeHash(parent, SMILES, baseHash)))
 }
 
-collapseBTResults <- function(pred)
+collapseBTResults <- function(prod)
 {
-    pred <- lapply(pred, function(p)
+    prod <- lapply(prod, function(p)
     {
         # merge duplicate compound rows, which can occur due to consecutive
         # reactions giving the same TP
@@ -35,18 +35,18 @@ collapseBTResults <- function(pred)
         p <- unique(p, by = "InChIKey")
     })
 
-    predAll <- rbindlist(pred, idcol = "parent")
+    prodAll <- rbindlist(prod, idcol = "parent")
 
     # merge parent and sub-parent (ie from consecutive reactions)
-    predAll[, parent := paste0(parent, " (", parent_ID, ")")]
+    prodAll[, parent := paste0(parent, " (", parent_ID, ")")]
 
     # combine equal TPs from different parents
-    predAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
+    prodAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
 
     # ... and remove now duplicates
-    predAll <- unique(predAll, by = "InChIKey")
+    prodAll <- unique(prodAll, by = "InChIKey")
 
-    return(predAll)
+    return(prodAll)
 }
 
 BTMPFinishHandler <- function(cmd)
@@ -104,7 +104,7 @@ BTMPPrepareHandler <- function(cmd)
 }
 
 #' @export
-predictTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
+generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
                                      skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
 {
     checkmate::assert(
@@ -140,17 +140,17 @@ predictTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts
     {
         results <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::BTMPFinishHandler,
                                        prepareHandler = patRoon:::BTMPPrepareHandler,
-                                       cacheName = "predictTPsBT", setHash = setHash, logSubDir = "biotransformer")
+                                       cacheName = "generateTPsBT", setHash = setHash, logSubDir = "biotransformer")
     }
 
     results <- pruneList(results, checkZeroRows = TRUE)
     parents <- parents[name %in% names(results)]
 
-    return(TPPredictionsBT(parents = parents, predictions = results))
+    return(transformationProductsBT(parents = parents, products = results))
 }
 
 #' @export
-setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includeParents)
+setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
@@ -158,20 +158,20 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includeParents
     checkmate::reportAssertions(ac)
 
     cat("Collapsing results... ")
-    predAll <- collapseBTResults(pred@predictions)
+    prodAll <- collapseBTResults(TPs@products)
     cat("Done!\n")
 
-    doConvertToMFDB(predAll, parents(pred), out, includeParents)
+    doConvertToMFDB(prodAll, parents(TPs), out, includeParents)
 })
 
-setMethod("linkParentsToFGroups", "TPPredictionsBT", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "transformationProductsBT", function(TPs, fGroups)
 {
-    return(screenInfo(fGroups)[name %in% names(pred), c("name", "group"), with = FALSE])
+    return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
 })
 
 #' @export
-setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE, minSimilarity = NULL,
-                                                negate = FALSE)
+setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormulas = FALSE, minSimilarity = NULL,
+                                                         negate = FALSE)
 {
     # UNDONE: move to base class?
 
@@ -194,21 +194,21 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
     {
         if (removeEqualFormulas)
         {
-            obj@predictions <- Map(parents(obj)$formula, obj@predictions, f = function(pform, pred)
+            obj@products <- Map(parents(obj)$formula, obj@products, f = function(pform, prod)
             {
                 if (negate)
-                    return(pred[formula == pform])
-                return(pred[formula != pform])
+                    return(prod[formula == pform])
+                return(prod[formula != pform])
             })
         }
         
         if (!is.null(minSimilarity))
         {
             pred <- if (negate) function(x) x < minSimilarity else function(x) numGTE(x, minSimilarity)
-            obj@predictions <- lapply(obj@predictions, function(p) p[pred(similarity)])
+            obj@products <- lapply(obj@products, function(p) p[pred(similarity)])
         }
 
-        obj@predictions <- pruneList(obj@predictions, checkZeroRows = TRUE)
+        obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
 
         saveCacheData("filterTPs", obj, hash)
     }

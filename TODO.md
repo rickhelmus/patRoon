@@ -131,7 +131,6 @@
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
 - Consistency
-    - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
         - same for formulaDiff, retDiff, RTDir etc
@@ -140,9 +139,9 @@
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
-    - generic predictTPs() function
-        - rename predict to generate?
+    - generic generateTPs() function
     - RTDir: convert to character?
+    - doConvertToMFDB: works fully for both BT and Lib columns?
 - reporting
     - padding between two tables?
     - default TP columns OK?

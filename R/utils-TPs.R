@@ -28,16 +28,16 @@ getTPParents <- function(parents, adduct, skipInvalid)
     return(parents)
 }
 
-doConvertToMFDB <- function(predAll, parents, out, includeParents)
+doConvertToMFDB <- function(prodAll, parents, out, includeParents)
 {
     # UNDONE: cache?
     
     # set to MetFrag style names
-    setnames(predAll,
+    setnames(prodAll,
              c("name", "formula", "neutralMass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass"))
-    if (!is.null(predAll[["Precursor Major Isotope Mass"]])) # BT
-        setnames(predAll, "Precursor Major Isotope Mass", "Precursor MonoisotopicMass")
+    if (!is.null(prodAll[["parent_Major Isotope Mass"]])) # BT
+        setnames(prodAll, "parent_Major Isotope Mass", "Parent MonoisotopicMass")
     
     if (includeParents)
     {
@@ -46,17 +46,17 @@ doConvertToMFDB <- function(predAll, parents, out, includeParents)
                  c("name", "formula", "neutralMass"),
                  c("Identifier", "MolecularFormula", "MonoisotopicMass"))
         pars[, CompoundName := Identifier]
-        predAll <- rbind(pars, predAll, fill = TRUE)
+        prodAll <- rbind(pars, prodAll, fill = TRUE)
     }
     
     # Add required InChIKey1 column
-    predAll[, InChIKey1 := getIKBlock1(InChIKey)]
+    prodAll[, InChIKey1 := getIKBlock1(InChIKey)]
     
     # equalize identifiers and names
-    predAll[, CompoundName := Identifier]
+    prodAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
                   "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
     
-    fwrite(predAll[, intersect(keepCols, names(predAll)), with = FALSE], out)
+    fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }

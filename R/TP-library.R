@@ -3,14 +3,14 @@
 NULL
 
 #' @export
-TPPredictionsLibrary <- setClass("TPPredictionsLibrary", contains = "TPPredictions")
+transformationProductsLibrary <- setClass("transformationProductsLibrary", contains = "transformationProducts")
 
-setMethod("initialize", "TPPredictionsLibrary",
+setMethod("initialize", "transformationProductsLibrary",
           function(.Object, ...) callNextMethod(.Object, algorithm = "library", ...))
 
 
 #' @export
-predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
+generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
                               matchSuspectsBy = "InChIKey")
 {
     # UNDONE: default match by IK or IK1?
@@ -125,23 +125,23 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
     results <- pruneList(results, checkZeroRows = TRUE)
     parents <- parents[name %in% names(results)]
     
-    return(TPPredictionsLibrary(parents = parents, predictions = results))
+    return(transformationProductsLibrary(parents = parents, products = results))
 }
 
 #' @export
-setMethod("convertToMFDB", "TPPredictionsLibrary", function(pred, out, includeParents)
+setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
     
-    allTPs <- rbindlist(pred@predictions)
+    allTPs <- rbindlist(TPs@products)
     
-    doConvertToMFDB(allTPs, parents(pred), out, includeParents)
+    doConvertToMFDB(allTPs, parents(TPs), out, includeParents)
 })
 
-setMethod("linkParentsToFGroups", "TPPredictionsLibrary", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "transformationProductsLibrary", function(TPs, fGroups)
 {
-    return(screenInfo(fGroups)[name %in% names(pred), c("name", "group"), with = FALSE])
+    return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
 })

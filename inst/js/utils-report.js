@@ -83,7 +83,7 @@ function initTPs()
 function showTPs(cmp, group)
 {
     filterDTRows(cmp, "TPsTable");
-    selectDTRow(cmp, "precursorsTable", 1);
+    selectDTRow(cmp, "parentsTable", 1);
 }
 
 $(document).ready(function()

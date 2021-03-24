@@ -28,7 +28,7 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
     if (!is.null(TPLibrary))
     {
         checkmate::assertDataFrame(TPLibrary, any.missing = FALSE, min.rows = 1, add = ac)
-        libCols <- c("precursor_name", "precursor_SMILES", "TP_name", "TP_SMILES")
+        libCols <- c("parent_name", "parent_SMILES", "TP_name", "TP_SMILES")
         assertHasNames(TPLibrary, libCols, add = ac)
         for (cl in libCols)
             assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, add = ac)
@@ -47,7 +47,7 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
         TPLibrary <- copy(as.data.table(TPLibrary))
         
         # add chem infos where necessary
-        for (wh in c("precursor", "TP"))
+        for (wh in c("parent", "TP"))
         {
             for (col in c("formula", "InChI", "InChIKey"))
             {
@@ -74,12 +74,12 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
         # match with library
         if (matchSuspectsBy == "InChIKey1")
         {
-            dataLib <- getIKBlock1(TPLibrary$precursor_InChIKey)
+            dataLib <- getIKBlock1(TPLibrary$parent_InChIKey)
             dataSusp <- getIKBlock1(parents$InChIKey)
         }
         else
         {
-            dataLib <- TPLibrary[[paste0("precursor_", matchSuspectsBy)]]
+            dataLib <- TPLibrary[[paste0("parent_", matchSuspectsBy)]]
             dataSusp <- parents[[matchSuspectsBy]]
         }
         
@@ -90,19 +90,19 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
         parents <- parents[dataSusp %chin% dataInBoth]
         
         # rename from suspect list
-        TPLibrary[, precursor_name := parents$name]
+        TPLibrary[, parent_name := parents$name]
     }
     else
     {
-        parents <- unique(TPLibrary[, grepl("^precursor_", names(TPLibrary)), with = FALSE], by = "precursor_name")
-        setnames(parents, sub("^precursor_", "", names(parents)))
+        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
+        setnames(parents, sub("^parent_", "", names(parents)))
     }
     
-    results <- split(TPLibrary, by = "precursor_name")
+    results <- split(TPLibrary, by = "parent_name")
     results <- Map(results, names(results), f = function(r, pn)
     {
-        # remove precursor columns
-        set(r, j = grep("^precursor_", names(r), value = TRUE), value = NULL)
+        # remove parent columns
+        set(r, j = grep("^parent_", names(r), value = TRUE), value = NULL)
         
         # remove TP_ prefix
         cols <- grep("^TP_", names(r), value = TRUE)
@@ -116,9 +116,9 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
         return(r)
     })
     
-    if (!is.null(TPLibrary[["precursor_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
+    if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
     {
-        results <- Map(results, TPLibrary[match(names(results), precursor_name)]$precursor_LogP,
+        results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
                        f = function(r, pLogP) set(r, j = "RTDir", value = fifelse(r$LogP < pLogP, -1, 1)))
     }
     
@@ -129,19 +129,19 @@ predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, s
 }
 
 #' @export
-setMethod("convertToMFDB", "TPPredictionsLibrary", function(pred, out, includePrec)
+setMethod("convertToMFDB", "TPPredictionsLibrary", function(pred, out, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
-    checkmate::assertFlag(includePrec, add = ac)
+    checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
     
     allTPs <- rbindlist(pred@predictions)
     
-    doConvertToMFDB(allTPs, parents(pred), out, includePrec)
+    doConvertToMFDB(allTPs, parents(pred), out, includeParents)
 })
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsLibrary", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "TPPredictionsLibrary", function(pred, fGroups)
 {
     return(screenInfo(fGroups)[name %in% names(pred), c("name", "group"), with = FALSE])
 })

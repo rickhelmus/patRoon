@@ -27,11 +27,11 @@ PubChemTransformations <- PubChemTransformations[, -"#cid"]
 # convert column names to generic patRoon format
 setnames(PubChemTransformations,
          c("predecessor", "predecessorcid", "successor", "successorcid"),
-         c("precursor_name", "precursor_CID", "TP_name", "TP_CID"))
+         c("parent_name", "parent_CID", "TP_name", "TP_CID"))
 
 # merge duplicates rows: these may occur eg when different sources exist
 # NOTE: this doesn't take into account different CIDs, hence, only the first will remain
-nameCols <- c("precursor_name", "TP_name")
+nameCols <- c("parent_name", "TP_name")
 otherCols <- c("transformation", "evidencedoi", "evidenceref", "sourcecomment", "sourcecommentfull",
                "datasetdoi", "datasetref", "enzyme", "biosystem")
 PubChemTransformations[, (otherCols) := lapply(.SD, function(x) paste0(unique(x), collapse = "/")),
@@ -39,25 +39,25 @@ PubChemTransformations[, (otherCols) := lapply(.SD, function(x) paste0(unique(x)
 PubChemTransformations <- unique(PubChemTransformations, by = nameCols)
 
 # use CIDs to get SMILES with webchem
-allCIDs <- union(PubChemTransformations$precursor_CID, PubChemTransformations$TP_CID)
+allCIDs <- union(PubChemTransformations$parent_CID, PubChemTransformations$TP_CID)
 PCInfos <- as.data.table(webchem::pc_prop(allCIDs, c("CanonicalSMILES", "XLogP")))
 
-# and add SMILES/XLogPs to precs/TPs...
-PubChemTransformations[, c("precursor_SMILES", "precursor_LogP") :=
-                           PCInfos[match(precursor_CID, CID), .(CanonicalSMILES, XLogP)]]
+# and add SMILES/XLogPs to parents/TPs...
+PubChemTransformations[, c("parent_SMILES", "parent_LogP") :=
+                           PCInfos[match(parent_CID, CID), .(CanonicalSMILES, XLogP)]]
 PubChemTransformations[, c("TP_SMILES", "TP_LogP") := PCInfos[match(TP_CID, CID), .(CanonicalSMILES, XLogP)]]
 
 # add other chem properties
-PubChemTransformations[, c("precursor_formula", "TP_formula", "precursor_InChI", "TP_InChI",
-                           "precursor_InChIKey", "TP_InChIKey") :=
-                           .(patRoon:::convertToFormulaBabel(precursor_SMILES, "smi", mustWork = TRUE),
+PubChemTransformations[, c("parent_formula", "TP_formula", "parent_InChI", "TP_InChI",
+                           "parent_InChIKey", "TP_InChIKey") :=
+                           .(patRoon:::convertToFormulaBabel(parent_SMILES, "smi", mustWork = TRUE),
                              patRoon:::convertToFormulaBabel(TP_SMILES, "smi", mustWork = TRUE),
-                             patRoon:::babelConvert(precursor_SMILES, "smi", "inchi", mustWork = TRUE),
+                             patRoon:::babelConvert(parent_SMILES, "smi", "inchi", mustWork = TRUE),
                              patRoon:::babelConvert(TP_SMILES, "smi", "inchi", mustWork = TRUE),
-                             patRoon:::babelConvert(precursor_SMILES, "smi", "inchikey", mustWork = TRUE),
+                             patRoon:::babelConvert(parent_SMILES, "smi", "inchikey", mustWork = TRUE),
                              patRoon:::babelConvert(TP_SMILES, "smi", "inchikey", mustWork = TRUE))]
-PubChemTransformations[, c("precursor_neutralMass", "TP_neutralMass") :=
-                           .(sapply(precursor_formula, patRoon:::getFormulaMass),
+PubChemTransformations[, c("parent_neutralMass", "TP_neutralMass") :=
+                           .(sapply(parent_formula, patRoon:::getFormulaMass),
                              sapply(TP_formula, patRoon:::getFormulaMass))]
 
 usethis::use_data(compScorings, adductsGF, adductsMF, TPsLogicReactions, PubChemTransformations, internal = TRUE,

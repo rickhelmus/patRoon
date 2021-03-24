@@ -12,7 +12,7 @@ setMethod("initialize", "TPPredictionsComponents",
 
 setMethod("needsScreening", "TPPredictionsComponents", function(pred) FALSE)
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsComponents", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "TPPredictionsComponents", function(pred, fGroups)
 {
     fg <- intersect(names(pred), names(fGroups))
     return(data.table(name = fg, group = fg))

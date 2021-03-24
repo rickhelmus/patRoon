@@ -124,3 +124,17 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
     setnames(ret, "name", "TP_name")
     return(ret)
 })
+
+
+#' @export
+generateTPs <- function(algorithm, ...)
+{
+    checkmate::assertChoice(algorithm, c("biotransformer", "logic", "library"))
+    
+    f <- switch(algorithm,
+                biotransformer = generateTPsBioTransformer,
+                logic = generateTPsLogic,
+                library = generateTPsLibrary)
+    
+    f(...)
+}

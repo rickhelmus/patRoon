@@ -139,7 +139,6 @@
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
-    - generic generateTPs() function
     - RTDir: convert to character?
     - doConvertToMFDB: works fully for both BT and Lib columns?
 - reporting

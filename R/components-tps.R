@@ -5,7 +5,7 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
+genTPSpecSimilarities <- function(obj, groupName1, groupName2, specSimParams, ...)
 {
     # NOTE: groupName2 may have duplicate group names, which will be removed by intersect below. We don't need to repeat
     # their calculation. Just re-add them below.
@@ -16,13 +16,16 @@ genTPSpecSimilarities <- function(obj, groupName1, groupName2, ...)
     
     getSim <- function(shift)
     {
+        sp <- specSimParams
+        sp$shift <- shift
+        
         if (length(gn1) == 0)
             return(NA_real_)
         
         ret <- numeric()
         if (length(gn2) > 0)
         {
-            ret <- drop(spectrumSimilarity(obj, gn1, gn2, shift = shift, MSLevel = 2, drop = FALSE, ...))
+            ret <- drop(spectrumSimilarity(obj, gn1, gn2, MSLevel = 2, drop = FALSE, specSimParams = sp, ...))
             names(ret) <- gn2
         }
         if (length(otherGN2) > 0)

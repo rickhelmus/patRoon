@@ -132,7 +132,6 @@
             - at least doc that annotation results may disappear
 - Consistency
     - More generic naming for predict etc to accommodate other sources for TPs
-    - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
         - same for formulaDiff, retDiff, RTDir etc

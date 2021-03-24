@@ -99,10 +99,10 @@ setMethod("$", "TPPredictions", function(x, name)
 setMethod("as.data.table", "TPPredictions", function(x) rbindlist(predictions(x), idcol = "suspect"))
 
 #' @export
-setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
+setMethod("convertToSuspects", "TPPredictions", function(pred, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(includePrec, add = ac)
+    checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
     
     predAll <- rbindlist(predictions(pred))
@@ -110,7 +110,7 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
     predAll <- predAll[, intersect(keepCols, names(predAll)), with = FALSE]
     predAll <- prepareSuspectList(predAll, NULL, FALSE, FALSE)
     
-    if (includePrec)
+    if (includeParents)
         predAll <- rbind(parents(pred), predAll, fill = TRUE)
     
     return(predAll)

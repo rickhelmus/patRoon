@@ -211,8 +211,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "reaction_add",
-                              "reaction_sub", "deltaMZ")
+                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "trans_add",
+                              "trans_sub", "deltaMZ")
                 prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
                 
                 comps <- rbindlist(sapply(parentFGs, function(parentFG)
@@ -319,7 +319,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     if (length(obj) == 0)
         return(obj)
     
-    if (!is.null(formulas) && is.null(obj[[1]][["reaction_add"]]))
+    if (!is.null(formulas) && is.null(obj[[1]][["trans_add"]]))
         stop("formula filter is only available for logic TP products")
     
     old <- obj
@@ -383,12 +383,12 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                 if (!is.null(formulas[[parentFG]]))
                 {
                     # filter results where subtraction of any of the parent formulas is impossible
-                    ct[keep == TRUE & nzchar(reaction_sub), keep := sapply(reaction_sub, canSub, formulas[[parentFG]])]
+                    ct[keep == TRUE & nzchar(trans_sub), keep := sapply(trans_sub, canSub, formulas[[parentFG]])]
                 }
                 
                 # filter results where addition is not part of TP candidate formulas
-                ct[keep == TRUE & nzchar(reaction_add), keep := mapply(reaction_add, formulaTable(formulas)[group],
-                                                                       FUN = canSub)]
+                ct[keep == TRUE & nzchar(trans_add), keep := mapply(trans_add, formulaTable(formulas)[group],
+                                                                    FUN = canSub)]
             }
             
             return(!ct$keep)

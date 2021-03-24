@@ -6,7 +6,7 @@ adductsGF <- data.table::fread(system.file("data-raw", "adducts-genform.csv", pa
 # from http://ipb-halle.github.io/MetFrag/projects/metfragcl/ and Constants.java in MetFragLib
 adductsMF <- data.table::fread(system.file("data-raw", "adducts-metfrag.csv", package = "patRoon"))
 
-TPsLogicReactions <- data.table::fread(system.file("data-raw", "TP-logic.csv", package = "patRoon"))
+TPsLogicTransformations <- data.table::fread(system.file("data-raw", "TP-logic.csv", package = "patRoon"))
 
 # obtain PubChem transformations and prepare data
 transFile <- tempfile(fileext = ".tsv")
@@ -60,5 +60,5 @@ PubChemTransformations[, c("parent_neutralMass", "TP_neutralMass") :=
                            .(sapply(parent_formula, patRoon:::getFormulaMass),
                              sapply(TP_formula, patRoon:::getFormulaMass))]
 
-usethis::use_data(compScorings, adductsGF, adductsMF, TPsLogicReactions, PubChemTransformations, internal = TRUE,
+usethis::use_data(compScorings, adductsGF, adductsMF, TPsLogicTransformations, PubChemTransformations, internal = TRUE,
                   overwrite = TRUE)

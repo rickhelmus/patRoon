@@ -134,7 +134,6 @@
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
-    - suspects --> parents?
     - precursor diff: 1-2 or 2-1? --> verify all
         - same for formulaDiff, retDiff, RTDir etc
     - TP logic: reaction/transformation
@@ -144,6 +143,7 @@
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - generic predictTPs() function
         - rename predict to generate?
+    - RTDir: convert to character?
 - reporting
     - padding between two tables?
     - default TP columns OK?

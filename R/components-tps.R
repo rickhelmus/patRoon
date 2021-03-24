@@ -135,7 +135,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         cmp[, retDiff := gInfoParents[parentFG, "rts"] - ret]
         cmp[, mzDiff := gInfoParents[parentFG, "mzs"] - mz]
         
-        cmp[, RTDir := fcase((retDiff + minRTDiff) < 0, -1,
+        cmp[, retDir := fcase((retDiff + minRTDiff) < 0, -1,
                              (retDiff - minRTDiff) > 0, 1,
                              default = 0)]
         
@@ -211,14 +211,14 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "RTDir", "reaction_add",
+                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "reaction_add",
                               "reaction_sub", "deltaMZ")
                 prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
                 
                 comps <- rbindlist(sapply(parentFGs, function(parentFG)
                 {
                     ret <- merge(TPs, prods, by.x = "TP_name", by.y = "name")
-                    setnames(ret, "RTDir", "TP_RTDir")
+                    setnames(ret, "retDir", "TP_retDir")
                     
                     ret <- prepareComponent(ret, parentFG)
                     
@@ -300,7 +300,7 @@ setMethod("as.data.table", "componentsTPs", function(x)
 })
 
 #' @export
-setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
+setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                                               minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
                                               minFragMatches = NULL, minNLMatches = NULL, formulas = NULL,
                                               verbose = TRUE, negate = FALSE)
@@ -313,7 +313,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
     aapply(checkmate::assertNumber, . ~ minSpecSim + minSpecSimPrec + minSpecSimBoth + minFragMatches + minNLMatches,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ RTDirMatch + verbose + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ retDirMatch + verbose + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -340,7 +340,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
         return(ct)
     }
     
-    anyTPFilters <- RTDirMatch || !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
+    anyTPFilters <- retDirMatch || !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
         !is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas)
     
     if (anyTPFilters)
@@ -350,8 +350,8 @@ setMethod("filter", "componentsTPs", function(obj, ..., RTDirMatch = FALSE,
             ct <- copy(ct)
             ct[, keep := TRUE]
             
-            if (RTDirMatch)
-                ct[TP_RTDir != 0 & RTDir != 0, keep := TP_RTDir == RTDir]
+            if (retDirMatch)
+                ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir == retDir]
             
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)

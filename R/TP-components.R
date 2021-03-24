@@ -56,7 +56,7 @@ setMethod("generateTPsComponents", "components", function(components, fGroupsPre
         
         ret <- ret[, c("group", "ret", "mz"), with = FALSE]
         setnames(ret, "group", "name")
-        ret[, RTDir := 0]
+        ret[, retDir := 0]
         
         # UNDONE: more checks?
         

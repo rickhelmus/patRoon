@@ -78,7 +78,7 @@ BTMPFinishHandler <- function(cmd)
     # Assign some unique identifier
     ret[, name := paste0(cmd$parent, "-TP", seq_len(nrow(ret)))]
     
-    ret[, RTDir := fifelse(ALogP < parent_ALogP, -1, 1)]
+    ret[, retDir := fifelse(ALogP < parent_ALogP, -1, 1)]
     
     ret[, similarity := mapply(parent_SMILES, SMILES, FUN = patRoon:::distSMILES,
                                MoreArgs = list(fpType = cmd$fpType, fpSimMethod = cmd$fpSimMethod))][]

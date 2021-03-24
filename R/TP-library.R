@@ -111,7 +111,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
         # make TP names unique
         r[, name := paste0(pn, "-TP-", name)]
         
-        r[, RTDir := 0] # may be changed below
+        r[, retDir := 0] # may be changed below
         
         return(r)
     })
@@ -119,7 +119,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
     if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
     {
         results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
-                       f = function(r, pLogP) set(r, j = "RTDir", value = fifelse(r$LogP < pLogP, -1, 1)))
+                       f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
     }
     
     results <- pruneList(results, checkZeroRows = TRUE)

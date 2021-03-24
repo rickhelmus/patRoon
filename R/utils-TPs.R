@@ -28,7 +28,7 @@ getTPParents <- function(parents, adduct, skipInvalid)
     return(parents)
 }
 
-doConvertToMFDB <- function(predAll, parents, out, includePrec)
+doConvertToMFDB <- function(predAll, parents, out, includeParents)
 {
     # UNDONE: cache?
     
@@ -39,7 +39,7 @@ doConvertToMFDB <- function(predAll, parents, out, includePrec)
     if (!is.null(predAll[["Precursor Major Isotope Mass"]])) # BT
         setnames(predAll, "Precursor Major Isotope Mass", "Precursor MonoisotopicMass")
     
-    if (includePrec)
+    if (includeParents)
     {
         pars <- copy(parents)
         setnames(pars,

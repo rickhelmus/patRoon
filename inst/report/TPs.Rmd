@@ -7,7 +7,7 @@ Transformation Products {data-orientation=rows}
 
 # sync objects
 components <- rmdVars$components[, intersect(names(rmdVars$fGroups), groupNames(rmdVars$components))]
-components <- delete(components, i = !componentInfo(components)$precursor_group %chin% names(rmdVars$fGroups))
+components <- delete(components, i = !componentInfo(components)$parent_group %chin% names(rmdVars$fGroups))
 
 cInfo <- componentInfo(components)
 
@@ -20,7 +20,7 @@ if (isScreening(rmdVars$fGroups))
 
 plotPathFull <- getPlotPath(FALSE)
 
-message("Generating precursor plots...")
+message("Generating parent plots...")
 prog <- openProgBar(0, nrow(cInfo))
 
 makeStructPlot <- function(SMI, out)
@@ -40,20 +40,20 @@ if (isFGSet(rmdVars$fGroups))
     plotIntMainArgs <- c(plotIntMainArgs, list(col = "black"))
 }
 
-precPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(precRow, i)
+parentPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(parentRow, i)
 {
-    grpi <- match(precRow$precursor_group, names(rmdVars$fGroups))
+    grpi <- match(parentRow$parent_group, names(rmdVars$fGroups))
     plots <- list()
-    fg <- rmdVars$fGroups[, precRow$precursor_group]
+    fg <- rmdVars$fGroups[, parentRow$parent_group]
     
-    plots[["int"]] <- file.path(plotPathFull, sprintf("int-prec_%d.png", grpi))
+    plots[["int"]] <- file.path(plotPathFull, sprintf("int-parent_%d.png", grpi))
     makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3,
                    bg = NA, cacheDB = rmdVars$cacheDB)
 
-    if (!is.null(precRow[["precursor_SMILES"]]))
+    if (!is.null(parentRow[["parent_SMILES"]]))
     {
-        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-prec_%d.png", grpi))
-        makeStructPlot(precRow$precursor_SMILES, plots[["struct"]])
+        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
+        makeStructPlot(parentRow$parent_SMILES, plots[["struct"]])
     }
 
     setTxtProgressBar(prog, i)
@@ -81,7 +81,7 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
     SMI <- ctRow[["SMILES"]]
     if (!is.null(SMI))
     {
-        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-prec_%d.png", grpi))
+        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
         makeStructPlot(SMI, plots[["struct"]])
     }
     
@@ -92,26 +92,26 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
         
         if (isScreening(rmdVars$fGroups))
         {
-            suspPrecRow <- suspTbl[name == ctRow$precursor_name & group == ctRow$precursor_group]
+            suspParRow <- suspTbl[name == ctRow$parent_name & group == ctRow$parent_group]
             suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
             if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
-                all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
-                nrow(suspTPRow) == 1 && !is.na(suspPrecRow$compRank) && !is.na(suspTPRow$compRank))
+                all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
+                nrow(suspTPRow) == 1 && !is.na(suspParRow$compRank) && !is.na(suspTPRow$compRank))
             {
                 plSpecArgs <- list(obj = rmdVars$compounds, formulas = rmdVars[["formulas"]],
-                                   index = c(suspPrecRow$compRank, suspTPRow$compRank),
+                                   index = c(suspParRow$compRank, suspTPRow$compRank),
                                    MSPeakLists = rmdVars$MSPeakLists, plotStruct = FALSE)
             }
             else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
-                     all(c(ctRow$precursor_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
-                     nrow(suspTPRow) == 1 && !is.na(suspPrecRow$formRank) && !is.na(suspTPRow$formRank))
+                     all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
+                     nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank))
             {
-                plSpecArgs <- list(obj = rmdVars$formulas, precursor = c(suspPrecRow$formula, suspTPRow$formula),
+                plSpecArgs <- list(obj = rmdVars$formulas, precursor = c(suspParRow$formula, suspTPRow$formula),
                                    MSPeakLists = rmdVars$MSPeakLists)
             }
         }
         
-        if (length(plSpecArgs) == 0 && !is.null(rmdVars$MSPeakLists[[ctRow$precursor_group]][["MSMS"]]) &&
+        if (length(plSpecArgs) == 0 && !is.null(rmdVars$MSPeakLists[[ctRow$parent_group]][["MSMS"]]) &&
             !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
         {
             # no formulas/compounds, try peak lists
@@ -121,7 +121,7 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
         if (length(plSpecArgs) > 0)
         {
             plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
-            makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$precursor_group, ctRow$group),
+            makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$parent_group, ctRow$group),
                                                                                specSimParams = rmdVars$specSimParams, title = "")),
                            5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
         }
@@ -143,15 +143,15 @@ prepPlots <- function(pl)
     return(pl)
 }
 
-precPlots <- prepPlots(precPlots); TPPlots <- prepPlots(TPPlots)
+parentPlots <- prepPlots(parentPlots); TPPlots <- prepPlots(TPPlots)
 ```
 
 
 ##
     
-### Precursors { data-width=400 .precursors }
+### Parents { data-width=400 .parents }
     
-<style> .precursors { overflow-x: auto; } </style>
+<style> .parents { overflow-x: auto; } </style>
     
 ```{r echo=FALSE}
 makeTPTab <- function(cr, cols)
@@ -199,39 +199,39 @@ makeTPTab <- function(cr, cols)
 
 chromPlotStyle <- "width: auto; height: 250px;"
 
-precDT <- data.table(compInd = seq_len(nrow(cInfo)))
+parentsDT <- data.table(compInd = seq_len(nrow(cInfo)))
 
 splitCI <- split(cInfo, seq_len(nrow(cInfo)))
 
-precInfoCols <- intersect(c("name", "precursor_name", "precursor_group", "precursor_formula", "precursor_CID"), names(cInfo))
-precDT[, precursor := sapply(splitCI, function(cir)
+parentInfoCols <- intersect(c("name", "parent_name", "parent_group", "parent_formula", "parent_CID"), names(cInfo))
+parentsDT[, parent := sapply(splitCI, function(cir)
 {
-    precInfo <- cir[, precInfoCols, with = FALSE]
-    setnames(precInfo, sub("^precursor_", "", names(precInfo)))
+    parInfo <- cir[, parentInfoCols, with = FALSE]
+    setnames(parInfo, sub("^parent_", "", names(parInfo)))
     
-    if (!is.null(precInfo[["formula"]]))
-        precInfo[, formula := subscriptFormulaHTML(formula)]
-    if (!is.null(precInfo[["CID"]]))
-        precInfo[, CID := makeDBIdentLink("pubchem", CID)]
+    if (!is.null(parInfo[["formula"]]))
+        parInfo[, formula := subscriptFormulaHTML(formula)]
+    if (!is.null(parInfo[["CID"]]))
+        parInfo[, CID := makeDBIdentLink("pubchem", CID)]
 
-    prec <- makeInfoBox(paste0(names(precInfo), ": ", precInfo, collapse = "<br>"))
+    par <- makeInfoBox(paste0(names(parInfo), ": ", parInfo, collapse = "<br>"))
     
-    if (!is.null(precPlots[[cir$name]][["struct"]]))
-        prec <- paste0(imgTags(precPlots[[cir$name]][["struct"]]), "<br>", prec)
+    if (!is.null(parentPlots[[cir$name]][["struct"]]))
+        par <- paste0(imgTags(parentPlots[[cir$name]][["struct"]]), "<br>", par)
     
-    return(prec)
+    return(par)
 })]
 
-precDT[, EIC := imgTags(chromPaths[match(cInfo$precursor_group, names(rmdVars$fGroups))], style = chromPlotStyle)]
+parentsDT[, EIC := imgTags(chromPaths[match(cInfo$parent_group, names(rmdVars$fGroups))], style = chromPlotStyle)]
 
 if (isScreening(rmdVars$fGroups))
 {
     suspCols <- c("formRank", "compRank", "annSimBoth", "estIDLevel")
     if (any(sapply(suspCols, grepl, names(suspTbl))))
     {
-        precDT[, screening := sapply(splitCI, function(cir)
+        parentsDT[, screening := sapply(splitCI, function(cir)
         {
-            sr <- suspTbl[name == cir$precursor_name & group == cir$precursor_group]
+            sr <- suspTbl[name == cir$parent_name & group == cir$parent_group]
             if (nrow(sr) > 0)
                 makeTPTab(sr, suspCols)
             else
@@ -240,13 +240,13 @@ if (isScreening(rmdVars$fGroups))
     }
 }
 
-precDT[, "intensity profile" := imgTags(sapply(precPlots[cInfo$name], "[[", "int"))]
+parentsDT[, "intensity profile" := imgTags(sapply(parentPlots[cInfo$name], "[[", "int"))]
 
-precDT[, show := { sprintf("<button onclick=\"showTPs('%s', %d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
-                           compInd, match(cInfo$precursor_group, names(rmdVars$fGroups))) }]
-setcolorder(precDT, c("compInd", "show"))
+parentsDT[, show := { sprintf("<button onclick=\"showTPs('%s', %d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
+                              compInd, match(cInfo$parent_group, names(rmdVars$fGroups))) }]
+setcolorder(parentsDT, c("compInd", "show"))
 
-DT::datatable(precDT,
+DT::datatable(parentsDT,
               extensions = "Buttons",
               options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "300px",
                              dom = "tip",
@@ -255,8 +255,8 @@ DT::datatable(precDT,
                              order = list(list(0, "asc")),
                              columnDefs = list(list(visible = FALSE, targets = 0),
                                                list(className = "dt-center",
-                                                    targets = (seq_len(ncol(precDT)))-1))),
-              escape = FALSE, rownames = FALSE, elementId = "precursorsTable")
+                                                    targets = (seq_len(ncol(parentsDT)))-1))),
+              escape = FALSE, rownames = FALSE, elementId = "parentsTable")
 ```
 
 

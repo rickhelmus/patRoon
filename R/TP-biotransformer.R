@@ -9,7 +9,7 @@ setMethod("initialize", "TPPredictionsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBaseBTCmd <- function(precursor, SMILES, type, steps, fpType, fpSimMethod, extraOpts, baseHash)
+getBaseBTCmd <- function(parent, SMILES, type, steps, fpType, fpSimMethod, extraOpts, baseHash)
 {
     mainArgs <- c("-b", type,
                   "-k", "pred",
@@ -17,9 +17,9 @@ getBaseBTCmd <- function(precursor, SMILES, type, steps, fpType, fpSimMethod, ex
                   "-s", as.character(steps),
                   extraOpts)
     
-    return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", precursor, ".txt"), precursor = precursor,
+    return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", parent, ".txt"), parent = parent,
                 SMILES = SMILES, fpType = fpType, fpSimMethod = fpSimMethod,
-                hash = makeHash(precursor, SMILES, baseHash)))
+                hash = makeHash(parent, SMILES, baseHash)))
 }
 
 collapseBTResults <- function(pred)
@@ -29,21 +29,19 @@ collapseBTResults <- function(pred)
         # merge duplicate compound rows, which can occur due to consecutive
         # reactions giving the same TP
         p <- copy(p)
-        col <- "Precursor ID"
+        col <- "parent_ID"
         p[!nzchar(get(col)), (col) := "parent"]
         p[, (col) := paste0(get(col), collapse = "/"), by = "InChIKey"]
         p <- unique(p, by = "InChIKey")
     })
 
-    predAll <- rbindlist(pred, idcol = "precursor")
+    predAll <- rbindlist(pred, idcol = "parent")
 
-    # merge precursor and sub-precursor (ie from consecutive reactions)
-    predAll[, precursor := paste0(precursor, " (", `Precursor ID`, ")")]
+    # merge parent and sub-parent (ie from consecutive reactions)
+    predAll[, parent := paste0(parent, " (", parent_ID, ")")]
 
-    # combine equal TPs from different precursors
-    predAll[, c("name", "precursor") := .(paste0(name, collapse = ","),
-                                          paste0(precursor, collapse = ",")),
-            by = "InChIKey"]
+    # combine equal TPs from different parents
+    predAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
 
     # ... and remove now duplicates
     predAll <- unique(predAll, by = "InChIKey")
@@ -65,24 +63,24 @@ BTMPFinishHandler <- function(cmd)
     setnames(ret,
              c("Molecular formula", "Major Isotope Mass"),
              c("formula", "neutralMass"))
+    setnames(ret, sub("^Precursor ", "parent_", names(ret)))
     
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
     ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
     
     # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
-    ret[!nzchar(formula), formula :=
-            {
-                mols <- patRoon:::getMoleculesFromSMILES(SMILES)
-                return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
-            }]
+    ret[!nzchar(formula), formula := {
+        mols <- patRoon:::getMoleculesFromSMILES(SMILES)
+        return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
+    }]
     
     # Assign some unique identifier
-    ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
+    ret[, name := paste0(cmd$parent, "-TP", seq_len(nrow(ret)))]
     
-    ret[, RTDir := fifelse(ALogP < `Precursor ALogP`, -1, 1)]
+    ret[, RTDir := fifelse(ALogP < parent_ALogP, -1, 1)]
     
-    ret[, similarity := mapply(`Precursor SMILES`, SMILES, FUN = patRoon:::distSMILES,
+    ret[, similarity := mapply(parent_SMILES, SMILES, FUN = patRoon:::distSMILES,
                                MoreArgs = list(fpType = cmd$fpType, fpSimMethod = cmd$fpSimMethod))][]
     
     return(ret)
@@ -152,21 +150,21 @@ predictTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts
 }
 
 #' @export
-setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
+setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
-    checkmate::assertFlag(includePrec, add = ac)
+    checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
 
     cat("Collapsing results... ")
     predAll <- collapseBTResults(pred@predictions)
     cat("Done!\n")
 
-    doConvertToMFDB(predAll, parents(pred), out, includePrec)
+    doConvertToMFDB(predAll, parents(pred), out, includeParents)
 })
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "TPPredictionsBT", function(pred, fGroups)
 {
     return(screenInfo(fGroups)[name %in% names(pred), c("name", "group"), with = FALSE])
 })

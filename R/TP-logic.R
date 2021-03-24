@@ -3,8 +3,6 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-# UNDONE: precursor --> parent?
-
 getTPLogicTransformations <- function(transformations)
 {
     if (is.null(transformations))
@@ -59,7 +57,7 @@ TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "TPPredictionsLogic", function(pred, fGroups)
 {
     fg <- intersect(names(pred), names(fGroups))
     return(data.table(name = fg, group = fg))

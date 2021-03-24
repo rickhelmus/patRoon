@@ -113,10 +113,10 @@ setGeneric("predictTPsLogic", function(fGroups, minMass = 40, ...) standardGener
 setGeneric("predictTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("predictTPsComponents"))
 setGeneric("parents", function(pred) standardGeneric("parents"))
 setGeneric("predictions", function(pred) standardGeneric("predictions"))
-setGeneric("convertToMFDB", function(pred, out, includePrec = TRUE) standardGeneric("convertToMFDB"))
-setGeneric("convertToSuspects", function(pred, includePrec = TRUE) standardGeneric("convertToSuspects"))
+setGeneric("convertToMFDB", function(pred, out, includeParents = TRUE) standardGeneric("convertToMFDB"))
+setGeneric("convertToSuspects", function(pred, includeParents = TRUE) standardGeneric("convertToSuspects"))
 setGeneric("needsScreening", function(pred) standardGeneric("needsScreening"))
-setGeneric("linkPrecursorsToFGroups", function(pred, fGroups) standardGeneric("linkPrecursorsToFGroups"))
+setGeneric("linkParentsToFGroups", function(pred, fGroups) standardGeneric("linkParentsToFGroups"))
 setGeneric("linkTPsToFGroups", function(pred, fGroups) standardGeneric("linkTPsToFGroups"))
 
 ### suspect screening

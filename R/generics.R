@@ -107,17 +107,17 @@ setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
-### TP prediction
+### TP generation
 
-setGeneric("predictTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("predictTPsLogic"))
-setGeneric("predictTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("predictTPsComponents"))
-setGeneric("parents", function(pred) standardGeneric("parents"))
-setGeneric("predictions", function(pred) standardGeneric("predictions"))
-setGeneric("convertToMFDB", function(pred, out, includeParents = TRUE) standardGeneric("convertToMFDB"))
-setGeneric("convertToSuspects", function(pred, includeParents = TRUE) standardGeneric("convertToSuspects"))
-setGeneric("needsScreening", function(pred) standardGeneric("needsScreening"))
-setGeneric("linkParentsToFGroups", function(pred, fGroups) standardGeneric("linkParentsToFGroups"))
-setGeneric("linkTPsToFGroups", function(pred, fGroups) standardGeneric("linkTPsToFGroups"))
+setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("generateTPsLogic"))
+setGeneric("generateTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("generateTPsComponents"))
+setGeneric("parents", function(TPs) standardGeneric("parents"))
+setGeneric("products", function(TPs) standardGeneric("products"))
+setGeneric("convertToMFDB", function(TPs, out, includeParents = TRUE) standardGeneric("convertToMFDB"))
+setGeneric("convertToSuspects", function(TPs, includeParents = TRUE) standardGeneric("convertToSuspects"))
+setGeneric("needsScreening", function(TPs) standardGeneric("needsScreening"))
+setGeneric("linkParentsToFGroups", function(TPs, fGroups) standardGeneric("linkParentsToFGroups"))
+setGeneric("linkTPsToFGroups", function(TPs, fGroups) standardGeneric("linkTPsToFGroups"))
 
 ### suspect screening
 

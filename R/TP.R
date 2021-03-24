@@ -2,62 +2,61 @@
 #' @include workflow-step.R
 NULL
 
-#' Base transformation product (TP) predictions class
+#' Base transformation product (TP) products class
 #'
-#' Holds information for all predicted TPs for a set of parents.
+#' Holds information for all TPs for a set of parents.
 #'
-#' This class holds all generated data for predicted transformation products for
+#' This class holds all generated data for transformation products for
 #' a set of parents. The class is \code{virtual} and derived objects are
-#' created by \link[=TP-prediction]{TP predictors}.
+#' created by \link[=TP-generation]{TP predictors}.
 #'
-#' @param obj,x,object \code{TPPredictions} object to be accessed
+#' @param obj,x,object \code{transformationProducts} object to be accessed
 #'
-#' @seealso \code{\link{TP-prediction}}
+#' @seealso \code{\link{TP-generation}}
 #'
-#' @slot parents Table with all parents with predictions. Use the
+#' @slot parents Table with all parents with products. Use the
 #'   \code{parents} method for access.
-#' @slot predictions List of predicted TPs for each suspect. Use the
-#'   \code{predictions} method for access.
+#' @slot products List of TPs for each parent. Use the
+#'   \code{products} method for access.
 #'
 #' @templateVar seli parents
 #' @templateVar selOrderi names()
 #' @templateVar dollarOpName suspect
 #' @template sub_op-args
 #'
-#' @templateVar class TPPredictions
+#' @templateVar class transformationProducts
 #' @template class-hierarchy
 #'
 #' @export
-TPPredictions <- setClass("TPPredictions",
-                          slots = c(parents = "data.table", predictions = "list"),
+transformationProducts <- setClass("transformationProducts",
+                          slots = c(parents = "data.table", products = "list"),
                           contains = c("VIRTUAL", "workflowStep"))
 
-#' @describeIn TPPredictions Accessor method for the \code{parents} slot of a
-#'   \code{TPPredictions} class. This is a \code{data.table} with all parents
-#'   used for predictions.
+#' @describeIn transformationProducts Accessor method for the \code{parents} slot of a
+#'   \code{transformationProducts} class. This is a \code{data.table} with all parents
+#'   used for products.
 #' @aliases parents
 #' @export
-setMethod("parents", "TPPredictions", function(pred) pred@parents)
+setMethod("parents", "transformationProducts", function(TPs) TPs@parents)
 
-#' @describeIn TPPredictions Accessor method for the \code{predictions} slot of
-#'   a \code{TPPredictions} class. Each TP result is stored as a
+#' @describeIn transformationProducts Accessor method for the \code{products} slot of
+#'   a \code{transformationProducts} class. Each TP result is stored as a
 #'   \code{\link{data.table}}.
-#' @aliases predictions
+#' @aliases products
 #' @export
-setMethod("predictions", "TPPredictions", function(pred) pred@predictions)
+setMethod("products", "transformationProducts", function(TPs) TPs@products)
 
-#' @describeIn components Obtain total number of predictions.
+#' @describeIn components Obtain total number of products.
 #' @export
-setMethod("length", "TPPredictions", function(x) if (length(predictions(x)) == 0) 0 else sum(sapply(predictions(x), nrow)))
+setMethod("length", "transformationProducts", function(x) if (length(products(x)) == 0) 0 else sum(sapply(products(x), nrow)))
 
-#' @describeIn TPPredictions Obtain the names of all parents with predicted
-#'   TPs.
+#' @describeIn transformationProducts Obtain the names of all parents with TPs.
 #' @export
-setMethod("names", "TPPredictions", function(x) parents(x)$name)
+setMethod("names", "transformationProducts", function(x) parents(x)$name)
 
-#' @describeIn TPPredictions Show summary information for this object.
+#' @describeIn transformationProducts Show summary information for this object.
 #' @export
-setMethod("show", "TPPredictions", function(object)
+setMethod("show", "transformationProducts", function(object)
 {
     callNextMethod()
     
@@ -65,62 +64,62 @@ setMethod("show", "TPPredictions", function(object)
     printf("Total TPs: %d\n", length(object))
 })
 
-#' @describeIn TPPredictions Subset on parents.
+#' @describeIn transformationProducts Subset on parents.
 #' @export
-setMethod("[", c("TPPredictions", "ANY", "missing", "missing"), function(x, i, ...)
+setMethod("[", c("transformationProducts", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, names(x))
-        x@predictions <- x@predictions[i]
+        x@products <- x@products[i]
         x@parents <- x@parents[name %in% i]
     }
     
     return(x)
 })
 
-#' @describeIn TPPredictions Extracts a table with TPs for a suspect.
+#' @describeIn transformationProducts Extracts a table with TPs for a suspect.
 #' @export
-setMethod("[[", c("TPPredictions", "ANY", "missing"), function(x, i, j)
+setMethod("[[", c("transformationProducts", "ANY", "missing"), function(x, i, j)
 {
     assertExtractArg(i)
-    return(x@predictions[[i]])
+    return(x@products[[i]])
 })
 
-#' @describeIn TPPredictions Extracts a table with TPs for a suspect.
+#' @describeIn transformationProducts Extracts a table with TPs for a suspect.
 #' @export
-setMethod("$", "TPPredictions", function(x, name)
+setMethod("$", "transformationProducts", function(x, name)
 {
-    eval(substitute(x@predictions$NAME_ARG, list(NAME_ARG = name)))
+    eval(substitute(x@products$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @describeIn TPPredictions Returns all prediction data in a table.
+#' @describeIn transformationProducts Returns all TP data in a table.
 #' @export
-setMethod("as.data.table", "TPPredictions", function(x) rbindlist(predictions(x), idcol = "suspect"))
+setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "suspect"))
 
 #' @export
-setMethod("convertToSuspects", "TPPredictions", function(pred, includeParents)
+setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
     
-    predAll <- rbindlist(predictions(pred))
+    prodAll <- rbindlist(products(TPs))
     keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
-    predAll <- predAll[, intersect(keepCols, names(predAll)), with = FALSE]
-    predAll <- prepareSuspectList(predAll, NULL, FALSE, FALSE)
+    prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
+    prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE)
     
     if (includeParents)
-        predAll <- rbind(parents(pred), predAll, fill = TRUE)
+        prodAll <- rbind(parents(TPs), prodAll, fill = TRUE)
     
-    return(predAll)
+    return(prodAll)
 })
 
-setMethod("needsScreening", "TPPredictions", function(pred) TRUE)
+setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)
 
-setMethod("linkTPsToFGroups", "TPPredictions", function(pred, fGroups)
+setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 {
-    TPNames <- as.data.table(pred)$name
+    TPNames <- as.data.table(TPs)$name
     ret <- screenInfo(fGroups)[name %in% TPNames, c("group", "name"), with = FALSE]
     setnames(ret, "name", "TP_name")
     return(ret)

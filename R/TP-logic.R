@@ -20,7 +20,7 @@ getTPLogicTransformations <- function(transformations)
     return(ret[])
 }
 
-doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
+doGenerateTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
 {
     gInfo <- groupInfo(fGroups)
     parents <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
@@ -29,7 +29,7 @@ doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
     
     prog <- openProgBar(0, nrow(parents))
     
-    predictions <- lapply(seq_len(nrow(parents)), function(si)
+    products <- lapply(seq_len(nrow(parents)), function(si)
     {
         ret <- data.table(name = paste0(parents$name[si], "-", transformations$reaction),
                           neutralMass = neutralMasses[si] + transformations$deltaMZ,
@@ -43,28 +43,28 @@ doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
         
         return(ret)
     })
-    names(predictions) <- parents$name
+    names(products) <- parents$name
     
     setTxtProgressBar(prog, nrow(parents))
     close(prog)
     
-    return(list(parents = parents, predictions = predictions))
+    return(list(parents = parents, products = products))
 }
 
 #' @export
-TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
+transformationProductsLogic <- setClass("transformationProductsLogic", contains = "transformationProducts")
 
-setMethod("initialize", "TPPredictionsLogic",
+setMethod("initialize", "transformationProductsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-setMethod("linkParentsToFGroups", "TPPredictionsLogic", function(pred, fGroups)
+setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, fGroups)
 {
-    fg <- intersect(names(pred), names(fGroups))
+    fg <- intersect(names(TPs), names(fGroups))
     return(data.table(name = fg, group = fg))
 })
 
 #' @export
-setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
+setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
@@ -75,20 +75,20 @@ setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, ad
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
     neutralMasses <- groupInfo(fGroups)[, "mzs"] - sapply(fgAdd$grpAdducts, adductMZDelta)
     
-    res <- doPredictTPsLogic(fGroups, minMass, neutralMasses, transformations)
+    res <- doGenerateTPsLogic(fGroups, minMass, neutralMasses, transformations)
     
-    return(TPPredictionsLogic(parents = res$parents, predictions = res$predictions))
+    return(transformationProductsLogic(parents = res$parents, products = res$products))
 })
 
 #' @export
-setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
+setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)
+    res <- doGenerateTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)
     
-    return(TPPredictionsLogic(parents = res$parents, predictions = res$predictions))
+    return(transformationProductsLogic(parents = res$parents, products = res$products))
 })

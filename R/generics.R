@@ -111,7 +111,7 @@ setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
 setGeneric("predictTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("predictTPsLogic"))
 setGeneric("predictTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("predictTPsComponents"))
-setGeneric("suspects", function(pred) standardGeneric("suspects"))
+setGeneric("parents", function(pred) standardGeneric("parents"))
 setGeneric("predictions", function(pred) standardGeneric("predictions"))
 setGeneric("convertToMFDB", function(pred, out, includePrec = TRUE) standardGeneric("convertToMFDB"))
 setGeneric("convertToSuspects", function(pred, includePrec = TRUE) standardGeneric("convertToSuspects"))

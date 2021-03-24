@@ -10,18 +10,18 @@ setMethod("initialize", "TPPredictionsLibrary",
 
 
 #' @export
-predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
+predictTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
                               matchSuspectsBy = "InChIKey")
 {
     # UNDONE: default match by IK or IK1?
     
     checkmate::assert(
-        checkmate::checkNull(suspects),
-        checkmate::checkClass(suspects, "data.frame"),
-        checkmate::checkClass(suspects, "compounds"),
-        checkmate::checkClass(suspects, "featureGroupsScreening"),
-        checkmate::checkClass(suspects, "featureGroupsScreeningSet"),
-        .var.name = "suspects"
+        checkmate::checkNull(parents),
+        checkmate::checkClass(parents, "data.frame"),
+        checkmate::checkClass(parents, "compounds"),
+        checkmate::checkClass(parents, "featureGroupsScreening"),
+        checkmate::checkClass(parents, "featureGroupsScreeningSet"),
+        .var.name = "parents"
     )
     
     ac <- checkmate::makeAssertCollection()
@@ -34,8 +34,8 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
             assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, add = ac)
     }
         
-    if (is.data.frame(suspects))
-        assertSuspectList(suspects, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents))
+        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertFlag(skipInvalid, add = ac)
     checkmate::assertChoice(matchSuspectsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
@@ -67,35 +67,35 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
         }
     }
 
-    if (!is.null(suspects))
+    if (!is.null(parents))
     {
-        suspects <- getTPSuspects(suspects, adduct, skipInvalid)
+        parents <- getTPParents(parents, adduct, skipInvalid)
         
         # match with library
         if (matchSuspectsBy == "InChIKey1")
         {
             dataLib <- getIKBlock1(TPLibrary$precursor_InChIKey)
-            dataSusp <- getIKBlock1(suspects$InChIKey)
+            dataSusp <- getIKBlock1(parents$InChIKey)
         }
         else
         {
             dataLib <- TPLibrary[[paste0("precursor_", matchSuspectsBy)]]
-            dataSusp <- suspects[[matchSuspectsBy]]
+            dataSusp <- parents[[matchSuspectsBy]]
         }
         
         # only take data in both
         dataInBoth <- intersect(dataLib, dataSusp)
         dataInBoth <- dataInBoth[match(dataSusp, dataInBoth, nomatch = 0)] # align suspect order
         TPLibrary <- TPLibrary[match(dataInBoth, dataLib)] # match and align suspect order
-        suspects <- suspects[dataSusp %chin% dataInBoth]
+        parents <- parents[dataSusp %chin% dataInBoth]
         
         # rename from suspect list
-        TPLibrary[, precursor_name := suspects$name]
+        TPLibrary[, precursor_name := parents$name]
     }
     else
     {
-        suspects <- unique(TPLibrary[, grepl("^precursor_", names(TPLibrary)), with = FALSE], by = "precursor_name")
-        setnames(suspects, sub("^precursor_", "", names(suspects)))
+        parents <- unique(TPLibrary[, grepl("^precursor_", names(TPLibrary)), with = FALSE], by = "precursor_name")
+        setnames(parents, sub("^precursor_", "", names(parents)))
     }
     
     results <- split(TPLibrary, by = "precursor_name")
@@ -123,9 +123,9 @@ predictTPsLibrary <- function(suspects = NULL, TPLibrary = NULL, adduct = NULL, 
     }
     
     results <- pruneList(results, checkZeroRows = TRUE)
-    suspects <- suspects[name %in% names(results)]
+    parents <- parents[name %in% names(results)]
     
-    return(TPPredictionsLibrary(suspects = suspects, predictions = results))
+    return(TPPredictionsLibrary(parents = parents, predictions = results))
 }
 
 #' @export
@@ -138,7 +138,7 @@ setMethod("convertToMFDB", "TPPredictionsLibrary", function(pred, out, includePr
     
     allTPs <- rbindlist(pred@predictions)
     
-    doConvertToMFDB(allTPs, suspects(pred), out, includePrec)
+    doConvertToMFDB(allTPs, parents(pred), out, includePrec)
 })
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsLibrary", function(pred, fGroups)

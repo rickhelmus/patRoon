@@ -2,26 +2,24 @@
 #' @include workflow-step.R
 NULL
 
-# UNDONE: precursor/suspect --> parent?
-
 #' Base transformation product (TP) predictions class
 #'
-#' Holds information for all predicted TPs for a set of suspects.
+#' Holds information for all predicted TPs for a set of parents.
 #'
 #' This class holds all generated data for predicted transformation products for
-#' a set of suspects. The class is \code{virtual} and derived objects are
+#' a set of parents. The class is \code{virtual} and derived objects are
 #' created by \link[=TP-prediction]{TP predictors}.
 #'
 #' @param obj,x,object \code{TPPredictions} object to be accessed
 #'
 #' @seealso \code{\link{TP-prediction}}
 #'
-#' @slot suspects Table with all suspects with predictions. Use the
-#'   \code{suspects} method for access.
+#' @slot parents Table with all parents with predictions. Use the
+#'   \code{parents} method for access.
 #' @slot predictions List of predicted TPs for each suspect. Use the
 #'   \code{predictions} method for access.
 #'
-#' @templateVar seli suspects
+#' @templateVar seli parents
 #' @templateVar selOrderi names()
 #' @templateVar dollarOpName suspect
 #' @template sub_op-args
@@ -31,15 +29,15 @@ NULL
 #'
 #' @export
 TPPredictions <- setClass("TPPredictions",
-                          slots = c(suspects = "data.table", predictions = "list"),
+                          slots = c(parents = "data.table", predictions = "list"),
                           contains = c("VIRTUAL", "workflowStep"))
 
-#' @describeIn TPPredictions Accessor method for the \code{suspects} slot of a
-#'   \code{TPPredictions} class. This is a \code{data.table} with all suspects
+#' @describeIn TPPredictions Accessor method for the \code{parents} slot of a
+#'   \code{TPPredictions} class. This is a \code{data.table} with all parents
 #'   used for predictions.
-#' @aliases suspects
+#' @aliases parents
 #' @export
-setMethod("suspects", "TPPredictions", function(pred) pred@suspects)
+setMethod("parents", "TPPredictions", function(pred) pred@parents)
 
 #' @describeIn TPPredictions Accessor method for the \code{predictions} slot of
 #'   a \code{TPPredictions} class. Each TP result is stored as a
@@ -52,10 +50,10 @@ setMethod("predictions", "TPPredictions", function(pred) pred@predictions)
 #' @export
 setMethod("length", "TPPredictions", function(x) if (length(predictions(x)) == 0) 0 else sum(sapply(predictions(x), nrow)))
 
-#' @describeIn TPPredictions Obtain the names of all suspects with predicted
+#' @describeIn TPPredictions Obtain the names of all parents with predicted
 #'   TPs.
 #' @export
-setMethod("names", "TPPredictions", function(x) suspects(x)$name)
+setMethod("names", "TPPredictions", function(x) parents(x)$name)
 
 #' @describeIn TPPredictions Show summary information for this object.
 #' @export
@@ -63,11 +61,11 @@ setMethod("show", "TPPredictions", function(object)
 {
     callNextMethod()
     
-    printf("Suspects with predictions: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), nrow(suspects(object)))
+    printf("Parents: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), nrow(parents(object)))
     printf("Total TPs: %d\n", length(object))
 })
 
-#' @describeIn TPPredictions Subset on suspects.
+#' @describeIn TPPredictions Subset on parents.
 #' @export
 setMethod("[", c("TPPredictions", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -75,7 +73,7 @@ setMethod("[", c("TPPredictions", "ANY", "missing", "missing"), function(x, i, .
     {
         i <- assertSubsetArgAndToChr(i, names(x))
         x@predictions <- x@predictions[i]
-        x@suspects <- x@suspects[name %in% i]
+        x@parents <- x@parents[name %in% i]
     }
     
     return(x)
@@ -113,7 +111,7 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
     predAll <- prepareSuspectList(predAll, NULL, FALSE, FALSE)
     
     if (includePrec)
-        predAll <- rbind(suspects(pred), predAll, fill = TRUE)
+        predAll <- rbind(parents(pred), predAll, fill = TRUE)
     
     return(predAll)
 })

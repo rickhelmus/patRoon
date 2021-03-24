@@ -25,15 +25,15 @@ getTPLogicTransformations <- function(transformations)
 doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
 {
     gInfo <- groupInfo(fGroups)
-    suspects <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
+    parents <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
     
     transformations <- getTPLogicTransformations(transformations)
     
-    prog <- openProgBar(0, nrow(suspects))
+    prog <- openProgBar(0, nrow(parents))
     
-    predictions <- lapply(seq_len(nrow(suspects)), function(si)
+    predictions <- lapply(seq_len(nrow(parents)), function(si)
     {
-        ret <- data.table(name = paste0(suspects$name[si], "-", transformations$reaction),
+        ret <- data.table(name = paste0(parents$name[si], "-", transformations$reaction),
                           neutralMass = neutralMasses[si] + transformations$deltaMZ,
                           deltaMZ = transformations$deltaMZ,
                           reaction_add = transformations$add,
@@ -45,12 +45,12 @@ doPredictTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
         
         return(ret)
     })
-    names(predictions) <- suspects$name
+    names(predictions) <- parents$name
     
-    setTxtProgressBar(prog, nrow(suspects))
+    setTxtProgressBar(prog, nrow(parents))
     close(prog)
     
-    return(list(suspects = suspects, predictions = predictions))
+    return(list(parents = parents, predictions = predictions))
 }
 
 #' @export
@@ -79,7 +79,7 @@ setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, ad
     
     res <- doPredictTPsLogic(fGroups, minMass, neutralMasses, transformations)
     
-    return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
+    return(TPPredictionsLogic(parents = res$parents, predictions = res$predictions))
 })
 
 #' @export
@@ -92,5 +92,5 @@ setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40,
     
     res <- doPredictTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)
     
-    return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
+    return(TPPredictionsLogic(parents = res$parents, predictions = res$predictions))
 })

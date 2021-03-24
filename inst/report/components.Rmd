@@ -21,7 +21,6 @@ plotPathLink <- getPlotPath(TRUE)
 isHClust <- inherits(rmdVars$components, "componentsIntClust")
 isHomol <- inherits(rmdVars$components, "componentsNT")
 isSet <- inherits(rmdVars$components, "componentsSet")
-isTP <- inherits(rmdVars$components, "componentsTPs")
 
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
@@ -90,7 +89,7 @@ plot(rmdVars$components)
 ", ticks = "```", inter = as.character(rmdVars$interactiveHeat)))
 ```
 
-```{r echo=FALSE,eval=isHomol || isTP}
+```{r echo=FALSE,eval=isHomol}
 rmdText <- knitr::knit(text = glue::glue("
 ##
 
@@ -103,7 +102,7 @@ plotGraph(rmdVars$components, onlyLinked = TRUE)
 ", ticks = "```"))
 ```
 
-`r if (isHClust || isHomol || isTP) rmdText`
+`r if (isHClust || isHomol) rmdText`
 
 <style> .components { overflow-x: auto; } </style>
 
@@ -137,13 +136,6 @@ makeCompDT <- function(s, scrollY)
                             info = infoTables,
                             EIC = imgTags(eicpaths))
     
-    if (isTP)
-    {
-        cmpInfo <- componentInfo(rmdVars$components)
-        compTable[, component := sprintf("%s<br>(prec: %s - group: %s)", component, cmpInfo$precursor_name,
-                                         cmpInfo$precursor_group)]
-    }
-
     if (isHClust)
     {
         intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", compInds))

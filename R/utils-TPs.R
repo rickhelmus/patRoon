@@ -1,34 +1,34 @@
-getTPSuspects <- function(suspects, adduct, skipInvalid)
+getTPParents <- function(parents, adduct, skipInvalid)
 {
-    if (is.data.frame(suspects))
-        suspects <- prepareSuspectList(suspects, adduct, skipInvalid, calcMZs = FALSE)
-    else if (inherits(suspects, "compounds"))
+    if (is.data.frame(parents))
+        parents <- prepareSuspectList(parents, adduct, skipInvalid, calcMZs = FALSE)
+    else if (inherits(parents, "compounds"))
     {
-        compTab <- as.data.table(suspects)
+        compTab <- as.data.table(parents)
         if (!is.null(compTab[["compoundName"]]))
             compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
         else
             setnames(compTab, "Identifier", "name")
-        suspects <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
+        parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
     }
     else # suspect screening
-        suspects <- copy(screenInfo(suspects)) # UNDONE: keep all columns?
+        parents <- copy(screenInfo(parents)) # UNDONE: keep all columns?
     
-    if (is.null(suspects[["SMILES"]]))
-        stop("No SMILES information available for suspects. Please include either SMILES or InChI columns.")
+    if (is.null(parents[["SMILES"]]))
+        stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")
     
-    noSM <- is.na(suspects$SMILES) | !nzchar(suspects$SMILES)
+    noSM <- is.na(parents$SMILES) | !nzchar(parents$SMILES)
     if (any(noSM))
     {
         do.call(if (skipInvalid) warning else stop,
-                "The following suspects miss mandatory SMILES: ", paste0(suspects$name[noSM], collapse = ","))
-        suspects <- suspects[!noSM]
+                "The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ","))
+        parents <- parents[!noSM]
     }
     
-    return(suspects)
+    return(parents)
 }
 
-doConvertToMFDB <- function(predAll, suspects, out, includePrec)
+doConvertToMFDB <- function(predAll, parents, out, includePrec)
 {
     # UNDONE: cache?
     
@@ -41,12 +41,12 @@ doConvertToMFDB <- function(predAll, suspects, out, includePrec)
     
     if (includePrec)
     {
-        precs <- copy(suspects)
-        setnames(precs,
+        pars <- copy(parents)
+        setnames(pars,
                  c("name", "formula", "neutralMass"),
                  c("Identifier", "MolecularFormula", "MonoisotopicMass"))
-        precs[, CompoundName := Identifier]
-        predAll <- rbind(precs, predAll, fill = TRUE)
+        pars[, CompoundName := Identifier]
+        predAll <- rbind(pars, predAll, fill = TRUE)
     }
     
     # Add required InChIKey1 column

@@ -106,20 +106,20 @@ BTMPPrepareHandler <- function(cmd)
 }
 
 #' @export
-predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
+predictTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
                                      skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
 {
     checkmate::assert(
-        checkmate::checkClass(suspects, "data.frame"),
-        checkmate::checkClass(suspects, "compounds"),
-        checkmate::checkClass(suspects, "featureGroupsScreening"),
-        checkmate::checkClass(suspects, "featureGroupsScreeningSet"),
-        .var.name = "suspects"
+        checkmate::checkClass(parents, "data.frame"),
+        checkmate::checkClass(parents, "compounds"),
+        checkmate::checkClass(parents, "featureGroupsScreening"),
+        checkmate::checkClass(parents, "featureGroupsScreeningSet"),
+        .var.name = "parents"
     )
 
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(suspects))
-        assertSuspectList(suspects, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents))
+        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
@@ -127,12 +127,12 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    suspects <- getTPSuspects(suspects, adduct, skipInvalid)
+    parents <- getTPParents(parents, adduct, skipInvalid)
 
     baseHash <- makeHash(type, steps, extraOpts, adduct, skipInvalid, fpType, fpSimMethod)
-    setHash <- makeHash(suspects, baseHash)
+    setHash <- makeHash(parents, baseHash)
     
-    cmdQueue <- Map(suspects$name, suspects$SMILES, f = getBaseBTCmd,
+    cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,
                     MoreArgs = list(type = type, steps = steps, extraOpts = extraOpts, fpType = fpType,
                                     fpSimMethod = fpSimMethod, baseHash = baseHash))
 
@@ -146,9 +146,9 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
     }
 
     results <- pruneList(results, checkZeroRows = TRUE)
-    suspects <- suspects[name %in% names(results)]
+    parents <- parents[name %in% names(results)]
 
-    return(TPPredictionsBT(suspects = suspects, predictions = results))
+    return(TPPredictionsBT(parents = parents, predictions = results))
 }
 
 #' @export
@@ -163,7 +163,7 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     predAll <- collapseBTResults(pred@predictions)
     cat("Done!\n")
 
-    doConvertToMFDB(predAll, suspects(pred), out, includePrec)
+    doConvertToMFDB(predAll, parents(pred), out, includePrec)
 })
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups)
@@ -196,7 +196,7 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
     {
         if (removeEqualFormulas)
         {
-            obj@predictions <- Map(suspects(obj)$formula, obj@predictions, f = function(pform, pred)
+            obj@predictions <- Map(parents(obj)$formula, obj@predictions, f = function(pform, pred)
             {
                 if (negate)
                     return(pred[formula == pform])

@@ -192,7 +192,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         
         precFGMapping <- linkPrecursorsToFGroups(pred, fGroups)
         TPFGMapping <- linkTPsToFGroups(pred, fGroupsTPs)
-        susps <- suspects(pred)
+        pars <- parents(pred)
         
         precCount <- length(names(pred))
         prog <- openProgBar(0, precCount)
@@ -221,7 +221,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
                     
                     if (!is.null(ret[["formula"]])) # eg TRUE for BT
                     {
-                        precForm <- susps[name == pname]$formula
+                        precForm <- pars[name == pname]$formula
                         ret[, formulaDiff := sapply(formula, subtractFormula, formula1 = precForm)]
                     }
                     
@@ -249,12 +249,12 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPe
         
         if (!is.null(pred))
         {
-            susps <- suspects(pred)
+            pars <- parents(pred)
             cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "rt", "mz") # more/less?
-            cols <- intersect(names(susps), cols)
-            cols <- cols[sapply(cols, function(cl) any(!is.na(susps[[cl]])))]
+            cols <- intersect(names(pars), cols)
+            cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
             targetCols <- paste0("precursor_", cols)
-            compInfo[, (targetCols) := susps[match(precursor_name, susps$name), cols, with = FALSE]]
+            compInfo[, (targetCols) := pars[match(precursor_name, pars$name), cols, with = FALSE]]
         }
         
         compInfo[, size := sapply(compList, nrow)]
@@ -445,7 +445,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     
     if (!is.null(pred) && needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
-        stop("Input feature groups need to be screened for (TP) suspects!")
+        stop("Input feature groups need to be screened for parents/TPs!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds, minRTDiff,
                               specSimParams = specSimParams))
@@ -468,7 +468,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
 
     if (!is.null(pred) && needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
-        stop("Input feature groups need to be screened for (TP) suspects!")
+        stop("Input feature groups need to be screened for parents/TPs!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, ignorePrecursors, pred, MSPeakLists, formulas, compounds,
                               minRTDiff, specSimParams = specSimParams)

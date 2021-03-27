@@ -434,15 +434,37 @@ getNewProjectUI <- function(destPath)
                 "Analyses", icon = icon("folder-open"),
                 miniUI::miniContentPanel(
                     fillCol(
-                        flex = c(NA, NA, 1, NA),
+                        flex = c(NA, NA, NA, 1, NA),
+                        checkboxInput("setsWorkflow", "Sets workflow (positive+negative)"),
                         fillRow(
                             height = 120,
                             radioButtons("generateAnaInfo", "Generate analysis information",
                                          c("None" = "none", "From new csv file" = "table",
                                            "Load in script" = "script", "Example data" = "example")),
                             conditionalPanel(
-                                condition = "input.generateAnaInfo == \"table\"",
-                                textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
+                                condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
+                                fillCol(
+                                    flex = NA,
+                                    conditionalPanel(
+                                        condition = "input.setsWorkflow",
+                                        radioButtons("currentSet", "Selected set", c("positive", "negative"),
+                                                     inline = TRUE)
+                                    ),
+                                    conditionalPanel(
+                                        condition = "!input.setsWorkflow && input.generateAnaInfo == \"table\"",
+                                        textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
+                                    ),
+                                    conditionalPanel(
+                                        condition = "input.setsWorkflow && input.generateAnaInfo == \"table\" && input.currentSet == \"positive\"",
+                                        textInput("analysisTableFilePos",
+                                                  "Analysis table output file", "analyses-pos.csv")
+                                    ),
+                                    conditionalPanel(
+                                        condition = "input.setsWorkflow && input.generateAnaInfo == \"table\" && input.currentSet == \"negative\"",
+                                        textInput("analysisTableFileNeg",
+                                                  "Analysis table output file", "analyses-neg.csv")
+                                    )
+                                )
                             )
                         ),
                         conditionalPanel(
@@ -461,7 +483,19 @@ getNewProjectUI <- function(destPath)
                         ),
                         conditionalPanel(
                             condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
-                            rhandsontable::rHandsontableOutput("analysesHot")
+                            flex = NA,
+                            conditionalPanel(
+                                condition = "!input.setsWorkflow",
+                                rhandsontable::rHandsontableOutput("analysesHot")
+                            ),
+                            conditionalPanel(
+                                condition = "input.setsWorkflow && input.currentSet == \"positive\"",
+                                rhandsontable::rHandsontableOutput("analysesHotPos")
+                            ),
+                            conditionalPanel(
+                                condition = "input.setsWorkflow && input.currentSet == \"negative\"",
+                                rhandsontable::rHandsontableOutput("analysesHotNeg")
+                            )
                         )
                     )
                 ),
@@ -694,23 +728,83 @@ newProject <- function(destPath = NULL)
                     selectionMode = "range", outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
+    emptyAnaTable <- function() data.table(analysis = character(0), format = character(0),
+                                           group = character(0), blank = character(0), path = character(0))
+    
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(analyses = data.table(analysis = character(0), format = character(0),
-                                                        group = character(0), blank = character(0), path = character(0)))
+        rValues <- reactiveValues(analyses = emptyAnaTable(),
+                                  analysesPos = emptyAnaTable(),
+                                  analysesNeg = emptyAnaTable())
 
+        makeAnalysesHot <- function(rvName)
+        {
+            hot <- do.call(rhandsontable::rhandsontable,
+                           c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
+                             hotOpts)) %>%
+                rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text")
+            
+            return(hot)
+        }
+        getCurAnaHotName <- function()
+        {
+            if (!input$setsWorkflow)
+                return("analysesHot")
+            else if (input$currentSet == "positive")
+                return("analysesHotPos")
+            return("analysesHotNeg")
+        }
+        getCurAnaRVName <- function()
+        {
+            if (!input$setsWorkflow)
+                return("analyses")
+            else if (input$currentSet == "positive")
+                return("analysesPos")
+            return("analysesNeg")
+        }
+        verifyAnalysesOK <- function()
+        {
+            noAnas <- !input$setsWorkflow && nrow(rValues$analyses) == 0
+            noAnasPos <- input$setsWorkflow && nrow(rValues$analysesPos) == 0
+            noAnasNeg <- input$setsWorkflow && nrow(rValues$analysesNeg) == 0
+            
+            if (noAnas || noAnasPos || noAnasNeg)
+            {
+                msg <- "Please select some analyses"
+                if (noAnasPos && !noAnasNeg)
+                    msg <- paste(msg, "for positive mode")
+                else if (!noAnasPos && noAnasNeg)
+                    msg <- paste(msg, "for negative mode")
+                rstudioapi::showDialog("No analyses selected", paste0(msg, "!"), "")
+                return(FALSE)
+            }
+            
+            checkAnas <- if (!input$setsWorkflow)
+                input$analysisTableFile
+            else
+                c(input$analysisTableFilePos, input$analysisTableFileNeg)
+            for (f in checkAnas)
+            {
+                p <- file.path(input$destinationPath, input$analysisTableFile)
+                if (file.exists(p))
+                {
+                    ov <- rstudioapi::showQuestion("Analysis table file already exists",
+                                                   sprintf("Analysis table file already exists: '%s'.\nOverwrite?", p),
+                                                   "Yes", "No")
+                    if (!ov)
+                        return(FALSE)
+                }
+            }
+            
+            return(TRUE)
+        }
+        
         observeEvent(input$create, {
             if (!nzchar(input$destinationPath))
                 rstudioapi::showDialog("Invalid destination", "Please select a destination path!", "")
             else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
                 rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
-            else if (input$generateAnaInfo %in% c("table", "script") && nrow(rValues$analyses) == 0)
-                rstudioapi::showDialog("No analyses selected", "Please select some analyses!", "")
-            else if (input$generateAnaInfo == "table" && file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
-                     !rstudioapi::showQuestion("Analysis table file already exists",
-                                               sprintf("Analysis table file already exists: '%s'.\nOverwrite?",
-                                                       file.path(input$destinationPath, input$analysisTableFile)),
-                                               "Yes", "No"))
+            else if (input$generateAnaInfo %in% c("table", "script") && !verifyAnalysesOK())
             {}
             else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
                      !rstudioapi::showQuestion("Script file already exists:",
@@ -735,15 +829,19 @@ newProject <- function(destPath = NULL)
             shinyjs::toggle("removeAnalyses", condition = input$generateAnaInfo == "table")
         })
         
-        observeEvent(input$analysesHot, {
-            # HACK: input$analysesHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
-            if (input$analysesHot$params$maxRows > 0)
+        doObserveAnaHot <- function(name, rvName)
+        {
+            # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
             {
-                df <- rhandsontable::hot_to_r(input$analysesHot)
-                rValues$analyses[, c("group", "blank") := .(df$group, df$blank)]
+                df <- rhandsontable::hot_to_r(input[[name]])
+                rValues[[rvName]][, c("group", "blank") := .(df$group, df$blank)]
             }
-        })
-
+        }
+        observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
+        observeEvent(input$analysesHot, doObserveAnaHot("analysesHotPos", "analysesPos"))
+        observeEvent(input$analysesHot, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
+        
         observeEvent(input$addAnalysesDir, {
             anaDir <- rstudioapi::selectDirectory(path = "~/")
             if (!is.null(anaDir))
@@ -766,7 +864,8 @@ newProject <- function(destPath = NULL)
                     dt <- unique(dt, by = c("analysis", "path"))
                     setcolorder(dt, c("analysis", "format", "group", "blank", "path"))
 
-                    rValues$analyses <- rbind(rValues$analyses, dt)
+                    rvName <- getCurAnaRVName()
+                    rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
                 }
             }
         })
@@ -793,14 +892,17 @@ newProject <- function(destPath = NULL)
 
                     csvTab[, format := formats]
                     csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
-                    rValues$analyses <- rbind(rValues$analyses, csvTab)
+                    
+                    rvName <- getCurAnaRVName()
+                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab)
                 }
             }
         })
 
         observeEvent(input$removeAnalyses, {
-            rValues$analyses <- rValues$analyses[-seq.int(input$analysesHot_select$select$r,
-                                                          input$analysesHot_select$select$r2)]
+            rvName <- getCurAnaRVName()
+            hotSel <- paste0(getCurAnaHotName(), "_select")
+            rValues[[rvName]] <- rValues[[rvName]][-seq.int(input[[hotSel]]$select$r, input[[hotSel]]$select$r2)]
         })
 
         observeEvent(input$convAlgo, {
@@ -854,14 +956,9 @@ newProject <- function(destPath = NULL)
             }
         })
 
-        output$analysesHot <- rhandsontable::renderRHandsontable({
-            hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues$analyses, height = 250, maxRows = nrow(rValues$analyses)),
-                             hotOpts)) %>%
-                rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text")
-            
-            return(hot)
-        })
+        output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
+        output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))
+        output$analysesHotNeg <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesNeg"))
     }
 
     runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))

@@ -149,7 +149,7 @@ getScriptCode <- function(input, analyses)
     
     addNL()
     
-    addComment("Group and align features between analysis")
+    addComment("Group and align features between analyses")
     addCall("fGroups", "groupFeatures", list(
         list(value = "fList"),
         list(value = if (input$featGrouper == "XCMS") "xcms3" else tolower(input$featGrouper), quote = TRUE),

@@ -346,7 +346,7 @@ getScriptCode <- function(input, analyses)
     addNL()
     
     return(paste0(formatR::tidy_source(text = textConnectionValue(txtCon), brace.newline = TRUE,
-                                       width.cutoff = 120, wrap = FALSE)$text.tidy,
+                                       width.cutoff = 120, wrap = FALSE, output = FALSE)$text.tidy,
                   collapse = "\n"))
 }
 

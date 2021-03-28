@@ -785,7 +785,7 @@ newProject <- function(destPath = NULL)
                 c(input$analysisTableFilePos, input$analysisTableFileNeg)
             for (f in checkAnas)
             {
-                p <- file.path(input$destinationPath, input$analysisTableFile)
+                p <- file.path(input$destinationPath, f)
                 if (file.exists(p))
                 {
                     ov <- rstudioapi::showQuestion("Analysis table file already exists",

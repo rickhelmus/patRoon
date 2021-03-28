@@ -66,42 +66,86 @@ getScriptCode <- function(input, analyses)
         force(e)
         addText(" }")
     }
-    
+    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment)
+    {
+        if (input$generateAnaInfo == "table")
+        {
+            addComment("Load analysis table", condition = comment)
+            addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
+        }
+        else if (input$generateAnaInfo == "script")
+        {
+            addCall(anaInfoVarName, "generateAnalysisInfo", list(
+                list(name = "paths", value = unique(anaTable$path), quote = TRUE),
+                list(name = "groups", value = anaTable$group, quote = TRUE),
+                list(name = "blanks", value = anaTable$blank, quote = TRUE)
+            ))
+        }
+        else if (input$generateAnaInfo == "example")
+        {
+            addComment("Take example data from patRoonData package (triplicate solvent blank + triplicate standard)",
+                       condition = comment)
+            addCall(anaInfoVarName, "generateAnalysisInfo", list(
+                list(name = "paths", value = "patRoonData::exampleDataPath()"),
+                list(name = "groups", value = c(rep("solvent", 3), rep("standard", 3)), quote = TRUE),
+                list(name = "blanks", value = "solvent", quote = TRUE)
+            ))
+        }
+        else # none
+        {
+            addComment("NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.",
+                       condition = comment)
+            addCall(anaInfoVarName, "data.frame", list(
+                list(name = "path", value = "character()"),
+                list(name = "analysis", value = "character()"),
+                list(name = "groups", value = "character()"),
+                list(name = "blanks", value = "character()")
+            ))
+        }
+    }
+    addPrepBlock <- function(anaInfoVarName, DAMethodVarName)
+    {
+        addCall(NULL, "setDAMethod", list(
+            list(value = anaInfoVarName),
+            list(value = input[[DAMethodVarName]], quote = TRUE)
+        ), condition = nzchar(input[[DAMethodVarName]]))
+        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName), condition = input$doDACalib)
+        if (nzchar(input$convAlgo))
+        {
+            if (input$peakPicking)
+                centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
+            else
+                centroid <- FALSE
+            
+            for (of in input$convTo)
+            {
+                addCall(NULL, "convertMSFiles", list(
+                    list(name = "anaInfo", value = anaInfoVarName),
+                    list(name = "from", value = input$convFrom, quote = TRUE),
+                    list(name = "to", value = of, quote = TRUE),
+                    list(name = "algorithm", value = input$convAlgo, quote = TRUE),
+                    list(name = "centroid", value = centroid)))
+            }
+        }
+    }
+    addFindFeatures <- function(varName, anaInfoVarName)
+    {
+        addCall(varName, "findFeatures", list(
+            list(value = anaInfoVarName),
+            list(value = if (input$featFinder == "XCMS") "xcms3" else tolower(input$featFinder), quote = TRUE),
+            list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
+        ))
+    }
     
     addComment(paste("Script automatically generated on", date()))
     addHeader("initialization")
     
-    if (input$generateAnaInfo == "table")
+    if (!input$setsWorkflow)
+        addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE)
+    else
     {
-        addComment("Load analysis table")
-        addCall("anaInfo", "read.csv", list(value = input$analysisTableFile, quote = TRUE))
-    }
-    else if (input$generateAnaInfo == "script")
-    {
-        addCall("anaInfo", "generateAnalysisInfo", list(
-            list(name = "paths", value = unique(analyses$path), quote = TRUE),
-            list(name = "groups", value = analyses$group, quote = TRUE),
-            list(name = "blanks", value = analyses$blank, quote = TRUE)
-        ))
-    }
-    else if (input$generateAnaInfo == "example")
-    {
-        addComment("Take example data from patRoonData package (triplicate solvent blank + triplicate standard)")
-        addCall("anaInfo", "generateAnalysisInfo", list(
-            list(name = "paths", value = "patRoonData::exampleDataPath()"),
-            list(name = "groups", value = c(rep("solvent", 3), rep("standard", 3)), quote = TRUE),
-            list(name = "blanks", value = "solvent", quote = TRUE)
-        ))
-    }
-    else # none
-    {
-        addComment("NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.")
-        addCall("anaInfo", "data.frame", list(
-            list(name = "path", value = "character()"),
-            list(name = "analysis", value = "character()"),
-            list(name = "groups", value = "character()"),
-            list(name = "blanks", value = "character()")
-        ))
+        addAnaInfo("anaInfoPos", analyses$pos, input$analysisTableFilePos, TRUE)
+        addAnaInfo("anaInfoNeg", analyses$neg, input$analysisTableFileNeg, FALSE)
     }
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
@@ -110,27 +154,13 @@ getScriptCode <- function(input, analyses)
         addComment("Set to FALSE to skip data pre-treatment")
         addAssignment("doDataPretreatment", TRUE)
         addIfBlock("doDataPretreatment", {
-            addCall(NULL, "setDAMethod", list(
-                list(value = "anaInfo"),
-                list(value = input$DAMethod, quote = TRUE)
-            ), condition = nzchar(input$DAMethod))
-            addCall(NULL, "recalibrarateDAFiles", list(value = "anaInfo"), condition = input$doDACalib)
-            if (nzchar(input$convAlgo))
+            if (!input$setsWorkflow)
+                addPrepBlock("anaInfo", "DAMethod")
+            else
             {
-                if (input$peakPicking)
-                    centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
-                else
-                    centroid <- FALSE
-                
-                for (of in input$convTo)
-                {
-                    addCall(NULL, "convertMSFiles", list(
-                        list(name = "anaInfo", value = "anaInfo"),
-                        list(name = "from", value = input$convFrom, quote = TRUE),
-                        list(name = "to", value = of, quote = TRUE),
-                        list(name = "algorithm", value = input$convAlgo, quote = TRUE),
-                        list(name = "centroid", value = centroid)))
-                }
+                addPrepBlock("anaInfoPos", "DAMethodPos")
+                addNL()
+                addPrepBlock("anaInfoNeg", "DAMethodNeg")
             }
         })
     }
@@ -141,11 +171,18 @@ getScriptCode <- function(input, analyses)
     addComment(sprintf("NOTE: see the %s manual for many more options",
                        if (input$featFinder == "OpenMS") "reference" else input$featFinder),
                condition = input$featFinder != "Bruker")
-    addCall("fList", "findFeatures", list(
-        list(value = "anaInfo"),
-        list(value = if (input$featFinder == "XCMS") "xcms3" else tolower(input$featFinder), quote = TRUE),
-        list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
-    ))
+    if (!input$setsWorkflow)
+        addFindFeatures("fList", "anaInfo")
+    else
+    {
+        addFindFeatures("fListPos", "anaInfoPos")
+        addFindFeatures("fListNeg", "anaInfoNeg")
+        addCall("fList", "makeSet", list(
+            list(value = "fListPos"),
+            list(value = "fListNeg"),
+            list(name = "adducts", value = c("[M+H]+", "[M-H]-"), quote = TRUE)
+        ))
+    }
     
     addNL()
     
@@ -354,14 +391,24 @@ doCreateProject <- function(input, analyses)
 {
     mkdirp(input$destinationPath)
 
-    analyses <- copy(analyses)
-    analyses[, group := ifelse(!nzchar(group), analysis, group)]
+    prepareAnas <- function(anas, tableFile)
+    {
+        anas <- copy(anas)
+        anas[, group := ifelse(!nzchar(group), analysis, group)]
+        
+        # Make analysis table
+        if (input$generateAnaInfo == "table")
+            write.csv(anas[, c("path", "analysis", "group", "blank")],
+                      file.path(input$destinationPath, tableFile), row.names = FALSE)
+        
+        return(anas)
+    }
 
-    # Make analysis table
-    if (input$generateAnaInfo == "table")
-        write.csv(analyses[, c("path", "analysis", "group", "blank")],
-                  file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
-
+    if (!input$setsWorkflow)
+        analyses <- prepareAnas(analyses, input$analysisTableFile)
+    else
+        analyses <- Map(prepareAnas, analyses, list(input$analysisTableFilePos, input$analysisTableFileNeg))
+    
     if (nzchar(input$suspectList) && input$annotateSus && input$genIDLevelFile)
         genIDLevelRulesFile(file.path(input$destinationPath, "idlevelrules.yml"))
     

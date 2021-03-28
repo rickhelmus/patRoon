@@ -8,8 +8,11 @@
     - rename patRoonData::targets?
     - update data files?
 - newProject
-    - update for new feature and component algos and sets
+    - update for new feature and component algos
     - DA mslists: MSMSType should be bbCID if precursorMzWindow == 0?
+    - sets: add specific options for annotation and others?
+    - formatting with RStudio? --> requires opening file
+    - TP workflow
 
 
 ## Features

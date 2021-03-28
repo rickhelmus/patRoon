@@ -559,11 +559,21 @@ getNewProjectUI <- function(destPath)
                         flex = NA,
                         height = 120,
                         fillCol(
-                            flex = c(1, NA),
-                            height = 90,
-                            fileSelect("DAMethod", "DAMethodButton", "Set DataAnalysis method"),
-                            textNote("Leaving this blank will not set any method")
+                            flex = NA,
+                            height = 50,
+                            conditionalPanel(
+                                condition = "!input.setsWorkflow",
+                                fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method"),
+                            ),
+                            conditionalPanel(
+                                condition = "input.setsWorkflow",
+                                fillRow(
+                                    fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)"),
+                                    fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
+                                )
+                            )
                         ),
+                        textNote("Leaving this blank will not set any method"),
                         checkboxInput("doDACalib", "Perform m/z re-calibration")
                     )
                 )
@@ -798,6 +808,21 @@ newProject <- function(destPath = NULL)
             
             return(TRUE)
         }
+        selectDAMethod <- function(inputName)
+        {
+            dm <- rstudioapi::selectDirectory("Select DataAnalysis method")
+            if (!is.null(dm))
+            {
+                if (!file.exists(file.path(dm, "DataAnalysis.method")))
+                {
+                    rstudioapi::showDialog("Invalid DataAnalysis method", "Please select a valid DataAnalysis method!", "")
+                    dm <- NULL
+                }
+            }
+            
+            if (!is.null(dm))
+                updateTextInput(session, inputName, value = dm)
+        }
         
         observeEvent(input$create, {
             if (!nzchar(input$destinationPath))
@@ -814,7 +839,9 @@ newProject <- function(destPath = NULL)
             {}
             else
             {
-                doCreateProject(input, rValues$analyses)
+                anas <- if (!input$setsWorkflow) rValues$analyses else list(pos = rValues$analysesPos,
+                                                                            neg = rValues$analysesNeg)
+                doCreateProject(input, anas)
                 stopApp(TRUE)
             }
         })
@@ -919,16 +946,9 @@ newProject <- function(destPath = NULL)
             updateSelectInput(session, "convFrom", choices = from, selected = sel)
         })
 
-        observeEvent(input$DAMethodButton, {
-            dm <- rstudioapi::selectDirectory("Select DataAnalysis method")
-            if (!is.null(dm))
-            {
-                if (!file.exists(file.path(dm, "DataAnalysis.method")))
-                    rstudioapi::showDialog("Invalid DataAnalysis method", "Please select a valid DataAnalysis method!", "")
-                else
-                    updateTextInput(session, "DAMethod", value = dm)
-            }
-        })
+        observeEvent(input$DAMethodButton, selectDAMethod("DAMethod"))
+        observeEvent(input$DAMethodButtonPos, selectDAMethod("DAMethodPos"))
+        observeEvent(input$DAMethodButtonNeg, selectDAMethod("DAMethodNeg"))
 
         observeEvent(input$suspectListButton, {
             sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")

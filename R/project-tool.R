@@ -18,7 +18,7 @@ getScriptCode <- function(input, analyses)
         addNL()
     }
     addAssignment <- function(var, val, quote = FALSE) addText(paste(var, "<-", if (quote) doQuote(val) else val))
-    addCall <- function(var, func, args, condition = TRUE)
+    addCall <- function(var, func, args, condition = TRUE, indent = 0)
     {
         if (!condition)
             return(NULL)
@@ -54,11 +54,24 @@ getScriptCode <- function(input, analyses)
         })
         args <- pruneList(args)
         
-        cl <- paste0(func, "(", paste0(args, collapse = ", "), ")")
-        if (!is.null(var))
-            addAssignment(var, cl)
+        singleLineLength <- indent + nchar(func) + nchar("()") + nchar(paste0(args, collapse = ", "))
+        if (singleLineLength > 120)
+        {
+            argIndent <- indent + nchar(func) + nchar("(")
+            if (!is.null(var))
+                argIndent <- argIndent + nchar(var) + nchar(" <- ")
+            argCol <- paste0(",\n", strrep(" ", argIndent))
+        }
         else
-            addText(cl)
+            argCol <- ", "
+        
+        cl <- paste0(func, "(", paste0(args, collapse = argCol), ")")
+        if (!is.null(var))
+            cl <- paste0(var, " <- ", cl)
+        if (indent > 0)
+            cl <- paste0(strrep(" ", indent), cl)
+        
+        addText(cl)
     }
     addIfBlock <- function(condition, e)
     {
@@ -108,8 +121,8 @@ getScriptCode <- function(input, analyses)
         addCall(NULL, "setDAMethod", list(
             list(value = anaInfoVarName),
             list(value = input[[DAMethodVarName]], quote = TRUE)
-        ), condition = nzchar(input[[DAMethodVarName]]))
-        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName), condition = input$doDACalib)
+        ), condition = nzchar(input[[DAMethodVarName]]), indent = 4)
+        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName), condition = input$doDACalib, indent = 4)
         if (nzchar(input$convAlgo))
         {
             if (input$peakPicking)
@@ -124,7 +137,8 @@ getScriptCode <- function(input, analyses)
                     list(name = "from", value = input$convFrom, quote = TRUE),
                     list(name = "to", value = of, quote = TRUE),
                     list(name = "algorithm", value = input$convAlgo, quote = TRUE),
-                    list(name = "centroid", value = centroid)))
+                    list(name = "centroid", value = centroid)),
+                    indent = 4)
             }
         }
     }
@@ -153,16 +167,16 @@ getScriptCode <- function(input, analyses)
         addNL()
         addComment("Set to FALSE to skip data pre-treatment")
         addAssignment("doDataPretreatment", TRUE)
-        addIfBlock("doDataPretreatment", {
-            if (!input$setsWorkflow)
-                addPrepBlock("anaInfo", "DAMethod")
-            else
-            {
-                addPrepBlock("anaInfoPos", "DAMethodPos")
-                addNL()
-                addPrepBlock("anaInfoNeg", "DAMethodNeg")
-            }
-        })
+        addText("if (doDataPretreatment)\n{")
+        if (!input$setsWorkflow)
+            addPrepBlock("anaInfo", "DAMethod")
+        else
+        {
+            addPrepBlock("anaInfoPos", "DAMethodPos")
+            addNL()
+            addPrepBlock("anaInfoNeg", "DAMethodNeg")
+        }
+        addText("}")
     }
     
     addHeader("features")
@@ -381,10 +395,8 @@ getScriptCode <- function(input, analyses)
     }
     
     addNL()
-    
-    return(paste0(formatR::tidy_source(text = textConnectionValue(txtCon), brace.newline = TRUE,
-                                       width.cutoff = 120, wrap = FALSE, output = FALSE)$text.tidy,
-                  collapse = "\n"))
+
+    return(paste0(textConnectionValue(txtCon), collapse = "\n"))
 }
 
 doCreateProject <- function(input, analyses)

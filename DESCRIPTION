@@ -106,8 +106,7 @@ Imports:
     yaml,
     keys,
     backports,
-    shinyjs,
-    formatR
+    shinyjs
 Suggests: 
     RDCOMClient,
     metfRag,

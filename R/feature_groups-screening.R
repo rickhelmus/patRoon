@@ -671,7 +671,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     # do this before checking cache to ensure proper errors/warnings are thrown!
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
     
-    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
     cd <- loadCacheData("screenSuspects", hash)
     if (!is.null(cd))
         return(cd)

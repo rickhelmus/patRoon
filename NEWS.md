@@ -14,6 +14,7 @@
 - Fixed: in some cases the checking of `analysisInfo` validity may result in an error (reported by Tiago Sobreira)
 - Fixed: `convertMSFiles()` error with `dirs=TRUE` (reported by Tiago Sobreira)
 - Small updates/fixes for `installPatRoon()`
+- Fixed: `screenSuspects()` did not take `onlyHits` into account for caching
 
 
 # patRoon 1.2.0

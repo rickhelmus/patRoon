@@ -61,6 +61,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
         {
             warning(paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
                            paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n")))
+            suspects[, name_orig := name]
             suspects[, name := sanNames]
         }
         
@@ -146,7 +147,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
     
     setMetaData <- function(t, suspRow)
     {
-        for (col in c("name", "rt", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
+        for (col in c("name", "name_orig", "rt", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
                       "fragments_mz", "fragments_formula"))
         {
             if (!is.null(suspects[[col]]))

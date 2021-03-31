@@ -15,6 +15,7 @@
 - Fixed: `convertMSFiles()` error with `dirs=TRUE` (reported by Tiago Sobreira)
 - Small updates/fixes for `installPatRoon()`
 - Fixed: `screenSuspects()` did not take `onlyHits` into account for caching
+- `screenSuspects()`: The original suspect name is stored in the `name_orig` column
 
 
 # patRoon 1.2.0

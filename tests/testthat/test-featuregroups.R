@@ -3,6 +3,8 @@ context("feature groups")
 initXCMS()
 
 fList <- getTestFeatures()
+fList <- filter(fList, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
+
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
@@ -151,8 +153,8 @@ test_that("as.data.table works", {
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
     # check if area from first group of first analysis corresponds to its feature data
-    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[analyses(fgOpenMS)[1]]][1],
-                 featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(1, 1)]]])
+    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[analyses(fgOpenMS)[1]]][5],
+                 featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(5, 1)]]])
     
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
 
@@ -162,7 +164,7 @@ test_that("as.data.table works", {
                             must.include = "RSQ")
     checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, average = TRUE,
                                                 regression = TRUE)), must.include = "RSQ")
-    expect_true(all(is.na(regr$conc) | is.na(regr$conc_reg) | regr$RSQ < 0.9 |
+    expect_true(all(is.na(regr$conc) | is.na(regr$conc_reg) | is.na(regr$RSQ) | regr$RSQ < 0.9 |
                         abs(regr$conc - regr$conc_reg) < 0.5)) # calculated concentrations should be somewhat close
 
 
@@ -174,11 +176,11 @@ test_that("as.data.table works", {
 test_that("unique works", {
     # note: only have two rep groups
 
-    expect_equivalent(unique(fgOpenMS, which = "standard"),
-                      unique(fgOpenMS, which = "standard",
-                             relativeTo = setdiff(replicateGroups(fgOpenMS), "standard")))
-    expect_equivalent(unique(fgOpenMS, which = "standard"), unique(fgOpenMS, which = "standard", outer = TRUE))
-    expect_lt(length(unique(fgOpenMS, which = "standard")), length(fgOpenMS))
+    expect_equivalent(unique(fgOpenMS, which = "standard-pos"),
+                      unique(fgOpenMS, which = "standard-pos",
+                             relativeTo = setdiff(replicateGroups(fgOpenMS), "standard-pos")))
+    expect_equivalent(unique(fgOpenMS, which = "standard-pos"), unique(fgOpenMS, which = "standard-pos", outer = TRUE))
+    expect_lt(length(unique(fgOpenMS, which = "standard-pos")), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS))), length(fgOpenMS))
     expect_lt(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE)), length(fgOpenMS))
     expect_length(unique(fgOpenMSEmpty, which = replicateGroups(fgOpenMS)), 0)
@@ -199,9 +201,13 @@ minInt <- function(fg, rel)
         return(min(g[g != 0]) / max(g))
     return(min(g[g != 0]))
 }
+featCounts <- function(fg, rel)
+{
+    counts <- unlist(as.data.table(fg)[, lapply(.SD, function(x) sum(x > 0)), .SDcols = analyses(fg)])
+    return(if (rel) counts / length(fg) else counts)
+}
 
-stdRGs <- if (testWithSets()) c("standard", "standard-set2") else "standard"
-
+stdRGs <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
 test_that("basic filtering", {
     expect_gte(minInt(filter(fgOpenMS, absMinIntensity = 1500), FALSE), 1500)
     expect_gte(minInt(filter(fgOpenMS, relMinIntensity = 0.2), TRUE), 0.2)
@@ -217,12 +223,14 @@ test_that("basic filtering", {
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
-    expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
-    expect_identical(replicateGroups(fgOpenMS[, rGroups = "standard"]), "standard")
+    expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard-pos")), "standard-pos")
+    expect_identical(replicateGroups(fgOpenMS[, rGroups = "standard-pos"]), "standard-pos")
     expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), stdRGs)
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.7))), stdRGs)
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 400))), stdRGs)
     expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), stdRGs)
+    
+    expect_gte(min(featCounts(filter(fgOpenMS, relMinFeatures = 0.3), TRUE)), 0.3)
+    expect_gte(min(featCounts(filter(fgOpenMS, absMinFeatures = length(fgOpenMS) * 0.3), FALSE)),
+               length(fgOpenMS) * 0.3)
 
     expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinAnalyses = 3), testFile("fgf-minana-abs", text = TRUE))
@@ -245,19 +253,23 @@ test_that("basic filtering", {
 })
 
 test_that("replicate group subtraction", {
-    expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent")),
-                    names(unique(fgOpenMS, which = setdiff(replicateGroups(fgOpenMS), "solvent"))))
-    expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent"), 0)
+    expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent-pos")),
+                    names(unique(fgOpenMS, which = setdiff(replicateGroups(fgOpenMS), "solvent-pos"))))
+    expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent-pos"), 0)
 })
 
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
-fGCons <- consensus(fGCompOpenMS)
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
 # fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
-fGConsOneEmpty <- consensus(fgCompOneEmpty)
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
-fGConsBothEmpty <- consensus(fgCompBothEmpty)
+
+if (!testWithSets())
+{
+    fGCons <- consensus(fGCompOpenMS)
+    fGConsOneEmpty <- consensus(fgCompOneEmpty)
+    fGConsBothEmpty <- consensus(fgCompBothEmpty)
+}
 
 test_that("verify feature group comparison", {
     expect_known_value(groupTable(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
@@ -274,12 +286,16 @@ test_that("verify feature group comparison", {
     expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
     expect_equivalent(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
 
+    expect_length(fgCompOneEmpty, 2)
+    expect_length(fgCompBothEmpty, 2)
+    
+    skip_if(testWithSets())
+    
     expect_known_value(groupTable(fGCons), testFile("fg-comp-cons"))
 
     expect_lt(length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
-    expect_length(fgCompOneEmpty, 2)
+    
     expect_length(fGConsOneEmpty, length(fgOpenMS))
-    expect_length(fgCompBothEmpty, 2)
     expect_length(fGConsBothEmpty, 0)
 
     expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1)) +
@@ -320,14 +336,14 @@ test_that("reporting with empty object works", {
     expect_error(makeReportHTML(fgOpenMSEmpty), NA)
 })
 
-chordGroups <- c("standard-1" = "grp1",
-                 "standard-2" = "grp2",
-                 "standard-3" = "grp2",
-                 "solvent-1" = "grp3",
-                 "solvent-2" = "grp4",
-                 "solvent-3" = "grp5")
+chordGroups <- c("standard-pos-1" = "grp1",
+                 "standard-pos-2" = "grp2",
+                 "standard-pos-3" = "grp2",
+                 "solvent-pos-1" = "grp3",
+                 "solvent-pos-2" = "grp4",
+                 "solvent-pos-3" = "grp5")
 if (testWithSets())
-    chordGroups <- c(chordGroups, setNames(chordGroups, c(paste0("set2-", names(chordGroups)))))
+    chordGroups <- c(chordGroups, setNames(chordGroups, sub("pos", "neg", names(chordGroups))))
 
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, colourBy = "fGroups", showLegend = FALSE))
@@ -358,97 +374,96 @@ test_that("plotting works", {
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 rGroups
-    expect_doppel("venn-multiple", function() plotVenn(fgOpenMSConc, which = list(standards = paste0("standard-", 1:3), solvents = "solvent")))
+    expect_doppel("venn-multiple", function() plotVenn(fgOpenMS, which = list(standards = "standard-pos",
+                                                                              solvents = "solvent-pos")))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
-    expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent", "standard")))$areas[2],
-                 length(filter(fgOpenMS, rGroups = "standard")))
+    expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent-pos", "standard-pos")))$areas[2],
+                 length(filter(fgOpenMS, rGroups = "standard-pos")))
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$areas[2], length(fgXCMS))
-    expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
-                 length(consensus(fGCompOpenMS, relMinAbundance = 1)))
 
     # vdiffr doesn't work with UpSet
     expect_ggplot(plotUpSet(fgOpenMS))
     expect_ggplot(plotUpSet(fGCompOpenMS))
+    
+    skip_if(testWithSets())
+    
+    expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
+                 length(consensus(fGCompOpenMS, relMinAbundance = 1)))
 })
 
 test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, colourBy = "rGroups"))
-    expect_doppel("retmz", function() plot(fGConsOneEmpty, colourBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
 
     expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))
     expect_doppel("intensity-avg-empty", function() plotInt(fgOpenMSEmpty, TRUE))
 
     expect_error(plotChord(fgOpenMSEmpty))
-    expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotChord(fgCompBothEmpty))
 
     expect_doppel("eic-def-empty", function() plotChroms(fgOpenMSEmpty))
 
     expect_error(plotVenn(fgOpenMSEmpty))
-    expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotVenn(fgCompBothEmpty))
 
     expect_error(plotUpSet(fgOpenMSEmpty))
-    expect_ggplot(plotUpSet(fGConsOneEmpty))
     expect_error(plotUpSet(fgCompBothEmpty))
+    
+    skip_if(testWithSets())
+    
+    expect_doppel("retmz", function() plot(fGConsOneEmpty, colourBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
+    expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_ggplot(plotUpSet(fGConsOneEmpty))
 })
 
 if (testWithSets())
 {
-    fgOpenMSOneEmptySet <- makeSet(unset(fgOpenMS, "set1"), unset(fgOpenMSEmpty, "set2"), groupAlgo = "openms",
-                                   adducts = NULL, labels = c("set1", "set2"))
-    
-    fgUn1 <- unset(fgOpenMS, "set1"); fgUn2 <- unset(fgOpenMS, "set2")
-    fgUn2 <- filter(fgUn2, absMinIntensity = 1E5)
-    fgOpenMSDiffSet <- makeSet(fgUn1, fgUn2, groupAlgo = "openms", adducts = NULL, labels = c("set1", "set2"))
-    
-    fgUn2 <- unset(fgOpenMS, "set2")
-    adducts(fgUn2) <- rep("[M-H]-", length(fgUn2))
-    fgOpenMSDiffAdductSet <- makeSet(fgUn1, fgUn2, groupAlgo = "openms", adducts = NULL, labels = c("set1", "set2"))
+    fgOpenMSOneEmptySet <- makeSet(unset(fgOpenMS, "positive"), unset(fgOpenMSEmpty, "negative"), groupAlgo = "openms",
+                                   adducts = NULL, labels = c("positive", "negative"))
     
     fgOpenMSDiffAdduct <- fgOpenMS
-    adducts(fgOpenMSDiffAdduct, reGroup = FALSE, set = "set1")[names(fgOpenMSDiffAdduct)[3]] <- "[M+K]+"
+    adducts(fgOpenMSDiffAdduct, reGroup = FALSE, set = "positive")[names(fgOpenMSDiffAdduct[, sets = "positive"])[3]] <- "[M+K]+"
     fgOpenMSDiffAdductRG <- fgOpenMS
-    adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "set1")[names(fgOpenMSDiffAdduct)[3]] <- "[M+K]+"
+    adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "positive")[names(fgOpenMSDiffAdductRG[, sets = "positive"])] <- "[M+K]+"
     
-    fgUniqueSet2 <- unique(fgOpenMS, which = "set2", sets = TRUE)
+    fgUniqueSet2 <- unique(fgOpenMS, which = "negative", sets = TRUE)
 }
 
 test_that("sets functionality", {
     skip_if_not(testWithSets())
     
     # proper (de)neutralization
-    expect_equal(mean(groupInfo(unset(fgOpenMS, "set1"))$mzs) - mean(groupInfo(fgOpenMS[, sets = "set1"])$mzs),
+    expect_equal(mean(groupInfo(unset(fgOpenMS, "positive"))$mzs) - mean(groupInfo(fgOpenMS[, sets = "positive"])$mzs),
                  patRoon:::adductMZDelta(as.adduct("[M+H]+")))
-    expect_equal(analysisInfo(unset(fgOpenMS, "set1")), getTestAnaInfoSet1())
-    expect_equal(analysisInfo(fgOpenMS[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
-    expect_equal(unique(annotations(fgOpenMS)$adduct), "[M+H]+")
+    expect_equal(analysisInfo(unset(fgOpenMS, "positive")), getTestAnaInfoPos())
+    expect_equal(analysisInfo(fgOpenMS[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
+    expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
     expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
     expect_length(fgOpenMS[, sets = character()], 0)
-    expect_length(fgOpenMS[, sets = "set1"], length(fgOpenMS) - length(fgUniqueSet2))
-    expect_length(unset(fgOpenMS, set = "set1"), length(fgOpenMS) - length(fgUniqueSet2))
-    expect_equal(sets(filter(fgOpenMS, sets = "set1", negate = TRUE)), "set2")
+    expect_length(fgOpenMS[, sets = "positive"], length(fgOpenMS) - length(fgUniqueSet2))
+    expect_length(unset(fgOpenMS, set = "positive"), length(fgOpenMS) - length(fgUniqueSet2))
+    expect_equal(sets(filter(fgOpenMS, sets = "positive", negate = TRUE)), "negative")
     
     # can't make empty sets from fGroups atm
-    expect_error(makeSet(unset(fgOpenMSEmpty, "set1"), unset(fgOpenMSEmpty, "set2"),
-                         adducts = NULL, labels = c("set1", "set2")))
+    expect_error(makeSet(unset(fgOpenMSEmpty, "positive"), unset(fgOpenMSEmpty, "negative"),
+                         adducts = NULL, labels = c("positive", "negative")))
     
     expect_length(fgOpenMSOneEmptySet, length(fgOpenMS) - length(fgUniqueSet2))
     expect_length(filter(fgOpenMSOneEmptySet, absMinSets = 1), length(fgOpenMS) - length(fgUniqueSet2))
     expect_length(filter(fgOpenMSOneEmptySet, absMinSets = 2), 0)
     expect_length(filter(fgOpenMSOneEmptySet, relMinSets = 1), 0)
     
-    expect_length(filter(fgOpenMSDiffSet, absMinSets = 1), length(fgOpenMSDiffSet))
-    expect_lt(length(filter(fgOpenMSDiffSet, absMinSets = 2)), length(fgOpenMSDiffSet))
-    expect_lt(length(filter(fgOpenMSDiffSet, relMinSets = 1)), length(fgOpenMSDiffSet))
-    expect_setequal(adducts(fgOpenMSDiffAdductSet, set = "set2"), "[M-H]-")
-    expect_gt(length(fgOpenMSDiffAdductSet), length(fgOpenMS)) # different adducts: less grouping
+    expect_length(filter(fgOpenMS, absMinSets = 1), length(fgOpenMS))
+    expect_lt(length(filter(fgOpenMS, absMinSets = 2)), length(fgOpenMS))
+    expect_lt(length(filter(fgOpenMS, relMinSets = 1)), length(fgOpenMS))
+    expect_setequal(adducts(fgOpenMS, set = "negative"), "[M-H]-")
     
-    expect_equal(adducts(fgOpenMSDiffAdduct, set = "set1")[names(fgOpenMSDiffAdduct)[3]], "[M+K]+",
+    expect_equal(adducts(fgOpenMSDiffAdduct, set = "positive")[names(fgOpenMSDiffAdduct)[3]], "[M+K]+",
                  check.attributes = FALSE)
-    expect_true(any(adducts(fgOpenMSDiffAdductRG, set = "set1") == "[M+K]+"))
+    expect_false(length(fgOpenMSDiffAdductRG) == length(fgOpenMS)) # different adducts: different grouping
+    expect_setequal(adducts(fgOpenMSDiffAdductRG, set = "positive"), "[M+K]+")
     expect_setequal(names(fgOpenMSDiffAdduct), names(fgOpenMS))
     # should re-group --> new group names
     expect_false(checkmate::testSubset(names(fgOpenMSDiffAdductRG), names(fgOpenMS)))
@@ -465,8 +480,8 @@ test_that("sets functionality", {
     expect_equal(length(unique(fgOpenMS, which = sets(fgOpenMS), sets = TRUE)), length(fgOpenMS))
     expect_length(unique(fgOpenMSEmpty, which = sets(fgOpenMSEmpty), sets = TRUE), 0)
     
-    expect_lt(length(overlap(fgOpenMSDiffSet, which = sets(fgOpenMSDiffSet), sets = TRUE)), length(fgOpenMSDiffSet))
-    expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMSDiffSet), sets = TRUE), 0)
+    expect_lt(length(overlap(fgOpenMS, which = sets(fgOpenMS), sets = TRUE)), length(fgOpenMS))
+    expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), sets = TRUE), 0)
     
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, sets = TRUE))
 })

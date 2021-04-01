@@ -1,1 +1,1 @@
-Applying replicate abundance filter... Done! Filtered 215 (36.01%) groups. Remaining: 382.
+Applying replicate abundance filter... Done! Filtered 747 (17.38%) features and 331 (32.20%) feature groups. Remaining: 3552 features in 697 groups.

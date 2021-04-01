@@ -13,6 +13,8 @@
     - sets: add specific options for annotation and others?
     - formatting with RStudio? --> requires opening file
     - TP workflow
+    - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
+    - multiple suspect lists in UI and code gen
 
 
 ## Features

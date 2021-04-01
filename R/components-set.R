@@ -99,7 +99,7 @@ setMethod("consensus", "componentsSet", function(obj, ...)
 {
     allComponents <- c(list(obj), list(...))
     
-    checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
+    checkmate::assertList(allComponents, types = "componentsSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...")
     
     if (!allSame(lapply(allComponents, sets)))
@@ -157,9 +157,13 @@ setMethod("unset", "componentsSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     cInfo <- copy(componentInfo(obj))
-    cInfo[, set := NULL]
-    cInfo[, name := sub(paste0("\\-", set), "", name)][] # get rid of set specific names
-    cTable <- setNames(componentTable(obj), cInfo$name)
+    cTable <- componentTable(obj)
+    if (nrow(cInfo) > 0)
+    {
+        cInfo[, set := NULL]
+        cInfo[, name := sub(paste0("\\-", set), "", name)][] # get rid of set specific names
+        cTable <- setNames(cTable, cInfo$name)
+    }
     return(componentsUnset(components = cTable, componentInfo = cInfo, algorithm = paste0(algorithm(obj), "_unset")))
 })
 

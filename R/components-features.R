@@ -82,7 +82,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
             # UNDONE: handle ties?
 
             nrowPrior <- nrow(ct)
-            colsPrior <- names(ct)
+            colsPrior <- copy(names(ct)) # NOTE: need a copy: https://stackoverflow.com/a/15913648
             
             # since we must work with mass tolerances, first cluster presumably masses together
             hc <- fastcluster::hclust(dist(ct$neutralMass))

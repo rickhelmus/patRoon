@@ -271,7 +271,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     checkmate::assert(checkmate::checkFlag(isotopes, null.ok = TRUE),
                       checkmate::checkIntegerish(isotopes, lower = 0),
                       .var.name = isotopes)
-    checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::assertNumeric(rtIncrement, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     if (!is.logical(checkComponentsSession))
         assertCheckSession(checkComponentsSession, mustExist = TRUE, null.ok = TRUE, add = ac)

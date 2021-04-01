@@ -21,43 +21,39 @@ callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPa
 
 if (testWithSets())
 {
+    isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)
+    
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp_sets", file, ...) else "test_temp_sets"
     getTestDataPath <- function() "test_data_sets"
     getTestAnaInfo <- function()
     {
-        ret <- generateAnalysisInfo(c(patRoonData::exampleDataPath(), file.path(getWorkPath(), "set2")))
-        isSet2 <- grepl("^set2", ret$analysis)
-        ret$group[!isSet2] <- c(rep("solvent", 3), rep("standard", 3))
-        ret$blank[!isSet2] <- "solvent"
-        ret$group[isSet2] <- c(rep("solvent-set2", 3), rep("standard-set2", 3))
-        ret$blank[isSet2] <- "solvent-set2"
-        return(ret)
+        return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
     }
-    getTestAnaInfoSet1 <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("^set2", anaInfo$analysis), ]
+    getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
     {
-        isSet2 <- grepl("^set2", anaInfo$analysis)
-        if (any(isSet2))
-            return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
-                           findFeatures(anaInfo[isSet2, ], "openms", ...),
-                           adducts = "[M+H]+", labels = c("set1", "set2")))
-        return(makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+", labels = "set1"))
+        an <- isAnaInfoNeg(anaInfo)
+        if (any(an))
+            return(makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
+                           findFeatures(anaInfo[an, ], "openms", ...),
+                           adducts = c("[M+H]+", "[M-H]-")))
+        return(makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+"))
     }
     getTestFGroupsOneEmptySet <- function(anaInfo = getTestAnaInfo(), ...)
     {
-        isSet2 <- grepl("^set2", anaInfo$analysis)
-        fSet <- makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
-                        findFeatures(anaInfo[isSet2, ], "openms", noiseThrInt = 1E9, ...),
-                        adducts = "[M+H]+", labels = c("set1", "set2"))
+        an <- isAnaInfoNeg(anaInfo)
+        fSet <- makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
+                        findFeatures(anaInfo[an, ], "openms", noiseThrInt = 1E9, ...),
+                        adducts = c("[M+H]+", "[M-H]-"))
         return(groupFeatures(fSet, "openms"))
     }
     
-    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
-    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "set1")
-    getExpAnaInfo <- function() getTestAnaInfoSet1()
-    getExpFeats <- function(x) x[, sets = "set1"]
-    getExpFG <- function(x) x[, sets = "set1"]
-    doExport <- function(x, ...) export(x, ..., set = "set1")
+    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "positive")
+    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "positive")
+    getExpAnaInfo <- function() getTestAnaInfoPos()
+    getExpFeats <- function(x) x[, sets = "positive"]
+    getExpFG <- function(x) x[, sets = "positive"]
+    doExport <- function(x, ...) export(x, ..., set = "positive")
 
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-1", getTestAnaInfo()$analysis), ]
@@ -70,9 +66,7 @@ if (testWithSets())
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
-    getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),
-                                                      groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                      blanks = "solvent")
+    getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)

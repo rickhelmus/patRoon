@@ -1,1 +1,1 @@
-Applying minimum features filter... Done! Filtered 597 (100.00%) groups. Remaining: 0.
+Applying minimum features filter... Done! Filtered 4299 (100.00%) features and 1028 (100.00%) feature groups. Remaining: 0 features in 0 groups.

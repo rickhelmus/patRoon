@@ -315,6 +315,7 @@
     - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
     - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
     - formula/compound annotation consensus: ranking is properly scaled
+    - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

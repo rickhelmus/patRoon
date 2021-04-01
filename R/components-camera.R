@@ -75,8 +75,8 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
         isoTab[, group := gNames[isoGrpInds]]
         setnames(isoTab, c("y", "iso", "charge"), c("isogroup", "isonr", "charge"))
         isoTab[, val := NULL] # UNDONE: what is this?
-        anPList[, isotopes := NULL]
     }
+    anPList[, isotopes := NULL]
 
     # get adduct information
     adTable <- NULL
@@ -91,16 +91,22 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
                      c("adduct_rule", "adduct_charge", "adduct_nmol", "adduct_ion", "M_adduct"))
             return(ret[!duplicated(ret[, -"adnr"])]) # BUG: sometimes there are duplicate entries?
         }))
-        anPList[, adduct := NULL]
     }
+    anPList[, adduct := NULL]
 
     # merge isotope/adduct rows: do this afterwards so that uniqueness and order
     # of fGroup rows remain during collection of isotope/adduct information.
+    # If unavailable, NA columns are added to get predictable columns
     if (!is.null(isoTab))
         anPList <- merge(anPList, isoTab, all = TRUE, by = "group")
+    else
+        anPList[, c("isogroup", "isonr", "charge") := NA_real_]
     if (!is.null(adTable))
         anPList <- merge(anPList, adTable, all = TRUE, by = "group")
-
+    else
+        anPList[, c("adnr", "adduct_rule", "adduct_charge", "adduct_nmol", "adduct_ion", "M_adduct") := 
+                    .(NA_integer_, NA_real_, NA_real_, NA_real_, NA_character_, NA_real_)]
+    
     setorderv(anPList, "pcgroup")
     anPList[, pcgroup := paste0("CMP", pcgroup)]
     comps <- split(anPList, by = "pcgroup", keep.by = FALSE)

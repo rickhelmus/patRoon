@@ -330,6 +330,7 @@
     - show(): show unique fGroup counts
     - CAMERA components: handle cases when `minSize` filter results in zero components
     - CAMERA components: ensure consistent component names
+    - filter(): allow negative rtIncrement values
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt

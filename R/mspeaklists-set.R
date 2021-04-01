@@ -271,7 +271,6 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
                 return(NULL)
             
             # topSpec[, mergedBy := "unique"]; bottomSpec[, mergedBy := "unique"]
-            if (is.null(topSpec[["set"]]) || is.null(bottomSpec[["set"]])) browser()
             setnames(topSpec, "set", "mergedBy"); setnames(bottomSpec, "set", "mergedBy")
         }
         else

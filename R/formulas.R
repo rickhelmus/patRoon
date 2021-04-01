@@ -340,6 +340,10 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
     aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    # Note that group results without any MS/MS results will not have any MSMS score columns. Hence, for scoreLimits,
+    # look at all results to see what is there
+    allCols <- unique(unlist(lapply(formulaTable(obj), names)))
+    
     cat("Filtering formulas... ")
 
     oldn <- length(obj)
@@ -389,13 +393,19 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
         {
             for (sc in names(scoreLimits))
             {
-                cols <- getAllMergedConsCols(sc, names(formTable), mergedConsensusNames(obj))
+                cols <- getAllMergedConsCols(sc, allCols, mergedConsensusNames(obj))
                 if (length(cols) == 0)
                     next
-                keep <- formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                      do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
-                                  .SDcols = cols]
-                formTable <- formTable[if (negate) !keep else keep]
+                cols <- intersect(cols, names(formTable))
+                if (length(cols) == 0) # this may happen with MSMS scores and none of the results are from MSMS
+                    formTable <- formTable[negate]
+                else
+                {
+                    keep <- formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                          do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                      .SDcols = cols]
+                    formTable <- formTable[if (negate) !keep else keep]
+                }
             }
         }
 

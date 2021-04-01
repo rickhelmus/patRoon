@@ -328,6 +328,7 @@
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency
     - show(): show unique fGroup counts
+    - CAMERA components: handle cases when `minSize` filter results in zero components
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt

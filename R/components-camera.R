@@ -131,7 +131,8 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
     {
         # component(s) got filtered out, update
         cmpanalyses <- cmpanalyses[names(comps)] # update
-        names(comps) <- paste0("CMP", seq_along(comps))
+        if (length(comps) > 0)
+            names(comps) <- paste0("CMP", seq_along(comps))
     }
     
     rets <- lapply(comps, function(cm) gInfo[cm$group, "rts"])

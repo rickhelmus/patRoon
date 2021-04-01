@@ -264,12 +264,12 @@ test_that("sets functionality", {
     skip_if_not(testWithSets())
     
     # some tests from feature groups to ensure proper subsetting/unsetting
-    expect_equal(analysisInfo(unset(fGroupsScr, "set1")), getTestAnaInfoSet1())
-    expect_equal(analysisInfo(fGroupsScr[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
+    expect_equal(analysisInfo(unset(fGroupsScr, "positive")), getTestAnaInfoPos())
+    expect_equal(analysisInfo(fGroupsScr[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
     expect_equal(unique(annotations(fGroupsScr)$adduct), "[M+H]+")
     expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])
     expect_length(fGroupsScr[, sets = character()], 0)
-    expect_equal(sets(filter(fGroupsScr, sets = "set1", negate = TRUE)), "set2")
+    expect_equal(sets(filter(fGroupsScr, sets = "positive", negate = TRUE)), "set2")
 })
 
 

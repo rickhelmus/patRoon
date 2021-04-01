@@ -107,6 +107,9 @@
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
+- topMost filter: apply to set consensus results?
+    - currently group results may be removed if top candidate is not top candidate in all sets
+    - re-enable tests when fixed
 
 ## TPs
 

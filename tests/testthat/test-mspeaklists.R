@@ -208,14 +208,14 @@ if (testWithSets())
 test_that("sets functionality", {
     skip_if_not(testWithSets())
     
-    expect_equal(analysisInfo(plists[, sets = "set1"])[, 1:4], getTestAnaInfoSet1(getTestAnaInfoAnn()))
+    expect_equal(analysisInfo(plists[, sets = "positive"])[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()))
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)
-    expect_equal(sets(filter(plists, sets = "set1", negate = TRUE)), "set2")
+    expect_equal(sets(filter(plists, sets = "positive", negate = TRUE)), "negative")
     expect_setequal(groupNames(plists), unique(sapply(setObjects(plists), groupNames)))
-    expect_setequal(groupNames(unset(plists, "set1")), groupNames(setObjects(plists)[[1]]))
-    expect_setequal(groupNames(unset(plistsOneEmptySet, "set1")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
-    expect_length(unset(plistsOneEmptySet, "set2"), 0)
+    expect_setequal(groupNames(unset(plists, "positive")), groupNames(setObjects(plists)[[1]]))
+    expect_setequal(groupNames(unset(plistsOneEmptySet, "positive")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
+    expect_length(unset(plistsOneEmptySet, "negative"), 0)
     
     expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
                                                            MSLevel = 2, perSet = FALSE))

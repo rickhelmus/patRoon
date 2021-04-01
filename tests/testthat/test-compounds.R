@@ -304,11 +304,11 @@ test_that("sets functionality", {
     
     expect_equal(comps, comps[, sets = sets(comps)])
     expect_length(comps[, sets = character()], 0)
-    expect_equal(sets(filter(comps, sets = "set1", negate = TRUE)), "set2")
+    expect_equal(sets(filter(comps, sets = "positive", negate = TRUE)), "negative")
     expect_setequal(groupNames(comps), unique(sapply(setObjects(comps), groupNames)))
-    expect_setequal(groupNames(unset(comps, "set1")), groupNames(setObjects(comps)[[1]]))
-    expect_setequal(groupNames(unset(compsOneEmptySet, "set1")), groupNames(setObjects(compsOneEmptySet)[[1]]))
-    expect_length(unset(compsOneEmptySet, "set2"), 0)
+    expect_setequal(groupNames(unset(comps, "positive")), groupNames(setObjects(comps)[[1]]))
+    expect_setequal(groupNames(unset(compsOneEmptySet, "positive")), groupNames(setObjects(compsOneEmptySet)[[1]]))
+    expect_length(unset(compsOneEmptySet, "negative"), 0)
     
     expect_lt(length(callMF(fgOneEmptySet, plists, setThreshold = 1)), length(compsOneEmptySet))
     expect_length(callMF(fgOneEmptySet, plists, setThresholdAnn = 0), length(compsOneEmptySet))

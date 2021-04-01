@@ -1,1 +1,1 @@
-A componentsCamera objectHierarchy:components    |-- componentsCamera---Algorithm: cameraComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of feature groups in components: 32 (total), 4.6 (mean), 2 - 9 (min - max)
+A componentsCamera objectHierarchy:components    |-- componentsCamera---Algorithm: cameraComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (10 total)Number of unique feature groups in this object: 29Size of components: 29 (total), 2.9 (mean), 2 - 5 (min - max)

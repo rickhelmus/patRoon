@@ -34,10 +34,13 @@ if (testWithSets())
     {
         an <- isAnaInfoNeg(anaInfo)
         if (any(an))
-            return(makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
+            ret <- makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
                            findFeatures(anaInfo[an, ], "openms", ...),
-                           adducts = c("[M+H]+", "[M-H]-")))
-        return(makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+"))
+                           adducts = c("[M+H]+", "[M-H]-"))
+        else
+            ret <- makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+")
+        return(filter(ret, absMinIntensity = 5E4)) # reduce a bit as we don't need all of them for testing...
+        
     }
     getTestFGroupsOneEmptySet <- function(anaInfo = getTestAnaInfo(), ...)
     {
@@ -56,7 +59,7 @@ if (testWithSets())
     doExport <- function(x, ...) export(x, ..., set = "positive")
 
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ]
-    getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-1", getTestAnaInfo()$analysis), ]
+    getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(...)
@@ -67,7 +70,11 @@ if (testWithSets())
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
     getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
+    {
+        ret <- findFeatures(anaInfo, "openms", ...)
+        return(filter(ret, absMinIntensity = 5E4)) # reduce a bit as we don't need all of them for testing...
+    }
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)

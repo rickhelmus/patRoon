@@ -3,7 +3,6 @@ context("feature groups")
 initXCMS()
 
 fList <- getTestFeatures()
-fList <- filter(fList, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
 
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")

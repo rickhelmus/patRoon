@@ -1,1 +1,1 @@
-A componentsOpenMS objectHierarchy:componentsFeatures    |-- componentsOpenMS---Algorithm: openmsComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (41 total)Number of feature groups in components: 84 (total), 2.0 (mean), 2 - 3 (min - max)Feature components: 61 total
+A componentsOpenMS objectHierarchy:componentsFeatures    |-- componentsOpenMS---Algorithm: openmsComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (44 total)Number of unique feature groups in this object: 95Size of components: 95 (total), 2.2 (mean), 2 - 3 (min - max)Feature components: 59 total

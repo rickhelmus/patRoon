@@ -22,6 +22,7 @@ withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel 
 withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0, parallel = FALSE))
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none", componentInfo = data.table()))
+compsEmpty2 <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none2", componentInfo = data.table()))
 
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
@@ -122,11 +123,11 @@ test_that("filtering works", {
     expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0, negate = TRUE)),
                            function(cmp) all(is.na(cmp$isonr) | cmp$isonr != 0))))
 
-    expect_length(filter(compsNT, rtIncrement = c(0, 1000)), length(compsNT))
+    expect_length(filter(compsNT, rtIncrement = c(-1000, 1000)), length(compsNT))
     expect_length(filter(compsNT, rtIncrement = c(100, 1000)), 0)
     expect_length(filter(compsNT, mzIncrement = c(0, 1000)), length(compsNT))
     expect_length(filter(compsNT, mzIncrement = c(1000, 10000)), 0)
-    expect_length(filter(compsNT, rtIncrement = c(0, 1000), negate = TRUE), 0)
+    expect_length(filter(compsNT, rtIncrement = c(-1000, 1000), negate = TRUE), 0)
     expect_length(filter(compsNT, rtIncrement = c(100, 1000), negate = TRUE), length(compsNT))
     expect_length(filter(compsNT, mzIncrement = c(0, 1000), negate = TRUE), 0)
     expect_length(filter(compsNT, mzIncrement = c(1000, 10000), negate = TRUE), length(compsNT))
@@ -142,10 +143,8 @@ test_that("basic usage works", {
 
 test_that("consensus works", {
     expect_length(consensus(compsRC, compsCAM), length(compsRC) + length(compsCAM))
-    expect_error(consensus(compsRC, compsEmpty), "non-empty")
-    expect_error(consensus(compsEmpty, components(componentInfo = data.table(),
-                                                  algorithm = "empty2")),
-                 "non-empty")
+    expect_error(consensus(compsRC, compsEmpty))
+    expect_error(consensus(compsEmpty, compsEmpty2), "non-empty")
 })
 
 test_that("intensity clustered components", {
@@ -190,7 +189,11 @@ test_that("plotting works", {
     expect_HTML(plotGraph(compsNT, onlyLinked = FALSE))
 })
 
-fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
+fGroupsSI <- if (testWithSets())
+{
+    selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)
+} else
+    selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
 
 test_that("selectIons works", {
     expect_lt(length(fGroupsSI), length(fGroups))
@@ -227,29 +230,36 @@ if (testWithSets())
     fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoComponents())[, 1:50]
     compsRCOneEmptySet <- withr::with_seed(20, suppressWarnings(doGenComponents(fgOneEmptySet, "ramclustr")))
     
-    getSetCompNames <- function(cmp, set) grep(paste0("\\-", set), names(cmp), value = TRUE)
+    getSetCompNames <- function(cmp, set)
+    {
+        pat <- paste0("\\-", set, "$")
+        ret <- grep(pat, names(cmp), value = TRUE)
+        return(sub(pat, "", ret))
+    }
 }
 
 test_that("sets functionality", {
     skip_if_not(testWithSets())
     
     # components should be just a combination of the set specific components
-    expect_setequal(getSetCompNames(compsRC, "set1"), names(unset(compsRC, "set1")))
-    expect_setequal(getSetCompNames(compsRC, "set2"), names(unset(compsRC, "set2")))
-    expect_equal(length(compsRC), length(unset(compsRC, "set1")) + length(unset(compsRC, "set2")))
+    expect_setequal(getSetCompNames(compsRC, "positive"), names(unset(compsRC, "positive")))
+    expect_setequal(getSetCompNames(compsRC, "negative"), names(unset(compsRC, "negative")))
+    expect_equal(length(compsRC), length(unset(compsRC, "positive")) + length(unset(compsRC, "negative")))
     
     expect_equal(compsRC, compsRC[, sets = sets(compsRC)])
     expect_length(compsRC[, sets = character()], 0)
-    expect_equal(sets(filter(compsRC, sets = "set1", negate = TRUE)), "set2")
-    expect_setequal(groupNames(compsRC), unique(sapply(setObjects(compsRC), groupNames)))
-    expect_setequal(groupNames(unset(compsRC, "set1")), groupNames(setObjects(compsRC)[[1]]))
-    expect_setequal(groupNames(unset(compsRCOneEmptySet, "set1")), groupNames(setObjects(compsRCOneEmptySet)[[1]]))
-    expect_length(unset(compsRCOneEmptySet, "set2"), 0)
+    expect_equal(sets(filter(compsRC, sets = "positive", negate = TRUE)), "negative")
+    expect_setequal(groupNames(compsRC), unlist(unique(lapply(setObjects(compsRC), groupNames))))
+    expect_setequal(groupNames(unset(compsRC, "positive")), groupNames(setObjects(compsRC)[[1]]))
+    expect_setequal(groupNames(unset(compsRCOneEmptySet, "positive")), groupNames(setObjects(compsRCOneEmptySet)[[1]]))
+    expect_length(unset(compsRCOneEmptySet, "negative"), 0)
 
-    expect_HTML(plotGraph(compsNT, set = "set1", onlyLinked = FALSE))
+    expect_HTML(plotGraph(compsNT, set = "positive", onlyLinked = FALSE))
         
     expect_false(checkmate::testSubset(names(fGroupsSI), names(fGroups))) # should re-group --> new group names
-    expect_equal(nrow(annotations(fGroupsSI)), 2 * length(fGroupsSI)) # annotations stored per set
+    # annotations stored per set
+    expect_equal(nrow(annotations(fGroupsSI)),
+                 length(fGroupsSI[, sets = "positive"]) + length(fGroupsSI[, sets = "negative"]))
     
     # verify neutral masses
     expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSI))), function(i)

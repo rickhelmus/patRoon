@@ -165,10 +165,12 @@ setMethod("delete", "components", function(obj, i = NULL, j = NULL, ...)
     
     ac <- checkmate::makeAssertCollection()
     i <- assertDeleteArgAndToChr(i, names(obj), add = ac)
+    if (!is.function(j))
+        j <- assertDeleteArgAndToChr(j, groupNames(obj), add = ac)
     checkmate::assert(
         checkmate::checkFunction(j, null.ok = TRUE),
         checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
-        checkmate::checkSubset(j, gNames, empty.ok = TRUE),
+        checkmate::checkCharacter(j, any.missing = FALSE),
         .var.name = "j"
     )
     checkmate::reportAssertions(ac)

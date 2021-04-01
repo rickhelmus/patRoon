@@ -58,7 +58,7 @@ if (testWithSets())
     getExpFG <- function(x) x[, sets = "positive"]
     doExport <- function(x, ...) export(x, ..., set = "positive")
 
-    getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ]
+    getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)

@@ -47,8 +47,8 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             formulasSet@featureFormulas <- formulaTable(setObjects(formulasSet)[[1]], features = TRUE)
         
         if (makeCons)
-            formulasSet@formulas <- makeFormulasSetConsensus(setObjects(formulasSet), formulasSet@setThreshold,
-                                                             formulasSet@setThresholdAnn, formulasSet@origFGNames,
+            formulasSet@formulas <- makeFormulasSetConsensus(setObjects(formulasSet), formulasSet@origFGNames,
+                                                             formulasSet@setThreshold, formulasSet@setThresholdAnn,
                                                              mergedConsensusNames(formulasSet))
         else
         {
@@ -193,7 +193,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title, specSimParams = NULL,
+        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title, specSimParams = specSimParams,
                               useGGPlot2, mincex, xlim, ylim, ...))
     
     if (length(groupName) == 1)

@@ -80,6 +80,7 @@
         - delete sets stuff...
             - including getAllMergedConsCols? probably yes
         - keep ranking
+    - consensus compounds: make sure scRanges/scTypes calc remain
     - docs
         - new/changed as.data.table args
 

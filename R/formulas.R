@@ -1185,16 +1185,16 @@ setMethod("filter", "formulasFA", function(obj, ..., OM = FALSE, negate = FALSE)
 #'   object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpectrum", "formulasFA", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+setMethod("plotSpectrum", "formulasFA", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                  title = NULL, specSimParams = getDefSpecSimParams(),
                                                  useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(precursor, min.len = 1, max.len = 2, min.chars = 1, add = ac)
+    checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
     checkmate::assertCharacter(analysis, min.len = 1, max.len = 2, min.chars = 1, null.ok = TRUE, add = ac)
-    if (length(precursor) != length(groupName))
-        stop("Lengths of precursor and groupName should be equal.")
+    if (length(index) != length(groupName))
+        stop("Lengths of index and groupName should be equal.")
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
@@ -1207,12 +1207,15 @@ setMethod("plotSpectrum", "formulasFA", function(obj, precursor, groupName, anal
     
     if (length(groupName) == 1)
     {
-        if (is.null(title))
-            title <- subscriptFormula(precursor)
-        
-        spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
+        spec <- annotatedPeakList(obj, index, groupName, analysis, MSPeakLists)
         if (is.null(spec))
             return(NULL)
+        
+        if (index > nrow(obj[[groupName]]))
+            stop(sprintf("Specified candidate index out of range %d/%d", index, nrow(obj[[groupName]])), call. = FALSE)
+
+        if (is.null(title))
+            title <- subscriptFormula(obj[[groupName]]$neutral_formula[index])
         
         if (useGGPlot2)
             return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
@@ -1221,22 +1224,30 @@ setMethod("plotSpectrum", "formulasFA", function(obj, precursor, groupName, anal
     }
     else
     {
+        for (i in seq_len(2))
+        {
+            if (index[i] > nrow(obj[[groupName[i]]]))
+                stop(sprintf("Specified candidate index out of range %d/%d", index[i], nrow(obj[[groupName[i]]])),
+                     call. = FALSE)
+        }
+        
         if (is.null(title))
-            title <- subscriptFormula(precursor[1], formulas2 = precursor[2])
+            title <- subscriptFormula(obj[[groupName[1]]]$neutral_formula[index[1]],
+                                      formulas2 = obj[[groupName[2]]]$neutral_formula[index])
         
         binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, "unique", mustExist = TRUE)
         
-        topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, precursor[1], groupName[1], analysis[1],
+        topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], analysis[1],
                                                                          MSPeakLists), 1)
         
-        bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, precursor[2], groupName[2],
+        bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2],
                                                                             analysis[2], MSPeakLists), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
     }
 })
 
-setMethod("plotSpectrumHash", "formulasFA", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+setMethod("plotSpectrumHash", "formulasFA", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                      title = NULL, specSimParams = getDefSpecSimParams(),
                                                      useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
@@ -1245,13 +1256,13 @@ setMethod("plotSpectrumHash", "formulasFA", function(obj, precursor, groupName, 
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,
                      useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim, ylim = ylim, ...)
-        return(makeHash(do.call(plotSpectrumHash, c(args, list(precursor = precursor[1], groupName = groupName[1],
+        return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1],
                                                                analysis = analysis[1]))),
-                        do.call(plotSpectrumHash, c(args, list(precursor = precursor[2], groupName = groupName[2],
+                        do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2],
                                                                analysis = analysis[2])))))
     }
     
-    return(makeHash(precursor, annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists),
+    return(makeHash(index, annotatedPeakList(obj, index, groupName, analysis, MSPeakLists),
                     title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
@@ -1265,10 +1276,8 @@ setMethod("plotSpectrumHash", "formulasFA", function(obj, precursor, groupName, 
 #'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
-setMethod("consensus", "formulasFA", function(obj, ..., absMinAbundance = NULL,
-                                              relMinAbundance = NULL,
-                                              uniqueFrom = NULL, uniqueOuter = FALSE,
-                                              rankWeights = 1, labels = NULL)
+setMethod("consensus", "formulasFA", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
+                                              uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
 {
     # NOTE: keep args in sync with formulasSet method
     
@@ -1281,11 +1290,18 @@ setMethod("consensus", "formulasFA", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFormulas), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    allFormNames <- if (!is.null(labels)) labels else make.unique(sapply(allFormulas, algorithm))
-    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, allFormNames)
+    if (is.null(labels))
+        labels <- sapply(allFormulas, algorithm)
+    labels <- make.unique(labels)
     
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    return(formulasConsensus(formulas = consFormulaList, featureFormulas = list(),
+    cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
+                               uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
+                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "formula_mz",
+                                                                 "error", "error_median", "dbe"))
+    
+    return(formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
-                             mergedConsensusNames = allFormNames))
+                             mergedConsensusNames = labels))
 })

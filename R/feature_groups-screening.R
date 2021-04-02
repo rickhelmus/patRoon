@@ -405,7 +405,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   maxSuspFrags, maxFragMatches, fTable, formRank,
                                                   mFormNames = if (!is.null(formulas)) mergedConsensusNames(compounds) else character(),
                                                   fScRanges, formulasNormalizeScores, cTable, compRank,
-                                                  mConsNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
+                                                  mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
         
         set(si, i,

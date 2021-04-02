@@ -69,6 +69,19 @@
             - can set labels in advance, make.unique should be called in util anyway
         - add InChIKey1 to uniqueCols
     - use normalizeAnnScores() instead of form/comp versions
+    - formula --> ion_formula (also for compounds?)
+    - neutral_formula --> formula? or neutral_formula also for compounds?
+    - keep byMSMS? probably yes
+    - feature consensus
+        - input is just feature formulas; already with fragInfos
+        - average scorings etc as now
+        - merge fragInfos; also average scores
+        - remove MS only as now
+        - delete sets stuff...
+            - including getAllMergedConsCols? probably yes
+        - keep ranking
+    - docs
+        - new/changed as.data.table args
 
 
 ## Suspects

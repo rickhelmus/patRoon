@@ -188,7 +188,7 @@ setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPea
 #' @templateVar func annotations
 #' @templateVar desc returns annotations.
 #' @template generics
-setGeneric("annotations", function(obj) standardGeneric("annotations"))
+setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.

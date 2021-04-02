@@ -2,24 +2,24 @@
 #' @include workflow-step.R
 NULL
 
-featAnnotations <- setClass("featAnnotations",
-                      slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
-                      contains = c("workflowStep", "VIRTUAL"))
+featureAnnotations <- setClass("featureAnnotations",
+                               slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
+                               contains = c("workflowStep", "VIRTUAL"))
 
-setMethod("initialize", "featAnnotations", function(.Object, ...)
+setMethod("initialize", "featureAnnotations", function(.Object, ...)
 {
     .Object <- callNextMethod(.Object, ...)
     .Object@groupAnnotations <- makeEmptyListNamed(.Object@groupAnnotations)
     return(.Object)
 })
 
-setMethod("annotations", "featAnnotations", function(obj) obj@groupAnnotations)
+setMethod("annotations", "featureAnnotations", function(obj) obj@groupAnnotations)
 
-setMethod("groupNames", "featAnnotations", function(obj) names(obj@groupAnnotations))
+setMethod("groupNames", "featureAnnotations", function(obj) names(obj@groupAnnotations))
 
-setMethod("length", "featAnnotations", function(x) if (length(x@groupAnnotations) > 0) sum(sapply(x@groupAnnotations, nrow)) else 0)
+setMethod("length", "featureAnnotations", function(x) if (length(x@groupAnnotations) > 0) sum(sapply(x@groupAnnotations, nrow)) else 0)
 
-setMethod("[", c("featAnnotations", "ANY", "missing", "missing"), function(x, i, ...)
+setMethod("[", c("featureAnnotations", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
@@ -31,19 +31,19 @@ setMethod("[", c("featAnnotations", "ANY", "missing", "missing"), function(x, i,
     return(x)
 })
 
-setMethod("[[", c("featAnnotations", "ANY", "missing"), function(x, i, j)
+setMethod("[[", c("featureAnnotations", "ANY", "missing"), function(x, i, j)
 {
     assertExtractArg(i)
     return(x@groupAnnotations[[i]])
 })
 
-setMethod("$", "featAnnotations", function(x, name)
+setMethod("$", "featureAnnotations", function(x, name)
 {
     eval(substitute(x@groupAnnotations$NAME_ARG, list(NAME_ARG = name)))
 })
 
-setMethod("as.data.table", "featAnnotations", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
-                                                       excludeNormScores = defaultExclNormScores(x))
+setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
+                                                          excludeNormScores = defaultExclNormScores(x))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
@@ -53,16 +53,17 @@ setMethod("as.data.table", "featAnnotations", function(x, fGroups = NULL, fragme
     checkmate::reportAssertions(ac)
     
     mcn <- mergedConsensusNames(x)
-    cTable <- annotations(x)
+    annTable <- annotations(x)
     if (normalizeScores != "none")
     {
-        cTable <- mapply(cTable, x@scoreRanges, SIMPLIFY = FALSE, FUN = normalizeCompScores,
-                         MoreArgs = list(mcn, normalizeScores == "minmax", excludeNormScores))
+        annTable <- Map(annTable, x@scoreRanges, f = normalizeAnnScores,
+                        MoreArgs = list(scoreCols = annScoreNames(obj), mConsNames = mcn, normalizeScores == "minmax",
+                                      exclude = excludeNormScores))
     }
     
     if (fragments)
     {
-        ret <- rbindlist(lapply(cTable, function(ct)
+        ret <- rbindlist(lapply(annTable, function(ct)
         {
             ct <- copy(ct)
             ct[, row := seq_len(nrow(ct))]
@@ -76,7 +77,7 @@ setMethod("as.data.table", "featAnnotations", function(x, fGroups = NULL, fragme
         }), idcol = "group", fill = TRUE)
     }
     else
-        ret <- rbindlist(cTable, idcol = "group", fill = TRUE)
+        ret <- rbindlist(annTable, idcol = "group", fill = TRUE)
     
     if (!is.null(fGroups))
     {
@@ -89,9 +90,9 @@ setMethod("as.data.table", "featAnnotations", function(x, fGroups = NULL, fragme
     return(ret)
 })
 
-setMethod("filter", "featAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
-                                                fragElements = NULL, lossElements = NULL, topMost = NULL,
-                                                negate = FALSE)
+setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
+                                                   fragElements = NULL, lossElements = NULL, topMost = NULL,
+                                                   negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
@@ -99,8 +100,7 @@ setMethod("filter", "featAnnotations", function(obj, minExplainedPeaks = NULL, s
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
     if (!is.null(scoreLimits))
     {
-        # UNDONE: featAnnotationScorings method?
-        scCols <- unique(featAnnotationscorings()$name)
+        scCols <- annScoreNames(obj)
         checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
         checkmate::qassertr(scoreLimits, "N2")
     }
@@ -112,9 +112,9 @@ setMethod("filter", "featAnnotations", function(obj, minExplainedPeaks = NULL, s
     cat("Filtering annotations... ")
     
     mConsNames <- mergedConsensusNames(obj)
-
+    
     # UNDONE: minExplainedPeaks (include in scoreLimits?)
-        
+    
     oldn <- length(obj)
     obj@groupAnnotations <- sapply(obj@groupAnnotations, function(annTable)
     {
@@ -179,9 +179,9 @@ setMethod("filter", "featAnnotations", function(obj, minExplainedPeaks = NULL, s
     return(obj)
 })
 
-setMethod("plotScores", "featAnnotations", function(obj, index, groupName, normalizeScores = "max",
-                                                    excludeNormScores = defaultExclNormScores(x),
-                                                    onlyUsed = TRUE, useGGPlot2 = FALSE)
+setMethod("plotScores", "featureAnnotations", function(obj, index, groupName, normalizeScores = "max",
+                                                       excludeNormScores = defaultExclNormScores(x),
+                                                       onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -210,9 +210,9 @@ setMethod("plotScores", "featAnnotations", function(obj, index, groupName, norma
     makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
 })
 
-setMethod("plotScoresHash", "featAnnotations", function(obj, index, groupName, normalizeScores = "max",
-                                                  excludeNormScores = defaultExclNormScores(x),
-                                                  onlyUsed = TRUE, useGGPlot2 = FALSE)
+setMethod("plotScoresHash", "featureAnnotations", function(obj, index, groupName, normalizeScores = "max",
+                                                           excludeNormScores = defaultExclNormScores(x),
+                                                           onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     annTable <- annotations(obj)[[groupName]]
     if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
@@ -223,7 +223,7 @@ setMethod("plotScoresHash", "featAnnotations", function(obj, index, groupName, n
     return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
-setMethod("annotatedPeakList", "featAnnotations", function(obj, index, groupName, MSPeakLists, onlyAnnotated = FALSE)
+setMethod("annotatedPeakList", "featureAnnotations", function(obj, index, groupName, MSPeakLists, onlyAnnotated = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -263,12 +263,12 @@ setMethod("annotatedPeakList", "featAnnotations", function(obj, index, groupName
     return(spec[])
 })
 
-setMethod("plotVenn", "featAnnotations", function(obj, ..., labels = NULL, vennArgs = NULL)
+setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, vennArgs = NULL)
 {
     allFeatAnnotations <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(allFeatAnnotations, types = "featAnnotations", min.len = 2, any.missing = FALSE,
+    checkmate::assertList(allFeatAnnotations, types = "featureAnnotations", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFeatAnnotations), null.ok = TRUE, add = ac)
     checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
@@ -288,13 +288,13 @@ setMethod("plotVenn", "featAnnotations", function(obj, ..., labels = NULL, vennA
     }, nrow), vennArgs))
 })
 
-setMethod("plotUpSet", "featAnnotations", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
-                                                   nintersects = NA, upsetArgs = NULL)
+setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
+                                                      nintersects = NA, upsetArgs = NULL)
 {
     allFeatAnnotations <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(allFeatAnnotations, types = "featAnnotations", min.len = 2, any.missing = FALSE,
+    checkmate::assertList(allFeatAnnotations, types = "featureAnnotations", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFeatAnnotations), null.ok = TRUE, add = ac)
     checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)

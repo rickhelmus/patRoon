@@ -42,11 +42,18 @@ setMethod("$", "featureAnnotations", function(x, name)
     eval(substitute(x@groupAnnotations$NAME_ARG, list(NAME_ARG = name)))
 })
 
-setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
+setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fragments = FALSE, countElements = NULL,
+                                                          countFragElements = NULL, OM = FALSE,
+                                                          normalizeScores = "none",
                                                           excludeNormScores = defaultExclNormScores(x))
 {
+    # NOTE: keep args in sync with formulas/compounds methods
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(countElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(countFragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(OM, add = ac)
     checkmate::assertFlag(fragments, add = ac)
     assertNormalizationMethod(normalizeScores, add = ac)
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
@@ -85,8 +92,11 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
         setcolorder(ret, c("group", "ret", "group_mz"))
     }
     
+    ret <- addElementInfoToAnnTable(ret, countElements, countFragElements, OM, TRUE)
+    
     if (!is.null(ret[["fragInfo"]]))
         return(ret[, -"fragInfo"]) # not there if empty results
+    
     return(ret)
 })
 

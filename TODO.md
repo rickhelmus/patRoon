@@ -5,8 +5,7 @@
 - ggplot: remove?
     - Otherwise fix plotSpectrum() (sets) for title and ticks and possibly others
 - patRoonData
-    - rename patRoonData::targets?
-    - update data files?
+    - remove some more suspects to get better default hits?
 - newProject
     - update for new feature and component algos
     - DA mslists: MSMSType should be bbCID if precursorMzWindow == 0?
@@ -15,6 +14,8 @@
     - TP workflow
     - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
     - multiple suspect lists in UI and code gen
+    - example suspect lists
+    - set generateFormulas() calculateFeatures
 
 
 ## Features
@@ -46,6 +47,7 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
+    - lower default minFWHM (mainly for patRoonData... but seems also OK for other data)
 
 
 ## Annotation
@@ -59,7 +61,6 @@
 
 - spec similarity: use C++ code?
     - probably not ... many things such as alignment not relevant
-
 
 ## Components
 
@@ -110,6 +111,7 @@
 - topMost filter: apply to set consensus results?
     - currently group results may be removed if top candidate is not top candidate in all sets
     - re-enable tests when fixed
+- screenSuspects should support also unnamed list for multiple suspect lists
 
 ## TPs
 

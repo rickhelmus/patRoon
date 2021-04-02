@@ -266,8 +266,8 @@ getScriptCode <- function(input, analyses)
             addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
             addCall("mslists", "generateMSPeakLists", list(
                 list(value = "fGroups"),
-                list(value = "mzr", condition = input$peakListGen == "mzR"),
-                list(value = if (useFMF) "brukerfmf" else "bruker", condition = input$peakListGen == "Bruker"),
+                list(value = "mzr", quote = TRUE, condition = input$peakListGen == "mzR"),
+                list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = input$peakListGen == "Bruker"),
                 list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
                 list(name = "precursorMzWindow", value = input$precursorMzWindow, zeroToNULL = TRUE),
                 list(name = "bgsubtr", value = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
@@ -310,7 +310,7 @@ getScriptCode <- function(input, analyses)
             addCall("compounds", "generateCompounds", list(
                 list(value = "fGroups"),
                 list(value = "mslists"),
-                list(value = tolower(input$formulaGen), quote = TRUE),
+                list(value = tolower(input$compIdent), quote = TRUE),
                 list(name = "dbRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
                 list(name = "fragRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
                 list(name = "fragAbsMzDev", value = 0.002, condition = input$compIdent == "MetFrag"),

@@ -57,18 +57,13 @@ addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, class
 }
 
 doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter,
-                               minMaxNormalization, rankWeights, labels, uniqueCols)
+                               minMaxNormalization, rankWeights, annNames, uniqueCols)
 {
     # NOTE: keep args in sync with sets methods
     
     allFeatAnnotations <- c(list(obj), list(...))
     
     rankWeights <- rep(rankWeights, length.out = length(allFeatAnnotations))
-    annNames <- if (!is.null(labels)) labels else sapply(allFeatAnnotations, algorithm)
-    annNames <- make.unique(annNames)
-
-    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, annNames)
-    
     relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allFeatAnnotations), NULLToZero(relMinAbundance))
     
     # initialize all objects for merge: copy them, rename columns to
@@ -188,18 +183,7 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
     
     printf("Determining coverage and final scores... ")
     
-    # rename & merge score types and ranges
-    scoreTypes <- Reduce(union, mapply(allFeatAnnotations, annNames, FUN = function(ann, cn)
-    {
-        paste0(ann@scoreTypes, "-", cn)
-    }))
-    
-    scRanges <- Reduce(modifyList, Map(allFeatAnnotations, annNames, f = function(ann, cn)
-    {
-        lapply(ann@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
-    }))
-    
-    # Determine coverage of featAnnotations between objects and the merged score. The score column can be
+    # Determine coverage of between objects and the merged score. The score column can be
     # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(mAnnList))
     {
@@ -250,6 +234,5 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
     if (length(mAnnList) > 0)
         mAnnList <- mAnnList[sapply(mAnnList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
     
-    return(list(featAnnotations = mAnnList, scoreTypes = scoreTypes, scoreRanges = scRanges,
-                mergedConsensusNames = annNames))
+    return(mAnnList)
 }

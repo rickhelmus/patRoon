@@ -16,6 +16,8 @@
     - multiple suspect lists in UI and code gen
     - example suspect lists
     - set generateFormulas() calculateFeatures
+    - use strwrap()
+- remove old algorithm duplicate methods
 
 
 ## Features

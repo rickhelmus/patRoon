@@ -17,6 +17,45 @@ normalizeAnnScores <- function(res, scoreCols, scoreRanges, mConsNames, minMaxNo
     return(res)
 }
 
+addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, classify)
+{
+    annTable <- copy(annTable)
+    
+    # ensure CHNOPS counts are present
+    if (OM)
+        elements <- union(elements, c("C", "H", "N", "O", "P", "S"))
+    
+    if (!is.null(elements) && length(elements) > 0)
+    {
+        # Retrieve element lists from formulas
+        el <- getElements(annTable$neutral_formula, elements)
+        annTable[, names(el) := el]
+    }
+    if (!is.null(fragElements) && !is.null(annTable[["frag_formula"]]) && length(fragElements) > 0)
+    {
+        el <- getElements(annTable$frag_formula, fragElements)
+        annTable[, (paste0("frag_", names(el))) := el]
+    }
+    
+    if (OM)
+    {
+        # add element ratios commonly used for plotting
+        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
+        annTable[, c("OC", "HC", "NC", "PC", "SC") :=
+                     .(elrat(O, C), elrat(H, C), elrat(N, C), elrat(P, C), elrat(S, C))]
+        
+        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
+        annTable[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
+        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
+        annTable[, AI := getAI(DBE_AI, (C - O - N - S - P))]
+        
+        if (classify)
+            annTable[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
+    }
+    
+    return(annTable)
+}
+
 doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter,
                                minMaxNormalization, rankWeights, labels, uniqueCols)
 {

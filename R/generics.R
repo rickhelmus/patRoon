@@ -7,7 +7,6 @@ if (!isGeneric("plot"))
 setGeneric("groupTable", function(object, ...) standardGeneric("groupTable"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
-setGeneric("annotations", function(fGroups) standardGeneric("annotations"))
 setGeneric("adducts", function(fGroups) standardGeneric("adducts"))
 setGeneric("adducts<-", function(fGroups, value) standardGeneric("adducts<-"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
@@ -185,6 +184,11 @@ setGeneric("analyses", function(obj) standardGeneric("analyses"))
 #' @templateVar desc returns an annotated MS peak list.
 #' @template generics
 setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPeakList"))
+
+#' @templateVar func annotations
+#' @templateVar desc returns annotations.
+#' @template generics
+setGeneric("annotations", function(obj) standardGeneric("annotations"))
 
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.

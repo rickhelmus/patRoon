@@ -57,6 +57,18 @@
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
     - also for compounds?
+- annotation refactor
+    - compounds annotatedPeakList: merge in formula results
+    - defaultExclNormScores() and annScoreNames() methods
+    - plotSpectrum: doAnnPlotSpectrum function that takes mol as argument, to be shared with formulas and compounds methods
+        - or just keep separate methods?
+    - set UID columns
+    - consensus
+        - methods that call doConsensus function
+        - compounds: somehow include library in duplicated labels
+            - can set labels in advance, make.unique should be called in util anyway
+        - add InChIKey1 to uniqueCols
+    - use normalizeAnnScores() instead of form/comp versions
 
 
 ## Suspects

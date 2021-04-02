@@ -236,7 +236,7 @@ setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
 #' @export
-setMethod("annotations", "featureGroups", function(fGroups) fGroups@annotations)
+setMethod("annotations", "featureGroups", function(obj) obj@annotations)
 
 #' @describeIn featureGroups Returns a named \code{character} with adducts assigned to each feature group.
 #' @export

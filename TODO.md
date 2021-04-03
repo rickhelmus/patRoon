@@ -57,11 +57,10 @@
 - plotSpectrum/annotatedPeakList formula methods: check if formula exist?
     - if so, check if this doesn't interfere with compounds methods somehow
     - also for compounds?
+- GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
     - compounds annotatedPeakList: merge in formula results
     - defaultExclNormScores() and annScoreNames() methods
-    - plotSpectrum: doAnnPlotSpectrum function that takes mol as argument, to be shared with formulas and compounds methods
-        - or just keep separate methods?
     - set UID columns
     - consensus
         - methods that call doConsensus function
@@ -81,6 +80,10 @@
             - including getAllMergedConsCols? probably yes
         - keep ranking
     - consensus compounds: make sure scRanges/scTypes calc remain
+    - annScoreNames --> replace by generic for formulaScorings/compoundScorings?
+        - although this will require object as input which is a bit unhandy
+    - update rankFormulaTable: remove old MS/MS cols
+    - remove mergedNames again from rankFormulaTable etc
     - docs
         - new/changed as.data.table args
 

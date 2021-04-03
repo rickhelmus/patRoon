@@ -74,6 +74,11 @@ setGeneric("generateComponentsCliqueMS", function(fGroups, ...) standardGeneric(
 setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric("generateComponentsSpecClust"))
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
+### Feature annotation base class
+
+setGeneric("annScoreNames", function(obj) standardGeneric("annScoreNames"))
+
+
 ### Formulas
 
 setGeneric("formulaTable", function(obj, features = FALSE) standardGeneric("formulaTable"))
@@ -215,6 +220,11 @@ setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 #' @templateVar desc combines and merges data from various algorithms to generate a consensus.
 #' @template generics
 setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
+
+#' @templateVar func defaultExclNormScores
+#' @templateVar desc Returns default scorings that are excluded from normalization.
+#' @template generics
+setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNormScores"))
 
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.

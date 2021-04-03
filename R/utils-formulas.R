@@ -386,7 +386,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean, na.rm = TRUE),
                   by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
         
-        # remove NaNs that may have been introduced due to mean(..., na.RM=TRUE)
+        # remove NaNs that may have been introduced due to mean(..., na.rm=TRUE)
         numCols <- names(which(sapply(formTable, is.numeric)))
         formTable[, (numCols) := lapply(.SD, nafill), .SDcols = numCols]
         

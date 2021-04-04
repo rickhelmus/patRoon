@@ -668,13 +668,11 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
         
         names(formTable) <- anaInfo$analysis
         formTable <- pruneList(formTable, TRUE)
-        browser()
+
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
+            groupFormulas <- generateGroupFormulasByConsensus2(formTable, lapply(featIndex, function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn,
-                                                              gNames, "analysis_from", "analyses", "featCoverage",
-                                                              "featCoverageAnn", MSPeakLists, absAlignMzDev,
-                                                              character())
+                                                              gNames, MSPeakLists, absAlignMzDev)
         else
             groupFormulas <- list()
     }

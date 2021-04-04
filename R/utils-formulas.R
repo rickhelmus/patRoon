@@ -479,6 +479,132 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
     return(formCons)
 }
 
+generateFormConsensusForGroup2 <- function(formList, mergeCount, formThreshold, formThresholdAnn)
+{
+    # merge all together
+    formTable <- rbindlist(formList, fill = TRUE, idcol = "analysis")
+    
+    if (nrow(formTable) > 0)
+    {
+        # Determine coverage of precursor formulas.
+        formTable[, featCoverage := uniqueN(analysis) / mergeCount, by = "neutral_formula"]
+        formTable[, featCoverageAnn := uniqueN(analysis) / length(formList), by = "neutral_formula"]
+        
+        # add column that specifies of which datasets its merged from
+        formTable[, analyses := paste0(unique(analysis), collapse = ","), by = "neutral_formula"]
+        
+        # Apply coverage filters
+        if (formThreshold > 0 || formThresholdAnn > 0)
+            formTable <- formTable[featCoverage >= formThreshold & featCoverageAnn >= formThresholdAnn]
+        
+        # average scorings
+        avgCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
+        formTable[, (avgCols) := lapply(unique(.SD, by = "analysis")[, avgCols, with = FALSE], mean, na.rm = TRUE),
+                  by = "neutral_formula", .SDcols = c(avgCols, "analysis")]
+        
+        # merge fragInfos: average scorings and keep one row per fragment
+        formTable[, fragInfo := {
+            mergedFI <- rbindlist(fragInfo)
+            if (nrow(mergedFI) > 0)
+            {
+                for (col in c("error", "mSigma", "score"))
+                {
+                    if (!is.null(mergedFI[[col]]))
+                        mergedFI[, (col) := mean(get(col)), by = "ion_formula"]
+                }
+                mergedFI <- unique(mergedFI, by = "ion_formula")
+                setorderv(mergedFI, "mz")
+            }
+            list(list(mergedFI)) # double wrap seems necessary?
+        }, by = "neutral_formula"]
+        formTable[, explainedPeaks := sapply(fragInfo, nrow)]
+        
+        # Remove duplicate entries (do this after coverage!)
+        formTable <- unique(formTable, by = "neutral_formula")
+        
+        formTable <- rankFormulaTable(formTable, character())
+        
+        formTable[, analysis := NULL]
+    }
+    
+    return(formTable)
+}
+
+generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
+                                             MSPeakLists, absAlignMzDev)
+{
+    cat("Generating formula consensus...\n")
+    
+    hash <- makeHash(formList, formThreshold, formThresholdAnn, origGNames, MSPeakLists, absAlignMzDev)
+    formCons <- loadCacheData("formulasFGroupConsensus", hash)
+    
+    # figure out names
+    resNames <- unique(unlist(lapply(formList, names)))
+    resCount <- length(resNames)
+    
+    if (resCount == 0)
+        formCons <- list()
+    else if (is.null(formCons))
+    {
+        prog <- openProgBar(0, resCount)
+        
+        formCons <- lapply(seq_len(resCount), function(i)
+        {
+            fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
+            ret <- generateFormConsensusForGroup2(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn)
+            setTxtProgressBar(prog, i)
+            return(ret)
+        })
+        names(formCons) <- resNames
+        formCons <- pruneList(formCons, checkZeroRows = TRUE)
+        
+        # fix order
+        formCons <- formCons[intersect(origGNames, names(formCons))]
+        
+        # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than
+        # what was used to get the feature formula, or it may simply be removed.
+        formCons <- Map(formCons, lapply(averagedPeakLists(MSPeakLists)[names(formCons)], "[[", "MSMS"), f = function(fc, spec)
+        {
+            fc <- copy(fc)
+            fc[explainedPeaks > 0, fragInfo := lapply(fragInfo, function(fi)
+            {
+                # verify presence
+                fi <- fi[sapply(mz, function(mz)
+                {
+                    wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
+                    if (length(wh) > 1)
+                        warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
+                                "Consider lowering absAlignMzDev.", call. = FALSE)
+                    return(length(wh) > 0)
+                })]
+                
+                if (nrow(fi) > 0)
+                {
+                    # align remaining mzs
+                    fi[, PLIndex := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
+                    fi[, mz := spec$mz[PLIndex]]
+                }
+                else
+                    fi[, PLIndex := integer()]
+                
+                return(fi)
+            })]
+            fc[, explainedPeaks := sapply(fragInfo, nrow)]
+            return(fc)
+        })
+        formCons <- pruneList(formCons, checkZeroRows = TRUE)
+        
+        setTxtProgressBar(prog, resCount)
+        close(prog)
+        
+        saveCacheData("formulasFGroupConsensus", formCons, hash)
+    }
+    else
+        cat("Done!\n")
+    
+    return(formCons)
+}
+
 getFragmentInfoFromForms <- function(spec, fragFormTable)
 {
     if (nrow(fragFormTable) == 0)

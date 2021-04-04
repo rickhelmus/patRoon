@@ -123,7 +123,9 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     
     mConsNames <- mergedConsensusNames(obj)
     
-    # UNDONE: minExplainedPeaks (include in scoreLimits?)
+    if (!is.null(minExplainedPeaks))
+        scoreLimits <- modifyList(if (is.null(scoreLimits)) list() else scoreLimits,
+                                  list(minExplainedPeaks = c(minExplainedPeaks, Inf)))
     
     oldn <- length(obj)
     obj@groupAnnotations <- lapply(obj@groupAnnotations, function(annTable)

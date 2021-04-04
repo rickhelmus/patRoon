@@ -7,12 +7,10 @@ NULL
 # callback for executeMultiProcess()
 processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 {
-    noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
-                                    adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
-                                    isoScore = numeric(0), byMSMS = logical(0),
-                                    frag_formula = character(0), frag_formula_SIR = character(0),
-                                    frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
-                                    neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
+    noResult <- forms <- data.table(neutral_formula = character(), ion_formula = character(), ion_formula_mz = numeric(),
+                                    adduct = character(), score = numeric(), MSMSScore = numeric(),
+                                    isoScore = numeric(), explainedPeaks = integer(), explainedIntensity = numeric(),
+                                    fragInfo = list())
     
     
     resultPath <- getSiriusResultPath(outPath, msFName)
@@ -28,23 +26,23 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             forms <- noResult
         else
         {
-            setnames(forms, c("molecularFormula", "precursorFormula", "SiriusScore",
-                              "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
-                              "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
+            setnames(forms,
+                     c("molecularFormula", "precursorFormula", "SiriusScore",
+                       "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
+                       "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
                      c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
                        "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
             
             ionImpAdductsCached <- makeEmptyListNamed(list())
-            frags <- rbindlist(lapply(fragFiles, function(ff)
+            fragInfoList <- lapply(fragFiles, function(ff)
             {
                 fragInfo <- fread(ff)
                 setnames(fragInfo,
-                         c("mz", "intensity", "exactmass", "formula"),
-                         c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_formula_SIR"))
+                         c("exactmass", "formula"),
+                         c("ion_formula_mz", "ion_formula_SIR"))
                 fragInfo[, rel.intensity := NULL]
                 fragInfo[, ionization := gsub(" ", "", ionization, fixed = TRUE)]
-                fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff)]
-                
+
                 # sirius neutralizes fragments, make them ion again
                 if (!is.null(fragInfo[["implicitAdduct"]]))
                     ionImpAdducts <- ifelse(nzchar(fragInfo$implicitAdduct),
@@ -60,36 +58,54 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                                                           simplify = FALSE))
                 ionImpAdducts <- ionImpAdductsCached[ionImpAdducts]
 
-                fragInfo[, frag_formula := mapply(frag_formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
+                fragInfo[, ion_formula := mapply(ion_formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
                 if (!is.null(fragInfo[["implicitAdduct"]]))
                 {
                     # 'correct' formula masses: SIRIUS subtract implicit adduct from it
-                    fragInfo[nzchar(implicitAdduct), frag_formula_mz := frag_formula_mz +
+                    fragInfo[nzchar(implicitAdduct), ion_formula_mz := ion_formula_mz +
                                  sapply(implicitAdduct, getFormulaMass)]
                 }
                 return(fragInfo)
-            }))
+            })
+            names(fragInfoList) <- sapply(fragFiles, getFormulaFromSiriusFragFile)
             
-            # merge fragment info
-            forms <- merge(forms, frags, by = "neutral_adduct_formula")
+            # initialize all with empty fragInfos
+            if (length(fragInfoList) > 0)
+                forms[match(names(fragInfoList), neutral_adduct_formula), fragInfo := fragInfoList]
+            else
+                forms[, fragInfo := list()]
+
+            forms[, ion_formula := calculateIonFormula(neutral_formula, ..adduct)]
             
-            forms[, formula := calculateIonFormula(neutral_formula, ..adduct)]
-            forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
-            forms[, byMSMS := TRUE]
+            # add neutral losses now ion formulas are there    
+            forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
+            {
+                fi <- copy(fi)
+                if (nrow(fi) == 0)
+                    fi[, neutral_loss := character()]
+                else
+                    fi[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = form)]
+                return(fi)
+            })]
+            
             forms[, rank := NULL]
             
             # Precursor is always present in MS/MS spectrum: it's added by
             # SIRIUS if necessarily (with zero intensity). Remove it and use its
             # frag_formula_mz to get the formula_mz
-            forms[, formula_mz := .SD[frag_formula == formula, frag_formula_mz], by = "formula"]
-            forms <- forms[frag_intensity != 0 | formula != frag_formula]
+            forms[, ion_formula_mz := mapply(ion_formula, fragInfo,
+                                             FUN = function(form, fi) fi$ion_formula_mz[form == fi$ion_formula])]
+            forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
+            {
+                fi <- fi[intensity != 0 | ion_formula != form]
+                fi[, intensity := NULL]
+                return(fi)
+            })]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error",
+            setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "ion_formula_mz", "error",
                                  "error_frag_median", "error_frag_median_abs", "adduct", "score", "MSMSScore",
-                                 "isoScore", "byMSMS", "frag_formula", "frag_formula_SIR",
-                                 "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss", "explainedPeaks",
-                                 "explainedIntensity"))
+                                 "isoScore", "explainedPeaks", "explainedIntensity"))
             
             forms <- rankFormulaTable(forms, character())
         }
@@ -154,11 +170,10 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         if (length(formTable) > 0)
         {
             formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable,
+            groupFormulas <- generateGroupFormulasByConsensus2(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
-                                                              featThreshold, featThresholdAnn, gNames, "analysis_from",
-                                                              "analyses", "featCoverage", "featCoverageAnn",
-                                                              MSPeakLists, absAlignMzDev, character())
+                                                              featThreshold, featThresholdAnn, gNames,  MSPeakLists,
+                                                              absAlignMzDev)
         }
         else
             groupFormulas <- list()
@@ -185,7 +200,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
     
-    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
+    return(formulasFA(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
 })
 
 setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,

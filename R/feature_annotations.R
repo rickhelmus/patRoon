@@ -101,7 +101,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
 })
 
 setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
-                                                   fragElements = NULL, lossElements = NULL, topMost = NULL,
+                                                   fragElements = NULL, lossElements = NULL, topMost = NULL, OM = FALSE,
                                                    negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -116,7 +116,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     }
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(negate, add = ac)
+    aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     cat("Filtering annotations... ")
@@ -126,7 +126,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     # UNDONE: minExplainedPeaks (include in scoreLimits?)
     
     oldn <- length(obj)
-    obj@groupAnnotations <- sapply(obj@groupAnnotations, function(annTable)
+    obj@groupAnnotations <- lapply(obj@groupAnnotations, function(annTable)
     {
         if (!is.null(scoreLimits))
         {
@@ -176,8 +176,29 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                 annTable <- head(annTable, topMost)
         }
         
+        if (OM)
+        {
+            fElTable <- addElementInfoToAnnTable(annTable, NULL, NULL, OM = TRUE)
+            keep <- fElTable[, 
+                             # rules from Kujawinski & Behn, 2006 (10.1021/ac0600306)
+                             H >= 1/3 * C &
+                                 H <= ((2 * C) + N + 2) &
+                                 (H + N) %% 2 == 0 &
+                                 N <= C &
+                                 O <= C &
+                                 P <= 2 &
+                                 S <= 2 &
+                                 
+                                 # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
+                                 sapply(DBE_AI, checkmate::checkInt) &
+                                 HC <= 2.2 &
+                                 OC <= 1.2 &
+                                 NC <= 0.5]
+            annTable <- annTable[if (negate) !keep else keep]
+        }
+        
         return(annTable)
-    }, simplify = FALSE)
+    })
     
     if (length(obj) > 0)
         obj@groupAnnotations <- obj@groupAnnotations[sapply(obj@groupAnnotations, function(cm) !is.null(cm) && nrow(cm) > 0)]

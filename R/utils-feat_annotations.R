@@ -56,6 +56,36 @@ addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, class
     return(annTable)
 }
 
+doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
+{
+    if (is.null(spec))
+        return(NULL)
+    
+    spec <- copy(spec)
+    spec[, PLIndex := seq_len(nrow(spec))] # for merging
+    
+    if (!is.null(annTable) && nrow(annTable) >= index)
+    {
+        compr <- annTable[index]
+        fragInfo <- compr$fragInfo[[1]]
+        
+        if (!is.null(fragInfo))
+            spec <- merge(spec, fragInfo[, -"mz"], all.x = TRUE, by = "PLIndex")
+        
+        spec <- spec[, PLIndex := NULL]
+    }
+    
+    if (onlyAnnotated)
+    {
+        if (is.null(spec[["ion_formula"]]))
+            spec <- spec[0]
+        else
+            spec <- spec[!is.na(formula)]
+    }
+    
+    return(spec[])
+}
+
 doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter,
                                minMaxNormalization, rankWeights, annNames, uniqueCols)
 {

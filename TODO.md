@@ -84,8 +84,15 @@
         - although this will require object as input which is a bit unhandy
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc
+    - update formulaScorings: remove frag specific scores
+    - plotScores: compounds/formulas method, extend makeScoresPlot to just need annTable input
+    - formula --> ion_formula
+        - spec plotting
     - docs
         - new/changed as.data.table args
+    - news
+        - frag mSigma/score now also averaged
+        - formula --> ion_formula
 
 
 ## Suspects

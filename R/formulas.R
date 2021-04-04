@@ -1099,6 +1099,34 @@ setMethod("as.data.table", "formulasFA", function(x, fGroups = NULL, fragments =
     return(ret[])
 })
 
+#' @describeIn formulas Returns an MS/MS peak list annotated with data from a
+#'   given candidate formula.
+#'
+#' @param onlyAnnotated Set to \code{TRUE} to filter out any peaks that could
+#'   not be annotated.
+#'
+#' @export
+setMethod("annotatedPeakList", "formulasFA", function(obj, index, groupName, analysis = NULL, MSPeakLists,
+                                                    onlyAnnotated = FALSE)
+{
+    # NOTE: keep args in sync with sets method
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    assertChoiceSilent(groupName, groupNames(obj), add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertFlag(onlyAnnotated, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(analysis))
+        return(doAnnotatePeakList(MSPeakLists[[analysis, groupName]][["MSMS"]],
+                                  annotations(obj, TRUE)[[analysis, groupName]], index, onlyAnnotated))
+    
+    return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
+                              onlyAnnotated))
+})
+
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'

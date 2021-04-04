@@ -256,46 +256,6 @@ setMethod("plotScoresHash", "featureAnnotations", function(obj, index, groupName
     return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
-setMethod("annotatedPeakList", "featureAnnotations", function(obj, index, groupName, MSPeakLists, onlyAnnotated = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertCount(index, positive = TRUE, add = ac)
-    assertChoiceSilent(groupName, groupNames(obj), add = ac)
-    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertFlag(onlyAnnotated, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    spec <- MSPeakLists[[groupName]][["MSMS"]]
-    if (is.null(spec))
-        return(NULL)
-    
-    spec <- copy(spec)
-    spec[, PLIndex := seq_len(nrow(spec))] # for merging
-    
-    annTable <- annotations(obj)[[groupName]]
-    fragInfo <- NULL
-    if (!is.null(annTable) && nrow(annTable) >= index)
-    {
-        compr <- annTable[index]
-        fragInfo <- compr$fragInfo[[1]]
-        
-        if (!is.null(fragInfo))
-            spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
-        
-        spec <- spec[, PLIndex := NULL]
-    }
-    
-    if (onlyAnnotated)
-    {
-        if (is.null(spec[["formula"]]))
-            spec <- spec[0]
-        else
-            spec <- spec[!is.na(formula)]
-    }
-    
-    return(spec[])
-})
-
 setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, vennArgs = NULL)
 {
     allFeatAnnotations <- c(list(obj), list(...))

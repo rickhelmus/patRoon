@@ -59,8 +59,9 @@
     - also for compounds?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
-    - formulas: neutralMass column, set PLIndex for formulae obtained directly from groups, remove old code
+    - formulas: neutralMass column, remove old code
     - update DA formulas
+        - call setFormulaPLIndex()
     - use normalizeAnnScores() instead of form/comp versions
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc

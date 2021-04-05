@@ -671,8 +671,7 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
 
         if (length(formTable) > 0)
             groupFormulas <- generateGroupFormulasByConsensus2(formTable, lapply(featIndex, function(x) sum(x > 0)),
-                                                              featThreshold, featThresholdAnn,
-                                                              gNames, MSPeakLists, absAlignMzDev)
+                                                              featThreshold, featThresholdAnn, gNames)
         else
             groupFormulas <- list()
     }
@@ -681,6 +680,8 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
         groupFormulas <- doGenForm(averagedPeakLists(MSPeakLists), NULL)
         formTable <- list()
     }
+    
+    groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
     
     return(formulasFA(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
 }

@@ -96,20 +96,6 @@ GenFormMPFinishHandler <- function(cmd)
     return(f)
 }
 
-GenFormMPFinishHandler2 <- function(cmd)
-{
-    f <- patRoon:::processGenFormResultFile2(cmd$outFile, cmd$isMSMS, cmd$adduct, cmd$topMost)
-    if (is.null(f))
-        f <- data.table::data.table()
-    else if (cmd$MSMode == "msms")
-    {
-        # note that even if MSMS data is available we may get MS only
-        # formula in case no peaks could be explained
-        f <- f[byMSMS == TRUE]
-    }
-    return(f)
-}
-
 GenFormMPTimeoutHandler <- function(cmd, retries)
 {
     warning(paste("Formula calculation timed out for", cmd$group,
@@ -152,7 +138,7 @@ runGenForm <- function(mainArgs, groupPeakLists, annTable, MSMode, isolatePrec,
 {
     cmdQueue <- makeGenFormCmdQueue(groupPeakLists, annTable, baseHash, MSMode, isolatePrec, adduct, topMost,
                                     mainArgs, ana)
-
+    
     ret <- list()
     if (length(cmdQueue) > 0)
     {
@@ -162,132 +148,14 @@ runGenForm <- function(mainArgs, groupPeakLists, annTable, MSMode, isolatePrec,
                                    waitTimeout = 10, batchSize = batchSize, procTimeout = timeout,
                                    cacheName = "formulasGenForm", setHash = setHash)
     }
-
-    return(pruneList(ret, checkZeroRows = TRUE))
-}
-
-runGenForm2 <- function(mainArgs, groupPeakLists, annTable, MSMode, isolatePrec,
-                        baseHash, setHash, gNames, adduct, topMost,
-                        batchSize, timeout, ana)
-{
-    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, annTable, baseHash, MSMode, isolatePrec, adduct, topMost,
-                                    mainArgs, ana)
-    
-    ret <- list()
-    if (length(cmdQueue) > 0)
-    {
-        ret <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::GenFormMPFinishHandler2,
-                                   timeoutHandler = patRoon:::GenFormMPTimeoutHandler,
-                                   prepareHandler = patRoon:::GenFormMPPrepareHandler,
-                                   waitTimeout = 10, batchSize = batchSize, procTimeout = timeout,
-                                   cacheName = "formulasGenForm", setHash = setHash)
-    }
     
     return(pruneList(ret, checkZeroRows = TRUE))
-}
-
-processGenFormMSMSResultFile <- function(file)
-{
-    formsMSMS <- data.table::fread(file, sep = "\t", fill = TRUE, header = FALSE) # fill should be set with strange formatting of file
-
-    # first column: either formula precursor or fragment mass
-    # second column: either dbe or formula fragment/neutral loss
-    # third column: either precursor formula mz or dbe fragment
-    # fourth column: either mass deviation precursor or fragment formula mz
-    # fifth column: either MS score precursor or mass deviation fragment
-    # sixth column: either MSMS score for precursor or NA
-    # seventh column: either combined score for precursor or NA
-
-    # first split MS and MSMS results
-    formsMSMS[, isPrecursor := !is.na(formsMSMS[[6]])]
-    formsMSMS[, precursorGroup := cumsum(isPrecursor)] # assign unique ID for all precursors+their fragments
-
-    fMS <- formsMSMS[isPrecursor == TRUE, ]
-    data.table::setnames(fMS, 1:7, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore", "MSMSScore", "combMatch"))
-    fMS[, isPrecursor := NULL]
-    data.table::setkey(fMS, "precursorGroup")
-
-    fMSMS <- formsMSMS[isPrecursor == FALSE, ]
-
-    setnames(fMSMS, 1:5, c("frag_mz", "frag_formula", "frag_dbe", "frag_formula_mz", "frag_error"))
-
-    # If multiple results exist for a mass then subsequent results after the first have empty mz column.
-    # Fill in those empty masses
-    for (fi in seq_len(nrow(fMSMS)))
-    {
-        if (!nzchar(fMSMS$frag_mz[fi]))
-            set(fMSMS, fi, "frag_mz", fMSMS$frag_mz[fi - 1])
-    }
-
-    fMSMS[, c("V6", "V7", "isPrecursor") := NULL]
-    data.table::setkey(fMSMS, "precursorGroup")
-
-    formsMSMS <- merge(fMS, fMSMS, all.x = TRUE) # re-join (but ensure that MS only formulae in fMS are kept)
-    formsMSMS[, byMSMS := !is.na(frag_formula)]
-    formsMSMS[, precursorGroup := NULL]
-
-    # clear out MSMS scores for formulae w/out MSMS explanations
-    # UNDONE: do we need to discern candidates w/out MSMS data and w/ MSMS data but no explanations?
-    formsMSMS[byMSMS == FALSE, c("MSMSScore", "combMatch") := NA_real_]
-
-    return(formsMSMS)
-}
-
-processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
-{
-    if (file.size(file) == 0)
-        return(NULL)
-
-    if (!isMSMS)
-    {
-        forms <- data.table::fread(file, header = FALSE)
-        data.table::setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
-        forms[, byMSMS := FALSE]
-    }
-    else
-        forms <- patRoon:::processGenFormMSMSResultFile(file)
-
-    if (is.null(forms) || nrow(forms) == 0)
-        return(NULL)
-
-    forms <- patRoon:::rankFormulaTable(forms, character())
-    
-    # select topMost after ranking
-    if (!is.null(topMost) && data.table::uniqueN(forms, by = "neutral_formula") > topMost)
-    {
-        forms[, unFormID := .GRP, by = "neutral_formula"]
-        forms <- forms[unFormID <= topMost][, unFormID := NULL]
-    }
-    
-    forms[, neutral_formula := sapply(neutral_formula, sortFormula)] # GenForm doesn't seem to use Hill sorting
-    forms[, formula := calculateIonFormula(neutral_formula, adduct)]
-
-    # set correct column types
-    numCols <- intersect(c("error", "dbe", "isoScore", "frag_mz", "frag_error",
-                           "frag_dbe", "MSMSScore", "combMatch"), names(forms))
-    for (col in numCols)
-        data.table::set(forms, j = col, value = as.numeric(forms[[col]]))
-    
-    chrCols <- intersect(c("formula", "frag_formula", "neutral_formula"), names(forms))
-    for (col in chrCols)
-        data.table::set(forms, j = col, value = as.character(forms[[col]]))
-    
-    if (!is.null(forms[["frag_formula"]]))
-    {
-        forms[byMSMS == TRUE, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
-        forms[byMSMS == TRUE, frag_formula := Vectorize(sortFormula)(frag_formula)]
-    }
-
-    # set nice column order
-    data.table::setcolorder(forms, c("neutral_formula", "formula", "formula_mz", "error", "dbe", "isoScore", "byMSMS"))
-
-    return(forms)
 }
 
 getEmptyGFFragInfo <- function() data.table(mz = numeric(), ion_formula = character(), dbe = numeric(),
                                             ion_formula_mz = numeric(), error = numeric())
 
-processGenFormMSMSResultFile2 <- function(file)
+processGenFormMSMSResultFile <- function(file)
 {
     formsMSMS <- data.table::fread(file, sep = "\t", fill = TRUE, header = FALSE) # fill should be set with strange formatting of file
     
@@ -342,7 +210,7 @@ processGenFormMSMSResultFile2 <- function(file)
     return(ret)
 }
 
-processGenFormResultFile2 <- function(file, isMSMS, adduct, topMost)
+processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 {
     if (file.size(file) == 0)
         return(NULL)
@@ -355,7 +223,7 @@ processGenFormResultFile2 <- function(file, isMSMS, adduct, topMost)
         forms[, fragInfo := list(getEmptyGFFragInfo())]
     }
     else
-        forms <- patRoon:::processGenFormMSMSResultFile2(file)
+        forms <- patRoon:::processGenFormMSMSResultFile(file)
     
     if (is.null(forms) || nrow(forms) == 0)
         return(NULL)
@@ -473,123 +341,6 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
     checkmate::assertCount(batchSize, positive = TRUE, add = ac)
-
-    if (!is.logical(isolatePrec))
-         assertPListIsolatePrecParams(isolatePrec, add = ac)
-
-    checkmate::reportAssertions(ac)
-
-    if (length(fGroups) == 0)
-        return(formulas(algorithm = "genform"))
-    
-    adduct <- checkAndToAdduct(adduct, fGroups)
-
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    featIndex <- groupFeatIndex(fGroups)
-    fTable <- featureTable(fGroups)
-    gCount <- length(fGroups)
-    gNames <- names(fGroups)
-    annTable <- annotations(fGroups)
-
-    MSPeakLists <- MSPeakLists[, gNames] # only do relevant
-    
-    mainArgs <- c("exist",
-                  "oei",
-                  "noref",
-                  "dbe",
-                  "cm",
-                  sprintf("ppm=%f", relMzDev),
-                  sprintf("el=%s", elements),
-                  extraOpts)
-
-    if (hetero)
-        mainArgs <- c(mainArgs, "het")
-    if (oc)
-        mainArgs <- c(mainArgs, "oc")
-
-    formTable <- list()
-    baseHash <- makeHash(mainArgs, MSMode, isolatePrec)
-    setHash <- makeHash(fGroups, MSPeakLists, baseHash)
-
-    # ana is optional and not used when only calculating group average formulas
-    doGenForm <- function(groupPeakLists, ana)
-    {
-        if (!is.null(ana))
-            printf("Loading all formulas for analysis '%s'...\n", ana)
-        else
-            printf("Loading all formulas...\n")
-
-        ann <- if (nrow(annTable) > 0) annTable[match(names(groupPeakLists), group)] else annTable
-        forms <- runGenForm(mainArgs, groupPeakLists, ann, MSMode, isolatePrec, baseHash,
-                            setHash, gNames, adduct, topMost, batchSize, timeout, ana)
-
-        printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
-               if (!is.null(ana)) "features" else "feature groups",
-               if (gCount == 0) 0 else length(forms) * 100 / gCount)
-
-        return(forms)
-    }
-
-    if (calculateFeatures)
-    {
-        pLists <- peakLists(MSPeakLists)
-
-        formTable <- sapply(seq_along(anaInfo$analysis), function(anai)
-        {
-            ana <- anaInfo$analysis[anai]
-            if (is.null(pLists[[ana]]))
-                return(NULL)
-            
-            pl <- pLists[[ana]]
-            ftinds <- sapply(gNames, function(grp) featIndex[[grp]][anai])
-            doFGroups <- gNames[ftinds != 0] # prune missing
-            doFGroups <- intersect(doFGroups, names(pl))
-            
-            return(doGenForm(pl[doFGroups], ana))
-        }, simplify = FALSE)
-        
-        names(formTable) <- anaInfo$analysis
-        formTable <- pruneList(formTable, TRUE)
-
-        if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
-                                                              featThreshold, featThresholdAnn,
-                                                              gNames, "analysis_from", "analyses", "featCoverage",
-                                                              "featCoverageAnn", MSPeakLists, absAlignMzDev,
-                                                              character())
-        else
-            groupFormulas <- list()
-    }
-    else
-    {
-        groupFormulas <- doGenForm(averagedPeakLists(MSPeakLists), NULL)
-        formTable <- list()
-    }
-
-    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
-})
-
-generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
-                                     calculateFeatures = TRUE, featThreshold = 0,
-                                     featThresholdAnn = 0.75, absAlignMzDev = 0.002,
-                                     MSMode = "both", isolatePrec = TRUE, timeout = 120,
-                                     topMost = 50, batchSize = 8)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE,
-           fixed = list(add = ac))
-    aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
-           fixed = list(add = ac))
-    checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
-    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    checkmate::assertCount(topMost, positive = TRUE, add = ac)
-    checkmate::assertCount(batchSize, positive = TRUE, add = ac)
     
     if (!is.logical(isolatePrec))
         assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -638,7 +389,7 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
             printf("Loading all formulas...\n")
         
         ann <- if (nrow(annTable) > 0) annTable[match(names(groupPeakLists), group)] else annTable
-        forms <- runGenForm2(mainArgs, groupPeakLists, ann, MSMode, isolatePrec, baseHash,
+        forms <- runGenForm(mainArgs, groupPeakLists, ann, MSMode, isolatePrec, baseHash,
                             setHash, gNames, adduct, topMost, batchSize, timeout, ana)
         
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
@@ -670,7 +421,7 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
         formTable <- pruneList(formTable, TRUE)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus2(formTable, lapply(featIndex, function(x) sum(x > 0)),
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn, gNames)
         else
             groupFormulas <- list()
@@ -683,8 +434,8 @@ generateFormulasGenForm2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct 
     
     groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
     
-    return(formulasFA(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
-}
+    return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
+})
 
 setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
                                                                   setThresholdAnn = 0.75)

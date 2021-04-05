@@ -59,7 +59,7 @@
     - also for compounds?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
-    - formulas: neutralMass column, remove old code
+    - formulas: neutralMass column
     - update DA formulas
         - call setFormulaPLIndex()
     - use normalizeAnnScores() instead of form/comp versions

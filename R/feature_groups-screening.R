@@ -319,6 +319,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     printf("Annotating %d suspects...\n", nrow(si))
     prog <- openProgBar(0, nrow(si))
     
+    formNormScores <- if (!is.null(formulas)) annScoreNames(formulas, TRUE) else NULL
+    compNormScores <- if (!is.null(compounds)) annScoreNames(compounds, TRUE) else NULL
+    
     for (i in seq_len(nrow(si)))
     {
         gName <- si$group[i]
@@ -404,9 +407,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   annSimForm, annSimComp, annSimBoth,
                                                   maxSuspFrags, maxFragMatches, fTable, formRank,
                                                   mFormNames = if (!is.null(formulas)) mergedConsensusNames(compounds) else character(),
-                                                  fScRanges, formulasNormalizeScores, cTable, compRank,
+                                                  formNormScores, fScRanges, formulasNormalizeScores, cTable, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
-                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
+                                                  compNormScores, cScRanges, compoundsNormalizeScores, absMzDev,
+                                                  IDLevelRules)
         
         set(si, i,
             c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",

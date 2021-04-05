@@ -84,26 +84,6 @@ getCompScoreColNames <- function() unique(compoundScorings(includeSuspectLists =
 getCompSuspectListColNames <- function() setdiff(unique(compoundScorings(includeSuspectLists = TRUE)$name),
                                                  getCompScoreColNames())
 
-normalizeCompScores <- function(compResults, scoreRanges, mConsNames, minMaxNormalization, exclude = NULL)
-{
-    compResults <- copy(compResults)
-    columns <- names(compResults)
-    scoreCols <- getAllMergedConsCols(getCompScoreColNames(), columns, mConsNames)
-
-    if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]
-
-    if (length(scoreCols) > 0)
-    {
-        scoreRanges <- scoreRanges[scoreCols]
-        compResults[, (scoreCols) := mapply(.SD, scoreRanges, SIMPLIFY = FALSE,
-                                            FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
-                                            .SDcols = scoreCols]
-    }
-
-    return(compResults)
-}
-
 makeDBIdentLink <- function(db, ident)
 {
     ident <- as.character(ident)

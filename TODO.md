@@ -59,35 +59,21 @@
     - also for compounds?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
-    - compounds annotatedPeakList: merge in formula results
-    - defaultExclNormScores() and annScoreNames() methods
+    - formulas: neutralMass column
     - set UID columns
-    - consensus
-        - methods that call doConsensus function
-        - compounds: somehow include library in duplicated labels
-            - can set labels in advance, make.unique should be called in util anyway
-        - add InChIKey1 to uniqueCols
     - use normalizeAnnScores() instead of form/comp versions
-    - formula --> ion_formula (also for compounds?)
-    - neutral_formula --> formula? or neutral_formula also for compounds?
-    - keep byMSMS? probably yes
-    - feature consensus
-        - input is just feature formulas; already with fragInfos
-        - average scorings etc as now
-        - merge fragInfos; also average scores
-        - remove MS only as now
-        - delete sets stuff...
-            - including getAllMergedConsCols? probably yes
-        - keep ranking
-    - consensus compounds: make sure scRanges/scTypes calc remain
-    - annScoreNames --> replace by generic for formulaScorings/compoundScorings?
-        - although this will require object as input which is a bit unhandy
+    - formula --> ion_formula
+    - neutral_formula: also for compounds
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc
     - update formulaScorings: remove frag specific scores
-    - plotScores: compounds/formulas method, extend makeScoresPlot to just need annTable input
     - formula --> ion_formula
         - spec plotting
+    - remove old functions
+        - mergeFragInfo()?
+        - getCompSuspectListColNames()
+        - getCompScoreColNames --> replace with annScoreNames
+        - formulaTable/compoundTable
     - docs
         - new/changed as.data.table args
     - news

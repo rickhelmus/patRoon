@@ -335,10 +335,10 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
         cutcl <- cutClusters(compsCluster)
 
     if (normalizeScores != "none")
-        compTable <- mapply(compTable, compounds@scoreRanges, FUN = normalizeCompScores,
-                            MoreArgs = list(mConsNames = mcn, minMaxNormalization = normalizeScores == "minmax",
-                                            exclude = excludeNormScores),
-                            SIMPLIFY = FALSE)
+        compTable <- Map(compTable, compounds@scoreRanges, f = normalizeAnnScores,
+                         MoreArgs = list(scoreCols = annScoreNames(compounds, TRUE), mConsNames = mcn,
+                                         minMaxNormalization = normalizeScores == "minmax",
+                                         exclude = excludeNormScores))
 
     for (grp in names(compTable))
     {

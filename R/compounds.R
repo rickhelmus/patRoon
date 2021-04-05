@@ -1,5 +1,5 @@
 #' @include main.R
-#' @include workflow-step.R
+#' @include feature_annotations.R
 NULL
 
 #' Compound lists class
@@ -51,15 +51,7 @@ NULL
 #'
 #' @export
 compounds <- setClass("compounds",
-                      slots = c(compounds = "list", scoreTypes = "character", scoreRanges = "list"),
-                      contains = "workflowStep")
-
-setMethod("initialize", "compounds", function(.Object, ...)
-{
-    .Object <- callNextMethod(.Object, ...)
-    .Object@compounds <- makeEmptyListNamed(.Object@compounds)
-    return(.Object)
-})
+                      contains = "featureAnnotations")
 
 #' @rdname compounds-class
 compoundsConsensus <- setClass("compoundsConsensus",
@@ -68,29 +60,11 @@ compoundsConsensus <- setClass("compoundsConsensus",
 setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@mergedConsensusNames)
 
 
-#' @describeIn compounds Accessor method to obtain generated compounds.
-#' @return \code{compoundTable} returns a \code{list} containing for each feature
-#'   group a \code{\link{data.table}} with an overview of all candidate
-#'   compounds and other data such as candidate scoring, matched MS/MS
-#'   fragments, etc.
-#' @aliases compoundTable
 #' @export
-setMethod("compoundTable", "compounds", function(obj) obj@compounds)
+setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount"))
 
-#' @describeIn compounds Accessor method for the algorithm (a character
-#'   string) used to generate compounds.
-#' @export
-setMethod("algorithm", "compounds", function(obj) obj@algorithm)
+setMethod("annScoreNames", "compounds", function(obj, norm) unique(compoundScorings(includeSuspectLists = !norm)$name))
 
-#' @templateVar class compounds
-#' @templateVar what feature groups
-#' @template strmethod
-#' @export
-setMethod("groupNames", "compounds", function(obj) names(obj@compounds))
-
-#' @describeIn compounds Obtain total number of candidate compounds.
-#' @export
-setMethod("length", "compounds", function(x) if (length(x@compounds) > 0) sum(sapply(x@compounds, nrow)) else 0)
 
 #' @describeIn compounds Show summary information for this object.
 #' @export
@@ -107,90 +81,6 @@ setMethod("show", "compounds", function(object)
     cCounts <- if (length(object) == 0) 0 else sapply(object@compounds, nrow)
     printf("Number of compounds: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(cCounts), mean(cCounts), min(cCounts), max(cCounts))
-})
-
-#' @describeIn compounds Subset on feature groups.
-#' @export
-setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
-{
-    if (!missing(i))
-    {
-        i <- assertSubsetArgAndToChr(i, groupNames(x))
-        x@compounds <- x@compounds[i]
-        x@scoreRanges <- x@scoreRanges[i]
-    }
-
-    return(x)
-})
-
-#' @describeIn compounds Extract a compound table for a feature group.
-#' @export
-setMethod("[[", c("compounds", "ANY", "missing"), function(x, i, j)
-{
-    assertExtractArg(i)
-    return(x@compounds[[i]])
-})
-
-#' @describeIn compounds Extract a compound table for a feature group.
-#' @export
-setMethod("$", "compounds", function(x, name)
-{
-    eval(substitute(x@compounds$NAME_ARG, list(NAME_ARG = name)))
-})
-
-#' @describeIn compounds Returns all MS peak list data in a table.
-#'
-#' @param fragments If \code{TRUE} then information on annotated fragments will
-#'   be included.
-#'
-#' @template as_data_table-args
-#'
-#' @export
-setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
-                                                 excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"))
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
-    checkmate::assertFlag(fragments, add = ac)
-    assertNormalizationMethod(normalizeScores, add = ac)
-    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::reportAssertions(ac)
-
-    mcn <- mergedConsensusNames(x)
-    cTable <- compoundTable(x)
-    if (normalizeScores != "none")
-    {
-        cTable <- mapply(cTable, x@scoreRanges, SIMPLIFY = FALSE, FUN = normalizeCompScores,
-                         MoreArgs = list(mcn, normalizeScores == "minmax", excludeNormScores))
-    }
-
-    if (fragments)
-    {
-        ret <- rbindlist(lapply(cTable, function(ct)
-        {
-            ct <- copy(ct)
-            ct[, row := seq_len(nrow(ct))]
-
-            fragTab <- rbindlist(ct$fragInfo, idcol = "row", fill = TRUE)
-            fragTab[, PLIndex := NULL]
-            cnames <- setdiff(names(fragTab), "row")
-            setnames(fragTab, cnames, paste0("frag_", cnames))
-
-            return(merge(ct, fragTab, by = "row", all.x = TRUE)[, -"row"])
-        }), idcol = "group", fill = TRUE)
-    }
-    else
-        ret <- rbindlist(cTable, idcol = "group", fill = TRUE)
-
-    if (!is.null(fGroups))
-    {
-        ret[, c("ret", "group_mz") := groupInfo(fGroups)[group, c("rts", "mzs")]]
-        setcolorder(ret, c("group", "ret", "group_mz"))
-    }
-
-    if (!is.null(ret[["fragInfo"]]))
-        return(ret[, -"fragInfo"]) # not there if empty results
-    return(ret)
 })
 
 #' @describeIn compounds Returns a list containing for each feature group a
@@ -232,109 +122,26 @@ setMethod("identifiers", "compounds", function(compounds)
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
-                                          minFormulaScore = NULL, scoreLimits = NULL, elements = NULL,
-                                          fragElements = NULL, lossElements = NULL, topMost = NULL,
-                                          negate = FALSE)
+                                          minFormulaScore = NULL, scoreLimits = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
-           null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
-    if (!is.null(scoreLimits))
-    {
-        scCols <- unique(compoundScorings()$name)
-        checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
-        checkmate::qassertr(scoreLimits, "N2")
-    }
-    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
-           min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
-    cat("Filtering compounds... ")
-
-    mConsNames <- mergedConsensusNames(obj)
-    filterMinCols <- function(cmpTable, col, minVal)
+    if (!is.null(minScore) || !is.null(minFragScore) || !is.null(minFormulaScore))
     {
-        cols <- getAllMergedConsCols(col, names(cmpTable), mConsNames)
-        pred <- function(cl) is.na(cl) | cl >= minVal
-        if (negate)
-            pred <- Negate(pred)
-        for (cl in cols)
-            cmpTable <- cmpTable[pred(get(cl))]
-        return(cmpTable)
+        if (is.null(scoreLimits))
+            scoreLimits <- list()
+        
+        minVals <- c(score = minScore, fragScore = minFragScore, formulaScore = minFormulaScore)
+        minVals <- minVals[!sapply(minVals, is.null)]
+        for (sc in names(minVals))
+            scoreLimits[[sc]] <- c(minVals[[sc]], Inf)
     }
-
-    fMinVals <- c(explainedPeaks = minExplainedPeaks, score = minScore, fragScore = minFragScore,
-                  formulaScore = minFormulaScore)
-    fMinVals <- fMinVals[!sapply(fMinVals, is.null)]
-
-    oldn <- length(obj)
-    obj@compounds <- sapply(obj@compounds, function(cmpTable)
-    {
-        for (cl in names(fMinVals))
-            cmpTable <- filterMinCols(cmpTable, cl, fMinVals[cl])
-
-        if (!is.null(scoreLimits))
-        {
-            for (sc in names(scoreLimits))
-            {
-                cols <- getAllMergedConsCols(sc, names(cmpTable), mConsNames)
-                if (length(cols) == 0)
-                    next
-
-                keep <- cmpTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                     do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
-                                 .SDcols = cols]
-                if (negate)
-                    keep <- !keep
-                cmpTable <- cmpTable[keep]
-            }
-        }
-
-        if (nrow(cmpTable) == 0)
-            return(cmpTable)
-
-        if (!is.null(elements))
-        {
-            keep <- sapply(cmpTable$formula, checkFormula, elements, negate = negate)
-            cmpTable <- cmpTable[keep]
-        }
-        if (!is.null(fragElements) || !is.null(lossElements))
-        {
-            keep <- sapply(cmpTable$fragInfo, function(fi)
-            {
-                if (nrow(fi) == 0)
-                    return(FALSE)
-                if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements, negate = negate)))
-                    return(FALSE)
-                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate = negate)))
-                    return(FALSE)
-                return(TRUE)
-            })
-            cmpTable <- cmpTable[keep]
-        }
-
-        if (!is.null(topMost))
-        {
-            if (negate)
-                cmpTable <- tail(cmpTable, topMost)
-            else
-                cmpTable <- head(cmpTable, topMost)
-        }
-
-        return(cmpTable)
-    }, simplify = FALSE)
-
-    if (length(obj) > 0)
-        obj@compounds <- obj@compounds[sapply(obj@compounds, function(cm) !is.null(cm) && nrow(cm) > 0)]
-
-    obj@scoreRanges <- obj@scoreRanges[names(obj@compounds)]
     
-    newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) compounds. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))
     return(obj)
 })
 
@@ -356,8 +163,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 #'
 #' @aliases addFormulaScoring
 #' @export
-setMethod("addFormulaScoring", "compounds", function(compounds, formulas, updateScore,
-                                                     formulaScoreWeight)
+setMethod("addFormulaScoring", "compounds", function(compounds, formulas, updateScore, formulaScoreWeight)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(formulas, "formulas", add = ac)
@@ -368,7 +174,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     if (length(compounds) == 0)
         return(compounds)
 
-    cTable <- compoundTable(compounds)
+    cTable <- annotations(compounds)
     cGNames <- names(cTable)
 
     # UNDONE?
@@ -377,10 +183,9 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     
     calculateScores <- function(cr, forms)
     {
-        forms <- unique(forms, by = "neutral_formula") # ensure we have only one row per precursor (ranking remains)
-        
         fCount <- nrow(forms)
-        fRanks <- match(cr$formula, forms$neutral_formula, nomatch = fCount + 1) # add one to no-match results to make it the worst score
+        # add one to no-match results to make it the worst score
+        fRanks <- match(cr$neutral_formula, forms$neutral_formula, nomatch = fCount + 1)
         fRanks <- (fCount - (fRanks - 1)) / fCount # convert to 0-1 where one is best ranked and zero a no match
         
         return(fRanks)
@@ -527,7 +332,7 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
 #'
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
-                                              excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
+                                              excludeNormScores = defaultExclNormScores(obj),
                                               onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -539,34 +344,34 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
 
-    compTable <- compoundTable(obj)[[groupName]]
-
-    if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
+    annTable <- annotations(obj)[[groupName]]
+    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
         return(NULL)
-
+    
     mcn <- mergedConsensusNames(obj)
-
+    
     if (normalizeScores != "none")
-        compTable <- normalizeCompScores(compTable, obj@scoreRanges[[groupName]], mcn, normalizeScores == "minmax", excludeNormScores)
-
-    scoreCols <- getAllMergedConsCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
+        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,
+                                       normalizeScores == "minmax", excludeNormScores)
+    
+    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcn)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
-
-    makeScoresPlot(compTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
+    
+    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
 })
 
 setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normalizeScores = "max",
-                                                  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
+                                                  excludeNormScores = defaultExclNormScores(obj),
                                                   onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
-    compTable <- compoundTable(obj)[[groupName]]
-    if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
-        compTable <- NULL
+    annTable <- annotations(obj)[[groupName]]
+    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
+        annTable <- NULL
     else if (normalizeScores == "none")
-        compTable <- compTable[index]
+        annTable <- annTable[index]
     
-    return(makeHash(index, compTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
+    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
 #' @describeIn compounds Returns an MS/MS peak list annotated with data from a
@@ -580,64 +385,75 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
                                                      onlyAnnotated = FALSE)
 {
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE)
-
     allFGroups <- groupNames(obj)
     if (!is.null(formulas))
         allFGroups <- union(allFGroups, groupNames(formulas))
-
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     assertChoiceSilent(groupName, allFGroups, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(onlyAnnotated, add = ac)
     checkmate::reportAssertions(ac)
 
-    spec <- MSPeakLists[[groupName]][["MSMS"]]
-    if (is.null(spec))
-        return(NULL)
-
-    spec <- copy(spec)
-    spec[, PLIndex := seq_len(nrow(spec))] # for merging
-
-    compTable <- compoundTable(obj)[[groupName]]
-    fragInfo <- NULL
-    if (!is.null(compTable) && nrow(compTable) >= index)
+    if (is.null(formulas) || is.null(formulas[[groupName]]))
+        return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
+                                  onlyAnnotated))
+    
+    # NOTE: onlyAnnotated is set FALSE so we have the complete peaklist for merging
+    ret <- doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
+                              onlyAnnotated = FALSE)
+    if (is.null(ret))
+        return(ret)
+    
+    annTable <- annotations(obj)[[groupName]]
+    if (!is.null(annTable) && nrow(annTable) >= index)
     {
-        compr <- compTable[index]
-        fragInfo <- compr$fragInfo[[1]]
-
-        formTable <- if (!is.null(formulas)) formulas[[groupName]] else NULL
-        if (!is.null(formTable))
+        formIndex <- which(annTable[[groupName]]$neutral_formula[index] == formulas[[groupName]]$neutral_formula)
+        if (length(formIndex) != 0)
         {
-            formTable <- formTable[byMSMS == TRUE & neutral_formula == compr$formula]
-            if (nrow(formTable) > 0)
+            # both annotated peak lists should have equal rows etc since onlyAnnotated was set to FALSE, just merge
+            # formula columns
+            
+            annPLForms <- annotatedPeakList(formulas, which(formulas[[groupName]]), groupName, MSPeakLists,
+                                            onlyAnnotated = FALSE)
+
+            if (!is.null(annPLForms) && !is.null(annPLForms[["ion_formula"]]))
             {
-                formFragInfo <- getFragmentInfoFromForms(spec, formTable)
-                if (is.null(fragInfo))
+                if (is.null(ret[["ion_formula"]]))
                 {
-                    fragInfo <- formFragInfo
-                    fragInfo[, mergedBy := algorithm(formulas)]
+                    # only formula annotations
+                    ret[, ion_formula := annPLForms$ion_formula]
+                    ret[!is.na(ion_formula), mergedBy := algorithm(formulas)]
                 }
                 else
-                    fragInfo <- mergeFragInfo(fragInfo, formFragInfo, algorithm(obj), algorithm(formulas))
+                {
+                    inMe <- !is.na(ret$ion_formula)
+                    inForms <- !is.na(annPLForms$ion_formula)
+                    
+                    # UNDONE: handle different formula assignments?
+                    ret[, c("ion_formula", "mergedBy") := .(
+                        fcase(inMe, ion_formula,
+                              inForms, annPLForms$ion_formula),
+                        fcase(inMe & inForms, paste0(algorithm(obj), ",", algorithm(formulas)),
+                              inMe, algorithm(obj),
+                              inForms, algorithm(formulas))
+                    )]
+                }
             }
         }
-        
-        if (!is.null(fragInfo))
-            spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
-        
-        spec <- spec[, PLIndex := NULL]
     }
     
     if (onlyAnnotated)
     {
-        if (is.null(spec[["formula"]]))
-            spec <- spec[0]
+        if (is.null(ret[["formula"]]))
+            ret <- ret[0]
         else
-            spec <- spec[!is.na(formula)]
+            ret <- ret[!is.na(formula)]
     }
 
-    return(spec[])
+    return(ret[])
 })
 
 #' @describeIn compounds Plots an annotated spectrum for a given candidate
@@ -756,91 +572,6 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
                     plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
-#' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})
-#'   outlining unique and shared compound candidates of up to five different
-#'   \code{compounds} objects. Comparison is made on \code{InChIKey1}.
-#'
-#' @inheritParams plotVenn,formulas-method
-#'
-#' @template plotvenn-ret
-#'
-#' @export
-setMethod("plotVenn", "compounds", function(obj, ..., labels = NULL, vennArgs = NULL)
-{
-    allCompounds <- c(list(obj), list(...))
-
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
-    checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
-    checkmate::reportAssertions(ac)
-
-    if (is.null(labels))
-        labels <- make.unique(sapply(allCompounds, algorithm))
-    if (is.null(vennArgs))
-        vennArgs <- list()
-
-    allCompoundTabs <- lapply(allCompounds, as.data.table)
-    do.call(makeVennPlot, c(list(allCompoundTabs, labels, lengths(allCompounds), function(obj1, obj2)
-    {
-        if (length(obj1) == 0 || length(obj2) == 0)
-            return(data.table())
-        fintersect(obj1[, c("group", "InChIKey1")], obj2[, c("group", "InChIKey1")])
-    }, nrow), vennArgs))
-})
-
-#' @describeIn compounds plots an UpSet diagram (using the
-#'   \code{\link[UpSetR]{upset}} function) outlining unique and shared compound
-#'   candidates between different \code{compounds} objects. Comparison is made
-#'   on \code{InChIKey1}.
-#'
-#' @inheritParams plotUpSet,formulas-method
-#'
-#' @references \insertRef{Conway2017}{patRoon} \cr\cr
-#'   \insertRef{Lex2014}{patRoon}
-#'
-#' @export
-setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
-                                             nintersects = NA, upsetArgs = NULL)
-{
-    allCompounds <- c(list(obj), list(...))
-
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
-    checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
-    checkmate::assertCount(nsets, positive = TRUE)
-    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
-    checkmate::reportAssertions(ac)
-
-    if (is.null(labels))
-        labels <- make.unique(sapply(allCompounds, algorithm))
-
-    allCompsTabs <- mapply(allCompounds, labels, SIMPLIFY = FALSE, FUN = function(f, l)
-    {
-        ret <- as.data.table(f)
-        if (length(ret) == 0)
-            ret <- data.table(group = character(), InChIKey1 = character())
-        ret <- unique(ret[, c("group", "InChIKey1")])[, (l) := 1]
-    })
-
-    compTab <- Reduce(function(f1, f2)
-    {
-        merge(f1, f2, by = c("group", "InChIKey1"), all = TRUE)
-    }, allCompsTabs)
-
-    compTab <- compTab[, labels, with = FALSE]
-    for (j in seq_along(compTab))
-        set(compTab, which(is.na(compTab[[j]])), j, 0)
-
-    if (sum(sapply(compTab, function(x) any(x>0))) < 2)
-        stop("Need at least two non-empty objects to plot")
-
-    do.call(UpSetR::upset, c(list(compTab, nsets = nsets, nintersects = nintersects), upsetArgs))
-})
-
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
@@ -873,153 +604,30 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    rankWeights <- rep(rankWeights, length.out = length(allCompounds))
-    compNames <- if (!is.null(labels)) labels else sapply(allCompounds, algorithm)
-    if (anyDuplicated(compNames))
+    labels <- if (!is.null(labels)) labels else sapply(allCompounds, algorithm)
+    if (anyDuplicated(labels))
     {
         # duplicate algorithms used, try to form unique names by adding library
         dbs <- lapply(allCompounds, function(cmp) # UNDONE: make this a method
         {
-            for (res in compoundTable(cmp))
-            {
-                if (nrow(res) > 0)
-                    return(res$database[[1]])
-            }
+            if (length(cmp) > 0)
+                return(cmp[[1]]$database[1])
         })
 
-        compNames <- sapply(seq_along(allCompounds), function(cmpi) paste0(substr(algorithm(allCompounds[[cmpi]]), 1, 3), "-",
-                                                                           substr(dbs[[cmpi]], 1, 3)))
+        labels <- sapply(seq_along(allCompounds), function(cmpi) paste0(substr(algorithm(allCompounds[[cmpi]]), 1, 3), "-",
+                                                                        substr(dbs[[cmpi]], 1, 3)))
 
         # in case names are still duplicated
-        compNames <- make.unique(compNames)
+        labels <- make.unique(labels)
     }
 
-    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, compNames)
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
-    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allCompounds), NULLToZero(relMinAbundance))
-
-    # initialize all compound objects for merge: copy them, rename columns to
-    # avoid duplicates and set merged by field of fragInfo.
-    allCompTables <- lapply(seq_along(allCompounds), function(cmpi)
-    {
-        mergedBy <- compNames[[cmpi]]
-
-        return(lapply(compoundTable(allCompounds[[cmpi]]), function(ct)
-        {
-            ret <- copy(ct)
-
-            for (r in seq_len(nrow(ret)))
-            {
-                fi <- ret[["fragInfo"]][[r]]
-                if (!is.null(fi) && nrow(fi) > 0 && is.null(fi[["mergedBy"]]))
-                {
-                    fi <- copy(fi)
-                    set(fi, j = "mergedBy", value = mergedBy)
-                    set(ret, r, "fragInfo", list(list(fi)))
-                }
-            }
-
-            ret[, mergedBy := compNames[cmpi]]
-            ret[, rank := seq_len(.N)]
-
-            setnames(ret, paste0(names(ret), "-", compNames[[cmpi]]))
-
-            return(ret)
-        }))
-    })
-
-    # columns that should be unique (fragInfo and InChIKey1 are dealt separately)
-    uniqueCols <- c("SMILES", "formula", "InChI", "InChIKey2", "InChIKey", "neutralMass")
-
-    leftName <- compNames[[1]]
-    mCompList <- allCompTables[[1]]
-    for (compIndex in seq(2, length(allCompTables)))
-    {
-        rightName <- compNames[[compIndex]]
-
-        printf("Merging %s with %s... ", paste0(compNames[seq_len(compIndex-1)], collapse = ","), rightName)
-
-        rightTable <- allCompTables[[compIndex]]
-
-        for (grp in union(names(mCompList), names(rightTable)))
-        {
-            if (is.null(rightTable[[grp]]))
-                next # nothing to merge
-            else if (is.null(mCompList[[grp]])) # not yet present
-            {
-                mCompounds <- rightTable[[grp]]
-
-                # rename columns that should be unique from right to left
-                unCols <- c(uniqueCols, "fragInfo", "InChIKey1", "mergedBy")
-                unCols <- unCols[sapply(unCols, function(uc) !is.null(mCompounds[[paste0(uc, "-", rightName)]]))]
-                setnames(mCompounds, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
-            }
-            else
-            {
-                mCompounds <- merge(mCompList[[grp]], rightTable[[grp]],
-                                    by.x = paste0("InChIKey1-", leftName),
-                                    by.y = paste0("InChIKey1-", rightName),
-                                    all = TRUE)
-
-                # merge fragment info
-                fiColLeft <- paste0("fragInfo-", leftName)
-                fiColRight <- paste0("fragInfo-", rightName)
-
-                if (!is.null(mCompounds[[fiColLeft]]))
-                {
-                    for (r in seq_len(nrow(mCompounds)))
-                    {
-                        # use copy as a workaround for buggy nested data.tables
-                        fiRLeft <- copy(mCompounds[[fiColLeft]][[r]])
-                        fiRRight <- copy(mCompounds[[fiColRight]][[r]])
-                        hasLeft <- length(fiRLeft) > 0 && nrow(fiRLeft) > 0
-                        hasRight <- length(fiRRight) > 0 && nrow(fiRRight) > 0
-
-                        if (hasLeft && hasRight)
-                        {
-                            # both have fraginfo
-                            fiMerged <- mergeFragInfo(fiRLeft, fiRRight, leftName, rightName)
-                            set(mCompounds, r, fiColLeft, list(list(fiMerged)))
-                        }
-                        else if (hasRight) # only right
-                            set(mCompounds, r, fiColLeft, list(list(fiRRight)))
-                    }
-
-                    mCompounds[, (fiColRight) := NULL]
-                }
-
-                # remove duplicate columns that shouldn't
-                for (col in uniqueCols)
-                {
-                    colLeft <- paste0(col, "-", leftName)
-                    colRight <- paste0(col, "-", rightName)
-                    if (!is.null(mCompounds[[colRight]]))
-                    {
-                        if (is.null(mCompounds[[colLeft]]))
-                            setnames(mCompounds, colRight, colLeft)
-                        else
-                        {
-                            mCompounds[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
-                            mCompounds[, (colRight) := NULL]
-                        }
-                    }
-                }
-
-                # collapse mergedBy
-                ml <- paste0("mergedBy-", leftName); mr <- paste0("mergedBy-", rightName)
-                mCompounds[!is.na(get(ml)), (ml) := ifelse(!is.na(get(mr)), paste(get(ml), get(mr), sep = ","), get(ml))]
-                mCompounds[is.na(get(ml)), (ml) := get(mr)]
-                mCompounds[, (mr) := NULL]
-            }
-
-            mCompList[[grp]] <- mCompounds
-        }
-
-        cat("Done!\n")
-    }
-
-    printf("Determining coverage and final scores... ")
-
+    cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
+                               uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
+                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "SMILES", "InChI",
+                                                                 "InChIKey1", "InChIKey2", "InChIKey", "neutralMass"))
+    
     # rename & merge score types and ranges
     scoreTypes <- Reduce(union, mapply(allCompounds, compNames, FUN = function(cmp, cn)
     {
@@ -1031,60 +639,9 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
         lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
     }))
 
-    # Determine coverage of compounds between objects and the merged score. The score column can be
-    # used for the former as there is guaranteed to be one for each merged object.
-    for (grpi in seq_along(mCompList))
-    {
-        # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, c("fragInfo", "InChIKey1", "mergedBy"))
-        leftCols <- paste0(deDupCols, "-", leftName)
-        deDupCols <- deDupCols[leftCols %in% names(mCompList[[grpi]])]
-        leftCols <- leftCols[leftCols %in% names(mCompList[[grpi]])]
-        if (length(leftCols) > 0)
-            setnames(mCompList[[grpi]], leftCols, deDupCols)
-
-        mCompList[[grpi]][, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allCompounds))]
-
-        if (relMinAbundance > 0)
-            mCompList[[grpi]] <- mCompList[[grpi]][coverage >= relMinAbundance]
-        else if (!is.null(uniqueFrom))
-        {
-            if (!is.character(uniqueFrom))
-                uniqueFrom <- compNames[uniqueFrom]
-
-            keep <- function(mergedBy)
-            {
-                mbs <- unlist(strsplit(mergedBy, ","))
-                return(all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1))
-            }
-
-            mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
-        }
-
-        rnames <- getAllMergedConsCols("rank", names(mCompList[[grpi]]), compNames)
-        # get relevant weights with correct order
-        rwInds <- unlist(lapply(compNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
-        rWeights <- rankWeights[rwInds]
-        ncand <- nrow(mCompList[[grpi]])
-        mCompList[[grpi]][, rankscore := {
-            invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
-            invRanks[is.na(invRanks)] <- 0
-            weighted.mean(invRanks, rWeights)
-        }, .SDcols = rnames, by = seq_len(ncand)]
-        
-        setorderv(mCompList[[grpi]], "rankscore", order = -1)
-        mCompList[[grpi]][, c(rnames, "rankscore") := NULL]
-    }
-
-    cat("Done!\n")
-
-    # prune empty/NULL results
-    if (length(mCompList) > 0)
-        mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
-
-    return(compoundsConsensus(compounds = mCompList, scoreTypes = scoreTypes, scoreRanges = scRanges,
+    return(compoundsConsensus(groupAnnotations = cons, scoreTypes = scoreTypes, scoreRanges = scRanges,
                               algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
-                              mergedConsensusNames = compNames))
+                              mergedConsensusNames = labels))
 })
 
 #' @templateVar func generateCompounds

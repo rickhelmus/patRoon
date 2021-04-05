@@ -64,7 +64,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     if (normalizeScores != "none")
     {
         annTable <- Map(annTable, x@scoreRanges, f = normalizeAnnScores,
-                        MoreArgs = list(scoreCols = annScoreNames(obj), mConsNames = mcn, normalizeScores == "minmax",
+                        MoreArgs = list(scoreCols = annScoreNames(obj, TRUE), mConsNames = mcn, normalizeScores == "minmax",
                                       exclude = excludeNormScores))
     }
     
@@ -110,7 +110,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
     if (!is.null(scoreLimits))
     {
-        scCols <- annScoreNames(obj)
+        scCols <- annScoreNames(obj, FALSE)
         checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
         checkmate::qassertr(scoreLimits, "N2")
     }

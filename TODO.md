@@ -62,7 +62,7 @@
     - formulas: neutralMass column
     - update DA formulas
         - call setFormulaPLIndex()
-    - use normalizeAnnScores() instead of form/comp versions
+    - use normalizeAnnScores() instead of comp version
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc
     - update formulaScorings: remove frag specific scores

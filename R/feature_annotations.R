@@ -212,50 +212,6 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     return(obj)
 })
 
-setMethod("plotScores", "featureAnnotations", function(obj, index, groupName, normalizeScores = "max",
-                                                       excludeNormScores = defaultExclNormScores(x),
-                                                       onlyUsed = TRUE, useGGPlot2 = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertCount(index, positive = TRUE, add = ac)
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
-    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(onlyUsed, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    annTable <- annotations(obj)[[groupName]]
-    
-    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
-        return(NULL)
-    
-    mcn <- mergedConsensusNames(obj)
-    
-    if (normalizeScores != "none")
-        annTable <- normalizeAnnScores(annTable, annScoreNames(obj), obj@scoreRanges[[groupName]], mcn,
-                                       normalizeScores == "minmax", excludeNormScores)
-    
-    scoreCols <- getAllMergedConsCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(annTable), mcn)
-    if (onlyUsed)
-        scoreCols <- intersect(scoreCols, obj@scoreTypes)
-    
-    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
-})
-
-setMethod("plotScoresHash", "featureAnnotations", function(obj, index, groupName, normalizeScores = "max",
-                                                           excludeNormScores = defaultExclNormScores(x),
-                                                           onlyUsed = TRUE, useGGPlot2 = FALSE)
-{
-    annTable <- annotations(obj)[[groupName]]
-    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
-        annTable <- NULL
-    else if (normalizeScores == "none")
-        annTable <- annTable[index]
-    
-    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
-})
-
 setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, vennArgs = NULL)
 {
     allFeatAnnotations <- c(list(obj), list(...))

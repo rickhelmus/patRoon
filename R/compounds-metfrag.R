@@ -54,7 +54,7 @@ unifyMFNames <- function(mfr)
                  PubChemNumberPatents = "numberPatents",
                  fragInfo = "fragInfo", # keep it
                  FragmenterScore = "fragScore",
-                 MolecularFormula = "formula",
+                 MolecularFormula = "neutral_formula",
                  TrivialName = "compoundName",
                  CompoundName = "compoundName",
                  IUPACName = "compoundName",
@@ -205,22 +205,21 @@ cleanFragFormulas <- function(forms)
 getMFFragmentInfo <- function(spec, mfResult, adduct)
 {
     if (mfResult$NoExplPeaks == 0 || mfResult$FormulasOfExplPeaks == "NA")
-        return(data.table(mz = numeric(0), formula = character(0), neutral_loss = character(0),
-                          intensity = numeric(0), score = numeric(0), PLIndex = numeric(0)))
+        return(data.table(mz = numeric(0), ion_formula = character(0), neutral_loss = character(0),
+                          score = numeric(0), PLIndex = numeric(0)))
 
     # format of FormulasOfExplPeaks: list of strings with mz1:formula1;mz2:formula2;...
     fi <- unlist(strsplit(mfResult$FormulasOfExplPeaks, "[;:]")) # split into list with subsequent m/z / formula pairs
 
     ret <- data.table(mz = as.numeric(fi[c(TRUE, FALSE)]),
-                      formula = cleanFragFormulas(fi[c(FALSE, TRUE)]),
-                      formula_MF = fi[c(FALSE, TRUE)])
+                      ion_formula = cleanFragFormulas(fi[c(FALSE, TRUE)]),
+                      ion_formula_MF = fi[c(FALSE, TRUE)])
     if (!is.null(mfResult[["FragmenterScore_Values"]]))
         ret[, score := as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";")))]
     ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
-    ret[, neutral_loss := sapply(formula, subtractFormula, formula1 = ionform)]
+    ret[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
     ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
-    ret[, intensity := spec$intensity[PLIndex]]
-    setcolorder(ret, c("mz", "formula", "formula_MF", "neutral_loss", "intensity"))
+    setcolorder(ret, c("mz", "ion_formula", "ion_formula_MF", "neutral_loss"))
 
     return(ret)
 }
@@ -767,7 +766,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     if (any(isMFScore))
         scoreTypes[isMFScore] <- compsScores[match(scoreTypes[isMFScore], compsScores$metfrag), "name"]
 
-    return(compoundsMF(compounds = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
+    return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
                        scoreRanges = lapply(results, "[[", "scRanges"),
                        settings = mfSettings))
 })

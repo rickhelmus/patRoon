@@ -959,6 +959,8 @@ setMethod("initialize", "formulasFA", function(.Object, ...)
     
     .Object@featureFormulas <- makeEmptyListNamed(.Object@featureFormulas)
     
+    .Object@groupAnnotations <- lapply(.Object@groupAnnotations, function(ann) ann[, UID := neutral_formula])
+    
     return(.Object)
 })
 
@@ -1316,7 +1318,7 @@ setMethod("consensus", "formulasFA", function(obj, ..., absMinAbundance = NULL, 
                                annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "formula_mz",
                                                                  "error", "error_median", "dbe"))
     
-    return(formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
+    return(formulasConsensusFA(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
                              mergedConsensusNames = labels))
 })

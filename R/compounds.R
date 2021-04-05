@@ -53,6 +53,14 @@ NULL
 compounds <- setClass("compounds",
                       contains = "featureAnnotations")
 
+setMethod("initialize", "compounds", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    .Object@groupAnnotations <- lapply(.Object@groupAnnotations, function(ann) ann[, UID := InChIKey1])
+    return(.Object)
+})
+
+
 #' @rdname compounds-class
 compoundsConsensus <- setClass("compoundsConsensus",
                                slots = c(mergedConsensusNames = "character"),
@@ -629,12 +637,12 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
                                                                  "InChIKey1", "InChIKey2", "InChIKey", "neutralMass"))
     
     # rename & merge score types and ranges
-    scoreTypes <- Reduce(union, mapply(allCompounds, compNames, FUN = function(cmp, cn)
+    scoreTypes <- Reduce(union, mapply(allCompounds, labels, FUN = function(cmp, cn)
     {
         paste0(cmp@scoreTypes, "-", cn)
     }))
 
-    scRanges <- Reduce(modifyList, mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
+    scRanges <- Reduce(modifyList, Map(allCompounds, labels, f = function(cmp, cn)
     {
         lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
     }))

@@ -590,6 +590,8 @@ generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThresho
                 return(fi)
             })]
             fc[, explainedPeaks := sapply(fragInfo, nrow)]
+            fc[explainedPeaks == 0, fragInfo := lapply(fragInfo, function(fi) copy(fi)[, PLIndex := integer()])]
+            
             return(fc)
         })
         formCons <- pruneList(formCons, checkZeroRows = TRUE)

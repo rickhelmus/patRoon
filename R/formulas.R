@@ -1231,6 +1231,56 @@ setMethod("plotSpectrumHash", "formulasFA", function(obj, index, groupName, anal
                     title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
+#' @describeIn formulas Plots a barplot with scoring of a candidate formula.
+#'
+#' @export
+setMethod("plotScores", "formulasFA", function(obj, index, groupName, analysis = NULL, normalizeScores = "max",
+                                               excludeNormScores = defaultExclNormScores(obj), useGGPlot2 = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(analysis))
+        annTable <- annotations(obj)[[groupName]]
+    else
+        annTable <- annotations(obj, TRUE)[[analysis, groupName]]
+    
+    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
+        return(NULL)
+    
+    mcn <- mergedConsensusNames(obj)
+    
+    if (normalizeScores != "none")
+        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,
+                                       normalizeScores == "minmax", excludeNormScores)
+    
+    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcn)
+
+    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
+})
+
+setMethod("plotScoresHash", "formulasFA", function(obj, index, groupName, normalizeScores = "max",
+                                                   excludeNormScores = defaultExclNormScores(obj),
+                                                   useGGPlot2 = FALSE)
+{
+    if (is.null(analysis))
+        annTable <- annotations(obj)[[groupName]]
+    else
+        annTable <- annotations(obj, TRUE)[[analysis, groupName]]
+    if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
+        annTable <- NULL
+    else if (normalizeScores == "none")
+        annTable <- annTable[index]
+    
+    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
+})
+
 #' @templateVar what formulas
 #' @template consensus-form_comp
 #'

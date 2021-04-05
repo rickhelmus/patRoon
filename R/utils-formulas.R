@@ -530,12 +530,11 @@ generateFormConsensusForGroup2 <- function(formList, mergeCount, formThreshold, 
     return(formTable)
 }
 
-generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
-                                             MSPeakLists, absAlignMzDev)
+generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames)
 {
     cat("Generating formula consensus...\n")
     
-    hash <- makeHash(formList, formThreshold, formThresholdAnn, origGNames, MSPeakLists, absAlignMzDev)
+    hash <- makeHash(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames)
     formCons <- loadCacheData("formulasFGroupConsensus", hash)
     
     # figure out names
@@ -560,41 +559,6 @@ generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThresho
         
         # fix order
         formCons <- formCons[intersect(origGNames, names(formCons))]
-        
-        # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than
-        # what was used to get the feature formula, or it may simply be removed.
-        formCons <- Map(formCons, lapply(averagedPeakLists(MSPeakLists)[names(formCons)], "[[", "MSMS"), f = function(fc, spec)
-        {
-            fc <- copy(fc)
-            fc[explainedPeaks > 0, fragInfo := lapply(fragInfo, function(fi)
-            {
-                # verify presence
-                fi <- fi[sapply(mz, function(mz)
-                {
-                    wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
-                    if (length(wh) > 1)
-                        warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
-                                "Consider lowering absAlignMzDev.", call. = FALSE)
-                    return(length(wh) > 0)
-                })]
-                
-                if (nrow(fi) > 0)
-                {
-                    # align remaining mzs
-                    fi[, PLIndex := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
-                    fi[, mz := spec$mz[PLIndex]]
-                }
-                else
-                    fi[, PLIndex := integer()]
-                
-                return(fi)
-            })]
-            fc[, explainedPeaks := sapply(fragInfo, nrow)]
-            fc[explainedPeaks == 0, fragInfo := lapply(fragInfo, function(fi) copy(fi)[, PLIndex := integer()])]
-            
-            return(fc)
-        })
-        formCons <- pruneList(formCons, checkZeroRows = TRUE)
         
         setTxtProgressBar(prog, resCount)
         close(prog)
@@ -670,3 +634,42 @@ getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
 }
 
 getFormulaMass <- memoise(function(f, c = 0) rcdk::get.formula(f, c)@mass)
+
+setFormulaPLIndex <- function(formList, MSPeakLists, absAlignMzDev)
+{
+    # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than
+    # what was used to get the feature formula, or it may simply be removed.
+    
+    formList <- Map(formList, lapply(averagedPeakLists(MSPeakLists)[names(formList)], "[[", "MSMS"), f = function(fc, spec)
+    {
+        fc <- copy(fc)
+        fc[explainedPeaks > 0, fragInfo := lapply(fragInfo, function(fi)
+        {
+            # verify presence
+            fi <- fi[sapply(mz, function(mz)
+            {
+                wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
+                if (length(wh) > 1)
+                    warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
+                            "Consider lowering absAlignMzDev.", call. = FALSE)
+                return(length(wh) > 0)
+            })]
+            
+            if (nrow(fi) > 0)
+            {
+                # align remaining mzs
+                fi[, PLIndex := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
+                fi[, mz := spec$mz[PLIndex]]
+            }
+            
+            return(fi)
+        })]
+        fc[, explainedPeaks := sapply(fragInfo, nrow)]
+        fc[explainedPeaks == 0, fragInfo := lapply(fragInfo, function(fi) copy(fi)[, PLIndex := integer()])]
+        
+        return(fc)
+    })
+    formList <- pruneList(formList, checkZeroRows = TRUE)
+    
+    return(formList)
+}

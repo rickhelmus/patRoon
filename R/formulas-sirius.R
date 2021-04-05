@@ -172,8 +172,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
             formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
             groupFormulas <- generateGroupFormulasByConsensus2(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
-                                                              featThreshold, featThresholdAnn, gNames,  MSPeakLists,
-                                                              absAlignMzDev)
+                                                              featThreshold, featThresholdAnn, gNames)
         }
         else
             groupFormulas <- list()
@@ -183,6 +182,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         groupFormulas <- pruneList(formTable, checkZeroRows = TRUE)
         formTable <- list()
     }
+    
+    groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
     
     if (verbose)
     {

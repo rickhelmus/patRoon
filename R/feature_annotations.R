@@ -228,8 +228,8 @@ setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, ve
     if (is.null(vennArgs))
         vennArgs <- list()
     
-    allCompoundTabs <- lapply(allFeatAnnotations, as.data.table)
-    do.call(makeVennPlot, c(list(allCompoundTabs, labels, lengths(allFeatAnnotations), function(obj1, obj2)
+    allAnnTabs <- lapply(allFeatAnnotations, as.data.table)
+    do.call(makeVennPlot, c(list(allAnnTabs, labels, lengths(allFeatAnnotations), function(obj1, obj2)
     {
         if (length(obj1) == 0 || length(obj2) == 0)
             return(data.table())
@@ -254,7 +254,7 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     if (is.null(labels))
         labels <- make.unique(sapply(allFeatAnnotations, algorithm))
     
-    allCompsTabs <- mapply(allFeatAnnotations, labels, SIMPLIFY = FALSE, FUN = function(f, l)
+    allAnnTabs <- mapply(allFeatAnnotations, labels, SIMPLIFY = FALSE, FUN = function(f, l)
     {
         ret <- as.data.table(f)
         if (length(ret) == 0)
@@ -262,18 +262,18 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
         ret <- unique(ret[, c("group", "UID")])[, (l) := 1]
     })
     
-    compTab <- Reduce(function(f1, f2)
+    annTab <- Reduce(function(f1, f2)
     {
         merge(f1, f2, by = c("group", "UID"), all = TRUE)
-    }, allCompsTabs)
+    }, allAnnTabs)
     
-    compTab <- compTab[, labels, with = FALSE]
-    for (j in seq_along(compTab))
-        set(compTab, which(is.na(compTab[[j]])), j, 0)
+    annTab <- annTab[, labels, with = FALSE]
+    for (j in seq_along(annTab))
+        set(annTab, which(is.na(annTab[[j]])), j, 0)
     
-    if (sum(sapply(compTab, function(x) any(x>0))) < 2)
+    if (sum(sapply(annTab, function(x) any(x>0))) < 2)
         stop("Need at least two non-empty objects to plot")
     
-    do.call(UpSetR::upset, c(list(compTab, nsets = nsets, nintersects = nintersects), upsetArgs))
+    do.call(UpSetR::upset, c(list(annTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 

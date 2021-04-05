@@ -335,151 +335,7 @@ calculateFormScoreRanges <- function(formTable, mConsNames)
                     scoreCols))
 }
 
-generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, fromCol, mergedAllCol,
-                                          mergeCovCol, mergeCovAnnCol, mConsNames, rankCols)
-{
-    # merge all together
-    formTable <- rbindlist(formList, fill = TRUE, idcol = fromCol)
-    haveMSMS <- "frag_formula" %in% colnames(formTable)
-
-    if (nrow(formTable) > 0)
-    {
-        if (!is.null(rankCols)) # HACK: needed by set consensus
-        {
-            # get rank scores. NOTE: do this before removing any candidates as otherwise ranking will be messed up
-            
-            rcols <- intersect(rankCols, names(formTable))
-            formTable[, rankScore := {
-                allRanks <- unlist(getPrecursorFormData(.SD, rcols)[, rcols, with = FALSE])
-                invRanks <- (.NGRP - (allRanks - 1)) / .NGRP
-                invRanks[is.na(invRanks)] <- 0
-                mean(invRanks)
-            }, .SDcols = c(rcols, "neutral_formula"), by = "neutral_formula"]
-        }
-        
-        # Determine coverage of precursor formulas.
-        formTable[, (mergeCovCol) := uniqueN(get(fromCol)) / mergeCount, by = "neutral_formula"]
-        formTable[, (mergeCovAnnCol) := uniqueN(get(fromCol)) / length(formList), by = "neutral_formula"]
-
-        # add column that specifies of which datasets its merged from
-        formTable[, (mergedAllCol) := paste0(unique(get(fromCol)), collapse = ","), by = "neutral_formula"]
-        
-        # Apply coverage filters
-        if (formThreshold > 0 || formThresholdAnn > 0)
-            formTable <- formTable[get(mergeCovCol) >= formThreshold & get(mergeCovAnnCol) >= formThresholdAnn]
-
-        # remove MS only formulas if MS/MS candidate is also present (do after coverage filter).
-        MSMSForms <- unique(formTable[byMSMS == TRUE, neutral_formula])
-        formTable <- formTable[byMSMS == TRUE | !neutral_formula %in% MSMSForms]
-
-        # average scorings
-        
-        # frag_error is unique per fragment, while other scorings are per precursor candidate
-        fragAvgCols <- getAllMergedConsCols("frag_error", names(formTable), mConsNames)
-        if (haveMSMS && length(fragAvgCols) > 0)
-            formTable[, (fragAvgCols) := lapply(.SD, mean, na.rm = TRUE),
-                      by = c("neutral_formula", "frag_formula", fromCol),
-                      .SDcols = fragAvgCols]
-        
-        avgCols <- getAllMergedConsCols(c(formulaScorings()$name, "error", "error_median"),
-                                        names(formTable), mConsNames)
-        formTable[, (avgCols) := lapply(unique(.SD, by = fromCol)[, avgCols, with = FALSE], mean, na.rm = TRUE),
-                  by = "neutral_formula", .SDcols = c(avgCols, fromCol)]
-        
-        # remove NaNs that may have been introduced due to mean(..., na.rm=TRUE)
-        numCols <- names(which(sapply(formTable, is.numeric)))
-        formTable[, (numCols) := lapply(.SD, nafill), .SDcols = numCols]
-        
-        # Remove duplicate entries (do this after coverage!)
-        formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
-        
-        if (!is.null(rankCols))
-        {
-            setorderv(formTable, "rankScore", order = -1)
-            formTable[, rankScore := NULL]
-        }
-        else
-            formTable <- rankFormulaTable(formTable, mConsNames)
-    }
-
-    return(formTable)
-}
-
-generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
-                                             fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, MSPeakLists,
-                                             absAlignMzDev, mConsNames, rankCols = NULL)
-{
-    cat("Generating formula consensus...\n")
-
-    hash <- makeHash(formList, formThreshold, formThresholdAnn, origGNames, fromCol, mergedAllCol, mergeCovCol,
-                     mergeCovAnnCol, MSPeakLists, absAlignMzDev, mConsNames, rankCols)
-    formCons <- loadCacheData("formulasFGroupConsensus", hash)
-
-    # figure out names
-    resNames <- unique(unlist(lapply(formList, names)))
-    resCount <- length(resNames)
-
-    if (resCount == 0)
-        formCons <- list()
-    else if (is.null(formCons))
-    {
-        prog <- openProgBar(0, resCount)
-
-        formCons <- lapply(seq_len(resCount), function(i)
-        {
-            fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
-            ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn,
-                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol, mConsNames,
-                                                 rankCols)
-            setTxtProgressBar(prog, i)
-            return(ret)
-        })
-        names(formCons) <- resNames
-        formCons <- pruneList(formCons, checkZeroRows = TRUE)
-        
-        # fix order
-        formCons <- formCons[intersect(origGNames, names(formCons))]
-
-        # sync with group averaged peak lists: the fragments may either have a slightly different m/z than what was used
-        # to get the feature formula, or it may simply be removed.
-        if (!is.null(MSPeakLists)) # NULL for sets, not needed there
-        {
-            formCons <- Map(formCons, lapply(averagedPeakLists(MSPeakLists)[names(formCons)], "[[", "MSMS"), f = function(fc, spec)
-            {
-                # NOTE: ignore non MS/MS formulae
-                
-                if (is.null(fc[["frag_mz"]]))
-                    return(fc)
-                
-                fc <- fc[byMSMS == FALSE | sapply(frag_mz, function(mz)
-                {
-                    wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
-                    if (length(wh) > 1)
-                        warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
-                                "Consider lowering absAlignMzDev.", call. = FALSE)
-                    return(length(wh) > 0)
-                })]
-                
-                # align remaining mzs
-                fc[byMSMS == TRUE, frag_mz := spec$mz[sapply(frag_mz, function(mz) which.min(abs(mz - spec$mz)))]]
-                
-                return(fc)
-            })
-            formCons <- pruneList(formCons, checkZeroRows = TRUE)
-        }
-        
-        setTxtProgressBar(prog, resCount)
-        close(prog)
-
-        saveCacheData("formulasFGroupConsensus", formCons, hash)
-    }
-    else
-        cat("Done!\n")
-
-    return(formCons)
-}
-
-generateFormConsensusForGroup2 <- function(formList, mergeCount, formThreshold, formThresholdAnn)
+generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn)
 {
     # merge all together
     formTable <- rbindlist(formList, fill = TRUE, idcol = "analysis")
@@ -530,7 +386,7 @@ generateFormConsensusForGroup2 <- function(formList, mergeCount, formThreshold, 
     return(formTable)
 }
 
-generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames)
+generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames)
 {
     cat("Generating formula consensus...\n")
     
@@ -550,7 +406,7 @@ generateGroupFormulasByConsensus2 <- function(formList, mergeCounts, formThresho
         formCons <- lapply(seq_len(resCount), function(i)
         {
             fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
-            ret <- generateFormConsensusForGroup2(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn)
+            ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn)
             setTxtProgressBar(prog, i)
             return(ret)
         })

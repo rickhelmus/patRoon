@@ -55,7 +55,7 @@ unifySirNames <- function(sir)
                  pubchemids = "identifier",
                  PubChemNumberPatents = "numberPatents",
                  score = "score",
-                 molecularFormula = "formula",
+                 molecularFormula = "neutral_formula",
                  xlogp = "XlogP",
                  name = "compoundName",
                  links = "libraryLinks",

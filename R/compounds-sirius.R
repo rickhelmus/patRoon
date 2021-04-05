@@ -39,13 +39,13 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         for (ff in fragFiles)
         {
             fragInfo <- fread(ff)
-            fragInfo[, c("rel.intensity", "exactmass") := NULL]
+            fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
             fragInfo[, ionization := gsub(" ", "", ionization)]
             fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
 
             # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
             # candidate(s) it belongs to
-            wh <- which(results$formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
+            wh <- which(results$neutral_formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
             
             if (length(wh) > 0)
             {
@@ -58,11 +58,10 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
                 else
                     ionImpAdducts <- fragInfo$ionization
                 setnames(fragInfo, "formula", "formula_SIR")
-                fragInfo[, formula := mapply(formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
+                fragInfo[, ion_formula := mapply(formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
                 
-                ionform <- calculateIonFormula(results$formula[wh[1]], adduct)
-                fragInfo[, neutral_loss := sapply(formula, subtractFormula,
-                                                  formula1 = ionform)]
+                ionform <- calculateIonFormula(results$neutral_formula[wh[1]], adduct)
+                fragInfo[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
                 
                 set(results, wh, "fragInfo", list(list(fragInfo)))
                 set(results, wh, "explainedPeaks", nrow(fragInfo))
@@ -72,9 +71,9 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         if (is.null(results[["fragInfo"]]))
         {
             # warning(sprintf("no fragment info for %s", cmd$gName))
-            results[, fragInfo := list(rep(list(data.table(mz = numeric(0), formula = character(0),
-                                                           neutral_loss = character(0), intensity = numeric(0),
-                                                           score = numeric(0), PLIndex = numeric(0))),
+            results[, fragInfo := list(rep(list(data.table(mz = numeric(0), ion_formula = character(0),
+                                                           neutral_loss = character(0),  score = numeric(0),
+                                                           PLIndex = numeric(0))),
                     nrow(results)))]
             results[, explainedPeaks := 0]
         }
@@ -165,7 +164,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 
-    return(compounds(compounds = lapply(results, "[[", "comptab"), scoreTypes = "score",
+    return(compounds(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
                      scoreRanges = lapply(results, "[[", "scRanges"),
                      algorithm = "sirius"))
 })

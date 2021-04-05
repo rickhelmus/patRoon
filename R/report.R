@@ -237,8 +237,8 @@ reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, exclude
 
             ft <- formulas[[grp]]
             if (normalizeScores != "none")
-                ft <- normalizeFormScores(ft, formulas@scoreRanges[[grp]], mergedConsensusNames(formulas),
-                                          normalizeScores == "minmax", excludeNormScores)
+                ft <- normalizeAnnScores(ft, annScoreNames(formulas, TRUE), formulas@scoreRanges[[grp]],
+                                         mergedConsensusNames(formulas), normalizeScores == "minmax", excludeNormScores)
             write.csv(ft, out)
         }
     }

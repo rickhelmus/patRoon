@@ -305,28 +305,6 @@ getPrecursorFormData <- function(formTable, cols)
                      by = "neutral_formula", .SDcols = cols])
 }
 
-normalizeFormScores <- function(formResults, scoreRanges, mConsNames, minMaxNormalization, exclude = NULL)
-{
-    columns <- names(formResults)
-    scoreCols <- getAllMergedConsCols(formulaScorings()$name, columns, mConsNames)
-    
-    if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]
-    
-    if (length(scoreCols) > 0)
-    {
-        scoreRanges <- scoreRanges[scoreCols]
-        sc <- getPrecursorFormData(formResults, scoreCols)
-        sc[, (scoreCols) := mapply(.SD, scoreRanges, SIMPLIFY = FALSE,
-                                   FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
-           .SDcols = scoreCols]
-        # add/merge normalized columns and restore original column order
-        formResults <- formResults[, setdiff(columns, scoreCols), with = FALSE][sc, on = "neutral_formula"][, columns, with = FALSE]
-    }
-    
-    return(formResults)
-}
-
 calculateFormScoreRanges <- function(formTable, mConsNames)
 {
     scoreCols <- getAllMergedConsCols(formulaScorings()$name, names(formTable), mConsNames)

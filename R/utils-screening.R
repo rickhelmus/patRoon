@@ -266,16 +266,15 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames,
-                                        formScoreRanges, formulasNormalizeScores, compTable,
-                                        compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
-                                        absMzDev, IDLevelRules)
+                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formNormScores,
+                                        formScoreRanges, formulasNormalizeScores, compTable, compRank, mCompNames,
+                                        compNormScores, compScoreRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
 {
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
-        formTableNorm <- normalizeFormScores(formTable, formScoreRanges, mFormNames,
-                                             formulasNormalizeScores == "minmax")
+        formTableNorm <- normalizeAnnScores(formTable, formNormScores, formScoreRanges, mFormNames,
+                                            formulasNormalizeScores == "minmax")
         unFTable <- unique(formTable, by = "formula"); unFTableNorm <- unique(formTableNorm, by = "formula")
         if (!is.na(formRank))
         {
@@ -286,7 +285,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
     
     if (!is.null(compTable) && !is.null(suspectInChIKey1))
     {
-        compTableNorm <- normalizeCompScores(compTable, compScoreRanges, mCompNames, compoundsNormalizeScores == "minmax")
+        compTableNorm <- normalizeAnnScores(compTable, compNormScores, compScoreRanges, mCompNames, compoundsNormalizeScores == "minmax")
         if (!is.na(compRank))
         {
             cRow <- compTable[compRank]

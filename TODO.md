@@ -68,7 +68,6 @@
     - remove mergedNames again from rankFormulaTable etc
     - update formulaScorings: remove frag specific scores
     - formula --> ion_formula
-        - spec plotting
     - remove old functions
         - mergeFragInfo()?
         - getCompSuspectListColNames()
@@ -79,6 +78,7 @@
     - news
         - frag mSigma/score now also averaged
         - formula --> ion_formula
+        - intensity removed from fragInfo
 
 
 ## Suspects

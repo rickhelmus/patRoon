@@ -86,14 +86,14 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
 
 getMSPlotData <- function(spec, marklwd, markWhich = NULL)
 {
-    hasFragInfo <- !is.null(spec[["formula"]])
+    hasFragInfo <- !is.null(spec[["ion_formula"]])
     plotData <- copy(spec)
     
     # default colour/line width
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
     
     if (is.null(markWhich))
-        markWhich <- if (hasFragInfo) plotData[!is.na(formula), which = TRUE] else seq_len(nrow(plotData))
+        markWhich <- if (hasFragInfo) plotData[!is.na(ion_formula), which = TRUE] else seq_len(nrow(plotData))
     else
         markWhich <- plotData[mergedBy %in% markWhich, which = TRUE]
     
@@ -240,7 +240,7 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
     {
         expand <- if (!is.null(mol))
             1.75
-        else if (!is.null(plotData[["formula"]]) && any(!is.na(plotData$formula)))
+        else if (!is.null(plotData[["ion_formula"]]) && any(!is.na(plotData$ion_formula)))
             1.5
         else
             1.2
@@ -275,12 +275,12 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         abline(h = 0, col = "darkgrey")
     
     annPlotData <- NULL
-    if (!is.null(plotData[["formula"]]))
+    if (!is.null(plotData[["ion_formula"]]))
     {
-        annPlotData <- plotData[!is.na(formula)]
+        annPlotData <- plotData[!is.na(ion_formula)]
         if (nrow(annPlotData) > 0)
         {
-            formsSub <- subscriptFormula(annPlotData$formula)
+            formsSub <- subscriptFormula(annPlotData$ion_formula)
             
             calcFormHeights <- function(cex)
             {
@@ -378,10 +378,10 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
 makeMSPlotGG <- function(plotData, ..., mol = NULL)
 {
     # BUG: throws errors when parse=TRUE and all labels are empty
-    if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
+    if (!is.null(plotData$ion_formula) && any(!is.na(plotData$ion_formula)))
     {
-        plotData[!is.na(formula), formula := subscriptFormula(formula, parse = FALSE)]
-        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "formula")) +
+        plotData[!is.na(ion_formula), ion_formula := subscriptFormula(ion_formula, parse = FALSE)]
+        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "ion_formula")) +
             ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
                                      nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2,
                                      na.rm = TRUE)

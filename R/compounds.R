@@ -76,9 +76,9 @@ setMethod("show", "compounds", function(object)
     if (length(mn) > 1)
         printf("Merged: %s\n", paste0(mn, collapse = ", "))
 
-    printf("Number of feature groups with compounds in this object: %d\n", length(object@compounds))
+    printf("Number of feature groups with compounds in this object: %d\n", length(annotations(object)))
 
-    cCounts <- if (length(object) == 0) 0 else sapply(object@compounds, nrow)
+    cCounts <- if (length(object) == 0) 0 else sapply(annotations(object), nrow)
     printf("Number of compounds: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(cCounts), mean(cCounts), min(cCounts), max(cCounts))
 })
@@ -223,7 +223,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     setTxtProgressBar(prog, length(cTable))
     close(prog)
 
-    compounds@compounds <- cTable
+    compounds@groupAnnotations <- cTable
     compounds@scoreRanges <- mapply(compounds@scoreRanges, cTable, SIMPLIFY = FALSE, FUN = function(sc, ct)
     {
         ret <- c(sc, list(formulaScore = range(ct$formulaScore)))
@@ -252,7 +252,7 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
         .var.name = "index"
     )
 
-    assertChoiceSilent(groupName, names(obj@compounds), add = ac)
+    assertChoiceSilent(groupName, groupNames(obj), add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(index) == 1 && index == -1)
@@ -392,7 +392,6 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     assertChoiceSilent(groupName, allFGroups, add = ac)
-    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(onlyAnnotated, add = ac)
     checkmate::reportAssertions(ac)
@@ -511,7 +510,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         }
         
         if (is.null(title))
-            title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
+            title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$neutral_formula)
         
         if (!useGGPlot2)
             makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ..., mol = mol,
@@ -534,7 +533,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (is.null(title))
         {
             compr1 <- obj[[groupName[1]]][index[1], ]; compr2 <- obj[[groupName[2]]][index[2], ]
-            title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$formula, compr2$compoundName, compr2$formula)
+            title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$neutral_formula,
+                                               compr2$compoundName, compr2$neutral_formula)
         }
         
         binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, "unique", mustExist = TRUE)

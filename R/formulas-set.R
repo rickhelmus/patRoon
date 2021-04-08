@@ -309,15 +309,16 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
 })
 
 
-generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold, setThresholdAnn)
+generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setArgs, setThreshold, setThresholdAnn)
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
+    msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
     
     # UNDONE: mention that adduct argument is automatically set
 
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
-    setObjects <- Map(unsetFGroupsList, setArgs,
-                      f = function(fg, sa) do.call(generator, c(list(fGroups = fg, ...), sa)))
+    setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
+                      f = function(fg, mspl, sa) generator(fGroups = fg, MSPeakLists = mspl[[1]], ...))
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     

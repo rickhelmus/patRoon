@@ -450,14 +450,17 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
 #' @rdname formula-generation
 #' @aliases generateFormulas
 #' @export
-setMethod("generateFormulas", "featureGroups", function(fGroups, algorithm, ...)
+setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertChoice(algorithm, c("bruker", "genform", "sirius"))
+    checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
                 bruker = generateFormulasDA,
                 genform = generateFormulasGenForm,
                 sirius = generateFormulasSIRIUS)
     
-    f(fGroups, ...)
+    f(fGroups, MSPeakLists, ...)
 })

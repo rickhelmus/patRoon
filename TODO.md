@@ -158,6 +158,7 @@
     - fragMatches/NLMatches: doc that it's _not_ candidate specific
         --> also add for candidate specific if possible? although this could be taken from suspect annotations
         - otherwise maybe rename to eg allFragmentMatches
+    - plotInt: not normalized now? y axis isn't...
 
 ## Reporting
 
@@ -299,7 +300,7 @@
     - Fixed Hill ordering: H wasn't alphabetical if no C is present
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - fixed: withMSMS now applied after all other filters
-    - fixed: topX peaks for MSPeakLists would re-order peaklists
+    - fixed: topX peaks for MSPeakLists filter would re-order peaklists
     - MetFrag
         - formula_MF in MF FragInfo
         - useSmiles=true

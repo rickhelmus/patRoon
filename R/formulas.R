@@ -632,7 +632,7 @@ setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, an
                                                    title = NULL, specSimParams = getDefSpecSimParams(),
                                                    useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
-    if (!is.null(specSimParams))
+    if (length(groupName) > 1)
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,

@@ -743,7 +743,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, formulas = formulas, plotStruct = plotStruct, title = title,
-                     specSimParams = specSimParams(), useGGPlot2 = useGGPlot2, mincex = mincex,
+                     specSimParams = specSimParams, useGGPlot2 = useGGPlot2, mincex = mincex,
                      xlim = xlim, ylim = ylim, maxMolSize = maxMolSize, molRes = molRes, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))

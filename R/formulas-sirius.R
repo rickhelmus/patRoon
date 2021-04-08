@@ -136,7 +136,6 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               splitBatches = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile, fixed = list(add = ac))

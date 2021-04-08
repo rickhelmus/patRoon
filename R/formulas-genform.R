@@ -220,7 +220,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
         forms <- data.table::fread(file, header = FALSE)
         data.table::setnames(forms, c("neutral_formula", "dbe", "ion_formula_mz", "error", "isoScore"))
         forms[, explainedPeaks := 0L]
-        forms[, fragInfo := list(getEmptyGFFragInfo())]
+        forms[, fragInfo := list(patRoon:::getEmptyGFFragInfo())]
     }
     else
         forms <- patRoon:::processGenFormMSMSResultFile(file)
@@ -329,7 +329,6 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                                                                topMost = 50, batchSize = 8)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE,
            fixed = list(add = ac))

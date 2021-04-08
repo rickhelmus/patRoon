@@ -292,8 +292,8 @@ getScriptCode <- function(input, analyses)
             addComment("Calculate formula candidates")
             addCall("formulas", "generateFormulas", list(
                 list(value = "fGroups"),
+                list(value = "mslists"),
                 list(value = tolower(input$formulaGen), quote = TRUE),
-                list(value = "mslists", condition = input$formulaGen != "Bruker"),
                 list(name = "relMzDev", value = 5, condition = input$formulaGen != "Bruker"),
                 list(name = "precursorMzSearchWindow", value = 0.002, condition = input$formulaGen == "Bruker"),
                 list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),

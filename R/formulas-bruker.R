@@ -11,6 +11,11 @@ simplifyDAFormula <- function(formula)
     return(gsub("(?<=[[:alpha:]])1{1}(?![[:digit:]])", "", formula, perl = TRUE))
 }
 
+getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = character(), error = numeric(),
+                                            mSigma = numeric(), dbe = numeric(), score = numeric(),
+                                            neutral_loss = character())
+
+
 #' @details \code{generateFormulasDA} uses Bruker DataAnalysis to generate
 #'   chemical formulae. This method supports scoring based on overlap between
 #'   measured and theoretical isotopic patterns (both MS and MS/MS data) and the
@@ -35,13 +40,13 @@ simplifyDAFormula <- function(formula)
 #'
 #' @rdname formula-generation
 #' @export
-setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSearchWindow = 0.002,
+setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
                                                           MSMode = "both", adduct, featThreshold = 0,
                                                           featThresholdAnn = 0.75, absAlignMzDev = 0.002, save = TRUE,
                                                           close = save)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
@@ -126,21 +131,21 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
                             if (SMFResultCount < 1 || all.equal(SMFResult[["m_over_z"]], fts[[ana]]$mz[fti]) != TRUE)
                                 next
 
-                            dt <- data.table(neutral_formula = character(SMFResultCount),
-                                             formula = character(SMFResultCount),
-                                             formula_mz = numeric(SMFResultCount),
-                                             error = numeric(SMFResultCount), mSigma = numeric(SMFResultCount),
-                                             score = numeric(SMFResultCount), byMSMS = FALSE)
-
-                            for (l in 1:SMFResultCount)
+                            dt <- rbindlist(lapply(seq_len(SMFResultCount), function(resi)
                             {
-                                SMFResultItem <- SMFResult[[l]]
-                                dt[l, c("neutral_formula", "formula", "formula_mz", "error", "mSigma", "dbe", "score") :=
-                                       .(simplifyDAFormula(SMFResultItem[["NeutralFormula"]]),
-                                         simplifyDAFormula(SMFResultItem[["SumFormula"]]), SMFResultItem[["m_over_z"]],
-                                         SMFResultItem[["Error"]], SMFResultItem[["Sigma"]] * 1000,
-                                         SMFResultItem[["RingsAndDoubleBonds"]], SMFResultItem[["Score"]])]
-                            }
+                                SMFResultItem <- SMFResult[[resi]]
+                                return(list(
+                                    neutral_formula = simplifyDAFormula(SMFResultItem[["NeutralFormula"]]),
+                                    ion_formula = simplifyDAFormula(SMFResultItem[["SumFormula"]]),
+                                    ion_formula_mz = SMFResultItem[["m_over_z"]],
+                                    error = SMFResultItem[["Error"]],
+                                    mSigma = SMFResultItem[["Sigma"]] * 1000,
+                                    RingsAndDoubleBonds = SMFResultItem[["RingsAndDoubleBonds"]],
+                                    score = SMFResultItem[["Score"]],
+                                    explainedPeaks = 0,
+                                    fragInfo = getEmptyDAFragInfo()
+                                ))
+                            }))
 
                             ftableCount <- ftableCount + 1
                             ftable[[ftableCount]] <- dt
@@ -172,29 +177,34 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
 
                             if (SMF3DResultCount < 1 || abs(parent[["m_over_z"]] - fts[[ana]]$mz[fti]) > precursorMzSearchWindow)
                                 next
-
+                            
                             form <- simplifyDAFormula(parent[["SumFormula"]])
                             nform <- calculateNeutralFormula(form, fgAdd$grpAdducts[grp])
 
-                            dt <- data.table(neutral_formula = nform, formula = form, formula_mz = parent[["m_over_z"]],
-                                             error = parent[["Error"]], mSigma = parent[["Sigma"]] * 1000,
-                                             dbe = parent[["RingsAndDoubleBonds"]], score = parent[["Score"]],
-                                             byMSMS = TRUE, frag_formula = character(SMF3DResultCount),
-                                             frag_mz = numeric(SMF3DResultCount),
-                                             frag_error = numeric(SMF3DResultCount), frag_mSigma = numeric(SMF3DResultCount),
-                                             neutral_loss = character(SMF3DResultCount), frag_dbe = numeric(SMF3DResultCount),
-                                             frag_score = numeric(SMF3DResultCount))
+                            dt <- data.table(neutral_formula = nform,
+                                             ion_formula = form,
+                                             ion_formula_mz = parent[["m_over_z"]],
+                                             error = parent[["Error"]],
+                                             mSigma = parent[["Sigma"]] * 1000,
+                                             dbe = parent[["RingsAndDoubleBonds"]],
+                                             score = parent[["Score"]],
+                                             explainedPeaks = SMF3DResultCount)
 
-                            for (l in 1:SMF3DResultCount)
+                            dt[, fragInfo := lapply(seq_len(SMF3DResultCount), function(resi)
                             {
-                                frag <- SMF3DResult[[l]]
+                                frag <- SMF3DResult[[resi]]
                                 fform <- simplifyDAFormula(frag[["SumFormula"]])
-                                dt[l, c("frag_formula", "frag_mz", "frag_error", "frag_mSigma", "neutral_loss",
-                                        "frag_dbe", "frag_score") :=
-                                       .(fform, frag[["m_over_z"]], frag[["Error"]], frag[["Sigma"]] * 1000,
-                                         subtractFormula(form, fform), frag[["RingsAndDoubleBonds"]], frag[["Score"]])]
-                            }
-
+                                return(data.table(
+                                    mz = frag[["m_over_z"]],
+                                    ion_formula = fform,
+                                    error = frag[["Error"]],
+                                    mSigma = frag[["Sigma"]] * 1000,
+                                    RingsAndDoubleBonds = frag[["RingsAndDoubleBonds"]],
+                                    score = frag[["Score"]],
+                                    neutral_loss = subtractFormula(form, fform)
+                                ))
+                            })]
+                            
 
                             ftable3DFragCount <- ftable3DFragCount + 1
                             ftable3DFrag[[ftable3DFragCount]] <- dt
@@ -252,11 +262,11 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     if (length(fTable) > 0)
+    {
         groupFormulas <- generateGroupFormulasByConsensus(fTable, lapply(ftind, function(x) sum(x > 0)),
-                                                          featThreshold, featThresholdAnn,
-                                                          gNames, "analysis_from", "analyses", "featCoverage",
-                                                          "featCoverageAnn", MSPeakLists, absAlignMzDev,
-                                                          character())
+                                                          featThreshold, featThresholdAnn, gNames)
+        groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
+    }
     else
         groupFormulas <- list()
 

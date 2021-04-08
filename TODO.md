@@ -60,8 +60,6 @@
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
     - formulas: neutralMass column
-    - update DA formulas
-        - call setFormulaPLIndex()
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc
     - update formulaScorings: remove frag specific scores
@@ -71,6 +69,7 @@
         - getCompSuspectListColNames()
         - getCompScoreColNames --> replace with annScoreNames
         - formulaTable/compoundTable
+    - include MSPeakLists in generateFormulas like generateCompounds
     - docs
         - new/changed as.data.table args
     - news
@@ -188,6 +187,7 @@
 ## tests
 
 - test DA algorithms
+    - formulas: check if fragInfo etc is correct
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
     - thoroughly test consensus for compounds/formulas and ranking with both set and algo consensus
@@ -245,6 +245,7 @@
         - formulas: each line is the best candidate from an analysis/set
     - set ranking: same as compounds consensus (but no weights (yet))
     - as.data.table(formulas, average=T): now removes most cols
+    - formulasDA: update that MSPeakLists now is necessary (obtained via FFM PLs)
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -344,6 +345,7 @@
     - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
     - formula/compound annotation consensus: ranking is properly scaled
     - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data
+    - Bruker formulas: MSPeakLists argument now required
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

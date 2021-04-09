@@ -59,7 +59,6 @@
     - also for compounds?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
-    - update formulaScorings: remove frag specific scores
     - ion_formula_mz --> ionMass?
     - docs
         - new/changed as.data.table args

@@ -263,13 +263,13 @@ checkFormula <- function(formula, elementsVec, negate)
 #' @export
 formulaScorings <- function()
 {
-    data.frame(name = c("combMatch", "frag_mSigma", "frag_score", "isoScore", "mSigma", "MSMSScore", "score"),
-               genform = c("comb_match", "-", "-",  "MS_match", "-", "MSMS_match", "-"),
-               sirius = c("-", "-", "-", "isoScore", "-", "treeScore", "score"),
-               bruker = c("-", "mSigma (SmartFormula3D)", "Score (SmartFormula3D)", "-", "mSigma", "-", "Score"),
-               description = c("MS and MS/MS combined match value", "Deviation of isotopic pattern of fragment",
-                               "MS/MS fragment score", "How well the isotopic pattern matches", "Deviation of the isotopic pattern",
-                               "How well MS/MS data matches", "Overall MS formula score"),
+    data.frame(name = c("combMatch", "isoScore", "mSigma", "MSMSScore", "score"),
+               genform = c("comb_match", "MS_match", "-", "MSMS_match", "-"),
+               sirius = c("-", "isoScore", "-", "treeScore", "score"),
+               bruker = c("-", "-", "mSigma", "-", "Score"),
+               description = c("MS and MS/MS combined match value", "How well the isotopic pattern matches",
+                               "Deviation of the isotopic pattern", "How well MS/MS data matches",
+                               "Overall MS formula score"),
                stringsAsFactors = FALSE)
 }
 

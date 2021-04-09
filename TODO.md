@@ -59,11 +59,11 @@
     - also for compounds?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
-    - formulas: neutralMass column
     - update rankFormulaTable: remove old MS/MS cols
     - remove mergedNames again from rankFormulaTable etc
     - update formulaScorings: remove frag specific scores
     - formula --> ion_formula
+    - ion_formula_mz --> ionMass?
     - remove old functions
         - mergeFragInfo()?
         - getCompSuspectListColNames()

@@ -199,13 +199,12 @@ processGenFormMSMSResultFile <- function(file)
     data.table::setnames(ret, seq_len(7),
                          c("neutral_formula", "dbe", "ion_formula_mz", "error", "isoScore", "MSMSScore", "combMatch"))
     # initialize all with empty fragInfos
-    ret[, fragInfo := list(getEmptyGFFragInfo())]
+    ret[, fragInfo := list(list(getEmptyGFFragInfo()))]
+    
     if (length(fragInfoList) > 0)
         ret[match(as.integer(names(fragInfoList)), precursorGroup), fragInfo := fragInfoList]
     
     ret[, c("isPrecursor", "precursorGroup") := NULL]
-    
-    ret[, explainedPeaks := sapply(fragInfo, nrow)]
     
     return(ret)
 }
@@ -219,7 +218,6 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     {
         forms <- data.table::fread(file, header = FALSE)
         data.table::setnames(forms, c("neutral_formula", "dbe", "ion_formula_mz", "error", "isoScore"))
-        forms[, explainedPeaks := 0L]
         forms[, fragInfo := list(patRoon:::getEmptyGFFragInfo())]
     }
     else
@@ -235,29 +233,18 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
         forms <- forms[seq_len(topMost)]
 
     forms[, neutral_formula := sapply(neutral_formula, sortFormula)] # GenForm doesn't seem to use Hill sorting
-    forms[, ion_formula := calculateIonFormula(neutral_formula, adduct)]
+    
+    forms <- addMiscFormulaInfo(forms, adduct)
     
     # set correct column types
     numCols <- intersect(c("error", "dbe", "isoScore", "MSMSScore", "combMatch"), names(forms))
     for (col in numCols)
         data.table::set(forms, j = col, value = as.numeric(forms[[col]]))
-    for (col in c("ion_formula", "neutral_formula"))
-        data.table::set(forms, j = col, value = as.character(forms[[col]]))
+    data.table::set(forms, j = "neutral_formula", value = as.character(forms$neutral_formula))
 
-    # add neutral losses now ion formulas are there    
-    forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
-    {
-        fi <- copy(fi)
-        if (nrow(fi) == 0)
-            fi[, neutral_loss := character()]
-        else
-            fi[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = form)]
-        return(fi)
-    })]
-    
     # set nice column order
-    data.table::setcolorder(forms, c("neutral_formula", "ion_formula", "ion_formula_mz", "error", "dbe", "isoScore",
-                                     "explainedPeaks"))
+    data.table::setcolorder(forms, c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz", "error", "dbe",
+                                     "isoScore", "explainedPeaks"))
     
     return(forms)
 }

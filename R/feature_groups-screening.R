@@ -319,7 +319,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     printf("Annotating %d suspects...\n", nrow(si))
     prog <- openProgBar(0, nrow(si))
     
+    formScores <- if (!is.null(formulas)) annScoreNames(formulas, FALSE) else NULL
     formNormScores <- if (!is.null(formulas)) annScoreNames(formulas, TRUE) else NULL
+    compScores <- if (!is.null(compounds)) annScoreNames(compounds, FALSE) else NULL
     compNormScores <- if (!is.null(compounds)) annScoreNames(compounds, TRUE) else NULL
     
     for (i in seq_len(nrow(si)))
@@ -334,13 +336,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         formRank <- NA_integer_; annSimForm <- annSimBoth <- NA_real_
         if (!is.null(fTable) && !is.null(si[["formula"]]) && !is.na(si$formula[i]))
         {
-            unFTable <- unique(fTable, by = "formula")
-            formRank <- which(si$formula[i] == unFTable$neutral_formula)
+            formRank <- which(si$formula[i] == fTable$neutral_formula)
             formRank <- if (length(formRank) > 0) formRank[1] else NA_integer_
             if (!is.na(formRank))
                 annSimForm <- annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
-                                                                                      precursor = unFTable$neutral_formula[formRank],
-                                                                                      groupName = gName, MSPeakLists = MSPeakLists),
+                                                                                      index = formRank,
+                                                                                      groupName = gName,
+                                                                                      MSPeakLists = MSPeakLists),
                                                                     absMzDev, relMinMSMSIntensity, simMSMSMethod)
         }
         
@@ -383,20 +385,14 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         {
             fragForms <- unlist(strsplit(si[["fragments_formula"]][i], ";"))
             maxSuspFrags <- max(NAToZero(maxSuspFrags), length(fragForms))
-            
-            if (!is.null(fTable) && "formula" %in% checkFragments)
-            {
-                frTable <- fTable[byMSMS == TRUE & si$formula[i] == neutral_formula]
-                if (nrow(frTable) > 0)
-                {
-                    fi <- getFragmentInfoFromForms(MSMSList, frTable)
-                    maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% fi$formula))
-                }
-            }
-            
+
+            if (!is.null(fTable) && "formula" %in% checkFragments && !is.na(formRank) &&
+                !is.null(fTable[["fragInfo"]][[formRank]]))
+                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% fTable[["fragInfo"]][[formRank]]$ion_formula))
+
             if (!is.null(cTable) && "compound" %in% checkFragments && !is.na(compRank) &&
                 !is.null(cTable[["fragInfo"]][[compRank]]))
-                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[compRank]]$formula))
+                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[compRank]]$ion_formula))
         }
 
         maxFragMatchesRel <- NA_real_
@@ -407,10 +403,11 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   annSimForm, annSimComp, annSimBoth,
                                                   maxSuspFrags, maxFragMatches, fTable, formRank,
                                                   mFormNames = if (!is.null(formulas)) mergedConsensusNames(compounds) else character(),
-                                                  formNormScores, fScRanges, formulasNormalizeScores, cTable, compRank,
+                                                  formScores, formNormScores, fScRanges, formulasNormalizeScores,
+                                                  cTable, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
-                                                  compNormScores, cScRanges, compoundsNormalizeScores, absMzDev,
-                                                  IDLevelRules)
+                                                  compScores, compNormScores, cScRanges, compoundsNormalizeScores,
+                                                  absMzDev, IDLevelRules)
         
         set(si, i,
             c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",

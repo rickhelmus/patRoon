@@ -110,7 +110,7 @@ setMethod("as.data.table", "formulasSet", function(x, fGroups = NULL, average = 
 {
     ret <- callNextMethod(x, fGroups = fGroups, average = average, ...)
     if (average)
-        ret[, "formula" := NULL] # formula column doesn't make sense anymore
+        ret[, "ion_formula" := NULL] # ion formula column doesn't make sense anymore
     return(ret[])
 })
 

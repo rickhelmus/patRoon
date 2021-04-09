@@ -225,9 +225,9 @@ test_that("annotation works", {
     skip_if_not(doMetFrag && doSIRIUS)
 
     expect_lt(nrow(anPLOnly), nrow(anPL))
-    expect_true(any(is.na(anPL$formula)))
-    expect_false(any(is.na(anPLOnly$formula)))
-    expect_true(all(compsCons[[1]]$fragInfo[[1]]$formula %in% anPLOnly$formula))
+    expect_true(any(is.na(anPL$ion_formula)))
+    expect_false(any(is.na(anPLOnly$ion_formula)))
+    expect_true(all(compsCons[[1]]$fragInfo[[1]]$ion_formula %in% anPLOnly$ion_formula))
     expect_true(any(grepl("metfrag", anPLOnly$mergedBy)))
     expect_true(any(grepl("sirius", anPLOnly$mergedBy)))
     expect_true(any(grepl("genform", anPLOnly$mergedBy)))

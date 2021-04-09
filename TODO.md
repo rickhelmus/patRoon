@@ -60,6 +60,7 @@
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
     - ion_formula_mz --> ionMass?
+    - newProject: get peaklists also when formula==Bruker
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument
@@ -73,7 +74,7 @@
         - generateFormulas now includes mandatory MSPeakLists argument
         - maxFormulas/maxFragFormulas removed
         - elements filter: neutral_formula used for formulas (but not fragments)
-    - newProject: get peaklists also when formula==Bruker
+        - Fixed: MF was using wrong/inconsistent cache name
 
 
 ## Suspects

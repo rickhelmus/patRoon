@@ -290,18 +290,6 @@ rankFormulaTable <- function(formTable)
     return(formTable)
 }
 
-getPrecursorFormData <- function(formTable, cols)
-{
-    # formula tables may contain multiple lines for a precursor candidate: each
-    # for every annotated fragment. The scorings, however, should be the same
-    # for each candidate. Nevertheless, when dealing with consensus results,
-    # scorings are not homogeneous if a fragment is not annotated by all
-    # algorithms. For this reason try to find the first non-NA value from all
-    # rows.
-    return(formTable[, lapply(.SD, function(x) { xn <- x[!is.na(x)]; if (length(xn) > 0) xn[1] else x[1] }),
-                     by = "neutral_formula", .SDcols = cols])
-}
-
 calculateFormScoreRanges <- function(formTable, mConsNames)
 {
     scoreCols <- getAllMergedConsCols(formulaScorings()$name, names(formTable), mConsNames)
@@ -402,30 +390,12 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
     return(formCons)
 }
 
-getFragmentInfoFromForms <- function(spec, fragFormTable)
-{
-    if (nrow(fragFormTable) == 0)
-        return(data.table(mz = numeric(0), formula = character(0), neutral_loss = character(0),
-                          intensity = numeric(0), PLIndex = numeric(0)))
-
-    fi <- data.table(mz = fragFormTable$frag_mz, formula = fragFormTable$frag_formula, neutral_loss = fragFormTable$neutral_loss)
-    fi[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))] # UNDONE: is this always correct?
-    fi[, intensity := spec$intensity[PLIndex]]
-
-    if (!is.null(fragFormTable[["mergedBy"]]))
-        fi[, mergedBy := fragFormTable$mergedBy]
-
-    return(fi)
-}
-
 getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
 {
     formTable <- formTable[neutral_formula == precursor]
 
     if (nrow(formTable) == 0)
         return(NULL)
-
-    precInfo <- getPrecursorFormData(formTable, names(formTable))
 
     if (useHTML)
         precInfo[, neutral_formula := subscriptFormulaHTML(neutral_formula)]

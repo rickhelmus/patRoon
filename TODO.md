@@ -63,6 +63,9 @@
     - update formulaScorings: remove frag specific scores
     - formula --> ion_formula
     - ion_formula_mz --> ionMass?
+    - update
+        - getFormInfoList()
+        - annotateSuspects()
     - remove old functions
         - mergeFragInfo()?
         - getCompSuspectListColNames()

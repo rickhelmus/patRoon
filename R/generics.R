@@ -81,7 +81,6 @@ setGeneric("annScoreNames", function(obj, norm) standardGeneric("annScoreNames")
 
 ### Formulas
 
-setGeneric("formulaTable", function(obj, features = FALSE) standardGeneric("formulaTable"))
 setGeneric("generateFormulas", function(fGroups, algorithm, ...) standardGeneric("generateFormulas"))
 setGeneric("generateFormulasGenForm", function(fGroups, ...) standardGeneric("generateFormulasGenForm"))
 setGeneric("generateFormulasSIRIUS", function(fGroups, ...) standardGeneric("generateFormulasSIRIUS"))

@@ -77,12 +77,12 @@ test_that("basic subsetting", {
     expect_equal(length(formsGF[FALSE]), 0)
     expect_length(formsGFEmpty[1:5], 0)
 
-    expect_equivalent(formsGF[[2, 15]], formulaTable(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
+    expect_equivalent(formsGF[[2, 15]], annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
     expect_equivalent(formsGF[[analyses(formsGF)[2], groupNames(formsGF)[15]]],
-                      formulaTable(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
+                      annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
 
-    expect_equivalent(formsGF[[15]], formulaTable(formsGF)[[15]])
-    expect_equivalent(formsGF[[groupNames(formsGF)[15]]], formulaTable(formsGF)[[15]])
+    expect_equivalent(formsGF[[15]], annotations(formsGF)[[15]])
+    expect_equivalent(formsGF[[groupNames(formsGF)[15]]], annotations(formsGF)[[15]])
     expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
 

@@ -75,24 +75,13 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             else
                 forms[, fragInfo := list()]
 
-            forms[, ion_formula := calculateIonFormula(neutral_formula, ..adduct)]
-            
-            # add neutral losses now ion formulas are there    
-            forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
-            {
-                fi <- copy(fi)
-                if (nrow(fi) == 0)
-                    fi[, neutral_loss := character()]
-                else
-                    fi[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = form)]
-                return(fi)
-            })]
+            forms <- addMiscFormulaInfo(forms, adduct)
             
             forms[, rank := NULL]
             
             # Precursor is always present in MS/MS spectrum: it's added by
             # SIRIUS if necessarily (with zero intensity). Remove it and use its
-            # frag_formula_mz to get the formula_mz
+            # frag_formula_mz to get ion_formula_mz
             forms[, ion_formula_mz := mapply(ion_formula, fragInfo,
                                              FUN = function(form, fi) fi$ion_formula_mz[form == fi$ion_formula])]
             forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
@@ -103,9 +92,9 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             })]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "ion_formula_mz", "error",
-                                 "error_frag_median", "error_frag_median_abs", "adduct", "score", "MSMSScore",
-                                 "isoScore", "explainedPeaks", "explainedIntensity"))
+            setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "neutralMass",
+                                 "ion_formula_mz", "error", "error_frag_median", "error_frag_median_abs", "adduct",
+                                 "score", "MSMSScore", "isoScore", "explainedPeaks", "explainedIntensity"))
             
             forms <- rankFormulaTable(forms, character())
         }

@@ -20,11 +20,7 @@ Annotation {data-orientation=rows}
 ```{r echo=FALSE}
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
 if (!is.null(compounds))
-{
-    compTable <- annotations(compounds)
-    compFGroups <- rmdVars$groupNames[sapply(rmdVars$groupNames,
-                                             function(grp) !is.null(compTable[[grp]]) && nrow(compTable[[grp]]) > 0)]
-}
+    compFGroups <- intersect(groupNames(compounds), rmdVars$groupNames)
 if (!is.null(rmdVars$compsCluster))
 {
     cl <- clusters(rmdVars$compsCluster)
@@ -55,10 +51,7 @@ if (rmdVars$includeMFWebLinks != "none")
     })
 }
 if (!is.null(formulas) && "formulas" %in% rmdVars$reportPlots)
-{
-    formFGroups <- groupNames(formulas)
-    formFGroups <- intersect(formFGroups, rmdVars$groupNames)
-}
+    formFGroups <- intersect(groupNames(formulas), rmdVars$groupNames)
 if (!is.null(rmdVars$components))
 {
     cTable <- componentTable(rmdVars$components)
@@ -248,7 +241,7 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
     
     if (grp %in% compFGroups)
     {
-        cTable <- compTable[[grp]]
+        cTable <- compounds[[grp]]
         compsSeq <- seq_len(nrow(cTable))
         grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
         {
@@ -295,27 +288,28 @@ allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
     
     if (grp %in% formFGroups)
     {
-        precursors <- unique(formulas[[grp]][["neutral_formula"]])
-        
-        grpPlots[["formulaScores"]] <- sapply(precursors, function(prec)
+        fTable <- formulas[[grp]]
+        formsSeq <- seq_len(nrow(fTable))
+
+        grpPlots[["formulaScores"]] <- sapply(formsSeq, function(formi)
         {
-            ret <- file.path(plotPathFull, sprintf("formscore_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotScores", list(formulas, prec, grp,
+            ret <- file.path(plotPathFull, sprintf("formscore_%d_%i.png", grpi, formi))
+            makeCachedPlot(ret, "plotScores", list(formulas, formi, grp,
                                                    normalizeScores = rmdVars$formulasNormalizeScores,
                                                    excludeNormScores = rmdVars$formulasExclNormScores),
                            4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
         
-        grpPlots[["formulaSpecs"]] <- sapply(precursors, function(prec)
+        grpPlots[["formulaSpecs"]] <- sapply(formsSeq, function(formi)
         {
-            anPList <- annotatedPeakList(formulas, prec, grp,
+            anPList <- annotatedPeakList(formulas, formi, grp,
                                          MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
             if (is.null(anPList))
                 return("") # No MS/MS data available
             
-            ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
-            makeCachedPlot(ret, "plotSpectrum", list(formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists),
+            ret <- file.path(plotPathFull, sprintf("formspec_%d_%d.png", grpi, formi))
+            makeCachedPlot(ret, "plotSpectrum", list(formulas, formi, grp, MSPeakLists = rmdVars$MSPeakLists),
                            6, 4.5, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
@@ -345,19 +339,17 @@ if (rmdVars$selfContained)
 ```{r echo=FALSE, eval=length(compFGroups) > 0}
 compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
-    mn <- mergedConsensusNames(compounds)
-
-    ct <- compTable[[grp]]
+    ct <- compounds[[grp]]
     
     infoTexts <- sapply(seq_len(nrow(ct)), function(compi)
     {
-        it <- paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>")
+        it <- paste0(getCompInfoList(ct, compi, mergedConsensusNames(compounds), TRUE), collapse = "<br>")
         if (isSusp)
         {
             # insert suspect names (if any)
             tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
             if (!is.null(tbl[["susp_compRank"]]) && any(tbl$susp_compRank == compi, na.rm = TRUE))
-                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_compRank == compi]$name, collapse = ", ")),
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_compRank == compi]$susp_name, collapse = ", ")),
                              it, sep = "<br>")
         }
         return(it)
@@ -373,7 +365,7 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
         if (is.null(apl) || nrow(apl) == 0)
             return("<div align=\"center\">No annotation available.</div>")
         
-        apl[, formula := subscriptFormulaHTML(formula)]
+        apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
         apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
         
         knitr::kable(apl, "html", escape = FALSE) %>%
@@ -405,32 +397,32 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 ```{r echo=FALSE, eval=length(formFGroups) > 0}
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 {
-    precursors <- unique(formulas[[grp]][["neutral_formula"]])
+    ft <- formulas[[grp]]
     
-    infoTexts <- sapply(seq_along(precursors), function(preci)
+    infoTexts <- sapply(seq_len(nrow(ft)), function(formi)
     {
-        it <- paste0(getFormInfoList(formulas[[grp]], precursors[preci], mergedConsensusNames(formulas),
-                                     useHTML = TRUE), collapse = "<br>")
+        it <- paste0(getFormInfoList(ft, formi, mergedConsensusNames(formulas), TRUE), collapse = "<br>")
         if (isSusp)
         {
             # insert suspect names (if any)
             tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
-            if (!is.null(tbl[["susp_formRank"]]) && any(tbl$susp_formRank == preci, na.rm = TRUE))
-                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_formRank == preci]$name, collapse = ", ")),
+            if (!is.null(tbl[["susp_formRank"]]) && any(tbl$susp_formRank == formi, na.rm = TRUE))
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_formRank == formi]$susp_name, collapse = ", ")),
                              it, sep = "<br>")
         }
         return(it)
     })
+    
     infoTexts <- makeInfoBox(infoTexts)
     
-    fiTables <- sapply(precursors, function(prec)
+    fiTables <- sapply(seq_len(nrow(ft)), function(formi)
     {
-        apl <- annotatedPeakList(formulas, precursor = prec, groupName = grp,
-                                 MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
+        apl <- annotatedPeakList(formulas, index = formi, groupName = grp, MSPeakLists = rmdVars$MSPeakLists,
+                                 onlyAnnotated = TRUE)
         if (is.null(apl) || nrow(apl) == 0)
             return("<div align=\"center\">No annotation available.</div>")
         
-        apl[, formula := subscriptFormulaHTML(formula)]
+        apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
         apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
         
         knitr::kable(apl, "html", escape = FALSE) %>%
@@ -439,7 +431,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     })
     
     ret <- data.table(group = match(grp, names(rmdVars$fGroups)),
-                      formula = subscriptFormulaHTML(precursors),
+                      neutral_formula = subscriptFormulaHTML(ft$neutral_formula),
                       spectrum = paste0(imgTags(allPlots[[grp]]$formulaSpecs), "<br>", fiTables),
                       scores = paste0(imgTags(allPlots[[grp]]$formulaScores), "<br>", infoTexts))
 

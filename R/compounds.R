@@ -454,10 +454,10 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
     
     if (onlyAnnotated)
     {
-        if (is.null(ret[["formula"]]))
+        if (is.null(ret[["ion_formula"]]))
             ret <- ret[0]
         else
-            ret <- ret[!is.na(formula)]
+            ret <- ret[!is.na(ion_formula)]
     }
 
     return(ret[])

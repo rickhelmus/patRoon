@@ -107,7 +107,7 @@ makeDBIdentLink <- function(db, ident)
     return(paste0(sprintf(fmt, idlist, idlist), collapse = "; "))
 }
 
-getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
+getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
 {
     columns <- names(compResults)
 
@@ -163,7 +163,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mConsNames)
         ctext <- addValText(ctext, "%s", "relatedCIDs")
     }
 
-    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
+    ctext <- addValText(ctext, "%s", c("compoundName", "neutral_formula", "SMILES"))
 
     if (length(getAllMergedConsCols("InChIKey", columns, mConsNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")

@@ -390,28 +390,25 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
     return(formCons)
 }
 
-getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
+getFormInfoList <- function(formTable, index, mConsNames, useHTML)
 {
-    formTable <- formTable[neutral_formula == precursor]
-
-    if (nrow(formTable) == 0)
-        return(NULL)
+    resultRow <- formTable[index]
 
     if (useHTML)
-        precInfo[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
+        resultRow[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
 
     addValText <- function(curText, fmt, col)
     {
-        cols <- getAllMergedConsCols(col, names(precInfo), mConsNames)
+        cols <- getAllMergedConsCols(col, names(resultRow), mConsNames)
 
         ret <- character()
         for (cl in cols)
         {
-            if (!is.null(precInfo[[cl]]) && !is.na(precInfo[[cl]]) &&
-                (!is.character(precInfo[[cl]]) || nzchar(precInfo[[cl]])))
+            if (!is.null(resultRow[[cl]]) && !is.na(resultRow[[cl]]) &&
+                (!is.character(resultRow[[cl]]) || nzchar(resultRow[[cl]])))
             {
                 fm <- sprintf("%s: %s", cl, fmt)
-                ret <- c(ret, sprintf(fm, precInfo[[cl]]))
+                ret <- c(ret, sprintf(fm, resultRow[[cl]]))
             }
         }
 
@@ -420,8 +417,10 @@ getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
 
     ret <- character()
 
-    ret <- addValText(ret, "%s", "formula_mz")
     ret <- addValText(ret, "%s", "neutral_formula")
+    ret <- addValText(ret, "%s", "ion_formula")
+    ret <- addValText(ret, "%.4f", "neutralMass")
+    ret <- addValText(ret, "%.4f", "ion_formula_mz")
     ret <- addValText(ret, "%.2f ppm", "error")
     ret <- addValText(ret, "%.2f ppm", "error_median")
     ret <- addValText(ret, "%.1f", "mSigma")

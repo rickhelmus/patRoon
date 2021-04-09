@@ -235,7 +235,8 @@ reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, exclude
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
 
-            ft <- formulas[[grp]]
+            ft <- formulas[[grp]][, -getAllMergedConsCols("fragInfo", names(formulas[[grp]]),
+                                                          mergedConsensusNames(formulas)), with = FALSE]
             if (normalizeScores != "none")
                 ft <- normalizeAnnScores(ft, annScoreNames(formulas, TRUE), formulas@scoreRanges[[grp]],
                                          mergedConsensusNames(formulas), normalizeScores == "minmax", excludeNormScores)
@@ -283,7 +284,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
 
             plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
 
-            for (precursor in unique(ft$neutral_formula))
+            for (ind in seq_len(nrow(ft)))
             {
                 # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
 
@@ -298,15 +299,15 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
                     textPlot("No MS/MS data available.")
                 }
                 else
-                    plotSpectrum(formulas, precursor, grp, MSPeakLists = MSPeakLists)
+                    plotSpectrum(formulas, ind, grp, MSPeakLists = MSPeakLists)
 
                 screen(scr[3])
-                plotScores(formulas, precursor, grp, normalizeScores = normalizeScores,
+                plotScores(formulas, ind, grp, normalizeScores = normalizeScores,
                            excludeNormScores = excludeNormScores)
 
                 screen(scr[4])
 
-                textPlot(paste0(getFormInfoList(formulas[[grp]], precursor, mergedConsensusNames(formulas)),
+                textPlot(paste0(getFormInfoList(formulas[[grp]], ind, mergedConsensusNames(formulas), FALSE),
                                 collapse = "\n"))
 
                 close.screen(scr)
@@ -415,7 +416,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 screen(scr[4])
 
                 # draw text info
-                txt <- paste0(getCompInfoList(compTable[[grp]], idi, FALSE, mergedConsensusNames(compounds)),
+                txt <- paste0(getCompInfoList(compTable[[grp]], idi, mergedConsensusNames(compounds), FALSE),
                               collapse = "\n")
                 if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
                     txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")

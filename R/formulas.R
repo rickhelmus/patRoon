@@ -266,8 +266,8 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
-                                                 title = NULL, specSimParams = getDefSpecSimParams(),
-                                                 useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                               title = NULL, specSimParams = getDefSpecSimParams(),
+                                               useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -350,7 +350,7 @@ setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analys
 #'
 #' @export
 setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = NULL, normalizeScores = "max",
-                                               excludeNormScores = defaultExclNormScores(obj), useGGPlot2 = FALSE)
+                                             excludeNormScores = defaultExclNormScores(obj), useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -380,9 +380,9 @@ setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = N
     makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
 })
 
-setMethod("plotScoresHash", "formulas", function(obj, index, groupName, normalizeScores = "max",
-                                                   excludeNormScores = defaultExclNormScores(obj),
-                                                   useGGPlot2 = FALSE)
+setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis = NULL, normalizeScores = "max",
+                                                 excludeNormScores = defaultExclNormScores(obj),
+                                                 useGGPlot2 = FALSE)
 {
     if (is.null(analysis))
         annTable <- annotations(obj)[[groupName]]
@@ -393,7 +393,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, normaliz
     else if (normalizeScores == "none")
         annTable <- annTable[index]
     
-    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
+    return(makeHash(index, annTable, normalizeScores, excludeNormScores, useGGPlot2))
 })
 
 #' @templateVar what formulas
@@ -407,7 +407,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, normaliz
 #'
 #' @export
 setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
-                                              uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
+                                            uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
 {
     # NOTE: keep args in sync with formulasSet method
     

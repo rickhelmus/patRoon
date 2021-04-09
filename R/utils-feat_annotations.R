@@ -80,7 +80,7 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
         if (is.null(spec[["ion_formula"]]))
             spec <- spec[0]
         else
-            spec <- spec[!is.na(formula)]
+            spec <- spec[!is.na(ion_formula)]
     }
     
     return(spec[])

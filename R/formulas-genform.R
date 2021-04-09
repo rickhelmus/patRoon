@@ -218,7 +218,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     {
         forms <- data.table::fread(file, header = FALSE)
         data.table::setnames(forms, c("neutral_formula", "dbe", "ion_formula_mz", "error", "isoScore"))
-        forms[, fragInfo := list(patRoon:::getEmptyGFFragInfo())]
+        forms[, fragInfo := list(list(patRoon:::getEmptyGFFragInfo()))]
     }
     else
         forms <- patRoon:::processGenFormMSMSResultFile(file)

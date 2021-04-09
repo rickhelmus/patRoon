@@ -20,7 +20,7 @@ test_that("verify compound cluster generation", {
     expect_known_value(compsClust, testFile("compounds-clust"))
     expect_known_show(compsClust, testFile("compounds-clust", text = TRUE))
     # should have clusters for same number of feature groups with compounds
-    expect_length(clusters(compsClust), length(compoundTable(compounds)))
+    expect_length(clusters(compsClust), length(annotations(compounds)))
 
     expect_length(compsClustEmpty, 0)
     expect_known_show(compsClustEmpty, testFile("compounds-clust-empty", text = TRUE))

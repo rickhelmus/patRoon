@@ -13,7 +13,7 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 if (doMetFrag)
 {
     compsMF <- callMF(fGroups, plists)
-    ct <- compoundTable(compsMF)
+    ct <- annotations(compsMF)
     compsMFEmpty <- callMF(fGroupsEmpty, plists = plistsEmpty)
     compsMFEmptyPL <- callMF(fGroups, plists = plistsEmpty)
 }
@@ -132,8 +132,8 @@ test_that("basic subsetting", {
     expect_equal(length(comps[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
 
-    expect_equivalent(comps[[1]], compoundTable(comps)[[1]])
-    expect_equivalent(comps[[groupNames(comps)[1]]], compoundTable(comps)[[1]])
+    expect_equivalent(comps[[1]], annotations(comps)[[1]])
+    expect_equivalent(comps[[groupNames(comps)[1]]], annotations(comps)[[1]])
     expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
 })
 
@@ -237,12 +237,12 @@ test_that("reporting works", {
     skip_if_not(hasCompounds)
 
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = comps), NA)
-    for (grp in names(compoundTable(comps)))
+    for (grp in names(annotations(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.csv", class(fGroups), grp)))
 
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = comps,
                            MSPeakLists = plists), NA)
-    for (grp in names(compoundTable(comps)))
+    for (grp in names(annotations(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.pdf", class(fGroups), grp)))
 
     expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
@@ -267,15 +267,15 @@ test_that("plotting works", {
     skip_if_not(doMetFrag)
 
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, plotStruct = FALSE))
-    expect_plot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, plotStruct = TRUE))
-    # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, useGGPlot2 = TRUE))
+    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, plotStruct = FALSE))
+    expect_plot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, plotStruct = TRUE))
+    # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[1], plists, useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
-    # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
-    expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[2]))
-    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[2]))
+    # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[1]))
+    expect_plot(plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[2]))
+    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(annotations(compsMFIso))[2]))
 
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(compsMF, compsSIR))
@@ -313,14 +313,14 @@ test_that("sets functionality", {
     expect_lt(length(callMF(fgOneEmptySet, plists, setThreshold = 1)), length(compsOneEmptySet))
     expect_length(callMF(fgOneEmptySet, plists, setThresholdAnn = 0), length(compsOneEmptySet))
     
-    expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2],
+    expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2],
                                                                plists, plotStruct = FALSE, perSet = FALSE))
     expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1,
-                                                                      names(compoundTable(compsMFIso))[2],
+                                                                      names(annotations(compsMFIso))[2],
                                                                       plists, plotStruct = FALSE, perSet = TRUE,
                                                                       mirror = FALSE))
     expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1,
-                                                                      names(compoundTable(compsMFIso))[2],
+                                                                      names(annotations(compsMFIso))[2],
                                                                       plists, plotStruct = FALSE, perSet = TRUE,
                                                                       mirror = TRUE))
 })

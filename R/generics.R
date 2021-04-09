@@ -88,7 +88,6 @@ setGeneric("generateFormulasDA", function(fGroups, ...) standardGeneric("generat
 
 ### Compounds
 
-setGeneric("compoundTable", function(obj) standardGeneric("compoundTable"))
 setGeneric("generateCompounds", function(fGroups, MSPeakLists, algorithm, ...) standardGeneric("generateCompounds"))
 setGeneric("generateCompoundsMetFrag", function(fGroups, ...) standardGeneric("generateCompoundsMetFrag"))
 setGeneric("generateCompoundsSIRIUS", function(fGroups, ...) standardGeneric("generateCompoundsSIRIUS"))

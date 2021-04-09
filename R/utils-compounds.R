@@ -80,10 +80,6 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
     return(ret)
 }
 
-getCompScoreColNames <- function() unique(compoundScorings(includeSuspectLists = FALSE)$name)
-getCompSuspectListColNames <- function() setdiff(unique(compoundScorings(includeSuspectLists = TRUE)$name),
-                                                 getCompScoreColNames())
-
 makeDBIdentLink <- function(db, ident)
 {
     ident <- as.character(ident)

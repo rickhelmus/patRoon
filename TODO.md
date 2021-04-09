@@ -60,19 +60,21 @@
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - annotation refactor
     - update formulaScorings: remove frag specific scores
-    - formula --> ion_formula
     - ion_formula_mz --> ionMass?
+    - formulaTable/compoundTable: add to deprecated
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument
             - also update handbook, tutorial...
         - maxFormulas/maxFragFormulas removed (handbook)
+        - elements filter: neutral_formula used for formulas (but not fragments)
     - news
         - frag mSigma/score now also averaged
         - formula --> ion_formula
         - intensity removed from fragInfo
         - generateFormulas now includes mandatory MSPeakLists argument
         - maxFormulas/maxFragFormulas removed
+        - elements filter: neutral_formula used for formulas (but not fragments)
     - newProject: get peaklists also when formula==Bruker
 
 

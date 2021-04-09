@@ -234,7 +234,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                 {
                     MSMSFlist <- rbindlist(ftable3D[1:ftable3DCount])
                     if (ftableCount > 0)
-                        flist <- flist[!formula %in% MSMSFlist[["formula"]]]
+                        flist <- flist[!neutralformula %in% MSMSFlist[["neutral_formula"]]]
                     flist <- rbind(flist, MSMSFlist, fill = TRUE)
                 }
 

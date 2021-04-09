@@ -106,7 +106,8 @@ TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTa
                      all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
                      nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank))
             {
-                plSpecArgs <- list(obj = rmdVars$formulas, precursor = c(suspParRow$formula, suspTPRow$formula),
+                plSpecArgs <- list(obj = rmdVars$formulas,
+                                   index = c(suspParRow$formRank, suspTPRow$formRank),
                                    MSPeakLists = rmdVars$MSPeakLists)
             }
         }

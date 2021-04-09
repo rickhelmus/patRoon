@@ -152,7 +152,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         
         if (!is.null(elements))
         {
-            keep <- sapply(annTable$formula, checkFormula, elements, negate = negate)
+            keep <- sapply(annTable$neutral_formula, checkFormula, elements, negate = negate)
             annTable <- annTable[keep]
         }
         if (!is.null(fragElements) || !is.null(lossElements))
@@ -161,7 +161,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
             {
                 if (nrow(fi) == 0)
                     return(FALSE)
-                if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements, negate = negate)))
+                if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements, negate = negate)))
                     return(FALSE)
                 if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate = negate)))
                     return(FALSE)

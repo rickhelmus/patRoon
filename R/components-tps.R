@@ -77,13 +77,13 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
         return(list(fragmentMatches = rep(NA_integer_, length(TPFGs)),
                     neutralLossMatches = rep(NA_integer_, length(TPFGs))))
     
-    parentFrags <- unique(annPLParent$formula); parentNLs <- unique(annPLParent$neutral_loss)
+    parentFrags <- unique(annPLParent$ion_formula); parentNLs <- unique(annPLParent$neutral_loss)
     annPLTPs <- lapply(TPFGs, getAllAnnPLs)
     fragMatches <- sapply(annPLTPs, function(ann)
     {
         if (is.null(ann))
             return(NA_integer_)
-        return(sum(unique(ann$formula) %chin% parentFrags))
+        return(sum(unique(ann$ion_formula) %chin% parentFrags))
     })
     NLMatches <- sapply(annPLTPs, function(ann)
     {

@@ -87,8 +87,8 @@ test_that("basic subsetting", {
 })
 
 test_that("filtering works", {
-    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$byMSMS))
-    expect_true(all(!as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$byMSMS))
+    expect_gt(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks, 1)
+    expect_equal(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks, 0)
     expect_lt(length(filter(formsGF, minExplainedPeaks = 2)),
               length(filter(formsGF, minExplainedPeaks = 1)))
     expect_gt(length(filter(formsGF, minExplainedPeaks = 2, negate = TRUE)),
@@ -162,25 +162,11 @@ OMTab <- as.data.table(formsGF, OM = TRUE)
 test_that("as.data.table() works", {
     expect_setequal(as.data.table(formsGF)$group, groupNames(formsGF))
     expect_setequal(as.data.table(formsGF, average = TRUE)$group, groupNames(formsGF))
-    expect_setequal(as.data.table(formsGF, maxFormulas = 1)$group, groupNames(formsGF))
-    expect_setequal(as.data.table(formsGF, maxFragFormulas = 1)$group, groupNames(formsGF))
-    expect_setequal(as.data.table(formsGF, maxFormulas = 1, maxFragFormulas = 1)$group, groupNames(formsGF))
 
     expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
 
-    expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1),
-                         by = c("group", "neutral_formula")),
-                 length(groupNames(formsGF)))
-    # maxFragFormulas = 1: amount of unique (MS/MS) formulas should be same as
-    # amount of unique fragments
-    expect_equal(uniqueN(as.data.table(formsGFWithMSMS, maxFragFormulas = 1),
-                         by = c("group", "neutral_formula", "byMSMS", "frag_formula")),
-                 uniqueN(as.data.table(formsGFWithMSMS), by = c("group", "neutral_formula")))
-    expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1, maxFragFormulas = 1), by = "group"),
-                 length(groupNames(formsGF)))
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
                  length(groupNames(formsGF)))
-    expect_equal(as.data.table(formsGFMS, maxFragFormulas = 1), as.data.table(formsGFMS))
 
     checkmate::expect_names(names(as.data.table(formsGF, countElements = c("C", "H"))),
                             must.include = c("C", "H"))

@@ -195,16 +195,13 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = F
     
     if (average)
     {
-        # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
-        ret[, byMSMS := any(byMSMS), by = "group"]
-        
         ret[, formula_avg_count := .N, by = "group"]
         
         avgCols <- c("ion_formula", "neutral_formula")
         ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
         
         # just keep the essential columns as the rest doesn't make too much sense anymore
-        keepCols <- c("group", "ion_formula", "neutral_formula", "byMSMS")
+        keepCols <- c("group", "ion_formula", "neutral_formula")
         ret <- ret[, keepCols, with = FALSE]
         ret <- unique(ret, by = c("group", "neutral_formula"))
         

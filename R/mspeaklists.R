@@ -465,16 +465,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                     {
                         if (is.null(ab[[grp]]))
                             return(numeric())
-                        
-                        if (inherits(ab, "formulas"))
-                        {
-                            fTable <- ab[[grp]][byMSMS == TRUE]
-                            if (nrow(fTable) == 0)
-                                return(numeric())
-                            return(fTable$frag_mz)
-                        }
-                        
-                        # compounds
                         return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "mz")))
                     })))
                     

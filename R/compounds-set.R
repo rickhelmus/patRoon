@@ -198,31 +198,8 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, msplArgs,
                       f = function(fg, mspl) generator(fGroups = fg, MSPeakLists = mspl[[1]], ...))
-    
-    # update fragInfos
-    for (s in names(setObjects))
-    {
-        for (fg in groupNames(setObjects[[s]]))
-        {
-            pl <- copy(MSPeakListsSet[[fg]][["MSMS"]]); pl[, PLIndex := seq_len(.N)]; pl <- pl[set == s]
-            ct <- setObjects[[s]]@groupAnnotations[[fg]]
-            ct[, fragInfo := lapply(fragInfo, function(fi)
-            {
-                fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
-                if (nrow(fi) == 0)
-                {
-                    # otherwise it will be assigned as empty list, which messes up merging elsewhere
-                    fi[, PLIndexSet := numeric()]
-                }
-                else
-                    fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLIndex"]])]
-                fi[, set := s]
-                return(fi)
-            })]
-            setObjects[[s]]@groupAnnotations[[fg]] <- ct            
-        }
-    }
-    
+    setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
+
     cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, NULL)
     sc <- makeAnnSetScorings(setObjects, names(fGroupsSet))
     
@@ -236,25 +213,7 @@ compoundsUnset <- setClass("compoundsUnset", contains = "compounds")
 setMethod("unset", "compoundsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
-    obj <- obj[, sets = set]
-    
-    cList <- lapply(annotations(obj), copy)
-    
-    # get rid of sets specific columns
-    cList <- lapply(cList, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)
-    
-    # ... and in fragInfos
-    cList <- lapply(cList, function(ct)
-    {
-        ct[, fragInfo := lapply(fragInfo, function(fi)
-        {
-            fi <- copy(fi)
-            fi <- fi[set == ..set]
-            set(fi, j = c("set", "PLIndex"), value = NULL)
-            setnames(fi, "PLIndexOrig", "PLIndex") # restore original index
-        })]
-    })
-    
-    return(compoundsUnset(groupAnnotations = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
+    uann <- doFeatAnnUnset(obj, set)
+    return(compoundsUnset(groupAnnotations = uann, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
                           algorithm = paste0(algorithm(obj), "_unset")))
 })

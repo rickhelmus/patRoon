@@ -239,7 +239,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 
 annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 {
-    if (is.null(annPL[["formula"]]))
+    if (is.null(annPL[["ion_formula"]]))
         return(0)
 
     # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
@@ -251,35 +251,35 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
         annPL <- annPL[(intensity / maxInt) >= relMinIntensity]
     }
     
-    if (nrow(annPL) == 0 || sum(!is.na(annPL$formula)) == 0)
+    if (nrow(annPL) == 0 || sum(!is.na(annPL$ion_formula)) == 0)
         return(0)
     
     if (method == "cosine")
     {
-        annPL[, intensityAnn := ifelse(is.na(formula), 0, intensity)]
+        annPL[, intensityAnn := ifelse(is.na(ion_formula), 0, intensity)]
         return(as.vector((annPL$intensityAnn %*% annPL$intensity) /
                              (sqrt(sum(annPL$intensityAnn^2)) * sqrt(sum(annPL$intensity^2)))))
     }
     else # jaccard
-        return(sum(!is.na(annPL$formula)) / nrow(annPL))
+        return(sum(!is.na(annPL$ion_formula)) / nrow(annPL))
 }
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formNormScores,
-                                        formScoreRanges, formulasNormalizeScores, compTable, compRank, mCompNames,
-                                        compNormScores, compScoreRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
+                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formScores,
+                                        formNormScores, formScoreRanges, formulasNormalizeScores, compTable, compRank,
+                                        mCompNames, compScores, compNormScores, compScoreRanges,
+                                        compoundsNormalizeScores, absMzDev, IDLevelRules)
 {
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTableNorm <- normalizeAnnScores(formTable, formNormScores, formScoreRanges, mFormNames,
                                             formulasNormalizeScores == "minmax")
-        unFTable <- unique(formTable, by = "formula"); unFTableNorm <- unique(formTableNorm, by = "formula")
         if (!is.na(formRank))
         {
-            fRow <- unFTable[formRank]
-            fRowNorm <- unFTableNorm[formRank]
+            fRow <- formTable[formRank]
+            fRowNorm <- formTableNorm[formRank]
         }
     }
     
@@ -368,8 +368,6 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
     logFile <- withr::local_connection(file(logOut, "w"))
     doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)
     
-    formScores <- formulaScorings()$name
-    compScores <- compoundScorings()$name
     formCompScores <- intersect(formScores, compScores)
     allScores <- union(formScores, compScores)
     
@@ -457,7 +455,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                     isForm <- type %in% formScores
                 
                 if (isForm)
-                    levelOK <- checkAnnotationScore(val, type, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
+                    levelOK <- checkAnnotationScore(val, type, formRank, fRow, formTable, fRowNorm, formTableNorm,
                                                     getAllMergedConsCols(type, names(formTable), mFormNames))
                 else
                     levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,

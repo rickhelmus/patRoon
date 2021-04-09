@@ -65,7 +65,6 @@
     - ion_formula_mz --> ionMass?
     - update
         - getFormInfoList()
-        - annotateSuspects()
     - remove old functions
         - mergeFragInfo()?
         - getCompSuspectListColNames()

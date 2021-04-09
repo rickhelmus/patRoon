@@ -66,11 +66,13 @@
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument
             - also update handbook, tutorial...
+        - maxFormulas/maxFragFormulas removed (handbook)
     - news
         - frag mSigma/score now also averaged
         - formula --> ion_formula
         - intensity removed from fragInfo
         - generateFormulas now includes mandatory MSPeakLists argument
+        - maxFormulas/maxFragFormulas removed
     - newProject: get peaklists also when formula==Bruker
 
 

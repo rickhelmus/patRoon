@@ -679,7 +679,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                                        timeoutHandler = patRoon:::MFMPTimeoutHandler,
                                        errorHandler = patRoon:::MFMPErrorHandler,
                                        prepareHandler = patRoon:::MFMPPrepareHandler,
-                                       cacheName = "metfrag", setHash = setHash,
+                                       cacheName = "compoundsMetFrag", setHash = setHash,
                                        procTimeout = timeout, delayBetweenProc = 1000,
                                        logSubDir = "metfrag")
     }

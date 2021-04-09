@@ -7,37 +7,38 @@ NULL
 # callback for executeMultiProcess()
 processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 {
-    noResult <- forms <- data.table(neutral_formula = character(), ion_formula = character(), ion_formula_mz = numeric(),
-                                    adduct = character(), score = numeric(), MSMSScore = numeric(),
-                                    isoScore = numeric(), explainedPeaks = integer(), explainedIntensity = numeric(),
-                                    fragInfo = list())
+    noResult <- forms <- data.table::data.table(neutral_formula = character(), ion_formula = character(),
+                                                neutralMass = numeric(), ion_formula_mz = numeric(),
+                                                adduct = character(), score = numeric(), MSMSScore = numeric(),
+                                                isoScore = numeric(), explainedPeaks = integer(),
+                                                explainedIntensity = numeric(), fragInfo = list())
     
     
-    resultPath <- getSiriusResultPath(outPath, msFName)
+    resultPath <- patRoon:::getSiriusResultPath(outPath, msFName)
     summary <- file.path(resultPath, "formula_candidates.tsv")
     if (length(summary) == 0 || length(summary) == 0 || !file.exists(summary))
         forms <- noResult
     else
     {
         forms <- fread(summary)
-        fragFiles <- getSiriusFragFiles(resultPath)
+        fragFiles <- patRoon:::getSiriusFragFiles(resultPath)
         
         if (nrow(forms) == 0 || length(fragFiles) == 0)
             forms <- noResult
         else
         {
-            setnames(forms,
+            data.table::setnames(forms,
                      c("molecularFormula", "precursorFormula", "SiriusScore",
                        "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
                        "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
                      c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
                        "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
             
-            ionImpAdductsCached <- makeEmptyListNamed(list())
+            ionImpAdductsCached <- patRoon:::makeEmptyListNamed(list())
             fragInfoList <- lapply(fragFiles, function(ff)
             {
-                fragInfo <- fread(ff)
-                setnames(fragInfo,
+                fragInfo <- data.table::fread(ff)
+                data.table::setnames(fragInfo,
                          c("exactmass", "formula"),
                          c("ion_formula_mz", "ion_formula_SIR"))
                 fragInfo[, rel.intensity := NULL]
@@ -54,20 +55,20 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                 
                 notCached <- setdiff(ionImpAdducts, names(ionImpAdductsCached))
                 if (length(notCached) > 0)
-                    ionImpAdductsCached <<- c(ionImpAdductsCached, sapply(notCached, as.adduct, format = "sirius",
-                                                                          simplify = FALSE))
+                    ionImpAdductsCached <<- c(ionImpAdductsCached, sapply(notCached, patRoon:::as.adduct,
+                                                                          format = "sirius", simplify = FALSE))
                 ionImpAdducts <- ionImpAdductsCached[ionImpAdducts]
 
-                fragInfo[, ion_formula := mapply(ion_formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
+                fragInfo[, ion_formula := mapply(ion_formula_SIR, ionImpAdducts, FUN = patRoon:::calculateIonFormula)]
                 if (!is.null(fragInfo[["implicitAdduct"]]))
                 {
                     # 'correct' formula masses: SIRIUS subtract implicit adduct from it
                     fragInfo[nzchar(implicitAdduct), ion_formula_mz := ion_formula_mz +
-                                 sapply(implicitAdduct, getFormulaMass)]
+                                 sapply(implicitAdduct, patRoon:::getFormulaMass)]
                 }
                 return(fragInfo)
             })
-            names(fragInfoList) <- sapply(fragFiles, getFormulaFromSiriusFragFile)
+            names(fragInfoList) <- sapply(fragFiles, patRoon:::getFormulaFromSiriusFragFile)
             
             # initialize all with empty fragInfos
             if (length(fragInfoList) > 0)
@@ -75,7 +76,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             else
                 forms[, fragInfo := list()]
 
-            forms <- addMiscFormulaInfo(forms, adduct)
+            forms <- patRoon:::addMiscFormulaInfo(forms, adduct)
             
             forms[, rank := NULL]
             
@@ -92,11 +93,12 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             })]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "neutralMass",
-                                 "ion_formula_mz", "error", "error_frag_median", "error_frag_median_abs", "adduct",
-                                 "score", "MSMSScore", "isoScore", "explainedPeaks", "explainedIntensity"))
+            data.table::setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "neutralMass",
+                                             "ion_formula_mz", "error", "error_frag_median", "error_frag_median_abs",
+                                             "adduct", "score", "MSMSScore", "isoScore", "explainedPeaks",
+                                             "explainedIntensity"))
             
-            forms <- rankFormulaTable(forms, character())
+            forms <- patRoon:::rankFormulaTable(forms, character())
         }
     }
     return(forms)

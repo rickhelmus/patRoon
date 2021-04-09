@@ -5,7 +5,7 @@ NULL
 
 makeFormulasSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mConsNames)
 {
-    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
+    groupFormsList <- sapply(setObjects, annotations, features = FALSE, simplify = FALSE)
     
     # prep set form tables
     groupFormsList <- Map(groupFormsList, names(setObjects), f = function(fTableG, set)
@@ -42,9 +42,9 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
     if (length(setObjects(formulasSet)) >= 1)
     {
         if (length(setObjects(formulasSet)) > 1)
-            formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
+            formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, annotations, features = TRUE))
         else
-            formulasSet@featureFormulas <- formulaTable(setObjects(formulasSet)[[1]], features = TRUE)
+            formulasSet@featureFormulas <- annotations(setObjects(formulasSet)[[1]], features = TRUE)
         
         if (makeCons)
             formulasSet@formulas <- makeFormulasSetConsensus(setObjects(formulasSet), formulasSet@origFGNames,
@@ -297,7 +297,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
                                          rankWeights = rankWeights, labels = formNames))))
     }, simplify = FALSE)
 
-    combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
+    combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))
     
     gNames <- allFormulas[[1]]@origFGNames
     groupForms <- makeFormulasSetConsensus(setObjects, gNames, setThreshold, setThresholdAnn, formNames)
@@ -320,7 +320,7 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setA
     setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
                       f = function(fg, mspl, sa) generator(fGroups = fg, MSPeakLists = mspl[[1]], ...))
     
-    combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
+    combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))
     
     groupForms <- makeFormulasSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, character())
 
@@ -335,9 +335,9 @@ setMethod("unset", "formulasSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     
-    groupForms <- lapply(formulaTable(obj), copy)
+    groupForms <- lapply(annotations(obj), copy)
     groupForms <- lapply(groupForms, data.table::set, j = c("sets", "setCoverage"), value = NULL)
     
-    return(formulasUnset(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
+    return(formulasUnset(formulas = groupForms, featureFormulas = annotations(obj, features = TRUE),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })

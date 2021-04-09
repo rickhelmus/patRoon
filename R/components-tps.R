@@ -387,7 +387,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                 }
                 
                 # filter results where addition is not part of TP candidate formulas
-                ct[keep == TRUE & nzchar(trans_add), keep := mapply(trans_add, formulaTable(formulas)[group],
+                ct[keep == TRUE & nzchar(trans_add), keep := mapply(trans_add, annotations(formulas)[group],
                                                                     FUN = canSub)]
             }
             

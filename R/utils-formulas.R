@@ -277,9 +277,7 @@ rankFormulaTable <- function(formTable)
 {
     # order from best to worst
 
-    rankCols <- c("score", "combMatch", "isoScore", "mSigma", "MSMSScore")()
-    
-    rankCols <- intersect(rankCols, names(formTable))
+    rankCols <- intersect(c("score", "combMatch", "isoScore", "mSigma", "MSMSScore"), names(formTable))
 
     colorder <- rep(-1, length(rankCols))
 

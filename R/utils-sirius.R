@@ -2,8 +2,8 @@
 
 getSiriusBin <- function()
 {
-    # UNDONE: check bin/ subdir?
-    return(if (checkmate::testOS("linux")) "sirius.sh" else "sirius")
+    # NOTE: this seems to fluctuate every other SIRIUS version...
+    return("sirius")
 }
 
 getSIRIUSCmpName <- function() "unknownCompound"

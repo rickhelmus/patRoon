@@ -464,6 +464,12 @@ callAllNextMethods <- function(obj, f, ..., firstClass = NULL, startFrom = class
         selectMethod(f, sc)(obj, ...)
 }
 
+setMethodMult <- function(f, signatures, definition)
+{
+    for (sig in signatures)
+        setMethod(f, sig, definition)
+}
+
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x
 NAToZero <- function(x) if (is.na(x)) 0 else x

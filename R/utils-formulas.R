@@ -469,6 +469,31 @@ getFormInfoList <- function(formTable, precursor, mConsNames, useHTML = FALSE)
 
 getFormulaMass <- memoise(function(f, c = 0) rcdk::get.formula(f, c)@mass)
 
+addMiscFormulaInfo <- function(formTable, adduct)
+{
+    formTable <- copy(formTable)
+    
+    if (is.null(formTable[["ion_formula"]]))
+        formTable[, ion_formula := calculateIonFormula(neutral_formula, ..adduct)]
+    if (is.null(formTable[["neutralMass"]]))
+        formTable[, neutralMass := sapply(neutral_formula, getFormulaMass)]
+    
+    formTable[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
+    {
+        fi <- copy(fi)
+        if (nrow(fi) == 0)
+            fi[, neutral_loss := character()]
+        else
+            fi[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = form)]
+        return(fi)
+    })]
+    
+    if (is.null(formTable[["explainedPeaks"]]))
+        formTable[, explainedPeaks := sapply(fragInfo, nrow)]
+    
+    return(formTable)
+}
+
 setFormulaPLIndex <- function(formList, MSPeakLists, absAlignMzDev)
 {
     # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than

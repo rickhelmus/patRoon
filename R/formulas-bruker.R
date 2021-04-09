@@ -12,8 +12,7 @@ simplifyDAFormula <- function(formula)
 }
 
 getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = character(), error = numeric(),
-                                            mSigma = numeric(), dbe = numeric(), score = numeric(),
-                                            neutral_loss = character())
+                                            mSigma = numeric(), dbe = numeric(), score = numeric())
 
 
 #' @details \code{generateFormulasDA} uses Bruker DataAnalysis to generate
@@ -74,6 +73,12 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
     cachedSet <- loadCacheSet("formulasBruker", setHash, cacheDB)
     formHashes <- vector("character", nrow(anaInfo) * gCount)
     formHashCount <- 0
+    
+    setFormColOrder <- function(dt)
+    {
+        setcolorder(dt, c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz", "error", "mSigma", "dbe",
+                          "score", "explainedPeaks", "fragInfo"))
+    }
 
     for (anai in seq_len(nrow(anaInfo)))
     {
@@ -142,11 +147,13 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                     mSigma = SMFResultItem[["Sigma"]] * 1000,
                                     RingsAndDoubleBonds = SMFResultItem[["RingsAndDoubleBonds"]],
                                     score = SMFResultItem[["Score"]],
-                                    explainedPeaks = 0,
                                     fragInfo = getEmptyDAFragInfo()
                                 ))
                             }))
 
+                            dt <- addMiscFormulaInfo(dt, adduct)
+                            dt <- setFormColOrder(dt)
+                            
                             ftableCount <- ftableCount + 1
                             ftable[[ftableCount]] <- dt
                             break # Shouldn't be any more results
@@ -187,8 +194,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                              error = parent[["Error"]],
                                              mSigma = parent[["Sigma"]] * 1000,
                                              dbe = parent[["RingsAndDoubleBonds"]],
-                                             score = parent[["Score"]],
-                                             explainedPeaks = SMF3DResultCount)
+                                             score = parent[["Score"]])
 
                             dt[, fragInfo := lapply(seq_len(SMF3DResultCount), function(resi)
                             {
@@ -199,12 +205,13 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                     ion_formula = fform,
                                     error = frag[["Error"]],
                                     mSigma = frag[["Sigma"]] * 1000,
-                                    RingsAndDoubleBonds = frag[["RingsAndDoubleBonds"]],
+                                    dbe = frag[["RingsAndDoubleBonds"]],
                                     score = frag[["Score"]],
-                                    neutral_loss = subtractFormula(form, fform)
                                 ))
                             })]
-                            
+
+                            dt <- addMiscFormulaInfo(dt, adduct)
+                            dt <- setFormColOrder(dt)
 
                             ftable3DFragCount <- ftable3DFragCount + 1
                             ftable3DFrag[[ftable3DFragCount]] <- dt

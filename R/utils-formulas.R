@@ -273,16 +273,13 @@ formulaScorings <- function()
                stringsAsFactors = FALSE)
 }
 
-formulaRankingColumns <- function() c("byMSMS", "score", "combMatch", "isoScore", "mSigma", "MSMSScore")
-
-rankFormulaTable <- function(formTable, mConsNames, rankCols = NULL)
+rankFormulaTable <- function(formTable)
 {
     # order from best to worst
 
-    if (is.null(rankCols))
-        rankCols <- formulaRankingColumns()
+    rankCols <- c("score", "combMatch", "isoScore", "mSigma", "MSMSScore")()
     
-    rankCols <- getAllMergedConsCols(rankCols, names(formTable), mConsNames)
+    rankCols <- intersect(rankCols, names(formTable))
 
     colorder <- rep(-1, length(rankCols))
 
@@ -356,7 +353,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = "neutral_formula")
         
-        formTable <- rankFormulaTable(formTable, character())
+        formTable <- rankFormulaTable(formTable)
         
         formTable[, analysis := NULL]
     }

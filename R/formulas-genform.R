@@ -226,7 +226,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     if (is.null(forms) || nrow(forms) == 0)
         return(NULL)
     
-    forms <- patRoon:::rankFormulaTable(forms, character())
+    forms <- patRoon:::rankFormulaTable(forms)
     
     # select topMost after ranking
     if (!is.null(topMost) && nrow(forms) > topMost)

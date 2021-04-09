@@ -217,9 +217,9 @@ test_that("annotation works", {
     skip_if_not(doSIRIUS)
 
     expect_lt(nrow(anPLOnly), nrow(anPL))
-    expect_true(any(is.na(anPL$formula)))
-    expect_false(any(is.na(anPLOnly$formula)))
-    expect_true(all(formsGF[[4]][formula == "C9H8NO", frag_formula] %in% anPLOnly$formula))
+    expect_true(any(is.na(anPL$ion_formula)))
+    expect_false(any(is.na(anPLOnly$ion_formula)))
+    expect_true(all(formsGF[[4]][ion_formula == "C9H8NO", frag_formula] %in% anPLOnly$ion_formula))
     
     skip_if(!doSIRIUS || testWithSets())
     expect_true(any(grepl("genform", anPLCons$mergedBy)))

@@ -10,7 +10,7 @@ NULL
 #' generators}.
 #'
 #' @slot formulas,featureFormulas Lists of all generated formulae. Use the
-#'   \code{formulaTable} method for access.
+#'   \code{annotations} method for access.
 #' @slot scoreRanges The original min/max values of all scorings when candidate
 #'   results were generated. This is used for normalization.
 #'

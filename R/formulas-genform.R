@@ -426,7 +426,6 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
 setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
                                                                   setThresholdAnn = 0.75)
 {
-    setArgs <- assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
-    generateFormulasSet(fGroups, generateFormulasGenForm, ..., setArgs = setArgs, setThreshold = setThreshold,
+    generateFormulasSet(fGroups, MSPeakLists, generateFormulasGenForm, ..., setThreshold = setThreshold,
                         setThresholdAnn = setThresholdAnn)
 })

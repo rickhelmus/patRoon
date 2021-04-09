@@ -63,6 +63,7 @@
     - newProject: get peaklists also when formula==Bruker
     - sets
         - @export multi methods?
+        - sync featureFormulas --> in delete()?
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument

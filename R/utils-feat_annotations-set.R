@@ -198,6 +198,41 @@ syncAnnSetObjects <- function(obj, makeCons)
     return(obj)
 }
 
+initSetFragInfos <- function(setObjects, MSPeakListsSet)
+{
+    # update fragInfos
+    for (s in names(setObjects))
+    {
+        for (fg in groupNames(setObjects[[s]]))
+        {
+            pl <- copy(MSPeakListsSet[[fg]][["MSMS"]])
+            if (!is.null(pl)) # maybe NULL for MS only formulae
+            {
+                pl[, PLIndex := seq_len(.N)]
+                pl <- pl[set == s]
+            }
+            
+            ct <- setObjects[[s]]@groupAnnotations[[fg]]
+            ct[, fragInfo := lapply(fragInfo, function(fi)
+            {
+                fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
+                if (nrow(fi) == 0)
+                {
+                    # otherwise it will be assigned as empty list, which messes up merging elsewhere
+                    fi[, PLIndexSet := numeric()]
+                }
+                else
+                    fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLIndex"]])]
+                fi[, set := s]
+                return(fi)
+            })]
+            setObjects[[s]]@groupAnnotations[[fg]] <- ct            
+        }
+    }
+    
+    return(setObjects)
+}
+
 doFeatAnnConsensusSets <- function(allAnnObjs, origFGNames, labels, setThreshold, setThresholdAnn, ...)
 {
     # make consensus of shared setObjects
@@ -223,6 +258,30 @@ doFeatAnnConsensusSets <- function(allAnnObjs, origFGNames, labels, setThreshold
     return(list(setObjects = setObjects, groupAnnotations = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
                 algorithm = paste0(unique(sapply(allAnnObjs, algorithm)), collapse = ","),
                 mergedConsensusNames = labels))
+}
+
+doFeatAnnUnset <- function(obj, set)
+{
+    obj <- obj[, sets = set]
+    
+    ann <- lapply(annotations(obj), copy)
+    
+    # get rid of sets specific columns
+    ann <- lapply(ann, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)
+    
+    # ... and in fragInfos
+    ann <- lapply(ann, function(tbl)
+    {
+        tbl[, fragInfo := lapply(fragInfo, function(fi)
+        {
+            fi <- copy(fi)
+            fi <- fi[set == ..set]
+            set(fi, j = c("set", "PLIndex"), value = NULL)
+            setnames(fi, "PLIndexOrig", "PLIndex") # restore original index
+        })]
+    })
+    
+    return(ann)
 }
 
 # HACK: formulas/compounds share a lot of methods, but there is no clean and proper way to do this with multiple

@@ -61,6 +61,8 @@
 - annotation refactor
     - ion_formula_mz --> ionMass?
     - newProject: get peaklists also when formula==Bruker
+    - sets
+        - @export multi methods?
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument

@@ -61,7 +61,6 @@
 - annotation refactor
     - update formulaScorings: remove frag specific scores
     - ion_formula_mz --> ionMass?
-    - formulaTable/compoundTable: add to deprecated
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument

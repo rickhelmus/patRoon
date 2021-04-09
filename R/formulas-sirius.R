@@ -98,7 +98,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                              "adduct", "score", "MSMSScore", "isoScore", "explainedPeaks",
                                              "explainedIntensity"))
             
-            forms <- patRoon:::rankFormulaTable(forms, character())
+            forms <- patRoon:::rankFormulaTable(forms)
         }
     }
     return(forms)

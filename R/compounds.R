@@ -71,7 +71,7 @@ setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@merged
 #' @export
 setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount"))
 
-setMethod("annScoreNames", "compounds", function(obj, norm) unique(compoundScorings(includeSuspectLists = !norm)$name))
+setMethod("annScoreNames", "compounds", function(obj, onlyNums) unique(compoundScorings(includeSuspectLists = !onlyNums)$name))
 
 
 #' @describeIn compounds Show summary information for this object.

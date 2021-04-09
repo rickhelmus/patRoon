@@ -106,7 +106,7 @@ setMethod("analyses", "formulas", function(obj) names(obj@featureFormulas))
 #' @export
 setMethod("defaultExclNormScores", "formulas", function(obj) character())
 
-setMethod("annScoreNames", "formulas", function(obj, norm) formulaScorings()$name)
+setMethod("annScoreNames", "formulas", function(obj, onlyNums) formulaScorings()$name)
 
 #' @describeIn formulas Show summary information for this object.
 #' @export

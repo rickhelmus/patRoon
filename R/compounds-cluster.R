@@ -325,7 +325,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     if (!is.null(cd))
         return(cd)
         
-    compTable <- compoundTable(obj)
+    compTable <- annotations(obj)
 
     if (length(obj) == 0)
     {

@@ -511,7 +511,7 @@ setMethod("unset", "compoundsSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     
-    cList <- lapply(compoundTable(obj), copy)
+    cList <- lapply(annotations(obj), copy)
     
     # get rid of sets specific columns
     cList <- lapply(cList, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)

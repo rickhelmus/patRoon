@@ -99,7 +99,7 @@ setMethod("show", "compounds", function(object)
 #' @export
 setMethod("identifiers", "compounds", function(compounds)
 {
-    compTable <- compoundTable(compounds)
+    compTable <- annotations(compounds)
     return(sapply(names(compTable),
                   function(grp) unlist(strsplit(as.character(compTable[[grp]]$identifier), ";")), simplify = FALSE))
 })
@@ -264,9 +264,9 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
     checkmate::reportAssertions(ac)
 
     if (length(index) == 1 && index == -1)
-        index <- seq_len(nrow(compoundTable(obj)[[groupName]]))
+        index <- seq_len(nrow(annotations(obj)[[groupName]]))
 
-    mols <- getMoleculesFromSMILES(compoundTable(obj)[[groupName]][["SMILES"]][index])
+    mols <- getMoleculesFromSMILES(annotations(obj)[[groupName]][["SMILES"]][index])
     mcons <- mols[[1]]
     if (length(mols) > 1)
     {
@@ -307,7 +307,7 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
 
-    compTable <- compoundTable(obj)[[groupName]]
+    compTable <- annotations(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)
@@ -327,7 +327,7 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
 setMethod("plotStructureHash", "compounds", function(obj, index, groupName, width = 500,
                                                      height = 500, useGGPlot2 = FALSE)
 {
-    compTable <- compoundTable(obj)[[groupName]]
+    compTable <- annotations(obj)[[groupName]]
     SMI <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable$SMILES[index]
     return(makeHash(SMI, width, height, useGGPlot2))
 })
@@ -573,7 +573,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
     }
     
-    compTable <- compoundTable(obj)[[groupName]]
+    compTable <- annotations(obj)[[groupName]]
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
     
     return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),

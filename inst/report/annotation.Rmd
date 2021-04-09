@@ -21,7 +21,7 @@ Annotation {data-orientation=rows}
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
 if (!is.null(compounds))
 {
-    compTable <- compoundTable(compounds)
+    compTable <- annotations(compounds)
     compFGroups <- rmdVars$groupNames[sapply(rmdVars$groupNames,
                                              function(grp) !is.null(compTable[[grp]]) && nrow(compTable[[grp]]) > 0)]
 }

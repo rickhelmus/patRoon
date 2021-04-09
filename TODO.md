@@ -68,7 +68,6 @@
         - mergeFragInfo()?
         - getCompSuspectListColNames()
         - getCompScoreColNames --> replace with annScoreNames
-        - compoundTable
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument

@@ -328,7 +328,7 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
     anaInfo <- analysisInfo(fGroups)
-    compTable <- compoundTable(compounds)
+    compTable <- annotations(compounds)
     mcn <- mergedConsensusNames(compounds)
 
     if (!is.null(compsCluster))
@@ -380,7 +380,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     if (!is.null(compsCluster))
         cutcl <- cutClusters(compsCluster)
 
-    compTable <- compoundTable(compounds)
+    compTable <- annotations(compounds)
     idcount <- length(compTable)
     prog <- openProgBar(0, idcount)
 

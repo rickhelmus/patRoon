@@ -22,6 +22,8 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
     
     sCount <- length(setObjects)
     
+    scoreCols <- if (sCount > 0) annScoreNames(setObjects[[1]], TRUE)
+    
     cons <- sapply(allAnnGNames, function(gName)
     {
         allResults <- pruneList(sapply(setObjects, "[[", gName, simplify = FALSE))
@@ -46,8 +48,8 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
         
         Reduce(x = allResults, f = function(left, right)
         {
-            scoreColsLeft <- getAllMergedConsCols(getCompScoreColNames(), names(left), mConsNames)
-            scoreColsRight <- getAllMergedConsCols(getCompScoreColNames(), names(right), mConsNames)
+            scoreColsLeft <- getAllMergedConsCols(scoreCols, names(left), mConsNames)
+            scoreColsRight <- getAllMergedConsCols(scoreCols, names(right), mConsNames)
             scoreColsBoth <- intersect(scoreColsLeft, scoreColsRight)
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
             combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
@@ -102,7 +104,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, set
             fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
         })]
         
-        scCols <- getAllMergedConsCols(getCompScoreColNames(), names(ct), mConsNames)
+        scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
         ct[, (scCols) := lapply(.SD, function(x) x / setCoverageAnn), .SDcols = scCols]
 
         # re-sort by avg rank scores
@@ -168,22 +170,22 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     if (length(setObjects(compoundsSet)) >= 1)
     {
         if (makeCons)
-            compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
-                                                                compoundsSet@setThreshold, compoundsSet@setThresholdAnn,
-                                                                mergedConsensusNames(compoundsSet))
+            compoundsSet@groupAnnotations <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
+                                                                       compoundsSet@setThreshold, compoundsSet@setThresholdAnn,
+                                                                       mergedConsensusNames(compoundsSet))
         else
         {
             # sync available feature groups
             allFGroups <- unique(unlist(lapply(setObjects(compoundsSet), groupNames)))
-            compoundsSet@compounds <- compoundsSet@compounds[intersect(groupNames(compoundsSet), allFGroups)]
+            compoundsSet@groupAnnotations <- compoundsSet@groupAnnotations[intersect(groupNames(compoundsSet), allFGroups)]
             
             # only keep results from sets still present
             spat <- paste0(sets(compoundsSet), collapse = "|")
-            compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[grepl(spat, set)])
+            compoundsSet@groupAnnotations <- lapply(compoundsSet@groupAnnotations, function(ct) ct[grepl(spat, set)])
         }
     }
     else
-        compoundsSet@compounds <- list()
+        compoundsSet@groupAnnotations <- list()
     
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]
     
@@ -302,7 +304,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         }
         
         if (is.null(title))
-            title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
+            title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$neutral_formula)
         
         spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
         if (is.null(spec))
@@ -331,7 +333,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         if (is.null(title))
         {
             compr1 <- obj[[groupName[1]]][index[1], ]; compr2 <- obj[[groupName[2]]][index[2], ]
-            title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$formula, compr2$compoundName, compr2$formula)
+            title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$neutral_formula, compr2$compoundName,
+                                               compr2$neutral_formula)
         }
         
         theSets <- sets(obj)
@@ -456,7 +459,7 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     sc <- makeCompoundsSetScorings(setObjects, obj@origFGNames)
     
     return(compoundsConsensusSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                                 origFGNames = obj@origFGNames, compounds = cons, scoreTypes = sc$scTypes,
+                                 origFGNames = obj@origFGNames, groupAnnotations = cons, scoreTypes = sc$scTypes,
                                  scoreRanges = sc$scRanges,
                                  algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
                                  mergedConsensusNames = compNames))
@@ -478,7 +481,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         for (fg in groupNames(setObjects[[s]]))
         {
             pl <- copy(MSPeakListsSet[[fg]][["MSMS"]]); pl[, PLIndex := seq_len(.N)]; pl <- pl[set == s]
-            ct <- setObjects[[s]]@compounds[[fg]]
+            ct <- setObjects[[s]]@groupAnnotations[[fg]]
             ct[, fragInfo := lapply(fragInfo, function(fi)
             {
                 fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
@@ -492,7 +495,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
                 fi[, set := s]
                 return(fi)
             })]
-            setObjects[[s]]@compounds[[fg]] <- ct            
+            setObjects[[s]]@groupAnnotations[[fg]] <- ct            
         }
     }
     
@@ -500,7 +503,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
     return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                        origFGNames = names(fGroupsSet), compounds = cons, scoreTypes = sc$scTypes,
+                        origFGNames = names(fGroupsSet), groupAnnotations = cons, scoreTypes = sc$scTypes,
                         scoreRanges = sc$scRanges, algorithm = makeSetAlgorithm(setObjects)))
 }
 
@@ -528,6 +531,6 @@ setMethod("unset", "compoundsSet", function(obj, set)
         })]
     })
     
-    return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
+    return(compoundsUnset(groupAnnotations = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
                           algorithm = paste0(algorithm(obj), "_unset")))
 })

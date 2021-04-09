@@ -115,4 +115,24 @@ plotSpec <- function(obj, ...)
     plotSpectrum(obj, ...)
 }
 
+#' @details Please use \code{\link{annotations}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+formulaTable <- function(...)
+{
+    .Deprecated("annotations")
+    annotations(...)
+}
+
+#' @details Please use \code{\link{annotations}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+compoundTable <- function(...)
+{
+    .Deprecated("annotations")
+    annotations(...)
+}
+
 # nocov end

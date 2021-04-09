@@ -91,7 +91,7 @@ GenFormMPFinishHandler <- function(cmd)
     {
         # note that even if MSMS data is available we may get MS only
         # formula in case no peaks could be explained
-        f <- f[byMSMS == TRUE]
+        f <- f[explainedPeaks > 0]
     }
     return(f)
 }

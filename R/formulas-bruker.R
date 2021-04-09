@@ -282,6 +282,6 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
 
 setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
 {
-    generateFormulasSet(fGroups, generateFormulasDA, ..., setThreshold = setThreshold,
+    generateFormulasSet(fGroups, MSPeakLists, generateFormulasDA, ..., setThreshold = setThreshold,
                         setThresholdAnn = setThresholdAnn)
 })

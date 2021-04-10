@@ -24,8 +24,7 @@ setMethod("[", c("featureAnnotations", "ANY", "missing", "missing"), function(x,
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, groupNames(x))
-        x@groupAnnotations <- x@groupAnnotations[i]
-        x@scoreRanges <- x@scoreRanges[i]
+        x <- delete(x, setdiff(groupNames(x), i))
     }
     
     return(x)
@@ -100,6 +99,60 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     return(ret)
 })
 
+#' @export
+setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
+{
+    # NOTE: this is ~ a c/p from the features method
+    
+    ac <- checkmate::makeAssertCollection()
+    i <- assertDeleteArgAndToChr(i, groupNames(obj), add = ac)
+    checkmate::assert(
+        checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
+        checkmate::checkFunction(j, null.ok = TRUE),
+        .var.name = "j"
+    )
+    checkmate::reportAssertions(ac)
+    
+    if (length(i) == 0 || (!is.null(j) && length(j) == 0))
+        return(obj) # nothing to remove...
+    
+    # UNDONE: NULL for i and j will remove all?
+    
+    # i = NULL; j = vector: remove from all groups
+    # i = vector; j = NULL: remove specified groups
+    # j = function: remove specific results from given groups (or all if i=NULL)
+    
+    if (!is.function(j))
+    {
+        if (is.null(j))
+            obj@groupAnnotations <- obj@groupAnnotations[setdiff(groupNames(obj), i)]
+        else
+        {
+            obj@groupAnnotations[i] <- lapply(obj@groupAnnotations[i], function(at)
+            {
+                inds <- j[j <= nrow(at)]
+                return(if (length(inds) > 0) at[-inds] else at)
+            })
+        }
+    }
+    else
+    {
+        obj@groupAnnotations[i] <- Map(obj@groupAnnotations[i], i, f = function(at, grp)
+        {
+            rm <- j(at, grp, ...)
+            if (is.logical(rm))
+                return(at[!rm])
+            return(at[setdiff(seq_len(nrow(at)), rm)])
+        })
+    }
+    
+    obj@groupAnnotations <- pruneList(obj@groupAnnotations, checkZeroRows = TRUE)
+    
+    obj@scoreRanges <- obj@scoreRanges[names(obj@groupAnnotations)]
+
+    return(obj)
+})
+
 setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
                                                    fragElements = NULL, lossElements = NULL, topMost = NULL, OM = FALSE,
                                                    negate = FALSE)
@@ -125,11 +178,15 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     
     if (!is.null(minExplainedPeaks))
         scoreLimits <- modifyList(if (is.null(scoreLimits)) list() else scoreLimits,
-                                  list(minExplainedPeaks = c(minExplainedPeaks, Inf)))
+                                  list(explainedPeaks = c(minExplainedPeaks, Inf)))
+    mark <- if (negate) function(x) !x else function(x) x
     
     oldn <- length(obj)
-    obj@groupAnnotations <- lapply(obj@groupAnnotations, function(annTable)
+    obj <- delete(obj, j = function(annTable, ...)
     {
+        annTable <- copy(annTable)
+        annTable[, keep := TRUE]
+        
         if (!is.null(scoreLimits))
         {
             for (sc in names(scoreLimits))
@@ -138,74 +195,60 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                 if (length(cols) == 0)
                     next
                 
-                keep <- annTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                     do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
-                                 .SDcols = cols]
-                if (negate)
-                    keep <- !keep
-                annTable <- annTable[keep]
+                annTable[keep == TRUE, keep :=
+                             mark(do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                      do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2]),
+                         .SDcols = cols]
             }
         }
         
-        if (nrow(annTable) == 0)
-            return(annTable)
-        
         if (!is.null(elements))
-        {
-            keep <- sapply(annTable$neutral_formula, checkFormula, elements, negate = negate)
-            annTable <- annTable[keep]
-        }
+            annTable[keep == TRUE, keep := mark(sapply(neutral_formula, checkFormula, elements))]
+        
         if (!is.null(fragElements) || !is.null(lossElements))
         {
-            keep <- sapply(annTable$fragInfo, function(fi)
+            annTable[keep == TRUE, keep := mark(sapply(fragInfo, function(fi)
             {
                 if (nrow(fi) == 0)
                     return(FALSE)
-                if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements, negate = negate)))
+                if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements)))
                     return(FALSE)
-                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate = negate)))
+                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements)))
                     return(FALSE)
                 return(TRUE)
-            })
-            annTable <- annTable[keep]
-        }
-        
-        if (!is.null(topMost))
-        {
-            if (negate)
-                annTable <- tail(annTable, topMost)
-            else
-                annTable <- head(annTable, topMost)
+            }))]
         }
         
         if (OM)
         {
-            fElTable <- addElementInfoToAnnTable(annTable, NULL, NULL, OM = TRUE)
-            keep <- fElTable[, 
-                             # rules from Kujawinski & Behn, 2006 (10.1021/ac0600306)
-                             H >= 1/3 * C &
-                                 H <= ((2 * C) + N + 2) &
-                                 (H + N) %% 2 == 0 &
-                                 N <= C &
-                                 O <= C &
-                                 P <= 2 &
-                                 S <= 2 &
-                                 
-                                 # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
-                                 sapply(DBE_AI, checkmate::checkInt) &
-                                 HC <= 2.2 &
-                                 OC <= 1.2 &
-                                 NC <= 0.5]
-            annTable <- annTable[if (negate) !keep else keep]
+            annTable <- addElementInfoToAnnTable(annTable, NULL, NULL, OM = TRUE, classify = FALSE)
+            annTable[keep == TRUE, keep := mark( 
+                         # rules from Kujawinski & Behn, 2006 (10.1021/ac0600306)
+                         H >= 1/3 * C &
+                         H <= ((2 * C) + N + 2) &
+                         (H + N) %% 2 == 0 &
+                         N <= C &
+                         O <= C &
+                         P <= 2 &
+                         S <= 2 &
+                         
+                         # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
+                         sapply(DBE_AI, checkmate::checkInt) &
+                         HC <= 2.2 &
+                         OC <= 1.2 &
+                         NC <= 0.5)]
         }
         
-        return(annTable)
+        return(!annTable$keep)
     })
-    
-    if (length(obj) > 0)
-        obj@groupAnnotations <- obj@groupAnnotations[sapply(obj@groupAnnotations, function(cm) !is.null(cm) && nrow(cm) > 0)]
-    
-    obj@scoreRanges <- obj@scoreRanges[names(obj@groupAnnotations)]
+
+    if (!is.null(topMost))
+    {
+        if (negate)
+            obj <- delete(obj, j = seq_len(topMost))
+        else
+            obj <- delete(obj, j = function(at, ...) seq_len(nrow(at)) > topMost)
+    }
     
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) annotations. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)

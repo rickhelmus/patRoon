@@ -210,7 +210,7 @@ classifyFormula <- function(OC, HC, NC, AI)
     return("other")
 }
 
-checkFormula <- function(formula, elementsVec, negate)
+checkFormula <- function(formula, elementsVec)
 {
     for (elements in elementsVec)
     {
@@ -250,7 +250,7 @@ checkFormula <- function(formula, elementsVec, negate)
             }
         }
 
-        if (OK != negate)
+        if (OK)
             return(TRUE)
     }
 

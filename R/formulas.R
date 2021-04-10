@@ -183,15 +183,15 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 #' @return \code{as.data.table} returns a \code{\link{data.table}}.
 #'
 #' @export
-#'
 setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = FALSE, countElements = NULL,
                                                 countFragElements = NULL, OM = FALSE, normalizeScores = "none",
                                                 excludeNormScores = defaultExclNormScores(x), average = FALSE)
 {
     checkmate::assertFlag(average)
     
-    ret <- callNextMethod(x, fGroups, fragments, countElements, countFragElements, OM, normalizeScores,
-                          excludeNormScores)    
+    ret <- callNextMethod(x, fGroups = fGroups, fragments = fragments, countElements = countElements,
+                          countFragElements = countFragElements, OM = OM, normalizeScores = normalizeScores,
+                          excludeNormScores = excludeNormScores)
     
     if (average)
     {

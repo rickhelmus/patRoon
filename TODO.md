@@ -18,6 +18,7 @@
     - set generateFormulas() calculateFeatures
     - use strwrap()
 - remove old algorithm duplicate methods
+- add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 
 ## Features

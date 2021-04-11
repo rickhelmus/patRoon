@@ -298,16 +298,17 @@ setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ..
     })
     
     # update ranks
-    rankCols <- paste0("rank-", sets(obj))
     obj@groupAnnotations <- Map(obj@groupAnnotations, groupNames(obj), f = function(at, grp)
     {
-        at[, (rankCols) := Map(.SD, sets(obj), f = function(x, s)
+        setsPresent <- sets(obj)[sapply(sets(obj), function(s) paste0("rank-", s) %in% names(at))]
+        rankCols <- paste0("rank-", setsPresent)
+        at[, (rankCols) := lapply(setsPresent, function(s)
         {
             atso <- setObjects(obj)[[s]][[grp]]
             if (is.null(atso))
                 return(NA_integer_)
             return(match(UID, atso$UID, nomatch = NA_integer_))
-        }), .SDcols = rankCols][]
+        })][]
     })
     
     return(obj)

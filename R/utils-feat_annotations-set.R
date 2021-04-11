@@ -289,13 +289,51 @@ doFeatAnnUnset <- function(obj, set)
 # HACK: formulas/compounds share a lot of methods, but there is no clean and proper way to do this with multiple
 # inheritance. Instead, simply automatically define the same method for both
 
+setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ...)
+{
+    old <- obj
+    obj <- callNextMethod()
+    
+    # sync setObjects
+    annTab <- annotations(obj); annTabOld <- annotations(old)
+    obj@setObjects <- lapply(obj@setObjects, function(so)
+    {
+        delete(so, j = function(atso, grp)
+        {
+            if (is.null(annTab[[grp]]))
+                return(TRUE) # fully removed group
+            
+            # remove removed...
+            return(atso$UID %chin% setdiff(annTabOld[[grp]]$UID, annTab[[grp]]$UID))
+        })
+    })
+    
+    # update ranks
+    rankCols <- paste0("rank-", sets(obj))
+    obj@groupAnnotations <- Map(obj@groupAnnotations, groupNames(obj), f = function(at, grp)
+    {
+        at[, (rankCols) := Map(.SD, sets(obj), f = function(x, s)
+        {
+            atso <- setObjects(obj)[[s]][[grp]]
+            if (is.null(atso))
+                return(NA_integer_)
+            return(match(UID, atso$UID, nomatch = NA_integer_))
+        }), .SDcols = rankCols]
+    })
+    
+    return(obj)
+})
+                  
 setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compoundsSet", "ANY", "missing", "missing")),
               function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
     assertSets(x, sets, TRUE)
     
     if (!is.null(sets))
+    {
         x@setObjects <- x@setObjects[sets]
+        # UNDONE: remove set specific cols, and from set column?
+    }
     
     if (!missing(i))
     {

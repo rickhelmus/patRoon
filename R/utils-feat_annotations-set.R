@@ -186,6 +186,11 @@ updateSetObjectsConsensus <- function(obj)
     obj@scoreTypes <- sc$scTypes
     obj@scoreRanges <- sc$scRanges
     
+    # HACK: update feature formulas
+    # UNDONE: would be better with eg proper inheritance/methods, someday...
+    if (inherits(obj, "formulas"))
+        obj@featureFormulas <- pruneList(lapply(obj@featureFormulas, function(ff) pruneList(ff[groupNames(obj)])), TRUE)
+    
     return(obj)
 }
 

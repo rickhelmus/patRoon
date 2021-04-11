@@ -147,10 +147,10 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
         {
             # change ranges for overlap
             groupsLR <- intersect(names(left), names(right))
-            ret <- mapply(left[groupsLR], right[groupsLR], SIMPLIFY = FALSE, FUN = function(rangesL, rangesR)
+            ret <- Map(left[groupsLR], right[groupsLR], f = function(rangesL, rangesR)
             {
                 scLR <- names(rangesL) # should be same for left/right
-                mapply(rangesL[scLR], rangesR[scLR], FUN = range, SIMPLIFY = FALSE)
+                Map(range, rangesL[scLR], rangesR[scLR])
             })
             
             # add unique from left

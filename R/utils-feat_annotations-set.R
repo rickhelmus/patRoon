@@ -168,24 +168,13 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
     return(list(scTypes = scTypes, scRanges = scRanges))
 }
 
-syncAnnSetObjects <- function(obj, makeCons)
+updateSetObjectsConsensus <- function(obj)
 {
     if (length(setObjects(obj)) >= 1)
     {
-        if (makeCons)
-            obj@groupAnnotations <- makeFeatAnnSetConsensus(obj@setObjects, obj@origFGNames,
-                                                                     obj@setThreshold, obj@setThresholdAnn,
-                                                                     mergedConsensusNames(obj))
-        else
-        {
-            # sync available feature groups
-            allFGroups <- unique(unlist(lapply(setObjects(obj), groupNames)))
-            obj@groupAnnotations <- obj@groupAnnotations[intersect(groupNames(obj), allFGroups)]
-            
-            # only keep results from sets still present
-            spat <- paste0(sets(obj), collapse = "|")
-            obj@groupAnnotations <- lapply(obj@groupAnnotations, function(ct) ct[grepl(spat, set)])
-        }
+        obj@groupAnnotations <- makeFeatAnnSetConsensus(obj@setObjects, obj@origFGNames,
+                                                        obj@setThreshold, obj@setThresholdAnn,
+                                                        mergedConsensusNames(obj))
     }
     else
         obj@groupAnnotations <- list()
@@ -318,32 +307,71 @@ setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ..
             if (is.null(atso))
                 return(NA_integer_)
             return(match(UID, atso$UID, nomatch = NA_integer_))
-        }), .SDcols = rankCols]
+        }), .SDcols = rankCols][]
     })
     
     return(obj)
 })
                   
 setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compoundsSet", "ANY", "missing", "missing")),
-              function(x, i, j, ..., sets = NULL, drop = TRUE)
+              function(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
 {
-    assertSets(x, sets, TRUE)
+    ac <- checkmate::makeAssertCollection()
+    assertSets(x, sets, TRUE, add = ac)
+    checkmate::assertFlag(updateConsensus, add = ac)
+    checkmate::reportAssertions(ac)
     
     if (!is.null(sets))
     {
+        oldSets <- sets(x)
         x@setObjects <- x@setObjects[sets]
-        # UNDONE: remove set specific cols, and from set column?
+        if (!updateConsensus) # update sets result; otherwise done by updateSetObjectsConsensus() when new consensus is made
+        {
+            rmSets <- setdiff(oldSets, sets(x))
+            if (length(rmSets) > 0)
+            {
+                x@groupAnnotations <- lapply(x@groupAnnotations, function(ct)
+                {
+                    cols <- grep(paste0("\\-", rmSets, "$"), names(ct), value = TRUE)
+                    if (length(cols) == 0)
+                        return(ct) # set already no present
+                    
+                    ct <- copy(ct)
+                    
+                    # remove set specific columns
+                    ct[, (cols) := NULL]
+                    
+                    # update set column
+                    rankCols <- intersect(paste0("rank-", sets(x)), names(x))
+                    ct[, set := {
+                        s <- unlist(strsplit(set, ","))
+                        paste0(setdiff(s, rmSets), collapse = ",")
+                    }, by = seq_len(nrow(ct))]
+             
+                    return(ct[])       
+                })
+                
+                # remove results from removed sets --> those are now without set assignment
+                x <- delete(x, j = function(at, ...) !nzchar(at$set))
+            }
+        }
     }
     
     if (!missing(i))
     {
-        # NOTE: assume that subsetting with non-existing i will not result in errors
-        i <- assertSubsetArgAndToChr(i, groupNames(x))
-        x@setObjects <- lapply(x@setObjects, "[", i = i)
+        if (updateConsensus)
+        {
+            # NOTE: assume that subsetting with non-existing i will not result in errors
+            i <- assertSubsetArgAndToChr(i, groupNames(x))
+            x@setObjects <- lapply(x@setObjects, "[", i = i)
+        }
+        else
+            x <- callNextMethod()
+        
     }
     
-    if (!is.null(sets) || !missing(i))
-        x <- syncAnnSetObjects(x, FALSE)
+    if ((!is.null(sets) || !missing(i)) && updateConsensus)
+        x <- updateSetObjectsConsensus(x)
     
     return(x)
 })
@@ -386,7 +414,7 @@ setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., neg
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
-        obj <- syncAnnSetObjects(obj, TRUE)
+        obj <- updateSetObjectsConsensus(obj)
         cat("Done!\n")
     }
     

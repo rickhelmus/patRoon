@@ -392,31 +392,38 @@ setMethodMult("annotatedPeakList", c("formulasSet", "compoundsSet"), function(ob
     return(ret[])
 })
 
-setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., negate = FALSE, sets = NULL)
+setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., sets = NULL, updateConsensus = FALSE,
+                                                                   negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(negate, add = ac)
     assertSets(obj, sets, TRUE, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::assertFlag(updateConsensus, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
             sets <- setdiff(get("sets", pos = 2)(obj), sets)
-        obj <- obj[, sets = sets]
+        obj <- obj[, sets = sets, updateConsensus = updateConsensus]
     }
     
     if (...length() > 0)
     {
-        # filter set objects and re-generate annotation consensus
-        
-        obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
-        obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
-        
-        # synchronize other objects
-        cat("Synchronizing set objects...\n")
-        obj <- updateSetObjectsConsensus(obj)
-        cat("Done!\n")
+        if (updateConsensus)
+        {
+            # filter set objects and re-generate annotation consensus
+            
+            obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
+            obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
+            
+            # synchronize other objects
+            cat("Synchronizing set objects...\n")
+            obj <- updateSetObjectsConsensus(obj)
+            cat("Done!\n")
+        }
+        else
+            obj <- callNextMethod(obj, ..., negate = negate)
     }
     
     return(obj)

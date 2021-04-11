@@ -33,7 +33,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         {
             ct <- copy(ct)
             rname <- paste0("rank-", s)
-            ct[, c("set", "setCoverage", "setCoverageAnn", rname) := .(s, 1, 1, seq_len(.N))]
+            ct[, c("set", "setsCount", "setsMergedCount", rname) := .(s, 1, 1, seq_len(.N))]
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mConsNames)
@@ -86,11 +86,12 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
                        .(Map(fragInfo, i.fragInfo, f = rbind, MoreArgs = list(fill = TRUE)))),
                  on = "UID"]
             
+            left[UID %chin% right$UID, setsMergedCount := setsMergedCount + 1]
+            
             # add missing candidates from right
             left <- rbind(left, right[!UID %chin% left$UID], fill = TRUE)
             
-            left[, setCoverage := setCoverage + 1]
-            left[UID %chin% right$UID, setCoverageAnn := setCoverageAnn + 1]
+            left[, setsCount := setsCount + 1]
             
             return(left)
         })
@@ -106,7 +107,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         })]
         
         scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
-        ct[, (scCols) := lapply(.SD, function(x) x / setCoverageAnn), .SDcols = scCols]
+        ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
         
         # re-sort by avg rank scores
         rnames <- getAllMergedConsCols("rank", names(ct), names(setObjects))
@@ -120,7 +121,8 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         setorderv(ct, "rankScore", -1)
         ct[, rankScore := NULL]
         
-        ct[, c("setCoverageAnn", "setCoverage") := .(setCoverageAnn / setCoverage, setCoverage / sCount)]
+        ct[, c("setCoverageAnn", "setCoverage") := .(setsMergedCount / setsCount, setsMergedCount / sCount)]
+        ct[, c("setsCount", "setsMergedCount") := NULL]
         return(ct)
     })
     

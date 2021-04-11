@@ -65,11 +65,11 @@
     - newProject: get peaklists also when formula==Bruker
     - sets
         - @export multi methods?
-        - sync featureFormulas --> in delete()?
         - call makeAnnSetScorings() in generateFormulas?
             - after initiating object
             - current principle OK? or work from averaged scorings?
                 - update updateSetObjectsConsensus() if changing
+            - align principle with compounds?
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument

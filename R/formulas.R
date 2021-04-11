@@ -161,6 +161,17 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
     return(callNextMethod())
 })
 
+#' @export
+setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
+{
+    obj <- callNextMethod()
+    
+    obj@featureFormulas <- lapply(obj@featureFormulas, function(a) pruneList(a[groupNames(obj)]))
+    obj@featureFormulas <- pruneList(obj@featureFormulas, TRUE)
+    
+    return(obj)
+})
+
 #' @describeIn formulas Generates a table with all candidate formulae for each
 #'   feature group and other information such as element counts.
 #'

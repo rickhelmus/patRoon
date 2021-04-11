@@ -157,7 +157,7 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     unsetFormulas <- checkAndUnSetOther(sets(compounds), formulas, "formulas")
     compounds@setObjects <- Map(setObjects(compounds), unsetFormulas, f = addFormulaScoring,
                                 MoreArgs = list(updateScore = updateScore, formulaScoreWeight = formulaScoreWeight))
-    compounds <- syncAnnSetObjects(compounds, TRUE)
+    compounds <- updateSetObjectsConsensus(compounds)
     
     return(compounds)
 })

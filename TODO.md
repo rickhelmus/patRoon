@@ -17,6 +17,7 @@
     - example suspect lists
     - set generateFormulas() calculateFeatures
     - use strwrap()
+    - calcFeatures formulas arg
 - remove old algorithm duplicate methods
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
@@ -65,12 +66,17 @@
     - sets
         - @export multi methods?
         - sync featureFormulas --> in delete()?
+        - call makeAnnSetScorings() in generateFormulas?
+            - after initiating object
+            - current principle OK? or work from averaged scorings?
+                - update updateSetObjectsConsensus() if changing
     - docs
         - new/changed as.data.table args
         - generateFormulas: MSPeakLists argument
             - also update handbook, tutorial...
         - maxFormulas/maxFragFormulas removed (handbook)
         - elements filter: neutral_formula used for formulas (but not fragments)
+        - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
     - news
         - frag mSigma/score now also averaged
         - formula --> ion_formula
@@ -128,6 +134,7 @@
     - fix MapAligner exception with test-components
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
+    - disallow commas, minus and algo consensus labels in set names
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

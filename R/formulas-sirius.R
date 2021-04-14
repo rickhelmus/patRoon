@@ -91,6 +91,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                 fi[, intensity := NULL]
                 return(fi)
             })]
+            forms[, explainedPeaks := sapply(fragInfo, nrow)] # update
             
             # set nice column order
             data.table::setcolorder(forms, c("neutral_formula", "ion_formula", "neutral_adduct_formula", "neutralMass",

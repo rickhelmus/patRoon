@@ -164,9 +164,8 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
 
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
-                                                uniqueFrom = NULL, uniqueOuter = FALSE, minMaxNormalization = FALSE,
-                                                rankWeights = 1, labels = NULL, setThreshold = 0,
-                                                setThresholdAnn = 0.75)
+                                                uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
+                                                setThreshold = 0, setThresholdAnn = 0.75)
 {
     allAnnObjs <- c(list(obj), list(...))
     
@@ -178,9 +177,7 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
 
     cons <- doFeatAnnConsensusSets(allAnnObjs, obj@origFGNames, labels, setThreshold, setThresholdAnn,
                                    absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
-                                   uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter,
-                                   minMaxNormalization = minMaxNormalization, rankWeights = rankWeights)
-        
+                                   uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights)
 
     return(compoundsConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
                                  setThresholdAnn = setThresholdAnn, origFGNames = obj@origFGNames,

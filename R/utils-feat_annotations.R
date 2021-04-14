@@ -87,7 +87,7 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
 }
 
 doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter,
-                               minMaxNormalization, rankWeights, annNames, uniqueCols)
+                               rankWeights, annNames, uniqueCols)
 {
     # NOTE: keep args in sync with sets methods
     

@@ -66,7 +66,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     if (normalizeScores != "none")
     {
         annTable <- Map(annTable, x@scoreRanges, f = normalizeAnnScores,
-                        MoreArgs = list(scoreCols = annScoreNames(obj, TRUE), mConsNames = mcn, normalizeScores == "minmax",
+                        MoreArgs = list(scoreCols = annScoreNames(x, TRUE), mConsNames = mcn, normalizeScores == "minmax",
                                       exclude = excludeNormScores))
     }
     
@@ -199,27 +199,27 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                     next
                 
                 annTable[keep == TRUE, keep :=
-                             mark(do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                      do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2]),
+                             mark(do.call(pmax, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                      do.call(pmin, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2]),
                          .SDcols = cols]
             }
         }
         
         if (!is.null(elements))
-            annTable[keep == TRUE, keep := mark(sapply(neutral_formula, checkFormula, elements))]
+            annTable[keep == TRUE, keep := sapply(neutral_formula, checkFormula, elements, negate)]
         
         if (!is.null(fragElements) || !is.null(lossElements))
         {
-            annTable[keep == TRUE, keep := mark(sapply(fragInfo, function(fi)
+            annTable[keep == TRUE, keep := sapply(fragInfo, function(fi)
             {
                 if (nrow(fi) == 0)
                     return(FALSE)
-                if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements)))
+                if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements, negate)))
                     return(FALSE)
-                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements)))
+                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate)))
                     return(FALSE)
                 return(TRUE)
-            }))]
+            })]
         }
         
         if (OM)

@@ -62,7 +62,8 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)
-    doGenForms <- function(...) generateFormulas(...)
+    doGenForms <- function(...) generateFormulas(..., setThresholdAnn = 0) # zero threshold makes comparisons in testing much easier
+    doFormCons <- function(...) consensus(..., setThresholdAnn = 0) # zero threshold makes comparisons in testing much easier
     doGenComps <- function(...) generateCompounds(...)
     doGenComponents <- function(...) generateComponents(...)
 } else
@@ -88,6 +89,7 @@ if (testWithSets())
     
     doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
+    doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")
     doGenComponents <- function(fGroups, algorithm, ...)
     {

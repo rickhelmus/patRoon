@@ -174,7 +174,7 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
                             fiMerged <- mergeFragInfo(fiRLeft, fiRRight, leftName, rightName)
                             set(mAnnotations, r, fiColLeft, list(list(fiMerged)))
                         }
-                        else if (hasRight) # only right
+                        else if (!is.null(fiRRight)) # only right
                             set(mAnnotations, r, fiColLeft, list(list(fiRRight)))
                     }
                     
@@ -243,19 +243,22 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
             mAnnList[[grpi]] <- mAnnList[[grpi]][mAnnList[[grpi]][, sapply(mergedBy, keep)]]
         }
         
-        rnames <- getAllMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
-        # get relevant weights with correct order
-        rwInds <- unlist(lapply(annNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
-        rWeights <- rankWeights[rwInds]
-        ncand <- nrow(mAnnList[[grpi]])
-        mAnnList[[grpi]][, rankscore := {
-            invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
-            invRanks[is.na(invRanks)] <- 0
-            weighted.mean(invRanks, rWeights)
-        }, .SDcols = rnames, by = seq_len(ncand)]
-        
-        setorderv(mAnnList[[grpi]], "rankscore", order = -1)
-        mAnnList[[grpi]][, c(rnames, "rankscore") := NULL]
+        if (nrow(mAnnList[[grpi]]) > 0)
+        {
+            rnames <- getAllMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
+            # get relevant weights with correct order
+            rwInds <- unlist(lapply(annNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
+            rWeights <- rankWeights[rwInds]
+            ncand <- nrow(mAnnList[[grpi]])
+            mAnnList[[grpi]][, rankscore := {
+                invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
+                invRanks[is.na(invRanks)] <- 0
+                weighted.mean(invRanks, rWeights)
+            }, .SDcols = rnames, by = seq_len(ncand)]
+            
+            setorderv(mAnnList[[grpi]], "rankscore", order = -1)
+            mAnnList[[grpi]][, c(rnames, "rankscore") := NULL]
+        }
     }
     
     cat("Done!\n")

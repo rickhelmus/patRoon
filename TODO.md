@@ -60,6 +60,8 @@
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - ion_formula_mz --> ionMass?
 - min score filters: take maximum value of all merged columns?
+    - changed for now, update docs if keep
+- formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 
 ## Suspects
 
@@ -267,6 +269,7 @@
     - annotation
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
         - @export multi methods?
+        - algo consensus: done on setObjects
 - components
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max

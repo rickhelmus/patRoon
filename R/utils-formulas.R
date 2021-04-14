@@ -152,43 +152,6 @@ averageFormulas <- function(formulas)
 
 countUniqueFormulas <- function(fList) sum(unlist(lapply(fList, function(ft) length(unique(ft$neutral_formula)))))
 
-addElementInfoToFormTable <- function(formTable, elements, fragElements, OM)
-{
-    # ensure CHNOPS counts are present
-    if (OM)
-        elements <- unique(c(if (is.null(elements)) c() else elements, c("C", "H", "N", "O", "P", "S")))
-
-    if (!is.null(elements) && length(elements) > 0)
-    {
-        # Retrieve element lists from formulas
-        el <- getElements(formTable$neutral_formula, elements)
-        formTable[, names(el) := el]
-    }
-    if (!is.null(fragElements) && !is.null(formTable[["frag_formula"]]) &&
-        length(fragElements) > 0)
-    {
-        el <- getElements(formTable$frag_formula, fragElements)
-        formTable[, (paste0("frag_", names(el))) := el]
-    }
-
-    if (OM)
-    {
-        # add element ratios commonly used for plotting
-        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
-        formTable[, c("OC", "HC", "NC", "PC", "SC") :=
-                      .(elrat(O, C), elrat(H, C), elrat(N, C), elrat(P, C), elrat(S, C))]
-
-        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
-        formTable[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
-        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
-        formTable[, AI := getAI(DBE_AI, (C - O - N - S - P))]
-
-        formTable[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
-    }
-
-    return(formTable)
-}
-
 # classification according to Abdulla 2013 (10.1021/ac303221j)
 classifyFormula <- function(OC, HC, NC, AI)
 {

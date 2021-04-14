@@ -267,13 +267,16 @@ doFeatAnnUnset <- function(obj, set)
         })]
     })
     
-    # restore explainedPeaks
+    # restore sets specific columns
     ann <- lapply(ann, function(a)
     {
-        cols <- grep("^explainedPeaks\\-", names(a), value = TRUE)
-        setnames(a, cols, sub(paste0("\\-", set, "$"), "", cols))
+        pat <- paste0("\\-", set, "$")
+        cols <- grep(pat, names(a), value = TRUE)
+        setnames(a, cols, sub(pat, "", cols))
         return(a)
     })
+    
+    # UNDONE: remove rank columns?
     
     return(ann)
 }

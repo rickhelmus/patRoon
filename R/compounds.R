@@ -583,11 +583,6 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
-#' @param minMaxNormalization Set to \code{TRUE} to apply min-max normalization
-#'   of (merged) scoring columns. \code{FALSE} will apply normalization to the
-#'   maximum value. Scorings with negative values will always be min-max
-#'   normalized.
-#'
 #' @templateVar what compounds
 #' @template consensus-common-args
 #'
@@ -598,7 +593,6 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
                                              relMinAbundance = NULL,
                                              uniqueFrom = NULL, uniqueOuter = FALSE,
-                                             minMaxNormalization = FALSE,
                                              rankWeights = 1, labels = NULL)
 {
     # NOTE: keep args in sync with compoundsSet method

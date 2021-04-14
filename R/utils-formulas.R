@@ -469,9 +469,9 @@ setFormulaPLIndex <- function(formList, MSPeakLists, absAlignMzDev)
         fc[explainedPeaks > 0, fragInfo := lapply(fragInfo, function(fi)
         {
             # verify presence
-            fi <- fi[sapply(mz, function(mz)
+            fi <- fi[sapply(mz, function(fimz)
             {
-                wh <- which(numLTE(abs(mz - spec$mz), absAlignMzDev))
+                wh <- which(numLTE(abs(fimz - spec$mz), absAlignMzDev))
                 if (length(wh) > 1)
                     warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
                             "Consider lowering absAlignMzDev.", call. = FALSE)

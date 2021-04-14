@@ -19,7 +19,6 @@
     - use strwrap()
     - calcFeatures formulas arg
     - get peaklists also when formula==Bruker
-- remove old algorithm duplicate methods
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 

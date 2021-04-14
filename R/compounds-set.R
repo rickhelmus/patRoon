@@ -12,7 +12,6 @@ compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", set
 
 compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedConsensusNames = "character"),
                                   contains = "compoundsSet")
-setMethod("mergedConsensusNames", "compoundsConsensusSet", function(obj) obj@mergedConsensusNames)
 
 
 setMethod("updateSetConsensus", "compoundsSet", function(obj)

@@ -393,8 +393,12 @@ getFormInfoList <- function(formTable, index, mConsNames, useHTML)
     resultRow <- formTable[index]
 
     if (useHTML)
+    {
         resultRow[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
-
+        ionFormCols <- getAllMergedConsCols("ion_formula", names(resultRow), mConsNames)
+        resultRow[, (ionFormCols) := lapply(mget(ionFormCols), subscriptFormulaHTML)]
+    }
+    
     addValText <- function(curText, fmt, col)
     {
         cols <- getAllMergedConsCols(col, names(resultRow), mConsNames)

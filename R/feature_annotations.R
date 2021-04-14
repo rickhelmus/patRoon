@@ -58,6 +58,9 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (!is.null(countFragElements))
+        fragments <- TRUE
+    
     mcn <- mergedConsensusNames(x)
     annTable <- annotations(x)
     if (normalizeScores != "none")

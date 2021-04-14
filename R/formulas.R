@@ -185,8 +185,8 @@ setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
 #'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
 #'   amounts of each formula. Note that the neutral formula
 #'   (\code{neutral_formula} column) is used to count elements of non-fragmented
-#'   formulae, whereas the charged formula of fragments (\code{frag_formula}
-#'   column) is used for fragments. Set to \code{NULL} to not count any
+#'   formulae, whereas the charged formula of fragments (\code{ion_formula}
+#'   column in \code{fragInfo} data) is used for fragments. Set to \code{NULL} to not count any
 #'   elements.
 #'
 #' @template as_data_table-args
@@ -223,7 +223,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = F
         ret <- unique(ret, by = c("group", "neutral_formula"))
         
         # update if needed
-        ret <- addElementInfoToFormTable(ret, countElements, countFragElements, OM)
+        ret <- addElementInfoToAnnTable(ret, countElements, countFragElements, OM, TRUE)
     }
     
     return(ret[])

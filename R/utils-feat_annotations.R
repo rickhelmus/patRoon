@@ -31,9 +31,9 @@ addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, class
         el <- getElements(annTable$neutral_formula, elements)
         annTable[, names(el) := el]
     }
-    if (!is.null(fragElements) && !is.null(annTable[["frag_formula"]]) && length(fragElements) > 0)
+    if (!is.null(fragElements) && !is.null(annTable[["frag_ion_formula"]]) && length(fragElements) > 0)
     {
-        el <- getElements(annTable$frag_formula, fragElements)
+        el <- getElements(annTable$frag_ion_formula, fragElements)
         annTable[, (paste0("frag_", names(el))) := el]
     }
     

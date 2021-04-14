@@ -60,7 +60,7 @@
 - plotSpectrum/annotatedPeakList: check if index exist?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - ion_formula_mz --> ionMass?
-
+- min score filters: take maximum value of all merged columns?
 
 ## Suspects
 
@@ -267,7 +267,6 @@
     - unset(fGroups) will get adduct annotated fGroups
     - annotation
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
-        - minExplainedPeaks with updateConsensus=FALSE: takes maximum value
         - @export multi methods?
 - components
     - OpenMS: qTry == "feature" currently not supported

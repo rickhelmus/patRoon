@@ -348,6 +348,7 @@
     - elements filter: neutral_formula used for formulas (but not fragments)
     - Fixed: MF was using wrong/inconsistent cache name
     - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
+    - formula_mz --> ion_formula_mz
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

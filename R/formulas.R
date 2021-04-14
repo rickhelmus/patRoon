@@ -436,7 +436,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     
     cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
                                uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
-                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "formula_mz",
+                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "ion_formula_mz",
                                                                  "error", "error_median", "dbe"))
     
     return(formulasConsensus(groupAnnotations = cons, featureFormulas = list(),

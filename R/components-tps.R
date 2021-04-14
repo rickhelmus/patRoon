@@ -48,10 +48,9 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
         
         if (!is.null(formulas) && !is.null(formulas[[grp]]))
         {
-            precs <- unique(formulas[[grp]]$neutral_formula)
-            annPLsForm <- rbindlist(pruneList(lapply(precs, function(p)
+            annPLsForm <- rbindlist(pruneList(lapply(seq_len(nrow(formulas[[grp]])), function(i)
             {
-                ret <- annotatedPeakList(formulas, precursor = p, groupName = grp, MSPeakLists = MSPeakLists,
+                ret <- annotatedPeakList(formulas, index = i, groupName = grp, MSPeakLists = MSPeakLists,
                                          onlyAnnotated = TRUE)
             })))
         }

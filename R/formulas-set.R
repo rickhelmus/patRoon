@@ -16,6 +16,16 @@ formulasConsensusSet <- setClass("formulasConsensusSet", slots = c(mergedConsens
 setMethod("mergedConsensusNames", "formulasConsensusSet", function(obj) obj@mergedConsensusNames)
 
 
+setMethod("updateSetConsensus", "formulasSet", function(obj)
+{
+    obj <- doUpdateSetConsensus(obj)
+    
+    # update feature formulas
+    obj@featureFormulas <- pruneList(lapply(obj@featureFormulas, function(ff) pruneList(ff[groupNames(obj)])), TRUE)
+    
+    return(obj)
+})
+
 #' @describeIn formulasSet Shows summary information for this object.
 #' @export
 setMethod("show", "formulasSet", function(object)
@@ -155,8 +165,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     return(formulasConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
                                 setThresholdAnn = setThresholdAnn, origFGNames = obj@origFGNames,
                                 groupAnnotations = cons$groupAnnotations, featureFormulas = combFormulas,
-                                scoreTypes = cons$scTypes, scoreRanges = cons$scRanges, algorithm = cons$algorithm,
-                                mergedConsensusNames = cons$mergedConsensusNames))
+                                algorithm = cons$algorithm, mergedConsensusNames = cons$mergedConsensusNames))
 })
 
 

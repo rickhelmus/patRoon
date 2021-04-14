@@ -168,7 +168,7 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
     return(list(scTypes = scTypes, scRanges = scRanges))
 }
 
-updateSetObjectsConsensus <- function(obj)
+doUpdateSetConsensus <- function(obj)
 {
     if (length(setObjects(obj)) >= 1)
     {
@@ -180,16 +180,6 @@ updateSetObjectsConsensus <- function(obj)
         obj@groupAnnotations <- list()
     
     obj@scoreRanges <- obj@scoreRanges[groupNames(obj)]
-    
-    # update scoreTypes/scoreRanges
-    sc <- makeAnnSetScorings(setObjects(obj), obj@origFGNames)
-    obj@scoreTypes <- sc$scTypes
-    obj@scoreRanges <- sc$scRanges
-    
-    # HACK: update feature formulas
-    # UNDONE: would be better with eg proper inheritance/methods, someday...
-    if (inherits(obj, "formulas"))
-        obj@featureFormulas <- pruneList(lapply(obj@featureFormulas, function(ff) pruneList(ff[groupNames(obj)])), TRUE)
     
     return(obj)
 }
@@ -249,9 +239,8 @@ doFeatAnnConsensusSets <- function(allAnnObjs, origFGNames, labels, setThreshold
     }, simplify = FALSE)
     
     cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, labels)
-    sc <- makeAnnSetScorings(setObjects, origFGNames)
     
-    return(list(setObjects = setObjects, groupAnnotations = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
+    return(list(setObjects = setObjects, groupAnnotations = cons,
                 algorithm = paste0(unique(sapply(allAnnObjs, algorithm)), collapse = ","),
                 mergedConsensusNames = labels))
 }
@@ -331,7 +320,7 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
     {
         oldSets <- sets(x)
         x@setObjects <- x@setObjects[sets]
-        if (!updateConsensus) # update sets result; otherwise done by updateSetObjectsConsensus() when new consensus is made
+        if (!updateConsensus) # update sets result; otherwise done by updateSetConsensus() when new consensus is made
         {
             rmSets <- setdiff(oldSets, sets(x))
             if (length(rmSets) > 0)
@@ -377,7 +366,7 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
     }
     
     if ((!is.null(sets) || !missing(i)) && updateConsensus)
-        x <- updateSetObjectsConsensus(x)
+        x <- updateSetConsensus(x)
     
     return(x)
 })
@@ -428,7 +417,7 @@ setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, minExpla
             
             # synchronize other objects
             cat("Synchronizing set objects...\n")
-            obj <- updateSetObjectsConsensus(obj)
+            obj <- updateSetConsensus(obj)
             cat("Done!\n")
         }
         else

@@ -15,6 +15,18 @@ compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedConse
 setMethod("mergedConsensusNames", "compoundsConsensusSet", function(obj) obj@mergedConsensusNames)
 
 
+setMethod("updateSetConsensus", "compoundsSet", function(obj)
+{
+    obj <- doUpdateSetConsensus(obj)
+    
+    # update scoreTypes/scoreRanges
+    sc <- makeAnnSetScorings(setObjects(obj), obj@origFGNames)
+    obj@scoreTypes <- sc$scTypes
+    obj@scoreRanges <- sc$scRanges
+    
+    return(obj)
+})
+
 #' @describeIn compoundsSet Shows summary information for this object.
 #' @export
 setMethod("show", "compoundsSet", function(object)
@@ -157,7 +169,7 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     unsetFormulas <- checkAndUnSetOther(sets(compounds), formulas, "formulas")
     compounds@setObjects <- Map(setObjects(compounds), unsetFormulas, f = addFormulaScoring,
                                 MoreArgs = list(updateScore = updateScore, formulaScoreWeight = formulaScoreWeight))
-    compounds <- updateSetObjectsConsensus(compounds)
+    compounds <- updateSetConsensus(compounds)
     
     return(compounds)
 })
@@ -178,11 +190,13 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     cons <- doFeatAnnConsensusSets(allAnnObjs, obj@origFGNames, labels, setThreshold, setThresholdAnn,
                                    absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
                                    uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights)
+    sc <- makeAnnSetScorings(cons$setObjects, obj@origFGNames)
+    
 
     return(compoundsConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
                                  setThresholdAnn = setThresholdAnn, origFGNames = obj@origFGNames,
-                                 groupAnnotations = cons$groupAnnotations, scoreTypes = cons$scTypes,
-                                 scoreRanges = cons$scRanges, algorithm = cons$algorithm,
+                                 groupAnnotations = cons$groupAnnotations, scoreTypes = sc$scTypes,
+                                 scoreRanges = sc$scRanges, algorithm = cons$algorithm,
                                  mergedConsensusNames = cons$mergedConsensusNames))
 })
 

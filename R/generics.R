@@ -108,6 +108,7 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("unset", function(obj, set) standardGeneric("unset"))
+setGeneric("updateSetConsensus", function(obj) standardGeneric("updateSetConsensus"))
 
 ### TP generation
 

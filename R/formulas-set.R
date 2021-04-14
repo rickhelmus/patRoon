@@ -149,8 +149,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     
     cons <- doFeatAnnConsensusSets(allAnnObjs, obj@origFGNames, labels, setThreshold, setThresholdAnn,
                                    absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
-                                   uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter,
-                                   minMaxNormalization = minMaxNormalization, rankWeights = rankWeights)
+                                   uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights)
     combFormulas <- Reduce(modifyList, lapply(cons$setObjects, annotations, features = TRUE))
     
     return(formulasConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,

@@ -16,20 +16,20 @@ plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
-formsGF <- doGenForms(fGroups, "genform", plists)
-formsGFEmpty <- doGenForms(fGroupsEmpty, "genform", plistsEmpty)
-formsGFEmptyPL <- doGenForms(fGroups, "genform", plistsEmpty)
-formsGFEmptyPLMS <- doGenForms(fGroups, "genform", plistsEmptyMS)
+formsGF <- doGenForms(fGroups, plists, "genform")
+formsGFEmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "genform")
+formsGFEmptyPL <- doGenForms(fGroups, plistsEmpty, "genform")
+formsGFEmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "genform")
 formsGFWithMSMS <- filter(formsGF, minExplainedPeaks = 1)
-formsGFOC <- doGenForms(fGroups, "genform", plists, oc = TRUE)
-formsGFMS <- doGenForms(fGroups, "genform", plists, MSMode = "ms")
+formsGFOC <- doGenForms(fGroups, plists, "genform", oc = TRUE)
+formsGFMS <- doGenForms(fGroups, plists, "genform", MSMode = "ms")
 
 if (doSIRIUS)
 {
-    formsSIR <- doGenForms(fGroups, "sirius", plists, calculateFeatures = FALSE)
-    formsSIREmpty <- doGenForms(fGroupsEmpty, "sirius", plistsEmpty)
-    formsSIREmptyPL <- doGenForms(fGroups, "sirius", plistsEmpty)
-    formsSIREmptyPLMS <- doGenForms(fGroups, "sirius", plistsEmptyMS)
+    formsSIR <- doGenForms(fGroups, plists, "sirius", calculateFeatures = FALSE)
+    formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius")
+    formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius")
+    formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius")
 }
 
 if (doDATests())
@@ -44,9 +44,9 @@ test_that("verify formula generation", {
     expect_length(formsGFEmpty, 0)
     expect_length(formsGFEmptyPL, 0)
     expect_length(formsGFEmptyPLMS, 0)
-    expect_equal(doGenForms(fGroups, "genform", plistsEmptyMSMS), formsGFMS)
+    expect_equal(doGenForms(fGroups, plistsEmptyMSMS, "genform"), formsGFMS)
 
-    expect_gt(length(doGenForms(fGroups, "genform", plists, featThresholdAnn = 0)),
+    expect_gt(length(doGenForms(fGroups, plists, "genform", featThresholdAnn = 0)),
               length(formsGF))
 
     skip_if_not(doSIRIUS)
@@ -86,9 +86,10 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
 
+formsGFMST1 <- filter(formsGFMS, topMost = 1); formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
 test_that("filtering works", {
-    expect_gt(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks, 1)
-    expect_equal(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks, 0)
+    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks > 1))
+    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks == 0))
     expect_lt(length(filter(formsGF, minExplainedPeaks = 2)),
               length(filter(formsGF, minExplainedPeaks = 1)))
     expect_gt(length(filter(formsGF, minExplainedPeaks = 2, negate = TRUE)),
@@ -121,7 +122,7 @@ test_that("filtering works", {
     expect_length(filter(formsGFWithMSMS, fragElements = "Na0-100"), length(formsGFWithMSMS))
     expect_length(filter(formsGFWithMSMS, fragElements = "Na0-100", negate = TRUE), 0)
     expect_length(filter(formsGFMS, fragElements = "C0-100"), 0) # no MS/MS
-    expect_length(filter(formsGFMS, fragElements = "C0-100", negate = TRUE), length(formsGFMS))
+    expect_length(filter(formsGFMS, fragElements = "C0-100", negate = TRUE), 0)
 
     expect_length(filter(formsGFWithMSMS, lossElements = "C0-100"), length(formsGFWithMSMS))
     expect_length(filter(formsGFWithMSMS, lossElements = "C0-100", negate = TRUE), 0)
@@ -132,30 +133,31 @@ test_that("filtering works", {
     expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100"), 0) # no sodium
     expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100", negate = TRUE), length(formsGFWithMSMS))
     expect_length(filter(formsGFMS, lossElements = "C0-100"), 0) # no MS/MS
-    expect_length(filter(formsGFMS, lossElements = "C0-100", negate = TRUE), length(formsGFMS))
+    expect_length(filter(formsGFMS, lossElements = "C0-100", negate = TRUE), 0)
 
-    # UNDONE: update when topMost filter is fixed for sets
-    # expect_equal(length(groupNames(filter(formsGF, topMost = 1))), length(groupNames(formsGF)))
-    # expect_equal(length(filter(formsGF, topMost = 1, negate = TRUE)), length(groupNames(formsGF)))
-    # expect_range(length(filter(formsGF, topMost = 2)),
-    #              c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
-    # expect_range(length(filter(formsGF, topMost = 2, negate = TRUE)),
-    #              c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
-    # expect_true(all(unique(as.data.table(filter(formsGFMS, topMost = 1))$isoScore) >=
-    #                     unique(as.data.table(filter(formsGFMS, topMost = 1, negate = TRUE))$isoScore)))
+    expect_equal(length(groupNames(filter(formsGF, topMost = 1))), length(groupNames(formsGF)))
+    expect_gte(length(filter(formsGF, topMost = 1, negate = TRUE)), length(groupNames(formsGF)))
+    expect_range(length(filter(formsGF, topMost = 2)),
+                 c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
+    expect_range(length(filter(formsGF, topMost = 2, negate = TRUE)),
+                 c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
 
     expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
     expect_length(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf)), negate = TRUE), 0)
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)))), length(formsGF))
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)), negate = TRUE)), length(formsGF))
-    expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf))),
-                  length(formsGFWithMSMS)) # should filter away MS only formulas
-    expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf)), negate = TRUE), 0)
 
     expect_lt(length(filter(formsGF, OM = TRUE)), length(formsGF))
     expect_lt(length(filter(formsGF, OM = TRUE, negate = TRUE)), length(formsGF))
     expect_length(formsGF, sum(length(filter(formsGF, OM = TRUE)),
                                length(filter(formsGF, OM = TRUE, negate = TRUE))))
+    
+    skip_if(testWithSets())
+    
+    # in case of ties between pos/neg the isoScore is sometimes not the highest --> skip test with sets for now
+    expect_true(all(sapply(annotations(formsGFMST1[groupNames(formsGFMST1N)]), function(a) max(a$isoScore)) >=
+                        sapply(annotations(formsGFMST1N), function(a) max(a$isoScore))))
+    
 })
 
 OMTab <- as.data.table(formsGF, OM = TRUE)
@@ -172,42 +174,44 @@ test_that("as.data.table() works", {
                             must.include = c("C", "H"))
     checkmate::expect_names(names(as.data.table(formsGF, countFragElements = c("C", "H"))),
                             must.include = c("frag_C", "frag_H"))
-    expect_false(any(names(as.data.table(formsGFMS, countFragElements = c("C", "H"))) %in% c("frag_C", "frag_H")))
+    expect_true(all(is.na(unlist(as.data.table(formsGFMS, countFragElements = c("C", "H"))[, c("frag_C", "frag_H"), with = FALSE]))))
 
     checkmate::qexpectr(OMTab[, c(unlist(strsplit("CHNOPS", "")), paste0(unlist(strsplit("HNOPS", "")), "C"),
                                   "DBE_AI", "AI")], "N+")
     checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
 })
 
-if (doSIRIUS && !testWithSets())
-    fCons <- consensus(formsGF, formsSIR)
+if (doSIRIUS)
+    fCons <- doFormCons(formsGF, formsSIR)
+
+getAllNeutralForms <- function(obj) as.data.table(obj)$neutral_formula
 
 test_that("consensus works", {
-    skip_if(testWithSets())
-    
-    expect_length(consensus(formsGF, formsGFEmpty), length(formsGF))
+    expect_length(doFormCons(formsGF, formsGFEmpty), length(formsGF))
 
     skip_if_not(doSIRIUS)
     expect_known_value(fCons, testFile("formulas-cons"))
     expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
-    expect_setequal(groupNames(consensus(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
-    expect_lt(length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
-    expect_length(consensus(formsGFEmpty, formsSIREmpty), 0)
+    expect_setequal(groupNames(doFormCons(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
+    expect_lt(length(doFormCons(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty), 0)
 
-    expect_equal(length(consensus(formsGF, formsSIR, uniqueFrom = 1)) +
-                 length(consensus(formsGF, formsSIR, uniqueFrom = 2)) +
-                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
-    expect_equal(length(consensus(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
-    expect_length(consensus(formsGF, formsSIR, uniqueFrom = 1:2), length(fCons))
-    expect_lt(length(consensus(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fCons))
-    expect_length(consensus(formsGFEmpty, formsSIREmpty, uniqueFrom = 1), 0)
-    expect_length(consensus(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
+    expect_setequal(c(getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 1)),
+                      getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 2)),
+                      getAllNeutralForms(doFormCons(formsGF, formsSIR, relMinAbundance = 1))),
+                    getAllNeutralForms(fCons))
+    expect_setequal(c(getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)),
+                      getAllNeutralForms(doFormCons(formsGF, formsSIR, relMinAbundance = 1))),
+                    getAllNeutralForms(fCons))
+    expect_length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2), length(fCons))
+    expect_lt(length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fCons))
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1), 0)
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
-anPL <- annotatedPeakList(formsGF, precursor = "C9H7NO", groupName = groupNames(formsGF)[6], MSPeakLists = plists)
-anPLOnly <- annotatedPeakList(formsGF, precursor = "C9H7NO", groupName = groupNames(formsGF)[6],
-                              MSPeakLists = plists, onlyAnnotated = TRUE)
+anPLGroup <- screenInfo(fGroups)[formula == "C9H7NO"]$group
+anPL <- annotatedPeakList(formsGF, index = 1, groupName = anPLGroup, MSPeakLists = plists)
+anPLOnly <- annotatedPeakList(formsGF, index = 1, groupName = anPLGroup, MSPeakLists = plists, onlyAnnotated = TRUE)
 
 if (doSIRIUS && !testWithSets())
     anPLCons <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6],
@@ -219,7 +223,7 @@ test_that("annotation works", {
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$ion_formula)))
     expect_false(any(is.na(anPLOnly$ion_formula)))
-    expect_true(all(formsGF[[4]][ion_formula == "C9H8NO", frag_formula] %in% anPLOnly$ion_formula))
+    expect_true(all(formsGF[[anPLGroup]]$fragInfo[[1]]$ion_formula %in% anPLOnly$ion_formula))
     
     skip_if(!doSIRIUS || testWithSets())
     expect_true(any(grepl("genform", anPLCons$mergedBy)))
@@ -256,17 +260,14 @@ test_that("reporting empty objects works", {
 
 plotPrec <- formsGFWithMSMS[[2]][["neutral_formula"]][1]
 test_that("plotting works", {
-    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
-                                                       MSPeakLists = plists))
+    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
 
     # ggplot2 versions don't really work with vdiffr at the moment :(
     # expect_doppel("spec-gg", plotSpectrum(formsGFWithMSMS, fTable[byMSMS == TRUE, formula][1],
     #                                                 fTable[byMSMS == TRUE, group][1], plists,
     #                                                 useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
-                               useGGPlot2 = TRUE))
 
-    expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2]))
+    expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, index = 1, anPLGroup))
 
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(formsGF, formsSIR))
@@ -279,16 +280,19 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(formsGF, formsSIR))
     expect_error(plotUpSet(formsGFEmpty, formsSIREmpty))
     expect_error(plotUpSet(formsGF, formsSIREmpty))
+
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
+                 length(doFormCons(formsGF, formsSIR, relMinAbundance = 1)))
     
     skip_if(testWithSets())
-    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
-                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
+    
+    expect_ggplot(plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists, useGGPlot2 = TRUE))
 })
 
 if (testWithSets())
 {
     fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())
-    formsGFOneEmptySet <- doGenForms(fgOneEmptySet, "genform", plists)
+    formsGFOneEmptySet <- doGenForms(fgOneEmptySet, plists, "genform")
 }
 
 test_that("sets functionality", {
@@ -302,13 +306,13 @@ test_that("sets functionality", {
     expect_setequal(groupNames(unset(formsGFOneEmptySet, "positive")), groupNames(setObjects(formsGFOneEmptySet)[[1]]))
     expect_length(unset(formsGFOneEmptySet, "negative"), 0)
     
-    expect_lt(length(doGenForms(fgOneEmptySet, "genform", plists, setThreshold = 1)), length(formsGFOneEmptySet))
-    expect_length(doGenForms(fgOneEmptySet, "genform", plists, setThresholdAnn = 0), length(formsGFOneEmptySet))
+    expect_lt(length(doGenForms(fgOneEmptySet, plists, "genform", setThreshold = 1)), length(formsGFOneEmptySet))
+    expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThresholdAnn = 0), length(formsGFOneEmptySet))
     
-    expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
-                                                           MSPeakLists = plists, perSet = FALSE))
-    expect_doppel("form-spec-set-perset", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
+    expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists,
+                                                           perSet = FALSE))
+    expect_doppel("form-spec-set-perset", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = FALSE))
-    expect_doppel("form-spec-set-mirror", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
+    expect_doppel("form-spec-set-mirror", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = TRUE))
 })

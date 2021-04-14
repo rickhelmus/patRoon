@@ -193,7 +193,7 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
         for (fg in groupNames(setObjects[[s]]))
         {
             pl <- copy(MSPeakListsSet[[fg]][["MSMS"]])
-            if (!is.null(pl)) # maybe NULL for MS only formulae
+            if (!is.null(pl)) # may be NULL for MS only formulae
             {
                 pl[, PLIndex := seq_len(.N)]
                 pl <- pl[set == s]
@@ -220,7 +220,7 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
     return(setObjects)
 }
 
-doFeatAnnConsensusSets <- function(allAnnObjs, origFGNames, labels, setThreshold, setThresholdAnn, ...)
+doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, ...)
 {
     # make consensus of shared setObjects
     # add unique setObjects
@@ -228,22 +228,26 @@ doFeatAnnConsensusSets <- function(allAnnObjs, origFGNames, labels, setThreshold
     
     if (!allSame(lapply(allAnnObjs, sets)))
         stop("All objects must have the same sets.")
-    if (!allSame(lapply(allAnnObjs, slot, "origFGNames")))
-        stop("All objects must have been generated from the same feature groups.")
     
+    allOrigFGNames <- pruneList(lapply(allAnnObjs, slot, "origFGNames"), checkEmptyElements = TRUE)
+    if (!allSame(allOrigFGNames))
+        stop("All objects must have been generated from the same feature groups.")
+    origFGNames <- if (length(allOrigFGNames) == 0) character() else allAnnObjs[[1]]@origFGNames
+
     # NOTE: don't want to keep -set suffix
     labels <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allAnnObjs, algorithm))
     
     setObjects <- sapply(sets(allAnnObjs[[1]]), function(set)
     {
+        # return(do.call(consensus, c(lapply(allAnnObjs, unset, set = set), list(..., labels = labels))))
         return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set), list(..., labels = labels))))
     }, simplify = FALSE)
-    
+
     cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, labels)
     
     return(list(setObjects = setObjects, groupAnnotations = cons,
                 algorithm = paste0(unique(sapply(allAnnObjs, algorithm)), collapse = ","),
-                mergedConsensusNames = labels))
+                origFGNames = origFGNames, mergedConsensusNames = labels))
 }
 
 doFeatAnnUnset <- function(obj, set)
@@ -314,10 +318,10 @@ setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ..
     # update ranks
     obj@groupAnnotations <- Map(obj@groupAnnotations, groupNames(obj), f = function(at, grp)
     {
-        setsPresent <- sets(obj)[sapply(sets(obj), function(s) paste0("rank-", s) %in% names(at))]
-        rankCols <- paste0("rank-", setsPresent)
-        at[, (rankCols) := lapply(setsPresent, function(s)
+        rankCols <- getAllMergedConsCols("rank", names(at), mergedConsensusNames(obj))
+        at[, (rankCols) := lapply(rankCols, function(rc)
         {
+            s <- sub("^rank\\-", "", rc)
             atso <- setObjects(obj)[[s]][[grp]]
             if (is.null(atso))
                 return(NA_integer_)
@@ -347,9 +351,9 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
             {
                 x@groupAnnotations <- lapply(x@groupAnnotations, function(ct)
                 {
-                    cols <- grep(paste0("\\-", rmSets, "$"), names(ct), value = TRUE)
+                    cols <- grep(paste0("\\-(", paste0(rmSets, collapse = "|"), ")$"), names(ct), value = TRUE)
                     if (length(cols) == 0)
-                        return(ct) # set already no present
+                        return(ct) # set already not present
                     
                     ct <- copy(ct)
                     

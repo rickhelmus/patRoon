@@ -149,7 +149,7 @@ test_that("basic usage", {
 
 if (doMetFrag)
 {
-    forms <- doGenForms(fGroups, "genform", plists)
+    forms <- doGenForms(fGroups, plists, "genform")
     compsMFIsoF <- addFormulaScoring(compsMFIso, forms)
 }
 

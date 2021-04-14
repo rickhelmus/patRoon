@@ -34,17 +34,19 @@ splitFormulaToList <- memoise(function(formula)
 
 getElements <- function(formula, elements)
 {
-    ret <- sapply(formula, function(f)
+    return(rbindlist(lapply(formula, function(f)
     {
-        fl <- splitFormulaToList(f)
-        df <- as.data.frame(t(as.data.frame(fl)))
-        df[setdiff(elements, names(fl))] <- 0
-        return(df[, elements, drop = FALSE])
-    }, simplify = F, USE.NAMES = F)
-
-    ret <- as.data.frame(do.call(rbind, ret))
-    rownames(ret) <- NULL
-    return(ret)
+        if (is.na(f))
+        {
+            ret <- data.table()
+            ret[, (elements) := NA_integer_]
+            return(ret)
+        }
+            
+        fl <- as.list(splitFormulaToList(f))
+        fl[setdiff(elements, names(fl))] <- 0
+        return(fl[elements])
+    })))
 }
 
 formulaListToString <- function(formlist)
@@ -173,7 +175,7 @@ classifyFormula <- function(OC, HC, NC, AI)
     return("other")
 }
 
-checkFormula <- function(formula, elementsVec)
+checkFormula <- function(formula, elementsVec, negate)
 {
     for (elements in elementsVec)
     {
@@ -193,8 +195,7 @@ checkFormula <- function(formula, elementsVec)
         OK <- TRUE
 
         missingElements <- setdiff(names(minElFL), names(formlist))
-        if (length(missingElements) > 0 &&
-            any(sapply(missingElements, function(mel) minElFL[mel] > 0)))
+        if (length(missingElements) > 0 && any(sapply(missingElements, function(mel) minElFL[mel] > 0)))
             OK <- FALSE
         else
         {
@@ -213,7 +214,7 @@ checkFormula <- function(formula, elementsVec)
             }
         }
 
-        if (OK)
+        if (OK != negate)
             return(TRUE)
     }
 

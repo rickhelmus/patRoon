@@ -84,7 +84,7 @@ if (hasMF)
     compsMF <- callMF(fGroupsScr, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"),
                           db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
-    forms <- doGenForms(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
+    forms <- doGenForms(fGroupsScr, plists, "genform", calculateFeatures = FALSE)
     
     fGroupsAnnNothing <- annotateSuspects(fGroupsScr)
     fGroupsAnnMF <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)

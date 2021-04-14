@@ -208,11 +208,17 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = F
     {
         ret[, formula_avg_count := .N, by = "group"]
         
-        avgCols <- c("ion_formula", "neutral_formula")
-        ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
+        avgCols <- getAllMergedConsCols(c("ion_formula", "neutral_formula"), names(ret), mergedConsensusNames(x))
+        ret[, (avgCols) := lapply(.SD, function(f)
+        {
+            f <- f[!is.na(f)]
+            if (length(f) == 0)
+                return(NA_character_)
+            return(averageFormulas(unique(f)))
+        }), .SDcols = avgCols, by = "group"]
         
         # just keep the essential columns as the rest doesn't make too much sense anymore
-        keepCols <- c("group", "ion_formula", "neutral_formula")
+        keepCols <- c("group", avgCols)
         ret <- ret[, keepCols, with = FALSE]
         ret <- unique(ret, by = c("group", "neutral_formula"))
         
@@ -436,8 +442,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     
     cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
                                uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
-                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "ion_formula_mz",
-                                                                 "error", "error_median", "dbe"))
+                               annNames = labels, uniqueCols = c("neutral_formula", "error", "error_median", "dbe",
+                                                                 "neutralMass"))
     
     return(formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),

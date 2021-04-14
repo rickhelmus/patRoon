@@ -36,7 +36,8 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             ct[, c("set", "setsCount", "setsMergedCount", rname) := .(s, 1, 1, seq_len(.N))]
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
-            cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks"), names(ct), mConsNames)
+            cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks",
+                                           "ion_formula", "ion_formula_mz"), names(ct), mConsNames)
             if (length(cols) > 0)
                 setnames(ct, cols, paste0(cols, "-", s))
             

@@ -627,8 +627,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
     cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
                                uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
-                               annNames = labels, uniqueCols = c("neutral_formula", "ion_formula", "SMILES", "InChI",
-                                                                 "InChIKey1", "InChIKey2", "InChIKey", "neutralMass"))
+                               annNames = labels, uniqueCols = c("neutral_formula", "SMILES", "InChI", "InChIKey1",
+                                                                 "InChIKey2", "InChIKey", "neutralMass"))
     
     # rename & merge score types and ranges
     scoreTypes <- Reduce(union, mapply(allCompounds, labels, FUN = function(cmp, cn)

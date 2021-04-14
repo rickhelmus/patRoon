@@ -266,6 +266,14 @@ doFeatAnnUnset <- function(obj, set)
         })]
     })
     
+    # restore explainedPeaks
+    ann <- lapply(ann, function(a)
+    {
+        cols <- grep("^explainedPeaks\\-", names(a), value = TRUE)
+        setnames(a, cols, sub(paste0("\\-", set, "$"), "", cols))
+        return(a)
+    })
+    
     return(ann)
 }
 

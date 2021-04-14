@@ -235,7 +235,7 @@
         - maxFormulas/maxFragFormulas removed (handbook)
     - generateFormulas: MSPeakLists argument
         - also update handbook, tutorial...
-    - elements filter: neutral_formula used for formulas (but not fragments)
+    - as.data.table(): countFragElements implies fragments=TRUE
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses

@@ -80,9 +80,8 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             
             forms[, rank := NULL]
             
-            # Precursor is always present in MS/MS spectrum: it's added by
-            # SIRIUS if necessarily (with zero intensity). Remove it and use its
-            # frag_formula_mz to get ion_formula_mz
+            # Precursor is always present in MS/MS spectrum: it's added by SIRIUS if necessarily (with zero intensity).
+            # Remove it and use its mz to get ion_formula_mz
             forms[, ion_formula_mz := mapply(ion_formula, fragInfo,
                                              FUN = function(form, fi) fi$ion_formula_mz[form == fi$ion_formula])]
             forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)

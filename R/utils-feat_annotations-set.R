@@ -397,10 +397,11 @@ setMethodMult("annotatedPeakList", c("formulasSet", "compoundsSet"), function(ob
     return(ret[])
 })
 
-setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., sets = NULL, updateConsensus = FALSE,
-                                                                   negate = FALSE)
+setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, minExplainedPeaks = NULL, ..., sets = NULL,
+                                                                   updateConsensus = FALSE, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(minExplainedPeaks, positive = FALSE, null.ok = TRUE, add = ac)
     assertSets(obj, sets, TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::assertFlag(updateConsensus, add = ac)
@@ -413,13 +414,16 @@ setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., set
         obj <- obj[, sets = sets, updateConsensus = updateConsensus]
     }
     
-    if (...length() > 0)
+    doExplPeaks <- !is.null(minExplainedPeaks) && minExplainedPeaks > 0
+    
+    if (...length() > 0 || doExplPeaks)
     {
         if (updateConsensus)
         {
             # filter set objects and re-generate annotation consensus
             
-            obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
+            obj@setObjects <- lapply(obj@setObjects, filter, minExplainedPeaks = minExplainedPeaks, ...,
+                                     negate = negate)
             obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
             
             # synchronize other objects
@@ -428,7 +432,25 @@ setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., set
             cat("Done!\n")
         }
         else
-            obj <- callNextMethod(obj, ..., negate = negate)
+        {
+            # NOTE: if updateConsensus == FALSE then minExplainedPeaks is dealt with separately here since its column
+            # names are changed to be set specific
+            
+            if (doExplPeaks)
+            {
+                obj <- delete(obj, j = function(annTable, ...)
+                {
+                    cols <- grep("^explainedPeaks\\-", names(annTable), value = TRUE) # get all columns (including algo consensus)
+                    if (length(cols) == 0)
+                        return(FALSE)
+                    maxs <- do.call(pmax, c(annTable[, cols, with = FALSE], list(na.rm = TRUE)))
+                    return(if (negate) maxs >= minExplainedPeaks else maxs < minExplainedPeaks)
+                })
+            }
+            
+            if (...length() > 0)
+                obj <- callNextMethod(obj, ..., negate = negate)
+        }
     }
     
     return(obj)

@@ -77,6 +77,7 @@
         - maxFormulas/maxFragFormulas removed (handbook)
         - elements filter: neutral_formula used for formulas (but not fragments)
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
+        - minExplainedPeaks with updateConsensus=FALSE: takes maximum value
     - news
         - frag mSigma/score now also averaged
         - formula --> ion_formula

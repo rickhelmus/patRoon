@@ -13,7 +13,6 @@ formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
 
 formulasConsensusSet <- setClass("formulasConsensusSet", slots = c(mergedConsensusNames = "character"),
                                  contains = "formulasSet")
-setMethod("mergedConsensusNames", "formulasConsensusSet", function(obj) obj@mergedConsensusNames)
 
 
 setMethod("updateSetConsensus", "formulasSet", function(obj)
@@ -31,14 +30,6 @@ setMethod("updateSetConsensus", "formulasSet", function(obj)
 setMethod("show", "formulasSet", function(object)
 {
     callAllNextMethods(object, show, firstClass = "formulas", startFrom = "formulasSet")
-})
-
-setMethod("as.data.table", "formulasSet", function(x, fGroups = NULL, average = FALSE, ...)
-{
-    ret <- callNextMethod(x, fGroups = fGroups, average = average, ...)
-    if (average)
-        ret[, "ion_formula" := NULL] # ion formula column doesn't make sense anymore
-    return(ret[])
 })
 
 #' @export

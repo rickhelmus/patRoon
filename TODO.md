@@ -18,6 +18,7 @@
     - set generateFormulas() calculateFeatures
     - use strwrap()
     - calcFeatures formulas arg
+    - get peaklists also when formula==Bruker
 - remove old algorithm duplicate methods
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
@@ -56,37 +57,9 @@
 
 ## Annotation
 
-- plotSpectrum/annotatedPeakList formula methods: check if formula exist?
-    - if so, check if this doesn't interfere with compounds methods somehow
-    - also for compounds?
+- plotSpectrum/annotatedPeakList: check if index exist?
 - GenForm oc is FALSE by default. OK? Add to newProject?
-- annotation refactor
-    - ion_formula_mz --> ionMass?
-    - newProject: get peaklists also when formula==Bruker
-    - sets
-        - @export multi methods?
-        - call makeAnnSetScorings() in generateFormulas?
-            - after initiating object
-            - current principle OK? or work from averaged scorings?
-                - update updateSetObjectsConsensus() if changing
-            - align principle with compounds?
-    - docs
-        - new/changed as.data.table args
-        - generateFormulas: MSPeakLists argument
-            - also update handbook, tutorial...
-        - maxFormulas/maxFragFormulas removed (handbook)
-        - elements filter: neutral_formula used for formulas (but not fragments)
-        - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
-        - minExplainedPeaks with updateConsensus=FALSE: takes maximum value
-    - news
-        - frag mSigma/score now also averaged
-        - formula --> ion_formula
-        - intensity removed from fragInfo
-        - generateFormulas now includes mandatory MSPeakLists argument
-        - maxFormulas/maxFragFormulas removed
-        - elements filter: neutral_formula used for formulas (but not fragments)
-        - Fixed: MF was using wrong/inconsistent cache name
-        - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
+- ion_formula_mz --> ionMass?
 
 
 ## Suspects
@@ -258,6 +231,11 @@
     - set ranking: same as compounds consensus (but no weights (yet))
     - as.data.table(formulas, average=T): now removes most cols
     - formulasDA: update that MSPeakLists now is necessary (obtained via FFM PLs)
+    - new/changed as.data.table args
+        - maxFormulas/maxFragFormulas removed (handbook)
+    - generateFormulas: MSPeakLists argument
+        - also update handbook, tutorial...
+    - elements filter: neutral_formula used for formulas (but not fragments)
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -287,6 +265,10 @@
         - for sets: example with reGroup
     - as.data.table() for formulas: formula column removed if average=T
     - unset(fGroups) will get adduct annotated fGroups
+    - annotation
+        - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
+        - minExplainedPeaks with updateConsensus=FALSE: takes maximum value
+        - @export multi methods?
 - components
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
@@ -358,6 +340,14 @@
     - formula/compound annotation consensus: ranking is properly scaled
     - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data
     - Bruker formulas: MSPeakLists argument now required
+    - frag mSigma/score now also averaged
+    - formula --> ion_formula/neutral_formula (formulas/compounds)
+    - intensity removed from fragInfo
+    - generateFormulas now includes mandatory MSPeakLists argument
+    - as.data.table(): maxFormulas/maxFragFormulas removed
+    - elements filter: neutral_formula used for formulas (but not fragments)
+    - Fixed: MF was using wrong/inconsistent cache name
+    - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

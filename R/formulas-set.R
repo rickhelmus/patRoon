@@ -191,3 +191,15 @@ setMethod("unset", "formulasSet", function(obj, set)
     return(formulasUnset(groupAnnotations = uann, featureFormulas = annotations(obj, features = TRUE),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })
+
+setMethod("unset", "formulasSetConsensus", function(obj, set)
+{
+    # get rid of overall consensus cols, as they interfere when set specific are renamed in the parent unset method
+    obj@groupAnnotations <- lapply(obj@groupAnnotations, function(annTable)
+    {
+        annTable <- copy(annTable)
+        annTable[, c("coverage", "mergedBy") := NULL]
+        return(annTable)
+    })
+    
+    return(callNextMethod(obj, set))

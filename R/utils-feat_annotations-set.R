@@ -78,7 +78,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
                            }))
                        }),
                        # handle all other overlapping columns: select non NA
-                       fifelse(is.na(mget(otherColsBoth)), mget(otherColsBoth), mget(otherCols(otherColsBoth))),
+                       fifelse(!is.na(mget(otherColsBoth)), mget(otherColsBoth), mget(otherCols(otherColsBoth))),
                        # add missing columns from right (if any)
                        mget(otherCols(colsOnlyRight)),
                        # mark set presence

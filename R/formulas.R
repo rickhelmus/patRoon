@@ -446,14 +446,16 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
-                               uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
-                               annNames = labels, uniqueCols = c("neutral_formula", "error", "error_median", "dbe",
-                                                                 "neutralMass"))
+    cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
+                               uniqueCols = c("neutral_formula", "error", "error_median", "dbe", "neutralMass"))
     
-    return(formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
+    ret <- formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
-                             mergedConsensusNames = labels))
+                             mergedConsensusNames = labels)
+    
+    ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
+    
+    return(ret)
 })
 
 

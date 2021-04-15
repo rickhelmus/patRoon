@@ -186,17 +186,19 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn,
-                                   absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
-                                   uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights)
+    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
     sc <- makeAnnSetScorings(cons$setObjects, cons$origFGNames)
     
 
-    return(compoundsConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
+    ret <- compoundsConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
                                  setThresholdAnn = setThresholdAnn, origFGNames = cons$origFGNames,
                                  groupAnnotations = cons$groupAnnotations, scoreTypes = sc$scTypes,
                                  scoreRanges = sc$scRanges, algorithm = cons$algorithm,
-                                 mergedConsensusNames = cons$mergedConsensusNames))
+                                 mergedConsensusNames = cons$mergedConsensusNames)
+    
+    ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
+    
+    return(ret)
 })
 
 

@@ -220,7 +220,7 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
     return(setObjects)
 }
 
-doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, ...)
+doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
 {
     # make consensus of shared setObjects
     # add unique setObjects
@@ -237,13 +237,30 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
     # NOTE: don't want to keep -set suffix
     labels <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allAnnObjs, algorithm))
     
+    # NOTE: filtering (thresholds, unique) is not performed here: this is done afterwards in the consensus methods, as
+    # it makes more sense to filter the end result instead of those from set objects
+    consArgs <- list(rankWeights = rankWeights, labels = labels, absMinAbundance = NULL,
+                     relMinAbundance = NULL, uniqueFrom = NULL)
     setObjects <- sapply(sets(allAnnObjs[[1]]), function(set)
     {
-        # return(do.call(consensus, c(lapply(allAnnObjs, unset, set = set), list(..., labels = labels))))
-        return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set), list(..., labels = labels))))
+        return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set), consArgs)))
     }, simplify = FALSE)
 
     cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, labels)
+    cons <- lapply(cons, function(at)
+    {
+        at <- copy(at)
+        cols <- getAllMergedConsCols("mergedBy", names(at), names(setObjects))
+        at[, mergedBy := {
+            # collapse all cols with comma, split by comma, take unique, re-collapse with comma
+            allMB <- unlist(mget(cols))
+            allMB <- allMB[!is.na(allMB)]
+            allMB <- unique(unlist(strsplit(allMB, ",")))
+            paste0(allMB, collapse = ",")
+        }, by = seq_len(nrow(at))]
+        at[, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allAnnObjs))]
+        return(at)
+    })
     
     return(list(setObjects = setObjects, groupAnnotations = cons,
                 algorithm = paste0(unique(sapply(allAnnObjs, algorithm)), collapse = ","),
@@ -290,9 +307,11 @@ doFeatAnnUnset <- function(obj, set)
 
 setMethodMult("mergedConsensusNames", c("formulasSet", "compoundsSet"), function(obj) sets(obj))
 
-setMethodMult("mergedConsensusNames", c("formulasConsensusSet", "compoundsConsensusSet"), function(obj)
+setMethodMult("mergedConsensusNames", c("formulasConsensusSet", "compoundsConsensusSet"), function(obj, sets)
 {
-    c(sets(obj), obj@mergedConsensusNames, sapply(obj@mergedConsensusNames, paste0, "-", sets(obj)))
+    if (sets)
+        return(c(sets(obj), obj@mergedConsensusNames, sapply(obj@mergedConsensusNames, paste0, "-", sets(obj))))
+    return(obj@mergedConsensusNames)
 })
 
 

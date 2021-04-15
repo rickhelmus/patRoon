@@ -86,15 +86,13 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
     return(spec[])
 }
 
-doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter,
-                               rankWeights, annNames, uniqueCols)
+doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)
 {
     # NOTE: keep args in sync with sets methods
     
     allFeatAnnotations <- c(list(obj), list(...))
     
     rankWeights <- rep(rankWeights, length.out = length(allFeatAnnotations))
-    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allFeatAnnotations), NULLToZero(relMinAbundance))
     
     # initialize all objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
@@ -227,22 +225,6 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
         
         mAnnList[[grpi]][, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allFeatAnnotations))]
         
-        if (relMinAbundance > 0)
-            mAnnList[[grpi]] <- mAnnList[[grpi]][coverage >= relMinAbundance]
-        else if (!is.null(uniqueFrom))
-        {
-            if (!is.character(uniqueFrom))
-                uniqueFrom <- annNames[uniqueFrom]
-            
-            keep <- function(mergedBy)
-            {
-                mbs <- unlist(strsplit(mergedBy, ","))
-                return(all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1))
-            }
-            
-            mAnnList[[grpi]] <- mAnnList[[grpi]][mAnnList[[grpi]][, sapply(mergedBy, keep)]]
-        }
-        
         if (nrow(mAnnList[[grpi]]) > 0)
         {
             rnames <- getAllMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
@@ -268,4 +250,54 @@ doFeatAnnConsensus <- function(obj, ..., absMinAbundance, relMinAbundance, uniqu
         mAnnList <- mAnnList[sapply(mAnnList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
     
     return(mAnnList)
+}
+
+filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterAllCols)
+{
+    # UNDONE: export to filter() someday?
+    
+    # NOTE: this function may be called from sets methods. For those we want to get all set specific coverage/mergedBy
+    # columns, however, for absMinAbundance/uniqueFrom operations below, we need just the number of algorithms
+    mcnAll <- mergedConsensusNames(obj, TRUE)
+    mcnAlgo <- mergedConsensusNames(obj, FALSE)
+    
+    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(mcnAlgo), NULLToZero(relMinAbundance))
+    
+    if (relMinAbundance == 0 && is.null(uniqueFrom))
+        return(obj) # nothing to do
+
+    if (!is.null(uniqueFrom) && !is.character(uniqueFrom))
+        uniqueFrom <- mcnAlgo[uniqueFrom]
+        
+    obj <- delete(obj, j = function(annTable, grp, ...)
+    {
+        if (relMinAbundance > 0)
+        {
+            cols <- "coverage"
+            if (filterAllCols)
+                cols <- getAllMergedConsCols(cols, names(annTable), mcnAll)
+            
+            at <- annTable[, cols, with = FALSE]
+            return(do.call(pmax, c(at, list(na.rm = TRUE))) < relMinAbundance)
+        }
+        
+        # else apply uniqueFrom filter
+
+        cols <- "mergedBy"
+        if (filterAllCols)
+            cols <- getAllMergedConsCols(cols, names(annTable), mcnAll)
+        
+        cols <- getAllMergedConsCols("mergedBy", names(annTable), mcnAll)
+        at <- annTable[, cols, with = FALSE]
+        at[, keep := all(sapply(.SD, function(mb)
+        {
+            if (is.na(mb))
+                return(TRUE) # ignore NAs
+            mb <- unlist(strsplit(mb, ","))
+            return(all(mb %in% uniqueFrom) && (!uniqueOuter || length(mb) == 1))
+        })), by = seq_len(nrow(annTable)), .SDcols = cols]
+        return(!at$keep)
+    })
+    
+    return(obj)
 }

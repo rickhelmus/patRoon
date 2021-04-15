@@ -80,7 +80,7 @@ setMethod("show", "compounds", function(object)
 {
     callNextMethod()
 
-    mn <- mergedConsensusNames(object)
+    mn <- mergedConsensusNames(object, FALSE)
     if (length(mn) > 1)
         printf("Merged: %s\n", paste0(mn, collapse = ", "))
 
@@ -186,7 +186,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     cGNames <- names(cTable)
 
     # UNDONE?
-    if (length(mergedConsensusNames(compounds)) > 0)
+    if (length(mergedConsensusNames(compounds, FALSE)) > 0)
         stop("Currently formula scoring cannot be calculated for consensus results. Please add the scorings before calling consensus()")
     
     calculateScores <- function(cr, forms)
@@ -356,7 +356,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
         return(NULL)
     
-    mcn <- mergedConsensusNames(obj)
+    mcn <- mergedConsensusNames(obj, FALSE)
     
     if (normalizeScores != "none")
         annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,

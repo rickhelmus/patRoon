@@ -211,8 +211,6 @@ doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)
     
     printf("Determining coverage and final scores... ")
     
-    # Determine coverage of between objects and the merged score. The score column can be
-    # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(mAnnList))
     {
         # fix up de-duplicated column names

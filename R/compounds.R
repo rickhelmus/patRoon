@@ -625,10 +625,9 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
-    cons <- doFeatAnnConsensus(obj, ..., absMinAbundance = absMinAbundance, relMinAbundance = relMinAbundance,
-                               uniqueFrom = uniqueFrom, uniqueOuter = uniqueOuter, rankWeights = rankWeights,
-                               annNames = labels, uniqueCols = c("neutral_formula", "SMILES", "InChI", "InChIKey1",
-                                                                 "InChIKey2", "InChIKey", "neutralMass"))
+    cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
+                               uniqueCols = c("neutral_formula", "SMILES", "InChI", "InChIKey1",
+                                              "InChIKey2", "InChIKey", "neutralMass"))
     
     # rename & merge score types and ranges
     scoreTypes <- Reduce(union, mapply(allCompounds, labels, FUN = function(cmp, cn)
@@ -641,9 +640,13 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
         lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
     }))
 
-    return(compoundsConsensus(groupAnnotations = cons, scoreTypes = scoreTypes, scoreRanges = scRanges,
+    ret <- compoundsConsensus(groupAnnotations = cons, scoreTypes = scoreTypes, scoreRanges = scRanges,
                               algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
-                              mergedConsensusNames = labels))
+                              mergedConsensusNames = labels)
+    
+    ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
+    
+    return(ret)
 })
 
 #' @templateVar func generateCompounds

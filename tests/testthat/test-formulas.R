@@ -196,13 +196,13 @@ test_that("consensus works", {
     expect_lt(length(doFormCons(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
     expect_length(doFormCons(formsGFEmpty, formsSIREmpty), 0)
 
-    expect_setequal(c(getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 1)),
-                      getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 2)),
-                      getAllNeutralForms(doFormCons(formsGF, formsSIR, relMinAbundance = 1))),
-                    getAllNeutralForms(fCons))
-    expect_setequal(c(getAllNeutralForms(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)),
-                      getAllNeutralForms(doFormCons(formsGF, formsSIR, relMinAbundance = 1))),
-                    getAllNeutralForms(fCons))
+    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, uniqueFrom = 1),
+                                  doFormCons(formsGF, formsSIR, uniqueFrom = 2),
+                                  doFormCons(formsGF, formsSIR, relMinAbundance = 1)))),
+                 length(fCons))
+    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE),
+                                  doFormCons(formsGF, formsSIR, relMinAbundance = 1)))),
+                 length(fCons))
     expect_length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2), length(fCons))
     expect_lt(length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fCons))
     expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1), 0)

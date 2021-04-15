@@ -294,7 +294,7 @@ test_that("plotting works", {
 
 if (testWithSets())
 {
-    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())
+    fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
     compsOneEmptySet <- callMF(fgOneEmptySet, plists)
 }
 

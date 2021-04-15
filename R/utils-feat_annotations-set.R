@@ -305,7 +305,10 @@ doFeatAnnUnset <- function(obj, set)
 # HACK: formulas/compounds share a lot of methods, but there is no clean and proper way to do this with multiple
 # inheritance. Instead, simply automatically define the same method for both
 
-setMethodMult("mergedConsensusNames", c("formulasSet", "compoundsSet"), function(obj) sets(obj))
+setMethodMult("mergedConsensusNames", c("formulasSet", "compoundsSet"), function(obj, sets)
+{
+    return(if (sets) patRoon:::sets(obj) else character())
+})
 
 setMethodMult("mergedConsensusNames", c("formulasConsensusSet", "compoundsConsensusSet"), function(obj, sets)
 {

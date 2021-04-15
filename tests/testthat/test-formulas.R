@@ -88,7 +88,7 @@ test_that("basic subsetting", {
 
 formsGFMST1 <- filter(formsGFMS, topMost = 1); formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
 test_that("filtering works", {
-    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks > 1))
+    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks >= 1))
     expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks == 0))
     expect_lt(length(filter(formsGF, minExplainedPeaks = 2)),
               length(filter(formsGF, minExplainedPeaks = 1)))
@@ -209,13 +209,12 @@ test_that("consensus works", {
     expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
-anPLGroup <- screenInfo(fGroups)[formula == "C9H7NO"]$group
+anPLGroup <- screenInfo(fGroups)[name == "1H-benzotriazole"]$group
 anPL <- annotatedPeakList(formsGF, index = 1, groupName = anPLGroup, MSPeakLists = plists)
 anPLOnly <- annotatedPeakList(formsGF, index = 1, groupName = anPLGroup, MSPeakLists = plists, onlyAnnotated = TRUE)
 
-if (doSIRIUS && !testWithSets())
-    anPLCons <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6],
-                                  MSPeakLists = plists, onlyAnnotated = TRUE)
+if (doSIRIUS)
+    anPLCons <- annotatedPeakList(fCons, index = 1, groupName = anPLGroup, MSPeakLists = plists, onlyAnnotated = TRUE)
 
 test_that("annotation works", {
     skip_if_not(doSIRIUS)
@@ -225,7 +224,7 @@ test_that("annotation works", {
     expect_false(any(is.na(anPLOnly$ion_formula)))
     expect_true(all(formsGF[[anPLGroup]]$fragInfo[[1]]$ion_formula %in% anPLOnly$ion_formula))
     
-    skip_if(!doSIRIUS || testWithSets())
+    skip_if(!doSIRIUS)
     expect_true(any(grepl("genform", anPLCons$mergedBy)))
     expect_true(any(grepl("sirius", anPLCons$mergedBy)))
 })
@@ -258,7 +257,6 @@ test_that("reporting empty objects works", {
 })
 
 
-plotPrec <- formsGFWithMSMS[[2]][["neutral_formula"]][1]
 test_that("plotting works", {
     expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
 
@@ -291,7 +289,7 @@ test_that("plotting works", {
 
 if (testWithSets())
 {
-    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())
+    fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
     formsGFOneEmptySet <- doGenForms(fgOneEmptySet, plists, "genform")
 }
 
@@ -301,13 +299,13 @@ test_that("sets functionality", {
     expect_equal(formsGF, formsGF[, sets = sets(formsGF)])
     expect_length(formsGF[, sets = character()], 0)
     expect_equal(sets(filter(formsGF, sets = "positive", negate = TRUE)), "negative")
-    expect_setequal(groupNames(formsGF), unique(sapply(setObjects(formsGF), groupNames)))
+    expect_setequal(groupNames(formsGF), unique(unlist(lapply(setObjects(formsGF), groupNames))))
     expect_setequal(groupNames(unset(formsGF, "positive")), groupNames(setObjects(formsGF)[[1]]))
     expect_setequal(groupNames(unset(formsGFOneEmptySet, "positive")), groupNames(setObjects(formsGFOneEmptySet)[[1]]))
     expect_length(unset(formsGFOneEmptySet, "negative"), 0)
     
-    expect_lt(length(doGenForms(fgOneEmptySet, plists, "genform", setThreshold = 1)), length(formsGFOneEmptySet))
-    expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThresholdAnn = 0), length(formsGFOneEmptySet))
+    expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThreshold = 1), 0)
+    expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThresholdAnn = 1), length(formsGFOneEmptySet))
     
     expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists,
                                                            perSet = FALSE))

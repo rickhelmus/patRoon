@@ -62,6 +62,7 @@
 - min score filters: take maximum value of all merged columns?
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
+- default setThresholdAnn=0?
 
 ## Suspects
 
@@ -179,6 +180,7 @@
     - thoroughly test consensus for compounds/formulas and ranking with both set and algo consensus
     - enable annotation consensus tests
 - new ranking for formulas/compounds consensus (and sets)
+    - filterSets?
 - FC, plotVolcano
 - ensure peaklists are sorted
 - spectrumSimilarity()

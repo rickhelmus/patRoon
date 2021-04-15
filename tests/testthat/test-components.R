@@ -227,7 +227,7 @@ test_that("selectIons works", {
 
 if (testWithSets())
 {
-    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoComponents())[, 1:50]
+    fgOneEmptySet <- makeOneEmptySetFGroups(fGroupsSimple)
     compsRCOneEmptySet <- withr::with_seed(20, suppressWarnings(doGenComponents(fgOneEmptySet, "ramclustr")))
     
     getSetCompNames <- function(cmp, set)

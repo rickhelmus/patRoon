@@ -389,7 +389,7 @@ setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = N
     if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
         return(NULL)
     
-    mcn <- mergedConsensusNames(obj)
+    mcn <- mergedConsensusNames(obj, FALSE)
     
     if (normalizeScores != "none")
         annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,

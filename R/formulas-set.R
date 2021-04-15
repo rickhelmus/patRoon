@@ -192,7 +192,7 @@ setMethod("unset", "formulasSet", function(obj, set)
                          algorithm = paste0(algorithm(obj), "_unset")))
 })
 
-setMethod("unset", "formulasSetConsensus", function(obj, set)
+setMethod("unset", "formulasConsensusSet", function(obj, set)
 {
     # get rid of overall consensus cols, as they interfere when set specific are renamed in the parent unset method
     obj@groupAnnotations <- lapply(obj@groupAnnotations, function(annTable)

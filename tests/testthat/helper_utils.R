@@ -42,15 +42,8 @@ if (testWithSets())
         return(filter(ret, absMinIntensity = 5E4)) # reduce a bit as we don't need all of them for testing...
         
     }
-    getTestFGroupsOneEmptySet <- function(anaInfo = getTestAnaInfo(), ...)
-    {
-        an <- isAnaInfoNeg(anaInfo)
-        fSet <- makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
-                        findFeatures(anaInfo[an, ], "openms", noiseThrInt = 1E9, ...),
-                        adducts = c("[M+H]+", "[M-H]-"))
-        return(groupFeatures(fSet, "openms"))
-    }
-    
+    makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
+
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "positive")
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "positive")
     getExpAnaInfo <- function() getTestAnaInfoPos()
@@ -62,8 +55,9 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)
-    doGenForms <- function(...) generateFormulas(..., setThresholdAnn = 0) # zero threshold makes comparisons in testing much easier
-    doFormCons <- function(...) consensus(..., setThresholdAnn = 0) # zero threshold makes comparisons in testing much easier
+    # zero threshold makes comparisons in testing much easier
+    doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
+    doFormCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
     doGenComps <- function(...) generateCompounds(...)
     doGenComponents <- function(...) generateComponents(...)
 } else

@@ -250,7 +250,7 @@ doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)
     return(mAnnList)
 }
 
-filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterAllCols)
+filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterAlgoCols)
 {
     # UNDONE: export to filter() someday?
     
@@ -272,20 +272,23 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
         if (relMinAbundance > 0)
         {
             cols <- "coverage"
-            if (filterAllCols)
-                cols <- getAllMergedConsCols(cols, names(annTable), mcnAll)
-            
+            if (filterAlgoCols)
+                cols <- setdiff(getAllMergedConsCols(cols, names(annTable), mcnAll), cols)
+            if (length(cols) == 0)
+                return(FALSE)
             at <- annTable[, cols, with = FALSE]
-            return(do.call(pmax, c(at, list(na.rm = TRUE))) < relMinAbundance)
+            return(do.call(pmin, c(at, list(na.rm = TRUE))) < relMinAbundance)
         }
         
         # else apply uniqueFrom filter
 
         cols <- "mergedBy"
-        if (filterAllCols)
-            cols <- getAllMergedConsCols(cols, names(annTable), mcnAll)
+        if (filterAlgoCols)
+            cols <- setdiff(getAllMergedConsCols(cols, names(annTable), mcnAll), cols)
         
-        cols <- getAllMergedConsCols("mergedBy", names(annTable), mcnAll)
+        if (length(cols) == 0)
+            return(FALSE)
+        
         at <- annTable[, cols, with = FALSE]
         at[, keep := all(sapply(.SD, function(mb)
         {

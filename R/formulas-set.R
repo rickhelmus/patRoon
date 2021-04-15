@@ -134,11 +134,9 @@ setMethod("plotSpectrumHash", "formulasSet", function(obj, index, groupName, ana
 })
 
 #' @export
-setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
-                                               relMinAbundance = NULL,
-                                               uniqueFrom = NULL, uniqueOuter = FALSE,
-                                               rankWeights = 1, labels = NULL, setThreshold = 0,
-                                               setThresholdAnn = 0.75)
+setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
+                                               uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
+                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0.75)
 {
     allAnnObjs <- c(list(obj), list(...))
     
@@ -146,6 +144,8 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertList(allAnnObjs, types = "formulasSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
+    checkmate::assertFlag(filterSets, add = ac)
+    aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     checkmate::reportAssertions(ac)
     
     cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
@@ -156,7 +156,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
                                 groupAnnotations = cons$groupAnnotations, featureFormulas = combFormulas,
                                 algorithm = cons$algorithm, mergedConsensusNames = cons$mergedConsensusNames)
     
-    ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
+    ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterSets)
     
     return(ret)
 })
@@ -203,3 +203,4 @@ setMethod("unset", "formulasSetConsensus", function(obj, set)
     })
     
     return(callNextMethod(obj, set))
+})

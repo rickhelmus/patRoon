@@ -1,1 +1,1 @@
-A compoundsConsensus objectHierarchy:compounds    |-- compoundsConsensus---Algorithm: metfrag-set, sirius-setMerged: metfrag-set, sirius-setNumber of feature groups with compounds in this object: 5Number of compounds: 302 (total), 60.4 (mean), 1 - 100 (min - max)
+A compoundsConsensusSet objectHierarchy:compoundsSet    |-- compoundsConsensusSet---Algorithm: metfrag-set,sirius-setMerged: metfrag-set, sirius-setNumber of feature groups with compounds in this object: 9Number of compounds: 404 (total), 44.9 (mean), 1 - 189 (min - max)Sets: positive, negative

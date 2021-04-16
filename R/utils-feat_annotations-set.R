@@ -175,7 +175,7 @@ doUpdateSetConsensus <- function(obj)
     {
         obj@groupAnnotations <- makeFeatAnnSetConsensus(obj@setObjects, obj@origFGNames,
                                                         obj@setThreshold, obj@setThresholdAnn,
-                                                        mergedConsensusNames(obj))
+                                                        mergedConsensusNames(obj, FALSE))
     }
     else
         obj@groupAnnotations <- list()

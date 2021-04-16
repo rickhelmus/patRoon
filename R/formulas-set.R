@@ -148,6 +148,10 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     checkmate::reportAssertions(ac)
     
+    labels <- prepareConsensusLabels(obj, ..., labels = labels)
+    
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
+    
     cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
     combFormulas <- Reduce(modifyList, lapply(cons$setObjects, annotations, features = TRUE))
     

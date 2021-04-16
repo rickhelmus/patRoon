@@ -77,6 +77,7 @@ setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("gene
 ### Feature annotation base class
 
 setGeneric("annScoreNames", function(obj, onlyNums) standardGeneric("annScoreNames"))
+setGeneric("prepareConsensusLabels", function(obj, ..., labels) standardGeneric("prepareConsensusLabels"))
 
 
 ### Formulas

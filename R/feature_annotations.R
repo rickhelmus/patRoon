@@ -323,3 +323,12 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     do.call(UpSetR::upset, c(list(annTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
+setMethod("prepareConsensusLabels", "featureAnnotations", function(obj, ..., labels)
+{
+    if (is.null(labels))
+        labels <- sapply(list(obj, ...), algorithm)
+    
+    # in case names are (still) duplicated
+    labels <- make.unique(labels)
+    
+    return(labels)

@@ -440,10 +440,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFormulas), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (is.null(labels))
-        labels <- sapply(allFormulas, algorithm)
-    labels <- make.unique(labels)
-    
+    labels <- prepareConsensusLabels(obj, ..., labels = labels)
+
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,

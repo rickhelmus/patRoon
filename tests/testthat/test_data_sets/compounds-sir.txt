@@ -1,1 +1,1 @@
-A compoundsSet objectHierarchy:compounds,workflowStepSet    |-- compoundsSet---Algorithm: sirius-setNumber of feature groups with compounds in this object: 3Number of compounds: 300 (total), 100.0 (mean), 100 - 100 (min - max)Sets: set1, set2
+A compoundsSet objectHierarchy:compounds,workflowStepSet    |-- compoundsSet      |-- compoundsConsensusSet---Algorithm: sirius-setNumber of feature groups with compounds in this object: 5Number of compounds: 397 (total), 79.4 (mean), 1 - 188 (min - max)Sets: positive, negative

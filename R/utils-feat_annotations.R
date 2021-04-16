@@ -226,9 +226,9 @@ doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)
         if (nrow(mAnnList[[grpi]]) > 0)
         {
             rnames <- getAllMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
+            anpresent <- sub("^rank\\-", "", rnames)
             # get relevant weights with correct order
-            rwInds <- unlist(lapply(annNames, grep, rnames)) # unlist: in case of no matches, sapply would yield list
-            rWeights <- rankWeights[rwInds]
+            rWeights <- rankWeights[match(anpresent, annNames)]
             ncand <- nrow(mAnnList[[grpi]])
             mAnnList[[grpi]][, rankscore := {
                 invRanks <- (ncand - (unlist(.SD) - 1)) / ncand

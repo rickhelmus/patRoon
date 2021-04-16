@@ -81,7 +81,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         
         specs <- split(spec, by = "set")
         # UNDONE: this will overwrite consensus algo if present, OK?
-        specs <- lapply(specs, function(x) x[!is.na(formula), mergedBy := set])
+        specs <- lapply(specs, function(x) x[!is.na(ion_formula), mergedBy := set])
         
         plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
         return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...,  mol = mol,
@@ -188,6 +188,10 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     checkmate::reportAssertions(ac)
 
+    labels <- prepareConsensusLabels(obj, ..., labels = labels)
+    
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
+    
     cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
     sc <- makeAnnSetScorings(cons$setObjects, cons$origFGNames)
     

@@ -417,14 +417,14 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
     annTable <- annotations(obj)[[groupName]]
     if (!is.null(annTable) && nrow(annTable) >= index)
     {
-        formIndex <- which(annTable[[groupName]]$neutral_formula[index] == formulas[[groupName]]$neutral_formula)
+        formIndex <- which(annTable$neutral_formula[index] == formulas[[groupName]]$neutral_formula)
         if (length(formIndex) != 0)
         {
             # both annotated peak lists should have equal rows etc since onlyAnnotated was set to FALSE, just merge
             # formula columns
             
-            annPLForms <- annotatedPeakList(formulas, which(formulas[[groupName]]), groupName, MSPeakLists,
-                                            onlyAnnotated = FALSE)
+            annPLForms <- annotatedPeakList(formulas, index = formIndex, groupName = groupName,
+                                            MSPeakLists = MSPeakLists, onlyAnnotated = FALSE)
 
             if (!is.null(annPLForms) && !is.null(annPLForms[["ion_formula"]]))
             {

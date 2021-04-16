@@ -29,7 +29,7 @@ test_that("verify MetFragCL compound generation", {
     skip_if_not(doMetFrag)
     expect_known_value(compsMF, testFile("compounds-mf"))
     expect_known_show(compsMF, testFile("compounds-mf", text = TRUE))
-    expect_length(compsMF, 5) # should be one compound per feature group
+    expect_length(compsMF, length(groupNames(compsMF))) # should be one compound per feature group
     # make sure that all suspect names correspond to identified compounds
     expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == screenInfo(fGroups)[group == grp]$name)))
     expect_length(compsMFEmpty, 0)
@@ -58,6 +58,12 @@ comps <- if (doMetFrag) compsMFIso else if (doSIRIUS) compsSIR
 compsEmpty <- if (doMetFrag) compsMFEmptyPL else if (doSIRIUS) compsSIREmptyPL
 compsExplained <- filter(comps, minExplainedPeaks = 1)
 
+if (!testWithSets())
+{
+    compsT1 <- filter(comps, topMost = 1)
+    compsT1N <- filter(comps, topMost = 1, negate = TRUE)
+}
+
 test_that("filtering works", {
     skip_if_not(hasCompounds)
 
@@ -65,8 +71,6 @@ test_that("filtering works", {
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroups))
     expect_lte(length(filter(comps, topMost = 1, negate = TRUE)), length(fGroups))
     expect_lte(length(filter(comps, topMost = 5, negate = TRUE)), 5 * length(fGroups))
-    expect_true(all(as.data.table(filter(comps, topMost = 1))$score >
-                        as.data.table(filter(comps, topMost = 1, negate = TRUE))$score))
 
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
@@ -120,6 +124,12 @@ test_that("filtering works", {
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)))), length(compsSIR))
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)), negate = TRUE)),
               length(compsSIR))
+    
+    skip_if(testWithSets())
+    
+    # in case of ties between pos/neg the score is sometimes not the highest --> skip test with sets for now
+    expect_true(all(sapply(annotations(compsT1[groupNames(compsT1N)]), function(a) max(a$score)) >=
+                        sapply(annotations(compsT1N), function(a) max(a$score))))
 })
 
 test_that("basic subsetting", {
@@ -142,7 +152,7 @@ test_that("basic usage", {
     checkmate::expect_names(names(as.data.table(comps, fGroups = fGroups)),
                             must.include = c("ret", "group_mz"))
     checkmate::expect_names(names(as.data.table(comps, fragments = TRUE)),
-                            must.include = c("frag_formula", "frag_mz"))
+                            must.include = c("frag_ion_formula", "frag_mz"))
     expect_gt(nrow(as.data.table(comps, fragments = TRUE)), length(comps))
     expect_range(as.data.table(comps, normalizeScores = "max")$fragScore, c(0, 1))
 })
@@ -190,35 +200,35 @@ test_that("MetFrag can timeout", {
 })
 
 if (doMetFrag && doSIRIUS)
-    compsCons <- consensus(compsMF, compsSIR)
+    compsCons <- doCompCons(compsMF, compsSIR)
 
 test_that("consensus works", {
     skip_if_not(hasCompounds)
-    expect_length(consensus(comps, compsEmpty), length(comps))
+    expect_length(doCompCons(comps, compsEmpty), length(comps))
 
     skip_if_not(doMetFrag && doSIRIUS)
     expect_known_value(compsCons, testFile("compounds-cons"))
     expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
-    expect_lt(length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
-    expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL), 0)
+    expect_lt(length(doCompCons(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
+    expect_length(doCompCons(compsMFEmptyPL, compsSIREmptyPL), 0)
 
-    expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1)) +
-                 length(consensus(compsMF, compsSIR, uniqueFrom = 2)) +
-                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
-    expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
-    expect_length(consensus(compsMF, compsSIR, uniqueFrom = 1:2), length(compsCons))
-    expect_lt(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(compsCons))
-    expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1), 0)
-    expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1, uniqueOuter = TRUE), 0)
+    expect_equal(length(doCompCons(compsMF, compsSIR, uniqueFrom = 1)) +
+                 length(doCompCons(compsMF, compsSIR, uniqueFrom = 2)) +
+                 length(doCompCons(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
+    expect_equal(length(doCompCons(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
+                 length(doCompCons(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
+    expect_length(doCompCons(compsMF, compsSIR, uniqueFrom = 1:2), length(compsCons))
+    expect_lt(length(doCompCons(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(compsCons))
+    expect_length(doCompCons(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1), 0)
+    expect_length(doCompCons(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
 if (doMetFrag && doSIRIUS)
 {
-    anPL <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[1],
-                              MSPeakLists = plists, formulas = forms)
-    anPLOnly <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[1],
-                                  MSPeakLists = plists, formulas = forms, onlyAnnotated = TRUE)
+    anPLGroup <- screenInfo(fGroups)[name == "1H-benzotriazole"]$group
+    anPL <- annotatedPeakList(compsCons, index = 1, groupName = anPLGroup, MSPeakLists = plists, formulas = forms)
+    anPLOnly <- annotatedPeakList(compsCons, index = 1, groupName = anPLGroup, MSPeakLists = plists, formulas = forms,
+                                  onlyAnnotated = TRUE)
 }
 
 test_that("annotation works", {
@@ -267,15 +277,14 @@ test_that("plotting works", {
     skip_if_not(doMetFrag)
 
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, plotStruct = FALSE))
-    expect_plot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, plotStruct = TRUE))
+    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE))
+    expect_plot(plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[1], plists, useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[1]))
-    expect_plot(plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[2]))
-    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(annotations(compsMFIso))[2]))
+    expect_plot(plotStructure(compsMFIso, 1, anPLGroup))
+    expect_doppel("scores", function() plotScores(compsMFIso, 1, anPLGroup))
 
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(compsMF, compsSIR))
@@ -284,12 +293,16 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$areas[1], length(compsMF))
     expect_equal(expect_plot(plotVenn(compsMFEmpty, compsSIR))$areas[2], length(compsSIR))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$intersectionCounts,
-                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)))
+                 length(doCompCons(compsMF, compsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
 
     expect_ggplot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))
+    
+    skip_if(testWithSets())
+    
+    expect_ggplot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, useGGPlot2 = TRUE))
 })
 
 if (testWithSets())
@@ -305,7 +318,7 @@ test_that("sets functionality", {
     expect_equal(comps, comps[, sets = sets(comps)])
     expect_length(comps[, sets = character()], 0)
     expect_equal(sets(filter(comps, sets = "positive", negate = TRUE)), "negative")
-    expect_setequal(groupNames(comps), unique(sapply(setObjects(comps), groupNames)))
+    expect_setequal(groupNames(comps), unique(unlist(lapply(setObjects(comps), groupNames))))
     expect_setequal(groupNames(unset(comps, "positive")), groupNames(setObjects(comps)[[1]]))
     expect_setequal(groupNames(unset(compsOneEmptySet, "positive")), groupNames(setObjects(compsOneEmptySet)[[1]]))
     expect_length(unset(compsOneEmptySet, "negative"), 0)
@@ -313,14 +326,10 @@ test_that("sets functionality", {
     expect_lt(length(callMF(fgOneEmptySet, plists, setThreshold = 1)), length(compsOneEmptySet))
     expect_length(callMF(fgOneEmptySet, plists, setThresholdAnn = 0), length(compsOneEmptySet))
     
-    expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2],
-                                                               plists, plotStruct = FALSE, perSet = FALSE))
-    expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1,
-                                                                      names(annotations(compsMFIso))[2],
-                                                                      plists, plotStruct = FALSE, perSet = TRUE,
-                                                                      mirror = FALSE))
-    expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1,
-                                                                      names(annotations(compsMFIso))[2],
-                                                                      plists, plotStruct = FALSE, perSet = TRUE,
-                                                                      mirror = TRUE))
+    expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE,
+                                                               perSet = FALSE))
+    expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,
+                                                                      plotStruct = FALSE, perSet = TRUE, mirror = FALSE))
+    expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,
+                                                                      plotStruct = FALSE, perSet = TRUE, mirror = TRUE))
 })

@@ -248,7 +248,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     if (!is.null(topMost))
     {
         if (negate)
-            obj <- delete(obj, j = seq_len(topMost))
+            obj <- delete(obj, j = function(at, ...) seq_len(nrow(at)) <= (nrow(at) - topMost))
         else
             obj <- delete(obj, j = function(at, ...) seq_len(nrow(at)) > topMost)
     }
@@ -332,3 +332,4 @@ setMethod("prepareConsensusLabels", "featureAnnotations", function(obj, ..., lab
     labels <- make.unique(labels)
     
     return(labels)
+})

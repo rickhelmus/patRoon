@@ -2,11 +2,7 @@ context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn())
 # convert to screening results to simplify things a bit
-if (testWithSets())
-{
-    fGroups <- doScreen(fGroups, patRoonData::suspectsPos[, -2], onlyHits = TRUE) # omit mz column
-} else
-    fGroups <- doScreen(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+fGroups <- doScreen(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
@@ -86,7 +82,12 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
 
-formsGFMST1 <- filter(formsGFMS, topMost = 1); formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
+if (!testWithSets())
+{
+    formsGFMST1 <- filter(formsGFMS, topMost = 1)
+    formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
+}
+
 test_that("filtering works", {
     expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks >= 1))
     expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks == 0))
@@ -157,7 +158,6 @@ test_that("filtering works", {
     # in case of ties between pos/neg the isoScore is sometimes not the highest --> skip test with sets for now
     expect_true(all(sapply(annotations(formsGFMST1[groupNames(formsGFMST1N)]), function(a) max(a$isoScore)) >=
                         sapply(annotations(formsGFMST1N), function(a) max(a$isoScore))))
-    
 })
 
 OMTab <- as.data.table(formsGF, OM = TRUE)

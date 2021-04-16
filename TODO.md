@@ -63,6 +63,8 @@
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
+- SIRIUS comps: message with nr of features to annotate per adduct incorrect?
+
 
 ## Suspects
 
@@ -112,6 +114,8 @@
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
+    - screenSuspects should support also unnamed list for multiple suspect lists
+    - show method for screening
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -119,7 +123,7 @@
 - topMost filter: apply to set consensus results?
     - currently group results may be removed if top candidate is not top candidate in all sets
     - re-enable tests when fixed
-- screenSuspects should support also unnamed list for multiple suspect lists
+
 
 ## TPs
 

@@ -71,7 +71,8 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
             title <- subscriptFormula(obj[[groupName]]$neutral_formula[index])
         
         specs <- split(spec, by = "set")
-        specs <- lapply(specs, setnames, "set", "mergedBy")
+        # UNDONE: this will overwrite consensus algo if present, OK?
+        specs <- lapply(specs, function(x) x[!is.na(ion_formula), mergedBy := set])
         
         plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
         return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...))

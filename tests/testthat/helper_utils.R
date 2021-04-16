@@ -8,8 +8,8 @@ getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaIn
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
 {
-    fGroups <- doScreen(getTestFGroups(getTestAnaInfoAnn()), patRoonData::targets, onlyHits = TRUE)
-    # just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
+    fGroups <- doScreen(getTestFGroups(getTestAnaInfoAnn()), patRoonData::suspectsPos, onlyHits = TRUE)
+    # just focus on few targets also present in MF test DB
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
 
@@ -54,11 +54,13 @@ if (testWithSets())
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
-    doScreen <- function(...) screenSuspects(...)
+    doScreen <- function(fg, susp, ...) screenSuspects(fg, susp[, !grepl("mz", names(susp), fixed = TRUE), drop = FALSE], ...)
+        
     # zero threshold makes comparisons in testing much easier
     doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
     doFormCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
-    doGenComps <- function(...) generateCompounds(...)
+    doGenComps <- function(..., setThresholdAnn = 0) generateCompounds(..., setThresholdAnn = setThresholdAnn)
+    doCompCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
     doGenComponents <- function(...) generateComponents(...)
 } else
 {
@@ -85,6 +87,7 @@ if (testWithSets())
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")
+    doCompCons <- function(...) consensus(...)
     doGenComponents <- function(fGroups, algorithm, ...)
     {
         args <- c(list(fGroups, algorithm), list(...))

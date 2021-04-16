@@ -580,6 +580,25 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
                     plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
+setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
+{
+    if (is.null(labels))
+        labels <- sapply(list(obj, ...), algorithm)
+    
+    if (anyDuplicated(labels))
+    {
+        allCompounds <- list(obj, ...)
+        # duplicate algorithms used, try to form unique names by adding library
+        labels <- sapply(allCompounds, function(cmp)
+        {
+            db <- if (length(cmp) == 0) "empty" else cmp[[1]]$database[1]
+            return(paste0(substr(algorithm(cmp), 1, 3), "_", substr(db, 1, 3)))
+        })
+    }
+    
+    return(callNextMethod(obj, ..., labels = labels))
+})
+
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
@@ -606,23 +625,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    labels <- if (!is.null(labels)) labels else sapply(allCompounds, algorithm)
-    if (anyDuplicated(labels))
-    {
-        # duplicate algorithms used, try to form unique names by adding library
-        dbs <- lapply(allCompounds, function(cmp) # UNDONE: make this a method
-        {
-            if (length(cmp) > 0)
-                return(cmp[[1]]$database[1])
-        })
-
-        labels <- sapply(seq_along(allCompounds), function(cmpi) paste0(substr(algorithm(allCompounds[[cmpi]]), 1, 3), "-",
-                                                                        substr(dbs[[cmpi]], 1, 3)))
-
-        # in case names are still duplicated
-        labels <- make.unique(labels)
-    }
-
+    labels <- prepareConsensusLabels(obj, ..., labels = labels)
+    
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,

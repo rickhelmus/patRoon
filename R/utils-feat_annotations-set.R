@@ -234,9 +234,6 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
         stop("All objects must have been generated from the same feature groups.")
     origFGNames <- if (length(allOrigFGNames) == 0) character() else allAnnObjs[[1]]@origFGNames
 
-    # NOTE: don't want to keep -set suffix
-    labels <- if (!is.null(labels)) labels else sub("\\-set$", "", sapply(allAnnObjs, algorithm))
-    
     # NOTE: filtering (thresholds, unique) is not performed here: this is done afterwards in the consensus methods, as
     # it makes more sense to filter the end result instead of those from set objects
     consArgs <- list(rankWeights = rankWeights, labels = labels, absMinAbundance = NULL,

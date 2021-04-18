@@ -301,6 +301,7 @@ getScriptCode <- function(input, analyses)
                 list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$formulaGen != "Bruker"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$formulaGen == "SIRIUS"),
+                list(name = "calculateFeatures", value = "TRUE", condition = input$formulaGen != "Bruker"),
                 list(name = "featThresholdAnn", value = 0.75)
             ))
         }

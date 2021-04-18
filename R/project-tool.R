@@ -234,23 +234,49 @@ getScriptCode <- function(input, analyses)
         list(name = "mzRange", value = mzRange)
     ))
     
-    if (nzchar(input$suspectList))
+    if ((!input$setsWorkflow && nzchar(input$suspectList)) || (input$setsWorkflow && nzchar(input$suspectListPos)))
     {
         addHeader("suspect screening")
         addComment("Load suspect list")
-        addCall("suspFile", "read.csv", list(
-            list(value = input$suspectList, quote = TRUE),
-            list(name = "stringsAsFactors", value = FALSE)
-        ))
+        
+        addLoadSuspCall <- function(var, file)
+        {
+            addCall(var, "read.csv", list(
+                list(value = file, quote = TRUE),
+                list(name = "stringsAsFactors", value = FALSE)
+            ))
+        }
+        
+        if (!input$setsWorkflow)
+            addLoadSuspCall("suspFile", input$suspectList)
+        else
+        {
+            if (nzchar(input$suspectListNeg))
+            {
+                addLoadSuspCall("suspFilePos", input$suspectListPos)
+                addLoadSuspCall("suspFileNeg", input$suspectListNeg)
+            }
+            else
+                addLoadSuspCall("suspFile", input$suspectListPos)
+        }
+        
+        addScreenCall <- function(susp)
+        {
+            addCall("fGroups", "screenSuspects", list(
+                list(value = "fGroups"),
+                list(value = susp),
+                list(name = "rtWindow", value = 12),
+                list(name = "mzWindow", value = 0.005),
+                list(name = "adduct", value = input$suspectAdduct, quote = TRUE, isNULL = !nzchar(input$suspectAdduct)),
+                list(name = "onlyHits", value = TRUE)
+            ))
+        }
+        
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
-        addCall("fGroups", "screenSuspects", list(
-            list(value = "fGroups"),
-            list(value = "suspFile"),
-            list(name = "rtWindow", value = 12),
-            list(name = "mzWindow", value = 0.005),
-            list(name = "adduct", value = input$suspectAdduct, quote = TRUE, isNULL = !nzchar(input$suspectAdduct)),
-            list(name = "onlyHits", value = TRUE)
-        ))
+        if (!input$setsWorkflow || !nzchar(input$suspectListNeg))
+            addScreenCall("suspFile")
+        else
+            addScreenCall(c("suspFilePos", "suspFileNeg"))
     }
     
     doMSPL <- (nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent)
@@ -451,11 +477,11 @@ doCreateProject <- function(input, analyses)
 getNewProjectUI <- function(destPath)
 {
     textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
-    fileSelect <- function(idText, idButton, label, value = "")
+    fileSelect <- function(idText, idButton, label, value = "", ...)
     {
         fillRow(
             flex = c(1, NA),
-            textInput(idText, label, value, width = "100%"),
+            textInput(idText, label, value, width = "100%", ...),
             actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 15px")
         )
     }
@@ -630,8 +656,14 @@ getNewProjectUI <- function(destPath)
                             conditionalPanel(
                                 condition = "input.setsWorkflow",
                                 fillRow(
-                                    fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)"),
-                                    fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)")
+                                    ),
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
+                                    )
                                 )
                             )
                         ),
@@ -651,20 +683,27 @@ getNewProjectUI <- function(destPath)
                         selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
                                     "OpenMS", FALSE, width = "100%")
                     ),
-                    fillRow(
-                        height = 130,
-                        fillCol(
-                            flex = c(1, NA),
-                            height = 110,
-                            width = "95%",
-                            fileSelect("suspectList", "suspectListButton", "Suspect list"),
-                            textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                    fillCol(
+                        height = 75,
+                        flex = NA,
+                        conditionalPanel(
+                            condition = "!input.setsWorkflow",
+                            fileSelect("suspectList", "suspectListButton", "Suspect list", placeholder = "Leave empty for no suspect screening")
                         ),
-                        fillCol(
-                            flex = c(1, NA),
-                            height = 130,
-                            textInput("suspectAdduct", "Adduct", placeholder = "e.g. [M+H]+ or [M-H]-"),
-                            textNote("Used for mass calculation. Can be left empty if ionized mass or adduct data information is available in the suspect list (\"mz\"/\"adduct\" columns).")
+                        conditionalPanel(
+                            condition = "input.setsWorkflow",
+                            fillRow(
+                                fillCol(
+                                    width = "95%",
+                                    fileSelect("suspectListPos", "suspectListButtonPos", "Suspect list (positive)",
+                                               placeholder = "Leave empty for no suspect screening")
+                                ),
+                                fillCol(
+                                    width = "95%",
+                                    fileSelect("suspectListNeg", "suspectListButtonPos", "Suspect list (negative)",
+                                               placeholder = "Leave empty if same as positive")
+                                )
+                            )
                         )
                     ),
                     hr(),
@@ -737,7 +776,7 @@ getNewProjectUI <- function(destPath)
                                         multiple = FALSE, width = "100%")
                         ),
                         conditionalPanel(
-                            condition = "input.suspectList != \"\" && (input.formulaGen != \"\" || input.compIdent != \"\")",
+                            condition = "(input.suspectList != \"\" || input.suspectListPos != \"\") && (input.formulaGen != \"\" || input.compIdent != \"\")",
                             fillRow(
                                 height = 90,
                                 fillCol(
@@ -887,6 +926,32 @@ newProject <- function(destPath = NULL)
             if (!is.null(dm))
                 updateTextInput(session, inputName, value = dm)
         }
+        selectSuspList <- function(inputName)
+        {
+            sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
+            if (!is.null(sl))
+            {
+                csvTab <- tryCatch(fread(sl), error = function(e) FALSE, warning = function(w) FALSE)
+                cols <- names(csvTab)
+                massCols <- c("mz", "neutralMass", "formula", "SMILES", "InChI")
+                
+                err <- NULL
+                if (is.logical(csvTab))
+                    err <- "Failed to open/parse selected csv file!"
+                else if (nrow(csvTab) == 0)
+                    err <- "The selected files seems to be empty."
+                else if (!"name" %in% cols)
+                    err <- "The selected file does not have a name column"
+                else if (!any(massCols %in% cols))
+                    err <- paste("The selected file should have at least one of the columns:",
+                                 paste(massCols, collapse = ", "))
+                
+                if (!is.null(err))                
+                    rstudioapi::showDialog("Error", err, "")
+                else
+                    updateTextInput(session, inputName, value = sl)
+            }
+        }
         
         observeEvent(input$create, {
             if (!nzchar(input$destinationPath))
@@ -1014,32 +1079,10 @@ newProject <- function(destPath = NULL)
         observeEvent(input$DAMethodButtonPos, selectDAMethod("DAMethodPos"))
         observeEvent(input$DAMethodButtonNeg, selectDAMethod("DAMethodNeg"))
 
-        observeEvent(input$suspectListButton, {
-            sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
-            if (!is.null(sl))
-            {
-                csvTab <- tryCatch(fread(sl), error = function(e) FALSE, warning = function(w) FALSE)
-                cols <- names(csvTab)
-                massCols <- c("mz", "neutralMass", "formula", "SMILES", "InChI")
-                
-                err <- NULL
-                if (is.logical(csvTab))
-                    err <- "Failed to open/parse selected csv file!"
-                else if (nrow(csvTab) == 0)
-                    err <- "The selected files seems to be empty."
-                else if (!"name" %in% cols)
-                    err <- "The selected file does not have a name column"
-                else if (!any(massCols %in% cols))
-                    err <- paste("The selected file should have either one of the columns:",
-                                 paste(massCols, collapse = ", "))
-                
-                if (!is.null(err))                
-                    rstudioapi::showDialog("Error", err, "")
-                else
-                    updateTextInput(session, "suspectList", value = sl)
-            }
-        })
-
+        observeEvent(input$suspectListButton, selectSuspList("suspectList"))
+        observeEvent(input$suspectListButtonPos, selectSuspList("suspectListPos"))
+        observeEvent(input$suspectListButtonNeg, selectSuspList("suspectListNeg"))
+        
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
         output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))
         output$analysesHotNeg <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesNeg"))

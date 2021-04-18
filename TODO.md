@@ -11,9 +11,12 @@
     - sets: add specific options for annotation and others?
     - TP workflow
     - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
-    - multiple suspect lists in UI and code gen
     - example suspect lists
     - get peaklists also when formula==Bruker
+    - adduct
+        - selectIons
+        - one global option in first tab: positive, negative, both (sets)
+            - determines adduct for annotation, componentization and suspect screening
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 

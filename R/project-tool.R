@@ -152,7 +152,14 @@ getScriptCode <- function(input, analyses)
     }
     
     addComment(paste("Script automatically generated on", date()))
+    addNL()
+    addCall(NULL, "library", list(value = "patRoon"))
+    
     addHeader("initialization")
+    
+    addAssignment("workPath", input$destinationPath, quote = TRUE)
+    addCall(NULL, "setwd", list(value = "workPath"))
+    addNL()
     
     if (!input$setsWorkflow)
         addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE)

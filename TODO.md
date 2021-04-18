@@ -10,7 +10,7 @@
     - update for new feature and component algos
     - sets: add specific options for annotation and others?
     - TP workflow
-    - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
+    - update exampleData for polarity and polarity rGroups
     - example suspect lists
     - adduct
         - selectIons

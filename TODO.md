@@ -13,8 +13,6 @@
     - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
     - multiple suspect lists in UI and code gen
     - example suspect lists
-    - set generateFormulas() calculateFeatures
-    - calcFeatures formulas arg
     - get peaklists also when formula==Bruker
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 

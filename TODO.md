@@ -8,9 +8,7 @@
     - remove some more suspects to get better default hits?
 - newProject
     - update for new feature and component algos
-    - DA mslists: MSMSType should be bbCID if precursorMzWindow == 0?
     - sets: add specific options for annotation and others?
-    - formatting with RStudio? --> requires opening file
     - TP workflow
     - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
     - multiple suspect lists in UI and code gen
@@ -63,7 +61,6 @@
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
-- SIRIUS comps: message with nr of features to annotate per adduct incorrect?
 
 
 ## Suspects
@@ -303,6 +300,9 @@
 ## NEWS
 
 - progressr
+- newProject
+    - DA mslists: MSMSType now correctly bbCID if DIA is requested
+        - added DIA checkbox because of this
 - Features
     - as.data.table(fGroups): normalization, FC, averageFunc
     - topMostByRGroup/EICTopMostByRGroup

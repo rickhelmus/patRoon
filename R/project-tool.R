@@ -269,9 +269,11 @@ getScriptCode <- function(input, analyses)
                 list(value = "mzr", quote = TRUE, condition = input$peakListGen == "mzR"),
                 list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = input$peakListGen == "Bruker"),
                 list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
-                list(name = "precursorMzWindow", value = input$precursorMzWindow, zeroToNULL = TRUE),
+                list(name = "precursorMzWindow", value = if (input$DIA) "NULL" else input$precursorMzWindow,
+                     input$peakListGen == "mzR"),
                 list(name = "bgsubtr", value = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
-                list(name = "MSMSType", value = "MSMS", quote = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
+                list(name = "MSMSType", value = if (input$DIA) "BBCID" else "MSMS", quote = TRUE,
+                     condition = !useFMF && input$peakListGen == "Bruker"),
                 list(name = "avgFeatParams", value = "avgMSListParams", condition = input$peakListGen == "mzR"),
                 list(name = "avgFGroupParams", value = "avgMSListParams")
             ))
@@ -715,14 +717,16 @@ getNewProjectUI <- function(destPath)
                         conditionalPanel(
                             condition = "(input.formulaGen != \"\" && input.formulaGen != \"Bruker\") || input.compIdent != \"\"",
                             fillRow(
-                                height = 90,
-                                selectInput("peakListGen", "Peak list generator",
-                                            c("mzR", "Bruker DataAnalysis" = "Bruker"),
-                                            "mzR", multiple = FALSE, width = "95%"),
+                                height = 110,
+                                fillCol(
+                                    selectInput("peakListGen", "Peak list generator",
+                                                c("mzR", "Bruker DataAnalysis" = "Bruker"),
+                                                "mzR", multiple = FALSE, width = "95%"),
+                                    checkboxInput("DIA", "Data Independent Acquisition (DIA) MS/MS")
+                                ),
                                 conditionalPanel(
-                                    condition = "input.peakListGen == \"mzR\"",
+                                    condition = "input.peakListGen == \"mzR\" && !input.DIA",
                                     numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 4, width = "100%"),
-                                    textNote("The precursor m/z search window applied when finding MS/MS spectra. Set to zero for DIA experiments.")
                                 )
                             )
                         ),

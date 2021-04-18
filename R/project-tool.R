@@ -54,30 +54,30 @@ getScriptCode <- function(input, analyses)
         })
         args <- pruneList(args)
         
-        singleLineLength <- indent + nchar(func) + nchar("()") + nchar(paste0(args, collapse = ", "))
+        argText <- paste0(args, collapse = ", ")
+        callPrefix <- paste0(strrep(" ", indent), if (!is.null(var)) paste0(var, " <- ") else "", func, "(")
+        
+        singleLineLength <- nchar(callPrefix) + nchar(argText) + nchar(")")
         if (singleLineLength > 120)
         {
-            argIndent <- indent + nchar(func) + nchar("(")
-            if (!is.null(var))
-                argIndent <- argIndent + nchar(var) + nchar(" <- ")
-            argCol <- paste0(",\n", strrep(" ", argIndent))
+            # HACK: temporary replace " = " with "|=|" in order to keep var assignments on the same line
+            args <- lapply(args, function(a) 
+            {
+                a <- gsub(", ", ",|", a, fixed = TRUE) # items in a list
+                a <- gsub(" = ", "|=|", a, fixed = TRUE) # named arg assignments
+                return(a)
+            })
+            argText <- paste0(args, collapse = ", ")
+            
+            argText <- paste0(strwrap(argText, 120 - nchar(callPrefix) - 1, # -1: trailing ")"
+                                      exdent = nchar(callPrefix)),
+                              collapse = "\n")
+            
+            argText <- gsub("|", " ", argText, fixed = TRUE)
         }
-        else
-            argCol <- ", "
         
-        cl <- paste0(func, "(", paste0(args, collapse = argCol), ")")
-        if (!is.null(var))
-            cl <- paste0(var, " <- ", cl)
-        if (indent > 0)
-            cl <- paste0(strrep(" ", indent), cl)
-        
+        cl <- paste0(callPrefix, argText, ")")
         addText(cl)
-    }
-    addIfBlock <- function(condition, e)
-    {
-        addText(paste0("if (", condition, ") {"))
-        force(e)
-        addText(" }")
     }
     addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment)
     {

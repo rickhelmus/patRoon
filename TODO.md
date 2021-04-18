@@ -12,7 +12,6 @@
     - TP workflow
     - library(patRoon) / setwd() / update exampleData for polarity and polarity rGroups
     - example suspect lists
-    - get peaklists also when formula==Bruker
     - adduct
         - selectIons
         - one global option in first tab: positive, negative, both (sets)

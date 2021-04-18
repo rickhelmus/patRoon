@@ -279,7 +279,7 @@ getScriptCode <- function(input, analyses)
             addScreenCall(c("suspFilePos", "suspFileNeg"))
     }
     
-    doMSPL <- (nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent)
+    doMSPL <- nzchar(input$formulaGen) || nzchar(input$compIdent)
     
     if (nzchar(input$formulaGen) || nzchar(input$compIdent) || nzchar(input$components))
     {
@@ -755,7 +755,7 @@ getNewProjectUI <- function(destPath)
                                     c("None" = "", "RAMClustR", "CAMERA", "nontarget"),
                                     multiple = FALSE, width = "100%"),
                         conditionalPanel(
-                            condition = "(input.formulaGen != \"\" && input.formulaGen != \"Bruker\") || input.compIdent != \"\"",
+                            condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
                             fillRow(
                                 height = 110,
                                 fillCol(

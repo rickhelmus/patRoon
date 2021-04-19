@@ -433,7 +433,9 @@ if (knitr::is_html_output())
 } else
 {
     k <- knitr::kable(dt, format = "latex", longtable = TRUE, booktabs = TRUE)
-    k <- kableExtra::kable_styling(k, latex_options = "repeat_header", font_size = 7)
+    # k <- kableExtra::kable_styling(k, latex_options = "repeat_header", font_size = 7)
+    # UNDONE: repeat_header doesn't work anymore --> make bug report
+    k <- kableExtra::kable_styling(k, font_size = 7)
 }
 
 k

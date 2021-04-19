@@ -20,9 +20,9 @@ install:
             Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\sirius-4.7.2.zip)) {
-            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.7.2/sirius-4.7.2-win64-headless.zip -OutFile "C:\deps\sirius-win-4.7.2.zip"
-            7z x -aoa -oC:\deps\ C:\deps\sirius-win-4.7.2.zip
+        if (-Not (Test-Path C:\deps\sirius-4.8.1.zip)) {
+            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.8.1/sirius-4.8.1-win64-headless.zip -OutFile "C:\deps\sirius-win-4.8.1.zip"
+            7z x -aoa -oC:\deps\ C:\deps\sirius-win-4.8.1.zip
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\openbabel.exe)) {
@@ -31,7 +31,7 @@ install:
         C:\deps\openbabel.exe /S
 
 
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - C:\RLibrary

@@ -14,6 +14,7 @@ install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot", "tiny
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()
+tinytex::tlmgr_install("pdfcrop")
 webshot::install_phantomjs()
 Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 
@@ -40,6 +41,7 @@ rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document",
 
 tinytex::tlmgr_install("makeindex")
 refp <- file.path("docs/reference")
+patRoon:::mkdir(refp)
 devtools::build_manual(path = refp)
 file.rename(file.path(refp, paste0(desc::desc_get_field("Package"), "_", desc::desc_get_version(), ".pdf")),
             file.path(refp, "patRoon.pdf"))

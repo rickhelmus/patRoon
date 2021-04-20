@@ -3,7 +3,7 @@
 #' @include feature_groups-screening.R
 NULL
 
-# merges screening info from screenInfo slots or as.data.table() tables
+# merges screening info from screenInfo slots
 mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")

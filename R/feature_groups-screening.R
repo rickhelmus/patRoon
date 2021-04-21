@@ -317,11 +317,6 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     printf("Annotating %d suspects...\n", nrow(si))
     prog <- openProgBar(0, nrow(si))
     
-    formScores <- if (!is.null(formulas)) annScoreNames(formulas, FALSE) else NULL
-    formNormScores <- if (!is.null(formulas)) annScoreNames(formulas, TRUE) else NULL
-    compScores <- if (!is.null(compounds)) annScoreNames(compounds, FALSE) else NULL
-    compNormScores <- if (!is.null(compounds)) annScoreNames(compounds, TRUE) else NULL
-    
     for (i in seq_len(nrow(si)))
     {
         gName <- si$group[i]
@@ -400,12 +395,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
                                                   annSimForm, annSimComp, annSimBoth,
                                                   maxSuspFrags, maxFragMatches, fTable, formRank,
-                                                  mFormNames = if (!is.null(formulas)) mergedConsensusNames(compounds) else character(),
-                                                  formScores, formNormScores, fScRanges, formulasNormalizeScores,
-                                                  cTable, compRank,
+                                                  mFormNames = if (!is.null(formulas)) mergedConsensusNames(formulas) else character(),
+                                                  fScRanges, formulasNormalizeScores, cTable, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
-                                                  compScores, compNormScores, cScRanges, compoundsNormalizeScores,
-                                                  absMzDev, IDLevelRules)
+                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
         
         set(si, i,
             c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",

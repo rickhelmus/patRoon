@@ -237,6 +237,8 @@ formulaScorings <- function()
                stringsAsFactors = FALSE)
 }
 
+formScoreNames <- function(onlyNums) formulaScorings()$name
+
 rankFormulaTable <- function(formTable)
 {
     # order from best to worst

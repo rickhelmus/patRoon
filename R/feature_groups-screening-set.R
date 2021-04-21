@@ -128,6 +128,13 @@ setMethod("initialize", "featureGroupsScreeningSet",
 
 setMethod("screenInfo", "featureGroupsScreeningSet", function(obj) obj@screenInfo)
 
+#' @export
+setMethod("show", "featureGroupsScreeningSet", function(object)
+{
+    callNextMethod(object)
+    doScreeningShow(object)
+})
+
 setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
                                                                                  suspects = NULL, sets = NULL,
                                                                                  drop = TRUE)

@@ -110,7 +110,6 @@
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
-    - show method for screening
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

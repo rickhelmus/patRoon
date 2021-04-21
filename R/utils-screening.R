@@ -11,6 +11,13 @@ getAllSuspSetCols <- function(targetCols, allCols, sets)
     return(intersect(targetCols, allCols))
 }
 
+doScreeningShow <- function(obj)
+{
+    printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(obj)$name), 6, ", "),
+           nrow(screenInfo(obj)))
+    printf("Suspects annotated: %s\n", if (!is.null(screenInfo(obj)[["estIDLevel"]])) "yes" else "no")
+}
+
 convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromCols)
 {
     hasData <- function(x) !is.na(x) & nzchar(x)

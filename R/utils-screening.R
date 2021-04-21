@@ -141,7 +141,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     
-    if (!calcMZs)
+    if (calcMZs)
     {
         # check for any suspects without proper mass info
         isNA <- is.na(suspects$neutralMass) & is.na(suspects$mz)
@@ -273,12 +273,14 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formScores,
-                                        formNormScores, formScoreRanges, formulasNormalizeScores, compTable, compRank,
-                                        mCompNames, compScores, compNormScores, compScoreRanges,
+                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formScoreRanges,
+                                        formulasNormalizeScores, compTable, compRank, mCompNames, compScoreRanges,
                                         compoundsNormalizeScores, absMzDev, IDLevelRules)
 {
+    formScores <- formScoreNames(FALSE); formNormScores <- formScoreNames(TRUE)
+    compScores <- compScoreNames(FALSE); compNormScores <- compScoreNames(TRUE)
     fRow <- cRow <- NULL
+    
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTableNorm <- normalizeAnnScores(formTable, formNormScores, formScoreRanges, mFormNames,

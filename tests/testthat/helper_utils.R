@@ -1,4 +1,4 @@
-testWithSets <- function() T # UNDONE: check environment variable or something
+testWithSets <- function() F # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -30,7 +30,7 @@ if (testWithSets())
         return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
     }
     getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), doFilter = TRUE, ...)
     {
         an <- isAnaInfoNeg(anaInfo)
         if (any(an))
@@ -39,7 +39,9 @@ if (testWithSets())
                            adducts = c("[M+H]+", "[M-H]-"))
         else
             ret <- makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+")
-        return(filter(ret, absMinIntensity = 5E4)) # reduce a bit as we don't need all of them for testing...
+        if (doFilter)
+            ret <- filter(ret, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
+        return(ret)
         
     }
     makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
@@ -54,7 +56,12 @@ if (testWithSets())
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
     
-    doScreen <- function(fg, susp, ...) screenSuspects(fg, susp[, !grepl("mz", names(susp), fixed = TRUE), drop = FALSE], ...)
+    doScreen <- function(fg, susp, ...)
+    {
+        cols <- !grepl("mz", names(susp), fixed = TRUE)
+        susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
+        screenSuspects(fg, susp, ...)
+    }
         
     # zero threshold makes comparisons in testing much easier
     doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
@@ -67,10 +74,12 @@ if (testWithSets())
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
     getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), doFilter = TRUE, ...)
     {
         ret <- findFeatures(anaInfo, "openms", ...)
-        return(filter(ret, absMinIntensity = 5E4)) # reduce a bit as we don't need all of them for testing...
+        if (doFilter)
+            ret <- filter(ret, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
+        return(ret)
     }
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
@@ -83,7 +92,7 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
-    doScreen <- function(...) screenSuspects(...)
+    doScreen <- function(...) screenSuspects(..., adduct = "[M+H]+")
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")

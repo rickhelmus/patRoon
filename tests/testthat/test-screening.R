@@ -1,20 +1,18 @@
 context("screening")
 
-susps <- as.data.table(patRoonData::targets)
+susps <- as.data.table(patRoonData::suspectsPos)
 
 susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := convertToFormulaBabel(SMILES, "smi")]
-susps[, adduct := "[M+H]+"]
-susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
-fGroups <- getTestFGroups()
+fGroups <- getTestFGroups(doFilter = FALSE, minFWHM = 1)
 fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
 fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))
 
 scr <- getScrInfo(susps)
-scrSMI <- getScrInfo(susps[, c("name", "rt", "adduct", "SMILES")])
+scrSMI <- getScrInfo(susps[, c("name", "rt", "SMILES")])
 
 suspsMissing <- copy(susps)
 suspsMissing[1, mz := NA]
@@ -31,7 +29,7 @@ suspsFragForm <- copy(susps)
 suspsFragForm[name == "1H-benzotriazole", fragments_formula := "C6H6N"] # UNDONE: add qualifiers to patRoonData?
 
 test_that("suspect screening is OK", {
-    expect_equal(nrow(scr), nrow(susps))
+    expect_setequal(scr$name, susps$name)
     expect_known_value(scr, testFile("screening"))
     expect_length(doScreen(fGroups, susps, onlyHits = TRUE), nrow(susps))
 
@@ -45,17 +43,17 @@ test_that("suspect screening is OK", {
     })
     
     # alternative ion mass calculations
-    expect_equal_scr(scr, scrSMI, tolerance = 1E-3) # higher tolerance due to inaccurate mz column in patRoonData::targets
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "InChI")]))
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "neutralMass")]))
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "formula")]))
+    expect_equal_scr(scr, scrSMI)
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "InChI")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "neutralMass")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "formula")]))
 
     # same, with missing data (having 2 options for ion mass calculation should be sufficient)
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "mz", "neutralMass")]),
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "mz", "neutralMass")]),
                      tolerance = 1E-3)
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "neutralMass", "formula")]))
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "formula", "SMILES")]))
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "SMILES", "InChI")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "neutralMass", "formula")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "formula", "SMILES")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "SMILES", "InChI")]))
     
     expect_warning(doScreen(fGroups, suspsMissingRow, skipInvalid = TRUE))
     expect_error(doScreen(fGroups, suspsMissingRow, skipInvalid = FALSE))
@@ -153,24 +151,23 @@ test_that("Screen filters", {
     expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
     
     # mean intensities should be increased when selecting a group for this suspect
-    expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-quinolol",
+    expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "DEET",
                                                                                     analyses(fGroupsAnnNoRT),
                                                                                     with = FALSE])),
-              mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[susp_name == "2-quinolol",
+              mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[susp_name == "DEET",
                                                                                      analyses(selectedHitsInt),
                                                                                      with = FALSE])))
-    expect_gt(maxIDLevel(fGroupsAnnNoRT[, suspects = "2-quinolol"]),
-              maxIDLevel(selectedHitsLev[, suspects = "2-quinolol"]))
+    expect_gt(maxIDLevel(fGroupsAnnNoRT[, suspects = "DEET"]), maxIDLevel(selectedHitsLev[, suspects = "DEET"]))
     # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
-    # for now just verify that all groups are assigned to first quinolol (2-quinolol)
-    expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
+    # for now just verify that all groups are unique
+    expect_equal(anyDuplicated(screenInfo(selectedFGroupsLev)$group), 0)
     
     expect_lt(length(selectedHitsInt), length(fGroupsAnnNoRT))
     expect_lt(length(selectedHitsLev), length(fGroupsAnnNoRT))
     expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnNoRT)))
     
     expect_equal(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3)), 3)
-    expect_equal(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "formRank"), 1) # UNDONE: all are one or NA
+    expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "formRank"), 3)
     expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3), "compRank"), 3)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9), "annSimForm"), 0.9)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9), "annSimComp"), 0.9)
@@ -190,25 +187,24 @@ test_that("Negated screen filters", {
     expect_known_value(as.data.table(selectedNegFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-groups"))
     
     # as above, but opposite
-    expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-quinolol",
+    expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "DEET",
                                                                                     analyses(fGroupsAnnNoRT),
                                                                                     with = FALSE])),
-              mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[susp_name == "2-quinolol",
-                                                                                     analyses(selectedNegHitsInt),
-                                                                                     with = FALSE])))
-    expect_lt(minIDLevel(fGroupsAnnNoRT[, suspects = "2-quinolol"]),
-              minIDLevel(selectedNegHitsLev[, suspects = "2-quinolol"]))
+              mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[susp_name == "DEET",
+                                                                                        analyses(selectedNegHitsInt),
+                                                                                        with = FALSE])))
+    expect_lt(minIDLevel(fGroupsAnnNoRT[, suspects = "DEET"]), minIDLevel(selectedNegHitsLev[, suspects = "DEET"]))
     # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
-    # for now just verify that all groups are assigned to first quinolol (2-quinolol)
-    expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
+    # for now just verify that all groups are unique
+    expect_equal(anyDuplicated(screenInfo(selectedNegFGroupsLev)$group), 0)
     
     expect_length(selectedNegHitsInt, length(selectedHitsInt))
     expect_length(selectedNegHitsLev, length(selectedHitsLev))
     expect_equal(nrow(screenInfo(selectedNegFGroupsLev)), nrow(screenInfo(selectedFGroupsLev)))
     
     expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
-    expect_true(all(is.na(screenInfo(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE))$formRank)))
-    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3, negate = TRUE), "compRank"), 3)
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE), "formRank"), 3)
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 2, negate = TRUE), "compRank"), 2)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)

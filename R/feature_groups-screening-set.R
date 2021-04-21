@@ -305,7 +305,11 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     obj <- obj[, sets = set]
     sInfo <- mergeScreeningSetInfos(setObjects(obj), rmSetCols = FALSE)
     if (length(sInfo) > 0)
+    {
         sInfo[, sets := NULL]
+        # restore set specific columns
+        setnames(sInfo, sub(paste0("\\-", set, "$"), "", names(sInfo)))
+    }
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),
                                           groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),

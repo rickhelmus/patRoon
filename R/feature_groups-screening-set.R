@@ -269,8 +269,14 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     else
     {
         checkmate::assertList(suspects, "data.frame", any.missing = FALSE, all.missing = FALSE,
-                              len = length(sets(fGroups)), names = "unique")
-        checkmate::assertSubset(names(suspects), sets(fGroups), empty.ok = FALSE)
+                              len = length(sets(fGroups)))
+        checkmate::assert(
+            checkmate::checkNames(names(suspects), "unnamed"),
+            checkmate::checkNames(names(suspects), "unique", must.include = sets(fGroups)),
+            .var.name = "suspects"
+        )
+        if (checkmate::testNames(names(suspects), "unnamed"))
+            names(suspects) <- sets(fGroups)
     }
     
     # sync order

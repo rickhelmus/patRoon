@@ -110,7 +110,6 @@
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
-    - screenSuspects should support also unnamed list for multiple suspect lists
     - show method for screening
 - merging setObjects
     - check if more has to be cached and may need status messages

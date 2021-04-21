@@ -291,10 +291,9 @@ doFeatAnnUnset <- function(obj, set)
         pat <- paste0("\\-", set, "$")
         cols <- grep(pat, names(a), value = TRUE)
         setnames(a, cols, sub(pat, "", cols))
+        a[, rank := NULL] # no need for this anymore
         return(a)
     })
-    
-    # UNDONE: remove rank columns?
     
     return(ann)
 }

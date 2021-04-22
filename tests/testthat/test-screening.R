@@ -5,6 +5,7 @@ susps <- as.data.table(patRoonData::suspectsPos)
 susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := convertToFormulaBabel(SMILES, "smi")]
+susps[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
 
 fGroups <- getTestFGroups(doFilter = FALSE, minFWHM = 1)
 fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
@@ -12,7 +13,7 @@ fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))
 
 scr <- getScrInfo(susps)
-scrSMI <- getScrInfo(susps[, c("name", "rt", "SMILES")])
+scrSMI <- getScrInfo(susps[, c("name", "rt", "SMILES", "adduct")])
 
 suspsMissing <- copy(susps)
 suspsMissing[1, mz := NA]
@@ -31,46 +32,49 @@ suspsFragForm[name == "1H-benzotriazole", fragments_formula := "C6H6N"] # UNDONE
 test_that("suspect screening is OK", {
     expect_setequal(scr$name, susps$name)
     expect_known_value(scr, testFile("screening"))
-    expect_length(doScreen(fGroups, susps, onlyHits = TRUE), nrow(susps))
+    expect_setequal(names(fGroupsScr), screenInfo(fGroupsScr)$group)
 
     # check suspects without retention
     expect_gte(nrow(getScrInfo(susps[, -3])), nrow(scr))
     
     # valid suspect names
     withr::with_options(list(patRoon.cache.mode = "none"), {
-        expect_warning(doScreen(fGroups, data.table(name = "test.", mz = 100)))
-        expect_error(doScreen(fGroups, data.table(name = "", mz = 100)))
+        expect_warning(doScreen(fGroups, data.table(name = "test.", SMILES = "C1=CC=C(C=C1)C(=O)O")))
+        expect_error(doScreen(fGroups, data.table(name = "", SMILES = "C1=CC=C(C=C1)C(=O)O")))
     })
     
     # alternative ion mass calculations
-    expect_equal_scr(scr, scrSMI)
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "InChI")]))
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "neutralMass")]))
-    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "formula")]))
+    expect_equal_scr(scr, scrSMI, tolerance = 1E-3) # higher tolerance due to inaccurate mz column in patRoonData
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "InChI", "adduct")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "neutralMass", "adduct")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "formula", "adduct")]))
 
     # same, with missing data (having 2 options for ion mass calculation should be sufficient)
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "mz", "neutralMass")]),
-                     tolerance = 1E-3)
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "neutralMass", "formula")]))
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "formula", "SMILES")]))
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "SMILES", "InChI")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "neutralMass", "formula", "adduct")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "formula", "SMILES", "adduct")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "SMILES", "InChI", "adduct")]))
     
     expect_warning(doScreen(fGroups, suspsMissingRow, skipInvalid = TRUE))
     expect_error(doScreen(fGroups, suspsMissingRow, skipInvalid = FALSE))
     
     # subsetting
-    expect_length(fGroupsScr[, suspects = susps$name], nrow(susps))
+    expect_length(fGroupsScr[, suspects = susps$name], length(fGroupsScr))
     expect_length(fGroupsScr[, suspects = susps$name[1:2]], 2)
     expect_length(fGroupsScr[, suspects = "doesnotexist"], 0)
     
-    expect_equal(nrow(as.data.table(fGroupsScr, collapseSuspects = ",")), nrow(susps))
-    expect_gt(nrow(as.data.table(fGroupsScrNoRT, collapseSuspects = ",")), nrow(susps))
+    expect_equal(nrow(as.data.table(fGroupsScr, collapseSuspects = ",")), length(fGroupsScr))
+    expect_gt(nrow(as.data.table(fGroupsScrNoRT, collapseSuspects = ",")),
+              nrow(as.data.table(fGroupsScr, collapseSuspects = ",")))
+    
+    skip_if(testWithSets())
+
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "mz", "neutralMass", "adduct")]),
+                     tolerance = 1E-3)
     
     # adduct argument
     # UNDONE: do something with selectIons?
-    skip_if(testWithSets())
-    expect_equal_scr(getScrInfo(susps[name %in% c("TBA", "TPA")]),
-                     getScrInfo(susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
+    expect_equal_scr(getScrInfo(susps[name == "Aldicarb"]),
+                     getScrInfo(susps[name == "Aldicarb", -"adduct"], adduct = "[M+Na]+"))
     
 })
 
@@ -115,8 +119,8 @@ if (testWithSets())
     getAllSuspVals <- function(ann, col) screenInfo(ann)[[col]]
 }
 
-minIDLevel <- function(ann) min(numericIDLevel(getAllSuspVals(ann, "estIDLevel")))
-maxIDLevel <- function(ann) max(numericIDLevel(getAllSuspVals(ann, "estIDLevel")))
+minIDLevel <- function(ann) min(numericIDLevel(getAllSuspVals(ann, "estIDLevel")), na.rm = TRUE)
+maxIDLevel <- function(ann) max(numericIDLevel(getAllSuspVals(ann, "estIDLevel")), na.rm = TRUE)
 getMinScrCol <- function(ann, col) min(getAllSuspVals(ann, col), na.rm = TRUE)
 getMaxScrCol <- function(ann, col) max(getAllSuspVals(ann, col), na.rm = TRUE)
 
@@ -214,7 +218,7 @@ test_that("Negated screen filters", {
 })
 
 fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9), "openms")
-suspsEmpty <- data.table(name = "doesnotexist", mz = 1E5)
+suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C")
 fGroupsScrEmpty <- doScreen(fGroups, suspsEmpty)
 
 if (hasMF)
@@ -262,28 +266,31 @@ test_that("sets functionality", {
     # some tests from feature groups to ensure proper subsetting/unsetting
     expect_equal(analysisInfo(unset(fGroupsScr, "positive")), getTestAnaInfoPos())
     expect_equal(analysisInfo(fGroupsScr[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
-    expect_equal(unique(annotations(fGroupsScr)$adduct), "[M+H]+")
+    expect_setequal(unique(annotations(fGroupsScr)$adduct), c("[M+H]+", "[M-H]-"))
     expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])
     expect_length(fGroupsScr[, sets = character()], 0)
-    expect_equal(sets(filter(fGroupsScr, sets = "positive", negate = TRUE)), "set2")
+    expect_equal(sets(filter(fGroupsScr, sets = "positive", negate = TRUE)), "negative")
 })
 
+getTQAnalytes <- function(path)
+{
+    ret <- fread(path)[["Analyte Name"]]
+    return(ret[nzchar(ret)]) # omit first empty line
+}
 
-TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
-TQRes <- fread(TQFile)
-fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo())
-TQFileNoRT <- file.path(getTestDataPath(), "GlobalResults_noRT-TASQ.csv")
-TQResNoRT <- fread(TQFileNoRT)
+TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ-pos.csv")
+fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo(), clusterRTWindow = 14) # HACK: increase RT window a bit to avoid split groups
+TQFileNoRT <- file.path(getTestDataPath(), "GlobalResults-TASQ_noRT-pos.csv")
 fGroupsTQNoRT <- importFeatureGroupsBrukerTASQ(TQFileNoRT, getTestAnaInfo())
 fGroupsTQNoRT <- filter(fGroupsTQNoRT, blankThreshold = 5, removeBlanks = TRUE)
 
 test_that("TASQ import works", {
-    expect_equal(unique(TQRes$Analyte), names(fGroupsTQ))
+    expect_equal(unique(getTQAnalytes(TQFile)), names(fGroupsTQ))
     expect_known_value(groupTable(fGroupsTQ), testFile("susp-tasq"))
     expect_known_value(groupInfo(fGroupsTQ), testFile("susp-tasq-gi"))
     expect_known_show(fGroupsTQ, testFile("susp-tasq", text = TRUE))
     
-    expect_lt(length(unique(TQResNoRT$Analyte)), length(fGroupsTQNoRT))
+    expect_lt(length(unique(getTQAnalytes(TQFileNoRT))), length(fGroupsTQNoRT))
     expect_known_value(groupTable(fGroupsTQNoRT), testFile("susp-tasq-nort"))
     expect_known_value(groupInfo(fGroupsTQNoRT), testFile("susp-tasq-nort-gi"))
     expect_known_show(fGroupsTQNoRT, testFile("susp-tasq-nort", text = TRUE))

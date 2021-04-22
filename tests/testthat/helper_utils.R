@@ -1,4 +1,4 @@
-testWithSets <- function() F # UNDONE: check environment variable or something
+testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -58,7 +58,7 @@ if (testWithSets())
     
     doScreen <- function(fg, susp, ...)
     {
-        cols <- !grepl("mz", names(susp), fixed = TRUE)
+        cols <- !grepl("^mz$", names(susp), fixed = TRUE)
         susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
         screenSuspects(fg, susp, ...)
     }
@@ -92,7 +92,7 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
-    doScreen <- function(...) screenSuspects(..., adduct = "[M+H]+")
+    doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")

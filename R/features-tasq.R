@@ -1,4 +1,22 @@
 #' @include features.R
+NULL
+
+# NOTE: first column is ID and unnamed (V1)
+TASQImportCols <- function() c("V1", "Data Set", "Analyte Name", "RT [min]", "m/z meas.", "Height of PI", "Area of PI",
+                               "FWHM [s]")
+
+loadTASQFile <- function(path, analysisInfo)
+{
+    # NOTE: first line is empty
+    
+    tExport <- fread(path, select = TASQImportCols())
+    setnames(tExport, c("ID", "analysis", "group", "ret", "mz", "intensity", "area", "FWHM"))
+    
+    tExport <- tExport[!is.na(ret) & analysis %in% analysisInfo$analysis] # skip empty/other results
+    tExport[, ret := ret * 60] # min --> s
+    
+    return(tExport)
+}
 
 #' @rdname suspect-screening
 featuresBrukerTASQ <- setClass("featuresBrukerTASQ", contains = "features")
@@ -12,13 +30,7 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
 {
     cat("Importing features from TASQ...")
 
-    selCols <- c("Row", "Data Set", "RT [min]", "m/z meas.", "Height", "Area", "FWHM [s]")
-    tExport <- fread(TASQExportFile, select = selCols)
-    setnames(tExport, selCols, c("ID", "analysis", "ret", "mz", "intensity", "area", "FWHM"))
-
-    tExport <- tExport[!is.na(ret)] # skip empty results
-    tExport[, ret := ret * 60] # min --> s
-
+    tExport <- loadTASQFile(TASQExportFile, analysisInfo)
     tAnalyses <- unique(tExport$analysis)
     tAnalyses <- tAnalyses[tAnalyses %in% analysisInfo$analysis]
     analysisInfo <- analysisInfo[analysisInfo$analysis %in% tAnalyses, ]

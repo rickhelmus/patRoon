@@ -44,10 +44,8 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 12)
 {
-    selCols <- c("Row", "Data Set", "Analyte", "RT [min]", "m/z meas.", "Height")
-
     ac <- checkmate::makeAssertCollection()
-    assertCSVFile(path, selCols, add = ac)
+    assertCSVFile(path, TASQImportCols(), add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::assertNumber(clusterRTWindow, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -56,12 +54,8 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
     fTable <- featureTable(fts)
     analysisInfo <- fts@analysisInfo # may have been updated
     
-    tExport <- fread(path, select = selCols)
-    tExport <- tExport[!is.na(`RT [min]`) & `Data Set` %in% analysisInfo$analysis] # skip empty/other results
-    setnames(tExport, selCols, c("ID", "analysis", "group", "rts", "mzs", "intensity"))
+    tExport <- loadTASQFile(path, analysisInfo)
 
-    tExport[, rts := rts * 60] # min --> s
-    
     # If no retention times were specified in TASQ for a suspect then we cannot
     # assume that suspect hits across analyses are from the same peak. Hence, to
     # group the suspects across analyses, we need to
@@ -70,7 +64,7 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
     # --> perform HCA for each suspect to group them by close retention time and then re-assign names based on cluster number
     
     tExport[, cl := {
-        distm <- dist(rts)
+        distm <- dist(ret)
         hc <- fastcluster::hclust(distm)
         cutree(hc, h = clusterRTWindow)
     }, by = "group"]
@@ -78,7 +72,7 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
     tExport[cl > 1, group := paste0(group, "-", cl)]
 
     # calculate group averages
-    gInfoDT <- tExport[, .(rts = mean(rts), mzs = mean(mzs)), by = "group"]
+    gInfoDT <- tExport[, .(rts = mean(ret), mzs = mean(mz)), by = "group"]
     
     gInfo <- as.data.frame(gInfoDT[, c("rts", "mzs")])
     rownames(gInfo) <- gInfoDT$group

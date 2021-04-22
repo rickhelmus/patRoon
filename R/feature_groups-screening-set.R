@@ -204,23 +204,39 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     
     # add non set specific ranks
     allRankCols <- getAllSuspSetCols(c("formRank", "compRank"), names(screenInfo(fGroups)), sets(fGroups))
-    if (any(grepl("^formRank", allRankCols)))
+    
+    rankCols <- grep("^formRank", allRankCols, value = TRUE)
+    if (length(rankCols) > 0)
     {
-        fGroups@screenInfo[!is.na(formula) & group %in% groupNames(formulas), formRank := mapply(group, formula, FUN = function(g, f)
-        {
-            unFTable <- unique(formulas[[g]], by = "neutral_formula")
-            r <- which(f == unFTable$neutral_formula)
-            return(if (length(r) > 0) r[1] else NA_integer_)
-        })][]
+        fGroups@screenInfo[, formRank := {
+            if (is.na(formula) || !group %in% groupNames(formulas) || all(is.na(unlist(mget(rankCols)))))
+                NA_integer_
+            else
+            {
+                r <- which(formula == formulas[[group]]$neutral_formula)
+                if (length(r) > 0)
+                    r[1]
+                else
+                    NA_integer_
+            }
+        }, by = seq_len(nrow(fGroups@screenInfo))][]
     }
 
-    if (any(grepl("^compRank", allRankCols)))
+    rankCols <- grep("^compRank", allRankCols, value = TRUE)
+    if (length(rankCols) > 0)
     {
-        fGroups@screenInfo[!is.na(InChIKey) & group %in% groupNames(compounds), compRank := mapply(group, InChIKey, FUN = function(g, ik)
-        {
-            r <- which(getIKBlock1(ik) == compounds[[g]]$InChIKey1)
-            return(if (length(r) > 0) r[1] else NA_integer_)
-        })][]
+        fGroups@screenInfo[, compRank := {
+            if (is.na(InChIKey) || !group %in% groupNames(compounds) || all(is.na(unlist(mget(rankCols)))))
+                NA_integer_
+            else
+            {
+                r <- which(getIKBlock1(InChIKey) == compounds[[group]]$InChIKey1)
+                if (length(r) > 0)
+                    r[1]
+                else
+                    NA_integer_
+            }
+        }, by = seq_len(nrow(fGroups@screenInfo))][]
     }
 
     return(fGroups)

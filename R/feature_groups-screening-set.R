@@ -112,7 +112,7 @@ syncScreeningSetObjects <- function(obj)
     for (col in c("formRank", "compRank"))
     {
         if (!is.null(oldsi[[col]]))
-            newsi[, (col) := oldsi[group %in% newsi$group][[col]]]
+            newsi[oldsi, (col) := get(paste0("i.", col)), on = c("group", "name")]
     }
 
     obj@screenInfo <- newsi[]

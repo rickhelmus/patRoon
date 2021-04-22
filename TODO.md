@@ -365,6 +365,7 @@
     - susp_ prefix in as.data.table
     - suspFormRank/suspCompRank --> formRank/compRank
     - Updated TASQ support
+    - numericIDLevel: handle NAs
 - components
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency

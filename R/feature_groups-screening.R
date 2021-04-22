@@ -699,8 +699,11 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 #' @export
 numericIDLevel <- function(level)
 {
-    checkmate::assertCharacter(level, any.missing = FALSE, min.chars = 1)
-    return(as.integer(gsub("[[:alpha:]]*", "", level)))
+    checkmate::assertCharacter(level, any.missing = TRUE, min.chars = 1)
+    ret <- integer(length(level))
+    ret[is.na(level)] <- NA_integer_
+    ret[!is.na(level)] <- as.integer(gsub("[[:alpha:]]*", "", level[!is.na(level)]))
+    return(ret)
 }
 
 #' @details \code{genIDLevelRulesFile} Generates a template YAML file that is

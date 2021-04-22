@@ -493,7 +493,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         
         for (s in sets(fGroupsTPs))
         {
-            if (!is.null(unsetMSPeakLists))
+            if (!is.null(unsetMSPeakLists[[s]]))
             {
                 # calculate per set spectrum similarities
                 simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
@@ -508,7 +508,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 else
                     cmp[, (simColNames) := NA_real_]
                 
-                if (!is.null(unsetFormulas) || !is.null(unsetCompounds))
+                if (!is.null(unsetFormulas[[s]]) || !is.null(unsetCompounds[[s]]))
                 {
                     # calculate per set spectrum similarities
                     sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],

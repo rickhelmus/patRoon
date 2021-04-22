@@ -11,7 +11,7 @@ makeSetAlgorithm <- function(setObjects)
 checkAndUnSetOther <- function(targetSets, obj, objName, handleNULL = FALSE)
 {
     if (handleNULL && is.null(obj))
-        return(NULL)
+        return(setNames(as.list(rep(list(NULL), length(targetSets))), targetSets))
     
     missingSets <- setdiff(targetSets, sets(obj))
     if (length(missingSets) > 0)

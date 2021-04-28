@@ -223,6 +223,7 @@
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
     - form/compRanks: not updated when subsetting on sets
+    - logPath for annotateSuspects()
 - annotation
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
@@ -366,6 +367,7 @@
     - suspFormRank/suspCompRank --> formRank/compRank
     - Updated TASQ support
     - numericIDLevel: handle NAs
+    - logPath for annotateSuspects()
 - components
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency

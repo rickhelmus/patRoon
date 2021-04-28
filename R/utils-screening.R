@@ -275,7 +275,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
                                         maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formScoreRanges,
                                         formulasNormalizeScores, compTable, compRank, mCompNames, compScoreRanges,
-                                        compoundsNormalizeScores, absMzDev, IDLevelRules)
+                                        compoundsNormalizeScores, absMzDev, IDLevelRules, logPath)
 {
     formScores <- formScoreNames(FALSE); formNormScores <- formScoreNames(TRUE)
     compScores <- compScoreNames(FALSE); compNormScores <- compScoreNames(TRUE)
@@ -361,21 +361,26 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
         return(TRUE)            
     }
 
-    logDir <- R.utils::getAbsolutePath(file.path("log", "ident")) # take absolute path for length calculation below
-    logFile <- paste0(suspectName, "-", suspectFGroup, ".txt")
-    
-    # check if path would be too long for e.g Windows systems, which may happen with very long suspect names
-    pathLen <- nchar(logDir) + nchar(logFile) + 1 # +1: path separator
-    if (pathLen > 255)
+    if (!is.null(logPath))
     {
-        # truncate end part of suspect name
-        logFile <- paste0(substr(suspectName, 1, nchar(suspectName) - (pathLen - 255)), "-", suspectFGroup, ".txt")
+        logDir <- R.utils::getAbsolutePath(logPath) # take absolute path for length calculation below
+        logFile <- paste0(suspectName, "-", suspectFGroup, ".txt")
+        
+        # check if path would be too long for e.g Windows systems, which may happen with very long suspect names
+        pathLen <- nchar(logDir) + nchar(logFile) + 1 # +1: path separator
+        if (pathLen > 255)
+        {
+            # truncate end part of suspect name
+            logFile <- paste0(substr(suspectName, 1, nchar(suspectName) - (pathLen - 255)), "-", suspectFGroup, ".txt")
+        }
+        logOut <- file.path(logDir, logFile)
+        
+        mkdirp(dirname(logOut))
+        logFile <- withr::local_connection(file(logOut, "w"))
+        doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)
     }
-    logOut <- file.path(logDir, logFile)
-    
-    mkdirp(dirname(logOut))
-    logFile <- withr::local_connection(file(logOut, "w"))
-    doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)
+    else
+        doLog <- function(...) NULL
     
     formCompScores <- intersect(formScores, compScores)
     allScores <- union(formScores, compScores)

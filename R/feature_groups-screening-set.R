@@ -128,6 +128,8 @@ setMethod("initialize", "featureGroupsScreeningSet",
 
 setMethod("screenInfo", "featureGroupsScreeningSet", function(obj) obj@screenInfo)
 
+setMethod("mergedConsensusNames", "featureGroupsScreeningSet", function(obj) sets(obj))
+
 #' @export
 setMethod("show", "featureGroupsScreeningSet", function(object)
 {
@@ -203,7 +205,7 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     fGroups <- syncScreeningSetObjects(fGroups)
     
     # add non set specific ranks
-    allRankCols <- getAllSuspSetCols(c("formRank", "compRank"), names(screenInfo(fGroups)), sets(fGroups))
+    allRankCols <- getAllSuspCols(c("formRank", "compRank"), names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
     
     rankCols <- grep("^formRank", allRankCols, value = TRUE)
     if (length(rankCols) > 0)

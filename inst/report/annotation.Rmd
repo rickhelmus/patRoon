@@ -73,10 +73,7 @@ if (isSusp)
     keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz")
 
     clR2 <- c("susp_d_rt", "susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel")
-    if (isSet)
-        clR2 <- getAllSuspSetCols(clR2, names(fGroupsSpecDT), sets(rmdVars$fGroups))
-    else
-        clR2 <- intersect(clR2, names(fGroupsSpecDT))
+    clR2 <- getAllSuspCols(clR2, names(fGroupsSpecDT), mergedConsensusNames(rmdVars$fGroups))
     
     if (length(clR2) > 0)
         fGroupsSpecDT[, (clR2) := lapply(mget(clR2), round, 2)]
@@ -110,11 +107,11 @@ if (isSusp)
     fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_maxFrags", "susp_maxFragMatches", "susp_maxFragMatchesRel"),
                                c("suspect", "max matches", "max matches rel"), "fragments")
     
+    keepSuspCols <- c(keepSuspCols, getAllSuspCols("susp_estIDLevel", names(fGroupsSpecDT),
+                                                   mergedConsensusNames(rmdVars$fGroups)))
+    
     if (isSet)
-        keepSuspCols <- c(keepSuspCols, "susp_sets", getAllSuspSetCols("susp_estIDLevel", names(fGroupsSpecDT),
-                                                                       sets(rmdVars$fGroups)))
-    else
-        keepSuspCols <- c(keepSuspCols, "susp_estIDLevel")
+        keepSuspCols <- c(keepSuspCols, "susp_sets")
 } else
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
 

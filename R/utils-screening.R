@@ -244,6 +244,106 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     return(ret[])
 }
 
+doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
+                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
+{
+    if (nrow(screenInfo(obj)) > 0)
+    {
+        colFilter <- function(pred, what, col)
+        {
+            val <- get(what)
+            if (!is.null(val))
+            {
+                allCols <- getAllSuspCols(col, names(screenInfo(obj)), mergedConsensusNames(obj))
+                if (length(allCols) == 0)
+                    warning(sprintf("Cannot apply %s filter: no annotation data available (did you run annotateSuspects()?).", what))
+                else
+                {
+                    if (negate)
+                        doPred <- function(x, v) is.na(x) | !nzchar(x) | !pred(x, v)
+                    else
+                        doPred <- function(x, v) !is.na(x) & nzchar(x) & pred(x, v)
+                    
+                    # ensure at least one column follows predicate
+                    obj@screenInfo <- screenInfo(obj)[rowSums(sapply(mget(allCols), doPred, val)) >= 1]
+                }
+            }
+            return(obj)
+        }
+        minPred <- function(x, v) x >= v
+        maxPred <- function(x, v) x <= v
+        levPred <- function(x, v) maxPred(numericIDLevel(x), v)
+        
+        obj <- colFilter(levPred, "maxLevel", "estIDLevel")
+        obj <- colFilter(maxPred, "maxFormRank", "formRank")
+        obj <- colFilter(maxPred, "maxCompRank", "compRank")
+        obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
+        obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
+        obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")
+        obj <- colFilter(minPred, "absMinFragMatches", "maxFragMatches")
+        obj <- colFilter(minPred, "relMinFragMatches", "maxFragMatchesRel")
+        
+        # do here so that only duplicates not yet filtered out in previous steps are considered
+        # NOTE for sets: for ID levels only the regular (non-set) estIDLevel column is used
+        if (!is.null(selectHitsBy) || selectBestFGroups)
+        {
+            doKeep <- function(v, d) is.na(v) | length(v) == 1 | seq_along(v) == order(v, decreasing = d)[1]
+            doSelectFilter <- function(si, by, byCol)
+            {
+                if (by == "level" && is.null(si[["estIDLevel"]]))
+                    warning("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?).")
+                else
+                {
+                    gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
+                    # equalize names with screenInfo
+                    if (!is.null(gTab[["adduct"]]))
+                    {
+                        # may be there if adduct annotations are available, remove to not interfere with susp_adduct
+                        gTab[, adduct := NULL]
+                    }
+                    suspnames <- grep("^susp_", names(gTab), value = TRUE)
+                    setnames(gTab, suspnames, sub("^susp_", "", suspnames))
+                    
+                    if (by == "intensity")
+                    {
+                        gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
+                        gTab <- gTab[, keep := doKeep(avgInts, !negate), by = byCol]
+                    }
+                    else # select by best hit
+                        gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = byCol]
+                    
+                    if (any(!gTab$keep))
+                    {
+                        # merge-in keep column so we can subset screenInfo
+                        si <- copy(si)
+                        si[gTab, keep := i.keep, on = c("group", "name")]
+                        setorderv(si, "name")
+                        obj@screenInfo <- si[keep == TRUE, -"keep"]
+                    }
+                }
+                return(obj@screenInfo)
+            }
+            
+            if (!is.null(selectHitsBy))
+                obj@screenInfo <- doSelectFilter(obj@screenInfo, selectHitsBy, "name")
+            if (selectBestFGroups)
+                obj@screenInfo <- doSelectFilter(obj@screenInfo, "level", "group")
+        }
+    }
+    
+    # NOTE: do last in case previous steps removed hits 
+    if (!is.null(onlyHits))
+    {
+        sGroups <- unique(screenInfo(obj)$group)
+        if (negate && onlyHits)
+            obj <- obj[, setdiff(names(obj), sGroups)]
+        else
+            obj <- obj[, sGroups]
+    }
+    
+    return(obj)
+}
+
 annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 {
     if (is.null(annPL[["ion_formula"]]))

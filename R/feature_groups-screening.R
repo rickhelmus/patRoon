@@ -270,7 +270,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
                                                                  IDFile = system.file("misc", "IDLevelRules.yml",
-                                                                                      package = "patRoon"))
+                                                                                      package = "patRoon"),
+                                                                 logPath = file.path("log", "ident"))
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
@@ -282,6 +283,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
     checkmate::assertFileExists(IDFile, "r", add = ac)
+    if (!is.null(logPath))
+        assertCanCreateDir(logPath, add = ac)
     checkmate::reportAssertions(ac)
 
     hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
@@ -398,7 +401,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   mFormNames = if (!is.null(formulas)) mergedConsensusNames(formulas) else character(),
                                                   fScRanges, formulasNormalizeScores, cTable, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
-                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
+                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules, logPath)
         
         set(si, i,
             c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",

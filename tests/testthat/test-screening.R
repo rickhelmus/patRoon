@@ -110,15 +110,9 @@ if (hasMF)
                                   compounds = compsMF, IDFile = idlFrag)
 }
 
-if (testWithSets())
+getAllSuspVals <- function(ann, col)
 {
-    getAllSuspVals <- function(ann, col)
-    {
-        unlist(screenInfo(ann)[, getAllSuspSetCols(col, names(screenInfo(ann)), sets(ann)), with = FALSE])
-    }
-} else
-{
-    getAllSuspVals <- function(ann, col) screenInfo(ann)[[col]]
+    unlist(screenInfo(ann)[, getAllSuspCols(col, names(screenInfo(ann)), mergedConsensusNames(ann)), with = FALSE])
 }
 
 minIDLevel <- function(ann) min(numericIDLevel(getAllSuspVals(ann, "estIDLevel")), na.rm = TRUE)
@@ -204,13 +198,13 @@ test_that("Negated screen filters", {
     # for now just verify that all groups are unique
     expect_equal(anyDuplicated(screenInfo(selectedNegFGroupsLev)$group), 0)
     
-    expect_length(selectedNegHitsInt, length(selectedHitsInt))
-    expect_length(selectedNegHitsLev, length(selectedHitsLev))
+    expect_setequal(screenInfo(selectedNegHitsInt)$name, screenInfo(selectedHitsInt)$name)
+    expect_setequal(screenInfo(selectedNegHitsLev)$name, screenInfo(selectedHitsLev)$name)
     expect_equal(nrow(screenInfo(selectedNegFGroupsLev)), nrow(screenInfo(selectedFGroupsLev)))
     
     expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
     expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE), "formRank"), 3)
-    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 2, negate = TRUE), "compRank"), 2)
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 1, negate = TRUE), "compRank"), 1)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)
@@ -244,8 +238,7 @@ test_that("Empty objects", {
 })
 
 csvSuspCols <- c("susp_name", "susp_compRank", "susp_annSimBoth", "susp_estIDLevel")
-if (testWithSets())
-    csvSuspCols <- getAllSuspSetCols(csvSuspCols, names(screenInfo(fGroupsAnnNoRT)), sets(fGroupsAnnNoRT))
+csvSuspCols <- getAllSuspCols(csvSuspCols, names(screenInfo(fGroupsAnnNoRT)), mergedConsensusNames(fGroupsAnnNoRT))
 
 test_that("reporting works", {
     skip_if_not(hasMF)

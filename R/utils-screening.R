@@ -4,9 +4,9 @@ NULL
 
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 
-getAllSuspSetCols <- function(targetCols, allCols, sets)
+getAllSuspCols <- function(targetCols, allCols, mConsNames)
 {
-    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", sets),
+    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames),
                                        USE.NAMES = FALSE))
     return(intersect(targetCols, allCols))
 }

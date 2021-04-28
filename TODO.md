@@ -271,6 +271,9 @@
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
         - @export multi methods?
         - algo consensus: done on setObjects
+    - suspects
+        - different rank columns
+        - estIDLevel: best case, sublevels stripped if not the same
 - components
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max

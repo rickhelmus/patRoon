@@ -107,9 +107,9 @@ syncScreeningSetObjects <- function(obj)
     obj@setObjects <- lapply(obj@setObjects, function(x) x[analyses(obj), groupNames(obj)])
     newsi <- mergeScreeningSetInfos(obj@setObjects)
 
-    # retain form/comp ranks    
+    # retain sets form/comp ranks and estIDLevel    
     oldsi <- screenInfo(obj)
-    for (col in c("formRank", "compRank"))
+    for (col in c("formRank", "compRank", "estIDLevel"))
     {
         if (!is.null(oldsi[[col]]))
             newsi[oldsi, (col) := get(paste0("i.", col)), on = c("group", "name")]
@@ -197,21 +197,20 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
                               f = annotateSuspects, MoreArgs = list(...))
     
-    # clear old rank cols if present
-    rankCols <- c("formRank", "compRank")
-    if (any(rankCols %in% names(screenInfo(fGroups))))
-        fGroups@screenInfo[, intersect(rankCols, names(screenInfo(fGroups))) := NULL]
+    # clear old set cols if present
+    cols <- c("formRank", "compRank", "estIDLevel")
+    if (any(cols %in% names(screenInfo(fGroups))))
+        fGroups@screenInfo[, intersect(cols, names(screenInfo(fGroups))) := NULL]
     
     fGroups <- syncScreeningSetObjects(fGroups)
     
-    # add non set specific ranks
-    allRankCols <- getAllSuspCols(c("formRank", "compRank"), names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
-    
-    rankCols <- grep("^formRank", allRankCols, value = TRUE)
-    if (length(rankCols) > 0)
+    # add non set specific columns
+
+    cols <- getAllSuspCols("formRank", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
+    if (length(cols) > 0)
     {
         fGroups@screenInfo[, formRank := {
-            if (is.na(formula) || !group %in% groupNames(formulas) || all(is.na(unlist(mget(rankCols)))))
+            if (is.na(formula) || !group %in% groupNames(formulas) || all(is.na(unlist(mget(cols)))))
                 NA_integer_
             else
             {
@@ -224,11 +223,11 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
         }, by = seq_len(nrow(fGroups@screenInfo))][]
     }
 
-    rankCols <- grep("^compRank", allRankCols, value = TRUE)
-    if (length(rankCols) > 0)
+    cols <- getAllSuspCols("compRank", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
+    if (length(cols) > 0)
     {
         fGroups@screenInfo[, compRank := {
-            if (is.na(InChIKey) || !group %in% groupNames(compounds) || all(is.na(unlist(mget(rankCols)))))
+            if (is.na(InChIKey) || !group %in% groupNames(compounds) || all(is.na(unlist(mget(cols)))))
                 NA_integer_
             else
             {
@@ -237,6 +236,27 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
                     r[1]
                 else
                     NA_integer_
+            }
+        }, by = seq_len(nrow(fGroups@screenInfo))][]
+    }
+    
+    # add best ID Levels
+    cols <- getAllSuspCols("estIDLevel", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
+    if (length(cols) > 0)
+    {
+        fGroups@screenInfo[, estIDLevel := {
+            allIDs <- unlist(mget(cols))
+            allIDs <- allIDs[!is.na(allIDs)]
+            if (length(allIDs) == 0)
+                NA_character_
+            else
+            {
+                numIDs <- numericIDLevel(allIDs)
+                whMin <- which(numIDs == min(numIDs))
+                if (!allSame(allIDs[whMin]))
+                    as.character(numIDs[whMin[1]]) # strip sublevel if not all the same
+                else
+                    allIDs[whMin[1]]
             }
         }, by = seq_len(nrow(fGroups@screenInfo))][]
     }

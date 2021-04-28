@@ -165,8 +165,10 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
 #' @export
 setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, ...)
 {
+    oldn <- length(obj)
     obj <- callNextMethod()
-    obj <- syncScreeningSetObjects(obj)
+    if (length(obj) != oldn)
+        obj <- syncScreeningSetObjects(obj)
     return(obj)
 })
 
@@ -200,7 +202,10 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     # clear old set cols if present
     cols <- c("formRank", "compRank", "estIDLevel")
     if (any(cols %in% names(screenInfo(fGroups))))
+    {
+        fGroups@screenInfo <- copy(fGroups@screenInfo)
         fGroups@screenInfo[, intersect(cols, names(screenInfo(fGroups))) := NULL]
+    }
     
     fGroups <- syncScreeningSetObjects(fGroups)
     
@@ -280,7 +285,9 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     checkmate::reportAssertions(ac)
     
     oldsi <- screenInfo(obj)
-    obj <- doSuspectFilter(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
+    # NOTE: we do onlyHits later, as otherwise doSuspectFilter() might cause set synchronization (via delete()) whereas
+    # the setObjects are not updated yet
+    obj <- doSuspectFilter(obj, onlyHits = NULL, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
     newsi <- screenInfo(obj)
     suspFiltered <- !isTRUE(all.equal(oldsi, screenInfo(obj)))
@@ -298,13 +305,18 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
         })
     }
     
+    if (!is.null(onlyHits))
+        obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy = NULL, selectBestFGroups = FALSE, maxLevel = NULL,
+                               maxFormRank = NULL, maxCompRank = NULL, minAnnSimForm = NULL, minAnnSimComp = NULL,
+                               minAnnSimBoth = NULL, absMinFragMatches = NULL, relMinFragMatches = NULL,
+                               negate = negate)
+    
     # filter functionality from fGroupsSet
     if (...length() > 0)
         obj <- callNextMethod(obj, ..., negate = negate)
     
-    if (...length() > 0 || suspFiltered)
-    obj <- syncScreeningSetObjects(obj)
-    
+    if (...length() > 0 || suspFiltered || !is.null(onlyHits))
+        obj <- syncScreeningSetObjects(obj)
 
     return(obj)
 })

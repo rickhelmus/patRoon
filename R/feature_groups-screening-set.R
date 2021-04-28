@@ -249,11 +249,6 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
                                                           absMinFragMatches = NULL, relMinFragMatches = NULL,
                                                           negate = FALSE)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, TRUE, add = ac)
-    checkmate::reportAssertions(ac)
-    
     # filter functionality from fGroupsSet
     if (...length() > 0)
     {

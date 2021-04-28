@@ -271,23 +271,41 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
                                                           absMinFragMatches = NULL, relMinFragMatches = NULL,
                                                           negate = FALSE)
 {
-    # filter functionality from fGroupsSet
-    if (...length() > 0)
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
+    checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    oldsi <- screenInfo(obj)
+    obj <- doSuspectFilter(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
+                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
+    newsi <- screenInfo(obj)
+    suspFiltered <- !isTRUE(all.equal(oldsi, screenInfo(obj)))
+    
+    if (suspFiltered)
     {
-        obj <- callNextMethod(obj, ..., negate = negate)
-        obj <- syncScreeningSetObjects(obj)
+        # update setObjects
+        obj@setObjects <- lapply(obj@setObjects, function(so)
+        {
+            sosi <- copy(screenInfo(so))
+            sosi[, keep := FALSE]
+            sosi[newsi, keep := TRUE, on = c("group", "name")] # mark overlap
+            so@screenInfo <- sosi[keep == TRUE, -"keep"]
+            return(so)
+        })
     }
     
-    # filter functionality from screening (no need to pass ...)
-    obj@setObjects <- lapply(obj@setObjects, filter, onlyHits = onlyHits, selectHitsBy = selectHitsBy,
-                             selectBestFGroups = selectBestFGroups, maxLevel = maxLevel, maxFormRank = maxFormRank,
-                             maxCompRank = maxCompRank, minAnnSimForm = minAnnSimForm, minAnnSimComp = minAnnSimComp,
-                             minAnnSimBoth = minAnnSimBoth, absMinFragMatches = absMinFragMatches,
-                             relMinFragMatches = relMinFragMatches, negate = negate)
-    # --> groups may have been removed
-    obj <- obj[, unique(unlist(sapply(obj@setObjects, groupNames)))]
+    # filter functionality from fGroupsSet
+    if (...length() > 0)
+        obj <- callNextMethod(obj, ..., negate = negate)
+    
+    if (...length() > 0 || suspFiltered)
     obj <- syncScreeningSetObjects(obj)
     
+
     return(obj)
 })
 

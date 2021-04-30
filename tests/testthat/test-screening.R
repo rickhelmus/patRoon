@@ -39,8 +39,8 @@ test_that("suspect screening is OK", {
     
     # valid suspect names
     withr::with_options(list(patRoon.cache.mode = "none"), {
-        expect_warning(doScreen(fGroups, data.table(name = "test.", SMILES = "C1=CC=C(C=C1)C(=O)O")))
-        expect_error(doScreen(fGroups, data.table(name = "", SMILES = "C1=CC=C(C=C1)C(=O)O")))
+        expect_warning(doScreen(fGroups, data.table(name = "test.", SMILES = "C1=CC=C(C=C1)C(=O)O", mz = 100)))
+        expect_error(doScreen(fGroups, data.table(name = "", SMILES = "C1=CC=C(C=C1)C(=O)O", mz = 100)))
     })
     
     # alternative ion mass calculations
@@ -214,7 +214,7 @@ test_that("Negated screen filters", {
 })
 
 fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9), "openms")
-suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C")
+suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C", mz = 12)
 fGroupsScrEmpty <- doScreen(fGroups, suspsEmpty)
 
 if (hasMF)

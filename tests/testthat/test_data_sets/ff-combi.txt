@@ -1,1 +1,1 @@
-Done! Filtered 11401 (33.57%) features. Remaining: 22558
+Done! Filtered 833 (19.38%) features. Remaining: 3466

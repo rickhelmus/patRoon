@@ -573,11 +573,12 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
                                                       adduct, skipInvalid, onlyHits)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
-    
-    isAnnotated <- nrow(annotations(fGroups)) > 0
+
+    # NOTE: skip adduct check if fGroups is empty    
+    needsAdduct <- is.null(adduct) && nrow(annotations(fGroups)) == 0 && length(fGroups) > 0
     
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, is.null(adduct) && !isAnnotated, skipInvalid, add = ac)
+    assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)

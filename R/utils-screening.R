@@ -167,79 +167,95 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
     
+    # NOTE: rt is always included
+    metaDataCols <- c("name", "name_orig", "rt",
+                      intersect(c("mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
+                                  "fragments_mz", "fragments_formula"), names(suspects)))
+    
+    emptyResult <- function()
+    {
+        ret <- data.table()
+        for (col in c(metaDataCols, "group", "d_rt", "d_mz"))
+        {
+            if (col %in% c("rt", "mz", "neutralMass", "d_rt", "d_mz"))
+                ret[, (col) := numeric()]
+            else
+                ret[, (col) := character()]
+        }
+        return(ret)
+    }
+    
     setMetaData <- function(t, suspRow)
     {
-        for (col in c("name", "name_orig", "rt", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
-                      "fragments_mz", "fragments_formula"))
+        for (col in metaDataCols)
         {
-            if (!is.null(suspects[[col]]))
-                set(t, 1L, col, suspRow[[col]])
-            else if (col == "rt")
+            if (col == "rt" && is.null(suspects[["rt"]]))
                 set(t, 1L, col, NA_real_) # exception: always want this column
+            else
+                set(t, 1L, col, suspRow[[col]])
         }
         return(t)
     }        
     
-    prog <- openProgBar(0, nrow(suspects))
-    
-    retlist <- lapply(seq_len(nrow(suspects)), function(ti)
+    if (length(fGroups) > 0)
     {
-        hasRT <- !is.null(suspects[["rt"]]) && !is.na(suspects$rt[ti])
+        prog <- openProgBar(0, nrow(suspects))
         
-        gi <- gInfo
-        
-        # only consider nearby eluting fGroups if RTs are available
-        if (hasRT)
-            gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow), ]
-        
-        # match by mz, this is either done by...
-        #   - fGroup ionized mass and 'mz' column from suspect data if the latter is available
-        #   - fGroup ionized mass and calculated suspect ionized mass, only if adducts were specified
-        #     (mandatory if no adduct annotations available). Note that ionized masses are already calculated by
-        #     prepareSuspectList() and stored in the mz column.
-        #   - Neutralized fGroup/suspect mass (only if adduct annotations are available, this case mz column is NA)
-        
-        if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
+        retlist <- lapply(seq_len(nrow(suspects)), function(ti)
         {
-            at <- annTbl[group %in% rownames(gi) & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
-            gi <- gi[at$group, ]
-        }
-        else
-            gi <- gi[numLTE(abs(gi$mzs - suspects$mz[ti]), mzWindow), ]
+            hasRT <- !is.null(suspects[["rt"]]) && !is.na(suspects$rt[ti])
+            
+            gi <- gInfo
+            
+            # only consider nearby eluting fGroups if RTs are available
+            if (hasRT)
+                gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow), ]
+            
+            # match by mz, this is either done by...
+            #   - fGroup ionized mass and 'mz' column from suspect data if the latter is available
+            #   - fGroup ionized mass and calculated suspect ionized mass, only if adducts were specified
+            #     (mandatory if no adduct annotations available). Note that ionized masses are already calculated by
+            #     prepareSuspectList() and stored in the mz column.
+            #   - Neutralized fGroup/suspect mass (only if adduct annotations are available, this case mz column is NA)
+            
+            if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
+            {
+                at <- annTbl[group %in% rownames(gi) & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
+                gi <- gi[at$group, ]
+            }
+            else
+                gi <- gi[numLTE(abs(gi$mzs - suspects$mz[ti]), mzWindow), ]
+            
+            if (nrow(gi) == 0)
+                hits <- emptyResult() # no hits
+            else
+            {
+                hits <- rbindlist(lapply(rownames(gi), function(g)
+                {
+                    ret <- data.table()
+                    setMetaData(ret, suspects[ti])
+                    ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA_real_,
+                                                          ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
+                                                                 gi[g, "mzs"] - mz))]
+                    return(ret)
+                }), fill = TRUE)
+            }
+            
+            setTxtProgressBar(prog, ti)
+            return(hits)
+        })
+        ret <- rbindlist(retlist, fill = TRUE)
+        setcolorder(ret, "name")
         
-        if (nrow(gi) == 0) # no results? --> add NA result
-        {
-            ret <- data.table()
-            setMetaData(ret, suspects[ti])
-            ret[, c("group", "d_rt", "d_mz") := list(NA_character_, NA_real_, NA_real_)]
-            return(ret)
-        }
-        
-        hits <- rbindlist(lapply(rownames(gi), function(g)
-        {
-            ret <- data.table()
-            setMetaData(ret, suspects[ti])
-            ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA_real_,
-                                                  ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
-                                                         gi[g, "mzs"] - mz))]
-            return(ret)
-        }), fill = TRUE)
-        
-        setTxtProgressBar(prog, ti)
-        return(hits)
-    })
-    ret <- rbindlist(retlist, fill = TRUE)
-    
-    setcolorder(ret, "name")
-    
-    setTxtProgressBar(prog, nrow(suspects))
-    close(prog)
+        setTxtProgressBar(prog, nrow(suspects))
+        close(prog)
+    }
+    else
+        ret <- emptyResult()
     
     suspectsn <- nrow(suspects)
-    foundn <- suspectsn - sum(is.na(ret$group))
+    foundn <- nrow(ret)
     printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
-    
-    ret <- ret[!is.na(group), ]
     
     return(ret[])
 }

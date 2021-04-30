@@ -39,16 +39,16 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                   all = TRUE)
         })
         
-        if (nrow(scrInfo) > 0)
+        for (col in unCols)
         {
-            for (col in unCols)
+            allCols <- getAllCols(col)
+            if (length(allCols) > 0)
             {
-                allCols <- getAllCols(col)
-                if (length(allCols) > 0)
-                {
-                    # take first non NA value
-                    scrInfo[, (col) := {
-                        ret <- .SD[[1]] # set to first by default: in case all are NA and to ensure correct type
+                # take first non NA value
+                scrInfo[, (col) := {
+                    ret <- .SD[[1]] # set to first by default: in case all are NA and to ensure correct type
+                    if (nrow(scrInfo) > 0)
+                    {    
                         for (v in .SD)
                         {
                             if (!is.na(v))
@@ -57,10 +57,10 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                                 break
                             }
                         }
-                        ret
-                    }, by = seq_len(nrow(scrInfo)), .SDcols = allCols]
-                    scrInfo[, (allCols) := NULL]
-                }
+                    }
+                    ret
+                }, by = seq_len(nrow(scrInfo)), .SDcols = allCols]
+                scrInfo[, (allCols) := NULL]
             }
         }
         

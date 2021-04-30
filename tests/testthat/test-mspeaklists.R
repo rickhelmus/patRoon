@@ -51,28 +51,37 @@ checkIntLimit <- function(plists, relative, doMin, doMSMS, plistsOrig = NULL)
 
     intPLLimit <- function(pl, plorig = NULL)
     {
+        spec <- specorig <- NULL
         if (!doMSMS && !is.null(pl[["MS"]]))
         {
-            ints <- pl[["MS"]]$intensity
+            spec <- pl[["MS"]]
             if (!is.null(plorig))
-                intsorig <- plorig[["MS"]]$intensity
+                specorig <- plorig[["MS"]]
         }
         else if (doMSMS && !is.null(pl$MSMS))
         {
-            ints <- pl[["MSMS"]]$intensity
+            spec <- pl[["MSMS"]]
             if (!is.null(plorig))
-                intsorig <- plorig[["MSMS"]]$intensity
+                specorig <- plorig[["MSMS"]]
         }
         else
             return(NA)
 
-        if (length(ints) == 0)
+        if (is.null(spec) || nrow(spec) == 0)
             return(NA)
 
-        ret <- lim(ints)
+        ret <- lim(spec$intensity)
         if (relative)
-            ret <- ret / max(intsorig)
-
+        {
+            if (!is.null(spec[["set"]]))
+            {
+                spec <- copy(spec)
+                spec[, intrel := intensity / max(specorig[set == .BY]$intensity), by = "set"]
+                ret <- lim(spec$intrel)
+            }
+            else
+                ret <- ret / max(specorig$intensity)
+        }
         return(ret)
     }
 
@@ -105,6 +114,8 @@ checkPeaksLimit <- function(plists, doMin, doMSMS)
     }), na.rm = TRUE)), na.rm = TRUE))
 }
 
+isoTestBy <- if (testWithSets()) c("group", "set") else "group"
+
 test_that("filtering", {
     expect_gte(checkIntLimit(filter(plists, absMSIntThr = 2500), FALSE, TRUE, FALSE), 2500)
     expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 2500), FALSE, TRUE, TRUE), 2500)
@@ -130,10 +141,10 @@ test_that("filtering", {
 
     # isotopes for MS peak lists should not exceed M+5 (default)
     expect_lte(max(as.data.table(filter(
-        plists, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = "group"][[2]]), 5)
+        plists, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 5)
     # half with z=2
     expect_lte(max(as.data.table(filter(
-        plists, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = "group"][[2]]), 2.5)
+        plists, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 2.5)
 
     # UNDONE: deisotope?
 })
@@ -182,11 +193,13 @@ test_that("plotting works", {
                                                           analysis = analyses(plists)[1], MSLevel = 1))
     expect_doppel("mspl-spec-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
                                                             analysis = analyses(plistsMSMS)[1], MSLevel = 2))
-    expect_doppel("mspl-spec-avg-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[70],
+    expect_doppel("mspl-spec-avg-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[32],
                                                               MSLevel = 1))
-    expect_doppel("mspl-spec-avg-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+    expect_doppel("mspl-spec-avg-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
                                                                 MSLevel = 2))
 
+    skip_if(testWithSets())
+    
     expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70],
                                analysis = analyses(plists)[1], MSLevel = 1,
                                useGGPlot2 = TRUE))
@@ -212,15 +225,15 @@ test_that("sets functionality", {
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)
     expect_equal(sets(filter(plists, sets = "positive", negate = TRUE)), "negative")
-    expect_setequal(groupNames(plists), unique(sapply(setObjects(plists), groupNames)))
+    expect_setequal(groupNames(plists), unique(unlist(lapply(setObjects(plists), groupNames))))
     expect_setequal(groupNames(unset(plists, "positive")), groupNames(setObjects(plists)[[1]]))
     expect_setequal(groupNames(unset(plistsOneEmptySet, "positive")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
     expect_length(unset(plistsOneEmptySet, "negative"), 0)
     
-    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
                                                            MSLevel = 2, perSet = FALSE))
-    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
                                                                   MSLevel = 2, perSet = TRUE, mirror = FALSE))
-    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
                                                                   MSLevel = 2, perSet = TRUE, mirror = TRUE))
 })

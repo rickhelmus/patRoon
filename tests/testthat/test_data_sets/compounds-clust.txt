@@ -1,1 +1,1 @@
-A compounds cluster object (compoundsCluster)Number of feature groups with compound clusters in this object: 5Number of clusters: 10 (total), 2.0 (mean), 2 - 2 (min - max)Clustering properties: - hclust method: complete - fingerprint type: extended - fingerprint similarity method: tanimoto
+A compounds cluster object (compoundsCluster)Number of feature groups with compound clusters in this object: 9Number of clusters: 18 (total), 2.0 (mean), 2 - 2 (min - max)Clustering properties: - hclust method: complete - fingerprint type: extended - fingerprint similarity method: tanimoto

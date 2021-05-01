@@ -191,30 +191,34 @@ getScriptCode <- function(input, analyses)
     
     addHeader("features")
     
-    addComment("Find all features")
-    addComment(sprintf("NOTE: see the %s manual for many more options",
-                       if (input$featFinder == "OpenMS") "reference" else input$featFinder),
-               condition = !input$featFinder %in% c("Bruker", "SIRIUS"))
-    if (input$ionization != "both")
-        addFindFeatures("fList", "anaInfo")
-    else
+    if (input$featGrouper != "SIRIUS") # NOTE: never the case with sets
     {
-        addFindFeatures("fListPos", "anaInfoPos")
-        addFindFeatures("fListNeg", "anaInfoNeg")
-        addCall("fList", "makeSet", list(
-            list(value = "fListPos"),
-            list(value = "fListNeg"),
-            list(name = "adducts", value = c("[M+H]+", "[M-H]-"), quote = TRUE)
-        ))
+        addComment("Find all features")
+        addComment(sprintf("NOTE: see the %s manual for many more options",
+                           if (input$featFinder == "OpenMS") "reference" else input$featFinder),
+                   condition = !input$featFinder %in% c("Bruker", "SIRIUS"))
+        if (input$ionization != "both")
+            addFindFeatures("fList", "anaInfo")
+        else
+        {
+            addFindFeatures("fListPos", "anaInfoPos")
+            addFindFeatures("fListNeg", "anaInfoNeg")
+            addCall("fList", "makeSet", list(
+                list(value = "fListPos"),
+                list(value = "fListNeg"),
+                list(name = "adducts", value = c("[M+H]+", "[M-H]-"), quote = TRUE)
+            ))
+        }
+        
+        addNL()
     }
-    
-    addNL()
     
     addComment("Group and align features between analyses")
     addCall("fGroups", "groupFeatures", list(
-        list(value = "fList"),
+        list(value = "fList", condition = input$featGrouper != "SIRIUS"),
+        list(value = "anaInfo", condition = input$featGrouper == "SIRIUS"),
         list(value = if (input$featGrouper == "XCMS") "xcms3" else tolower(input$featGrouper), quote = TRUE),
-        list(name = "rtalign", value = TRUE),
+        list(name = "rtalign", value = TRUE, condition = input$featGrouper != "SIRIUS"),
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$group)",
              condition = input$featGrouper == "XCMS"),
         list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = input$featGrouper == "XCMS")
@@ -713,12 +717,19 @@ getNewProjectUI <- function(destPath)
                 "Features", icon = icon("chart-area"),
                 miniUI::miniContentPanel(
                     fillRow(
-                        height = 75,
+                        height = 90,
                         selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
                                                                       "Bruker DataAnalysis" = "Bruker"),
                                     "OpenMS", FALSE, width = "95%"),
-                        selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
-                                    "OpenMS", FALSE, width = "100%")
+                        fillCol(
+                            flex = c(1, NA),
+                            selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
+                                        "OpenMS", FALSE, width = "100%"),
+                            conditionalPanel(
+                                condition = "input.featGrouper == \"SIRIUS\"",
+                                textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
+                            )
+                        )
                     ),
                     fillCol(
                         height = 75,
@@ -1125,6 +1136,16 @@ newProject <- function(destPath = NULL)
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
         output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))
         output$analysesHotNeg <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesNeg"))
+        
+        observeEvent(input$featGrouper, {
+            if (input$ionization == "both" && input$featGrouper == "SIRIUS")
+            {
+                rstudioapi::showDialog("Not supported", "Grouping features with SIRIUS is currently not supported with sets", "")
+                updateSelectInput(inputId = "featGrouper", selected = "OpenMS")
+            }
+            else
+                shinyjs::toggleState("featFinder", input$featGrouper != "SIRIUS")
+        })
     }
 
     runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))

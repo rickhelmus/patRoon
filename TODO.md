@@ -12,8 +12,6 @@
     - TP workflow
     - update exampleData for polarity and polarity rGroups
     - example suspect lists
-    - adduct
-        - selectIons
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 

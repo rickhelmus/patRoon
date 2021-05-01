@@ -296,6 +296,36 @@ getScriptCode <- function(input, analyses)
     {
         addHeader("annotation")
         
+        if (nzchar(input$components))
+        {
+            addNL()
+            addComment("Perform automatic generation of components")
+            addCall("components", "generateComponents", list(
+                list(value = "fGroups"),
+                list(value = tolower(input$components), quote = TRUE),
+                list(name = "ionization", value = input$ionization, quote = TRUE, condition = input$ionization != "both"),
+                list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
+                list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
+                list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
+                list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
+                list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
+            ))
+            
+            if (input$selectIons)
+            {
+                pa <- switch(input$ionization,
+                             positive = "[M+H]+",
+                             negative = "[M-H]-",
+                             both = c("[M+H]+", "[M-H]-"))
+                addCall("fGroups", "selectIons", list(
+                    list(value = "fGroups"),
+                    list(value = "components"),
+                    list(name = "prefAdduct", value = pa, quote = TRUE),
+                    list(name = "onlyMonoIso", value = TRUE)
+                ))
+            }
+        }
+        
         if (doMSPL)
         {
             useFMF <- input$featFinder == "Bruker" && input$peakListGen == "Bruker"
@@ -372,22 +402,6 @@ getScriptCode <- function(input, analyses)
                     list(name = "updateScore", value = TRUE)
                 ))
             }
-        }
-        
-        if (nzchar(input$components))
-        {
-            addNL()
-            addComment("Perform automatic generation of components")
-            addCall("components", "generateComponents", list(
-                list(value = "fGroups"),
-                list(value = tolower(input$components), quote = TRUE),
-                list(name = "ionization", value = input$ionization, quote = TRUE, condition = input$ionization != "both"),
-                list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
-                list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
-                list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
-                list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
-                list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
-            ))
         }
         
         if (nzchar(input$suspectList) && input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)))
@@ -758,6 +772,16 @@ getNewProjectUI <- function(destPath)
                     fillCol(
                         flex = NA,
                         
+                        fillCol(
+                            height = 100,
+                            selectInput("components", "Component generation",
+                                        c("None" = "", "RAMClustR", "CAMERA", "nontarget"),
+                                        multiple = FALSE, width = "100%"),
+                            conditionalPanel(
+                                condition = "input.components == \"RAMClustR\" || input.components == \"CAMERA\"",
+                                checkboxInput("selectIons", "Select feature adduct ions", value = TRUE)
+                            )
+                        ),
                         fillRow(
                             height = 90,
                             fillCol(
@@ -771,9 +795,6 @@ getNewProjectUI <- function(destPath)
                                         c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag"),
                                         multiple = FALSE, width = "100%")
                         ),
-                        selectInput("components", "Component generation",
-                                    c("None" = "", "RAMClustR", "CAMERA", "nontarget"),
-                                    multiple = FALSE, width = "100%"),
                         conditionalPanel(
                             condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
                             fillRow(

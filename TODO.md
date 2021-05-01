@@ -14,8 +14,6 @@
     - example suspect lists
     - adduct
         - selectIons
-        - one global option in first tab: positive, negative, both (sets)
-            - determines adduct for annotation, componentization and suspect screening
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 

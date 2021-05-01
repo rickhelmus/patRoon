@@ -7,8 +7,7 @@
 - patRoonData
     - remove some more suspects to get better default hits?
 - newProject
-    - update for new feature and component algos
-        - support SAFD? needs profile data...
+    - support SAFD? needs profile data...
     - sets: add specific options for annotation and others?
     - TP workflow
     - example suspect lists

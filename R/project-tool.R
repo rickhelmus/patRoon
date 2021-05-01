@@ -427,6 +427,7 @@ getScriptCode <- function(input, analyses)
     
     if (length(input$report) > 0)
     {
+        componIsNULL <- !nzchar(input$components) || (input$selectIons && input$components != "nontarget")
         addHeader("reporting")
         addCall(NULL, "reportCSV", condition = "CSV" %in% input$report, list(
             list(value = "fGroups"),
@@ -434,7 +435,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = !nzchar(input$components))
+            list(name = "components", value = "components", isNULL = componIsNULL)
         ))
         addCall(NULL, "reportPDF", condition = "PDF" %in% input$report, list(
             list(value = "fGroups"),
@@ -442,7 +443,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = !nzchar(input$components))
+            list(name = "components", value = "components", isNULL = componIsNULL)
         ))
         addCall(NULL, "reportHTML", condition = "HTML" %in% input$report, list(
             list(value = "fGroups"),
@@ -450,7 +451,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = !nzchar(input$components)),
+            list(name = "components", value = "components", isNULL = componIsNULL),
             list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
             list(name = "selfContained", value = FALSE),
             list(name = "openReport", value = TRUE)
@@ -789,10 +790,10 @@ getNewProjectUI <- function(destPath)
                         fillCol(
                             height = 100,
                             selectInput("components", "Component generation",
-                                        c("None" = "", "RAMClustR", "CAMERA", "nontarget"),
+                                        c("None" = "", "RAMClustR", "CAMERA", "OpenMS", "CliqueMS", "nontarget"),
                                         multiple = FALSE, width = "100%"),
                             conditionalPanel(
-                                condition = "input.components == \"RAMClustR\" || input.components == \"CAMERA\"",
+                                condition = "input.components != \"nontarget\" && input.components != \"\"",
                                 checkboxInput("selectIons", "Select feature adduct ions", value = TRUE)
                             )
                         ),

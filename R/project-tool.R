@@ -143,6 +143,13 @@ getScriptCode <- function(input, analyses)
         addCall(varName, "findFeatures", list(
             list(value = anaInfoVarName),
             list(value = if (input$featFinder == "XCMS") "xcms3" else tolower(input$featFinder), quote = TRUE),
+            list(name = "noiseThrInt", value = 1000, condition = input$featFinder == "OpenMS"),
+            list(name = "chromSNR", value = 3, condition = input$featFinder == "OpenMS"),
+            list(name = "chromFWHM", value = 5, condition = input$featFinder == "OpenMS"),
+            list(name = "minFWHM", value = 3, condition = input$featFinder == "OpenMS"),
+            list(name = "maxFWHM", value = 60, condition = input$featFinder == "OpenMS"),
+            list(name = "kmeans", value = TRUE, condition = input$featFinder == "KPIC2"),
+            list(name = "level", value = 1000, condition = input$featFinder == "KPIC2"),
             list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
         ))
     }
@@ -187,7 +194,7 @@ getScriptCode <- function(input, analyses)
     addComment("Find all features")
     addComment(sprintf("NOTE: see the %s manual for many more options",
                        if (input$featFinder == "OpenMS") "reference" else input$featFinder),
-               condition = input$featFinder != "Bruker")
+               condition = !input$featFinder %in% c("Bruker", "SIRIUS"))
     if (input$ionization != "both")
         addFindFeatures("fList", "anaInfo")
     else
@@ -707,7 +714,7 @@ getNewProjectUI <- function(destPath)
                 miniUI::miniContentPanel(
                     fillRow(
                         height = 75,
-                        selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick",
+                        selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
                                                                       "Bruker DataAnalysis" = "Bruker"),
                                     "OpenMS", FALSE, width = "95%"),
                         selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),

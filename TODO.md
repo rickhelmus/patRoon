@@ -8,6 +8,7 @@
     - remove some more suspects to get better default hits?
 - newProject
     - update for new feature and component algos
+        - support SAFD? needs profile data...
     - sets: add specific options for annotation and others?
     - TP workflow
     - example suspect lists
@@ -44,6 +45,7 @@
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
     - lower default minFWHM (mainly for patRoonData... but seems also OK for other data)
+        - update newProject()
 
 
 ## Annotation
@@ -300,6 +302,7 @@
 - newProject
     - DA mslists: MSMSType now correctly bbCID if DIA is requested
         - added DIA checkbox because of this
+    - added some default findFeatureOpenMS args
 - Features
     - as.data.table(fGroups): normalization, FC, averageFunc
     - topMostByRGroup/EICTopMostByRGroup

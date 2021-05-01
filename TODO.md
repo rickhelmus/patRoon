@@ -10,7 +10,6 @@
     - support SAFD? needs profile data...
     - sets: add specific options for annotation and others?
     - TP workflow
-    - example suspect lists
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 

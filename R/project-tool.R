@@ -248,31 +248,49 @@ getScriptCode <- function(input, analyses)
         list(name = "mzRange", value = mzRange)
     ))
     
-    if ((input$ionization != "both" && nzchar(input$suspectList)) ||
+    if (input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos)))
     {
         addHeader("suspect screening")
-        addComment("Load suspect list")
         
-        addLoadSuspCall <- function(var, file)
+        if (input$exSuspList)
         {
-            addCall(var, "read.csv", list(
-                list(value = file, quote = TRUE),
-                list(name = "stringsAsFactors", value = FALSE)
-            ))
+            addComment("Get example suspect list")
+            
+            if (input$ionization == "positive")
+                addAssignment("suspFile", "patRoonData::suspectsPos")
+            else if (input$ionization == "negative")
+                addAssignment("suspFile", "patRoonData::suspectsNeg")
+            else
+            {
+                addAssignment("suspFilePos", "patRoonData::suspectsPos")
+                addAssignment("suspFileNeg", "patRoonData::suspectsNeg")
+            }
         }
-        
-        if (input$ionization != "both")
-            addLoadSuspCall("suspFile", input$suspectList)
         else
         {
-            if (nzchar(input$suspectListNeg))
+            addComment("Load suspect list")
+            
+            addLoadSuspCall <- function(var, file)
             {
-                addLoadSuspCall("suspFilePos", input$suspectListPos)
-                addLoadSuspCall("suspFileNeg", input$suspectListNeg)
+                addCall(var, "read.csv", list(
+                    list(value = file, quote = TRUE),
+                    list(name = "stringsAsFactors", value = FALSE)
+                ))
             }
+            
+            if (input$ionization != "both")
+                addLoadSuspCall("suspFile", input$suspectList)
             else
-                addLoadSuspCall("suspFile", input$suspectListPos)
+            {
+                if (nzchar(input$suspectListNeg))
+                {
+                    addLoadSuspCall("suspFilePos", input$suspectListPos)
+                    addLoadSuspCall("suspFileNeg", input$suspectListNeg)
+                }
+                else
+                    addLoadSuspCall("suspFile", input$suspectListPos)
+            }
         }
         
         addScreenCall <- function(susp)
@@ -291,7 +309,7 @@ getScriptCode <- function(input, analyses)
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
         addComment("Set adduct to NULL if suspect list contains an adduct column")
         
-        if (input$ionization != "both" || !nzchar(input$suspectListNeg))
+        if (input$ionization != "both" || (!input$exSuspList && !nzchar(input$suspectListNeg)))
             addScreenCall("suspFile")
         else
             addScreenCall(c("suspFilePos", "suspFileNeg"))
@@ -717,67 +735,79 @@ getNewProjectUI <- function(destPath)
             miniUI::miniTabPanel(
                 "Features", icon = icon("chart-area"),
                 miniUI::miniContentPanel(
-                    fillRow(
-                        height = 90,
-                        selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
-                                                                      "Bruker DataAnalysis" = "Bruker"),
-                                    "OpenMS", FALSE, width = "95%"),
-                        fillCol(
-                            flex = c(1, NA),
-                            selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
-                                        "OpenMS", FALSE, width = "100%"),
-                            conditionalPanel(
-                                condition = "input.featGrouper == \"SIRIUS\"",
-                                textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
-                            )
-                        )
-                    ),
                     fillCol(
-                        height = 75,
                         flex = NA,
-                        conditionalPanel(
-                            condition = "input.ionization != \"both\"",
-                            fileSelect("suspectList", "suspectListButton", "Suspect list", placeholder = "Leave empty for no suspect screening")
-                        ),
-                        conditionalPanel(
-                            condition = "input.ionization == \"both\"",
+                        fillCol(
+                            height = 90,
+                            flex = NA,
                             fillRow(
+                                selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
+                                                                              "Bruker DataAnalysis" = "Bruker"),
+                                            "OpenMS", FALSE, width = "95%"),
                                 fillCol(
-                                    width = "95%",
-                                    fileSelect("suspectListPos", "suspectListButtonPos", "Suspect list (positive)",
-                                               placeholder = "Leave empty for no suspect screening")
-                                ),
-                                fillCol(
-                                    width = "95%",
-                                    fileSelect("suspectListNeg", "suspectListButtonPos", "Suspect list (negative)",
-                                               placeholder = "Leave empty if same as positive")
+                                    flex = c(1, NA),
+                                    height = 90,
+                                    selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
+                                                "OpenMS", FALSE, width = "100%"),
+                                    conditionalPanel(
+                                        condition = "input.featGrouper == \"SIRIUS\"",
+                                        textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
+                                    )
                                 )
                             )
+                        ),
+                        fillCol(
+                            height = 125,
+                            flex = NA,
+                            conditionalPanel(
+                                condition = "input.ionization != \"both\"",
+                                fileSelect("suspectList", "suspectListButton", "Suspect list", placeholder = "Leave empty for no suspect screening")
+                            ),
+                            conditionalPanel(
+                                condition = "input.ionization == \"both\"",
+                                fillRow(
+                                    height = 60,
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("suspectListPos", "suspectListButtonPos", "Suspect list (positive)",
+                                                   placeholder = "Leave empty for no suspect screening")
+                                    ),
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("suspectListNeg", "suspectListButtonNeg", "Suspect list (negative)",
+                                                   placeholder = "Leave empty if same as positive")
+                                    )
+                                )
+                            ),
+                            fillRow(
+                                height = 50,
+                                checkboxInput("exSuspList", "Example suspect list(s)")
+                            )
+                        ),
+                        hr(),
+                        fillCol(
+                            flex = NA,
+                            height = 70,
+                            strong("Post-Filtering of feature groups"),
+                            textNote("Set below values to zero to disable a particular filter.")
+                        ),
+                        fillCol(
+                            height = 325,
+                            fillRow(
+                                numericInput("preIntThr", "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
+                                numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
+                            ),
+                            fillRow(
+                                numericInput("repAbundance", "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
+                                numericInput("maxRepRSD", "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
+                            ),
+                            fillRow(
+                                numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "95%"),
+                                checkboxInput("removeBlanks", "Discard blanks after filtering", TRUE)
+                            ),
+                            rangeNumeric("retention", "retention time (s)", step = 10),
+                            rangeNumeric("mz", "m/z", step = 10)
                         )
-                    ),
-                    hr(),
-                    fillCol(
-                        flex = NA,
-                        height = 70,
-                        strong("Post-Filtering of feature groups"),
-                        textNote("Set below values to zero to disable a particular filter.")
-                    ),
-                    fillCol(
-                        height = 325,
-                        fillRow(
-                            numericInput("preIntThr", "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
-                            numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
-                        ),
-                        fillRow(
-                            numericInput("repAbundance", "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
-                            numericInput("maxRepRSD", "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
-                        ),
-                        fillRow(
-                            numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "95%"),
-                            checkboxInput("removeBlanks", "Discard blanks after filtering", TRUE)
-                        ),
-                        rangeNumeric("retention", "retention time (s)", step = 10),
-                        rangeNumeric("mz", "m/z", step = 10)
                     )
                 )
             ),
@@ -1133,6 +1163,12 @@ newProject <- function(destPath = NULL)
         observeEvent(input$suspectListButton, selectSuspList("suspectList"))
         observeEvent(input$suspectListButtonPos, selectSuspList("suspectListPos"))
         observeEvent(input$suspectListButtonNeg, selectSuspList("suspectListNeg"))
+        
+        observeEvent(input$exSuspList, {
+            for (id in c("suspectList", "suspectListButton", "suspectListPos", "suspectListButtonPos",
+                         "suspectListNeg", "suspectListButtonNeg"))
+                shinyjs::toggleState(id, !input$exSuspList)
+        })
         
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
         output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))

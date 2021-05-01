@@ -358,7 +358,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS
 #' @templateVar ex2 findFeaturesBruker
-#' @templateVar algos bruker,openms,xcms,xcms3,envipick,kpic2
+#' @templateVar algos bruker,openms,xcms,xcms3,envipick,sirius,kpic2,safd
 #' @template generic-algo
 #'
 #' @rdname feature-finding
@@ -368,7 +368,8 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "kpic2"), add = ac)
+    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd"),
+                            add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -378,7 +379,9 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 xcms = findFeaturesXCMS,
                 xcms3 = findFeaturesXCMS3,
                 envipick = findFeaturesEnviPick,
-                kpic2 = findfeaturesKPIC2)
+                sirius = findFeaturesSIRIUS,
+                kpic2 = findfeaturesKPIC2,
+                safd = findFeaturesSAFD)
 
     f(analysisInfo, ..., verbose = verbose)
 }

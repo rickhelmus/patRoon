@@ -79,7 +79,7 @@ getScriptCode <- function(input, analyses)
         cl <- paste0(callPrefix, argText, ")")
         addText(cl)
     }
-    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment)
+    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment, ionization)
     {
         if (input$generateAnaInfo == "table")
         {
@@ -96,13 +96,9 @@ getScriptCode <- function(input, analyses)
         }
         else if (input$generateAnaInfo == "example")
         {
-            addComment("Take example data from patRoonData package (triplicate solvent blank + triplicate standard)",
+            addComment("Example data from patRoonData package (triplicate solvent blank + triplicate standard)",
                        condition = comment)
-            addCall(anaInfoVarName, "generateAnalysisInfo", list(
-                list(name = "paths", value = "patRoonData::exampleDataPath()"),
-                list(name = "groups", value = c(rep("solvent", 3), rep("standard", 3)), quote = TRUE),
-                list(name = "blanks", value = "solvent", quote = TRUE)
-            ))
+            addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = ionization, quote = TRUE))
         }
         else # none
         {
@@ -162,11 +158,11 @@ getScriptCode <- function(input, analyses)
     addNL()
     
     if (input$ionization != "both")
-        addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE)
+        addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE, input$ionization)
     else
     {
-        addAnaInfo("anaInfoPos", analyses$pos, input$analysisTableFilePos, TRUE)
-        addAnaInfo("anaInfoNeg", analyses$neg, input$analysisTableFileNeg, FALSE)
+        addAnaInfo("anaInfoPos", analyses$pos, input$analysisTableFilePos, TRUE, "positive")
+        addAnaInfo("anaInfoNeg", analyses$neg, input$analysisTableFileNeg, FALSE, "negative")
     }
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)

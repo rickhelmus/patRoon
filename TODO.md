@@ -10,7 +10,6 @@
     - update for new feature and component algos
     - sets: add specific options for annotation and others?
     - TP workflow
-    - update exampleData for polarity and polarity rGroups
     - example suspect lists
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 

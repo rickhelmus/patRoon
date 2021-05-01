@@ -258,13 +258,13 @@ getScriptCode <- function(input, analyses)
             addComment("Get example suspect list")
             
             if (input$ionization == "positive")
-                addAssignment("suspFile", "patRoonData::suspectsPos")
+                addAssignment("suspList", "patRoonData::suspectsPos")
             else if (input$ionization == "negative")
-                addAssignment("suspFile", "patRoonData::suspectsNeg")
+                addAssignment("suspList", "patRoonData::suspectsNeg")
             else
             {
-                addAssignment("suspFilePos", "patRoonData::suspectsPos")
-                addAssignment("suspFileNeg", "patRoonData::suspectsNeg")
+                addAssignment("suspListPos", "patRoonData::suspectsPos")
+                addAssignment("suspListNeg", "patRoonData::suspectsNeg")
             }
         }
         else
@@ -280,16 +280,16 @@ getScriptCode <- function(input, analyses)
             }
             
             if (input$ionization != "both")
-                addLoadSuspCall("suspFile", input$suspectList)
+                addLoadSuspCall("suspList", input$suspectList)
             else
             {
                 if (nzchar(input$suspectListNeg))
                 {
-                    addLoadSuspCall("suspFilePos", input$suspectListPos)
-                    addLoadSuspCall("suspFileNeg", input$suspectListNeg)
+                    addLoadSuspCall("suspListPos", input$suspectListPos)
+                    addLoadSuspCall("suspListNeg", input$suspectListNeg)
                 }
                 else
-                    addLoadSuspCall("suspFile", input$suspectListPos)
+                    addLoadSuspCall("suspList", input$suspectListPos)
             }
         }
         
@@ -306,13 +306,15 @@ getScriptCode <- function(input, analyses)
             ))
         }
         
+        addNL()
+        
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
         addComment("Set adduct to NULL if suspect list contains an adduct column")
         
         if (input$ionization != "both" || (!input$exSuspList && !nzchar(input$suspectListNeg)))
-            addScreenCall("suspFile")
+            addScreenCall("suspList")
         else
-            addScreenCall(c("suspFilePos", "suspFileNeg"))
+            addScreenCall(c("suspListPos", "suspListNeg"))
     }
     
     doMSPL <- nzchar(input$formulaGen) || nzchar(input$compIdent)

@@ -161,7 +161,7 @@ getScriptCode <- function(input, analyses)
     addCall(NULL, "setwd", list(value = "workPath"))
     addNL()
     
-    if (!input$setsWorkflow)
+    if (input$ionization != "both")
         addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE)
     else
     {
@@ -175,7 +175,7 @@ getScriptCode <- function(input, analyses)
         addComment("Set to FALSE to skip data pre-treatment")
         addAssignment("doDataPretreatment", TRUE)
         addText("if (doDataPretreatment)\n{")
-        if (!input$setsWorkflow)
+        if (input$ionization != "both")
             addPrepBlock("anaInfo", "DAMethod")
         else
         {
@@ -192,7 +192,7 @@ getScriptCode <- function(input, analyses)
     addComment(sprintf("NOTE: see the %s manual for many more options",
                        if (input$featFinder == "OpenMS") "reference" else input$featFinder),
                condition = input$featFinder != "Bruker")
-    if (!input$setsWorkflow)
+    if (input$ionization != "both")
         addFindFeatures("fList", "anaInfo")
     else
     {
@@ -241,7 +241,8 @@ getScriptCode <- function(input, analyses)
         list(name = "mzRange", value = mzRange)
     ))
     
-    if ((!input$setsWorkflow && nzchar(input$suspectList)) || (input$setsWorkflow && nzchar(input$suspectListPos)))
+    if ((input$ionization != "both" && nzchar(input$suspectList)) ||
+        (input$ionization == "both" && nzchar(input$suspectListPos)))
     {
         addHeader("suspect screening")
         addComment("Load suspect list")
@@ -254,7 +255,7 @@ getScriptCode <- function(input, analyses)
             ))
         }
         
-        if (!input$setsWorkflow)
+        if (input$ionization != "both")
             addLoadSuspCall("suspFile", input$suspectList)
         else
         {
@@ -274,13 +275,16 @@ getScriptCode <- function(input, analyses)
                 list(value = susp),
                 list(name = "rtWindow", value = 12),
                 list(name = "mzWindow", value = 0.005),
-                list(name = "adduct", value = input$suspectAdduct, quote = TRUE, isNULL = !nzchar(input$suspectAdduct)),
+                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
+                     condition = input$ionization != "both"),
                 list(name = "onlyHits", value = TRUE)
             ))
         }
         
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
-        if (!input$setsWorkflow || !nzchar(input$suspectListNeg))
+        addComment("Set adduct to NULL if suspect list contains an adduct column")
+        
+        if (input$ionization != "both" || !nzchar(input$suspectListNeg))
             addScreenCall("suspFile")
         else
             addScreenCall(c("suspFilePos", "suspFileNeg"))
@@ -331,7 +335,8 @@ getScriptCode <- function(input, analyses)
                 list(value = tolower(input$formulaGen), quote = TRUE),
                 list(name = "relMzDev", value = 5, condition = input$formulaGen != "Bruker"),
                 list(name = "precursorMzSearchWindow", value = 0.002, condition = input$formulaGen == "Bruker"),
-                list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),
+                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
+                     condition = input$ionization != "both"),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$formulaGen != "Bruker"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$formulaGen == "SIRIUS"),
                 list(name = "calculateFeatures", value = "TRUE", condition = input$formulaGen != "Bruker"),
@@ -351,7 +356,8 @@ getScriptCode <- function(input, analyses)
                 list(name = "fragRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
                 list(name = "fragAbsMzDev", value = 0.002, condition = input$compIdent == "MetFrag"),
                 list(name = "relMzDev", value = 5, condition = input$compIdent == "SIRIUS"),
-                list(name = "adduct", value = if (input$polarity == "positive") "[M+H]+" else "[M-H]-", quote = TRUE),
+                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
+                     condition = input$ionization != "both"),
                 list(name = "database", value = "pubchem", quote = TRUE, condition = input$compIdent == "MetFrag"),
                 list(name = "maxCandidatesToStop", value = 2500, condition = input$compIdent == "MetFrag"),
                 list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
@@ -375,7 +381,7 @@ getScriptCode <- function(input, analyses)
             addCall("components", "generateComponents", list(
                 list(value = "fGroups"),
                 list(value = tolower(input$components), quote = TRUE),
-                list(name = "ionization", value = input$polarity, quote = TRUE),
+                list(name = "ionization", value = input$ionization, quote = TRUE, condition = input$ionization != "both"),
                 list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
                 list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
                 list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
@@ -452,7 +458,7 @@ doCreateProject <- function(input, analyses)
         return(anas)
     }
 
-    if (!input$setsWorkflow)
+    if (input$ionization != "both")
         analyses <- prepareAnas(analyses, input$analysisTableFile)
     else
         analyses <- Map(prepareAnas, analyses, list(input$analysisTableFilePos, input$analysisTableFileNeg))
@@ -507,19 +513,27 @@ getNewProjectUI <- function(destPath)
 
         miniUI::miniTabstripPanel(
             miniUI::miniTabPanel(
-                "Destination", icon = icon("save"),
+                "General", icon = icon("save"),
                 miniUI::miniContentPanel(
                     fillCol(
+                        flex = NA,
                         fileSelect("destinationPath", "projectDestButton", "Project destination",
                                    if (is.null(destPath)) "~/" else destPath),
+                        br(),
                         fillRow(
+                            height = 100,
                             radioButtons("outputScriptTo", "Insert code into", c("New file" = "newFile",
                                                                                  "Current file" = "curFile")),
                             conditionalPanel(
                                 condition = "input.outputScriptTo == \"newFile\"",
-                                textInput("scriptFile", "Script file", "process.R"),
+                                textInput("scriptFile", "Script file", "process.R", width = "80%"),
                                 checkboxInput("createRStudioProj", "Create (and open) RStudio project", value = TRUE)
                             )
+                        ),
+                        br(),
+                        fillRow(
+                            height = 100,
+                            radioButtons("ionization", "Ionization", c("positive", "negative", "both (sets)" = "both"))
                         )
                     )
                 )
@@ -529,8 +543,7 @@ getNewProjectUI <- function(destPath)
                 "Analyses", icon = icon("folder-open"),
                 miniUI::miniContentPanel(
                     fillCol(
-                        flex = c(NA, NA, NA, 1, NA),
-                        checkboxInput("setsWorkflow", "Sets workflow (positive+negative)"),
+                        flex = c(NA, NA, 1, NA),
                         fillRow(
                             height = 120,
                             radioButtons("generateAnaInfo", "Generate analysis information",
@@ -541,21 +554,21 @@ getNewProjectUI <- function(destPath)
                                 fillCol(
                                     flex = NA,
                                     conditionalPanel(
-                                        condition = "input.setsWorkflow",
+                                        condition = "input.ionization == \"both\"",
                                         radioButtons("currentSet", "Selected set", c("positive", "negative"),
                                                      inline = TRUE)
                                     ),
                                     conditionalPanel(
-                                        condition = "!input.setsWorkflow && input.generateAnaInfo == \"table\"",
+                                        condition = "input.ionization != \"both\" && input.generateAnaInfo == \"table\"",
                                         textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
                                     ),
                                     conditionalPanel(
-                                        condition = "input.setsWorkflow && input.generateAnaInfo == \"table\" && input.currentSet == \"positive\"",
+                                        condition = "input.ionization == \"both\" && input.generateAnaInfo == \"table\" && input.currentSet == \"positive\"",
                                         textInput("analysisTableFilePos",
                                                   "Analysis table output file", "analyses-pos.csv")
                                     ),
                                     conditionalPanel(
-                                        condition = "input.setsWorkflow && input.generateAnaInfo == \"table\" && input.currentSet == \"negative\"",
+                                        condition = "input.ionization == \"both\" && input.generateAnaInfo == \"table\" && input.currentSet == \"negative\"",
                                         textInput("analysisTableFileNeg",
                                                   "Analysis table output file", "analyses-neg.csv")
                                     )
@@ -580,15 +593,15 @@ getNewProjectUI <- function(destPath)
                             condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                             flex = NA,
                             conditionalPanel(
-                                condition = "!input.setsWorkflow",
+                                condition = "input.ionization != \"both\"",
                                 rhandsontable::rHandsontableOutput("analysesHot")
                             ),
                             conditionalPanel(
-                                condition = "input.setsWorkflow && input.currentSet == \"positive\"",
+                                condition = "input.ionization == \"both\" && input.currentSet == \"positive\"",
                                 rhandsontable::rHandsontableOutput("analysesHotPos")
                             ),
                             conditionalPanel(
-                                condition = "input.setsWorkflow && input.currentSet == \"negative\"",
+                                condition = "input.ionization == \"both\" && input.currentSet == \"negative\"",
                                 rhandsontable::rHandsontableOutput("analysesHotNeg")
                             )
                         )
@@ -657,11 +670,11 @@ getNewProjectUI <- function(destPath)
                             flex = NA,
                             height = 50,
                             conditionalPanel(
-                                condition = "!input.setsWorkflow",
+                                condition = "input.ionization != \"both\"",
                                 fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method"),
                             ),
                             conditionalPanel(
-                                condition = "input.setsWorkflow",
+                                condition = "input.ionization == \"both\"",
                                 fillRow(
                                     fillCol(
                                         width = "95%",
@@ -694,11 +707,11 @@ getNewProjectUI <- function(destPath)
                         height = 75,
                         flex = NA,
                         conditionalPanel(
-                            condition = "!input.setsWorkflow",
+                            condition = "input.ionization != \"both\"",
                             fileSelect("suspectList", "suspectListButton", "Suspect list", placeholder = "Leave empty for no suspect screening")
                         ),
                         conditionalPanel(
-                            condition = "input.setsWorkflow",
+                            condition = "input.ionization == \"both\"",
                             fillRow(
                                 fillCol(
                                     width = "95%",
@@ -776,11 +789,6 @@ getNewProjectUI <- function(destPath)
                                     numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 4, width = "100%"),
                                 )
                             )
-                        ),
-                        conditionalPanel(
-                            condition = "input.formulaGen != \"\" || input.compIdent != \"\" || input.components != \"\"",
-                            selectInput("polarity", "Polarity", c("positive", "negative"), "positive",
-                                        multiple = FALSE, width = "100%")
                         ),
                         conditionalPanel(
                             condition = "(input.suspectList != \"\" || input.suspectListPos != \"\") && (input.formulaGen != \"\" || input.compIdent != \"\")",
@@ -868,7 +876,7 @@ newProject <- function(destPath = NULL)
         }
         getCurAnaHotName <- function()
         {
-            if (!input$setsWorkflow)
+            if (input$ionization != "both")
                 return("analysesHot")
             else if (input$currentSet == "positive")
                 return("analysesHotPos")
@@ -876,7 +884,7 @@ newProject <- function(destPath = NULL)
         }
         getCurAnaRVName <- function()
         {
-            if (!input$setsWorkflow)
+            if (input$ionization != "both")
                 return("analyses")
             else if (input$currentSet == "positive")
                 return("analysesPos")
@@ -884,9 +892,9 @@ newProject <- function(destPath = NULL)
         }
         verifyAnalysesOK <- function()
         {
-            noAnas <- !input$setsWorkflow && nrow(rValues$analyses) == 0
-            noAnasPos <- input$setsWorkflow && nrow(rValues$analysesPos) == 0
-            noAnasNeg <- input$setsWorkflow && nrow(rValues$analysesNeg) == 0
+            noAnas <- input$ionization != "both" && nrow(rValues$analyses) == 0
+            noAnasPos <- input$ionization == "both" && nrow(rValues$analysesPos) == 0
+            noAnasNeg <- input$ionization == "both" && nrow(rValues$analysesNeg) == 0
             
             if (noAnas || noAnasPos || noAnasNeg)
             {
@@ -899,7 +907,7 @@ newProject <- function(destPath = NULL)
                 return(FALSE)
             }
             
-            checkAnas <- if (!input$setsWorkflow)
+            checkAnas <- if (input$ionization != "both")
                 input$analysisTableFile
             else
                 c(input$analysisTableFilePos, input$analysisTableFileNeg)
@@ -975,8 +983,8 @@ newProject <- function(destPath = NULL)
             {}
             else
             {
-                anas <- if (!input$setsWorkflow) rValues$analyses else list(pos = rValues$analysesPos,
-                                                                            neg = rValues$analysesNeg)
+                anas <- if (input$ionization != "both") rValues$analyses else list(pos = rValues$analysesPos,
+                                                                                   neg = rValues$analysesNeg)
                 doCreateProject(input, anas)
                 stopApp(TRUE)
             }

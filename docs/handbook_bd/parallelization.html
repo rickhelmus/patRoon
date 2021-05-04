@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.8 Parallelization | patRoon handbook</title>
   <meta name="description" content="6.8 Parallelization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.8 Parallelization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-04-20" />
+<meta name="date" content="2021-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -131,6 +133,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 </head>
@@ -396,7 +421,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Most tools that are executed in parallel will log their output to text files. These files may be highly useful to check, for instance, if an error occurred. By default, the logfiles are stored in the <code>log</code> directory placed in the current working directory. However, you can change this location by setting the <code>patRoon.MP.logPath</code> option. If you set this option to <code>FALSE</code> than no logging occurs.</p>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Schymanski2014" class="csl-entry">
+<div class="csl-entry">
 Schymanski, Emma L., Junho Jeon, Rebekka Gulde, Kathrin Fenner, Matthias Ruff, Heinz P. Singer, and Juliane Hollender. 2014. <span>“Identifying Small Molecules via High Resolution Mass Spectrometry: Communicating Confidence.”</span> <em>Environmental Science and Technology</em> 48 (4): 2097–98. <a href="https://doi.org/10.1021/es5002105">https://doi.org/10.1021/es5002105</a>.
 </div>
 </div>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.3 Annotation | patRoon handbook</title>
   <meta name="description" content="4.3 Annotation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.3 Annotation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-04-20" />
+<meta name="date" content="2021-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -131,6 +133,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 </head>
@@ -251,8 +276,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="annotation" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-d771dd136dc2cc2661b9" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d771dd136dc2cc2661b9">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3f99f85d274096b28280" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3f99f85d274096b28280">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.</p>
 <div id="ms-peak-lists" class="section level3" number="4.3.1">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>
@@ -1473,7 +1498,7 @@ TRUE
 </div>
 <div id="suspAnn" class="section level3" number="4.3.4">
 <h3><span class="header-section-number">4.3.4</span> Suspect annotation</h3>
-<p>The data obtained during the previously described annotation steps can be used to improve a suspect screening workflow. The <code>annotateSuspects()</code> method uses the annotation data to calculate various annotation properties for each suspect, such as their rank in formula/compound candidates, which fragments from the suspect list were matched, and a <em>rough</em> indication of the identification level according to <span class="citation"><a href="parallelization.html#ref-Schymanski2014" role="doc-biblioref">Schymanski et al.</a> (<a href="parallelization.html#ref-Schymanski2014" role="doc-biblioref">2014</a>)</span></p>
+<p>The data obtained during the previously described annotation steps can be used to improve a suspect screening workflow. The <code>annotateSuspects()</code> method uses the annotation data to calculate various annotation properties for each suspect, such as their rank in formula/compound candidates, which fragments from the suspect list were matched, and a <em>rough</em> indication of the identification level according to <span class="citation"><a href="#ref-Schymanski2014" role="doc-biblioref">Schymanski et al.</a> (<a href="#ref-Schymanski2014" role="doc-biblioref">2014</a>)</span></p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="annotation.html#cb25-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">annotateSuspects</span>(fGroupsSusp, <span class="at">MSPeakLists =</span> mslists,</span>
 <span id="cb25-2"><a href="annotation.html#cb25-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <p>The calculation of identification levels is performed by a set of pre-defined rules. The <code>genIDLevelRulesFile()</code> can be used to inspect the default rules or to create your own rules file, which can subsequently passed to <code>annotateSuspects()</code> with the <code>IDFile</code> argument. See <code>?annotateSuspects</code> for more details on the file format and options. The default identification levels can be summarized as follows:</p>
@@ -1538,6 +1563,12 @@ TRUE
 <blockquote>
 <p><strong>NOTE</strong>: The current identification level rules are <em>only</em> optimized for GenForm and MetFrag annotation algorithms.</p>
 </blockquote>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Schymanski2014" class="csl-entry">
+Schymanski, Emma L., Junho Jeon, Rebekka Gulde, Kathrin Fenner, Matthias Ruff, Heinz P. Singer, and Juliane Hollender. 2014. <span>“Identifying Small Molecules via High Resolution Mass Spectrometry: Communicating Confidence.”</span> <em>Environmental Science and Technology</em> 48 (4): 2097–98. <a href="https://doi.org/10.1021/es5002105">https://doi.org/10.1021/es5002105</a>.
 </div>
 </div>
             </section>

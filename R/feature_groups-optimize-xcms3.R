@@ -69,7 +69,7 @@ featureGroupsOptimizerXCMS3$methods(
     
     getOptSettingRange = function(settingName, params, paramRanges) callSuper(settingName, params, flattenParams(paramRanges, FALSE)),
 
-    fixDesignParam = function(param, value) if (param %in% c("binSize", "minFraction")) round(value) else value,
+    fixDesignParam = function(param, value) if (param == "extraPeaks") round(value) else value,
     
     fixOptParamBounds = function(param, bounds)
     {

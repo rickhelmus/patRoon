@@ -16,6 +16,7 @@
 - Small updates/fixes for `installPatRoon()`
 - Fixed: `screenSuspects()` did not take `onlyHits` into account for caching
 - `screenSuspects()`: The original suspect name is stored in the `name_orig` column
+- `XCMS3` feature group optimization: `binSize` and `minFraction` values were rounded while they shouldn't (issue #27)
 
 
 # patRoon 1.2.0

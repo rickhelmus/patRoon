@@ -16,6 +16,8 @@ suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinRe
 suppressWarnings(compsCAMSize <- doGenComponents(fGroupsSimple, "camera", minSize = 3))
 compsNT <- doGenComponents(fGroups, "nontarget")
 compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
+plists <- generateMSPeakLists(fGroupsSimple, "mzr")
+compsSpec <- doGenComponents(fGroupsSimple, "specclust", plists)
 compsOpenMS <- doGenComponents(fGroups, "openms")
 compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)
 withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel = FALSE))
@@ -32,6 +34,7 @@ test_that("components generation works", {
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsNT, testFile("components-nt"))
     expect_known_value(compsInt, testFile("components-int"))
+    expect_known_value(compsSpec, testFile("components-spec"))
     expect_known_value(compsOpenMS, testFile("components-om"))
     # can't compare cliqueMS data as it has environments in them that change
     expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
@@ -57,6 +60,7 @@ test_that("verify components show", {
     expect_known_show(compsRC, testFile("components-rc", text = TRUE))
     expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
     expect_known_show(compsInt, testFile("components-int", text = TRUE))
+    expect_known_show(compsSpec, testFile("components-spec", text = TRUE))
     expect_known_show(compsOpenMS, testFile("components-om", text = TRUE))
     expect_known_show(compsClMS, testFile("components-cm", text = TRUE))
 })
@@ -147,9 +151,10 @@ test_that("consensus works", {
     expect_error(consensus(compsEmpty, compsEmpty2), "non-empty")
 })
 
-test_that("intensity clustered components", {
+test_that("clustered components", {
     expect_equivalent(length(treeCut(compsInt, k = 5)), 5)
     expect_equivalent(treeCutDynamic(compsInt), compsInt)
+    expect_setequal(groupNames(compsSpec), groupNames(filter(plists, withMSMS = TRUE)))
 })
 
 test_that("reporting works", {
@@ -181,6 +186,7 @@ test_that("plotting works", {
     expect_doppel("eic-component", function() plotChroms(compsRC, 1, fGroupsSimple))
 
     expect_plot(plot(compsInt))
+    expect_plot(plot(compsSpec))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))

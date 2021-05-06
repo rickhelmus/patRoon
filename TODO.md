@@ -167,6 +167,10 @@
 
 ## tests
 
+- checkComponents() / checkFeatures()
+    - server tests?
+    - import
+    - MC integration (features)
 - test DA algorithms
     - formulas: check if fragInfo etc is correct
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
@@ -175,20 +179,30 @@
     - enable annotation consensus tests
 - new ranking for formulas/compounds consensus (and sets)
     - filterSets?
-- FC, plotVolcano
 - ensure peaklists are sorted
-- spectrumSimilarity()
-- delete()
 - features
-    - topMostByRGroup
-    - xcms3 comparison
+    - new algos: kpic2/sirius
+    - xcms3/kpic2 comparison
     - new multiple blank filtering
     - syncing of XCMS/KPIC2 objects
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
+    - peak qualities
+        - filter (once implemented)
+    - FC
+        - as.data.table
+        - plotVolcano
+    - as.data.table: normalization?
+    - plotChroms: topMostByRGroup
 - TPs
+    - different workflows
     - filter() for componentsTPs
+    - plotGraph
 - annotatedBy MSPeakLists filter
+- delete()
+    - features, fGroups, components, screening, formulas, compounds
+- new shared functionality formulas/compounds?
+    
 
 
 ## docs

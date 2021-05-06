@@ -74,7 +74,7 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 
 #' @rdname feature-finding
 #' @export
-findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel = TRUE, verbose = TRUE)
+findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: docs
     #   - mention that filter() doesn't alter KPIC object, but IDs can be used to retrace

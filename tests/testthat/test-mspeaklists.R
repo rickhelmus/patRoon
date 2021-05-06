@@ -212,6 +212,110 @@ test_that("plotting works", {
                                useGGPlot2 = TRUE))
 })
 
+testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expectOne = FALSE)
+{
+    sim <- spectrumSimilarity(obj, groupName1 = groupName1, groupName2 = groupName2, NAToZero = FALSE, ...)
+    simNoNA <- spectrumSimilarity(obj, groupName1 = groupName1, groupName2 = groupName2, NAToZero = TRUE, ...)
+    
+    expect_range(simNoNA, c(0, 1))
+    
+    expect_length(sim, if (is.null(groupName2)) length(groupName1)^2 else length(groupName1) * length(groupName2))
+    expect_true(!expectNA || any(is.na(sim)))
+    expect_true(!expectOne || all(numEQ(sim, 1)))
+    
+    if (length(groupName1) == 1 && length(groupName2) == 1)
+    {
+        expect_false(checkmate::testMatrix(sim)) # should be dropped
+        checkmate::expect_matrix(spectrumSimilarity(obj, groupName1 = groupName1, groupName2 = groupName2, NAToZero = FALSE,
+                                                    drop = FALSE, ...), nrows = 1, ncols = 1, row.names = "unique",
+                                 col.names = "unique")
+    }
+    else
+        checkmate::expect_matrix(sim, nrows = length(groupName1),
+                                 ncols = length(if (is.null(groupName2)) groupName1 else groupName2),
+                                 row.names = "unique", col.names = "unique")
+}
+
+test_that("spectral similarity", {
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = analyses(plists)[1],
+                analysis2 = analyses(plists)[2], MSLevel = 1)
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = analyses(plists)[1],
+                analysis2 = NULL, MSLevel = 1)
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = NULL,
+                analysis2 = analyses(plists)[1], MSLevel = 1)
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], MSLevel = 1)
+
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], analysis1 = analyses(plists)[1],
+                analysis2 = analyses(plists)[1], MSLevel = 1, expectOne = TRUE)
+    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], MSLevel = 1, expectOne = TRUE)
+    testSpecSim(plists, groupNames(plists)[1], MSLevel = 1, expectOne = TRUE)
+    
+    testSpecSim(plists, groupNames(plists), groupNames(plists),
+                analysis1 = rep(analyses(plists)[1], length(groupNames(plists))),
+                analysis2 = rep(analyses(plists)[1], length(groupNames(plists))), MSLevel = 1, expectNA = testWithSets())
+    testSpecSim(plists, groupNames(plists), groupNames(plists), MSLevel = 1, expectNA = testWithSets())
+    testSpecSim(plists, groupNames(plists), groupNames(plists), MSLevel = 2, expectNA = TRUE)
+    testSpecSim(plists, groupNames(plists)[1:5], groupNames(plists)[6:10], MSLevel = 1)
+    
+    testSpecSim(plists, groupNames(plists), NULL, MSLevel = 1,
+                analysis1 = rep(analyses(plists)[1], length(groupNames(plists))), expectNA = testWithSets())
+    testSpecSim(plists, groupNames(plists), NULL, MSLevel = 1, expectNA = testWithSets())
+    testSpecSim(plists, groupNames(plists), NULL, MSLevel = 2, expectNA = TRUE)
+    
+    testSpecSim(plistsMSMS, groupNames(plistsMSMS)[1], groupNames(plistsMSMS)[2], MSLevel = 2)
+    testSpecSim(plistsMSMS, groupNames(plistsMSMS)[1], groupNames(plistsMSMS)[1], MSLevel = 2, expectOne = TRUE)
+    testSpecSim(plistsMSMS, groupNames(plistsMSMS), groupNames(plistsMSMS), MSLevel = 2)
+    testSpecSim(plistsMSMS, groupNames(plistsMSMS), NULL, MSLevel = 2)
+    
+    expect_null(spectrumSimilarity(plistsEmpty, groupNames(plistsEmpty)[1], groupNames(plistsEmpty)[1]))
+    checkmate::expect_scalar_na(spectrumSimilarity(plistsEmptyMS, groupNames(plistsEmptyMS)[1], groupNames(plistsEmptyMS)[1]))
+})
+
+makeTestPL <- function()
+{
+    spec <- data.table(mz = seq(50, 300, 50),
+                       intensity = seq(50E4, 300E4, length.out = 6),
+                       precursor = c(rep(FALSE, 5), TRUE))
+    
+    ret <- MSPeakLists(algorithm = "test")
+    ret@peakLists[["ana"]][["spec1"]] <- list(MS = copy(spec))
+    ret@peakLists[["ana"]][["spec2"]] <- list(MS = copy(spec))
+    ret@averagedPeakLists[["spec1"]] <- list(MS = copy(spec))
+    ret@averagedPeakLists[["spec2"]] <- list(MS = copy(spec))
+    return(ret)
+}
+
+testPL <- makeTestPL()
+testPLMethod <- makeTestPL()
+testPLMethod@averagedPeakLists[["spec2"]]$MS[, intensity := intensity * runif(.N, 0.1)]
+testPLPrec <- makeTestPL()
+testPLPrec@averagedPeakLists[["spec2"]]$MS <- testPLPrec@averagedPeakLists[["spec2"]]$MS[precursor == FALSE]
+testPLInt <- makeTestPL()
+testPLInt@averagedPeakLists[["spec2"]]$MS <- testPLInt@averagedPeakLists[["spec2"]]$MS[(intensity/max(intensity)) >= 0.5]
+# for testing shifts: make sure precursor is changed and that there is no overlap when shift is applied by adding .1
+# (UNDONE?)
+testPLShiftPrec <- makeTestPL()
+testPLShiftPrec@averagedPeakLists[["spec2"]]$MS[, mz := mz + 50.1]
+testPLShiftBoth <- makeTestPL()
+testPLShiftBoth@averagedPeakLists[["spec2"]]$MS[4:6, mz := mz + 50.1]
+doSimTestPL <- function(obj, ...) spectrumSimilarity(obj, "spec1", "spec2", ...)
+
+test_that("spectral similarity params", {
+    expect_lt(doSimTestPL(testPLMethod, specSimParams = getDefSpecSimParams(method = "cosine", relMinIntensity = 0)), 1)
+    expect_equal(doSimTestPL(testPLMethod, specSimParams = getDefSpecSimParams(method = "cosine", relMinIntensity = 0,
+                                                                               mzWeight = 1, intWeight = 0)), 1)
+    expect_equal(doSimTestPL(testPLMethod, specSimParams = getDefSpecSimParams(method = "jaccard", relMinIntensity = 0)), 1)
+    expect_equal(doSimTestPL(testPLPrec, specSimParams = getDefSpecSimParams(removePrecursor = TRUE)), 1)
+    expect_equal(doSimTestPL(testPLInt, specSimParams = getDefSpecSimParams(relMinIntensity = 0.5)), 1)
+    expect_equal(doSimTestPL(testPL, specSimParams = getDefSpecSimParams(minPeaks = nrow(testPL[[1]]$MS))), 1)
+    expect_true(is.na(doSimTestPL(testPL, specSimParams = getDefSpecSimParams(minPeaks = 100))))
+    expect_lt(doSimTestPL(testPLShiftPrec, specSimParams = getDefSpecSimParams(shift = "none")), 1)
+    expect_equal(doSimTestPL(testPLShiftPrec, specSimParams = getDefSpecSimParams(shift = "precursor")), 1)
+    expect_equal(doSimTestPL(testPLShiftPrec, specSimParams = getDefSpecSimParams(shift = "both")), 1)
+    expect_lt(doSimTestPL(testPLShiftBoth, specSimParams = getDefSpecSimParams(shift = "none")), 1)
+    expect_equal(doSimTestPL(testPLShiftBoth, specSimParams = getDefSpecSimParams(shift = "both")), 1)
+})
+
 if (testWithSets())
 {
     fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)

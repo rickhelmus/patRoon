@@ -375,7 +375,7 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
     if (is.null(analysis))
         analysis <- rep(list(NULL), length(group))
     else if (length(analysis) != length(group))
-        stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
+        stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr, nr))
     names(analysis) <- group
     
     specs <- pruneList(Map(getSpec, group, analysis, MoreArgs = list(MSPeakLists = MSPeakLists, MSLevel = MSLevel)))
@@ -484,23 +484,31 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
 
 expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
 {
-    nMissing <- length(groupName1) - nrow(sims)
-    
-    if (nMissing > 0)
+    if (length(sims) == 0)
     {
-        # add missing rows
-        sims <- do.call(rbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
-                                                      setdiff(groupName1, rownames(sims)))))
-        sims <- sims[groupName1, , drop = FALSE]
+        sims <- matrix(NA_real_, nrow = length(groupName1), ncol = length(groupName2))
+        rownames(sims) <- groupName1; colnames(sims) <- groupName2
     }
-    
-    nMissing <- length(groupName2) - ncol(sims)
-    if (nMissing > 0)
+    else
     {
-        # add missing columns
-        sims <- do.call(cbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
-                                                      setdiff(groupName2, colnames(sims)))))
-        sims <- sims[, groupName2, drop = FALSE]
+        nMissing <- length(groupName1) - nrow(sims)
+        
+        if (nMissing > 0)
+        {
+            # add missing rows
+            sims <- do.call(rbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
+                                                          setdiff(groupName1, rownames(sims)))))
+            sims <- sims[groupName1, , drop = FALSE]
+        }
+        
+        nMissing <- length(groupName2) - ncol(sims)
+        if (nMissing > 0)
+        {
+            # add missing columns
+            sims <- do.call(cbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
+                                                          setdiff(groupName2, colnames(sims)))))
+            sims <- sims[, groupName2, drop = FALSE]
+        }
     }
     
     return(sims)

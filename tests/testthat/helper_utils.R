@@ -184,8 +184,8 @@ expect_range <- function(object, r)
 {
     act <- quasi_label(rlang::enquo(object))
     act$r <- range(act$val)
-    expect(act$r[1] >= r[1] && act$r[2] <= r[2],
-           sprintf("range of %s is %.1f - %.1f which is outside %.1f - %.1f",
+    expect(numGTE(act$r[1], r[1]) && numLTE(act$r[2], r[2]),
+           sprintf("range of %s is %f - %f which is outside %f - %f",
                    act$lab, act$r[1], act$r[2], r[1], r[2]))
     invisible(act$val)
 }

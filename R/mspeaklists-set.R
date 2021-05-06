@@ -295,11 +295,14 @@ setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysi
 })
 
 #' @export
-setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2, analysis1 = NULL,
+setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2 = NULL, analysis1 = NULL,
                                                            analysis2 = NULL, MSLevel = 1,
                                                            specSimParams = getDefSpecSimParams(), NAToZero = FALSE,
                                                            drop = TRUE)
 {
+    if (length(obj) == 0)
+        return(NULL)
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
            fixed = list(choices = groupNames(obj), add = ac))
@@ -308,13 +311,27 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
 
     sims <- pruneList(lapply(setObjects(obj), function(so)
     {
-        gn1 <- intersect(groupName1, groupNames(so))
-        gn2 <- if (is.null(groupName2)) NULL else intersect(groupName2, groupNames(so))
+        wh <- groupName1 %in% groupNames(so)
+        if (!is.null(analysis1))
+            wh <- wh & (analysis1 %in% analyses(so))
+        gn1 <- groupName1[wh]
+        ana1 <- if (is.null(analysis1)) NULL else analysis1[wh]
+        
+        if (is.null(groupName2))
+            gn2 <- ana2 <- NULL
+        else
+        {
+            wh <- groupName2 %in% groupNames(so)
+            if (!is.null(analysis2))
+                wh <- wh & (analysis2 %in% analyses(so))
+            gn2 <- groupName2[wh]
+            ana2 <- if (is.null(analysis2)) NULL else analysis2[wh]
+        }
+        
         if (length(gn1) == 0 || (!is.null(groupName2) && length(gn2) == 0))
             return(NULL)
         # NOTE: don't drop NAs/dimensions here yet
-        ret <- spectrumSimilarity(so, gn1, gn2, analysis1, analysis2, MSLevel, specSimParams, NAToZero = FALSE,
-                                  drop = FALSE)
+        ret <- spectrumSimilarity(so, gn1, gn2, ana1, ana2, MSLevel, specSimParams, NAToZero = FALSE, drop = FALSE)
         return(expandFillSpecSimilarities(ret, groupName1, if (is.null(groupName2)) groupName1 else groupName2))
     }))
 

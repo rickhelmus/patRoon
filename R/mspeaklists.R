@@ -644,11 +644,15 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 #'   \code{\link{SpectrumSimilarity}}.
 
 #' @export
-setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1 = NULL, analysis2 = NULL,
-                                                        MSLevel = 1, specSimParams = getDefSpecSimParams(),
+setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2 = NULL, analysis1 = NULL,
+                                                        analysis2 = NULL, MSLevel = 1,
+                                                        specSimParams = getDefSpecSimParams(),
                                                         NAToZero = FALSE, drop = TRUE)
 {
     # NOTE: keep args in sync with sets method
+
+    if (length(obj) == 0)
+        return(NULL)
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = c(FALSE, TRUE),
@@ -659,9 +663,6 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     assertSpecSimParams(specSimParams, add = ac)
     aapply(checkmate::assertFlag, . ~ NAToZero + drop, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
-    if (length(obj) == 0)
-        return(NULL)
     
     if (is.null(groupName2))
     {

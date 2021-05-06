@@ -188,30 +188,6 @@ test_that("basic functionality", {
                             must.include = c("ret", "group_mz"))
 })
 
-test_that("plotting works", {
-    expect_doppel("mspl-spec-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[70],
-                                                          analysis = analyses(plists)[1], MSLevel = 1))
-    expect_doppel("mspl-spec-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
-                                                            analysis = analyses(plistsMSMS)[1], MSLevel = 2))
-    expect_doppel("mspl-spec-avg-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[32],
-                                                              MSLevel = 1))
-    expect_doppel("mspl-spec-avg-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
-                                                                MSLevel = 2))
-
-    skip_if(testWithSets())
-    
-    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70],
-                               analysis = analyses(plists)[1], MSLevel = 1,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
-                               analysis = analyses(plistsMSMS)[1], MSLevel = 2,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70], MSLevel = 1,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2], MSLevel = 2,
-                               useGGPlot2 = TRUE))
-})
-
 testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expectOne = FALSE)
 {
     sim <- spectrumSimilarity(obj, groupName1 = groupName1, groupName2 = groupName2, NAToZero = FALSE, ...)
@@ -223,7 +199,7 @@ testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expe
     expect_true(!expectNA || any(is.na(sim)))
     expect_true(!expectOne || all(numEQ(sim, 1)))
     
-    if (length(groupName1) == 1 && length(groupName2) == 1)
+    if (length(groupName1) == 1 && (is.null(groupName2) || length(groupName2) == 1))
     {
         expect_false(checkmate::testMatrix(sim)) # should be dropped
         checkmate::expect_matrix(spectrumSimilarity(obj, groupName1 = groupName1, groupName2 = groupName2, NAToZero = FALSE,
@@ -248,7 +224,7 @@ test_that("spectral similarity", {
     testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], analysis1 = analyses(plists)[1],
                 analysis2 = analyses(plists)[1], MSLevel = 1, expectOne = TRUE)
     testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], MSLevel = 1, expectOne = TRUE)
-    testSpecSim(plists, groupNames(plists)[1], MSLevel = 1, expectOne = TRUE)
+    testSpecSim(plists, groupNames(plists)[1], NULL, MSLevel = 1, expectOne = TRUE)
     
     testSpecSim(plists, groupNames(plists), groupNames(plists),
                 analysis1 = rep(analyses(plists)[1], length(groupNames(plists))),
@@ -314,6 +290,47 @@ test_that("spectral similarity params", {
     expect_equal(doSimTestPL(testPLShiftPrec, specSimParams = getDefSpecSimParams(shift = "both")), 1)
     expect_lt(doSimTestPL(testPLShiftBoth, specSimParams = getDefSpecSimParams(shift = "none")), 1)
     expect_equal(doSimTestPL(testPLShiftBoth, specSimParams = getDefSpecSimParams(shift = "both")), 1)
+})
+
+test_that("plotting works", {
+    expect_doppel("mspl-spec-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[70],
+                                                          analysis = analyses(plists)[1], MSLevel = 1))
+    expect_doppel("mspl-spec-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                                                            analysis = analyses(plistsMSMS)[1], MSLevel = 2))
+    expect_doppel("mspl-spec-avg-ms", function() plotSpectrum(plists, groupName = groupNames(plists)[32],
+                                                              MSLevel = 1))
+    expect_doppel("mspl-spec-avg-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
+                                                                MSLevel = 2))
+    
+    expect_doppel("mspl-spec_sim-ms", function() plotSpectrum(plists,
+                                                              groupName = c(groupNames(plists)[70], groupNames(plists)[75]),
+                                                              analysis = c(analyses(plists)[1], analyses(plists)[1]),
+                                                              MSLevel = 1))
+    expect_doppel("mspl-spec_sim-msms", function() plotSpectrum(plistsMSMS,
+                                                                groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
+                                                                analysis = c(analyses(plistsMSMS)[1], analyses(plistsMSMS)[1]),
+                                                                MSLevel = 2))
+    expect_doppel("mspl-spec_sim-avg-ms", function() plotSpectrum(plists,
+                                                                  groupName = c(groupNames(plists)[32], groupName = groupNames(plists)[33]),
+                                                                  MSLevel = 1))
+    expect_doppel("mspl-spec_sim-avg-msms", function() plotSpectrum(plistsMSMS,
+                                                                    groupName = c(groupNames(plistsMSMS)[14], groupNames(plistsMSMS)[15]),
+                                                                    MSLevel = 2))
+    
+    
+    
+    skip_if(testWithSets())
+    
+    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70],
+                               analysis = analyses(plists)[1], MSLevel = 1,
+                               useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                               analysis = analyses(plistsMSMS)[1], MSLevel = 2,
+                               useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70], MSLevel = 1,
+                               useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2], MSLevel = 2,
+                               useGGPlot2 = TRUE))
 })
 
 if (testWithSets())

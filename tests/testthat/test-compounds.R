@@ -273,11 +273,15 @@ test_that("reporting empty objects works", {
                                 compounds = comps, MSPeakLists = plists), NA)
 })
 
+anPLGroup2 <- screenInfo(fGroups)[name == "DEET"]$group
+
 test_that("plotting works", {
     skip_if_not(doMetFrag)
 
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
     expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE))
+    expect_doppel("compound-spec_sim", function() plotSpectrum(compsMFIso, index = c(1, 1), c(anPLGroup, anPLGroup2),
+                                                               MSPeakLists = plists, plotStruct = FALSE))
     expect_plot(plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[1], plists, useGGPlot2 = TRUE))
 

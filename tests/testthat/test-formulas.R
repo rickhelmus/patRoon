@@ -256,9 +256,11 @@ test_that("reporting empty objects works", {
                                 formulas = formsGF, MSPeakLists = plists), NA)
 })
 
-
+anPLGroup2 <- screenInfo(fGroups)[name == "DEET"]$group
 test_that("plotting works", {
     expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
+    expect_doppel("form-spec_sim", function() plotSpectrum(formsGFWithMSMS, index = c(1, 1), c(anPLGroup, anPLGroup2),
+                                                           MSPeakLists = plists))
 
     # ggplot2 versions don't really work with vdiffr at the moment :(
     # expect_doppel("spec-gg", plotSpectrum(formsGFWithMSMS, fTable[byMSMS == TRUE, formula][1],

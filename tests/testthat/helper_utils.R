@@ -1,4 +1,4 @@
-testWithSets <- function() F # UNDONE: check environment variable or something
+testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -100,7 +100,7 @@ if (testWithSets())
     doGenComponents <- function(fGroups, algorithm, ...)
     {
         args <- c(list(fGroups, algorithm), list(...))
-        if (algorithm != "intclust")
+        if (!algorithm %in% c("intclust", "specclust"))
             args <- c(args, list(ionization = "positive"))
         do.call(generateComponents, args)
     }

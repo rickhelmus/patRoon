@@ -1,4 +1,4 @@
-testWithSets <- function() F # UNDONE: check environment variable or something
+testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -338,3 +338,22 @@ initXCMS <- function()
         library(xcms)
 }
 
+testFeatAnnADT <- function(obj)
+{
+    expect_setequal(as.data.table(obj)$group, groupNames(obj))
+    expect_equal(nrow(as.data.table(obj)), length(obj))
+    
+    checkmate::expect_names(names(as.data.table(obj, fragments = TRUE)),
+                            must.include = c("frag_ion_formula", "frag_mz"))
+    expect_gt(nrow(as.data.table(obj, fragments = TRUE)), length(obj))
+    
+    checkmate::expect_names(names(as.data.table(obj, countElements = c("C", "H"))),
+                            must.include = c("C", "H"))
+    checkmate::expect_names(names(as.data.table(obj, countFragElements = c("C", "H"))),
+                            must.include = c("frag_C", "frag_H"))
+
+    OMTab <- as.data.table(obj, OM = TRUE)
+    checkmate::qexpectr(OMTab[, c(unlist(strsplit("CHNOPS", "")), paste0(unlist(strsplit("HNOPS", "")), "C"),
+                                  "DBE_AI", "AI")], "N+")
+    checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
+}

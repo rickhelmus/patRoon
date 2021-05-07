@@ -160,13 +160,8 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
 })
 
-test_that("basic usage", {
-    expect_equal(nrow(as.data.table(comps)), length(comps))
-    checkmate::expect_names(names(as.data.table(comps, fGroups = fGroups)),
-                            must.include = c("ret", "group_mz"))
-    checkmate::expect_names(names(as.data.table(comps, fragments = TRUE)),
-                            must.include = c("frag_ion_formula", "frag_mz"))
-    expect_gt(nrow(as.data.table(comps, fragments = TRUE)), length(comps))
+test_that("as.data.table() works", {
+    testFeatAnnADT(comps)
     expect_range(as.data.table(comps, normalizeScores = "max")$fragScore, c(0, 1))
 })
 

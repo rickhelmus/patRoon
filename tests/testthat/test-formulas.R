@@ -88,7 +88,20 @@ if (!testWithSets())
     formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
 }
 
-test_that("filtering works", {
+test_that("delete and filter", {
+    checkmate::expect_names(groupNames(delete(formsGF, i = 1)), disjunct.from = groupNames(formsGF)[1])
+    checkmate::expect_names(groupNames(delete(formsGF, i = groupNames(formsGF)[1])), disjunct.from = groupNames(formsGF)[1])
+    expect_length(delete(formsGF, i = groupNames(formsGF)), 0)
+    expect_false(delete(formsGF, j = 1)[[1]]$UID[1] == formsGF[[1]]$UID[1])
+    expect_length(delete(formsGF, j = 1), length(formsGF) - length(groupNames(formsGF)))
+    expect_false(delete(formsGF, j = function(...) 1)[[1]]$UID[1] == formsGF[[1]]$UID[1])
+    expect_length(delete(formsGF, j = function(...) 1), length(formsGF) - length(groupNames(formsGF)))
+    expect_length(delete(formsGF, j = function(...) TRUE), 0)
+    expect_equal(delete(formsGF, i = character()), formsGF)
+    expect_equal(delete(formsGF, j = integer()), formsGF)
+    expect_length(delete(formsGF), 0)
+    expect_length(delete(formsGFEmpty), 0)
+    
     expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$explainedPeaks >= 1))
     expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$explainedPeaks == 0))
     expect_lt(length(filter(formsGF, minExplainedPeaks = 2)),

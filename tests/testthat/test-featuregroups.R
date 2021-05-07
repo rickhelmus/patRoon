@@ -241,7 +241,19 @@ featCounts <- function(fg, rel)
 }
 
 stdRGs <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
-test_that("basic filtering", {
+test_that("delete and filter", {
+    checkmate::expect_names(analyses(delete(fgOpenMS, i = 1)), disjunct.from = analyses(fgOpenMS)[1])
+    checkmate::expect_names(analyses(delete(fgOpenMS, i = analyses(fgOpenMS)[1])), disjunct.from = analyses(fgOpenMS)[1])
+    expect_length(delete(fgOpenMS, i = analyses(fgOpenMS)), 0)
+    checkmate::expect_names(names(delete(fgOpenMS, j = 1:5)), disjunct.from = names(fgOpenMS)[1:5])
+    checkmate::expect_names(names(delete(fgOpenMS, j = names(fgOpenMS)[1:5])), disjunct.from = names(fgOpenMS)[1:5])
+    expect_true(all(groupTable(delete(fgOpenMS, j = function(...) 3))[3, ] == 0))
+    expect_length(delete(fgOpenMS, j = function(...) TRUE), 0)
+    expect_equal(delete(fgOpenMS, i = character()), fgOpenMS)
+    expect_equal(delete(fgOpenMS, j = integer()), fgOpenMS)
+    expect_length(delete(fgOpenMS), 0)
+    expect_length(delete(fgOpenMSEmpty), 0)
+    
     expect_gte(minInt(filter(fgOpenMS, absMinIntensity = 1500), FALSE), 1500)
     expect_gte(minInt(filter(fgOpenMS, relMinIntensity = 0.2), TRUE), 0.2)
     expect_gte(minInt(filter(fgOpenMS, preAbsMinIntensity = 1500), FALSE), 1500)

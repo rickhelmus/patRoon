@@ -86,7 +86,20 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
 })
 
-test_that("basic filtering", {
+test_that("delete and filter", {
+    checkmate::expect_names(analyses(delete(ffOpenMS, i = 1)), disjunct.from = analyses(ffOpenMS)[1])
+    checkmate::expect_names(analyses(delete(ffOpenMS, i = analyses(ffOpenMS)[1])), disjunct.from = analyses(ffOpenMS)[1])
+    expect_length(delete(ffOpenMS, i = analyses(ffOpenMS)), 0)
+    expect_false(delete(ffOpenMS, j = 1)[[1]]$ID[1] == ffOpenMS[[1]]$ID[1])
+    expect_length(delete(ffOpenMS, j = 3:4), length(ffOpenMS) - (length(analyses(ffOpenMS)) * 2))
+    expect_false(delete(ffOpenMS, j = function(...) 1)[[1]]$ID[1] == ffOpenMS[[1]]$ID[1])
+    expect_length(delete(ffOpenMS, j = function(...) 3:4), length(ffOpenMS) - (length(analyses(ffOpenMS)) * 2))
+    expect_length(delete(ffOpenMS, j = function(...) TRUE), 0)
+    expect_equal(delete(ffOpenMS, i = character()), ffOpenMS)
+    expect_equal(delete(ffOpenMS, j = integer()), ffOpenMS)
+    expect_length(delete(ffOpenMS), 0)
+    expect_length(delete(ffEmpty), 0)
+    
     expect_gte(min(filter(ffOpenMS, absMinIntensity = 500)[[1]]$intensity), 500)
     expect_gte(min(filter(ffOpenMS, relMinIntensity = 0.2)[[1]]$intensity), 0.2 * max(ffOpenMS[[1]]$intensity))
 

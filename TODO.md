@@ -192,7 +192,6 @@
         - as.data.table
         - plotVolcano
     - as.data.table: normalization?
-    - plotChroms: topMostByRGroup
 - TPs
     - different workflows
     - filter() for componentsTPs

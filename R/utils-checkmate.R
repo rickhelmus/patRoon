@@ -177,7 +177,8 @@ assertLogicTransformations <- function(x, null.ok = FALSE, .var.name = checkmate
     if (null.ok && is.null(x))
         return(NULL)
     
-    checkmate::assertDataFrame(x, col.names = "unique", .var.name = .var.name, add = add)
+    checkmate::assertDataFrame(x, min.rows = 1, any.missing = FALSE, col.names = "unique", .var.name = .var.name,
+                               add = add)
     checkmate::assertNames(colnames(x), permutation.of = c("transformation", "add", "sub", "retDir"), what = "colnames",
                            add = add)
 

@@ -8,7 +8,7 @@ getTPParents <- function(parents, adduct, skipInvalid)
         if (!is.null(compTab[["compoundName"]]))
             compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
         else
-            setnames(compTab, "Identifier", "name")
+            setnames(compTab, "identifier", "name")
         parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
     }
     else # suspect screening
@@ -21,7 +21,7 @@ getTPParents <- function(parents, adduct, skipInvalid)
     if (any(noSM))
     {
         do.call(if (skipInvalid) warning else stop,
-                "The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ","))
+                list("The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ",")))
         parents <- parents[!noSM]
     }
     

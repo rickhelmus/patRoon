@@ -11,7 +11,7 @@ setMethod("initialize", "transformationProductsLibrary",
 
 #' @export
 generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
-                              matchSuspectsBy = "InChIKey")
+                               matchSuspectsBy = "InChIKey")
 {
     # UNDONE: default match by IK or IK1?
     

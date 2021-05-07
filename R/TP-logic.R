@@ -6,12 +6,12 @@ NULL
 getTPLogicTransformations <- function(transformations)
 {
     if (is.null(transformations))
-        ret <- patRoon:::TPsLogicTransformations # stored inside R/sysdata.rda
+        transformations <- patRoon:::TPsLogicTransformations # stored inside R/sysdata.rda
     
-    if (is.data.table(ret))
-        ret <- copy(ret)
+    if (is.data.table(transformations))
+        ret <- copy(transformations)
     else
-        ret <- as.data.table(ret)
+        ret <- as.data.table(transformations)
     
     ret[, deltaMZ := 0]
     ret[nzchar(add), deltaMZ := sapply(add, getFormulaMass)]
@@ -22,6 +22,10 @@ getTPLogicTransformations <- function(transformations)
 
 doGenerateTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
 {
+    if (length(fGroups) == 0)
+        return(list(parents = data.table(name = character(), rt = numeric(), neutralMass = numeric()),
+                    products = list()))
+    
     gInfo <- groupInfo(fGroups)
     parents <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
     
@@ -67,7 +71,7 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
 setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(minMass, finite = TRUE, add = ac)
+    checkmate::assertNumber(minMass, lower = 0, finite = TRUE, add = ac)
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -84,7 +88,7 @@ setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, a
 setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(minMass, finite = TRUE, add = ac)
+    checkmate::assertNumber(minMass, lower = 0, finite = TRUE, add = ac)
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     

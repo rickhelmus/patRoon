@@ -195,7 +195,6 @@
     - plotGraph
 - annotatedBy MSPeakLists filter
     - first fix PLIndex
-- new shared functionality formulas/compounds?
     
 
 

@@ -173,25 +173,15 @@ test_that("delete and filter", {
                         sapply(annotations(formsGFMST1N), function(a) max(a$isoScore))))
 })
 
-OMTab <- as.data.table(formsGF, OM = TRUE)
 test_that("as.data.table() works", {
-    expect_setequal(as.data.table(formsGF)$group, groupNames(formsGF))
-    expect_setequal(as.data.table(formsGF, average = TRUE)$group, groupNames(formsGF))
-
+    testFeatAnnADT(formsGF)
+    
     expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
-
+    expect_setequal(as.data.table(formsGF, average = TRUE)$group, groupNames(formsGF))
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
                  length(groupNames(formsGF)))
-
-    checkmate::expect_names(names(as.data.table(formsGF, countElements = c("C", "H"))),
-                            must.include = c("C", "H"))
-    checkmate::expect_names(names(as.data.table(formsGF, countFragElements = c("C", "H"))),
-                            must.include = c("frag_C", "frag_H"))
-    expect_true(all(is.na(unlist(as.data.table(formsGFMS, countFragElements = c("C", "H"))[, c("frag_C", "frag_H"), with = FALSE]))))
-
-    checkmate::qexpectr(OMTab[, c(unlist(strsplit("CHNOPS", "")), paste0(unlist(strsplit("HNOPS", "")), "C"),
-                                  "DBE_AI", "AI")], "N+")
-    checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
+    expect_true(all(is.na(unlist(as.data.table(formsGFMS,
+                                               countFragElements = c("C", "H"))[, c("frag_C", "frag_H"), with = FALSE]))))
 })
 
 if (doSIRIUS)

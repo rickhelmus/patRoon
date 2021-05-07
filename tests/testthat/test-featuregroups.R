@@ -173,6 +173,7 @@ test_that("XCMS3 conversion", {
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
+fctbl <- as.data.table(fgOpenMS, FCParams = getFCParams(c("solvent-pos", "standard-pos")))
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
@@ -399,6 +400,7 @@ test_that("plotting works", {
     expect_doppel("eic-def", function() plotChroms(subFGroups))
     expect_doppel("eic-rtmin", function() plotChroms(subFGroups, retMin = TRUE))
     expect_doppel("eic-tm1", function() plotChroms(subFGroups, topMost = 1))
+    expect_doppel("eic-tm1rg", function() plotChroms(subFGroups, topMost = 1, topMostByRGroup = TRUE))
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
     expect_doppel("eic-cbr", function() plotChroms(subFGroups, colourBy = "rGroups"))
     expect_doppel("eic-cbf", function() plotChroms(subFGroups, colourBy = "fGroups"))

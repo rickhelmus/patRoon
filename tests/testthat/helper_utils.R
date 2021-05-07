@@ -1,4 +1,4 @@
-testWithSets <- function() T # UNDONE: check environment variable or something
+testWithSets <- function() F # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -46,8 +46,22 @@ if (testWithSets())
     }
     makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
 
-    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "positive")
-    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "positive")
+    doExportXCMS <- function(x, ...)
+    {
+        # HACK: if x is a SIRIUS fGroups object, it will not be a set object
+        if (is(x, "featureGroupsSIRIUS"))
+            getXCMSSet(x, ...)
+        else
+            getXCMSSet(x, exportedData = FALSE, set = "positive")
+    }
+    doExportXCMS3 <- function(x, ...)
+    {
+        # HACK: if x is a SIRIUS fGroups object, it will not be a set object
+        if (is(x, "featureGroupsSIRIUS"))
+            getXCMSnExp(x, ...)
+        else
+            getXCMSnExp(x, exportedData = FALSE, set = "positive")
+    }
     getExpAnaInfo <- function() getTestAnaInfoPos()
     getExpFeats <- function(x) x[, sets = "positive"]
     getExpFG <- function(x) x[, sets = "positive"]

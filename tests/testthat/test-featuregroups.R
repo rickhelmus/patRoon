@@ -7,6 +7,8 @@ fList <- getTestFeatures()
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
+fgKPIC2 <- groupFeatures(fList, "kpic2")
+fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
 
 # fList with dummy concs
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
@@ -19,6 +21,7 @@ fListEmpty <- getEmptyFeatures()
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
+fgKPIC2Empty <- groupFeatures(fListEmpty, "kpic2")
 
 test_that("verify feature grouping output", {
     expect_known_value(groupTable(fgOpenMS), testFile("fg-openms"))
@@ -31,19 +34,25 @@ test_that("verify feature grouping output", {
     expect_equal(groupTable(fgOpenMS),
                  groupTable(groupFeatures(fList, "openms",
                                           extraOptsGroup = list("-algorithm:distance_RT:max_difference" = 12))))
+    
     expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
+    expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
+    expect_known_value(groupTable(fgSIRIUS), testFile("fg-sirius"))
 })
 
 test_that("verify show output", {
     expect_known_show(fgOpenMS, testFile("fg-show-openms", text = TRUE))
     expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
     expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
+    expect_known_show(fgKPIC2, testFile("fg-show-kpic2", text = TRUE))
+    expect_known_show(fgSIRIUS, testFile("fg-show-sirius", text = TRUE))
 })
 
 test_that("empty objects work", {
     expect_length(fgOpenMSEmpty, 0)
     expect_length(fgXCMSEmpty, 0)
     expect_length(fgXCMS3Empty, 0)
+    expect_length(fgKPIC2Empty, 0)
 })
 
 if (!testWithSets())
@@ -105,14 +114,20 @@ test_that("exporting works", {
 XCMSImpXCMS <- doExportXCMS(fgXCMS)
 XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, exportedData = FALSE)
 XCMSImpOpenMS <- doExportXCMS(fgOpenMS, exportedData = FALSE)
+XCMSImpKPIC2 <- doExportXCMS(fgKPIC2, exportedData = FALSE)
+XCMSImpSIRIUS <- doExportXCMS(fgSIRIUS, exportedData = FALSE)
 test_that("XCMS conversion", {
     expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(getExpFG(fgXCMS)))
     expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(getExpFG(fgOpenMS)))
+    expect_equal(nrow(xcms::groups(XCMSImpKPIC2)), length(getExpFG(fgKPIC2)))
+    expect_equal(nrow(xcms::groups(XCMSImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
     expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
     expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
+    expect_known_value(xcms::groups(XCMSImpKPIC2), testFile("fg-xcms_import_kpic2"))
+    expect_known_value(xcms::groups(XCMSImpSIRIUS), testFile("fg-xcms_import_sirius"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS, getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
@@ -120,20 +135,30 @@ test_that("XCMS conversion", {
                  unname(groupTable(getExpFG(fgXCMS3))))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpOpenMS, getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgOpenMS))))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpKPIC2, getExpAnaInfo()))),
+                 unname(groupTable(getExpFG(fgKPIC2))))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpSIRIUS, getExpAnaInfo()[1, ]))),
+                 unname(groupTable(getExpFG(fgSIRIUS))))
 })
 
 XCMS3ImpXCMS <- doExportXCMS3(fgXCMS, exportedData = FALSE)
 XCMS3ImpXCMS3 <- doExportXCMS3(fgXCMS3)
 XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS, exportedData = FALSE)
+XCMS3ImpKPIC2 <- doExportXCMS3(fgKPIC2, exportedData = FALSE)
+XCMS3ImpSIRIUS <- doExportXCMS3(fgSIRIUS, exportedData = FALSE)
 
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(getExpFG(fgXCMS)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(getExpFG(fgOpenMS)))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpKPIC2)), length(getExpFG(fgKPIC2)))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpKPIC2), testFile("fg-xcms3_import_kpic2"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS), testFile("fg-xcms3_import_sirius"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
@@ -141,6 +166,10 @@ test_that("XCMS3 conversion", {
                  unname(groupTable(getExpFG(fgXCMS3))))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgOpenMS))))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpKPIC2, getExpAnaInfo()))),
+                 unname(groupTable(getExpFG(fgKPIC2))))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpSIRIUS, getExpAnaInfo()[1, ]))),
+                 unname(groupTable(getExpFG(fgSIRIUS))))
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
@@ -152,8 +181,8 @@ test_that("as.data.table works", {
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
     # check if area from first group of first analysis corresponds to its feature data
-    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[analyses(fgOpenMS)[1]]][4],
-                 featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(4, 1)]]])
+    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[analyses(fgOpenMS)[1]]][10],
+                 featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(10, 1)]]])
     
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
 

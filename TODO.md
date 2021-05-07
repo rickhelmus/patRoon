@@ -55,6 +55,7 @@
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
+- Get rid of PLIndex in fragInfos, so MSPeakLists can be post-filtered (eg necessary by annotatedBy filter)
 
 
 ## Suspects
@@ -181,7 +182,6 @@
     - filterSets?
 - ensure peaklists are sorted
 - features
-    - new algos: kpic2/sirius
     - xcms3/kpic2 comparison
     - new multiple blank filtering
     - syncing of XCMS/KPIC2 objects

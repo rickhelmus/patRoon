@@ -80,15 +80,18 @@ setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
 {
     i <- assertDeleteArgAndToChr(i, names(obj))
     
-    # figure out corresponding sets and revert names of i to non-set names
-    isets <- componentInfo(obj)[match(i, name)]$set
-    i <- mapply(i, isets, FUN = function(x, s) sub(paste0("-", s, "$"), "", x))
-    
-    unisets <- unique(isets)
-    obj@setObjects[unisets] <- Map(obj@setObjects[unisets], unisets,
-                                   f = function(o, s) delete(o, i = i[isets == s], j = j, ...))
-    
-    obj <- syncComponentsSetObjects(obj)
+    if (length(obj) > 0)
+    {
+        # figure out corresponding sets and revert names of i to non-set names
+        isets <- componentInfo(obj)[match(i, name)]$set
+        i <- mapply(i, isets, FUN = function(x, s) sub(paste0("-", s, "$"), "", x))
+        
+        unisets <- unique(isets)
+        obj@setObjects[unisets] <- Map(obj@setObjects[unisets], unisets,
+                                       f = function(o, s) delete(o, i = i[isets == s], j = j, ...))
+        
+        obj <- syncComponentsSetObjects(obj)
+    }
     
     return(componentsReducedSet(setObjects = setObjects(obj), components = obj@components,
                                 componentInfo = obj@componentInfo))

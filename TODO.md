@@ -195,8 +195,6 @@
     - plotGraph
 - annotatedBy MSPeakLists filter
     - first fix PLIndex
-- delete()
-    - features, fGroups, components, screening, formulas, compounds
 - new shared functionality formulas/compounds?
     
 

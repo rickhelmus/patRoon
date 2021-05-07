@@ -82,7 +82,22 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
 })
 
-test_that("filtering works", {
+test_that("delete and filter", {
+    checkmate::expect_names(names(delete(compsRC, i = 1)), disjunct.from = names(compsRC)[1])
+    checkmate::expect_names(names(delete(compsRC, i = names(compsRC)[1])), disjunct.from = names(compsRC)[1])
+    expect_length(delete(compsRC, i = names(compsRC)), 0)
+    expect_false(delete(compsRC, j = 1)[[1]]$group[1] == compsRC[[1]]$group[1])
+    checkmate::expect_names(names(delete(compsRC, j = groupNames(compsRC)[1])), disjunct.from = groupNames(compsRC)[1])
+    expect_false(delete(compsRC, j = function(...) 1)[[1]]$group[1] == compsRC[[1]]$group[1])
+    expect_equal(sum(componentInfo(delete(compsRC, j = function(...) 1:2))$size),
+                 sum(componentInfo(compsRC)$size) - (length(names(compsRC)) * 2))
+    expect_length(delete(compsRC, j = function(...) TRUE), 0)
+    # NOTE: use componentTable since delete() will reduce the object, thus not allowing direct comparison
+    expect_equal(componentTable(delete(compsRC, i = character())), componentTable(compsRC))
+    expect_equal(componentTable(delete(compsRC, j = integer())), componentTable(compsRC))
+    expect_length(delete(compsRC), 0)
+    expect_length(delete(compsEmpty), 0)
+    
     expect_length(filter(compsRC, size = c(0, 100)), length(compsRC))
     expect_length(filter(compsRC, size = c(50, 100)), 0)
     expect_length(filter(compsRC, size = c(0, 100), negate = TRUE), 0)

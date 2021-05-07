@@ -64,9 +64,22 @@ if (!testWithSets())
     compsT1N <- filter(comps, topMost = 1, negate = TRUE)
 }
 
-test_that("filtering works", {
+test_that("delete and filter", {
     skip_if_not(hasCompounds)
 
+    checkmate::expect_names(groupNames(delete(comps, i = 1)), disjunct.from = groupNames(comps)[1])
+    checkmate::expect_names(groupNames(delete(comps, i = groupNames(comps)[1])), disjunct.from = groupNames(comps)[1])
+    expect_length(delete(comps, i = groupNames(comps)), 0)
+    expect_false(delete(comps, j = 1)[[1]]$UID[1] == comps[[1]]$UID[1])
+    expect_length(delete(comps, j = 1), length(comps) - length(groupNames(comps)))
+    expect_false(delete(comps, j = function(...) 1)[[1]]$UID[1] == comps[[1]]$UID[1])
+    expect_length(delete(comps, j = function(...) 1), length(comps) - length(groupNames(comps)))
+    expect_length(delete(comps, j = function(...) TRUE), 0)
+    expect_equal(delete(comps, i = character()), comps)
+    expect_equal(delete(comps, j = integer()), comps)
+    expect_length(delete(comps), 0)
+    expect_length(delete(compsEmpty), 0)
+    
     expect_lte(length(filter(comps, topMost = 1)), length(fGroups))
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroups))
     expect_lte(length(filter(comps, topMost = 1, negate = TRUE)), length(fGroups))

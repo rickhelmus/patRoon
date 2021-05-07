@@ -182,7 +182,6 @@
     - filterSets?
 - ensure peaklists are sorted
 - features
-    - xcms3/kpic2 comparison
     - new multiple blank filtering
     - syncing of XCMS/KPIC2 objects
     - check if featindex and groups slots are in sync with features
@@ -199,6 +198,7 @@
     - filter() for componentsTPs
     - plotGraph
 - annotatedBy MSPeakLists filter
+    - first fix PLIndex
 - delete()
     - features, fGroups, components, screening, formulas, compounds
 - new shared functionality formulas/compounds?

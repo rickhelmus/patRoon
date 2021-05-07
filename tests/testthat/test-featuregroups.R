@@ -288,7 +288,8 @@ test_that("replicate group subtraction", {
 
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
-# fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
+fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
+fGCompKPIC2 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "kpic2")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
 
@@ -302,10 +303,13 @@ if (!testWithSets())
 test_that("verify feature group comparison", {
     expect_known_value(groupTable(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
     expect_known_value(groupTable(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
+    expect_known_value(groupTable(fGCompXCMS3@comparedFGroups), testFile("fg-comp-xcms3"))
+    expect_known_value(groupTable(fGCompKPIC2@comparedFGroups), testFile("fg-comp-kpic2"))
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
-    # expect_named(fGCompXCMS3, c("openms", "xcms"))
+    expect_named(fGCompXCMS3, c("openms", "xcms"))
+    expect_named(fGCompKPIC2, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
 

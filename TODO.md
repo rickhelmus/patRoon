@@ -188,9 +188,6 @@
     - subsetting and groupScores
     - peak qualities
         - filter (once implemented)
-    - FC
-        - as.data.table
-        - plotVolcano
     - as.data.table: normalization?
 - TPs
     - different workflows

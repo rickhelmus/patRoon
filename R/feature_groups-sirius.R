@@ -10,16 +10,15 @@ doSIRIUSFGroups <- function(inputFiles, verbose)
               "-o", outPath,
               "lcms-align")
     
-    executeCommand(command, args, stdout = if (verbose) "" else FALSE,
-                   stderr = if (verbose) "" else FALSE)
+    executeCommand(command, args, stdout = if (verbose) "" else FALSE, stderr = if (verbose) "" else FALSE)
     
     return(outPath)
 }
 
 processSIRIUSFGroups <- function(outPath, anaInfo)
 {
-    resDirs <- list.files(outPath, pattern = "^[[:digit:]]+_[[:alnum:]]+_[[:digit:]]+$",
-                          full.names = TRUE)
+    resDirs <- list.files(outPath, pattern = "^[[:digit:]]+_.+_[[:digit:]]+$", full.names = TRUE)
+    
     resTbl <- rbindlist(Map(resDirs, seq_along(resDirs), f = function(dir, grpi)
     {
         json <- jsonlite::fromJSON(file.path(dir, "lcms.json.gz"), FALSE)
@@ -35,6 +34,8 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
         resTbl[, ID := seq_len(.N), by = "analysis"]
         fList <- split(resTbl, by = "analysis", keep.by = FALSE)
         fList <- fList[intersect(anaInfo$analysis, names(fList))] # re-order
+        # no need anymore, and clashes with group assignments in fGroups constructor
+        fList <- lapply(fList, set, j = "group", value = NULL)
         features <- featuresSIRIUS(analysisInfo = anaInfo, features = fList)
         
         ngrp <- max(resTbl$group)

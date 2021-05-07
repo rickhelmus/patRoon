@@ -182,38 +182,46 @@ setMethod("getPICSet", "features", function(obj, exportedData = TRUE)
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)
     EICs <- if (exportedData) getEICsForFeatures(obj) else NULL
-    return(lapply(seq_along(fTable), function(anai)
+    return(lapply(names(fTable), function(ana)
     {
         ret <- list()
         if (exportedData)
         {
-            ret$path = getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai])
+            anai <- match(ana, anaInfo$analysis)
+            
+            ret$path = getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
             ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
-            ret$pics <- Map(EICs[[anai]], fTable[[anai]]$mz, f = function(eic, mz)
+            
+            if (!is.null(EICs[[ana]]))
             {
-                setDT(eic)
-                setnames(eic, "intensity", "int")
-                eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
-                eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
-                return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
-            })
-            ret$peaks <- Map(ret$pics, fTable[[anai]]$intensity, f = function(pic, int)
-            {
-                # UNDONE: some dummy values here
-                return(list(peakIndex = which.min(abs(pic[, "int"] - int)),
-                            snr = NA_real_,
-                            signals = int,
-                            peakScale = 10))
-            })
+                ret$pics <- Map(EICs[[ana]], fTable[[ana]]$mz, f = function(eic, mz)
+                {
+                    setDT(eic)
+                    setnames(eic, "intensity", "int")
+                    eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
+                    eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
+                    return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
+                })
+                ret$peaks <- Map(ret$pics, fTable[[ana]]$intensity, f = function(pic, int)
+                {
+                    # UNDONE: some dummy values here
+                    return(list(peakIndex = which.min(abs(pic[, "int"] - int)),
+                                snr = NA_real_,
+                                signals = int,
+                                peakScale = 10))
+                })
+            }
+            else
+                ret$pics <- ret$peaks <- list()
         }
         else
         {
-            ret$path <- anaInfo$analysis[anai]
+            ret$path <- ana
             ret$scantime <- integer()
             ret$pics <- ret$peaks <- list()
         }
         
-        ret$peakinfo <- makeKPIC2PeakInfo(fTable[[anai]])
+        ret$peakinfo <- makeKPIC2PeakInfo(fTable[[ana]])
 
         return(ret)
     }))

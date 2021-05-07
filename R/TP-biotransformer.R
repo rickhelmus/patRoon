@@ -106,7 +106,7 @@ BTMPPrepareHandler <- function(cmd)
 
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
-                                     skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
+                                      skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),

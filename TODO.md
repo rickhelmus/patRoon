@@ -177,7 +177,6 @@
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
 - sets
     - thoroughly test consensus for compounds/formulas and ranking with both set and algo consensus
-    - enable annotation consensus tests
 - new ranking for formulas/compounds consensus (and sets)
     - filterSets?
 - ensure peaklists are sorted

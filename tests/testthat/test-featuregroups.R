@@ -173,7 +173,8 @@ test_that("XCMS3 conversion", {
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
-fctbl <- as.data.table(fgOpenMS, FCParams = getFCParams(c("solvent-pos", "standard-pos")))
+FCParams <- getFCParams(c("solvent-pos", "standard-pos"))
+fctbl <- as.data.table(fgOpenMS, FCParams = FCParams)
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
@@ -196,10 +197,13 @@ test_that("as.data.table works", {
     expect_true(all(is.na(regr$conc) | is.na(regr$conc_reg) | is.na(regr$RSQ) | regr$RSQ < 0.9 |
                         abs(regr$conc - regr$conc_reg) < 0.5)) # calculated concentrations should be somewhat close
 
+    checkmate::expect_names(names(fctbl), must.include = c("FC", "FC_log", "PV", "PV_log", "classification"))
+    checkmate::expect_subset(fctbl$classification, c("insignificant", "FC", "increase", "decrease", "significant"))
 
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE, features = TRUE)), 0)
+    expect_equal(nrow(as.data.table(fgOpenMSEmpty, FCParams = FCParams)), 0)
 })
 
 test_that("unique works", {
@@ -418,6 +422,8 @@ test_that("plotting works", {
     # vdiffr doesn't work with UpSet
     expect_ggplot(plotUpSet(fgOpenMS))
     expect_ggplot(plotUpSet(fGCompOpenMS))
+    
+    expect_doppel("volcano", function() plotVolcano(fgOpenMS, FCParams))
     
     skip_if(testWithSets())
     

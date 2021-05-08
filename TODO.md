@@ -153,6 +153,7 @@
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - retDir: convert to character?
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
+    - only keep relevant suspect list columns when input is screening object for lib/BT TPs
 - reporting
     - padding between two tables?
     - default TP columns OK?

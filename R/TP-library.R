@@ -83,14 +83,14 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
             dataSusp <- parents[[matchSuspectsBy]]
         }
         
+        # rename from suspect list
+        TPLibrary[, parent_name_lib := parent_name] # store original
+        TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
+        
         # only take data in both
         dataInBoth <- intersect(dataLib, dataSusp)
-        dataInBoth <- dataInBoth[match(dataSusp, dataInBoth, nomatch = 0)] # align suspect order
-        TPLibrary <- TPLibrary[match(dataInBoth, dataLib)] # match and align suspect order
+        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
         parents <- parents[dataSusp %chin% dataInBoth]
-        
-        # rename from suspect list
-        TPLibrary[, parent_name := parents$name]
     }
     else
     {
@@ -124,6 +124,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
     
     results <- pruneList(results, checkZeroRows = TRUE)
     parents <- parents[name %in% names(results)]
+    results <- results[match(parents$name, names(results))] # sync order
     
     return(transformationProductsLibrary(parents = parents, products = results))
 }

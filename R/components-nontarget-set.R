@@ -5,6 +5,13 @@ NULL
 
 componentsNTSet <- setClass("componentsNTSet", contains = "componentsSet")
 
+setMethod("collapseComponents", "componentsNTSet", function(obj)
+{
+    obj@setObjects <- lapply(obj@setObjects, collapseComponents)
+    obj <- syncComponentsSetObjects(obj)
+    return(obj)
+})
+
 #' @export
 setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked, set) plotGraph(unset(obj, set), onlyLinked = onlyLinked))
 

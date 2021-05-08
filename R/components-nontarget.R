@@ -23,6 +23,18 @@ NULL
 #' @export
 componentsNT <- setClass("componentsNT", slots = c(homol = "list"), contains = "components")
 
+setMethod("collapseComponents", "componentsNT", function(obj)
+{
+    obj@components <- lapply(obj@components, function(cmp)
+    {
+        keep <- c("rt", "mz", "group", "rGroup")
+        cmp <- cmp[, keep, with = FALSE]
+        cmp[, rGroup := paste0(unique(rGroup), collapse = ","), by = "group"]
+        return(unique(cmp, by = "group"))
+    })
+    return(obj)
+})
+
 #' @describeIn componentsNT Plots an interactive network graph for linked
 #'   homologous series (\emph{i.e.} series with (partial) overlap which could
 #'   not be merged). The resulting graph can be browsed interactively and allows

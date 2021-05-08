@@ -64,6 +64,7 @@ setGeneric("spectrumSimilarity", function(obj, ...) standardGeneric("spectrumSim
 setGeneric("componentTable", function(obj) standardGeneric("componentTable"))
 setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
+setGeneric("collapseComponents", function(obj) standardGeneric("collapseComponents"))
 setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGeneric("generateComponents"))
 setGeneric("generateComponentsRAMClustR", function(fGroups, ...) standardGeneric("generateComponentsRAMClustR"))
 setGeneric("generateComponentsCAMERA", function(fGroups, ...) standardGeneric("generateComponentsCAMERA"))

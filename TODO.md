@@ -65,16 +65,12 @@
 
 ## Components
 
-- get rid of duplicated fGroup rows for nontarget so that they can work with delete/checkComponents
 - extraOpts --> `...` for nontarget?
+- printComponentsFiltered: mention something else than feature groups (eg not true for TP components)
 - checkComponents
     - more settings?
     - session import
     - change column names for both tables?
-    - somehow handle partial removing of componentsTPs
-        - add extra column identifier and use that instead of group column?
-        - or add specific code that also involves the TP_name
-        - or simply don't support it for now?
 - feature components
     - cliqueMS
         - change checkPackage GH link once PRs are merged
@@ -107,6 +103,7 @@
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
     - screening: filter on set specific rank cols? Or all? (now all)
+    - components: rename original setObject names to simplify things, verify it then works with checkComponents
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -281,6 +278,7 @@
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - OpenMS/cliqueMS adducts?
+    - checkComponents/delete: for NT/TP components all fGroups are removed
 - TPs
     - mention Bas as author for log2fc, spec similarity/shift etc
         - cosine based on OrgMassSpecR

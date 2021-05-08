@@ -210,7 +210,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkComponentsInterface$new(components = components, fGroups = fGroups, EICs = EICs,
+    int <- checkComponentsInterface$new(components = collapseComponents(components), fGroups = fGroups, EICs = EICs,
                                         primarySelections = cmpNames, curSession = curSession,
                                         session = session)
     return(runCheckUI(int))

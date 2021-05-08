@@ -70,6 +70,7 @@ componentsReduced <- setClass("componentsReduced",
 setMethod("initialize", "componentsReduced",
           function(.Object, ...) callNextMethod(.Object, algorithm = "reduced", ...))
 
+setMethod("collapseComponents", "components", function(obj) obj)
 
 #' @describeIn components Accessor method for the \code{components} slot of a
 #'   \code{components} class. Each component is stored as a

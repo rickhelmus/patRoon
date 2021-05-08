@@ -12,7 +12,11 @@ getTPParents <- function(parents, adduct, skipInvalid)
         parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
     }
     else # suspect screening
-        parents <- copy(screenInfo(parents)) # UNDONE: keep all columns?
+    {
+        parents <- copy(screenInfo(parents))
+        parents <- unique(parents, by = "name")
+        parents[, group := NULL] # UNDONE: remove more columns?
+    }
     
     if (is.null(parents[["SMILES"]]))
         stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")

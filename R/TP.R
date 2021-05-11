@@ -104,7 +104,10 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
-    
+
+    if (length(TPs) == 0)
+        stop("Cannot create suspect list: no data", call. = FALSE)
+
     prodAll <- rbindlist(products(TPs))
     keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
     prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
@@ -112,7 +115,7 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
     
     if (includeParents)
         prodAll <- rbind(parents(TPs), prodAll, fill = TRUE)
-    
+
     return(prodAll)
 })
 

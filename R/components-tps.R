@@ -98,10 +98,11 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLists, formulas, compounds, minRTDiff,
                                specSimParams)
 {
-    if (length(fGroups) == 0)
+    if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, minRTDiff, specSimParams)
+    hash <- makeHash(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLists, formulas, compounds, minRTDiff,
+                     specSimParams)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -113,7 +114,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     {
         msg <- "fGroupsTPs is doesn't contain any feature groups"
         if (ignoreParents)
-            msg <- paste(msg, "or doesn't contain any (unique) feature groups")
+            msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
         return(componentsTPs(componentInfo = data.table(), components = list()))
@@ -305,10 +306,10 @@ setMethod("as.data.table", "componentsTPs", function(x)
     # as regular method, but get rid of double links column when merging
     # components / componentInfo
     
-    x@componentInfo <- x@componentInfo[, -"links"]
-    ret <- callNextMethod(x)
+    if (length(x) > 0)
+        x@componentInfo <- x@componentInfo[, -"links"]
     
-    return(ret)
+    return(callNextMethod(x))
 })
 
 #' @export
@@ -363,12 +364,17 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             ct[, keep := TRUE]
             
             if (retDirMatch)
-                ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir == retDir]
+            {
+                if (negate)
+                    ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir != retDir]
+                else
+                    ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir == retDir]
+            }
             
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)
-            ct <- minColFilter(ct, "minSpecSimBoth", minSpecSimBoth)
-            ct <- minColFilter(ct, "fragMatches", minFragMatches)
+            ct <- minColFilter(ct, "specSimilarityBoth", minSpecSimBoth)
+            ct <- minColFilter(ct, "fragmentMatches", minFragMatches)
             ct <- minColFilter(ct, "neutralLossMatches", minNLMatches)
             
             if (!is.null(formulas))
@@ -409,7 +415,6 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
         if (verbose)
             printComponentsFiltered(old, obj)
     }
-    
     
     if (...length() > 0)
         return(callNextMethod(obj, ..., verbose = verbose, negate = negate))
@@ -496,52 +501,55 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     unsetCompounds <- checkAndUnSetOther(sets(fGroupsTPs), compounds, "compounds", TRUE)
 
     cat("Adding sets related data...\n")
-    ret@components <- withProg(length(ret), FALSE, Map(ret@components, ret@componentInfo$parent_group, f = function(cmp, parentFG)
+    if (length(ret) > 0)
     {
-        # mark set presence
-        cmp[, set := sapply(group, function(g)
+        ret@components <- withProg(length(ret), FALSE, Map(ret@components, ret@componentInfo$parent_group, f = function(cmp, parentFG)
         {
-            paste0(names(which(sapply(gNamesTPsSets, function(n) g %chin% n))), collapse = ",")
-        })]
-        
-        for (s in sets(fGroupsTPs))
-        {
-            if (!is.null(unsetMSPeakLists[[s]]))
+            # mark set presence
+            cmp[, set := sapply(group, function(g)
             {
-                # calculate per set spectrum similarities
-                simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
-                grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
-                
-                if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[parentFG]][["MSMS"]]))
-                {
-                    sims <- genTPSpecSimilarities(unsetMSPeakLists[[s]], parentFG, grpsInSet,
-                                                  specSimParams = specSimParams)
-                    cmp[match(grpsInSet, group), (simColNames) := sims]
-                }
-                else
-                    cmp[, (simColNames) := NA_real_]
-                
-                if (!is.null(unsetFormulas[[s]]) || !is.null(unsetCompounds[[s]]))
+                paste0(names(which(sapply(gNamesTPsSets, function(n) g %chin% n))), collapse = ",")
+            })]
+            
+            for (s in sets(fGroupsTPs))
+            {
+                if (!is.null(unsetMSPeakLists[[s]]))
                 {
                     # calculate per set spectrum similarities
-                    sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
-                                                 unsetCompounds[[s]])
-                    annColNames <- paste0(c("fragmentMatches", "neutralLossMatches"), "-", s)
-                    cmp[, (annColNames) := sims]
+                    simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
+                    grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
+                    
+                    if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[parentFG]][["MSMS"]]))
+                    {
+                        sims <- genTPSpecSimilarities(unsetMSPeakLists[[s]], parentFG, grpsInSet,
+                                                      specSimParams = specSimParams)
+                        cmp[match(grpsInSet, group), (simColNames) := sims]
+                    }
+                    else
+                        cmp[, (simColNames) := NA_real_]
+                    
+                    if (!is.null(unsetFormulas[[s]]) || !is.null(unsetCompounds[[s]]))
+                    {
+                        # calculate per set spectrum similarities
+                        sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
+                                                     unsetCompounds[[s]])
+                        annColNames <- paste0(c("fragmentMatches", "neutralLossMatches"), "-", s)
+                        cmp[, (annColNames) := sims]
+                    }
                 }
+                
+                # move spec similarity columns to end
+                setcolorder(cmp, setdiff(names(cmp), grep("^specSimilarity", names(cmp), value = TRUE)))
+                
+                # ... and annotation sim columns after that
+                setcolorder(cmp, setdiff(names(cmp), grep("Matches", names(cmp), fixed = TRUE, value = TRUE)))
+                
+                doProgress()
             }
             
-            # move spec similarity columns to end
-            setcolorder(cmp, setdiff(names(cmp), grep("^specSimilarity", names(cmp), value = TRUE)))
-            
-            # ... and annotation sim columns after that
-            setcolorder(cmp, setdiff(names(cmp), grep("Matches", names(cmp), fixed = TRUE, value = TRUE)))
-            
-            doProgress()
-        }
-        
-        return(cmp)
-    }))
-        
+            return(cmp)
+        }))
+    }
+    
     return(ret)
 })

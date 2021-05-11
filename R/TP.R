@@ -21,7 +21,7 @@ NULL
 #'
 #' @templateVar seli parents
 #' @templateVar selOrderi names()
-#' @templateVar dollarOpName suspect
+#' @templateVar dollarOpName parent
 #' @template sub_op-args
 #'
 #' @templateVar class transformationProducts
@@ -78,7 +78,7 @@ setMethod("[", c("transformationProducts", "ANY", "missing", "missing"), functio
     return(x)
 })
 
-#' @describeIn transformationProducts Extracts a table with TPs for a suspect.
+#' @describeIn transformationProducts Extracts a table with TPs for a parent.
 #' @export
 setMethod("[[", c("transformationProducts", "ANY", "missing"), function(x, i, j)
 {
@@ -86,16 +86,17 @@ setMethod("[[", c("transformationProducts", "ANY", "missing"), function(x, i, j)
     return(x@products[[i]])
 })
 
-#' @describeIn transformationProducts Extracts a table with TPs for a suspect.
+#' @describeIn transformationProducts Extracts a table with TPs for a parent.
 #' @export
 setMethod("$", "transformationProducts", function(x, name)
 {
     eval(substitute(x@products$NAME_ARG, list(NAME_ARG = name)))
 })
 
+# UNDONE: add more parent info?
 #' @describeIn transformationProducts Returns all TP data in a table.
 #' @export
-setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "suspect"))
+setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "parent"))
 
 #' @export
 setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents)

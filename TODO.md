@@ -122,6 +122,7 @@
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
+    - disable parallellization (by default)?
 - metabolic logic
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents

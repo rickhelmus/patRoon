@@ -159,7 +159,7 @@ setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includ
     checkmate::reportAssertions(ac)
 
     cat("Collapsing results... ")
-    prodAll <- collapseBTResults(TPs@products)
+    prodAll <- if (length(TPs) > 0) collapseBTResults(TPs@products) else data.table()
     cat("Done!\n")
 
     doConvertToMFDB(prodAll, parents(TPs), out, includeParents)

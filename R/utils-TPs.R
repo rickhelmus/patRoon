@@ -36,7 +36,10 @@ getTPParents <- function(parents, adduct, skipInvalid)
 doConvertToMFDB <- function(prodAll, parents, out, includeParents)
 {
     # UNDONE: cache?
-    
+
+    if (nrow(prodAll) == 0)
+        stop("Cannot create MetFrag database: no data", call. = FALSE)
+
     # set to MetFrag style names
     setnames(prodAll,
              c("name", "formula", "neutralMass"),

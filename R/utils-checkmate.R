@@ -152,7 +152,7 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
             x <- x[, intersect(names(x), allCols)]
     }
     
-    checkmate::assertDataFrame(x, any.missing = skipInvalid, min.rows = 1, .var.name = .var.name, add = add)
+    checkmate::assertDataFrame(x, any.missing = TRUE, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)
 
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
@@ -161,14 +161,25 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
     needsAdduct <- needsAdduct && (is.null(x[["mz"]]) || any(is.na(x$mz)))
     for (col in c("name", "SMILES", "InChI", "formula", "InChIKey", "adduct", "fragments_mz", "fragments_formula"))
     {
-        emptyOK <- col != "name" && (col != "adduct" || !needsAdduct) && skipInvalid
+        emptyOK <- col != "name" && (col != "adduct" || !needsAdduct)
         assertListVal(x, col, assertCharOrFactor, empty.ok = emptyOK, null.ok = emptyOK, add = add)
     }
 
     for (col in c("mz", "neutralMass", "rt"))
-        assertListVal(x, col, checkmate::assertNumeric, any.missing = emptyOK, null.ok = emptyOK, lower = 0,
+        assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, null.ok = TRUE, lower = 0,
                       finite = TRUE, add = add)
 
+    if (!skipInvalid)
+    {
+        cx <- copy(x)
+        cx[, OK := any(!sapply(.SD, is.na)), by = seq_len(nrow(cx)), .SDcols = intersect(names(x), mzCols)]
+        if (all(!cx$OK))
+            stop("Suspect list doesn not contain any (data to calculate) suspect masses", call. = FALSE)
+        else if (any(!cx$OK))
+            stop("Suspect list does not contain any (data to calculate) suspect masses for row(s): ",
+                 paste0(which(!cx$OK), collapse = ", "), call. = FALSE)
+    }
+    
     invisible(NULL)
 }
 

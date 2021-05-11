@@ -195,7 +195,8 @@ setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormula
     {
         if (removeEqualFormulas)
         {
-            obj@products <- Map(parents(obj)$formula, obj@products, f = function(pform, prod)
+            # NOTE: obj@products should be first arg to Map to keep names...
+            obj@products <- Map(obj@products, parents(obj)$formula, f = function(prod, pform)
             {
                 if (negate)
                     return(prod[formula == pform])
@@ -210,6 +211,7 @@ setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormula
         }
 
         obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
+        obj@parents <- obj@parents[name %in% names(obj@products)]
 
         saveCacheData("filterTPs", obj, hash)
     }

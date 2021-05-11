@@ -15,12 +15,15 @@ TPsLibCustom <- generateTPs("library",
                                                    TP_name = "Linuron", TP_SMILES = "CN(C(=O)NC1=CC(=C(C=C1)Cl)Cl)OC"))
 TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
+TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ]) # for filter tests
+
+fGroupsEmpty <- getEmptyTestFGroups()
+fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
+TPsLogicEmpty <- generateTPs("logic", fGroupsEmpty)
 
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
-fGroupsEmpty <- getEmptyTestFGroups()
-fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
 
 doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
@@ -64,7 +67,7 @@ test_that("verify TP generation", {
     checkmate::expect_names(names(parents(TPsBTSusp)), must.include = c("name", "SMILES", "InChI", "InChIKey",
                                                                         "formula", "neutralMass"))
     
-    expect_length(generateTPs("logic", fGroupsEmpty), 0)
+    expect_length(TPsLogicEmpty, 0)
     expect_length(generateTPs("library", fGroupsScrEmpty), 0)
     expect_length(generateTPs("biotransformer", fGroupsScrEmpty), 0)
     
@@ -77,4 +80,59 @@ test_that("verify TP generation", {
 
     checkmate::expect_names(parents(TPsLibComp)$name, subset.of = as.data.table(compsMF)$identifier)
     checkmate::expect_names(parents(TPsBTComp)$name, subset.of = as.data.table(compsMF)$identifier)
+})
+
+assertSusp <- function(...) patRoon:::assertSuspectList(..., needsAdduct = FALSE, skipInvalid = FALSE)
+testMFDB <- function(...)
+{
+    outf <- tempfile(fileext = ".csv")
+    convertToMFDB(..., out = outf, includeParents = FALSE); db <- fread(outf)
+    cols <- c("Identifier", "MolecularFormula", "MonoisotopicMass",
+              "Precursor MonoisotopicMass", "SMILES", "InChI", "InChIKey",
+              "InChIKey1", "ALogP")
+    
+    checkmate::expect_data_table(MFDBNP, any.missing = FALSE, nrows = length(TPsLibScr))
+    checkmate::expect_names(names(MFDBNP), subset.of = cols)
+    
+    convertToMFDB(..., out = outf, includeParents = TRUE); db <- fread(outf)
+    checkmate::expect_data_table(MFDBP, any.missing = FALSE, nrows = length(TPsLibScr) + nrow(parents(TPsLibScr)))
+    checkmate::expect_names(names(MFDBP), subset.of = cols)
+}
+
+getMFDB <- function(...) { outf <- tempfile(fileext = ".csv"); convertToMFDB(..., out = outf); fread(outf) }
+MFDBNP <- getMFDB(TPsLibScr, includeParents = FALSE)
+MFDBP <- getMFDB(TPsLibScr, includeParents = TRUE)
+TPsBTSuspFEF <- filter(TPsBTSuspMore, removeEqualFormulas = TRUE)
+TPsBTSuspFEFN <- filter(TPsBTSuspMore, removeEqualFormulas = TRUE, negate = TRUE)
+pnames <- parents(TPsLogic)$name
+test_that("basic usage", {
+    expect_length(TPsLogic["nope"], 0)
+    expect_equivalent(names(TPsLogic[1:2]), pnames[1:2])
+    expect_equivalent(names(TPsLogic[pnames[2:3]]), pnames[2:3])
+    expect_equivalent(names(TPsLogic[c(TRUE, FALSE)]), pnames[c(TRUE, FALSE)])
+    expect_equal(length(TPsLogic[FALSE]), 0)
+    expect_length(TPsLogicEmpty[1:5], 0)
+    
+    expect_equivalent(TPsLogic[[2]], products(TPsLogic)[[2]])
+    expect_equivalent(TPsLogic[[names(TPsLogic)[2]]], products(TPsLogic)[[2]])
+    expect_equivalent(callDollar(TPsLogic, names(TPsLogic)[2]), TPsLogic[[2]])
+    
+    expect_equal(nrow(as.data.table(TPsLogic)), length(TPsLogic))
+    
+    expect_error(assertSusp(convertToSuspects(TPsLogic)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsLibScr)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsBTSusp)), NA)
+    
+    testMFDB(TPsLibScr)
+    testMFDB(TPsBTSusp)
+    
+    expect_false(any(mapply(parents(TPsBTSuspFEF)$formula, products(TPsBTSuspFEF), FUN = function(f, p) any(f %in% p$formula))))
+    expect_true(all(mapply(parents(TPsBTSuspFEFN)$formula, products(TPsBTSuspFEFN), FUN = function(f, p) all(f %in% p$formula))))
+    expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
+    expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
+    
+    skip_if_not(doMetFrag)
+    
+    expect_error(assertSusp(convertToSuspects(TPsLibComp)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsBTComp)), NA)
 })

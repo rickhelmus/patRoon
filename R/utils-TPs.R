@@ -10,6 +10,7 @@ getTPParents <- function(parents, adduct, skipInvalid)
         else
             setnames(compTab, "identifier", "name")
         parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
+        parents <- prepareSuspectList(parents, adduct, skipInvalid, calcMZs = FALSE)
     }
     else # suspect screening
     {

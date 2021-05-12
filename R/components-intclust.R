@@ -106,41 +106,6 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
     return(makeHash(plotm, ...))
 })
 
-#' @describeIn componentsIntClust generates a dendrogram from a given cluster
-#'   object and optionally highlights resulting branches when the cluster is
-#'   cut.
-#' @param numericLabels Set to \code{TRUE} to label with numeric indices instead
-#'   of (long) feature group names.
-#' @templateVar withoutDots TRUE
-#' @template plot_clust
-#' @export
-setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabels = TRUE,
-                                                 colourBranches = length(x) < 50,
-                                                 showLegend = length(x) < 20, ...)
-{
-    verifyCompNotAltered(obj)
-    
-    checkmate::assertString(pal, min.chars = 1)
-    dendro <- as.dendrogram(x@clust)
-    if (numericLabels)
-        dendextend::labels(dendro) <- as.character(seq_along(x@cutClusters))
-    plotDendroWithClusters(dendro, x@cutClusters, pal, colourBranches, showLegend, ...)
-    invisible(NULL)
-})
-
-
-#' @templateVar class componentsIntClust
-#' @template plotsil
-#' @export
-setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16, type = "b", ...)
-{
-    verifyCompNotAltered(obj)
-    
-    checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
-    doPlotSilhouettes(obj@clust, obj@distm, kSeq, pch, type, ...)
-    invisible(NULL)
-})
-
 #' @details \code{generateComponentsIntClust} generates components based on
 #'   intensity profiles of feature groups. Hierarchical clustering is performed
 #'   on normalized (and optionally replicate averaged) intensity data and the

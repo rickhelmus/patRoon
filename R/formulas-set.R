@@ -134,6 +134,18 @@ setMethod("plotSpectrumHash", "formulasSet", function(obj, index, groupName, ana
                     perSet, mirror))
 })
 
+setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    assertChoiceSilent(groupName, groupNames(obj), add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
+    checkmate::reportAssertions(ac)
+
+    return(doAnnotatePeakListSet(obj, index, groupName, MSPeakLists, formulas = NULL, analysis = analysis, ...))
+})
+
 #' @export
 setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,

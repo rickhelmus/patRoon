@@ -173,6 +173,22 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     return(compounds)
 })
 
+setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL, ...)
+{
+    checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
+    allFGroups <- groupNames(obj)
+    if (!is.null(formulas))
+        allFGroups <- union(allFGroups, groupNames(formulas))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    assertChoiceSilent(groupName, allFGroups, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
+    checkmate::reportAssertions(ac)
+    
+    return(doAnnotatePeakListSet(obj, index, groupName, MSPeakLists, formulas, ...))
+})
+
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                 uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,

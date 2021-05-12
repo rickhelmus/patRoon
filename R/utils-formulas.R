@@ -451,8 +451,8 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
             if (nrow(fi) > 0)
             {
                 # align remaining mzs
-                fi[, PLID := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
-                fi[, mz := spec$mz[PLID]]
+                fi[, PLID := sapply(mz, function(x) spec[which.min(abs(x - mz))]$ID)]
+                fi[, mz := spec[match(PLID, ID)]$mz]
             }
             
             return(fi)

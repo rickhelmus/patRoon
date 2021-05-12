@@ -134,7 +134,7 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
 
 setMethod("delete", "featureGroupsKPIC2", function(obj, ...)
 {
-    obj <- callNextMethod(f)
+    obj <- callNextMethod()
     
     # UNDONE: sync picsSetGroups slot?
     

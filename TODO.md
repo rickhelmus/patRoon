@@ -233,6 +233,7 @@
     - generateFormulas: MSPeakLists argument
         - also update handbook, tutorial...
     - as.data.table(): countFragElements implies fragments=TRUE
+    - MSPL: reAverage for subset/filter
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -317,7 +318,7 @@
     - mzWindow --> mzExpWindow
     - groupFeatures: feat arg --> obj
 - Annotation
-    - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
+    - MSPL: reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - fixed: withMSMS now applied after all other filters

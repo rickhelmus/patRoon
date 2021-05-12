@@ -53,6 +53,8 @@ componentsIntClust <- setClass("componentsIntClust",
 setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE, col = NULL,
                                                         margins = c(6, 2), cexCol = 1,  ...)
 {
+    verifyCompNotAltered(obj)
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(interactive, add = ac)
     checkmate::reportAssertions(ac)
@@ -79,6 +81,8 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
 setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
                                                     lty = 3, col = NULL, ...)
 {
+    verifyCompNotAltered(obj)
+    
     checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
 
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
@@ -114,6 +118,8 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
                                                  colourBranches = length(x) < 50,
                                                  showLegend = length(x) < 20, ...)
 {
+    verifyCompNotAltered(obj)
+    
     checkmate::assertString(pal, min.chars = 1)
     dendro <- as.dendrogram(x@clust)
     if (numericLabels)
@@ -128,6 +134,8 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
 #' @export
 setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16, type = "b", ...)
 {
+    verifyCompNotAltered(obj)
+    
     checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
     doPlotSilhouettes(obj@clust, obj@distm, kSeq, pch, type, ...)
     invisible(NULL)

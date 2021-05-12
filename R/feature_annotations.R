@@ -78,7 +78,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
             ct[, row := seq_len(nrow(ct))]
             
             fragTab <- rbindlist(ct$fragInfo, idcol = "row", fill = TRUE)
-            fragTab[, PLIndex := NULL]
+            fragTab[, PLID := NULL]
             cnames <- setdiff(names(fragTab), "row")
             setnames(fragTab, cnames, paste0("frag_", cnames))
             

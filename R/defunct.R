@@ -370,7 +370,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             
             for (i in seq_len(nrow(spec)))
             {
-                infoi <- if (is.null(fi) || nrow(fi) == 0) FALSE else match(i, fi$PLIndex, nomatch = FALSE)
+                infoi <- if (is.null(fi) || nrow(fi) == 0) FALSE else match(i, fi$PLID, nomatch = FALSE)
                 
                 htext <- ""
                 if (infoi)

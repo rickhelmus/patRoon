@@ -418,7 +418,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
         formTable <- list()
     }
     
-    groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
+    groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
     return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
 })

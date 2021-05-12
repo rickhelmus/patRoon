@@ -272,7 +272,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
     {
         groupFormulas <- generateGroupFormulasByConsensus(fTable, lapply(ftind, function(x) sum(x > 0)),
                                                           featThreshold, featThresholdAnn, gNames)
-        groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
+        groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     }
     else
         groupFormulas <- list()

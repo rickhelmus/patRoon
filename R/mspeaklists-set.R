@@ -29,6 +29,8 @@ MSPeakListsSet <- setClass("MSPeakListsSet",
                            slots = c(analysisInfo = "data.frame"),
                            contains = c("MSPeakLists", "workflowStepSet"))
 
+setMethod("initialize", "MSPeakListsSet", function(.Object, ...) callNextMethod(.Object, ..., setIDs = FALSE))
+    
 setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 {
     # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
@@ -90,10 +92,6 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     checkmate::assertFlag(reAverage, add = ac)
     checkmate::reportAssertions(ac)
 
-    # NOTE: reAverage is ignored here, as syncMSPeakListsSetObjects() should
-    # always be called and averaging for MSPeaksListSet actually only concerns
-    # merging
-
     if (!is.null(sets))
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
     
@@ -146,7 +144,8 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 
 #' @export
 setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, absMzDev = 0.002,
-                                               retainPrecursorMSMS = TRUE, negate = FALSE, sets = NULL)
+                                               retainPrecursorMSMS = TRUE, reAverage = FALSE, negate = FALSE,
+                                               sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
@@ -183,13 +182,13 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, abs
     {
         if (is.null(annotatedByList))
             obj@setObjects <- lapply(obj@setObjects, filter, ..., absMzDev = absMzDev,
-                                     retainPrecursorMSMS = retainPrecursorMSMS, negate = negate)
+                                     retainPrecursorMSMS = retainPrecursorMSMS, reAverage = reAverage, negate = negate)
         else
         {
             obj@setObjects <- Map(obj@setObjects, annotatedByList, f = function(so, ab)
             {
                 filter(so, ..., annotatedBy = ab, absMzDev = absMzDev, retainPrecursorMSMS = retainPrecursorMSMS,
-                       negate = negate)
+                       reAverage = reAverage, negate = negate)
             })
         }
         obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)

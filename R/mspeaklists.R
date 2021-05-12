@@ -397,7 +397,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
                                             minMSMSPeaks = NULL, isolatePrec = NULL, deIsotopeMS = FALSE,
                                             deIsotopeMSMS = FALSE, withMSMS = FALSE, annotatedBy = NULL,
-                                            absMzDev = 0.002, retainPrecursorMSMS = TRUE, negate = FALSE)
+                                            absMzDev = 0.002, retainPrecursorMSMS = TRUE, reAverage = FALSE,
+                                            negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -408,7 +409,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks + minMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
-    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + withMSMS + retainPrecursorMSMS + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + withMSMS + retainPrecursorMSMS + reAverage + negate,
+           fixed = list(add = ac))
     checkmate::assert(
         checkmate::checkNull(annotatedBy),
         checkmate::checkClass(annotatedBy, "formulas"),
@@ -530,9 +532,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     obj@peakLists <- pLists
     
     # update group averaged peak lists
-    obj@averagedPeakLists <- averageMSPeakLists(obj)
+    
+    if (reAverage)
+        obj@averagedPeakLists <- averageMSPeakLists(obj)
 
-    # and filter them as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
     obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists, TRUE)
     

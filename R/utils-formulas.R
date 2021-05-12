@@ -428,7 +428,7 @@ addMiscFormulaInfo <- function(formTable, adduct)
     return(formTable)
 }
 
-setFormulaPLIndex <- function(formList, MSPeakLists, absAlignMzDev)
+setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
 {
     # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than
     # what was used to get the feature formula, or it may simply be removed.
@@ -451,14 +451,14 @@ setFormulaPLIndex <- function(formList, MSPeakLists, absAlignMzDev)
             if (nrow(fi) > 0)
             {
                 # align remaining mzs
-                fi[, PLIndex := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
-                fi[, mz := spec$mz[PLIndex]]
+                fi[, PLID := sapply(mz, function(x) which.min(abs(x - spec$mz)))]
+                fi[, mz := spec$mz[PLID]]
             }
             
             return(fi)
         })]
         fc[, explainedPeaks := sapply(fragInfo, nrow)]
-        fc[explainedPeaks == 0, fragInfo := lapply(fragInfo, function(fi) copy(fi)[, PLIndex := integer()])]
+        fc[explainedPeaks == 0, fragInfo := lapply(fragInfo, function(fi) copy(fi)[, PLID := integer()])]
         
         return(fc)
     })

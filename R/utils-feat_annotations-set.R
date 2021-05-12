@@ -9,7 +9,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     # - checking setThreshold/setThresholdAnn
     # - merging by UID
     # - average scores
-    # - merge fragInfos and update PLIndex
+    # - merge fragInfos and update PLID
     
     
     sumMergedScoreRows <- function(sc, m) .rowSums(unlist(sc), na.rm = TRUE, m = m, n = 2)
@@ -104,7 +104,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         ct[, fragInfo := lapply(fragInfo, function(fi)
         {
             fi <- copy(fi) # avoid DT warning/bug
-            fi[, c("PLIndex", "PLIndexSet", "PLIndexOrig") := .(PLIndexSet, NULL, PLIndex)]
+            fi[, c("PLID", "PLIDSet", "PLIDOrig") := .(PLIDSet, NULL, PLID)]
         })]
         
         scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
@@ -195,7 +195,7 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
             pl <- copy(MSPeakListsSet[[fg]][["MSMS"]])
             if (!is.null(pl)) # may be NULL for MS only formulae
             {
-                pl[, PLIndex := seq_len(.N)]
+                pl[, PLID := seq_len(.N)]
                 pl <- pl[set == s]
             }
             
@@ -206,10 +206,10 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
                 if (nrow(fi) == 0)
                 {
                     # otherwise it will be assigned as empty list, which messes up merging elsewhere
-                    fi[, PLIndexSet := numeric()]
+                    fi[, PLIDSet := numeric()]
                 }
                 else
-                    fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLIndex"]])]
+                    fi[, PLIDSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLID"]])]
                 fi[, set := s]
                 return(fi)
             })]
@@ -280,8 +280,8 @@ doFeatAnnUnset <- function(obj, set)
         {
             fi <- copy(fi)
             fi <- fi[set == ..set]
-            set(fi, j = c("set", "PLIndex"), value = NULL)
-            setnames(fi, "PLIndexOrig", "PLIndex") # restore original index
+            set(fi, j = c("set", "PLID"), value = NULL)
+            setnames(fi, "PLIDOrig", "PLID") # restore original index
         })]
     })
     
@@ -422,8 +422,8 @@ setMethodMult("annotatedPeakList", c("formulasSet", "compoundsSet"), function(ob
         setnames(ret, "set.x", "set")
         ret[, set.y := NULL]
     }
-    if (!is.null(ret[["PLIndexOrig"]]))
-        ret[, PLIndexOrig := NULL]
+    if (!is.null(ret[["PLIDOrig"]]))
+        ret[, PLIDOrig := NULL]
     
     return(ret[])
 })

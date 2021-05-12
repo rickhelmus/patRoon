@@ -22,14 +22,14 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     else if (nrow(fiRight) > 0)
     {
         # for overlap: just add label
-        fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLIndex")
+        fiLeft <- merge(fiLeft, fiRight[, c("PLID", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLID")
         fiLeft[is.na(mergedBy.y), mergedBy := mergedBy.x]
         fiLeft[is.na(mergedBy.x), mergedBy := mergedBy.y]
         fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y), mergedBy := paste(mergedBy.x, mergedBy.y, sep = ",")]
         fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
 
         # add unique
-        fiUnique <- fiRight[!PLIndex %in% fiLeft$PLIndex]
+        fiUnique <- fiRight[!PLID %in% fiLeft$PLID]
         if (nrow(fiUnique) > 0)
             fiLeft <- rbind(fiLeft, fiUnique, fill = TRUE)
     }

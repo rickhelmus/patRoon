@@ -41,7 +41,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
             fragInfo <- fread(ff)
             fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
             fragInfo[, ionization := gsub(" ", "", ionization)]
-            fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
+            fragInfo[, PLID := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
 
             # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
             # candidate(s) it belongs to
@@ -73,7 +73,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
             # warning(sprintf("no fragment info for %s", cmd$gName))
             results[, fragInfo := list(rep(list(data.table(mz = numeric(0), ion_formula = character(0),
                                                            neutral_loss = character(0),  score = numeric(0),
-                                                           PLIndex = numeric(0))),
+                                                           PLID = numeric(0))),
                     nrow(results)))]
             results[, explainedPeaks := 0]
         }

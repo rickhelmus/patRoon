@@ -206,7 +206,7 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
 {
     if (mfResult$NoExplPeaks == 0 || mfResult$FormulasOfExplPeaks == "NA")
         return(data.table(mz = numeric(0), ion_formula = character(0), neutral_loss = character(0),
-                          score = numeric(0), PLIndex = numeric(0)))
+                          score = numeric(0), PLID = numeric(0)))
 
     # format of FormulasOfExplPeaks: list of strings with mz1:formula1;mz2:formula2;...
     fi <- unlist(strsplit(mfResult$FormulasOfExplPeaks, "[;:]")) # split into list with subsequent m/z / formula pairs
@@ -218,7 +218,7 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
         ret[, score := as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";")))]
     ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
     ret[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
-    ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
+    ret[, PLID := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
     setcolorder(ret, c("mz", "ion_formula", "ion_formula_MF", "neutral_loss"))
 
     return(ret)

@@ -173,7 +173,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         formTable <- list()
     }
     
-    groupFormulas <- setFormulaPLIndex(groupFormulas, MSPeakLists, absAlignMzDev)
+    groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
     if (verbose)
     {

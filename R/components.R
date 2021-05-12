@@ -64,12 +64,6 @@ setMethod("initialize", "components", function(.Object, ...)
     return(.Object)
 })
 
-#' @rdname components-class
-componentsReduced <- setClass("componentsReduced",
-                              contains = "components")
-setMethod("initialize", "componentsReduced",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "reduced", ...))
-
 setMethod("collapseComponents", "components", function(obj) obj)
 
 #' @describeIn components Accessor method for the \code{components} slot of a
@@ -218,7 +212,7 @@ setMethod("delete", "components", function(obj, i = NULL, j = NULL, ...)
             obj@componentInfo[, size := sapply(obj@components, nrow)][] # update
     }
     
-    return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
+    return(obj)
 })
 
 #' @describeIn components Returns all component data in a table.
@@ -357,7 +351,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     if (verbose)
         printComponentsFiltered(old, obj)
 
-    return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
+    return(obj)
 })
 
 #' @describeIn components Returns the component id(s) to which a feature group

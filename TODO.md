@@ -194,10 +194,6 @@
     - peak qualities
         - filter (once implemented)
     - as.data.table: normalization?
-- TPs
-    - different workflows
-    - filter() for componentsTPs
-    - plotGraph
 - annotatedBy MSPeakLists filter
     - first fix PLIndex
     
@@ -287,6 +283,7 @@
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - OpenMS/cliqueMS adducts?
     - checkComponents/delete: for NT/TP components all fGroups are removed
+    - update docs for reduced removal: only clust affected, remove note about reduced
 - TPs
     - mention Bas as author for log2fc, spec similarity/shift etc
         - cosine based on OrgMassSpecR
@@ -388,6 +385,7 @@
     - CAMERA components: handle cases when `minSize` filter results in zero components
     - CAMERA components: ensure consistent component names
     - filter(): allow negative rtIncrement values
+    - componentsReduced removed, intclust checks instead
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt

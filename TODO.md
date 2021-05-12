@@ -79,13 +79,7 @@
     - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
     - OpenMS: handle potentialAdducts per set
     - prefAdducts: also include eg Na by default?
-- get rid of componentsReduced?
-    - not good for methods such as those from componentsTPs (eg as.data.table doesn't remove links, filter functionality) and nontarget
-    - make a reduceComponents() method instead?
-    - not very relevant to have for CAMERA, RAMClustR, cliqueMS, nontarget
-    - featureComponents could be updated instead of reduced
-    - --> only important for cluster components? maybe add a check function for its methods instead that will verify if operations are possible
-    
+
 
 ## sets
 
@@ -115,9 +109,6 @@
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
-- topMost filter: apply to set consensus results?
-    - currently group results may be removed if top candidate is not top candidate in all sets
-    - re-enable tests when fixed
 
 
 ## TPs

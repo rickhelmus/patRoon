@@ -98,7 +98,7 @@ MSPeakLists <- setClass("MSPeakLists",
                         contains = "workflowStep")
 
 
-setMethod("initialize", "MSPeakLists", function(.Object, ...)
+setMethod("initialize", "MSPeakLists", function(.Object, setIDs = TRUE, ...)
 {
     .Object <- callNextMethod(.Object, ...)
 
@@ -108,24 +108,27 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
     
-    addIDs <- function(pl)
+    if (setIDs)
     {
-        add <- function(p)
+        addIDs <- function(pl)
         {
-            p <- copy(p)
-            p[, ID := seq_len(.N)]
-            setcolorder(p, "ID")
-            return(p)
+            add <- function(p)
+            {
+                p <- copy(p)
+                p[, ID := seq_len(.N)]
+                setcolorder(p, "ID")
+                return(p)
+            }
+            if (!is.null(pl[["MS"]]))
+                pl$MS <- add(pl$MS)
+            if (!is.null(pl[["MSMS"]]))
+                pl$MSMS <- add(pl$MSMS)
+            
+            return(pl)
         }
-        if (!is.null(pl[["MS"]]))
-            pl$MS <- add(pl$MS)
-        if (!is.null(pl[["MSMS"]]))
-            pl$MSMS <- add(pl$MSMS)
-        
-        return(pl)
+        .Object@peakLists <- lapply(.Object@peakLists, function(pla) lapply(pla, addIDs))
+        .Object@averagedPeakLists <- lapply(.Object@averagedPeakLists, addIDs)
     }
-    .Object@peakLists <- lapply(.Object@peakLists, function(pla) lapply(pla, addIDs))
-    .Object@averagedPeakLists <- lapply(.Object@averagedPeakLists, addIDs)
     
     return(.Object)
 })

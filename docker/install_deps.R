@@ -14,6 +14,12 @@ remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
 install.packages("vdiffr")
 install.packages("circlize", repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
+BiocManager::install("ropls") # for KPIC2
+remotes::install_github("rickhelmus/KPIC2")
+remotes::install_github("rickhelmus/cliqueMS")
+install.packages("MetaClean")
+remotes::install_github("KelseyChetnik/MetaCleanData")
+
 install.packages("desc")
 
 getMissingPkgs <- function()

@@ -233,7 +233,9 @@
     - generateFormulas: MSPeakLists argument
         - also update handbook, tutorial...
     - as.data.table(): countFragElements implies fragments=TRUE
-    - MSPL: reAverage for subset/filter
+    - MSPL
+        - reAverage for subset/filter
+        - ID column, used by fragInfo
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -318,7 +320,9 @@
     - mzWindow --> mzExpWindow
     - groupFeatures: feat arg --> obj
 - Annotation
-    - MSPL: reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
+    - MSPL
+        - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
+        - PLIndex -- > PLID and different meaning
     - Fixed Hill ordering: H wasn't alphabetical if no C is present
     - minMSMSPeaks and annotatedBy MSPeakLists filters
     - fixed: withMSMS now applied after all other filters
@@ -403,7 +407,6 @@
 
 ## Annotation
 
-- Get rid of PLIndex and harmonize approach with linking annotated peaks for formulas/compounds using tolerances, which eg allows altered MSPeakLists after annotation
 - SusDat MF support
 - parallel MSPeakLists generation?
 - somehow handle different fragment formula annotations when making a consensus between formula/compounds objects

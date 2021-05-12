@@ -9,7 +9,6 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     # - checking setThreshold/setThresholdAnn
     # - merging by UID
     # - average scores
-    # - merge fragInfos and update PLID
     
     
     sumMergedScoreRows <- function(sc, m) .rowSums(unlist(sc), na.rm = TRUE, m = m, n = 2)
@@ -98,15 +97,9 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         })
     }, simplify = FALSE)
     
-    # update fragInfos, average scores and convert absolute merge counts to coverage
+    # update average scores and convert absolute merge counts to coverage
     cons <- lapply(cons, function(ct)
     {
-        ct[, fragInfo := lapply(fragInfo, function(fi)
-        {
-            fi <- copy(fi) # avoid DT warning/bug
-            fi[, c("PLID", "PLIDSet", "PLIDOrig") := .(PLIDSet, NULL, PLID)]
-        })]
-        
         scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
         ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
         
@@ -169,6 +162,34 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
     return(list(scTypes = scTypes, scRanges = scRanges))
 }
 
+doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, ...)
+{
+    usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+    usMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
+    usInds <- lapply(sets(obj), function(s) obj[[groupName]][[paste0("rank-", s)]][index])
+    
+    if (!is.null(formulas))
+    {
+        usForm <- checkAndUnSetOther(sets(obj), formulas, "formulas")
+        annPLs <- Map(usObj, usInds, usMSPL, usForm, f = annotatedPeakList,
+                      MoreArgs = c(list(groupName = groupName), list(...)))
+    }
+    else
+        annPLs <- Map(usObj, usInds, usMSPL, f = annotatedPeakList,
+                      MoreArgs = c(list(groupName = groupName), list(...)))
+    
+    annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
+    
+    if (!is.null(annPLs[["set.x"]]))
+    {
+        # remove duplicate set column resulting from merging peak lists and fragInfo
+        setnames(annPLs, "set.x", "set")
+        annPLs[, set.y := NULL]
+    }
+    
+    return(annPLs[])
+}
+
 doUpdateSetConsensus <- function(obj)
 {
     if (length(setObjects(obj)) >= 1)
@@ -192,28 +213,12 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
     {
         for (fg in groupNames(setObjects[[s]]))
         {
-            pl <- copy(MSPeakListsSet[[fg]][["MSMS"]])
-            if (!is.null(pl)) # may be NULL for MS only formulae
-            {
-                pl[, PLID := seq_len(.N)]
-                pl <- pl[set == s]
-            }
-            
-            ct <- setObjects[[s]]@groupAnnotations[[fg]]
-            ct[, fragInfo := lapply(fragInfo, function(fi)
+            setObjects[[s]]@groupAnnotations[[fg]][, fragInfo := lapply(fragInfo, function(fi)
             {
                 fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
-                if (nrow(fi) == 0)
-                {
-                    # otherwise it will be assigned as empty list, which messes up merging elsewhere
-                    fi[, PLIDSet := numeric()]
-                }
-                else
-                    fi[, PLIDSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLID"]])]
                 fi[, set := s]
                 return(fi)
             })]
-            setObjects[[s]]@groupAnnotations[[fg]] <- ct            
         }
     }
     
@@ -280,8 +285,7 @@ doFeatAnnUnset <- function(obj, set)
         {
             fi <- copy(fi)
             fi <- fi[set == ..set]
-            set(fi, j = c("set", "PLID"), value = NULL)
-            setnames(fi, "PLIDOrig", "PLID") # restore original index
+            set(fi, j = "set", value = NULL)
         })]
     })
     
@@ -411,21 +415,6 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
         x <- updateSetConsensus(x)
     
     return(x)
-})
-
-setMethodMult("annotatedPeakList", c("formulasSet", "compoundsSet"), function(obj, ...)
-{
-    ret <- callNextMethod()
-    if (!is.null(ret[["set.x"]]))
-    {
-        # remove duplicate set column resulting from merging peak lists and fragInfo
-        setnames(ret, "set.x", "set")
-        ret[, set.y := NULL]
-    }
-    if (!is.null(ret[["PLIDOrig"]]))
-        ret[, PLIDOrig := NULL]
-    
-    return(ret[])
 })
 
 setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., sets = NULL, updateConsensus = FALSE,

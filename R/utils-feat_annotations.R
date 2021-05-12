@@ -62,17 +62,14 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
         return(NULL)
     
     spec <- copy(spec)
-    spec[, PLID := seq_len(nrow(spec))] # for merging
-    
+
     if (!is.null(annTable) && nrow(annTable) >= index)
     {
         compr <- annTable[index]
         fragInfo <- compr$fragInfo[[1]]
         
         if (!is.null(fragInfo))
-            spec <- merge(spec, fragInfo[, -"mz"], all.x = TRUE, by = "PLID")
-        
-        spec <- spec[, PLID := NULL]
+            spec <- merge(spec, fragInfo[, -"mz"], all.x = TRUE, by.x = "ID", by.y = "PLID")
     }
     
     if (onlyAnnotated)

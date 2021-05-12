@@ -218,7 +218,7 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
         ret[, score := as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";")))]
     ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
     ret[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
-    ret[, PLID := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
+    ret[, PLID := sapply(mz, function(omz) spec[which.min(abs(omz - mz))]$ID)]
     setcolorder(ret, c("mz", "ion_formula", "ion_formula_MF", "neutral_loss"))
 
     return(ret)

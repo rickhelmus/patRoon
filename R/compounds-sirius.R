@@ -41,7 +41,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
             fragInfo <- fread(ff)
             fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
             fragInfo[, ionization := gsub(" ", "", ionization)]
-            fragInfo[, PLID := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
+            fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
 
             # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
             # candidate(s) it belongs to

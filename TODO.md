@@ -7,7 +7,6 @@
 - patRoonData
     - remove some more suspects to get better default hits?
 - newProject
-    - support SAFD? needs profile data...
     - sets: add specific options for annotation and others?
     - TP workflow
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
@@ -40,7 +39,6 @@
 
 ## Annotation
 
-- plotSpectrum/annotatedPeakList: check if index exist?
 - GenForm oc is FALSE by default. OK? Add to newProject?
 - ion_formula_mz --> ionMass?
 - min score filters: take maximum value of all merged columns?
@@ -63,20 +61,6 @@
 
 ## sets
 
-- methods to implement
-    - consensus / comparison()
-        - compounds
-            - merge by identifier for non sets?
-                - is merging by IK1 in generally reasonable anyway?
-                    - seems unique
-            - check mergedBy clashes between algos/sets
-                - seems OK, but algo mergedBy removed for plotSpectrum --> OK?
-            - keep setThreshold for consensus?
-                - probably yes?
-        - formulas
-            - rename columns like compounds, eg rank, mergedBy
-                - finished?
-        - getAllMergedConsCols(): make set aware?
 - misc
     - formulas/compounds: update set column when subsetting on sets?
     - fix MapAligner exception with test-components
@@ -84,10 +68,6 @@
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
     - screening: filter on set specific rank cols? Or all? (now all)
-- merging setObjects
-    - check if more has to be cached and may need status messages
-    - compound set consensus: scoreRanges should be re-determined from annotation results?
-        - ??
 
 
 ## TPs
@@ -108,8 +88,6 @@
     - remove? doesn't seem useful anymore
 - log2fc
     - P values are calculated properly?
-    - workflow: first do log2fc subsetting, then clustering
-        - not relevant anymore?
 - spectrumSimilarity
     - plotting
         - formulas/compounds
@@ -120,7 +98,6 @@
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
 - Consistency
-    - consistency for spectrum/peaklist
     - precursor diff: 1-2 or 2-1? --> verify all
 - misc
     - show method for new components classes

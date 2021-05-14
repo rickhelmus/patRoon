@@ -1,5 +1,4 @@
 #' @include main.R
-#' @include features-openms.R
 #' @include features-xcms.R
 #' @include feature_groups.R
 #' @include feature_groups-xcms.R
@@ -153,13 +152,6 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
     xcms::profinfo(xs) <- list(method = "bin", step = 0.1)
 
     return(xs)
-})
-
-#' @rdname xcms-conv
-#' @export
-setMethod("getXCMSSet", "featuresOpenMS", function(obj, verbose, ...)
-{
-    return(callNextMethod(obj, verbose = verbose, loadRawData = TRUE))
 })
 
 #' @rdname xcms-conv

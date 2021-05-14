@@ -30,7 +30,6 @@
     - updatePICSet(): also sync peaks list? otherwise doc
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
-    - remove featuresOpenMS method for getXCMSSet(), update docs
     - delete for features and fGroups
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
@@ -194,6 +193,7 @@
     - MC import/export
     - session filters: TRUE will use default yml file name
     - XMCS(3): `exportedData` --> `loadRawData`
+    - removed featuresOpenMS method for getXCMSSet()
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA

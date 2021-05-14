@@ -300,13 +300,14 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (file.exists(sessionOut) && !overWrite)
+        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
+    
     if (length(fGroups) == 0)
     {
         printf("No feature groups, nothing to do...\n")
         return(invisible(NULL))
     }
-    
-    # UNDONE: handle overWrite
     
     oldSession <- readCheckSession(sessionIn, "featureGroups")
     
@@ -316,37 +317,14 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
         return(invisible(NULL))
     }
     
-    gInfo <- groupInfo(fGroups)
-    gInfoDT <- as.data.table(gInfo[, c("rts", "mzs")])
-    setnames(gInfoDT, c("ret", "mz")) # equalize column names between old/new tables
-    gInfoDT[, group := rownames(gInfo)]
+    newGroupsTab <- importCheckUISessionGroups(oldSession, fGroups, rtWindow, mzWindow)
     
-    oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
-    
-    warnTol <- FALSE
-    newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)
+    if (nrow(newGroupsTab) == 0)
     {
-        gi <- gInfoDT[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
-        if (nrow(gi) == 0)
-        {
-            printf("Could not find any matching feature groups for old group %s\n", ogtr$group)
-            warnTol <<- TRUE
-            return(NULL)
-        }
-        else if (nrow(gi) > 1)
-        {
-            printf("Old group %s matched to multiple new groups: %s\n", ogtr$group, paste0(gi$group, collapse = ", "))
-            warnTol <<- TRUE
-        }
-        return(gi)
-    }), oldGroupTab$group)
+        printf("Nothing could be matched, nothing to do...\n")
+        return(invisible(NULL))
+    }
     
-    if (warnTol)
-        printf(paste("NOTE: You may consider tweaking the retention and/or m/z tolerances by setting",
-               "the rtWindow/mzWindow arguments\n"))
-    
-    newGroupsTab <- rbindlist(pruneList(newGroups), idcol = "oldGroup")
-
     removeFully <- newGroupsTab[oldGroup %chin% oldSession$removeFully]$group
     
     rmpwh <- which(newGroupsTab$oldGroup %chin% names(oldSession$removePartially))
@@ -357,8 +335,6 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
                      fGroups[, newGroupsTab$group], "featureGroups")
     
     invisible(NULL)
-    # importCheckUISession(pathIn, pathOut, "feature groups", "analyses", names(fGroups),
-    #                      analyses(fGroups), overWrite = overWrite)
 }
 
 #' @details \code{checkFeatures} is used to review chromatographic

@@ -24,9 +24,6 @@
 	    - check better for what is supported by SIRIUS?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - Check: units of plotChord() rt/mz graphs seems off
-- checkUI
-    - file import with different group names
-        - for features: handle overWrite
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters

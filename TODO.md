@@ -27,8 +27,6 @@
 - checkUI
     - file import with different group names
         - for features: handle overWrite
-        - implement components
-            - harmonize code with features
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
@@ -67,7 +65,6 @@
 - extraOpts --> `...` for nontarget?
 - checkComponents
     - more settings?
-    - session import
     - change column names for both tables?
 - feature components
     - cliqueMS
@@ -419,7 +416,8 @@
 - intclust
     - optionally take areas instead of intensities
     - cache results
-
+- import check sessions?
+    - needs way to match component names
 
 # Future
 

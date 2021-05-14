@@ -104,7 +104,6 @@
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
     - screening: filter on set specific rank cols? Or all? (now all)
-    - components: rename original setObject names to simplify things, verify it then works with checkComponents
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

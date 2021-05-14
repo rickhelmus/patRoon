@@ -28,7 +28,6 @@
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
     - updatePICSet(): also sync peaks list? otherwise doc
-    - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
     - rename exportedData, update docs (also handbook)
@@ -59,7 +58,6 @@
 
 ## Components
 
-- extraOpts --> `...` for nontarget?
 - checkComponents
     - more settings?
     - change column names for both tables?
@@ -268,6 +266,7 @@
     - OpenMS/cliqueMS adducts?
     - checkComponents/delete: for NT/TP components all fGroups are removed
     - update docs for reduced removal: only clust affected, remove note about reduced
+    - extraOpts --> `...` for nontarget
 - TPs
     - mention Bas as author for log2fc, spec similarity/shift etc
         - cosine based on OrgMassSpecR
@@ -372,6 +371,7 @@
     - CAMERA components: ensure consistent component names
     - filter(): allow negative rtIncrement values
     - componentsReduced removed, intclust checks instead
+    - extraOpts --> `...` for nontarget
 - plotGraph: better error if if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt

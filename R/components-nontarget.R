@@ -101,7 +101,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #' @export
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
                                                                    elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
-                                                                   absMzDevLink = absMzDev * 2, extraOpts = NULL,
+                                                                   absMzDevLink = absMzDev * 2, 
                                                                    traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 {
     ac <- checkmate::makeAssertCollection()
@@ -111,7 +111,6 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, min.len = 1, add = ac)
     aapply(checkmate::assertNumber, . ~ rtDev + absMzDev + absMzDevLink, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertFlag(traceHack, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -119,7 +118,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         return(componentsNT(homol = list(), componentInfo = data.table(), components = list(),
                             algorithm = "nontarget"))
 
-    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, absMzDevLink, extraOpts)
+    extraArgs <- list(...)
+    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, absMzDevLink, extraArgs)
     cd <- loadCacheData("componentsNontarget", hash)
     if (!is.null(cd))
         return(cd)
@@ -141,12 +141,10 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         return(if (length(fGrpRep) == 0) NULL else as.data.table(fGrpRep, average = TRUE))
     }, simplify = FALSE)
 
-    homArgs <- list(isotopes = isotopes, elements = elements, minmz = mzRange[1],
-                     maxmz = mzRange[2], minrt = rtRange[1], maxrt = rtRange[2], ppm = FALSE,
-                     mztol = absMzDev, rttol = rtDev)
-    if (!is.null(extraOpts))
-        homArgs <- modifyList(homArgs, extraOpts)
-
+    homArgs <- c(list(isotopes = isotopes, elements = elements, minmz = mzRange[1],
+                      maxmz = mzRange[2], minrt = rtRange[1], maxrt = rtRange[2], ppm = FALSE,
+                      mztol = absMzDev, rttol = rtDev),
+                 extraArgs)
     
     homList <- sapply(rGroups, function(rg)
     {

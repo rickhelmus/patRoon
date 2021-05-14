@@ -57,16 +57,8 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
     }
     
     if (...length() > 0)
-    {
-        obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
-        obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
-        
-        # synchronize other objects
-        cat("Synchronizing set objects...\n")
-        obj <- syncComponentsSetObjects(obj)
-        cat("Done!\n")
-    }
-    
+        obj <- callNextMethod(obj, ..., negate = negate)
+
     return(obj)
 })
 

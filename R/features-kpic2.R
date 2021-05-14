@@ -175,17 +175,17 @@ setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
 })
 
 #' @export
-setMethod("getPICSet", "features", function(obj, exportedData = TRUE)
+setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
 {
-    checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(loadRawData)
     
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)
-    EICs <- if (exportedData) getEICsForFeatures(obj) else NULL
+    EICs <- if (loadRawData) getEICsForFeatures(obj) else NULL
     return(lapply(names(fTable), function(ana)
     {
         ret <- list()
-        if (exportedData)
+        if (loadRawData)
         {
             anai <- match(ana, anaInfo$analysis)
             

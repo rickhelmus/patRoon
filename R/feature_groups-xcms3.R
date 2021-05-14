@@ -27,7 +27,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 #'
 #' @rdname feature-grouping
 #' @export
-setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
                                                      retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
@@ -35,13 +35,13 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, expor
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     assertS4(groupParam, add = ac)
     assertS4(retAlignParam, add = ac)
     checkmate::reportAssertions(ac)
 
-    xdata <- getXCMSnExp(feat, verbose = verbose, exportedData = exportedData)
-    return(doGroupFeaturesXCMS3(xdata, feat, rtalign, exportedData, groupParam, retAlignParam, verbose))
+    xdata <- getXCMSnExp(feat, verbose = verbose, loadRawData = loadRawData)
+    return(doGroupFeaturesXCMS3(xdata, feat, rtalign, loadRawData, groupParam, retAlignParam, verbose))
 })
 
 #' @export
@@ -56,20 +56,20 @@ setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
     
     # HACK: force non-set features method to allow grouping of neutralized features
     # UNDONE: or simply export this functionality with a flag?
-    xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, exportedData = FALSE)
+    xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, loadRawData = FALSE)
     
-    return(doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, exportedData = FALSE, groupParam, xcms::ObiwarpParam(),
+    return(doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, loadRawData = FALSE, groupParam, xcms::ObiwarpParam(),
                                 verbose))
 })
 
-doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, exportedData, groupParam, retAlignParam, verbose)
+doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, retAlignParam, verbose)
 {
     anaInfo <- analysisInfo(feat)
     
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = anaInfo, features = feat))
     
-    hash <- makeHash(feat, rtalign, exportedData, groupParam, retAlignParam)
+    hash <- makeHash(feat, rtalign, loadRawData, groupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -77,7 +77,7 @@ doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, exportedData, groupParam,
     if (verbose)
         cat("Grouping features with XCMS...\n===========\n")
     
-    if (!exportedData && rtalign)
+    if (!loadRawData && rtalign)
     {
         if (verbose)
             cat("Skipping RT alignment: no raw data\n")

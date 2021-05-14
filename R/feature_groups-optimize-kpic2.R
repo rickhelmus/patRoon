@@ -13,7 +13,7 @@ featureGroupsOptimizerKPIC2$methods(
         
         # filter out invalid params (e.g. when user forgets to use
         # groupArgs/alignArgs for specifying params to optimize)
-        params <- params[names(params) %in% c("rtalign", "exportedData", "groupArgs", "alignArgs")]
+        params <- params[names(params) %in% c("rtalign", "loadRawData", "groupArgs", "alignArgs")]
         
         for (p in c("groupArgs", "alignArgs"))
         {
@@ -61,7 +61,7 @@ featureGroupsOptimizerKPIC2$methods(
     convertOptToCallParams = function(params)
     {
         # general params
-        ret <- params[names(params) %in% c("rtalign", "exportedData")]
+        ret <- params[names(params) %in% c("rtalign", "loadRawData")]
         
         for (p in c("groupArgs", "alignArgs"))
         {

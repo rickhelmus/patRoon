@@ -30,7 +30,6 @@
     - updatePICSet(): also sync peaks list? otherwise doc
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
-    - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - delete for features and fGroups
         - XCMS: also update groups data? --> use new function once it hits BC
@@ -51,16 +50,8 @@
 - default setThresholdAnn=0?
 
 
-## Suspects
-
-- spec similarity: use C++ code?
-    - probably not ... many things such as alignment not relevant
-
 ## Components
 
-- checkComponents
-    - more settings?
-    - change column names for both tables?
 - feature components
     - cliqueMS
         - change checkPackage GH link once PRs are merged
@@ -202,6 +193,7 @@
     - groupFeatures: feat arg --> obj
     - MC import/export
     - session filters: TRUE will use default yml file name
+    - XMCS(3): `exportedData` --> `loadRawData`
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
@@ -308,6 +300,7 @@
     - noDataPlot() for empty plots, eg by plot(), plotChroms()...
     - mzWindow --> mzExpWindow
     - groupFeatures: feat arg --> obj
+    - XMCS(3): `exportedData` --> `loadRawData`
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
@@ -372,7 +365,7 @@
     - filter(): allow negative rtIncrement values
     - componentsReduced removed, intclust checks instead
     - extraOpts --> `...` for nontarget
-- plotGraph: better error if if object is empty
+- plotGraph: better error if object is empty
 - Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
 - xnames/showLegend args for plotInt
 - newProject: switch to new system and tweaks

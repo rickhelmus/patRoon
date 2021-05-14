@@ -103,18 +103,18 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
+setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
-    checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(loadRawData)
     checkmate::assertFlag(verbose)
 
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
     xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
 
-    if (exportedData)
+    if (loadRawData)
         xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)),
                                       function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]),
                                       USE.NAMES = FALSE)
@@ -140,7 +140,7 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
                                      rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
                                      sample = numeric(), sn = numeric())
         
-        if (exportedData)
+        if (loadRawData)
         {
             xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i], verbose = verbose)[[1]]
             rlist$raw[[i]] <- xr@scantime
@@ -159,7 +159,7 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 #' @export
 setMethod("getXCMSSet", "featuresOpenMS", function(obj, verbose, ...)
 {
-    return(callNextMethod(obj, verbose = verbose, exportedData = TRUE))
+    return(callNextMethod(obj, verbose = verbose, loadRawData = TRUE))
 })
 
 #' @rdname xcms-conv
@@ -171,14 +171,14 @@ setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
+setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData)
 {
-    checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(loadRawData)
     checkmate::assertFlag(verbose)
 
     if (verbose)
         cat("Getting ungrouped xcmsSet...\n")
-    xs <- getXCMSSet(getFeatures(obj), verbose = verbose, exportedData = exportedData)
+    xs <- getXCMSSet(getFeatures(obj), verbose = verbose, loadRawData = loadRawData)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xcms::groupidx(xs) <- xsgrps$idx
@@ -189,7 +189,7 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData)
+setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, loadRawData)
 {
     # first see if we can just return the xcmsSet used during grouping
 
@@ -199,7 +199,7 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData
         !all(simplifyAnalysisNames(xcms::filepaths(obj@xs)) == anaInfo$analysis))
     {
         # files changed, need to update group statistics which is rather complex so just fallback
-        return(callNextMethod(obj, verbose = verbose, exportedData = exportedData))
+        return(callNextMethod(obj, verbose = verbose, loadRawData = loadRawData))
     }
 
     return(obj@xs)
@@ -217,12 +217,12 @@ setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., set) getXCMSSet(u
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "features", function(obj, verbose, exportedData)
+setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
 {
-    checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(loadRawData)
     
     rawData <- NULL
-    if (exportedData)
+    if (loadRawData)
         rawData <- readMSDataForXCMS3(analysisInfo(obj))
     else
     {
@@ -288,7 +288,7 @@ setMethod("getXCMSnExp", "featuresXCMS3", function(obj, ...)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, exportedData)
+setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData)
 {
     checkmate::assertFlag(verbose)
     
@@ -297,7 +297,7 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, exportedData)
 
     msLevel = 1L # UNDONE?
 
-    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose, exportedData = exportedData)
+    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose, loadRawData = loadRawData)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xsgrps$groups[, peakidx := list(xsgrps$idx)]
@@ -322,7 +322,7 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, exportedData)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, exportedData)
+setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, loadRawData)
 {
     # first see if we can just return the embedded xcms object
     # NOTE: we can't do this if analyses have been subset
@@ -331,7 +331,7 @@ setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, exportedDa
 
     if (nrow(Biobase::pData(obj@xdata)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == anaInfo$analysis))
-        return(callNextMethod(obj, verbose = verbose, exportedData = exportedData))
+        return(callNextMethod(obj, verbose = verbose, loadRawData = loadRawData))
 
     return(obj@xdata)
 })

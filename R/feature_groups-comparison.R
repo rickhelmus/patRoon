@@ -203,7 +203,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     featsFromGroups <- convertFeatureGroupsToFeatures(fGroupsList)
 
     if (groupAlgo == "xcms" || groupAlgo == "xcms3" || groupAlgo == "kpic2")
-        groupArgs <- c(list(exportedData = FALSE), groupArgs)
+        groupArgs <- c(list(loadRawData = FALSE), groupArgs)
     compGroups <- do.call(groupFeatures, c(list(featsFromGroups, groupAlgo), groupArgs))
 
     return(featureGroupsComparison(fGroupsList = fGroupsList, comparedFGroups = compGroups))

@@ -86,7 +86,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     if (length(anasTBD) > 0)
     {
         cat("Exporting to XCMS features... ")
-        xds <- sapply(anasTBD, function(a) getXCMSnExp(fList[a], verbose = FALSE, exportedData = TRUE),
+        xds <- sapply(anasTBD, function(a) getXCMSnExp(fList[a], verbose = FALSE, loadRawData = TRUE),
                       simplify = FALSE)
         cat("Done!\n")
         

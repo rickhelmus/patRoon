@@ -52,7 +52,7 @@ if (testWithSets())
         if (is(x, "featureGroupsSIRIUS"))
             getXCMSSet(x, ...)
         else
-            getXCMSSet(x, exportedData = FALSE, set = "positive")
+            getXCMSSet(x, loadRawData = FALSE, set = "positive")
     }
     doExportXCMS3 <- function(x, ...)
     {
@@ -60,7 +60,7 @@ if (testWithSets())
         if (is(x, "featureGroupsSIRIUS"))
             getXCMSnExp(x, ...)
         else
-            getXCMSnExp(x, exportedData = FALSE, set = "positive")
+            getXCMSnExp(x, loadRawData = FALSE, set = "positive")
     }
     getExpAnaInfo <- function() getTestAnaInfoPos()
     getExpFeats <- function(x) x[, sets = "positive"]

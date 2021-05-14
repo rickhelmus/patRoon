@@ -13,7 +13,7 @@ featureGroupsOptimizerXCMS$methods(
 
         # filter out invalid params (e.g. when user forgets to use
         # groupArgs/retcorArgs for specifying params to optimize)
-        params <- params[names(params) %in% c("rtalign", "exportedData", "groupArgs", "retcorArgs")]
+        params <- params[names(params) %in% c("rtalign", "loadRawData", "groupArgs", "retcorArgs")]
         
         for (p in c("groupArgs", "retcorArgs"))
         {
@@ -56,7 +56,7 @@ featureGroupsOptimizerXCMS$methods(
     convertOptToCallParams = function(params)
     {
         # general params
-        ret <- params[names(params) %in% c("rtalign", "exportedData")]
+        ret <- params[names(params) %in% c("rtalign", "loadRawData")]
 
         for (p in c("groupArgs", "retcorArgs"))
         {

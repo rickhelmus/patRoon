@@ -159,10 +159,10 @@ Some examples for these functions are shown below.
 export(fGroups, "brukertasq", out = "my_targets.csv")
 
 # convert features to xcmsSet.
-# NOTE: exportedData should only be FALSE when the analysis data files cannot be
+# NOTE: loadRawData should only be FALSE when the analysis data files cannot be
 # loaded by XCMS (e.g. when obtained with DataAnalysis)
-xset <- getXCMSSet(fList, exportedData = TRUE)
-xsetg <- getXCMSSet(fGroups, exportedData = TRUE) # get grouped xcmsSet
+xset <- getXCMSSet(fList, loadRawData = TRUE)
+xsetg <- getXCMSSet(fGroups, loadRawData = TRUE) # get grouped xcmsSet
 
 # using the new XCMS3 interface
 # NOTE: for XCMS3 data currently always has to be exported

@@ -65,20 +65,26 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
 #' @export
 setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
 {
-    i <- assertDeleteArgAndToChr(i, names(obj))
-    
-    if (length(obj) > 0)
+    old <- obj
+    obj <- callNextMethod()
+
+    # sync setObjects
+    cmpTab <- componentTable(obj); cmpTabOld <- componentTable(old)
+    obj@setObjects <- Map(obj@setObjects, sets(obj), f = function(so, soName)
     {
-        # figure out corresponding sets and revert names of i to non-set names
-        isets <- componentInfo(obj)[match(i, name)]$set
-        i <- mapply(i, isets, FUN = function(x, s) sub(paste0("-", s, "$"), "", x))
+        sNames <- paste0(names(so), "-", soName)
+        removed <- !sNames %chin% names(obj)
+        so <- delete(so, i = removed)
         
-        unisets <- unique(isets)
-        obj@setObjects[unisets] <- Map(obj@setObjects[unisets], unisets,
-                                       f = function(o, s) delete(o, i = i[isets == s], j = j, ...))
+        if (length(so) > 0)
+        {
+            # sync the rest
+            sNames <- sNames[!removed] # update
+            so@components <- Map(so@components, sNames, f = function(socmp, sn) fintersect(obj[[sn]], socmp))
+        }
         
-        obj <- syncComponentsSetObjects(obj)
-    }
+        return(so)
+    })
     
     return(obj)
 })

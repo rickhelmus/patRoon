@@ -12,20 +12,20 @@ setMethod("initialize", "featureGroupsKPIC2",
 
 #' @rdname feature-grouping
 #' @export
-setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupArgs = list(tolerance = c(0.005, 12)),
                                                      alignArgs = list(), verbose = TRUE)
 {
     checkPackage("KPIC", "https://github.com/hcji/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + alignArgs, any.missing = FALSE, names = "unique",
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    picsSet <- getPICSet(feat, exportedData = exportedData)
-    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, exportedData, groupArgs, alignArgs, verbose))
+    picsSet <- getPICSet(feat, loadRawData = loadRawData)
+    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose))
 })
 
 #' @export
@@ -41,17 +41,17 @@ setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(t
     
     # HACK: force non-set features method to allow grouping of neutralized features
     # UNDONE: or simply export this functionality with a flag?
-    picsSet <- selectMethod("getPICSet", "features")(feat, exportedData = FALSE)
-    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, exportedData = FALSE, groupArgs = groupArgs,
+    picsSet <- selectMethod("getPICSet", "features")(feat, loadRawData = FALSE)
+    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
                                 alignArgs = list(), verbose = verbose))
 })
 
-doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, exportedData, groupArgs, alignArgs, verbose)
+doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose)
 {
     if (length(feat) == 0)
         return(featureGroupsKPIC2(analysisInfo = analysisInfo(feat), features = feat))
     
-    hash <- makeHash(feat, rtalign, exportedData, groupArgs, alignArgs)
+    hash <- makeHash(feat, rtalign, loadRawData, groupArgs, alignArgs)
     cachefg <- loadCacheData("featureGroupsKPIC2", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -61,7 +61,7 @@ doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, exportedData, groupArgs
     
     picsSetGrouped <- do.call(KPIC::PICset.group, c(list(picsSet), groupArgs))
     
-    if (!exportedData && rtalign)
+    if (!loadRawData && rtalign)
     {
         if (verbose)
             cat("Skipping RT alignment: no raw data\n")

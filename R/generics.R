@@ -38,7 +38,7 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 #' \code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
 #'
 #' @param obj The object that should be converted.
-#' @param exportedData,\dots Set to \code{TRUE} if analyses were exported as
+#' @param loadRawData,\dots Set to \code{TRUE} if analyses were exported as
 #'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
 #'   \code{featuresXCMS} methods).
 #' @param verbose If \code{FALSE} then no text output is shown.

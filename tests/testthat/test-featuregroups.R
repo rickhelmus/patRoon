@@ -112,10 +112,10 @@ test_that("exporting works", {
 })
 
 XCMSImpXCMS <- doExportXCMS(fgXCMS)
-XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, exportedData = FALSE)
-XCMSImpOpenMS <- doExportXCMS(fgOpenMS, exportedData = FALSE)
-XCMSImpKPIC2 <- doExportXCMS(fgKPIC2, exportedData = FALSE)
-XCMSImpSIRIUS <- doExportXCMS(fgSIRIUS, exportedData = FALSE)
+XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, loadRawData = FALSE)
+XCMSImpOpenMS <- doExportXCMS(fgOpenMS, loadRawData = FALSE)
+XCMSImpKPIC2 <- doExportXCMS(fgKPIC2, loadRawData = FALSE)
+XCMSImpSIRIUS <- doExportXCMS(fgSIRIUS, loadRawData = FALSE)
 test_that("XCMS conversion", {
     expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(getExpFG(fgXCMS)))
     expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(getExpFG(fgXCMS3)))
@@ -141,11 +141,11 @@ test_that("XCMS conversion", {
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
 
-XCMS3ImpXCMS <- doExportXCMS3(fgXCMS, exportedData = FALSE)
+XCMS3ImpXCMS <- doExportXCMS3(fgXCMS, loadRawData = FALSE)
 XCMS3ImpXCMS3 <- doExportXCMS3(fgXCMS3)
-XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS, exportedData = FALSE)
-XCMS3ImpKPIC2 <- doExportXCMS3(fgKPIC2, exportedData = FALSE)
-XCMS3ImpSIRIUS <- doExportXCMS3(fgSIRIUS, exportedData = FALSE)
+XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS, loadRawData = FALSE)
+XCMS3ImpKPIC2 <- doExportXCMS3(fgKPIC2, loadRawData = FALSE)
+XCMS3ImpSIRIUS <- doExportXCMS3(fgSIRIUS, loadRawData = FALSE)
 
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(getExpFG(fgXCMS)))

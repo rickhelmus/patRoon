@@ -37,7 +37,7 @@ featureGroupsOptimizerXCMS3$methods(
         
         # filter out invalid params (e.g. when user forgets to use
         # groupParams/retAlignParams for specifying params to optimize)
-        params <- params[names(params) %in% c("rtalign", "exportedData", "groupMethod", "groupParams",
+        params <- params[names(params) %in% c("rtalign", "loadRawData", "groupMethod", "groupParams",
                                               "retAlignMethod", "retAlignParams")]
 
         if (is.null(params[["groupParams"]]))
@@ -91,7 +91,7 @@ featureGroupsOptimizerXCMS3$methods(
     
     convertOptToCallParams = function(params)
     {
-        ret <- params[names(params) %in% c("rtalign", "exportedData")]
+        ret <- params[names(params) %in% c("rtalign", "loadRawData")]
         
         # convert flattened group/ret align lists back to XCMS usable param objects
         ret$groupParam <- convertXCMS3GroupListToParam(params[groupParamNames], params$groupMethod,

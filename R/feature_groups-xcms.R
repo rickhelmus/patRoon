@@ -17,7 +17,7 @@ setMethod("initialize", "featureGroupsXCMS",
 #'   Both functions have an extensive list of parameters to modify their
 #'   behaviour and may therefore be used to potentially optimize results.
 #'
-#' @param exportedData Set to \code{TRUE} if analyses were exported as
+#' @param loadRawData Set to \code{TRUE} if analyses were exported as
 #'   \code{mzXML} or \code{mzML} files.
 #' @param groupArgs,retcorArgs named \code{character vector} that can contain
 #'   extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
@@ -29,19 +29,19 @@ setMethod("initialize", "featureGroupsXCMS",
 #'
 #' @rdname feature-grouping
 #' @export
-setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
                                                     retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
-    # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
+    # UNDONE: keep loadRawData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    xs <- getXCMSSet(feat, verbose = verbose, exportedData = exportedData)
-    return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
+    xs <- getXCMSSet(feat, verbose = verbose, loadRawData = loadRawData)
+    return(doGroupFeaturesXCMS(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose))
 })
 
 setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
@@ -53,17 +53,17 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
     
     # HACK: force non-set features method to allow grouping of neutralized features
     # UNDONE: or simply export this functionality with a flag?
-    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, exportedData = FALSE)
+    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, loadRawData = FALSE)
     
-    return(doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, exportedData = FALSE, groupArgs, list(), verbose))
+    return(doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs, list(), verbose))
 })
 
-doGroupFeaturesXCMS <- function(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose)
+doGroupFeaturesXCMS <- function(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose)
 {
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = analysisInfo(feat), features = feat))
     
-    hash <- makeHash(feat, rtalign, exportedData, groupArgs, retcorArgs)
+    hash <- makeHash(feat, rtalign, loadRawData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -76,7 +76,7 @@ doGroupFeaturesXCMS <- function(xs, feat, rtalign, exportedData, groupArgs, retc
     else
         suppressMessages(invisible(utils::capture.output(xs <- do.call(xcms::group, c(list(xs), groupArgs)))))
     
-    if (!exportedData && rtalign)
+    if (!loadRawData && rtalign)
     {
         if (verbose)
             cat("Skipping RT alignment: no raw data\n")

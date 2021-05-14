@@ -20,7 +20,7 @@ featureGroupsOptimizer$methods(
 
         fg <- do.call(groupFeatures, c(list(features, algorithm, verbose = FALSE), params))
 
-        ret <- utilsIPO$getRGTVValues(getXCMSSet(fg, verbose = FALSE, exportedData = TRUE), task, retCorFailed)
+        ret <- utilsIPO$getRGTVValues(getXCMSSet(fg, verbose = FALSE, loadRawData = TRUE), task, retCorFailed)
 
         if (keepObject)
             ret <- list(response = ret, object = fg)

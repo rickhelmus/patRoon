@@ -150,28 +150,6 @@ checkComponentsInterface$methods(
     }
 )
 
-#' @export
-importCheckComponentsSession <- function(sessionIn, sessionOut, components, overWrite = FALSE)
-{
-    # UNDONE: docs
-    
-    aapply(checkmate::assertString, . ~ sessionIn + sessionOut, min.chars = 1)
-    pathIn <- getCheckSessionPath(sessionIn, "components"); pathOut <- getCheckSessionPath(sessionOut, "components")
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
-    checkmate::assertPathForOutput(pathOut, overwrite = TRUE, .var.name = "sessionOut", add = ac)
-    checkmate::assertClass(components, "components", add = ac)
-    checkmate::assertFlag(overWrite, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (length(components) == 0)
-        stop("No components, nothing to do...")
-    
-    importCheckUISession(pathIn, pathOut, "components", "feature groups", names(components), groupNames(components),
-                         overWrite = overWrite)
-}
-
 #' @rdname GUI-utils
 #' @aliases checkComponents
 #' @export

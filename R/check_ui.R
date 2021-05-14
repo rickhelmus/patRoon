@@ -90,52 +90,39 @@ saveCheckSession <- function(session, path, fGroups, type)
     yaml::write_yaml(session, path)
 }
 
-importCheckUISession <- function(pathIn, pathOut, primaryName, secondaryName,
-                                 primarySelections, secondaryRowNames, overWrite = FALSE)
+importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow)
 {
-    if (file.exists(pathOut) && !overWrite)
-        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
-    # settings import:
-    # - remove any primary/secondary selections (eg feature groups/analyses) not present in target object
-    # - default missing values
+    gInfo <- groupInfo(fGroups)
+    gInfoDT <- as.data.table(gInfo[, c("rts", "mzs")])
+    setnames(gInfoDT, c("ret", "mz")) # equalize column names between old/new tables
+    gInfoDT[, group := rownames(gInfo)]
     
-    settings <- readRDS(pathIn)
-    otherPrimSelections <- names(settings$secondarySelections)
-    commonPrimSelections <- intersect(primarySelections, otherPrimSelections)
-    commonSecNames <- intersect(secondaryRowNames, settings$secondarySelections$name)
+    oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
     
-    if (length(commonPrimSelections) == 0)
-        warning(sprintf("Imported session doesn't contain any relevant %s!", primaryName), call. = FALSE)
-    if (length(commonSecNames) == 0)
-        warning(sprintf("Imported session doesn't contain any relevant %s!", secondaryName), call. = FALSE)
-    
-    # only keep common
-    settings$primarySelections <- intersect(primarySelections, settings$primarySelections)
-    settings$secondarySelections <- settings$secondarySelections[, c("name", commonPrimSelections), drop = FALSE]
-    settings$secondarySelections <- settings$secondarySelections[settings$secondarySelections$name %in% commonSecNames, ,
-                                                         drop = FALSE]
-    
-    # add missing
-    missingPrimSelections <- setdiff(primarySelections, otherPrimSelections)
-    settings$primarySelections <- c(settings$primarySelections, missingPrimSelections)
-    if (length(missingPrimSelections) > 0 && nrow(settings$secondarySelections) > 0)
-        settings$secondarySelections[, missingPrimSelections] <- TRUE
-    missingTbl <- data.frame(name = setdiff(secondaryRowNames, settings$secondarySelections$name))
-    if (nrow(missingTbl) > 0)
+    warnTol <- FALSE
+    newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)
     {
-        missingTbl[, primarySelections] <- TRUE
-        if (nrow(settings$secondarySelections) > 0)
-            settings$secondarySelections <- rbind(settings$secondarySelections, missingTbl)
-        else
-            settings$secondarySelections <- missingTbl
-    }
+        gi <- gInfoDT[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
+        if (nrow(gi) == 0)
+        {
+            printf("Could not find any matching feature groups for old group %s\n", ogtr$group)
+            warnTol <<- TRUE
+            return(NULL)
+        }
+        else if (nrow(gi) > 1)
+        {
+            printf("Old group %s matched to multiple new groups: %s\n", ogtr$group, paste0(gi$group, collapse = ", "))
+            warnTol <<- TRUE
+        }
+        return(gi)
+    }), oldGroupTab$group)
     
-    # match secondary name order
-    settings$secondarySelections <- settings$secondarySelections[match(secondaryRowNames,
-                                                                       settings$secondarySelections$name), ]
+    if (warnTol)
+        printf(paste("NOTE: You may consider tweaking the retention and/or m/z tolerances by setting",
+                     "the rtWindow/mzWindow arguments\n"))
     
-    saveRDS(settings, pathOut)
+    return(rbindlist(pruneList(newGroups), idcol = "oldGroup"))
 }
 
 getCheckUI <- function(UIInterface, settings)

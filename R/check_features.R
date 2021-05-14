@@ -168,9 +168,12 @@ checkFeaturesInterface$methods(
             if (!"estIDLevel" %in% rValues$settings$fGroupColumns && !is.null(gData[["estIDLevel"]]))
                 gData[, "estIDLevel" := NULL]
             if (!"suspOther" %in% rValues$settings$fGroupColumns)
-                gData[, (intersect(names(gData),
-                                   c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
-                                     "maxFrags", "maxFragMatches", "maxFragMatchesRel"))) := NULL]
+            {
+                rmCols <- intersect(names(gData), c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp",
+                                                    "annSimBoth", "maxFrags", "maxFragMatches", "maxFragMatchesRel"))
+                if (length(rmCols) > 0)
+                    gData[, (rmCols) := NULL]
+            }
         }
         
         if (!"ionAnn" %in% rValues$settings$fGroupColumns)

@@ -55,7 +55,6 @@
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
-- Get rid of PLIndex in fragInfos, so MSPeakLists can be post-filtered (eg necessary by annotatedBy filter)
 
 
 ## Suspects
@@ -66,7 +65,6 @@
 ## Components
 
 - extraOpts --> `...` for nontarget?
-- printComponentsFiltered: mention something else than feature groups (eg not true for TP components)
 - checkComponents
     - more settings?
     - session import
@@ -115,7 +113,6 @@
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
     - show status after finishing
-    - add to generateComponents generic
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?

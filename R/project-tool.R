@@ -146,8 +146,8 @@ getScriptCode <- function(input, analyses)
             list(name = "noiseThrInt", value = 1000, condition = input$featFinder == "OpenMS"),
             list(name = "chromSNR", value = 3, condition = input$featFinder == "OpenMS"),
             list(name = "chromFWHM", value = 5, condition = input$featFinder == "OpenMS"),
-            list(name = "minFWHM", value = 3, condition = input$featFinder == "OpenMS"),
-            list(name = "maxFWHM", value = 60, condition = input$featFinder == "OpenMS"),
+            list(name = "minFWHM", value = 1, condition = input$featFinder == "OpenMS"),
+            list(name = "maxFWHM", value = 30, condition = input$featFinder == "OpenMS"),
             list(name = "kmeans", value = TRUE, condition = input$featFinder == "KPIC2"),
             list(name = "level", value = 1000, condition = input$featFinder == "KPIC2"),
             list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")

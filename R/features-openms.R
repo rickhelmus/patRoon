@@ -80,8 +80,8 @@ setMethod("initialize", "featuresOpenMS",
 #' @export
 findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
                                traceTermCriterion = "sample_rate", traceTermOutliers = 5, minSampleRate = 0.5,
-                               minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 3,
-                               maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
+                               minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 1,
+                               maxFWHM = 30, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
                                isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
                                extraOpts = NULL, intSearchRTWindow = 3, verbose = TRUE)
 {

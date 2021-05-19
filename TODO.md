@@ -4,8 +4,6 @@
 
 - ggplot: remove?
     - Otherwise fix plotSpectrum() (sets) for title and ticks and possibly others
-- patRoonData
-    - remove some more suspects to get better default hits?
 - newProject
     - sets: add specific options for annotation and others?
     - TP workflow
@@ -33,8 +31,6 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
-    - lower default minFWHM (mainly for patRoonData... but seems also OK for other data)
-        - update newProject()
 
 
 ## Annotation
@@ -278,6 +274,7 @@
     - mzWindow --> mzExpWindow
     - groupFeatures: feat arg --> obj
     - XMCS(3): `exportedData` --> `loadRawData`
+    - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

@@ -290,12 +290,14 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     {
         if (!is.null(identifiers) && is.null(identifiers[[grp]]))
             return(NULL)
+        if (is.null(MSPeakLists[[grp]][["MS"]]))
+            return(NULL)
 
         spec <- MSPeakLists[[grp]][["MSMS"]]
         if (is.null(spec))
             return(NULL)
 
-        mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
+        mfSettings$IonizedPrecursorMass <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
         mfSettings$PrecursorIonType <- addChr
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 

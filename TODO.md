@@ -321,6 +321,7 @@
     - Fixed: MF was using wrong/inconsistent cache name
     - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
     - formula_mz --> ion_formula_mz
+    - MF now uses peaklist precursor mz instead of fGroup mz
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

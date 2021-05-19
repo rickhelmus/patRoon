@@ -7,7 +7,7 @@ susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := convertToFormulaBabel(SMILES, "smi")]
 susps[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
 
-fGroups <- getTestFGroups(doFilter = FALSE, minFWHM = 1)
+fGroups <- getTestFGroups(doFilter = FALSE)
 fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
 fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))

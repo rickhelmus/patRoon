@@ -46,8 +46,8 @@ generateFeatureOptPSetOpenMS <- function(...)
 {
     return(list(chromFWHM = c(5, 10),
                 mzPPM = c(3, 10),
-                minFWHM = c(3, 6),
-                maxFWHM = c(35, 65)))
+                minFWHM = c(1, 6),
+                maxFWHM = c(20, 40)))
 }
 
 getDefFeaturesOptParamRangesOpenMS <- function(params) list(localMZRange = c(0.00001, Inf),

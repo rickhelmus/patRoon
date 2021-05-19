@@ -166,18 +166,31 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
 {
     usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     usMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
-    usInds <- lapply(sets(obj), function(s) obj[[groupName]][[paste0("rank-", s)]][index])
-    
     if (!is.null(formulas))
-    {
         usForm <- checkAndUnSetOther(sets(obj), formulas, "formulas")
-        annPLs <- Map(usObj, usInds, usMSPL, usForm, f = annotatedPeakList,
-                      MoreArgs = c(list(groupName = groupName), list(...)))
-    }
-    else
-        annPLs <- Map(usObj, usInds, usMSPL, f = annotatedPeakList,
-                      MoreArgs = c(list(groupName = groupName), list(...)))
-    
+
+    annPLs <- sapply(sets(obj), function(s)
+    {
+        # if the group does not occur in the setObject: return NULL
+        if (!groupName %in% groupNames(usObj[[s]]) &&
+            (is.null(formulas) || !groupName %in% groupNames(usForm[[s]])))
+            return(NULL)
+        
+        ind <- obj[[groupName]][[paste0("rank-", s)]][index]
+        
+        # if the candidate does not exist in the setObject: use a dummy index to get an unannotated PL
+        if (is.null(ind))
+        {
+            soann <- usObj[[s]][[groupName]]
+            ind <- if (!is.null(soann)) nrow(soann) + 1L else 1L
+        }
+        
+        args <- list(groupName = groupName, index = ind, obj = usObj[[s]], MSPeakLists = usMSPL[[s]], ...)
+        if (!is.null(formulas))
+            args <- c(args, list(formulas = usForm[[s]]))
+        return(do.call(annotatedPeakList, args))
+    }, simplify = FALSE)
+        
     annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
     
     if (!is.null(annPLs[["set.x"]]))

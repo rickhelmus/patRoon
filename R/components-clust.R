@@ -152,7 +152,7 @@ setMethod("plot", "componentsClust", function(x, pal = "Paired", numericLabels =
                                               colourBranches = length(x) < 50,
                                               showLegend = length(x) < 20, ...)
 {
-    verifyCompNotAltered(obj)
+    verifyCompNotAltered(x)
     
     checkmate::assertString(pal, min.chars = 1)
     dendro <- as.dendrogram(x@clust)

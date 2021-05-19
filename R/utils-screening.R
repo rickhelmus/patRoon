@@ -168,8 +168,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     annTbl <- annotations(fGroups)
     
     # NOTE: rt is always included
-    metaDataCols <- c("name", "name_orig", "rt",
-                      intersect(c("mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
+    metaDataCols <- c("name", "rt",
+                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
                                   "fragments_mz", "fragments_formula"), names(suspects)))
     
     emptyResult <- function()
@@ -254,7 +254,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
         ret <- emptyResult()
     
     suspectsn <- nrow(suspects)
-    foundn <- nrow(ret)
+    foundn <- uniqueN(ret$name)
     printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
     
     return(ret[])

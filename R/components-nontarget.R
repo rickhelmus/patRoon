@@ -102,7 +102,8 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
                                                                    elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
                                                                    absMzDevLink = absMzDev * 2, 
-                                                                   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
+                                                                   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
+                                                                   ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)

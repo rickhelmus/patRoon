@@ -171,8 +171,11 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
         {
             # update if components were filtered
             cInfo <- cInfo[name %in% names(comps)]
-            names(comps) <- paste0("CMP", seq_along(comps))
-            cInfo[, name := names(comps)]
+            if (length(comps) > 0)
+            {
+                names(comps) <- paste0("CMP", seq_along(comps))
+                cInfo[, name := names(comps)]
+            }
         }
     }
 

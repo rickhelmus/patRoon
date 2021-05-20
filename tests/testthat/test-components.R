@@ -163,8 +163,10 @@ test_that("basic usage works", {
 
 test_that("consensus works", {
     expect_length(consensus(compsRC, compsCAM), length(compsRC) + length(compsCAM))
-    expect_error(consensus(compsRC, compsEmpty))
-    expect_error(consensus(compsEmpty, compsEmpty2), "non-empty")
+    expect_error(consensus(compsEmpty, compsEmpty2), NA)
+    
+    skip_if(testWithSets())
+    expect_error(consensus(compsRC, compsEmpty), NA) # can't do with sets: all objects must have same sets
 })
 
 test_that("clustered components", {

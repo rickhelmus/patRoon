@@ -575,10 +575,6 @@ setMethod("consensus", "components", function(obj, ...)
     checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...")
 
-    allComponents <- allComponents[lengths(allComponents) > 0]
-    if (length(allComponents) < 2)
-        stop("Need at least two non-empty components objects")
-
     compNames <- make.unique(sapply(allComponents, algorithm))
     mcmp <- mergeComponents(allComponents, compNames, "algorithm")
     

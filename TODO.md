@@ -398,7 +398,7 @@
     - batch mode
 - msPurity integration
 - algorithmObject() generic: for xset, xsa, rc, ...
-- more withr wrapping? (dev, par)
+- more withr wrapping? (par)
 - newProject()
     - concentration column for anaInfo
     - generate more detailed script with e.g. commented examples of subsetting, extraction etc

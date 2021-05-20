@@ -228,10 +228,10 @@ if (doMetFrag)
 test_that("TP component usage", {
     expect_HTML(plotGraph(componTPsLogic, onlyLinked = FALSE))
     
-    expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0],
-                 as.data.table(componTPsRetF))
-    expect_equal(as.data.table(componTPsLogic)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0],
-                 as.data.table(componTPsRetFN))
+    expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
+                 as.data.table(componTPsRetF)[, -"size"])
+    expect_equal(as.data.table(componTPsLogic)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0, -"size"],
+                 as.data.table(componTPsRetFN)[, -"size"])
     
     skip_if_not(doMetFrag)
     

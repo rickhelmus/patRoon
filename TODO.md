@@ -31,6 +31,7 @@
         - XCMS: also update groups data? --> use new function once it hits BC
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
+    - OpenMS: alignment may yield negative RTs...
 
 
 ## Annotation

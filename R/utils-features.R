@@ -71,7 +71,7 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     }
     
     cacheName <- sprintf("filterFGroups_%s", cacheCateg)
-    hash <- makeHash(fGroups, hashParam)
+    hash <- makeHash(fGroups, what, hashParam)
     ret <- loadCacheData(cacheName, hash)
     if (is.null(ret))
     {

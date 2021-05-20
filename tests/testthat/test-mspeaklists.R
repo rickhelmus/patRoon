@@ -303,8 +303,8 @@ test_that("plotting works", {
                                                                 MSLevel = 2))
     
     expect_doppel("mspl-spec_sim-ms", function() plotSpectrum(plists,
-                                                              groupName = c(groupNames(plists)[70], groupNames(plists)[75]),
-                                                              analysis = c(analyses(plists)[1], analyses(plists)[1]),
+                                                              groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
+                                                              analysis = c(analyses(plistsMSMS)[1], analyses(plistsMSMS)[1]),
                                                               MSLevel = 1))
     expect_doppel("mspl-spec_sim-msms", function() plotSpectrum(plistsMSMS,
                                                                 groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
@@ -351,10 +351,10 @@ test_that("sets functionality", {
     expect_setequal(groupNames(unset(plistsOneEmptySet, "positive")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
     expect_length(unset(plistsOneEmptySet, "negative"), 0)
     
-    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
+    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
                                                            MSLevel = 2, perSet = FALSE))
-    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
+    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
                                                                   MSLevel = 2, perSet = TRUE, mirror = FALSE))
-    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
+    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
                                                                   MSLevel = 2, perSet = TRUE, mirror = TRUE))
 })

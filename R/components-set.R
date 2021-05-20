@@ -100,10 +100,6 @@ setMethod("consensus", "componentsSet", function(obj, ...)
     if (!allSame(lapply(allComponents, sets)))
         stop("All objects must have the same sets.")
     
-    allComponents <- allComponents[lengths(allComponents) > 0]
-    if (length(allComponents) < 2)
-        stop("Need at least two non-empty components objects")
-    
     setObjects <- sapply(sets(obj), function(set)
     {
         return(do.call(consensus, lapply(lapply(allComponents, setObjects), "[[", set)))

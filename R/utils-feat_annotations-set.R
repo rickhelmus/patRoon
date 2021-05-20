@@ -164,6 +164,11 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
 
 doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, ...)
 {
+    hash <- makeHash(obj[[groupName]][index], MSPeakLists[[groupName]][["MSMS"]], formulas[[groupName]])
+    cd <- loadCacheData("annPeakListSet", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     usMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
     if (!is.null(formulas))
@@ -199,6 +204,8 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
         setnames(annPLs, "set.x", "set")
         annPLs[, set.y := NULL]
     }
+    
+    saveCacheData("annPeakListSet", annPLs, hash)
     
     return(annPLs[])
 }
@@ -284,6 +291,11 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
 
 doFeatAnnUnset <- function(obj, set)
 {
+    hash <- makeHash(obj, set)
+    cd <- loadCacheData("featAnnUnset", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     obj <- obj[, sets = set]
     
     ann <- lapply(annotations(obj), copy)
@@ -311,6 +323,8 @@ doFeatAnnUnset <- function(obj, set)
         a[, rank := NULL] # no need for this anymore
         return(a)
     })
+    
+    saveCacheData("featAnnUnset", ann, hash)
     
     return(ann)
 }

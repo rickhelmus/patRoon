@@ -220,7 +220,6 @@ fGroupsSI <- if (testWithSets())
     selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
 
 test_that("selectIons works", {
-    expect_lt(length(fGroupsSI), length(fGroups))
     expect_setequal(annotations(fGroupsSI)$group, names(fGroupsSI))
     
     # expect pref adduct is most abundant
@@ -247,6 +246,10 @@ test_that("selectIons works", {
         return(isTRUE(all.equal(ann$neutralMass + adductMZDelta(as.adduct(ann$adduct)),
                                 groupInfo(fGroupsSI)[ann$group, "mzs"])))
     })))
+    
+    skip_if(testWithSets())
+    
+    expect_lt(length(fGroupsSI), length(fGroups))
 })
 
 if (testWithSets())
@@ -279,7 +282,8 @@ test_that("sets functionality", {
     expect_length(unset(compsRCOneEmptySet, "negative"), 0)
 
     expect_HTML(plotGraph(compsNT, set = "positive", onlyLinked = FALSE))
-        
+    
+    expect_false(length(fGroupsSI) == length(fGroups)) # may increase or decrease for sets
     expect_false(checkmate::testSubset(names(fGroupsSI), names(fGroups))) # should re-group --> new group names
     # annotations stored per set
     expect_equal(nrow(annotations(fGroupsSI)),

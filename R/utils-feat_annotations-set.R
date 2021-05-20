@@ -164,11 +164,11 @@ makeAnnSetScorings <- function(setObjects, origFGNames)
 
 doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, ...)
 {
-    hash <- makeHash(obj[[groupName]][index], MSPeakLists[[groupName]][["MSMS"]], formulas[[groupName]])
+    hash <- makeHash(obj[[groupName]][index], MSPeakLists[[groupName]][["MSMS"]], formulas[[groupName]], ...)
     cd <- loadCacheData("annPeakListSet", hash)
     if (!is.null(cd))
         return(cd)
-    
+
     usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     usMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
     if (!is.null(formulas))
@@ -184,7 +184,7 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
         ind <- obj[[groupName]][[paste0("rank-", s)]][index]
         
         # if the candidate does not exist in the setObject: use a dummy index to get an unannotated PL
-        if (is.null(ind))
+        if (is.null(ind) || is.na(ind))
         {
             soann <- usObj[[s]][[groupName]]
             ind <- if (!is.null(soann)) nrow(soann) + 1L else 1L
@@ -195,7 +195,7 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
             args <- c(args, list(formulas = usForm[[s]]))
         return(do.call(annotatedPeakList, args))
     }, simplify = FALSE)
-        
+    
     annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
     
     if (!is.null(annPLs[["set.x"]]))

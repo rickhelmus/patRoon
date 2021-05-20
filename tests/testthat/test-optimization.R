@@ -1,6 +1,7 @@
 context("optimization")
 
 initXCMS()
+library(Biobase) # BUG: needed by XCMS with futures...
 
 anaInfo <- getTestAnaInfo()[1:2, ]
 anaInfoOne <- getTestAnaInfo()[4, ]
@@ -15,6 +16,7 @@ ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 1
                                       maxIterations = 2)
 # disable 'old' xcms for now to save testing time (both interfaces are fairly similar anyway)
 # ffOptXCMS <- optimizeFeatureFinding(anaInfo, "xcms", list(mzdiff = c(0.002, 0.006)))
+
 ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006)), maxIterations = 2)
 ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c(10, 30)), maxIterations = 2)
 

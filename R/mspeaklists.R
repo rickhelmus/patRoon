@@ -559,7 +559,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         obj@averagedPeakLists <- averageMSPeakLists(obj)
 
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
-    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists, TRUE)
+    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists, reAverage)
     
     saveCacheData("filterMSPeakLists", obj, hash)
 

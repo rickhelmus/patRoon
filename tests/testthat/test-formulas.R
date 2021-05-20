@@ -232,17 +232,18 @@ test_that("annotation works", {
     expect_true(any(grepl("sirius", anPLCons$mergedBy)))
 })
 
+reportGroups <- groupNames(formsGFWithMSMS)[1:10]
 test_that("reporting works", {
     expect_error(reportCSV(fGroups, getWorkPath(), formulas = formsGF), NA)
     for (grp in groupNames(formsGF))
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.csv", class(fGroups), grp)))
 
-    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formulas = formsGFWithMSMS,
+    expect_error(reportPDF(fGroups[, reportGroups], getWorkPath(), reportFGroups = FALSE, formulas = formsGFWithMSMS,
                            MSPeakLists = plists), NA)
-    for (grp in groupNames(formsGFWithMSMS))
+    for (grp in reportGroups)
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
 
-    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "formulas",
+    expect_reportHTML(makeReportHTML(fGroups[, reportGroups], reportPlots = "formulas",
                                      formulas = formsGFWithMSMS, MSPeakLists = plists))
 })
 

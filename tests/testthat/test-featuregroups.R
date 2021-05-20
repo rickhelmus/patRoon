@@ -4,7 +4,7 @@ initXCMS()
 
 fList <- getTestFeatures()
 
-fgOpenMS <- groupFeatures(fList, "openms")
+fgOpenMS <- groupFeatures(fList, "openms");
 fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
@@ -260,7 +260,8 @@ test_that("delete and filter", {
     expect_gte(minInt(filter(fgOpenMS, preRelMinIntensity = 0.2), TRUE), 0.2)
 
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, c(120, 200))
-    expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
+    # expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
+    expect_equivalent(filter(fgXCMS3, retentionRange = c(0, Inf)), fgXCMS3) # NOTE: cannot use OpenMS as it may  yield negative RTs...
     expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, c(200, 300))
     expect_equivalent(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
     expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mzs %% 1, c(0.1, 0.2))

@@ -50,9 +50,9 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
         {
             annPLsForm <- rbindlist(pruneList(lapply(seq_len(nrow(formulas[[grp]])), function(i)
             {
-                ret <- annotatedPeakList(formulas, index = i, groupName = grp, MSPeakLists = MSPeakLists,
-                                         onlyAnnotated = TRUE)
-            })))
+                annotatedPeakList(formulas, index = i, groupName = grp, MSPeakLists = MSPeakLists,
+                                  onlyAnnotated = TRUE)
+            })), fill = TRUE)
         }
         
         if (!is.null(compounds) && !is.null(compounds[[grp]]))

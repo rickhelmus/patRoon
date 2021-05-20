@@ -170,10 +170,17 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 #' @export
 setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
 {
+    old <- obj
     obj <- callNextMethod()
     
-    obj@featureFormulas <- lapply(obj@featureFormulas, function(a) pruneList(a[groupNames(obj)]))
-    obj@featureFormulas <- pruneList(obj@featureFormulas, TRUE)
+    # sync featureFormulas
+    # NOTE: these may contain results for other groups than the groupAnnotations --> just remove the removed groups
+    rmGroups <- setdiff(groupNames(old), groupNames(obj))
+    if (length(rmGroups) > 0)
+    {
+        obj@featureFormulas <- lapply(obj@featureFormulas, function(a) pruneList(a[!names(a) %chin% rmGroups]))
+        obj@featureFormulas <- pruneList(obj@featureFormulas, TRUE)
+    }
     
     return(obj)
 })

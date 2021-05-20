@@ -2,7 +2,7 @@
 
 #' @importFrom utils head tail modifyList setTxtProgressBar txtProgressBar write.csv write.table read.csv
 #' @importFrom graphics plot axis barplot close.screen grconvertX grconvertY grid layout legend lines par plot.new points polygon rasterImage rect screen segments split.screen strwidth text title xinch yinch abline contour persp
-#' @importFrom grDevices adjustcolor colorRampPalette dev.off pdf png
+#' @importFrom grDevices adjustcolor colorRampPalette
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames as.dendrogram order.dendrogram as.dist as.formula
 #' @importFrom Rdpack reprompt
 #' @importFrom magrittr %>%
@@ -578,9 +578,9 @@ NULL
 #'   assignment (see details).
 #' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence (\samp{0-1}) of a formula in all features
 #'   before it is considered as a candidate for a feature group. For instance, \code{featThreshold=0.75} dictates that a
-#'   formula should be present in at least 75% of the features inside a feature group.
+#'   formula should be present in at least 75\% of the features inside a feature group.
 #' @param featThresholdAnn As \code{featThreshold}, but only considers features with annotations. For instance,
-#'   \code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75% of the features with
+#'   \code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75\% of the features with
 #'   annotations inside a feature group.
 #' @param extraOpts An optional character vector with any other commandline options that will be passed to
 #'   \command{GenForm} or \command{SIRIUS}. See the \verb{GenForm options} section/SIRIUS manual for all available

@@ -159,7 +159,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
     anaInfo <- analysisInfo(fGroups)
 
     pdfFile <- file.path(path, sprintf("%s.pdf", class(fGroups)))
-    pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
+    withr::local_pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
     plotChroms(fGroups, rtWindow, mzExpWindow, retMin, 1, FALSE, EICs, TRUE, FALSE)
@@ -189,7 +189,6 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
     close(prog)
     if (!is.null(scr))
         close.screen(scr)
-    dev.off()
 
     # UNDONE: may fail sometimes (on AppVeyor)
     # tools::compactPDF(pdfFile)
@@ -280,39 +279,38 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
         {
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
             # a4r: width=11.69, height=8.27
-            pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
-
-            plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
-
-            for (ind in seq_len(nrow(ft)))
-            {
-                # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
-
-                scr <- split.screen(c(2, 1))
-                scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
-
-                screen(scr[1])
-
-                if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+            withr::with_pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8, code = {
+                plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
+                
+                for (ind in seq_len(nrow(ft)))
                 {
-                    # no MSMS spectrum, i.e. MS only formula
-                    textPlot("No MS/MS data available.")
+                    # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
+                    
+                    scr <- split.screen(c(2, 1))
+                    scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
+                    
+                    screen(scr[1])
+                    
+                    if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+                    {
+                        # no MSMS spectrum, i.e. MS only formula
+                        textPlot("No MS/MS data available.")
+                    }
+                    else
+                        plotSpectrum(formulas, ind, grp, MSPeakLists = MSPeakLists)
+                    
+                    screen(scr[3])
+                    plotScores(formulas, ind, grp, normalizeScores = normalizeScores,
+                               excludeNormScores = excludeNormScores)
+                    
+                    screen(scr[4])
+                    
+                    textPlot(paste0(getFormInfoList(formulas[[grp]], ind, mergedConsensusNames(formulas), FALSE),
+                                    collapse = "\n"))
+                    
+                    close.screen(scr)
                 }
-                else
-                    plotSpectrum(formulas, ind, grp, MSPeakLists = MSPeakLists)
-
-                screen(scr[3])
-                plotScores(formulas, ind, grp, normalizeScores = normalizeScores,
-                           excludeNormScores = excludeNormScores)
-
-                screen(scr[4])
-
-                textPlot(paste0(getFormInfoList(formulas[[grp]], ind, mergedConsensusNames(formulas), FALSE),
-                                collapse = "\n"))
-
-                close.screen(scr)
-            }
-            dev.off()
+            })
         }
 
         setTxtProgressBar(prog, match(grp, formGroups))
@@ -396,37 +394,35 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
 
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
             # a4r: width=11.69, height=8.27
-            pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
-
-            plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
-
-            for (idi in seq_len(nrow(compTable[[grp]])))
-            {
-                # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
-
-                scr <- split.screen(c(2, 1))
-                scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
-
-                screen(scr[1])
-                plotSpectrum(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
-
-                screen(scr[3])
-                plotScores(compounds, idi, grp, normalizeScores, exclNormScores, onlyUsedScorings)
-
-                screen(scr[4])
-
-                # draw text info
-                txt <- paste0(getCompInfoList(compTable[[grp]], idi, mergedConsensusNames(compounds), FALSE),
-                              collapse = "\n")
-                if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
-                    txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")
-
-                textPlot(txt)
-
-                close.screen(scr)
-            }
-
-            dev.off()
+            withr::with_pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8, code = {
+                plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
+                
+                for (idi in seq_len(nrow(compTable[[grp]])))
+                {
+                    # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
+                    
+                    scr <- split.screen(c(2, 1))
+                    scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
+                    
+                    screen(scr[1])
+                    plotSpectrum(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
+                    
+                    screen(scr[3])
+                    plotScores(compounds, idi, grp, normalizeScores, exclNormScores, onlyUsedScorings)
+                    
+                    screen(scr[4])
+                    
+                    # draw text info
+                    txt <- paste0(getCompInfoList(compTable[[grp]], idi, mergedConsensusNames(compounds), FALSE),
+                                  collapse = "\n")
+                    if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
+                        txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")
+                    
+                    textPlot(txt)
+                    
+                    close.screen(scr)
+                }
+            })
         }
         setTxtProgressBar(prog, gi)
     }
@@ -508,7 +504,7 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzEx
 
     prog <- openProgBar(0, length(components))
 
-    pdf(file.path(path, "components.pdf"), paper = "a4", pointsize = 10, width = 8, height = 11)
+    withr::local_pdf(file.path(path, "components.pdf"), paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # HACK: this should be replaced some proper inheritance/methods at some point
     isHClust <- inherits(components, "componentsIntClust")
@@ -554,7 +550,6 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzEx
         setTxtProgressBar(prog, cmpi)
     }
 
-    dev.off()
     close(prog)
 }
 

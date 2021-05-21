@@ -111,9 +111,9 @@ test_that("delete and filter", {
     expect_length(filter(formsGFMS, minExplainedPeaks = 1), 0)
     expect_length(filter(formsGFMS, minExplainedPeaks = 1, negate = TRUE), length(formsGFMS))
 
-    expect_length(filter(formsGF, elements = "C1-100"), length(formsGFOC)) # all should contain carbon
+    expect_true(all(grepl("^C", as.data.table(filter(formsGF, elements = "C1-100"))$neutral_formula))) # all should contain carbon
     expect_length(filter(formsGFOC, elements = "C1-100", negate = TRUE), 0)
-    expect_length(filter(formsGF, elements = c("Na1-100", "C1-100")), length(formsGFOC)) # no sodium, but carbon should be there
+    expect_true(all(grepl("^C", as.data.table(filter(formsGF, elements = c("Na1-100", "C1-100")))$neutral_formula))) # no sodium, but carbon should be there
     expect_length(filter(formsGFOC, elements = c("Na1-100", "C1-100"), negate = TRUE), length(formsGFOC)) # no sodium
     expect_length(filter(formsGF, elements = c("H0-100", "C1-100")), length(formsGF)) # presence of both shouldn't affect results
     expect_length(filter(formsGF, elements = c("H90-100", "C0-100"), negate = TRUE), length(formsGF)) # all formulae shouldn't have 90-100 Hs

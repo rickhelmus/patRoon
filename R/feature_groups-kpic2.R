@@ -10,6 +10,17 @@ setMethod("initialize", "featureGroupsKPIC2",
           function(.Object, ...) callNextMethod(.Object, algorithm = "kpic2", ...))
 
 
+#' @details \code{groupFeaturesKPIC2} uses the the
+#'   \href{https://github.com/hcji/KPIC2}{KPIC2} \R package for grouping of features. Grouping of features and alignment of
+#'   their retention times are performed with the
+#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}} and
+#'   \code{\link[KPIC:PICset.align]{KPIC::PICset.align}} functions, respectively.
+#'
+#' @param alignArgs named \code{character vector} that may contain extra parameters to be used by
+#'   \code{\link[KPIC:PICset.align]{KPIC::PICset.align}}.
+#'
+#' @references \insertRef{Ji2017}{patRoon}
+#'
 #' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
@@ -28,6 +39,7 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose))
 })
 
+#' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
                                                         verbose = TRUE)
@@ -118,6 +130,11 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
                               ftindex = ftindex))
 }
 
+#' @details \code{importFeatureGroupsKPIC2} imports grouped features from an \pkg{KPIC} object.
+#'
+#' @param picsSetGrouped A grouped \code{PIC set} object (\emph{e.g.} as returned by
+#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}}).
+#'
 #' @rdname feature-grouping
 #' @export
 importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)

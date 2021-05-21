@@ -229,6 +229,11 @@ NULL
 #' @param rtalign Enable retention time alignment.
 #' @param \dots Any parameters to be passed to the selected grouping/importing
 #'   algorithm.
+#' @param loadRawData Set to \code{TRUE} if analyses were exported as
+#'   \code{mzXML} or \code{mzML} files.
+#' @param groupArgs named \code{character vector} that may contain
+#'   extra grouping parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} or
+#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}}.
 #' @param verbose if \code{FALSE} then no text output will be shown.
 #' @param type Which file type should be imported or exported: \code{"brukerpa"}
 #'   (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ),

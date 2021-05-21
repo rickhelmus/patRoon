@@ -10,22 +10,15 @@ setMethod("initialize", "featureGroupsXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
 
 
-#' @details \code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of
-#'   features. Grouping of features and alignment of their retention times are
-#'   performed with the \code{\link[xcms:group-methods]{xcms::group}} and
-#'   \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively.
-#'   Both functions have an extensive list of parameters to modify their
-#'   behaviour and may therefore be used to potentially optimize results.
+#' @details \code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of features. Grouping of features and
+#'   alignment of their retention times are performed with the \code{\link[xcms:group-methods]{xcms::group}} and
+#'   \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively. Both functions have an extensive list of
+#'   parameters to modify their behaviour and may therefore be used to potentially optimize results.
+#'   
+#' @param retcorArgs named \code{character vector} that may contain extra parameters to be used by
+#'   \code{\link[xcms:retcor-methods]{xcms::retcor}}.
 #'
-#' @param loadRawData Set to \code{TRUE} if analyses were exported as
-#'   \code{mzXML} or \code{mzML} files.
-#' @param groupArgs,retcorArgs named \code{character vector} that can contain
-#'   extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
-#'   \code{\link[xcms:retcor-methods]{xcms::retcor}}, respectively.
-#'
-#' @references \addCitations{xcms}{1} \cr\cr
-#'   \addCitations{xcms}{2} \cr\cr
-#'   \addCitations{xcms}{3}
+#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
 #' @rdname feature-grouping
 #' @export

@@ -11,6 +11,7 @@
 \alias{importFeatureGroupsBrukerPA}
 \alias{importFeatureGroupsEnviMass}
 \alias{groupFeaturesKPIC2,features-method}
+\alias{groupFeaturesKPIC2,featuresSet-method}
 \alias{importFeatureGroupsKPIC2}
 \alias{groupFeaturesOpenMS,features-method}
 \alias{groupFeaturesSIRIUS}
@@ -41,6 +42,12 @@ importFeatureGroupsEnviMass(path, feat, positive)
   loadRawData = TRUE,
   groupArgs = list(tolerance = c(0.005, 12)),
   alignArgs = list(),
+  verbose = TRUE
+)
+
+\S4method{groupFeaturesKPIC2}{featuresSet}(
+  feat,
+  groupArgs = list(tolerance = c(0.005, 12)),
   verbose = TRUE
 )
 
@@ -124,9 +131,15 @@ from grouped features.}
 \item{loadRawData}{Set to \code{TRUE} if analyses were exported as
 \code{mzXML} or \code{mzML} files.}
 
-\item{groupArgs, retcorArgs}{named \code{character vector} that can contain
-extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
-\code{\link[xcms:retcor-methods]{xcms::retcor}}, respectively.}
+\item{groupArgs}{named \code{character vector} that can contain
+extra grouping parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
+\code{\link[KPIC:PICset.group]{KPIC::PICset.group}}.}
+
+\item{alignArgs}{named \code{character vector} that may contain extra parameters to be used by
+\code{\link[KPIC:PICset.align]{KPIC::PICset.align}}.}
+
+\item{picsSetGrouped}{A grouped \code{PIC set} object (\emph{e.g.} as returned by
+\code{\link[KPIC:PICset.group]{KPIC::PICset.group}}).}
 
 \item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{analysis info}.}
 
@@ -150,6 +163,9 @@ Any options specified here will override any of the above. Example:
 \code{extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)}
 (corresponds to setting \code{maxGroupRT=12}). Set to \code{NULL} to
 ignore.}
+
+\item{retcorArgs}{named \code{character vector} that may contain extra parameters to be used by
+\code{\link[xcms:retcor-methods]{xcms::retcor}}.}
 
 \item{xs}{An \code{\link{xcmsSet}} object.}
 
@@ -213,6 +229,14 @@ optimal settings often depend on applied methodology and instrumentation.
   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be
   used for both importing functions).
 
+\code{groupFeaturesKPIC2} uses the the
+  \href{https://github.com/hcji/KPIC2}{KPIC2} \R package for grouping of features. Grouping of features and alignment of
+  their retention times are performed with the
+  \code{\link[KPIC:PICset.group]{KPIC::PICset.group}} and
+  \code{\link[KPIC:PICset.align]{KPIC::PICset.align}} functions, respectively.
+
+\code{importFeatureGroupsKPIC2} converts grouped features from an \pkg{KPIC} object.
+
 \code{groupFeaturesOpenMS} uses the OpenMS tools for grouping of
   features (see \url{http://www.openms.de}). Retention times may be aligned
   by the
@@ -223,12 +247,10 @@ optimal settings often depend on applied methodology and instrumentation.
   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
    TOPP tools.
 
-\code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of
-  features. Grouping of features and alignment of their retention times are
-  performed with the \code{\link[xcms:group-methods]{xcms::group}} and
-  \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively.
-  Both functions have an extensive list of parameters to modify their
-  behaviour and may therefore be used to potentially optimize results.
+\code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of features. Grouping of features and
+  alignment of their retention times are performed with the \code{\link[xcms:group-methods]{xcms::group}} and
+  \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively. Both functions have an extensive list of
+  parameters to modify their behaviour and may therefore be used to potentially optimize results.
 
 \code{importFeatureGroupsXCMS} converts grouped features from an
   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
@@ -245,15 +267,15 @@ optimal settings often depend on applied methodology and instrumentation.
   \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
 }
 \references{
+\insertRef{Ji2017}{patRoon}
+
 \insertRef{Rst2016}{patRoon} \cr\cr
   \href{https://pugixml.org/}{pugixml} (via \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr
   \addCitations{Rcpp}{1} \cr\cr
   \addCitations{Rcpp}{2} \cr\cr
   \addCitations{Rcpp}{3}
 
-\addCitations{xcms}{1} \cr\cr
-  \addCitations{xcms}{2} \cr\cr
-  \addCitations{xcms}{3}
+\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 
 \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr
   \addCitations{xcms}{3}

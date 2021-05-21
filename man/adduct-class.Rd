@@ -33,7 +33,7 @@ adduct(...)
   
   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
   
-  \code{"cliquems"} is the format used by \pkg{\link{cliqueMS}}.}
+  \code{"cliquems"} is the format used by \pkg{\link[=cliqueMS-package]{cliqueMS}}.}
 
 \item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
 otherwise returns \code{NA}.}

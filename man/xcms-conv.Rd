@@ -51,8 +51,8 @@ getXCMSnExp(obj, verbose = TRUE, ...)
 \item{verbose}{If \code{FALSE} then no text output is shown.}
 
 \item{loadRawData, \dots}{Set to \code{TRUE} if analyses were exported as
-\code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
-\code{featuresXCMS} methods).}
+\code{mzXML} or \code{mzML} files (ignored for \code{featuresXCMS} and
+\code{featuresXCMS3} methods).}
 }
 \description{
 Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an

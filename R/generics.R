@@ -37,14 +37,15 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 #'
 #' @param obj The object that should be converted.
 #' @param loadRawData,\dots Set to \code{TRUE} if analyses were exported as
-#'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
-#'   \code{featuresXCMS} methods).
+#'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresXCMS} and
+#'   \code{featuresXCMS3} methods).
 #' @param verbose If \code{FALSE} then no text output is shown.
 #' @rdname xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 
 #' @rdname xcms-conv
 setGeneric("getXCMSnExp", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSnExp"))
+
 
 ### MS Peak Lists
 

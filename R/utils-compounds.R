@@ -100,7 +100,7 @@ makeDBIdentLink <- function(db, ident)
     else if (startsWith(idlist[1], "DTX"))
         fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
     else
-        fmt <- "%s"
+        return(paste0(idlist, collapse = "; "))
     
     return(paste0(sprintf(fmt, idlist, idlist), collapse = "; "))
 }

@@ -177,6 +177,48 @@ test_that("formula scoring works", {
     expect_error(addFormulaScoring(compsMFEmptyPL, forms), NA)
 })
 
+verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
+{
+    allObj <- list(obj1)
+    if (!is.null(obj2))
+        allObj <- c(allObj, list(obj2))
+    
+    msplF <- filter(mspl, annotatedBy = allObj, retainPrecursorMSMS = FALSE, negate = negate)
+    if (length(msplF) == 0)
+        return(succeed("Empty MSPL"))
+    
+    for (fg in groupNames(msplF))
+    {
+        if (is.null(msplF[[fg]][["MSMS"]]))
+            next
+        
+        objIDs <- unlist(lapply(allObj, function(o)
+        {
+            if (is.null(o[[fg]]))
+                return(integer())
+            return(lapply(o[[fg]]$fragInfo, "[[", "PLID"))
+        }))
+      
+        if (negate)
+            expect_true(!any(msplF[[fg]]$MSMS$ID %in% objIDs))
+        else
+            expect_true(all(msplF[[fg]]$MSMS$ID %in% objIDs))
+    }
+}
+
+test_that("annotatedBy filter for MSPL", {
+    # NOTE: do these tests here, since we have all the objects ready: peaklists, compounds & formulas
+    
+    verifyMSPLAnFilter(plists, comps)
+    verifyMSPLAnFilter(plists, forms)
+    verifyMSPLAnFilter(plists, comps, forms)
+    verifyMSPLAnFilter(plistsEmpty, compsEmpty)
+    
+    verifyMSPLAnFilter(plists, comps, negate = TRUE)
+    verifyMSPLAnFilter(plists, forms, negate = TRUE)
+    verifyMSPLAnFilter(plists, comps, forms, negate = TRUE)
+})
+
 # on a clean system, i.e. where ~/.jnati/repo/jnniinchi is not yet initialized, starting multiple
 # MetFrag processes in parallel (i.e. when maxProcAmount>1) may result in errors. This should now
 # be fixed by setting a small delay between starting up processes (delayBetweenProc arg of executeMultiProcess())

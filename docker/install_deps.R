@@ -8,7 +8,7 @@ install.packages("dplyr") # missing dep(?)
 BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
-remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
+remotes::install_github("rickhelmus/patRoonData@version20", upgrade = "never")
 remotes::install_github("thomasp85/farver", upgrade = "never")
 remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
 install.packages("vdiffr")
@@ -17,6 +17,7 @@ install.packages("circlize", repos="http://cran.r-project.org") # get most recen
 BiocManager::install("ropls") # for KPIC2
 remotes::install_github("rickhelmus/KPIC2")
 remotes::install_github("rickhelmus/cliqueMS")
+BiocManager::install(c("BiocStyle", "Rgraphviz")) # for MetaClean
 install.packages("MetaClean")
 remotes::install_github("KelseyChetnik/MetaCleanData")
 

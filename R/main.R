@@ -179,28 +179,25 @@ NULL
 #'
 #' Functions and classes for collection of features.
 #'
-#' Several functions exist to collect features (\emph{i.e.} retention and MS
-#' information that represent potential compounds) from a set of analyses. All
-#' 'feature finders' return an object derived from the \code{\link{features}}
-#' base class. The next step in a general workflow is to group and align these
-#' features across analyses by \link[=feature-grouping]{feature groupers}. Note
-#' that some feature finders have a plethora of options which sometimes may have
-#' a large effect on the quality of results. Fine-tuning parameters is therefore
-#' important, and the optimum is largely dependent upon applied analysis
-#' methodology and instrumentation.
+#' Several functions exist to collect features (\emph{i.e.} retention and MS information that represent potential
+#' compounds) from a set of analyses. All 'feature finders' return an object derived from the \code{\link{features}}
+#' base class. The next step in a general workflow is to group and align these features across analyses by
+#' \link[=feature-grouping]{feature groupers}. Note that some feature finders have a plethora of options which sometimes
+#' may have a large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is
+#' largely dependent upon applied analysis methodology and instrumentation.
 #'
 #' @param analysisInfo \link[=analysis-information]{Analysis info table}.
-#' @param ... further parameters passed to \code{\link[xcms]{xcmsSet}}
-#'   (\code{findFeaturesXCMS}), \code{\link[enviPick]{enviPickwrap}}
-#'   (\code{featurefinderEnviPick}) or to selected feature finding or importing
-#'   algorithms (\code{findFeatures} and \code{importFeatures}).
+#' @param ... further parameters passed to \code{\link[xcms]{xcmsSet}} (\code{findFeaturesXCMS}),
+#'   \code{\link[enviPick]{enviPickwrap}} (\code{featurefinderEnviPick}),
+#'   \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}} (\code{findFeaturesKPIC2}) or to selected feature
+#'   finding or importing algorithms (\code{findFeatures} and \code{importFeatures}).
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
 #' @templateVar what \code{generateFeaturesOpenMS}
 #' @template uses-multiProc
 #'
-#' @note The file format of analyses for \code{findFeaturesXCMS} and
-#'   \code{findFeaturesXCMS3} must be \code{mzML} or \code{mzXML}.
+#' @note The file format of analyses for \code{findFeaturesXCMS} and \code{findFeaturesXCMS3} must be \code{mzML} or
+#'   \code{mzXML}.
 #'
 #' @name feature-finding
 #' @return An object of a class which is derived from \code{\link{features}}.

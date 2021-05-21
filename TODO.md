@@ -145,6 +145,7 @@
 
 - ref docs
     - delete()
+    - parallelize args
 - ffOpenMS etc: analyses also needs to be available for hashing
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)

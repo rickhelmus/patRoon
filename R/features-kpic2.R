@@ -72,6 +72,15 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
+#' @details \code{findFeaturesKPIC2} uses the
+#'   \href{https://github.com/hcji/KPIC2}{KPIC2} \R package to extract features.
+#'
+#' @param kmeans If \code{TRUE} then \code{\link{getPIC.kmeans}} is used to
+#'   obtain PICs, otherwise it is \code{\link{getPIC}}.
+#' @param level Passed to \code{\link{getPIC}} or \code{\link{getPIC.kmeans}}
+#'
+#' @references \insertRef{Ji2017}{patRoon}
+#'
 #' @rdname feature-finding
 #' @export
 findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., parallel = TRUE, verbose = TRUE)
@@ -168,12 +177,15 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
     return(featuresKPIC2(picsList = picsList, features = feat, analysisInfo = analysisInfo))
 }
 
-#' @export
-setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
-{
-    return(unname(obj@picsList))
-})
-
+#' Conversion to KPIC2 objects
+#'
+#' Converts a \code{\link{features}} object to an \pkg{KPIC} object.
+#'
+#' @param obj The \code{features} object that should be converted.
+#' @param loadRawData,\dots Set to \code{TRUE} if analyses were exported as
+#'   \code{mzXML} or \code{mzML} files (ignored by \code{featuresKPIC2} method).
+#' @rdname kpic2-conv
+#' @aliases getPICSet
 #' @export
 setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
 {
@@ -225,4 +237,11 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
 
         return(ret)
     }))
+})
+
+#' @rdname kpic2-conv
+#' @export
+setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
+{
+    return(unname(obj@picsList))
 })

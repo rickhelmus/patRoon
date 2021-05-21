@@ -1,0 +1,1 @@
+A featuresKPIC2 objectHierarchy:features    |-- featuresKPIC2---Algorithm: kpic2Total feature count: 417Average feature count/analysis: 417Analyses: standard-pos-1 (1 total)Replicate groups: standard-pos (1 total)Replicate groups used as blank: solvent-pos (1 total)

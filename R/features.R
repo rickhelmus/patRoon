@@ -389,9 +389,9 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @details \code{importFeatures} is a generic function to import feature groups
 #'   produced by other software. The actual functionality is provided by
 #'   specific functions such as \code{importFeaturesXCMS} and
-#'   \code{importFeaturesEnviMass}.
+#'   \code{importFeaturesKPIC2}.
 #' @param type What type of data should be imported: \code{"xcms"},
-#'   \code{"xcms3"} or \code{"envimass"}.
+#'   \code{"xcms3"}, \code{"kpic2"} or \code{"envimass"}.
 #'
 #' @rdname feature-finding
 #' @export
@@ -402,8 +402,9 @@ importFeatures <- function(analysisInfo, type, ...)
     f <- switch(type,
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
+                kpic2 = importfeaturesKPIC2,
                 envimass = importFeaturesEnviMass,
-                stop("Invalid algorithm! Should be: xcms, xcms3 or envimass"))
+                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2 or envimass"))
 
     f(analysisInfo = analysisInfo, ...)
 }

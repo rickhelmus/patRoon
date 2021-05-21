@@ -29,7 +29,6 @@
 \alias{annotations,featureGroups-method}
 \alias{adducts,featureGroups-method}
 \alias{adducts<-,featureGroups-method}
-\alias{adducts<-}
 \alias{[,featureGroups,ANY,ANY,missing-method}
 \alias{[[,featureGroups,ANY,ANY-method}
 \alias{$,featureGroups-method}

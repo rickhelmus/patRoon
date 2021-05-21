@@ -90,7 +90,7 @@ enabled.}
 
 \item{MSPeakLists, formulas, compounds}{Annotation data
 (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
-\code{\code{compounds}}) obtained for this \code{featureGroupsScreening}
+\code{\link{compounds}}) obtained for this \code{featureGroupsScreening}
 object. All arguments can be \code{NULL} to exclude it from the annotation.}
 
 \item{absMzDev}{Maximum absolute \emph{m/z} deviation.}

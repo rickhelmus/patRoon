@@ -3,6 +3,7 @@
 #' @include components-set.R
 NULL
 
+#' @export
 componentsNTSet <- setClass("componentsNTSet", contains = "componentsSet")
 
 setMethod("collapseComponents", "componentsNTSet", function(obj)
@@ -15,6 +16,7 @@ setMethod("collapseComponents", "componentsNTSet", function(obj)
 #' @export
 setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked, set) plotGraph(unset(obj, set), onlyLinked = onlyLinked))
 
+#' @export
 componentsNTUnset <- setClass("componentsNTUnset", contains = "componentsNT")
 setMethod("unset", "componentsNTSet", function(obj, set)
 {

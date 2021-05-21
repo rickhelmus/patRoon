@@ -2,12 +2,10 @@
 % Please edit documentation in R/TP.R, R/components.R, R/components-camera.R,
 %   R/components-ramclustr.R
 \docType{class}
-\name{length,TPPredictions-method}
-\alias{length,TPPredictions-method}
+\name{length,transformationProducts-method}
+\alias{length,transformationProducts-method}
 \alias{components-class}
 \alias{components}
-\alias{componentsReduced-class}
-\alias{componentsReduced}
 \alias{componentTable,components-method}
 \alias{componentTable}
 \alias{componentInfo,components-method}
@@ -19,6 +17,7 @@
 \alias{[,components,ANY,ANY,missing-method}
 \alias{[[,components,ANY,ANY-method}
 \alias{$,components-method}
+\alias{delete,components-method}
 \alias{as.data.table,components-method}
 \alias{filter,components-method}
 \alias{findFGroup,components-method}
@@ -32,7 +31,7 @@
 \alias{componentsRC}
 \title{Component class}
 \usage{
-\S4method{length}{TPPredictions}(x)
+\S4method{length}{transformationProducts}(x)
 
 \S4method{componentTable}{components}(obj)
 
@@ -52,6 +51,8 @@
 
 \S4method{$}{components}(x, name)
 
+\S4method{delete}{components}(obj, i = NULL, j = NULL, ...)
+
 \S4method{as.data.table}{components}(x)
 
 \S4method{filter}{components}(
@@ -61,7 +62,9 @@
   isotopes = NULL,
   rtIncrement = NULL,
   mzIncrement = NULL,
-  negate = FALSE
+  checkComponentsSession = NULL,
+  negate = FALSE,
+  verbose = TRUE
 )
 
 \S4method{findFGroup}{components}(obj, fGroup)
@@ -127,6 +130,8 @@ minimum/maximum retention or mz increment of a homologous series. Set to
 
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
+\item{verbose}{If set to \code{FALSE} then no text output is shown.}
+
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
 
@@ -173,7 +178,7 @@ Contains data for feature groups that are related in some way. These
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{length}: Obtain total number of predictions.
+\item \code{length}: Obtain total number of products.
 
 \item \code{componentTable}: Accessor method for the \code{components} slot of a
 \code{components} class. Each component is stored as a
@@ -196,6 +201,8 @@ feature groups for which data is present in this object.
 \item \code{[[}: Extracts a component table, optionally filtered by a feature group.
 
 \item \code{$}: Extracts a component table by component name.
+
+\item \code{delete}: Deletes (parts of) components
 
 \item \code{as.data.table}: Returns all component data in a table.
 
@@ -231,7 +238,7 @@ for each component. Use the \code{componentInfo} method for access.}
   within a component if that component contains adduct information.
 }
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsReduced}}}       \item{\code{\link{componentsSet}}}       \itemize{         \item{\code{\link{componentsClustSet}}}         \itemize{           \item{\code{\link{componentsSpecClustSet}}}         }       }       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsClust}}}       \itemize{         \item{\code{\link{componentsIntClust}}}         \item{\code{\link{componentsSpecClust}}}       }       \item{\code{\link{componentsNT}}}       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsTPs}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsSet}}}       \itemize{         \item{\code{\link{componentsNTSet}}}       }       \item{\code{\link{componentsUnset}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsFeatures}}}       \itemize{         \item{\code{\link{componentsCliqueMS}}}         \item{\code{\link{componentsOpenMS}}}       }       \item{\code{\link{componentsClust}}}       \itemize{         \item{\code{\link{componentsIntClust}}}         \item{\code{\link{componentsSpecClust}}}       }       \item{\code{\link{componentsNT}}}       \itemize{         \item{\code{\link{componentsNTUnset}}}       }       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsTPs}}}     }   } }
 }
 
 \seealso{

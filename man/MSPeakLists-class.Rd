@@ -18,6 +18,7 @@
 \alias{as.data.table,MSPeakLists-method}
 \alias{filter,MSPeakLists-method}
 \alias{plotSpectrum,MSPeakLists-method}
+\alias{spectrumSimilarity,MSPeakLists-method}
 \alias{getDefIsolatePrecParams}
 \title{Class containing MS Peak Lists}
 \usage{
@@ -33,7 +34,7 @@
 
 \S4method{show}{MSPeakLists}(object)
 
-\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., reAverage = TRUE, drop = TRUE)
+\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., reAverage = FALSE, drop = TRUE)
 
 \S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
 
@@ -54,7 +55,10 @@
   deIsotopeMS = FALSE,
   deIsotopeMSMS = FALSE,
   withMSMS = FALSE,
+  annotatedBy = NULL,
+  absMzDev = 0.002,
   retainPrecursorMSMS = TRUE,
+  reAverage = FALSE,
   negate = FALSE
 )
 
@@ -64,10 +68,24 @@
   analysis = NULL,
   MSLevel = 1,
   title = NULL,
+  specSimParams = getDefSpecSimParams(),
   useGGPlot2 = FALSE,
+  mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
   ...
+)
+
+\S4method{spectrumSimilarity}{MSPeakLists}(
+  obj,
+  groupName1,
+  groupName2 = NULL,
+  analysis1 = NULL,
+  analysis2 = NULL,
+  MSLevel = 1,
+  specSimParams = getDefSpecSimParams(),
+  NAToZero = FALSE,
+  drop = TRUE
 )
 
 getDefIsolatePrecParams(...)
@@ -79,7 +97,9 @@ getDefIsolatePrecParams(...)
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.}
+\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}
+(\code{plotSpec}) or \code{\link{SpectrumSimilarity}}
+(\code{spectrumSimilarity}).}
 
 \item{reAverage}{Set to \code{TRUE} to regenerate averaged MS peak lists
 after subsetting analyses.}
@@ -120,6 +140,9 @@ presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 which MS/MS data is available. if \code{negate=TRUE} then only results
 \emph{without} MS/MS data will be retained.}
 
+\item{absMzDev}{Maximum deviation for \emph{m/z} alignment (in Da). Sets the
+\code{t} argument of \code{\link{SpectrumSimilarity}}.}
+
 \item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be
 filtered out from MS/MS peak lists (note that precursors are never removed
 from MS peak lists). The \code{negate} argument does not affect this
@@ -145,6 +168,24 @@ faster.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{groupName1, groupName2}{The names of the feature groups for which the
+comparison should be made.}
+
+\item{analysis1, analysis2}{The name of the analysis for the comparison. If
+\code{NULL} then data from the feature group averaged peak list is used.}
+
+\item{doPlot}{Set to \code{TRUE} to make a head-to-tail plot. Otherwise only
+the similarity will be returned.}
+
+\item{relMinIntensity}{Relative intensity threshold. Sets the \code{b}
+argument of \code{\link{SpectrumSimilarity}}.}
+
+\item{omitPrecursor}{If \code{TRUE} then the precursor mass peak is removed
+prior the comparison.}
+
+\item{mzShift}{A number that is added to all mass peaks of the second peak
+list. Useful for \emph{e.g.} comparing precursor/parent MS/MS peaks.}
 }
 \value{
 \code{peakLists} returns a nested list containing MS (and MS/MS where
@@ -163,6 +204,9 @@ faster.}
 
 \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
   object}} if \code{useGGPlot2} is \code{TRUE}.
+
+\code{spectrumSimilarity} returns the same as
+  \code{\link{SpectrumSimilarity}}.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a
@@ -213,6 +257,9 @@ lists. However, since version \samp{1.1}, the resulting feature group lists are
 
 \item \code{plotSpectrum}: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.
+
+\item \code{spectrumSimilarity}: Calculates the spectral similarity between
+two spectra.
 }}
 
 \section{Slots}{
@@ -287,6 +334,6 @@ names.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}     \itemize{       \item{\code{\link{MSPeakListsSet}}}       \item{\code{\link{MSPeakListsSetIonized}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}     \itemize{       \item{\code{\link{MSPeakListsSet}}}       \item{\code{\link{MSPeakListsUnset}}}     }   } }
 }
 

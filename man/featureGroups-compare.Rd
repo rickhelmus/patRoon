@@ -16,6 +16,7 @@
 \alias{plotUpSet,featureGroupsComparison-method}
 \alias{plotChord,featureGroupsComparison-method}
 \alias{consensus,featureGroupsComparison-method}
+\alias{consensus,featureGroupsComparisonSet-method}
 \title{Comparing feature groups}
 \usage{
 \S4method{comparison}{featureGroups}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
@@ -35,6 +36,8 @@
   uniqueFrom = NULL,
   uniqueOuter = FALSE
 )
+
+\S4method{consensus}{featureGroupsComparisonSet}(obj, ...)
 }
 \arguments{
 \item{\dots}{For \code{comparison}: \code{featureGroups} objects that should
@@ -52,8 +55,7 @@
 
 \item{groupAlgo}{The \code{\link[=feature-grouping]{feature grouping
 algorithm}} that should be used for grouping \emph{pseudo} features (see
-details). Valid values are: \code{"xcms"} or \code{"openms"}. Note:
-\code{xcms3} is not (yet) supported.}
+details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2} or \code{"openms"}.}
 
 \item{groupArgs}{A \code{list} containing further parameters for
 \code{\link[=feature-grouping]{feature grouping}}.}

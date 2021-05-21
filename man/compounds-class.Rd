@@ -6,16 +6,7 @@
 \alias{compounds}
 \alias{compoundsConsensus-class}
 \alias{compoundsConsensus}
-\alias{compoundTable,compounds-method}
-\alias{compoundTable}
-\alias{algorithm,compounds-method}
-\alias{groupNames,compounds-method}
-\alias{length,compounds-method}
 \alias{show,compounds-method}
-\alias{[,compounds,ANY,missing,missing-method}
-\alias{[[,compounds,ANY,missing-method}
-\alias{$,compounds-method}
-\alias{as.data.table,compounds-method}
 \alias{identifiers,compounds-method}
 \alias{identifiers}
 \alias{filter,compounds-method}
@@ -26,34 +17,10 @@
 \alias{plotScores,compounds-method}
 \alias{annotatedPeakList,compounds-method}
 \alias{plotSpectrum,compounds-method}
-\alias{plotVenn,compounds-method}
-\alias{plotUpSet,compounds-method}
 \alias{consensus,compounds-method}
 \title{Compound lists class}
 \usage{
-\S4method{compoundTable}{compounds}(obj)
-
-\S4method{algorithm}{compounds}(obj)
-
-\S4method{groupNames}{compounds}(obj)
-
-\S4method{length}{compounds}(x)
-
 \S4method{show}{compounds}(object)
-
-\S4method{[}{compounds,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
-
-\S4method{[[}{compounds,ANY,missing}(x, i, j)
-
-\S4method{$}{compounds}(x, name)
-
-\S4method{as.data.table}{compounds}(
-  x,
-  fGroups = NULL,
-  fragments = FALSE,
-  normalizeScores = "none",
-  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount")
-)
 
 \S4method{identifiers}{compounds}(compounds)
 
@@ -64,11 +31,7 @@
   minFragScore = NULL,
   minFormulaScore = NULL,
   scoreLimits = NULL,
-  elements = NULL,
-  fragElements = NULL,
-  lossElements = NULL,
-  topMost = NULL,
-  negate = FALSE
+  ...
 )
 
 \S4method{addFormulaScoring}{compounds}(
@@ -94,7 +57,7 @@
   index,
   groupName,
   normalizeScores = "max",
-  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
+  excludeNormScores = defaultExclNormScores(obj),
   onlyUsed = TRUE,
   useGGPlot2 = FALSE
 )
@@ -116,23 +79,14 @@
   formulas = NULL,
   plotStruct = TRUE,
   title = NULL,
+  specSimParams = getDefSpecSimParams(),
   useGGPlot2 = FALSE,
+  mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
   maxMolSize = c(0.2, 0.4),
   molRes = c(100, 100),
   ...
-)
-
-\S4method{plotVenn}{compounds}(obj, ..., labels = NULL, vennArgs = NULL)
-
-\S4method{plotUpSet}{compounds}(
-  obj,
-  ...,
-  labels = NULL,
-  nsets = length(list(...)) + 1,
-  nintersects = NA,
-  upsetArgs = NULL
 )
 
 \S4method{consensus}{compounds}(
@@ -142,55 +96,12 @@
   relMinAbundance = NULL,
   uniqueFrom = NULL,
   uniqueOuter = FALSE,
-  minMaxNormalization = FALSE,
   rankWeights = 1,
   labels = NULL
 )
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
-
-\item{i}{A numeric or character value which is used to select feature groups by
-their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a scalar value.}
-
-\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
-  \code{\link[graphics]{plot}}.
-
-  Others: Any further (and unique) \code{compounds} objects.}
-
-\item{drop, j}{ignored.}
-
-\item{name}{The feature group name (partially matched).}
-
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate this object. If not \code{NULL} it is used to add feature group
-information (retention and \emph{m/z} values).}
-
-\item{fragments}{If \code{TRUE} then information on annotated fragments will
-be included.}
-
-\item{normalizeScores}{A \code{character} that specifies how normalization of
-annotation scorings occurs. Either
-\code{"none"} (no normalization),
-\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
-normalization). Note that normalization of negative scores (e.g. output by
-\command{SIRIUS}) is always performed as min-max. Furthermore, currently
-normalization for \code{compounds} takes the original min/max scoring
-values into account when candidates were generated. Thus, for
-\code{compounds} scoring, normalization is not affected when candidate
-results were removed after they were generated (\emph{e.g.} by use of
-\code{filter}).}
-
-\item{excludeNormScores}{A
-  \code{character} vector specifying any compound scoring names that
-  should \emph{not} be normalized. Set to \code{NULL} to normalize all
-  scorings. Note that whether any normalization occurs is set by the
-  \code{excludeNormScores} argument.
-
-  For \code{compounds}: By default \code{score} and
-  \code{individualMoNAScore} are set to mimic the behavior of the
-  \command{MetFrag} web interface.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimum number
 of explained peaks, overall score, in-silico fragmentation score and
@@ -207,29 +118,10 @@ limits). The names of each element should follow the values returned by
 scorings see \code{\link{compoundScorings}}. Note that a result without a
 specified scoring is never removed. Set to \code{NULL} to skip this filter.}
 
-\item{elements}{Only retain candidate formulae (neutral form) that match a
-given elemental restriction. The format of \code{elements} is a
-\code{character} string with elements that should be present where each
-element is followed by a valid amount or a range thereof. If no number is
-specified then \samp{1} is assumed. For instance,
-\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
-\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
-should be present, respectively. When \code{length(elements)>1} formulas
-are tested to follow at least one of the given elemental restrictions. For
-instance, \code{elements=c("P", "S")} specifies that either one phosphorus
-or one sulphur atom should be present. Set to \code{NULL} to ignore this
-filter.}
+\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
 
-\item{fragElements, lossElements}{Specifies elemental restrictions for
-fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow (or not follow if
-\code{negate=TRUE}) the given restrictions. See \code{elements} for the
-used format.}
-
-\item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
-score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.}
-
-\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
+  Others: Any further (and unique) \code{compounds} objects.}
 
 \item{formulas}{The \code{\link{formulas}} object that should be used for
 scoring/annotation. For \code{plotSpectrum}: set to \code{NULL} to ignore.}
@@ -260,6 +152,28 @@ plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+annotation scorings occurs. Either
+\code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+\command{SIRIUS}) is always performed as min-max. Furthermore, currently
+normalization for \code{compounds} takes the original min/max scoring
+values into account when candidates were generated. Thus, for
+\code{compounds} scoring, normalization is not affected when candidate
+results were removed after they were generated (\emph{e.g.} by use of
+\code{filter}).}
+
+\item{excludeNormScores}{A
+  \code{character} vector specifying any compound scoring names that
+  should \emph{not} be normalized. Set to \code{NULL} to normalize all
+  scorings. Note that whether any normalization occurs is set by the
+  \code{excludeNormScores} argument.
+
+  For \code{compounds}: By default \code{score} and
+  \code{individualMoNAScore} are set to mimic the behavior of the
+  \command{MetFrag} web interface.}
+
 \item{onlyUsed}{If \code{TRUE} then only scorings are plotted that actually
 have been used to rank data (see the \code{scoreTypes} argument to
 \code{\link{generateCompoundsMetFrag}} for more details).}
@@ -285,19 +199,6 @@ the candidate structure (relative to the plot size).}
 \item{molRes}{Numeric vector of size two with the resolution of the candidate
 structure (in pixels).}
 
-\item{labels}{A \code{character} with names to use for labelling. If
-\code{NULL} labels are automatically generated.}
-
-\item{vennArgs}{A \code{list} with further arguments passed to
-\pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
-
-\item{nsets}{See \code{\link[UpSetR]{upset}}.}
-
-\item{nintersects}{See \code{\link[UpSetR]{upset}}.}
-
-\item{upsetArgs}{A list with any further arguments to be passed to
-\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
-
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
 instance, \code{relMinAbundance=0.5} means that a result should be present
@@ -317,24 +218,46 @@ of the objects given for the consensus. Set to \code{NULL} to ignore.}
 \code{uniqueOuter=TRUE}: only retain data that are also unique between
 objects specified in \code{uniqueFrom}.}
 
-\item{minMaxNormalization}{Set to \code{TRUE} to apply min-max normalization
-of (merged) scoring columns. \code{FALSE} will apply normalization to the
-maximum value. Scorings with negative values will always be min-max
-normalized.}
-
-\item{rankWeights}{A numeric vector with weights of to calulcate the mean
+\item{rankWeights}{A numeric vector with weights of to calculate the mean
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of \samp{1} means equal weights for all considered
 objects.}
+
+\item{drop, j}{ignored.}
+
+\item{i}{A numeric or character value which is used to select feature groups by
+their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a scalar value.}
+
+\item{name}{The feature group name (partially matched).}
+
+\item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
+score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
+
+\item{elements}{Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of \code{elements} is a
+\code{character} string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then \samp{1} is assumed. For instance,
+\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
+\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When \code{length(elements)>1} formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, \code{elements=c("P", "S")} specifies that either one phosphorus
+or one sulphur atom should be present. Set to \code{NULL} to ignore this
+filter.}
+
+\item{fragElements, lossElements}{Specifies elemental restrictions for
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow (or not follow if
+\code{negate=TRUE}) the given restrictions. See \code{elements} for the
+used format.}
 }
 \value{
 \code{plotSpectrum} and \code{plotStructure} will return a
   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
-
-\code{compoundTable} returns a \code{list} containing for each feature
-  group a \code{\link{data.table}} with an overview of all candidate
-  compounds and other data such as candidate scoring, matched MS/MS
-  fragments, etc.
 
 \code{filter} returns a filtered \code{compounds} object.
 
@@ -343,17 +266,6 @@ objects.}
 
 \code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
-
-\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
-\item \code{gList} the \code{gList} object that was returned by
-  the utilized \pkg{\link{VennDiagram}} plotting function.
-\item \code{areas} The total area for each plotted group.
-\item \code{intersectionCounts} The number of intersections between groups.
-}
-
-The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
-from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
-\code{\link{draw.triple.venn}}).
 
 \code{consensus} returns a \code{compounds} object that is produced
   by merging multiple specified \code{compounds} objects.
@@ -367,25 +279,7 @@ Contains data of generated chemical compounds for given feature groups.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{compoundTable}: Accessor method to obtain generated compounds.
-
-\item \code{algorithm}: Accessor method for the algorithm (a character
-string) used to generate compounds.
-
-\item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups for which data is present in this object.
-
-\item \code{length}: Obtain total number of candidate compounds.
-
 \item \code{show}: Show summary information for this object.
-
-\item \code{[}: Subset on feature groups.
-
-\item \code{[[}: Extract a compound table for a feature group.
-
-\item \code{$}: Extract a compound table for a feature group.
-
-\item \code{as.data.table}: Returns all MS peak list data in a table.
 
 \item \code{identifiers}: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
@@ -418,15 +312,6 @@ given candidate compound for a feature group.
 \item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate
 compound for a feature group.
 
-\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
-outlining unique and shared compound candidates of up to five different
-\code{compounds} objects. Comparison is made on \code{InChIKey1}.
-
-\item \code{plotUpSet}: plots an UpSet diagram (using the
-\code{\link[UpSetR]{upset}} function) outlining unique and shared compound
-candidates between different \code{compounds} objects. Comparison is made
-on \code{InChIKey1}.
-
 \item \code{consensus}: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
@@ -451,7 +336,7 @@ results were generated. This is used for normalization.}
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}       \item{\code{\link{compoundsSet}}}       \item{\code{\link{compoundsSetIonized}}}     }   } }
+ \itemize{   \item{\code{\link{featureAnnotations}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}       \item{\code{\link{compoundsSet}}}       \itemize{         \item{\code{\link{compoundsConsensusSet}}}       }       \item{\code{\link{compoundsUnset}}}     }   } }
 }
 
 \section{Source}{
@@ -462,7 +347,4 @@ results were generated. This is used for normalization.}
 
 \references{
 \addCitations{rcdk}{1}
-
-\insertRef{Conway2017}{patRoon} \cr\cr
-  \insertRef{Lex2014}{patRoon}
 }

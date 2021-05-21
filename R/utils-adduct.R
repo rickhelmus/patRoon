@@ -273,7 +273,7 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   
 #'   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
 #'   
-#'   \code{"cliquems"} is the format used by \pkg{\link{cliqueMS}}.
+#'   \code{"cliquems"} is the format used by \pkg{\link[=cliqueMS-package]{cliqueMS}}.
 #' @param isPositive A logical that specifies whether the adduct should be
 #'   positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 #'   \code{numeric} identifier.

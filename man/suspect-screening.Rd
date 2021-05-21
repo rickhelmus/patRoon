@@ -18,11 +18,11 @@
 \S4method{screenSuspects}{featureGroups}(
   fGroups,
   suspects,
-  rtWindow = 12,
-  mzWindow = 0.005,
-  adduct = NULL,
-  skipInvalid = TRUE,
-  onlyHits = FALSE
+  rtWindow,
+  mzWindow,
+  adduct,
+  skipInvalid,
+  onlyHits
 )
 
 numericIDLevel(level)

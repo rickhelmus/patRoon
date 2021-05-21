@@ -7,6 +7,8 @@
 \alias{plotEIC}
 \alias{groups}
 \alias{plotSpec}
+\alias{formulaTable}
+\alias{compoundTable}
 \title{Deprecated and renamed functions.}
 \usage{
 reportMD(...)
@@ -24,6 +26,10 @@ plotEIC(obj, ...)
 groups(object, ...)
 
 plotSpec(obj, ...)
+
+formulaTable(...)
+
+compoundTable(...)
 }
 \arguments{
 \item{\dots}{Passed to successor function.}
@@ -57,5 +63,9 @@ Please use \code{\link{plotChroms}} instead.
 Please use \code{\link{groupTable}} instead.
 
 Please use \code{\link{plotSpectrum}} instead.
+
+Please use \code{\link{annotations}} instead.
+
+Please use \code{\link{annotations}} instead.
 }
 \keyword{internal}

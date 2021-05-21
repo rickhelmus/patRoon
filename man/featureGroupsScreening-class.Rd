@@ -32,7 +32,8 @@
   checkFragments = c("mz", "formula", "compound"),
   formulasNormalizeScores = "max",
   compoundsNormalizeScores = "max",
-  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon")
+  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+  logPath = file.path("log", "ident")
 )
 
 \S4method{filter}{featureGroupsScreening}(
@@ -228,7 +229,7 @@ The \code{relMinMSMSIntensity} filter argument to
 
   \itemize{
 
-  \item \code{suspFormRank},\code{suspCompRank} The rank of the suspect
+  \item \code{formRank},\code{compRank} The rank of the suspect
   within the formula/compound annotation results.
 
   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity
@@ -349,7 +350,7 @@ The \code{relMinMSMSIntensity} filter argument to
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{featureGroups}}}   \itemize{     \item{\strong{\code{\link{featureGroupsScreening}}}}   } }
+ \itemize{   \item{\code{\link{featureGroups}}}   \itemize{     \item{\strong{\code{\link{featureGroupsScreening}}}}     \itemize{       \item{\code{\link{featureGroupsSetScreeningUnset}}}     }   } }
 }
 
 \section{Source}{

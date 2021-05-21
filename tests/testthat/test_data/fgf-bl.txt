@@ -1,1 +1,1 @@
-Applying blank filter... Done! Filtered 2761 (85.01%) features and 544 (71.48%) feature groups. Remaining: 487 features in 217 groups.
+Applying blank filter... Done! Filtered 2766 (81.28%) features and 544 (68.77%) feature groups. Remaining: 637 features in 247 groups.

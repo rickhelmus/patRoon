@@ -1,1 +1,1 @@
-Applying minimum features filter... Done! Filtered 1462 (45.01%) features and 64 (8.41%) feature groups. Remaining: 1786 features in 697 groups.
+Applying minimum features filter... Done! Filtered 1457 (42.82%) features and 71 (8.98%) feature groups. Remaining: 1946 features in 720 groups.

@@ -46,8 +46,9 @@
   retMin = TRUE,
   EICGrid = c(2, 1),
   EICRtWindow = 20,
-  EICMzWindow = 0.005,
+  EICMzExpWindow = 0.001,
   EICTopMost = NULL,
+  EICTopMostByRGroup = FALSE,
   EICOnlyPresent = TRUE,
   clearPath = FALSE
 )
@@ -70,10 +71,12 @@
   components = NULL,
   interactiveHeat = FALSE,
   MSPeakLists = NULL,
+  specSimParams = getDefSpecSimParams(),
   retMin = TRUE,
   EICRtWindow = 20,
-  EICMzWindow = 0.005,
+  EICMzExpWindow = 0.001,
   EICTopMost = NULL,
+  EICTopMostByRGroup = FALSE,
   EICOnlyPresent = TRUE,
   selfContained = TRUE,
   optimizePng = FALSE,
@@ -148,9 +151,9 @@ reported.}
 \item{EICGrid}{An integer vector in the form \code{c(columns, rows)} that is
 used to determine the plotting grid when reporting EICs in PDF files.}
 
-\item{EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent}{Plotting parameters
-passed to \code{\link{plotChroms}} (\emph{i.e.} \code{rtWindow},
-\code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).}
+\item{EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent}{Plotting parameters passed to \code{\link{plotChroms}} (\emph{i.e.}
+\code{rtWindow}, \code{mzExpWindow}, \code{topMost}, \code{topMostByRGroup}
+and \code{onlyPresent} arguments).}
 
 \item{reportPlots}{A character vector specifying what should be plotted.
 Valid options are: \code{"chord"}, \code{"venn"}, \code{"upset"} (plot a

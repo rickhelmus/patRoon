@@ -4,110 +4,71 @@
 \name{formulas-class}
 \alias{formulas-class}
 \alias{formulas}
-\alias{formulaTable,formulas-method}
-\alias{formulaTable}
-\alias{algorithm,formulas-method}
+\alias{formulasConsensus-class}
+\alias{formulasConsensus}
+\alias{annotations,formulas-method}
 \alias{analyses,formulas-method}
-\alias{groupNames,formulas-method}
-\alias{length,formulas-method}
 \alias{show,formulas-method}
-\alias{[,formulas,ANY,missing,missing-method}
 \alias{[[,formulas,ANY,ANY-method}
-\alias{$,formulas-method}
 \alias{as.data.table,formulas-method}
-\alias{filter,formulas-method}
 \alias{annotatedPeakList,formulas-method}
-\alias{plotScores,formulas-method}
 \alias{plotSpectrum,formulas-method}
-\alias{plotVenn,formulas-method}
-\alias{plotUpSet,formulas-method}
+\alias{plotScores,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
-\S4method{formulaTable}{formulas}(obj, features = FALSE)
-
-\S4method{algorithm}{formulas}(obj)
+\S4method{annotations}{formulas}(obj, features = FALSE)
 
 \S4method{analyses}{formulas}(obj)
 
-\S4method{groupNames}{formulas}(obj)
-
-\S4method{length}{formulas}(x)
-
 \S4method{show}{formulas}(object)
 
-\S4method{[}{formulas,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
-
 \S4method{[[}{formulas,ANY,ANY}(x, i, j)
-
-\S4method{$}{formulas}(x, name)
 
 \S4method{as.data.table}{formulas}(
   x,
   fGroups = NULL,
-  average = FALSE,
+  fragments = FALSE,
   countElements = NULL,
   countFragElements = NULL,
   OM = FALSE,
-  maxFormulas = NULL,
-  maxFragFormulas = NULL,
   normalizeScores = "none",
-  excludeNormScores = NULL
-)
-
-\S4method{filter}{formulas}(
-  obj,
-  minExplainedPeaks = NULL,
-  elements = NULL,
-  fragElements = NULL,
-  lossElements = NULL,
-  topMost = NULL,
-  scoreLimits = NULL,
-  OM = FALSE,
-  negate = FALSE
+  excludeNormScores = defaultExclNormScores(x),
+  average = FALSE
 )
 
 \S4method{annotatedPeakList}{formulas}(
   obj,
-  precursor,
+  index,
   groupName,
   analysis = NULL,
   MSPeakLists,
   onlyAnnotated = FALSE
 )
 
-\S4method{plotScores}{formulas}(
-  obj,
-  precursor,
-  groupName,
-  analysis = NULL,
-  normalizeScores = "max",
-  excludeNormScores = NULL,
-  useGGPlot2 = FALSE
-)
-
 \S4method{plotSpectrum}{formulas}(
   obj,
-  precursor,
+  index,
   groupName,
   analysis = NULL,
   MSPeakLists,
   title = NULL,
+  specSimParams = getDefSpecSimParams(),
   useGGPlot2 = FALSE,
+  mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
   ...
 )
 
-\S4method{plotVenn}{formulas}(obj, ..., labels = NULL, vennArgs = NULL)
-
-\S4method{plotUpSet}{formulas}(
+\S4method{plotScores}{formulas}(
   obj,
-  ...,
-  labels = NULL,
-  nsets = length(list(...)) + 1,
-  nintersects = NA,
-  upsetArgs = NULL
+  index,
+  groupName,
+  analysis = NULL,
+  normalizeScores = "max",
+  excludeNormScores = defaultExclNormScores(obj),
+  useGGPlot2 = FALSE
 )
 
 \S4method{consensus}{formulas}(
@@ -131,32 +92,17 @@ for feature groups.}
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
-  \code{\link[graphics]{plot}}.
-
-  Others: Any further (and unique) \code{formulas} objects.}
-
-\item{drop}{ignored.}
-
-\item{name}{The feature group name (partially matched).}
-
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate this object. If not \code{NULL} it is used to add feature group
 information (retention and \emph{m/z} values).}
-
-\item{average}{If set to \code{TRUE} an 'average formula' is generated for
-each feature group by combining all elements from all candidates and
-averaging their amounts. This obviously leads to non-existing formulae,
-however, this data may be useful to deal with multiple candidate formulae
-per feature group when performing elemental characterization.}
 
 \item{countElements, countFragElements}{A \code{character} vector with
 elements that should be counted for each MS(/MS) formula candidate. For
 instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
 amounts of each formula. Note that the neutral formula
 (\code{neutral_formula} column) is used to count elements of non-fragmented
-formulae, whereas the charged formula of fragments (\code{frag_formula}
-column) is used for fragments. Set to \code{NULL} to not count any
+formulae, whereas the charged formula of fragments (\code{ion_formula}
+column in \code{fragInfo} data) is used for fragments. Set to \code{NULL} to not count any
 elements.}
 
 \item{OM}{For \code{as.data.table}: if set to \code{TRUE} several columns
@@ -167,10 +113,6 @@ elements.}
   For \code{filter}: If \code{TRUE} then several filters are applied to
   exclude unlikely formula candidates present in organic matter (OM). See
   Source section for details.}
-
-\item{maxFormulas, maxFragFormulas}{Maximum amount of unique candidate
-formulae (or fragment formulae) per feature group. Set to \code{NULL} to
-ignore.}
 
 \item{normalizeScores}{A \code{character} that specifies how normalization of
 annotation scorings occurs. Either
@@ -194,45 +136,11 @@ results were removed after they were generated (\emph{e.g.} by use of
   \code{individualMoNAScore} are set to mimic the behavior of the
   \command{MetFrag} web interface.}
 
-\item{minExplainedPeaks}{Minimum number of fragment peaks that are
-explained. Setting this to \samp{1} will remove any MS only formula
-results. Set to \code{NULL} to ignore.}
-
-\item{elements}{Only retain candidate formulae (neutral form) that match a
-given elemental restriction. The format of \code{elements} is a
-\code{character} string with elements that should be present where each
-element is followed by a valid amount or a range thereof. If no number is
-specified then \samp{1} is assumed. For instance,
-\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
-\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
-should be present, respectively. When \code{length(elements)>1} formulas
-are tested to follow at least one of the given elemental restrictions. For
-instance, \code{elements=c("P", "S")} specifies that either one phosphorus
-or one sulphur atom should be present. Set to \code{NULL} to ignore this
-filter.}
-
-\item{fragElements, lossElements}{Specifies elemental restrictions for
-fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow (or not follow if
-\code{negate=TRUE}) the given restrictions. See \code{elements} for the
-used format.}
-
-\item{topMost}{Retain no more than this amount of best ranked (or worst
-ranked if \code{negate=TRUE}) candidates for each feature group.}
-
-\item{scoreLimits}{Filter results by their scores. Should be a named
-\code{list} that contains two-sized numeric vectors with the
-minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
-limits). The names of each element should follow the values returned by
-\code{\link{formulaScorings}()$name}. For instance,
-\code{scoreLimits=list(isoScore=c(0.5, Inf))} specifies that the isotopic
-match score should be at least \samp{0.5}. More details of scorings can be
-obtained with \code{\link{formulaScorings}}. Note that a result without a
-specified scoring is never removed. Set to \code{NULL} to skip this filter.}
-
-\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
-
-\item{precursor}{The formula of the precursor (in neutral form).}
+\item{average}{If set to \code{TRUE} an 'average formula' is generated for
+each feature group by combining all elements from all candidates and
+averaging their amounts. This obviously leads to non-existing formulae,
+however, this data may be useful to deal with multiple candidate formulae
+per feature group when performing elemental characterization.}
 
 \item{groupName}{The name of the feature group to which the candidate
 belongs.}
@@ -247,27 +155,21 @@ generate the candidate}
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
 
+\item{title}{The title of the plot. Set to \code{NULL} for an automatically
+generated title.}
+
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
 plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
-\item{title}{The title of the plot. Set to \code{NULL} for an automatically
-generated title.}
-
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
-\item{labels}{A \code{character} with names to use for labelling. If
-\code{NULL} labels are automatically generated.}
+\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
 
-\item{vennArgs}{A \code{list} with further arguments passed to
-\pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
-
-\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
-
-\item{upsetArgs}{A list with any further arguments to be passed to
-\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
+  Others: Any further (and unique) \code{formulas} objects.}
 
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
@@ -288,34 +190,30 @@ of the objects given for the consensus. Set to \code{NULL} to ignore.}
 \code{uniqueOuter=TRUE}: only retain data that are also unique between
 objects specified in \code{uniqueFrom}.}
 
-\item{rankWeights}{A numeric vector with weights of to calulcate the mean
+\item{rankWeights}{A numeric vector with weights of to calculate the mean
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of \samp{1} means equal weights for all considered
 objects.}
+
+\item{labels}{A \code{character} with names to use for labelling. If
+\code{NULL} labels are automatically generated.}
+
+\item{drop}{ignored.}
+
+\item{name}{The feature group name (partially matched).}
+
+\item{precursor}{The formula of the precursor (in neutral form).}
 }
 \value{
-\code{formulaTable} returns a \code{list} containing for each feature
+\code{annotations} returns a \code{list} containing for each feature
   group (or feature if \code{features=TRUE}) a \code{\link{data.table}}
   with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.
 
 \code{as.data.table} returns a \code{\link{data.table}}.
 
-\code{filter} returns a filtered \code{\link{formulas}} object.
-
 \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
   object}} if \code{useGGPlot2} is \code{TRUE}.
-
-\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
-\item \code{gList} the \code{gList} object that was returned by
-  the utilized \pkg{\link{VennDiagram}} plotting function.
-\item \code{areas} The total area for each plotted group.
-\item \code{intersectionCounts} The number of intersections between groups.
-}
-
-The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
-from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
-\code{\link{draw.triple.venn}}).
 
 \code{consensus} returns a \code{formulas} object that is produced by
   merging results from multiple \code{formulas} objects.
@@ -329,50 +227,28 @@ generators}.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{formulaTable}: Accessor method to obtain generated formulae.
-
-\item \code{algorithm}: Accessor method for the algorithm (a character
-string) used to generate formulae.
+\item \code{annotations}: Accessor method to obtain generated formulae.
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
-\item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups for which data is present in this object.
-
-\item \code{length}: Obtain total number of formulae entries.
-
 \item \code{show}: Show summary information for this object.
-
-\item \code{[}: Subset on feature groups.
 
 \item \code{[[}: Extract a formula table. If both arguments (\code{i} and
 \code{j}) are specified, the feature specific formula table belonging to
 the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
 formula table for the feature group specified by \code{j} is returned.
 
-\item \code{$}: Extract a formula table for a feature group.
-
 \item \code{as.data.table}: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.
-
-\item \code{filter}: Performs rule based filtering on formula results.
 
 \item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
 given candidate formula.
 
-\item \code{plotScores}: Plots a barplot with scoring of a candidate compound.
-
 \item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.
 
-\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
-outlining unique and shared formula candidates of up to five different
-\code{formulas} objects.
-
-\item \code{plotUpSet}: plots an UpSet diagram (using the
-\code{\link[UpSetR]{upset}} function) outlining unique and shared formula
-candidates between different \code{formula} objects.
+\item \code{plotScores}: Plots a barplot with scoring of a candidate formula.
 
 \item \code{consensus}: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
@@ -388,16 +264,12 @@ the \code{rank} columns.
 
 \describe{
 \item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the
-\code{formulaTable} method for access.}
+\code{annotations} method for access.}
 
 \item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
 results were generated. This is used for normalization.}
 }}
 
-\note{
-\code{filter} does not modify any formula results for features (if
-  present).
-}
 \section{Source}{
  Calculation of the aromaticity index (AI) and related double
   bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
@@ -411,7 +283,7 @@ results were generated. This is used for normalization.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}     \itemize{       \item{\code{\link{formulasSet}}}       \item{\code{\link{formulasSetIonized}}}     }   } }
+ \itemize{   \item{\code{\link{featureAnnotations}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}     \itemize{       \item{\code{\link{formulasConsensus}}}       \item{\code{\link{formulasSet}}}       \itemize{         \item{\code{\link{formulasConsensusSet}}}       }       \item{\code{\link{formulasUnset}}}     }   } }
 }
 
 \references{
@@ -419,7 +291,4 @@ results were generated. This is used for normalization.}
   \insertRef{Abdulla2013}{patRoon} \cr\cr
   \insertRef{Koch2006}{patRoon} \cr\cr
   \insertRef{Kujawinski2006}{patRoon}
-
-\insertRef{Conway2017}{patRoon} \cr\cr
-  \insertRef{Lex2014}{patRoon}
 }

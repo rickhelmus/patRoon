@@ -11,14 +11,17 @@
 \alias{formulaScorings}
 \title{Automatic chemical formula generation}
 \usage{
-\S4method{generateFormulas}{featureGroups}(fGroups, algorithm, ...)
+\S4method{generateFormulas}{featureGroups}(fGroups, MSPeakLists, algorithm, ...)
 
 \S4method{generateFormulasDA}{featureGroups}(
   fGroups,
+  MSPeakLists,
   precursorMzSearchWindow = 0.002,
   MSMode = "both",
   adduct,
-  featThreshold = 0.75,
+  featThreshold = 0,
+  featThresholdAnn = 0.75,
+  absAlignMzDev = 0.002,
   save = TRUE,
   close = save
 )
@@ -27,13 +30,15 @@
   fGroups,
   MSPeakLists,
   relMzDev = 5,
-  adduct = "[M+H]+",
+  adduct = NULL,
   elements = "CHNOP",
   hetero = TRUE,
   oc = FALSE,
   extraOpts = NULL,
   calculateFeatures = TRUE,
-  featThreshold = 0.75,
+  featThreshold = 0,
+  featThresholdAnn = 0.75,
+  absAlignMzDev = 0.002,
   MSMode = "both",
   isolatePrec = TRUE,
   timeout = 120,
@@ -45,7 +50,7 @@
   fGroups,
   MSPeakLists,
   relMzDev = 5,
-  adduct = "[M+H]+",
+  adduct = NULL,
   elements = "CHNOP",
   profile = "qtof",
   database = NULL,
@@ -55,7 +60,9 @@
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
   calculateFeatures = TRUE,
-  featThreshold = 0.75,
+  featThreshold = 0,
+  featThresholdAnn = 0.75,
+  absAlignMzDev = 0.002,
   verbose = TRUE,
   splitBatches = FALSE
 )
@@ -63,11 +70,11 @@
 formulaScorings()
 }
 \arguments{
-\item{fGroups}{\code{\link{featureGroups}} object for which formulae should
-be generated. This should be the same or a subset of the object that was
-used to create the specified \code{MSPeakLists} (only relevant for
-algorithms using \code{MSPeakLists}). In the case of a subset only the
-remaining feature groups in the subset are considered.}
+\item{fGroups}{\code{\link{featureGroups}} object for which formulae should be generated. This should be the same or
+a subset of the object that was used to create the specified \code{MSPeakLists} (only relevant for algorithms using
+\code{MSPeakLists}). In the case of a subset only the remaining feature groups in the subset are considered.}
+
+\item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
 
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
@@ -80,26 +87,27 @@ feature \emph{m/z}) used to find back feature data of precursor/parent ions
 from MS/MS spectra (this data is not readily available from
 \command{SmartFormula3D} results).}
 
-\item{MSMode}{Whether formulae should be generated only from MS data
-  (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}).
+\item{MSMode}{Whether formulae should be generated only from MS data (\code{"ms"}), MS/MS data (\code{"msms"}) or
+  both (\code{"both"}).
 
-  For \command{GenForm} selecting \code{"both"} will fall back to formula
-  calculation with only MS data in case no MS/MS data is available.
+  For \command{GenForm} selecting \code{"both"} will fall back to formula calculation with only MS data in case no
+  MS/MS data is available.
 
-  For calulation with Bruker DataAnalysis selecting \code{"both"} will
-  calculate formulae from MS data \emph{and} MS/MS data and combines the
-  results (duplicated formulae are removed). This is useful when poor MS/MS
-  data would exclude proper candidates.}
+  For calulation with Bruker DataAnalysis selecting \code{"both"} will calculate formulae from MS data \emph{and}
+  MS/MS data and combines the results (duplicated formulae are removed). This is useful when poor MS/MS data would
+  exclude proper candidates.}
 
 \item{adduct}{An \code{\link{adduct}} object (or something that can be
 converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
 \code{"[M+Na]+"}.}
 
-\item{featThreshold}{If \code{calculateFeatures=TRUE}: minimum presence
-(\samp{0-1}) of a formula in all features before it is considered as a
-candidate for a feature group. For instance, \code{featThreshold} dictates
-that a formula should be present in at least 75% of the features inside a
-feature group.}
+\item{featThreshold}{If \code{calculateFeatures=TRUE}: minimum presence (\samp{0-1}) of a formula in all features
+before it is considered as a candidate for a feature group. For instance, \code{featThreshold=0.75} dictates that a
+formula should be present in at least 75\% of the features inside a feature group.}
+
+\item{featThresholdAnn}{As \code{featThreshold}, but only considers features with annotations. For instance,
+\code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75\% of the features with
+annotations inside a feature group.}
 
 \item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting \code{close=TRUE}
@@ -107,9 +115,6 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 \code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
 likely what you want as otherwise any processed data is lost.}
-
-\item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for
-the supplied \code{fGroups}.}
 
 \item{relMzDev}{Maximum relative deviation between the measured and candidate
 formula \emph{m/z} values (in ppm). Sets the \option{ppm}
@@ -133,13 +138,12 @@ respectively.}
 \item{oc}{Only consider organic formulae (\emph{i.e.} with at least one
 carbon atom). Sets the \option{oc} commandline option.}
 
-\item{extraOpts}{An optional character vector with any other commandline
-options that will be passed to \command{GenForm} or \command{SIRIUS}. See
-the \verb{GenForm options} section/SIRIUS manual for all available
+\item{extraOpts}{An optional character vector with any other commandline options that will be passed to
+\command{GenForm} or \command{SIRIUS}. See the \verb{GenForm options} section/SIRIUS manual for all available
 commandline options.}
 
-\item{calculateFeatures}{If \code{TRUE} fomulae are first calculated for all
-features prior to feature group assignment (see details).}
+\item{calculateFeatures}{If \code{TRUE} fomulae are first calculated for all features prior to feature group
+assignment (see details).}
 
 \item{isolatePrec}{Settings used for isolation of precursor mass peaks and
 their isotopes. This isolation is highly important for accurate isotope
@@ -147,19 +151,19 @@ scoring of candidates, as non-relevant mass peaks will dramatically
 decrease the score. The value of \code{isolatePrec} should either be a
 \code{list} with parameters (see the
 \code{\link[=filter,MSPeakLists-method]{filter method}} for
-\code{MSPeakLists} for more details), \code{TRUE} for default parameters
-(the \code{z} parameter is automatically deduced from the \code{adduct}
-argument) or \code{FALSE} for no isolation (\emph{e.g.} when you already
-performed isolation with the \code{filter} method).}
+\code{MSPeakLists} for more details), \code{TRUE} for default parameters or
+\code{FALSE} for no isolation (\emph{e.g.} when you already performed
+isolation with the \code{filter} method). The \code{z} parameter (charge)
+is automatically deduced from the adduct used for annotation (unless
+\code{isolatePrec=FALSE}), hence any custom \code{z} setting is ignored.}
 
 \item{timeout}{Maximum time (in seconds) that a \command{GenForm} command is
 allowed to execute. If this time is exceeded a warning is emitted and the
 command is terminated. See the notes section for more information on the
 need of timeouts.}
 
-\item{topMost}{Only keep this number of candidates (per feature group) with
-highest score. For \command{SIRIUS}: Sets the \option{--candidates}
-commandline option.}
+\item{topMost}{Only keep this number of candidates (per feature group) with highest score. For \command{SIRIUS}: Sets
+the \option{--candidates} commandline option.}
 
 \item{batchSize}{Maximum number of \command{GenForm} commands that should be
 run sequentially in each parallel process. Combining commands with short
@@ -203,33 +207,25 @@ is often the fastest if calculations are performed on a single computer.}
 A \code{\link{formulas}} object containing all generated formulae.
 }
 \description{
-Functionality to automatically calculate chemical formulae for all feature
-groups.
+Functionality to automatically calculate chemical formulae for all feature groups.
 }
 \details{
-Several algorithms are provided to automatically generate formulae for given
-feature groups. All tools use the accurate mass of a feature to
-back-calculate candidate formulae. Depending on the algorithm and data
-availability, other data such as isotopic pattern and MS/MS fragments may be
-used to further improve formula assignment and ranking.
+Several algorithms are provided to automatically generate formulae for given feature groups. All tools use the
+accurate mass of a feature to back-calculate candidate formulae. Depending on the algorithm and data availability,
+other data such as isotopic pattern and MS/MS fragments may be used to further improve formula assignment and
+ranking.
 
-When DataAnalysis is used for formula generation or
-\code{calculateFeatures=TRUE} formulae are first calculated for each feature.
-The results are then combined for final assignment of candidate formulae for
-each feature group. If a formula was found in multiple features within the
-group, the reported scorings and mass errors are averaged and other numeric
-values are those from the feature in the analysis of the \code{"analysis"}
-column. The calculation of formulae on 'feature level' might result in a
-more thorough formula search and better removal of outliers (controlled by
-\code{featThreshold} argument). In contrast, when calculations occur on
-'feature group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae
-are directly assigned to each feature group (by using group averaged peak MS
-lists), which significantly reduces processing time is, especially with many
-analyses. Note that in both situations subsequent algorithms that use formula
-data (\emph{e.g.} \code{\link{addFormulaScoring}} and \link{reporting}
-functions) only use formula data that was eventually assigned to feature
-groups. Furthermore, please note that calculation of formulae with
-DataAnalysis always occurs on 'feature level'.
+When DataAnalysis is used for formula generation or \code{calculateFeatures=TRUE} formulae are first calculated for
+each feature. The results are then combined for final assignment of candidate formulae for each feature group. If a
+formula was found in multiple features within the group, the reported scorings and mass errors are averaged and other
+numeric values are those from the feature in the analysis of the \code{"analysis"} column. The calculation of
+formulae on 'feature level' might result in a more thorough formula search and better removal of outliers (controlled
+by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature group
+level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by using
+group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses. Note
+that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}} and
+\link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore, please
+note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
 
 \code{generateFormulas} is a generic function that will generate formulae
   using one of the supported algorithms. The actual functionality is provided
@@ -287,9 +283,8 @@ For annotations performed with \command{SIRIUS} it is often the fastest
   \code{verbose=FALSE} or \option{patRoon.MP.method="future"}).
 }
 \section{Scorings}{
- Each algorithm implements their own scoring system. Their
-  names have been harmonized where possible. An overview is obtained with the
-  \code{formulaScorings} function:
+ Each algorithm implements their own scoring system. Their names have been harmonized where
+  possible. An overview is obtained with the \code{formulaScorings} function:
   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
 }
 
@@ -299,10 +294,10 @@ For annotations performed with \command{SIRIUS} it is often the fastest
   more details and \link[=patRoon-package]{patRoon options} for configuration
   options.
 
- When \code{futures} are used for parallel processing
-  (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
-  are done with batch mode is disabled (see \code{batchSize} argument), which
-  generally limit overall performance.
+ When \code{futures} are used for parallel
+  processing (\code{patRoon.MP.method="future"}), calculations with
+  \command{GenForm} are done with batch mode is disabled (see
+  \code{batchSize} argument), which generally limit overall performance.
 }
 
 \section{GenForm options}{
@@ -386,6 +381,6 @@ Explanation:
 }
 \seealso{
 \code{\link{formulas-class}}. The
-  \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
-   manual} (also known as MOLGEN-MSMS).
+  \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm manual} (also
+  known as MOLGEN-MSMS).
 }

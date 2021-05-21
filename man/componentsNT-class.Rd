@@ -7,7 +7,7 @@
 \alias{plotGraph,componentsNT-method}
 \title{Components class for homologous series.}
 \usage{
-\S4method{plotGraph}{componentsNT}(obj, onlyLinked = TRUE)
+\S4method{plotGraph}{componentsNT}(obj, onlyLinked)
 }
 \arguments{
 \item{obj}{The \code{componentsNT} object to plot.}

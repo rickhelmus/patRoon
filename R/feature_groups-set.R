@@ -20,12 +20,17 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
     }, "minSets", verbose))
 }
 
+#' @rdname featureGroups-class
+#' @export
 featureGroupsSet <- setClass("featureGroupsSet",
                              slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical"),
                              contains = "featureGroups")
 
+#' @describeIn featureGroups Obtains the set names of this object.
+#' @export
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 {
@@ -35,6 +40,7 @@ setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
     return(setNames(ann$adduct, ann$group))
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
 {
@@ -72,6 +78,8 @@ setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = T
     return(obj)
 })
 
+#' @rdname featureGroups-class
+#' @export
 setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
 {
     # HACK: subset annotations here as format with sets is different
@@ -87,7 +95,7 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @describeIn featureGroupsSet Shows summary information for this object.
+#' @rdname featureGroups-class
 #' @export
 setMethod("show", "featureGroupsSet", function(object)
 {
@@ -114,28 +122,11 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 })
 
 # UNDONE: mention that object will be unset
-#' @describeIn featureGroupsSet Exports feature groups to a \file{.csv} file that
-#'   is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
-#'   analyte database) or that is suitable as input for the \verb{Targeted peak
-#'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
-#' @param out The destination file for the exported data.
+#' @rdname featureGroups-class
 #' @export
 setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(unset(obj, set), type, out))
 
-#' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
-#'   with retention, \emph{m/z}, intensity and optionally other feature data.
-#' @param features If \code{TRUE} then feature specific data will be added. If
-#'   \code{average=TRUE} this data will be averaged for each feature group.
-#' @param regression Set to \code{TRUE} to add regression data for each feature
-#'   group. For this a linear model is created (intensity/area [depending on
-#'   \code{areas} argument] \emph{vs} concentration). The model concentrations
-#'   (e.g. of a set of standards) is derived from the \code{conc} column of the
-#'   \link[=analysis-information]{analysis information}. From this model the
-#'   intercept, slope and R2 is added to the output. In addition, when
-#'   \code{features=TRUE}, concentrations for each feature are added. Note that
-#'   no regression information is added when no \code{conc} column is present in
-#'   the analysis information or when less than two concentrations are specified
-#'   (\emph{i.e.} the minimum amount).
+#' @rdname featureGroups-class
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                         qualities = FALSE, regression = FALSE, averageFunc = mean,
@@ -201,6 +192,8 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     return(ret[])
 })
 
+#' @rdname featureGroups-class
+#' @export
 setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL, absMinSets = NULL,
                                                  relMinSets = NULL)
 {
@@ -227,6 +220,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
     return(obj)
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames = !sets, showLegend = sets, pch = 20,
                                                   type = "b", lty = 3, col = NULL, ..., sets = FALSE)
@@ -291,6 +285,7 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames =
     par(oldp)
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets = FALSE)
 {
@@ -304,6 +299,7 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
     callNextMethod(obj, which = which, ...)
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 {
@@ -316,6 +312,7 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
     callNextMethod(x, which = which, ...)
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, sets = FALSE)
 {
@@ -350,6 +347,8 @@ setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, set
     return(ret)
 })
 
+#' @rdname featureGroups-class
+#' @export
 setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)
 {
     setLen <- length(sets(fGroups))
@@ -413,6 +412,7 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     return(ret)
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
                                                adducts = NULL, labels = NULL)
@@ -477,13 +477,19 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
 })
 
+#' @rdname featureGroups-class
 #' @export
 setMethod("makeSet", "featureGroupsSet", function(obj, ...)
 {
     stop("Making a set from set objects is not supported", call. = FALSE)
 })
 
+#' @rdname featureGroups-class
+#' @export
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
+
+#' @rdname featureGroups-class
+#' @export
 setMethod("unset", "featureGroupsSet", function(obj, set)
 {
     # UNDONE: mention that group names remain the same and thus represent neutral masses

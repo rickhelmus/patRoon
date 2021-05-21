@@ -5,11 +5,14 @@
 \alias{compoundViewer,featureGroups,MSPeakLists,compounds-method}
 \alias{compoundViewer}
 \alias{groupFeaturesScreening}
+\alias{checkChromatograms}
 \title{Defunct functions.}
 \usage{
 \S4method{compoundViewer}{featureGroups,MSPeakLists,compounds}(fGroups, MSPeakLists, compounds)
 
 groupFeaturesScreening(...)
+
+checkChromatograms(...)
 }
 \arguments{
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object.}
@@ -30,6 +33,10 @@ The \code{compoundViewer} method is used to view compound
 
 \code{groupFeaturesScreening} was replaced by
   \code{\link{screenSuspects}}. Please refer to this function and the
+  handbook for the updated interface.
+
+\code{checkChromatograms} was replaced by
+  \code{\link{checkFeatures}}. Please refer to this function and the
   handbook for the updated interface.
 }
 \keyword{internal}

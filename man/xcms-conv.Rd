@@ -4,44 +4,53 @@
 \alias{getXCMSSet}
 \alias{getXCMSnExp}
 \alias{getXCMSSet,features-method}
-\alias{getXCMSSet,featuresOpenMS-method}
 \alias{getXCMSSet,featuresXCMS-method}
 \alias{getXCMSSet,featureGroups-method}
 \alias{getXCMSSet,featureGroupsXCMS-method}
+\alias{getXCMSSet,featuresSet-method}
+\alias{getXCMSSet,featureGroupsSet-method}
 \alias{getXCMSnExp,features-method}
 \alias{getXCMSnExp,featuresXCMS3-method}
 \alias{getXCMSnExp,featureGroups-method}
 \alias{getXCMSnExp,featureGroupsXCMS3-method}
+\alias{getXCMSnExp,featuresSet-method}
+\alias{getXCMSnExp,featureGroupsSet-method}
 \title{Conversion to XCMS objects}
 \usage{
 getXCMSSet(obj, verbose = TRUE, ...)
 
-getXCMSnExp(obj, verbose = TRUE)
+getXCMSnExp(obj, verbose = TRUE, ...)
 
-\S4method{getXCMSSet}{features}(obj, verbose, exportedData)
-
-\S4method{getXCMSSet}{featuresOpenMS}(obj, verbose = TRUE, ...)
+\S4method{getXCMSSet}{features}(obj, verbose, loadRawData)
 
 \S4method{getXCMSSet}{featuresXCMS}(obj, verbose = TRUE, ...)
 
-\S4method{getXCMSSet}{featureGroups}(obj, verbose, exportedData)
+\S4method{getXCMSSet}{featureGroups}(obj, verbose, loadRawData)
 
-\S4method{getXCMSSet}{featureGroupsXCMS}(obj, verbose, exportedData)
+\S4method{getXCMSSet}{featureGroupsXCMS}(obj, verbose, loadRawData)
 
-\S4method{getXCMSnExp}{features}(obj, verbose = TRUE)
+\S4method{getXCMSSet}{featuresSet}(obj, ..., set)
 
-\S4method{getXCMSnExp}{featuresXCMS3}(obj, verbose = TRUE)
+\S4method{getXCMSSet}{featureGroupsSet}(obj, ..., set)
 
-\S4method{getXCMSnExp}{featureGroups}(obj, verbose = TRUE)
+\S4method{getXCMSnExp}{features}(obj, verbose, loadRawData)
 
-\S4method{getXCMSnExp}{featureGroupsXCMS3}(obj, verbose = TRUE)
+\S4method{getXCMSnExp}{featuresXCMS3}(obj, verbose = TRUE, ...)
+
+\S4method{getXCMSnExp}{featureGroups}(obj, verbose, loadRawData)
+
+\S4method{getXCMSnExp}{featureGroupsXCMS3}(obj, verbose, loadRawData)
+
+\S4method{getXCMSnExp}{featuresSet}(obj, ..., set)
+
+\S4method{getXCMSnExp}{featureGroupsSet}(obj, ..., set)
 }
 \arguments{
 \item{obj}{The object that should be converted.}
 
 \item{verbose}{If \code{FALSE} then no text output is shown.}
 
-\item{exportedData, \dots}{Set to \code{TRUE} if analyses were exported as
+\item{loadRawData, \dots}{Set to \code{TRUE} if analyses were exported as
 \code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
 \code{featuresXCMS} methods).}
 }

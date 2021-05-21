@@ -29,6 +29,7 @@
   chromWidthRange = NULL,
   rGroups = NULL,
   removeBlanks = FALSE,
+  checkFeaturesSession = NULL,
   negate = FALSE
 )
 

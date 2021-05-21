@@ -248,7 +248,6 @@ setMethod("adducts", "featureGroups", function(obj)
 })
 
 #' @describeIn featureGroups Sets adducts for feature groups.
-#' @aliases adducts<-
 #' @export
 setReplaceMethod("adducts", "featureGroups", function(obj, value)
 {

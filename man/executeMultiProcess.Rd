@@ -47,7 +47,9 @@ retries)} where \code{cmd} is the queue data for that command and
 command has failed. The signature should be \code{function(cmd, exitStatus,
 retries)}. The \code{exitStatus} argument is the exit code of the command
 (may be \code{NA} in rare cases this is unknown). Other arguments are as
-\code{timeoutHandler}.}
+\code{timeoutHandler}. The return value should be as \code{timeoutHandler}
+or a \code{character} with an error message which will be thrown with
+\code{\link{stop}}.}
 
 \item{prepareHandler}{A function that is called prior to execution of the
 command. The function signature should be \code{function(cmd)} where

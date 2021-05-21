@@ -12,7 +12,7 @@ adduct(...)
 
 \S4method{show}{adduct}(object)
 
-\S4method{as.character}{adduct}(x, format = "generic")
+\S4method{as.character}{adduct}(x, format = "generic", err = TRUE)
 }
 \arguments{
 \item{x, object}{An \code{adduct} object.}
@@ -29,7 +29,14 @@ adduct(...)
 
   \code{"genform"} and \code{"metfrag"} support fixed types of adducts
   which can be obtained with the \code{GenFormAdducts} and
-  \code{MetFragAdducts} functions, respectively.}
+  \code{MetFragAdducts} functions, respectively.
+  
+  \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
+  
+  \code{"cliquems"} is the format used by \pkg{\link{cliqueMS}}.}
+
+\item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
+otherwise returns \code{NA}.}
 
 \item{\dots}{Any of \code{add}, \code{sub}, \code{molMult} and/or \code{charge}. See \verb{Slots}.}
 }

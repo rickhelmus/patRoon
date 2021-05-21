@@ -83,6 +83,8 @@ if (testWithSets())
     doGenComps <- function(..., setThresholdAnn = 0) generateCompounds(..., setThresholdAnn = setThresholdAnn)
     doCompCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
     doGenComponents <- function(...) generateComponents(...)
+    
+    doGenLogicTPs <- function(...) generateTPs("logic", ...)
 } else
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
@@ -106,7 +108,13 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
-    doScreen <- function(...) screenSuspects(...)
+    doScreen <- function(fg, susp, ...)
+    {
+        if ((is.null(susp[["mz"]]) || any(is.na(susp$mz))) && (is.null(susp[["adduct"]]) || any(is.na(susp$adduct))))
+            screenSuspects(fg, susp, ..., adduct = "[M+H]+")
+        else
+            screenSuspects(fg, susp, ...)
+    }
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")
@@ -118,6 +126,8 @@ if (testWithSets())
             args <- c(args, list(ionization = "positive"))
         do.call(generateComponents, args)
     }
+    
+    doGenLogicTPs <- function(...) generateTPs("logic", ..., adduct = "[M+H]+")
 }
 
 

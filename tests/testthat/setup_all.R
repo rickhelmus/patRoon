@@ -17,4 +17,4 @@ options(datatable.auto.index = FALSE) # should make tests more reproducible
 options(patRoon.MP.logPath = FALSE)
 
 # HACK: sometimes plot isn't recognized as an S4 generic
-setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
+# setGeneric("plot", function(x, y, ...) standardGeneric("plot"))

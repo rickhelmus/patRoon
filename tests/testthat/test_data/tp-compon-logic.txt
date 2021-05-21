@@ -1,0 +1,1 @@
+A componentsTPs objectHierarchy:components    |-- componentsTPs---Algorithm: tpComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (37 total)Number of unique feature groups in this object: 56Size of components: 209 (total), 5.6 (mean), 1 - 10 (min - max)

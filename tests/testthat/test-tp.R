@@ -4,9 +4,9 @@ fGroups <- getCompFGroups()
 
 suspL <- patRoonData::suspectsPos[patRoonData::suspectsPos$name %in% screenInfo(fGroups)$name, ]
 
-TPsLogic <- generateTPs("logic", fGroups)
-TPsLogicCustom <- generateTPs("logic", fGroups, transformations = data.table(transformation = "test", add = "C",
-                                                                             sub = "", retDir = 1))
+TPsLogic <- doGenLogicTPs(fGroups)
+TPsLogicCustom <- doGenLogicTPs(fGroups, transformations = data.table(transformation = "test", add = "C",
+                                                                      sub = "", retDir = 1))
 TPsLibPC <- generateTPs("library")
 TPsLibSusp <- generateTPs("library", suspL)
 TPsLibScr <- generateTPs("library", fGroups)
@@ -19,7 +19,7 @@ TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ])
 
 fGroupsEmpty <- getEmptyTestFGroups()
 fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
-TPsLogicEmpty <- generateTPs("logic", fGroupsEmpty)
+TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
 
@@ -53,7 +53,7 @@ test_that("verify TP generation", {
 
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
-    expect_true(all(as.data.table(generateTPs("logic", fGroups, minMass = 100))$neutralMass >= 100))
+    expect_true(all(as.data.table(doGenLogicTPs(fGroups, minMass = 100))$neutralMass >= 100))
     expect_length(TPsLogicCustom, length(fGroups))
 
     expect_setequal(parents(TPsLibPC)$name, patRoon:::PubChemTransformations$parent_name)
@@ -146,9 +146,10 @@ test_that("basic usage", {
 fGroupsMore <- getTestFGroups()
 componTPsNone <- generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL)
 componTPsNoneTPDiff <- generateComponents(fGroupsMore[, 1:25], "tp", fGroupsMore[, 26:50], TPs = NULL)
+
 componTPsLib <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibSusp)), "tp", TPs = TPsLibSusp)
 
-TPsLogicMore <- generateTPs("logic", fGroupsMore[, 1:50])
+TPsLogicMore <- doGenLogicTPs(fGroupsMore[, 1:50])
 fGroupsTPsLogic <- doScreen(fGroupsMore, convertToSuspects(TPsLogicMore), onlyHits = TRUE)
 componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 
@@ -159,8 +160,8 @@ if (doMetFrag)
 {
     fGroupsAnn <- doScreen(fGroupsMore, convertToSuspects(TPsLibSusp), onlyHits = TRUE)
     plistsAnn <- generateMSPeakLists(fGroupsAnn, "mzr")
-    formsAnn <- generateFormulas(fGroupsAnn, plistsAnn, "genform", elements = "CHNOPSClF", calculateFeatures = FALSE)
-    compsAnn <- generateCompounds(fGroupsAnn, plistsAnn, "metfrag", database = "pubchemlite")
+    formsAnn <- doGenForms(fGroupsAnn, plistsAnn, "genform", elements = "CHNOPSClF", calculateFeatures = FALSE)
+    compsAnn <- doGenComps(fGroupsAnn, plistsAnn, "metfrag", database = "pubchemlite")
     componTPsAnn <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn, formulas = formsAnn,
                                        compounds = compsAnn)
     componTPsAnnPL <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn)
@@ -222,7 +223,7 @@ componTPsRetFN <- filter(componTPsLogic, retDirMatch = TRUE, negate = TRUE)
 if (doMetFrag)
 {
     plistsLogicAnn <- generateMSPeakLists(fGroupsTPsLogic, "mzr")
-    formsLogicAnn <- generateFormulas(fGroupsTPsLogic, plistsLogicAnn, "genform", calculateFeatures = FALSE)
+    formsLogicAnn <- doGenForms(fGroupsTPsLogic, plistsLogicAnn, "genform", calculateFeatures = FALSE)
 }
 
 test_that("TP component usage", {
@@ -246,7 +247,7 @@ test_that("TP component usage", {
     
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSim = 0.2, negate = TRUE), "specSimilarity"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2, negate = TRUE), "specSimilarityPrec"), 0.2)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.2, negate = TRUE), "specSimilarityBoth"), 0.2)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.3, negate = TRUE), "specSimilarityBoth"), 0.3)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minFragMatches = 2, negate = TRUE), "fragmentMatches"), 2)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 2, negate = TRUE), "neutralLossMatches"), 2)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 4, negate = TRUE), "neutralLossMatches"), 4)
 })

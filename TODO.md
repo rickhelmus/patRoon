@@ -33,7 +33,6 @@
         - either with futures or with MP and cache intensities afterwards
     - OpenMS: alignment may yield negative RTs...
 
-
 ## Annotation
 
 - GenForm oc is FALSE by default. OK? Add to newProject?

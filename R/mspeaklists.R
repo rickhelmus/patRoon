@@ -419,7 +419,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
                                             minMSMSPeaks = NULL, isolatePrec = NULL, deIsotopeMS = FALSE,
                                             deIsotopeMSMS = FALSE, withMSMS = FALSE, annotatedBy = NULL,
-                                            absMzDev = 0.002, retainPrecursorMSMS = TRUE, reAverage = FALSE,
+                                            retainPrecursorMSMS = TRUE, reAverage = FALSE,
                                             negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
@@ -440,7 +440,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         checkmate::checkList(annotatedBy, c("formulas", "compounds"), any.missing = FALSE, min.len = 1, unique = TRUE),
         .var.name = "annotatedBy"
     )
-    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -448,7 +447,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                      topMSPeaks, topMSMSPeaks, minMSMSPeaks, isolatePrec, deIsotopeMS, deIsotopeMSMS,
-                     withMSMS, annotatedBy, absMzDev, retainPrecursorMSMS, negate)
+                     withMSMS, annotatedBy, retainPrecursorMSMS, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -456,10 +455,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     if (!is.null(annotatedBy) && !is.list(annotatedBy))
         annotatedBy <- list(annotatedBy)
 
-    mzWithin <- function(mz, otherMZs) any(numLTE(abs(mz - otherMZs), absMzDev))
-    if (negate)
-        mzWithin <- Negate(mzWithin)
-    
     doFilterGroups <- function(pl, onAvg)
     {
         # onAvg: skip some filters unneeded for averaged peak lists
@@ -485,25 +480,27 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 {
                     grp <- pln[grpi]
                     
-                    allFragMZs <- unique(unlist(lapply(annotatedBy, function(ab)
+                    allAnnPLIDs <- unique(unlist(lapply(annotatedBy, function(ab)
                     {
                         if (is.null(ab[[grp]]))
-                            return(numeric())
-                        return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "mz")))
+                            return(integer())
+                        return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "PLID")))
                     })))
                     
-                    if (length(allFragMZs) == 0)
+                    if (length(allAnnPLIDs) == 0)
                     {
                         if (!negate)
                             ret$MSMS <- ret$MSMS[retainPrecursorMSMS & precursor == TRUE]
                     }
                     else
                     {
-                        ret$MSMS <- ret$MSMS[, keep := sapply(mz, mzWithin, otherMZs = allFragMZs)]
+                        if (negate)
+                            ret$MSMS <- ret$MSMS[, keep := !ID %in% allAnnPLIDs]
+                        else
+                            ret$MSMS <- ret$MSMS[, keep := ID %in% allAnnPLIDs]
+                        
                         if (retainPrecursorMSMS)
                             ret$MSMS[precursor == TRUE, keep := TRUE]
-                        
-                        precInd <- ret$MSMS[precursor == TRUE, which = TRUE]
                         
                         ret$MSMS <- ret$MSMS[keep == TRUE][, -"keep"]
                     }

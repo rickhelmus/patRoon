@@ -42,6 +42,7 @@
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
+- update GenForm
 
 
 ## Components
@@ -137,9 +138,7 @@
     - peak qualities
         - filter (once implemented)
     - as.data.table: normalization?
-- annotatedBy MSPeakLists filter
-    - first fix PLIndex
-    
+
 
 
 ## docs

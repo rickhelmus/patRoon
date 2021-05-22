@@ -309,7 +309,6 @@ doFeatAnnUnset <- function(obj, set)
         tbl[, fragInfo := lapply(fragInfo, function(fi)
         {
             fi <- copy(fi)
-            fi <- fi[set == ..set]
             set(fi, j = "set", value = NULL)
         })]
     })
@@ -416,6 +415,9 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
                         paste0(setdiff(s, rmSets), collapse = ",")
                     }, by = seq_len(nrow(ct))]
              
+                    # update fragInfos
+                    ct[, fragInfo := lapply(fragInfo, function(fi) fi[!set %chin% rmSets])]
+                    
                     return(ct[])       
                 })
                 

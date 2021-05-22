@@ -53,12 +53,17 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
             # UNDONE: does SIRIUS report group rets/mzs?
             gInfo[grpi, c("rts", "mzs")] <- list(mean(grpRes$ret), mean(grpRes$mz))
         }
-        
-        gNames <- mapply(seq_len(ngrp), gInfo$rts, gInfo$mzs, FUN =  makeFGroupName)
+
+        # group order is not consistent between runs --> sort
+        ord <- order(gInfo$mzs)
+        gInfo <- gInfo[ord, ]
+        gTab <- gTab[, ord, with = FALSE]; ftind <- ftind[, ord, with = FALSE]
+
+        gNames <- mapply(seq_len(ngrp), gInfo$rts, gInfo$mzs, FUN = makeFGroupName)
         rownames(gInfo) <- gNames
         setnames(gTab, gNames)
         setnames(ftind, gNames)
-        
+
         return(featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, analysisInfo = anaInfo,
                                    features = features, ftindex = ftind))
     }

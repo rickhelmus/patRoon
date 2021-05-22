@@ -150,9 +150,10 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
     checkmate::assertFlag(negate, add = ac)
     checkmate::assert(
         checkmate::checkNull(annotatedBy),
-        checkmate::checkClass(annotatedBy, "formulas"),
-        checkmate::checkClass(annotatedBy, "compounds"),
-        checkmate::checkList(annotatedBy, c("formulas", "compounds"), any.missing = FALSE, min.len = 1, unique = TRUE),
+        checkmate::checkClass(annotatedBy, "formulasSet"),
+        checkmate::checkClass(annotatedBy, "compoundsSet"),
+        checkmate::checkList(annotatedBy, c("formulasSet", "compoundsSet"), any.missing = FALSE, min.len = 1,
+                             unique = TRUE),
         .var.name = "annotatedBy"
     )
     assertSets(obj, sets, TRUE, add = ac)
@@ -178,7 +179,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
     
     if (...length() > 0 || !is.null(annotatedBy))
     {
-        if (is.null(annotatedByList))
+        if (is.null(annotatedBy))
             obj@setObjects <- lapply(obj@setObjects, filter, ..., retainPrecursorMSMS = retainPrecursorMSMS,
                                      reAverage = reAverage, negate = negate)
         else

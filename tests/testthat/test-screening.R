@@ -248,7 +248,9 @@ test_that("reporting works", {
     checkmate::expect_names(names(fread(getWorkPath(paste0(class(fGroupsAnnNoRT), ".csv")))),
                             must.include = csvSuspCols)
     expect_file(reportPDF(fGroupsAnnNoRT, getWorkPath()), getWorkPath(paste0(class(fGroupsAnnNoRT), ".pdf")))
-    expect_reportHTML(makeReportHTML(fGroupsAnnNoRT))
+    # add in other annotation data to get annotation tab
+    expect_reportHTML(makeReportHTML(fGroupsAnnNoRT[, 1:10], MSPeakLists = plists, formulas = forms,
+                                     compounds = compsMFMoNa))
 
     expect_error(reportCSV(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)
     expect_error(reportPDF(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)

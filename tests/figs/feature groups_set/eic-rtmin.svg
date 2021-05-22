@@ -34,7 +34,7 @@
 <text transform='translate(41.76,249.26) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>6e+05</text>
 <text transform='translate(41.76,164.69) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>8e+05</text>
 <text transform='translate(41.76,80.11) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>1e+06</text>
-<polyline points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
+<polygon points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 <text x='314.02' y='34.47' style='font-size: 14.40px; font-weight: bold; font-family: Liberation Sans;' textLength='120.77px' lengthAdjust='spacingAndGlyphs'>25 feature groups</text>
 <text x='318.72' y='557.28' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='111.36px' lengthAdjust='spacingAndGlyphs'>Retention time (min.)</text>
 <text transform='translate(12.96,303.14) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='44.67px' lengthAdjust='spacingAndGlyphs'>Intensity</text>

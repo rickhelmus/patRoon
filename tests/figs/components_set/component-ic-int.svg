@@ -25,7 +25,7 @@
 <text transform='translate(41.76,248.07) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.6</text>
 <text transform='translate(41.76,165.94) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.8</text>
 <text transform='translate(41.76,83.80) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<polyline points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
+<polygon points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 <text transform='translate(12.96,333.82) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='106.05px' lengthAdjust='spacingAndGlyphs'>normalized intensity</text>
 <line x1='228.40' y1='502.56' x2='666.40' y2='502.56' style='stroke-width: 0.75;' />
 <line x1='228.40' y1='502.56' x2='228.40' y2='509.76' style='stroke-width: 0.75;' />

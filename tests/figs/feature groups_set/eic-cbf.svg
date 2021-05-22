@@ -36,7 +36,7 @@
 <text transform='translate(41.76,249.26) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>6e+05</text>
 <text transform='translate(41.76,164.69) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>8e+05</text>
 <text transform='translate(41.76,80.11) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>1e+06</text>
-<polyline points='59.04,502.56 589.31,502.56 589.31,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
+<polygon points='59.04,502.56 589.31,502.56 589.31,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 <defs>
   <clipPath id='cpMC4wMHw2MTkuNTV8NTc2LjAwfDAuMDA='>
     <rect x='0.00' y='0.00' width='619.55' height='576.00' />

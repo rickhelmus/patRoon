@@ -36,7 +36,7 @@
 <text transform='translate(41.76,287.47) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>10</text>
 <text transform='translate(41.76,202.18) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>12</text>
 <text transform='translate(41.76,116.89) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>14</text>
-<polyline points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
+<polygon points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 <text x='339.06' y='557.28' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='70.67px' lengthAdjust='spacingAndGlyphs'>chromFWHM</text>
 <text transform='translate(12.96,301.80) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='42.00px' lengthAdjust='spacingAndGlyphs'>mzPPM</text>
 <defs>

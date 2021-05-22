@@ -4,8 +4,9 @@ initXCMS()
 
 fList <- getTestFeatures()
 
-fgOpenMS <- groupFeatures(fList, "openms");
-fgXCMS <- groupFeatures(fList, "xcms", rtalign = testWithSets()) # BUG: old XCMS obiwarp doesn' work with non sets test data
+fgOpenMS <- groupFeatures(fList, "openms")
+# BUG: old XCMS obiwarp doesn' work with non sets test data
+fgXCMS <- if (!testWithSets()) groupFeatures(fList, "xcms", rtalign = FALSE) else groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times

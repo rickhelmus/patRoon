@@ -30,6 +30,8 @@ SIRFeatMPFinishHandler <- function(cmd)
         return(patRoon:::loadSIRFeat(json, 1))
     }))
     
+    setorderv(ret, "mz") # order is inconsistent between runs --> fix order by sorting
+    
     ret[, ID := seq_len(nrow(..ret))]
     setcolorder(ret, "ID")
     return(ret[])

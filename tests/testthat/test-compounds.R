@@ -187,23 +187,34 @@ verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
     if (length(msplF) == 0)
         return(succeed("Empty MSPL"))
     
-    for (fg in groupNames(msplF))
+    doVerify <- function(pl, ao)
     {
-        if (is.null(msplF[[fg]][["MSMS"]]))
-            next
-        
-        objIDs <- unlist(lapply(allObj, function(o)
+        for (fg in groupNames(msplF))
         {
-            if (is.null(o[[fg]]))
-                return(integer())
-            return(lapply(o[[fg]]$fragInfo, "[[", "PLID"))
-        }))
-      
-        if (negate)
-            expect_true(!any(msplF[[fg]]$MSMS$ID %in% objIDs))
-        else
-            expect_true(all(msplF[[fg]]$MSMS$ID %in% objIDs))
+            if (is.null(pl[[fg]][["MSMS"]]))
+                next
+            
+            objIDs <- unlist(lapply(ao, function(o)
+            {
+                if (is.null(o[[fg]]))
+                    return(integer())
+                return(lapply(o[[fg]]$fragInfo, "[[", "PLID"))
+            }))
+            
+            if (negate)
+                expect_true(!any(pl[[fg]]$MSMS$ID %in% objIDs))
+            else
+                expect_true(all(pl[[fg]]$MSMS$ID %in% objIDs))
+        }
     }
+    
+    if (testWithSets())
+    {
+        for (s in sets(msplF))
+            doVerify(msplF[, sets = s], lapply(allObj, function(o) o[, sets = s]))
+    }
+    else
+        doVerify(msplF, allObj)
 }
 
 test_that("annotatedBy filter for MSPL", {

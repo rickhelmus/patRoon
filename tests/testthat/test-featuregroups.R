@@ -159,7 +159,8 @@ test_that("XCMS3 conversion", {
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpKPIC2), testFile("fg-xcms3_import_kpic2"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS), testFile("fg-xcms3_import_sirius"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS)[, names(xcms::featureDefinitions(XCMS3ImpSIRIUS)) != "peakidx"],
+                       testFile("fg-xcms3_import_sirius")) # NOTE: peakidx not consistent
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))

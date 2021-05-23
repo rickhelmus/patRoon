@@ -8,7 +8,8 @@ featuresOptimizerEnviPick$methods(
 
     checkInitialParams = function(params)
     {
-        params[["parallel"]] <- !parallel
+        if (parallel)
+            params[["parallel"]] <- FALSE # don't parallelize both
         return(params)
     },
     

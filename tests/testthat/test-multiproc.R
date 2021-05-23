@@ -15,7 +15,7 @@ px <- paste0(
 
 performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst = FALSE, delay = FALSE,
                           errorHandler = function(...) FALSE, timeoutHandler = function(...) FALSE,
-                          maxProcAmount = NULL, ...)
+                          maxProcAmount = NULL, procTimeout = 3, ...)
 {
     if (!is.null(maxProcAmount))
         withr::local_options(list(patRoon.MP.maxProcs = maxProcAmount))
@@ -25,7 +25,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
         shFile <- tempfile("makefile", fileext = ".bat")
         cat("if not exist %1 (SET ret=1) else (SET ret=0)",
             "echo y > %1",
-            if (delay) paste(paste0("\"", px, "\""), "sleep 2") else "",
+            if (delay) paste(paste0("\"", px, "\""), "sleep 1") else "",
             if (failFirst) "exit /b %ret%" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
     }
@@ -36,7 +36,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
             "test -f $1",
             "ret=$?",
             "echo y > $1",
-            if (delay) paste(paste0("\"", px, "\""), "sleep 2") else "",
+            if (delay) paste(paste0("\"", px, "\""), "sleep 1") else "",
             if (failFirst) "exit $ret" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
         Sys.chmod(shFile)
@@ -54,7 +54,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
     }), as.character(seq_len(len)))
 
     ct <- curTimeMS()
-    res <- executeMultiProcess(cmdQueue, function(cmd) { cmd }, procTimeout = 5, showProgress = FALSE,
+    res <- executeMultiProcess(cmdQueue, function(cmd) { cmd }, procTimeout = procTimeout, showProgress = FALSE,
                                errorHandler = errorHandler, timeoutHandler = timeoutHandler, ...)
     printf("time: %.2f\n", curTimeMS() - ct)
 
@@ -84,7 +84,7 @@ test_that("multi-process functionality", {
     performMPTest(10, batchSize = 8)
     performMPTest(10, batchSize = 20)
     performMPTest(10, maxProcAmount = 1) # maxProcAmount>1 by default
-    performMPTest(3, failFirst = TRUE, errorHandler = ehandler)
+    performMPTest(3, failFirst = TRUE, errorHandler = ehandler, procTimeout = 5)
 
     performMPTest(10, fail = c(2, 8))
     performMPTest(10, fail = c(2, 8), batchSize = 3)
@@ -109,15 +109,15 @@ test_that("multi-process future functionality", {
     withr::local_options(list(patRoon.MP.method = "future"))
     future::plan("multisession", workers = 2)
     withr::defer(future::plan("sequential"))
-                        
+
     performMPTest(10)
-    performMPTest(3, failFirst = TRUE, errorHandler = ehandler)
-    
+    performMPTest(3, failFirst = TRUE, errorHandler = ehandler, procTimeout = 5)
+
     performMPTest(10, fail = c(2, 8))
     performMPTest(10, fail = c(2, 8), errorHandler = ehandler)
     performMPTest(10, fail = c(1, 10))
     performMPTest(2, fail = c(1, 2))
-    
+
     performMPTest(10, timeout = c(2, 8))
     performMPTest(10, timeout = c(2, 8), timeoutHandler = thandler)
     performMPTest(10, timeout = c(1, 10))

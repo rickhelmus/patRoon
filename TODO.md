@@ -64,7 +64,8 @@
     - compound/formula set consensus
         - weights for ranking (like compound consensus)?
     - disallow commas, minus and algo consensus labels in set names
-    - screening: filter on set specific rank cols? Or all? (now all)
+    - screening: filter on set specific rank cols? Or all?
+        - for now all if no sets columns are present (ie not ID level and ranks)
 
 
 ## TPs

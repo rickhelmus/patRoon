@@ -196,6 +196,9 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
         return(do.call(annotatedPeakList, args))
     }, simplify = FALSE)
     
+    if (all(sapply(annPLs, is.null)))
+        return(NULL) # HACK: make sure that NULL stays NULL
+    
     annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
     
     if (!is.null(annPLs[["set.x"]]))

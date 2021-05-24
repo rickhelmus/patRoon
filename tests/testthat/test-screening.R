@@ -1,6 +1,8 @@
 context("screening")
 
-susps <- as.data.table(patRoonData::suspectsPos)[1:10] # take subset of suspects to speed things up a bit
+susps <- as.data.table(patRoonData::suspectsPos)
+# take subset of suspects to speed things up a bit
+susps <- susps[name %in% fread(getMFTestDBPath())$Name | name == "2-Hydroxyquinoline"] # 2-OH quinoline: isomers present, handy for tests below
 susps[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
 if (testWithSets())
 {
@@ -150,7 +152,20 @@ if (hasMF)
     # take fGroupsAnnNoRT: doesn't have rt in susp list, so has double hits
     selectedHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = TRUE)
     selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
-    selectedFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = TRUE)
+    
+    # for selectBestFGroups it's tricky to get good data, just inject some fake for now
+    fakeDupGroup <- screenInfo(fGroupsAnnNoRT)[name == "DEET"]$group; fakeReplSusp <- "1H-benzotriazole"
+    makeFakeHit <- function(obj)
+    {
+        ret <- obj
+        ret@screenInfo <- copy(ret@screenInfo)
+        ret@screenInfo[name == fakeReplSusp, group := fakeDupGroup]
+        return(ret)
+    }
+    fGroupsAnnNoRTFake <- makeFakeHit(fGroupsAnnNoRT)
+    if (testWithSets())
+        fGroupsAnnNoRTFake@setObjects[[1]] <- makeFakeHit(fGroupsAnnNoRTFake@setObjects[[1]])
+    selectedFGroupsLev <- filter(fGroupsAnnNoRTFake, selectBestFGroups = TRUE)
 }
 
 test_that("Screen filters", {
@@ -169,13 +184,12 @@ test_that("Screen filters", {
                                                                                      with = FALSE])))
     expect_gt(maxIDLevel(fGroupsAnnNoRT[, suspects = "2-Hydroxyquinoline"]),
               maxIDLevel(selectedHitsLev[, suspects = "2-Hydroxyquinoline"]))
-    # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
-    # for now just verify that all groups are unique
-    expect_equal(anyDuplicated(screenInfo(selectedFGroupsLev)$group), 0)
+    expect_gt(maxIDLevel(fGroupsAnnNoRTFake[, fakeDupGroup]), maxIDLevel(selectedFGroupsLev[, fakeDupGroup]))
     
     expect_lt(length(selectedHitsInt), length(fGroupsAnnNoRT))
     expect_lt(length(selectedHitsLev), length(fGroupsAnnNoRT))
-    expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnNoRT)))
+    expect_lt(nrow(screenInfo(selectedFGroupsLev)), nrow(screenInfo(fGroupsAnnNoRTFake)))
+    expect_length(selectedFGroupsLev, length(fGroupsAnnNoRTFake))
     
     expect_lte(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3)), 3)
     expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "formRank"), 3)
@@ -192,7 +206,7 @@ if (hasMF)
 {
     selectedNegHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = FALSE, negate = TRUE)
     selectedNegHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = FALSE, negate = TRUE)
-    selectedNegFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = FALSE, negate = TRUE)
+    selectedNegFGroupsLev <- filter(fGroupsAnnNoRTFake, selectBestFGroups = TRUE, negate = TRUE)
 }
 
 test_that("Negated screen filters", {
@@ -211,13 +225,12 @@ test_that("Negated screen filters", {
                                                                                         with = FALSE])))
     expect_lt(minIDLevel(fGroupsAnnNoRT[, suspects = "2-Hydroxyquinoline"]),
               minIDLevel(selectedNegHitsLev[, suspects = "2-Hydroxyquinoline"]))
-    # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
-    # for now just verify that all groups are unique
-    expect_equal(anyDuplicated(screenInfo(selectedNegFGroupsLev)$group), 0)
+    expect_lt(minIDLevel(fGroupsAnnNoRTFake[, fakeDupGroup]), minIDLevel(selectedNegFGroupsLev[, fakeDupGroup]))
     
     expect_setequal(screenInfo(selectedNegHitsInt)$name, screenInfo(selectedHitsInt)$name)
     expect_setequal(screenInfo(selectedNegHitsLev)$name, screenInfo(selectedHitsLev)$name)
-    expect_equal(nrow(screenInfo(selectedNegFGroupsLev)), nrow(screenInfo(selectedFGroupsLev)))
+    expect_setequal(screenInfo(selectedNegFGroupsLev)$group, screenInfo(selectedFGroupsLev)$group)
+    expect_length(selectedNegFGroupsLev, length(fGroupsAnnNoRTFake))
     
     expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
     expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE), "formRank"), 3)
@@ -269,7 +282,7 @@ test_that("reporting works", {
                             must.include = csvSuspCols)
     expect_file(reportPDF(fGroupsAnnNoRT, getWorkPath()), getWorkPath(paste0(class(fGroupsAnnNoRT), ".pdf")))
     # add in other annotation data to get annotation tab
-    expect_reportHTML(makeReportHTML(fGroupsAnnNoRT[, 1:10], MSPeakLists = plists, formulas = forms,
+    expect_reportHTML(makeReportHTML(fGroupsAnnNoRT[, 1:5], MSPeakLists = plists, formulas = forms,
                                      compounds = compsMFMoNa))
 
     expect_error(reportCSV(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)

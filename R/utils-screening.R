@@ -265,12 +265,16 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
 {
     if (nrow(screenInfo(obj)) > 0)
     {
-        colFilter <- function(pred, what, col)
+        colFilter <- function(pred, what, col, ac = TRUE)
         {
             val <- get(what)
             if (!is.null(val))
             {
-                allCols <- getAllSuspCols(col, names(screenInfo(obj)), mergedConsensusNames(obj))
+                allCols <- if (ac)
+                    getAllSuspCols(col, names(screenInfo(obj)), mergedConsensusNames(obj))
+                else
+                    intersect(col, names(screenInfo(obj)))
+                
                 if (length(allCols) == 0)
                     warning(sprintf("Cannot apply %s filter: no annotation data available (did you run annotateSuspects()?).", what))
                 else
@@ -290,9 +294,9 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
         maxPred <- function(x, v) x <= v
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
         
-        obj <- colFilter(levPred, "maxLevel", "estIDLevel")
-        obj <- colFilter(maxPred, "maxFormRank", "formRank")
-        obj <- colFilter(maxPred, "maxCompRank", "compRank")
+        obj <- colFilter(levPred, "maxLevel", "estIDLevel", ac = FALSE)
+        obj <- colFilter(maxPred, "maxFormRank", "formRank", ac = FALSE)
+        obj <- colFilter(maxPred, "maxCompRank", "compRank", ac = FALSE)
         obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
         obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
         obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")

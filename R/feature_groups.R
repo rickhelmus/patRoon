@@ -65,7 +65,7 @@ NULL
 #' @templateVar delfa2 the group name
 #' @templateVar delfr the analyses of the features in the group to be removed (same format as \code{i})
 #' @templateVar dollarOpName feature group
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each
 #'   feature group (columns) per analysis (rows). Access with \code{groups}

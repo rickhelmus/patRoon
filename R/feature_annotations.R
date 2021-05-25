@@ -32,7 +32,7 @@ NULL
 #' @templateVar delfa2 the feature group name
 #' @templateVar delfr the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName feature group
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @param \dots Ignored.
 #'

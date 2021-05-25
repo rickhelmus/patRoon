@@ -20,7 +20,7 @@ NULL
 #' @templateVar seli labels
 #' @templateVar selOrderi names()
 #' @templateVar dollarOpName label
-#' @template sub_op-args
+#' @template sub_sel_del-args
 
 #' @export
 featureGroupsComparison <- setClass("featureGroupsComparison",

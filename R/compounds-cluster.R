@@ -51,7 +51,7 @@ NULL
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar noextract TRUE
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @return \code{cutTree} and \code{cutTreeDynamic} return the modified
 #'   \code{compoundsCluster} object.

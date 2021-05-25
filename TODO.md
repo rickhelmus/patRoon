@@ -170,11 +170,11 @@
     - update IPO docs for kpic2 (and mention min/max_width split and others)
     - ... for findFeaturesXCMS3
     - progressr
-    - groupFeatures: feat arg --> obj
     - MC import/export
     - session filters: TRUE will use default yml file name
-    - XMCS(3): `exportedData` --> `loadRawData`
-    - removed featuresOpenMS method for getXCMSSet()
+    - xcms-conv
+        - removed featuresOpenMS method for getXCMSSet()
+        - set/... arg
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA

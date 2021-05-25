@@ -33,10 +33,11 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 #' \code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
 #'
 #' @param obj The object that should be converted.
-#' @param loadRawData,\dots Set to \code{TRUE} if analyses were exported as
-#'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresXCMS} and
-#'   \code{featuresXCMS3} methods).
+#' @param \dots Ignored.
 #' @param verbose If \code{FALSE} then no text output is shown.
+#' 
+#' @template loadrawdata-arg
+#' 
 #' @rdname xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 

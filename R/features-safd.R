@@ -42,13 +42,29 @@ makeSAFDCommand <- function(inPath, fileName, mzRange, maxNumbIter, maxTPeakW, r
                 fileName = fileName))
 }
 
-#' @details \code{findFeaturesSAFD} uses the
-#'   \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
-#'   package to extract features.
+#' @details \code{findFeaturesSAFD} uses \href{https://bitbucket.org/SSamanipour/safd.jl/src/master/}{SAFD} to obtain
+#'   features. This functionality is still experimental. Please see the \verb{Using SAFD} section below for more
+#'   details.
 #'
-#' @note \code{findFeaturesSAFD} Requires analysis files to be in the
-#'   \code{mzXML} format.
+#' @param profPath A \code{character} vector with paths to the profile MS data for each analysis (will be re-cycled if
+#'   necessary). See the \verb{Using SAFD} section for more details.
+#' @param mzRange The \emph{m/z} window to be imported (passed to the \code{import_files_MS1} function).
+#' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
+#'   passed to the \code{safd_s3D} function.
 #'
+#' @section Using SAFD: The support for SAFD is still experimental, and its interface might change in the future.
+#'
+#'   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
+#'   everything works, \emph{e.g.} by running the test data.
+#'
+#'   This algorithm only supports profile (\emph{i.e.} not centroided) MS data. Since other \code{patRoon} functionality
+#'   typically relies on the centroided data, MS data must be available in \emph{both} forms. The centroided data is
+#'   specified through the 'regular' \link[=analysis-information]{analysis info} mechanism, whereas the location of the
+#'   profile data is specified through the \code{profPath} argument. The base file names (\emph{i.e.} the file name
+#'   without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+#'   profile data must be \code{mzXML}.
+#'
+#' @references \insertRef{Samanipour2019}{patRoon}
 #' @rdname feature-finding
 #' @export
 findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400), 

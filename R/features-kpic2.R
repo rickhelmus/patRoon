@@ -182,8 +182,8 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
 #' Converts a \code{\link{features}} object to an \pkg{KPIC} object.
 #'
 #' @param obj The \code{features} object that should be converted.
-#' @param loadRawData,\dots Set to \code{TRUE} if analyses were exported as
-#'   \code{mzXML} or \code{mzML} files (ignored by \code{featuresKPIC2} method).
+#' @template loadrawdata-arg
+#' @param \dots Ignored
 #' @rdname kpic2-conv
 #' @aliases getPICSet
 #' @export

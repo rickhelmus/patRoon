@@ -32,10 +32,18 @@ printFeatStats <- function(fList)
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
+#' @templateVar del TRUE
+#' @templateVar deli analyses
+#' @templateVar delj features
+#' @templateVar deljtype numeric index (row) of the feature
+#' @templateVar delfwhat analysis
+#' @templateVar delfa1 the feature table (a \code{data.table})
+#' @templateVar delfa2 the analysis name
+#' @templateVar delfr the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName analysis
 #' @template sub_op-args
 #'
-#' @param \dots Ignored.
+#' @param \dots For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.
 #'
 #' @templateVar class features
 #' @template class-hierarchy
@@ -218,7 +226,9 @@ setMethod("$", "features", function(x, name)
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @describeIn features Completely deletes specified features.
+#' @templateVar where features
+#' @templateVar what features
+#' @template delete
 #' @export
 setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 {

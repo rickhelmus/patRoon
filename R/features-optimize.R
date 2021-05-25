@@ -175,7 +175,6 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
                               bestParamSet = result$bestParamSet))
 }
 
-#' @param method Method used by XCMS to find features (only if \code{algorithm="xcms"}).
 #' @rdname feature-optimization
 #' @export
 generateFeatureOptPSet <- function(algorithm, ...)
@@ -193,6 +192,7 @@ generateFeatureOptPSet <- function(algorithm, ...)
     return(modifyList(defs, list(...)))
 }
 
+#' @param method Method used by XCMS to find features (only if \code{algorithm="xcms"}).
 #' @rdname feature-optimization
 #' @export
 getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")

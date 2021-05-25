@@ -188,6 +188,7 @@ NULL
 #'
 #' @param analysisInfo \link[=analysis-information]{Analysis info table}.
 #' @param ... further parameters passed to \code{\link[xcms]{xcmsSet}} (\code{findFeaturesXCMS}),
+#'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}} (\code{findFeaturesXCMS3}),
 #'   \code{\link[enviPick]{enviPickwrap}} (\code{featurefinderEnviPick}),
 #'   \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}} (\code{findFeaturesKPIC2}) or to selected feature
 #'   finding or importing algorithms (\code{findFeatures} and \code{importFeatures}).

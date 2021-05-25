@@ -148,6 +148,8 @@
     - parallelize args
     - update loadRawData --> template?
     - groupFeatures: align doesn't work for sets with KPIC/XCMS
+- handbook
+    - KPIC2, cliqueMS installation
 - ffOpenMS etc: analyses also needs to be available for hashing
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)

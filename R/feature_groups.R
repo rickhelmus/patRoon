@@ -1827,6 +1827,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @templateVar ex1 groupFeaturesOpenMS
 #' @templateVar ex2 groupFeaturesXCMS3
 #' @templateVar algos openms,xcms,xcms3,kpic2
+#' @templateVar noParam TRUE
 #' @template generic-algo
 #'
 #' @rdname feature-grouping
@@ -1848,6 +1849,10 @@ setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = T
     f(obj, ..., verbose = verbose)
 })
 
+#' @details The \code{data.frame} method for \code{groupFeatures} is a special case that currently only supports the
+#'   \code{"sirius"} algorithm.
+#' @rdname feature-grouping
+#' @export
 setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

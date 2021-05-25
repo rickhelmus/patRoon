@@ -81,11 +81,14 @@ setMethod("initialize", "featureGroupsSIRIUS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "sirius", ...))
 
 
+#' @details \code{groupFeaturesSIRIUS} uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find
+#'   \emph{and} group features. This is done by running the \command{lcms-align} command on every analyses at once. Note
+#'   that grouping feature data from other algorithms than \command{SIRIUS} are therefore not supported.
+#' @references \insertRef{Dhrkop2019}{patRoon}
 #' @rdname feature-grouping
 #' @export
 groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
 {
-    # UNDONE: docs
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzML", add = ac)
     checkmate::assertFlag(verbose, add = ac)

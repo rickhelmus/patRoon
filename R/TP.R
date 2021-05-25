@@ -22,7 +22,7 @@ NULL
 #' @templateVar seli parents
 #' @templateVar selOrderi names()
 #' @templateVar dollarOpName parent
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @templateVar class transformationProducts
 #' @template class-hierarchy

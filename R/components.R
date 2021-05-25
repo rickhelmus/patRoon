@@ -47,7 +47,7 @@ NULL
 #' @templateVar delfa2 the component name
 #' @templateVar delfr the feature groups to be removed (same format as \code{j})
 #' @templateVar dollarOpName component
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @return The subset operator (\code{"["}) and \code{filter} method return the
 #'   data subset in an object from the \code{componentsReduced} class. This

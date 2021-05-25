@@ -36,7 +36,7 @@ NULL
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalji TRUE
 #' @templateVar dollarOpName feature group
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores

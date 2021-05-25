@@ -41,7 +41,7 @@ printFeatStats <- function(fList)
 #' @templateVar delfa2 the analysis name
 #' @templateVar delfr the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName analysis
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.
 #'

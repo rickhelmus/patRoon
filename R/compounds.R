@@ -33,7 +33,7 @@ NULL
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar dollarOpName feature group
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @return \code{plotSpectrum} and \code{plotStructure} will return a
 #'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.

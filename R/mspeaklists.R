@@ -34,7 +34,7 @@ NULL
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalji TRUE
 #' @templateVar dollarOpName feature group
-#' @template sub_op-args
+#' @template sub_sel_del-args
 #'
 #' @section Isolating precursor data: Formula calculation typically relies on
 #'   evaluating the measured isotopic pattern from the precursor to score

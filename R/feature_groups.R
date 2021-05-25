@@ -17,10 +17,12 @@ NULL
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
 #' @param retMin Plot retention time in minutes (instead of seconds).
-#' @param \dots Ignored for \code{"["} operator or passed to
-#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}),
-#'   \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
-#'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+#' @param \dots For the \code{"["} operator: ignored.
+#'
+#'   For \code{delete}: passed to the function specified as \code{j}.
+#'
+#'   Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
+#'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average If \code{TRUE} then data within replicate groups are averaged.
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak
@@ -54,6 +56,14 @@ NULL
 #' @templateVar selj feature groups
 #' @templateVar selOrderj names()
 #' @templateVar optionalji TRUE
+#' @templateVar del TRUE
+#' @templateVar deli analyses
+#' @templateVar delj feature groups
+#' @templateVar deljtype numeric index, logical or character
+#' @templateVar delfwhat feature group
+#' @templateVar delfa1 a vector of the group intensities
+#' @templateVar delfa2 the group name
+#' @templateVar delfr the analyses of the features in the group to be removed (same format as \code{i})
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
 #'
@@ -313,6 +323,9 @@ setMethod("$", "featureGroups", function(x, name)
     eval(substitute(x@groups$NAME_ARG, list(NAME_ARG = name)))
 })
 
+#' @templateVar where featureGroups
+#' @templateVar what feature groups
+#' @template delete
 #' @export
 setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
 {

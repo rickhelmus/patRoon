@@ -20,7 +20,9 @@ NULL
 #' @param obj,object,x The \code{component} object.
 #' @param index The index of the component. Can be a numeric index or a
 #'   character with its name.
-#' @param \dots For \code{plotChroms}: Further (optional) arguments passed to the
+#' @param \dots For \code{delete}: passed to the function specified as \code{j}.
+#' 
+#'   For \code{plotChroms}: Further (optional) arguments passed to the
 #'   \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
 #'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
 #'   \code{topMost} arguments cannot be set as these are set by this method.
@@ -36,6 +38,14 @@ NULL
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalj TRUE
+#' @templateVar del TRUE
+#' @templateVar deli components
+#' @templateVar delj feature groups
+#' @templateVar deljtype numeric index/logical (relative to component) or character
+#' @templateVar delfwhat component
+#' @templateVar delfa1 the component (a \code{data.table})
+#' @templateVar delfa2 the component name
+#' @templateVar delfr the feature groups to be removed (same format as \code{j})
 #' @templateVar dollarOpName component
 #' @template sub_op-args
 #'
@@ -152,7 +162,9 @@ setMethod("$", "components", function(x, name)
     eval(substitute(x@components$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @describeIn components Deletes (parts of) components
+#' @templateVar where components
+#' @templateVar what (parts of) components
+#' @template delete
 #' @export
 setMethod("delete", "components", function(obj, i = NULL, j = NULL, ...)
 {

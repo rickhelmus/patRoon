@@ -145,8 +145,12 @@
 
 - ref docs
     - delete()
+        - mention j=DT for fGroups method?
+        - rename sub_op template
     - parallelize args
+        - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
     - groupFeatures: align doesn't work for sets with KPIC/XCMS
+    - finish featureAnnotations class
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)

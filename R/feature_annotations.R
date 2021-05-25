@@ -2,6 +2,44 @@
 #' @include workflow-step.R
 NULL
 
+#' Base feature annotations class
+#'
+#' Holds information for all feature (group) annotations.
+#'
+#' This class provides a way to store intensity, retention times, \emph{m/z} and
+#' other data for all features in a set of analyses. The class is \code{virtual}
+#' and derived objects are created by 'feature finders' such as
+#' \code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and
+#' \code{findFeaturesBruker}.
+#'
+#' @param obj,x,object \code{featureAnnotations} object to be accessed
+#'
+#' @seealso \code{\link{feature-finding}}
+#'
+#' @slot features List of features per analysis file. Use the
+#'   \code{featureTable} method for access.
+#' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method
+#'   for access.
+#'
+#' @templateVar seli feature groups
+#' @templateVar selOrderi groupNames()
+#' @templateVar del TRUE
+#' @templateVar deli feature groups
+#' @templateVar delj candidates
+#' @templateVar deljtype numeric indices (rows)
+#' @templateVar delfwhat feature group
+#' @templateVar delfa1 the annotation table (a \code{data.table})
+#' @templateVar delfa2 the feature group name
+#' @templateVar delfr the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
+#' @templateVar dollarOpName feature group
+#' @template sub_op-args
+#'
+#' @param \dots Ignored.
+#'
+#' @templateVar class features
+#' @template class-hierarchy
+#'
+#' @export
 featureAnnotations <- setClass("featureAnnotations",
                                slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
                                contains = c("workflowStep", "VIRTUAL"))
@@ -102,6 +140,9 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     return(ret)
 })
 
+#' @templateVar where featureAnnotations
+#' @templateVar what annotations
+#' @template delete
 #' @export
 setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 {

@@ -52,18 +52,14 @@ featuresSIRIUS <- setClass("featuresSIRIUS", contains = "features")
 setMethod("initialize", "featuresSIRIUS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "sirius", ...))
 
-#' @details \code{findFeaturesSIRIUS} uses the
-#'   \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
-#'   package to extract features.
-#'
-#' @note \code{findFeaturesSIRIUS} Requires analysis files to be in the
-#'   \code{mzXML} format.
+#' @details \code{findFeaturesSIRIUS} uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find
+#'   features. The features are collected by running the \command{lcms-align} command for every analysis.
 #'
 #' @rdname feature-finding
+#' @references \insertRef{Dhrkop2019}{patRoon}
 #' @export
 findFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
 {
-    # UNDONE: docs
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzML", add = ac)
     checkmate::assertFlag(verbose, add = ac)

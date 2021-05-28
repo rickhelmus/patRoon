@@ -148,7 +148,6 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
-    - groupFeatures: align doesn't work for sets with KPIC/XCMS
     - finish featureAnnotations class
 - handbook
     - KPIC2, cliqueMS installation
@@ -164,11 +163,6 @@
         - session filter: argument and its order
         - MC import/export
         - session filters: TRUE will use default yml file name
-    - groupQualities/Scores
-        - slots
-        - GaussianSimilarity: NAs are made zero
-        - as.data.table: qualities argument
-        - calculatePeakQualities(), also generic
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
 - suspect screening
@@ -230,6 +224,7 @@
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same
     - features
+        - groupFeatures: align doesn't work for sets with KPIC/XCMS
         - xcms-conv
             - set/... arg
 - components

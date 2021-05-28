@@ -195,6 +195,7 @@ setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
+#' @param weights,flatnessFactor See method documentation.
 #' @template generics
 setGeneric("calculatePeakQualities", function(obj, weights = NULL,
                                               flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))

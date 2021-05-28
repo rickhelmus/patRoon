@@ -23,10 +23,10 @@ NULL
 #'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average If \code{TRUE} then data within replicate groups are averaged.
-#' 
+#'
 #'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak intensities.
-#' 
+#'
 #'   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
 #'   if \code{pch=NULL} then values are automatically assigned.
@@ -71,8 +71,10 @@ NULL
 #' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each feature group (columns) per analysis
 #'   (rows). Each index corresponds to the row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
-#' @slot annotations A (\code{\link{data.table}}) with adduct/isotope annotations for each group (see
-#'   \code{\link{selectIons}}).
+#' @slot groupQualities,groupScores A \code{\link{data.table}} with qualities/scores for each feature group (see the
+#'   \code{calculatePeakQualities} method).
+#' @slot annotations A \code{\link{data.table}} with adduct/isotope annotations for each group (see the
+#'   \code{selectIons} method).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -547,28 +549,25 @@ getFCParams <- function(rGroups, ...)
 }
 
 
-#' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}})
-#'   with retention, \emph{m/z}, intensity and optionally other feature data.
-#' @param features If \code{TRUE} then feature specific data will be added. If
-#'   \code{average=TRUE} this data will be averaged for each feature group.
-#' @param regression Set to \code{TRUE} to add regression data for each feature
-#'   group. For this a linear model is created (intensity/area [depending on
-#'   \code{areas} argument] \emph{vs} concentration). The model concentrations
-#'   (e.g. of a set of standards) is derived from the \code{conc} column of the
-#'   \link[=analysis-information]{analysis information}. From this model the
-#'   intercept, slope and R2 is added to the output. In addition, when
-#'   \code{features=TRUE}, concentrations for each feature are added. Note that
-#'   no regression information is added when no \code{conc} column is present in
-#'   the analysis information or when less than two concentrations are specified
+#' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
+#'   and optionally other feature data.
+#' @param features If \code{TRUE} then feature specific data will be added. If \code{average=TRUE} this data will be
+#'   averaged for each feature group.
+#' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
+#'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
+#'   \code{qualities=FALSE} then nothing is reported.
+#' @param regression Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
+#'   created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
+#'   (e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
+#'   information}. From this model the intercept, slope and R2 is added to the output. In addition, when
+#'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
+#'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
-#' @param averageFunc Function used for averaging. Used when \code{average=TRUE}
-#'   or \code{FCParams != NULL}
-#' @param normFunc Function that should be used for normalization of data. The
-#'   function is called for all intensities/areas of a feature group and these
-#'   quantities are divided by the result of the function call. For example,
-#'   when \code{\link{max}} is used normalized intensities will be between zero
-#'   and one. If all quantities are zero then the function will not be called.
-#'   Set to \code{NULL} to perform no normalization.
+#' @param averageFunc Function used for averaging. Used when \code{average=TRUE} or \code{FCParams != NULL}
+#' @param normFunc Function that should be used for normalization of data. The function is called for all
+#'   intensities/areas of a feature group and these quantities are divided by the result of the function call. For
+#'   example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
+#'   zero then the function will not be called. Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,
@@ -1630,6 +1629,22 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
+#' @describeIn featureGroups Calculates peak and group qualities for all features and feature groups. The peak qualities
+#'   (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
+#'   function}, and subsequentially averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
+#'   \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
+#'   publication cited below for more details). Similarly to \code{\link{features}} method, these metrics are scored by
+#'   normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+#'   \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores.
+#' 
+#' @inheritParams calculatePeakQualities,features-method
+#' @param avgFunc The function used to average the peak qualities and scores for each feature group.
+#' 
+#' @references \insertRef{Chetnik2020}{patRoon}
+#'
+#' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
+#'
+#' @export
 setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
                                                               parallel = TRUE)
 {

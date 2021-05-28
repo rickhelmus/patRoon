@@ -289,12 +289,20 @@ checkFeaturesInterface$methods(
     }
 )
 
+#' @details \code{importCheckFeaturesSession} is used to import a session file that was generated from a different
+#'   \code{\link{featureGroups}} object. This is useful to avoid re-doing manual interpretation of chromatographic peaks
+#'   when, for instance, feature group data is re-created with different parameters.
+#'
+#' @param sessionIn,sessionOut The file names for the input and output sessions.
+#' @param mzWindow The \emph{m/z} window (in Da) used to relate 'old' with 'new' feature groups.
+#' @param overWrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
+#'   function will stop with an error message.
+#' 
+#' @rdname check-GUI
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = 6, mzWindow = 0.002,
                                        overWrite = FALSE)
 {
-    # UNDONE: docs
-    
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(sessionIn, mustExist = TRUE, add = ac)
     assertCheckSession(sessionOut, mustExist = FALSE, add = ac)
@@ -340,38 +348,14 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
     invisible(NULL)
 }
 
-#' @details \code{checkFeatures} is used to review chromatographic
-#'   information for feature groups. This is especially useful to get a visual
-#'   impression of the quality of detected features. In addition, this function
-#'   may be used to remove unwanted (\emph{e.g.} outlier) features. Better
-#'   performance is often obtained when an external browser is used to use this
-#'   Shiny application. Furthermore, when a large \code{featureGroups} object is
-#'   used it is recommended to limit the number of analyses/feature groups by
-#'   subsetting the object.
-#'
-#' @param mzWindow Default \emph{m/z} window to be used for creating extracted
-#'   ion chromatograms (EICs).
-#' @param enabledFGroups A logical vector that states for each feature group
-#'   whether it should be kept (\code{TRUE}) or not (\code{FALSE}). The order is
-#'   the same as the \code{fGroups} parameter. If \code{NULL} then all feature
-#'   groups are considered to be kept.
-#'
-#' @return \code{checkFeatures} returns a logical vector for all feature
-#'   groups that were selected to be kept (\code{TRUE}) or not (\code{FALSE}).
-#'   This result can be passed to the \code{enabledFGroups} parameter for
-#'   subsequent calls to \code{checkFeatures} in order to restore the
-#'   keep/not keep state from a previous call. To actually remove unwanted
-#'   feature groups the object should be subset by the subsetting
-#'   (\code{\link{[}}) operator to which the return value should be passed as
-#'   the second parameter.
-#'
-#' @rdname GUI-utils
+#' @details \code{checkFeatures} is used to review chromatographic information for feature groups. Its main purpose is
+#'   to assist in reviewing the quality of detected feature (groups) and easily select unwanted data such as features
+#'   with poor peak shapes or noise.
+#' @rdname check-GUI
 #' @aliases checkFeatures
 #' @export
 setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow, clearSession)
 {
-    # UNDONE: update docs
-    
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
     
@@ -437,6 +421,13 @@ convertQualitiesToMCData <- function(fGroups)
     return(ret)
 }
 
+#' @details \code{getMCTrainData} converts a session created by \code{checkFeatures} to a \code{data.frame} that can be
+#'   used by the \pkg{MetaClean} to train a new model. The output format is comparable to that from
+#'   \code{\link{getPeakQualityMetrics}}.
+#' @note \code{getMCTrainData} only uses session data for selected feature groups. Selected features for removal are
+#'   ignored, as this is not supported by \pkg{MetaClean}.
+#' @rdname check-GUI
+#' @export
 getMCTrainData <- function(fGroups, session)
 {
     ac <- checkmate::makeAssertCollection()
@@ -452,6 +443,13 @@ getMCTrainData <- function(fGroups, session)
     return(as.data.frame(ret))
 }
 
+#' @details \code{predictCheckFeaturesSession} Uses ML data from \pkg{MetaClean} to predict the quality (Pass/Fail) of
+#'   feature group data, and converts this to a session which can be reviewed with \code{checkFeatures} and used to
+#'   remove unwanted feature groups by \code{\link[=filter,featureGroups-method]{filter}}.
+#' @param model The model that was created with \pkg{MetaClean} and that should be used to predict pass/fail data. If
+#'   \code{NULL}, the example model of the \pkg{MetaCleanData} package is used.
+#' @rdname check-GUI
+#' @export
 predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrite = FALSE)
 {
     checkPackage("MetaClean")

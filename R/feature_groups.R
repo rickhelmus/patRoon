@@ -1635,11 +1635,13 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 #'   \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
 #'   publication cited below for more details). Similarly to \code{\link{features}} method, these metrics are scored by
 #'   normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
-#'   \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores.
-#' 
+#'   \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
+#'   \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
+#'   Pass/Fail ML models from \pkg{MetaClean}.
+#'
 #' @inheritParams calculatePeakQualities,features-method
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
-#' 
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.

@@ -742,13 +742,32 @@ NULL
 #' @seealso \code{\link{analysis-information}}
 NULL
 
-#' Interactive GUI utilities
+#' Interactive GUI utilities to check workflow data
 #'
-#' Interactive utilities using \pkg{\link{shiny}} to provide a graphical user
-#' interface (GUI).
+#' These functions provide interactive utilities to explore and review workflow data using a \pkg{\link{shiny}}
+#' graphical user interface (GUI). In addition, unsatisfactory data (\emph{e.g.} noise identified as a feature and
+#' unrelated feature groups in a component) can easily be selected for removal.
+#'
+#' The data selected for removal is stored in \emph{sessions}. These are \file{YAML} files to allow easy external
+#' manipulation. The sessions can be used to restore the selections that were made for data removal when the GUI tool is
+#' executed again. Furthermore, functionality is provided to import and export sessions. To actually remove the data the
+#' \code{\link{filter}} method should be used with the session file as input.
 #'
 #' @param fGroups A \code{\link{featureGroups}} object.
 #'
-#' @name GUI-utils
+#'   This should be the 'new' object for \code{importCheckFeaturesSession} for which the session needs to be imported.
+#' @param session The session file name.
+#' @param rtWindow For \code{checkFeatures} and \code{checkComponents}: the retention time (in seconds) that will be
+#'   subtracted/added to respectively the minimum and maximum retention time of the plotted feature groups. Thus,
+#'   setting this value to a positive value will 'zoom out' on the retention time axis.
+#'
+#'   For \code{importCheckFeaturesSession}: the retention time window (seconds) used to relate 'old' with 'new' feature
+#'   groups.
+#' @param clearSession If \code{TRUE} the session will be completely cleared before starting the GUI. This effectively
+#'   removes all selections for data removal.
+#'
+#' @references \insertRef{Chetnik2020}{patRoon}
+#' 
+#' @name check-GUI
 NULL
 

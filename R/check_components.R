@@ -150,13 +150,22 @@ checkComponentsInterface$methods(
     }
 )
 
-#' @rdname GUI-utils
+#' @details \code{checkComponents} is used to review components and their feature groups contained within. A typical use
+#'   case is to verify that peaks from features that were annotated as related adducts and/or isotopes are correctly
+#'   aligned.
+#'
+#' @param components The \code{\link{components}} to be checked.
+#'
+#' @note \code{checkComponents}: Some componentization algorithms (\emph{e.g.} \code{\link{generateComponentsNontarget}}
+#'   and \code{\link{generateComponentsTPs}}) may output components where the same feature group in a component is
+#'   present multiple times, for instance, when multiple TPs are matched to the same feature group. If such a feature
+#'   group is selected for removal, then \emph{all} of its result in the component will be marked for removal.
+#'
+#' @rdname check-GUI
 #' @aliases checkComponents
 #' @export
 setMethod("checkComponents", "components", function(components, fGroups, session, rtWindow, clearSession)
 {
-    # UNDONE: update docs
-    
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
     checkmate::assertFlag(clearSession)
     

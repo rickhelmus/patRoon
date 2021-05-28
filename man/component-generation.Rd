@@ -69,7 +69,8 @@
   rtDev = 30,
   absMzDev = 0.002,
   absMzDevLink = absMzDev * 2,
-  traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4))
+  traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
+  ...
 )
 
 \S4method{generateComponentsOpenMS}{featureGroups}(
@@ -220,12 +221,9 @@ adducts, isotopes, in-source fragments and homologues. The linking of this
 data is generally useful to provide more information for compound annotation
 and reduce the data size and thus complexity.
 
-\code{generateComponents} is a generic function that will generate components
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{generateComponentsRAMClustR} and
-  \code{generateComponentsNontarget}. While these functions may be called directly,
-  \code{generateComponents} provides a generic interface and is therefore usually
-  preferred.
+\code{generateComponents} is a generic function that will generate components using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as \code{generateComponentsRAMClustR} and \code{generateComponentsNontarget}. While these
+  functions may be called directly, \code{generateComponents} provides a generic interface and is therefore usually preferred.
 
 \code{generateComponentsCAMERA} provides an interface to
   \href{https://bioconductor.org/packages/release/bioc/html/CAMERA.html}{CAMERA}

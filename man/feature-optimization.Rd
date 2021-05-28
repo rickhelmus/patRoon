@@ -48,32 +48,26 @@ getDefFeaturesOptParamRanges(algorithm, method = "centWave")
 \item{features}{A \code{\link{features}} object with the features that should
 be used to optimize grouping.}
 
-\item{algorithm}{The algorithm used for finding or grouping features (see
-\code{\link{findFeatures}} and \code{\link{groupFeatures}}).}
+\item{algorithm}{The algorithm used for finding or grouping features (see \code{\link{findFeatures}} and
+\code{\link{groupFeatures}}).}
 
-\item{\dots}{One or more lists with parameter sets (see below) (for
-\code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}).
-Alternatively, named arguments that set (and possibly override) the
-parameters that should be returned from \code{generateFeatureOptPSet} or
-\code{generateFGroupsOptPSet}.}
+\item{\dots}{One or more lists with parameter sets (see below) (for \code{optimizeFeatureFinding} and
+\code{optimizeFeatureGrouping}). Alternatively, named arguments that set (and possibly override) the parameters
+that should be returned from \code{generateFeatureOptPSet} or \code{generateFGroupsOptPSet}.}
 
 \item{templateParams}{Template parameter set (see below).}
 
-\item{paramRanges}{A list with vectors containing absolute parameter ranges
-(minimum/maximum) that constrain numeric parameters choosen during
-experiments. See the \code{\link{getDefFeaturesOptParamRanges}} and
-\code{\link{getDefFGroupsOptParamRanges}} functions for defaults. Values
-should be \code{Inf} when no limit should be used.}
+\item{paramRanges}{A list with vectors containing absolute parameter ranges (minimum/maximum) that constrain numeric
+parameters choosen during experiments. See the \code{\link{getDefFeaturesOptParamRanges}} and
+\code{\link{getDefFGroupsOptParamRanges}} functions for defaults. Values should be \code{Inf} when no limit should
+be used.}
 
-\item{maxIterations}{Maximum number of iterations that may be performed to
-find optimimum values. Used to restrict neededless long
-optimization procedures. In IPO this was fixed to \samp{50}.}
+\item{maxIterations}{Maximum number of iterations that may be performed to find optimimum values. Used to restrict
+neededless long optimization procedures. In IPO this was fixed to \samp{50}.}
 
-\item{maxModelDeviation}{See the \verb{Potential suboptimal results by
-optimization model} section below.}
+\item{maxModelDeviation}{See the \verb{Potential suboptimal results by optimization model} section below.}
 
-\item{anaInfo}{\link[=analysis-information]{Analysis info table} (passed
-to \code{\link{findFeatures}}).}
+\item{anaInfo}{\link[=analysis-information]{Analysis info table} (passed to \code{\link{findFeatures}}).}
 
 \item{isoIdent}{Sets the algorithm used to identify isotopes. Valid values
 are: \code{"IPO"}, \code{"CAMERA"} and \code{"OpenMS"}. The latter can only
@@ -90,151 +84,121 @@ if \code{isoIdent="IPO"}. Valid values: \code{"none"},
 \item{method}{Method used by XCMS to find features (only if \code{algorithm="xcms"}).}
 }
 \value{
-The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
-  return their results in a \code{\link{optimizationResult}} object.
+The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping} return their results in a
+  \code{\link{optimizationResult}} object.
 }
 \description{
-Automatic optimization of feature finding and grouping parameters through
-Design of Experiments (DoE).
+Automatic optimization of feature finding and grouping parameters through Design of Experiments (DoE).
 }
 \details{
-Many different parameters exist that may affect the output quality of feature
-finding and grouping. To avoid time consuming manual experimentation,
-functionality is provided to largely automate the optimization process. The
-methodology, which uses design of experiments (DoE), is based on the
-excellent \href{https://github.com/rietho/IPO}{Isotopologue Parameter
-Optimization (IPO) R package}. The functionality of this package is directly
-integrated in patRoon. Some functionality was added or changed, however, the
-principle algorithm workings are nearly identical.
+Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time
+consuming manual experimentation, functionality is provided to largely automate the optimization process. The
+methodology, which uses design of experiments (DoE), is based on the excellent
+\href{https://github.com/rietho/IPO}{Isotopologue Parameter Optimization (IPO) R package}. The functionality of this
+package is directly integrated in patRoon. Some functionality was added or changed, however, the principle algorithm
+workings are nearly identical.
 
-Compared to IPO, the following functionality was added or changed:
-\itemize{
-  \item The code was made more generic in order to include support for other
-feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3).
-  \item The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used
-  to find isotopes.
-  \item The
-\code{maxModelDeviation} parameter was added to potentially avoid
-suboptimal results (\href{https://github.com/rietho/IPO/issues/61}{issue
-discussed here}).
-  \item The use of multiple 'parameter sets' (discussed
-below) which, for instance, allow optimizing qualitative paremeters more
-easily (see \verb{examples}).
-  \item More consistent optimization code for feature
-finding/grouping.
-  \item More consistent output using S4 classes (\emph{i.e.}
-\code{\link{optimizationResult}} class).
-  \item Experiments are not (yet) executed in parallel (although feature
-  finding or grouping may be if the algorithm supports it).
-}
+Compared to IPO, the following functionality was added or changed: \itemize{ \item The code was made more generic in
+order to include support for other feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3). \item
+The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used to find isotopes. \item The
+\code{maxModelDeviation} parameter was added to potentially avoid suboptimal results
+(\href{https://github.com/rietho/IPO/issues/61}{issue discussed here}). \item The use of multiple 'parameter sets'
+(discussed below) which, for instance, allow optimizing qualitative paremeters more easily (see \verb{examples}).
+\item More consistent optimization code for feature finding/grouping. \item More consistent output using S4 classes
+(\emph{i.e.} \code{\link{optimizationResult}} class). \item Experiments are not (yet) executed in parallel (although
+feature finding or grouping may be if the algorithm supports it). }
 }
 \section{Parameter sets}{
- Which parameters should be optimized is determined
-  by a \emph{parameter set}. A set is defined by a named \code{list}
-  containing the minimum and maximum starting range for each parameter that
-  should be tested. For instance, the set \code{list(chromFWHM = c(5, 10),
-  mzPPM = c(5, 15))} specifies that the \code{chromFWHM} and \code{mzPPM}
-  parameters (used by OpenMS feature finding) should be optimized within a
-  range of \samp{5}-\samp{10} and \samp{5}-\samp{15}, respectively. Note that
-  this range may be increased or decreased after a DoE iteration in order to
-  find a better optimum. The absolute limits are controlled by the
-  \code{paramRanges} function argument.
+ Which parameters should be optimized is determined by a \emph{parameter set}. A set is
+  defined by a named \code{list} containing the minimum and maximum starting range for each parameter that should be
+  tested. For instance, the set \code{list(chromFWHM = c(5, 10), mzPPM = c(5, 15))} specifies that the
+  \code{chromFWHM} and \code{mzPPM} parameters (used by OpenMS feature finding) should be optimized within a range of
+  \samp{5}-\samp{10} and \samp{5}-\samp{15}, respectively. Note that this range may be increased or decreased after a
+  DoE iteration in order to find a better optimum. The absolute limits are controlled by the \code{paramRanges}
+  function argument.
 
-  Multiple parameter sets may be specified (\emph{i.e.} through the \dots
-  function argument). In this situation, the optimization algorithm is
-  repeated for each set, and the final optimum is determined from the parameter
-  set with the best response. The \code{templateParams} function argument may
-  be useful in this case to define a template for each parameter set. Actual
-  parameter sets are then constructed by joining each parameter set with the
-  set specified for \code{templateParams}. When a parameter is defined in
-  both a regular and template set, the parameter in the regular set takes
-  precedence.
+  Multiple parameter sets may be specified (\emph{i.e.} through the \dots function argument). In this situation, the
+  optimization algorithm is repeated for each set, and the final optimum is determined from the parameter set with
+  the best response. The \code{templateParams} function argument may be useful in this case to define a template for
+  each parameter set. Actual parameter sets are then constructed by joining each parameter set with the set specified
+  for \code{templateParams}. When a parameter is defined in both a regular and template set, the parameter in the
+  regular set takes precedence.
 
-  Parameters that should not be optimized but still need to be set for the
-  feature finding/grouping functions should also be defined in a (template)
-  parameter set. Which parameters should be optimized is determined whether
-  its value is specified as a vector range or a single fixed value.
-  For instance, when a set is defined as \code{list(chromFWHM = c(5, 10),
-  mzPPM = 5)}, only the \code{chromFWHM} parameter is optimized, whereas
-  \code{mzPPM} is kept constant at \samp{5}.
+  Parameters that should not be optimized but still need to be set for the feature finding/grouping functions should
+  also be defined in a (template) parameter set. Which parameters should be optimized is determined whether its value
+  is specified as a vector range or a single fixed value. For instance, when a set is defined as \code{list(chromFWHM
+  = c(5, 10), mzPPM = 5)}, only the \code{chromFWHM} parameter is optimized, whereas \code{mzPPM} is kept constant at
+  \samp{5}.
 
-  Using multiple parameter sets with differing fixed values allows
-  optimization of qualitative values (see examples below).
-  
-  The parameters specified in parameter sets are directly passed through
-  the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
-  Hence, grouping and retention time alignment parameters used by XCMS should
-  (still) be set through the \code{groupArgs} and \code{retcorArgs}
-  parameters.
-  
-  \strong{NOTE:} For XCMS3, which normally uses parameter classes for
-  settings its options, the parameters must be defined in a named list like
-  any other algorithm. The set parameters are then used passed to the
-  constructor of the right parameter class object (e.g.
-  \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For
-  grouping/alignment sets, these parameters need to be specified in nested
-  lists called \code{groupParams} and \code{retAlignParams}, respectively
-  (similar to \code{groupArgs}/\code{retcorArgs} for
-  \code{algorithm="xcms"}). Finally, the underlying XCMS method to be used
-  should be defined in the parameter set (\emph{i.e.} by setting the
-  \code{method} field for feature parameter sets and the \code{groupMethod}
-  and \code{retAlignMethod} for grouping/aligning parameter sets). See the
-  examples below for more details.
+  Using multiple parameter sets with differing fixed values allows optimization of qualitative values (see examples
+  below).
 
-  \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
-  parameters for XCMS feature finding should be split in two different
-  values:
-  \itemize{
-    \item The minimum and maximum ranges for \code{peakwidth} are optimized by
-  setting \code{min_peakwidth} and \code{max_peakwidth}, respectively.
-    \item The \code{k} and \code{I} parameters contained in \code{prefilter}
-    are split in \code{prefilter} and \code{value_of_prefilter},
-    respectively.
+  The parameters specified in parameter sets are directly passed through the \code{\link{findFeatures}} or
+  \code{\link{groupFeatures}} functions. Hence, grouping and retention time alignment parameters used by XCMS should
+  (still) be set through the \code{groupArgs} and \code{retcorArgs} parameters.
+
+  \strong{NOTE:} For XCMS3, which normally uses parameter classes for settings its options, the parameters must be
+  defined in a named list like any other algorithm. The set parameters are then used passed to the constructor of the
+  right parameter class object (e.g. \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For grouping/alignment
+  sets, these parameters need to be specified in nested lists called \code{groupParams} and \code{retAlignParams},
+  respectively (similar to \code{groupArgs}/\code{retcorArgs} for \code{algorithm="xcms"}). Finally, the underlying
+  XCMS method to be used should be defined in the parameter set (\emph{i.e.} by setting the \code{method} field for
+  feature parameter sets and the \code{groupMethod} and \code{retAlignMethod} for grouping/aligning parameter sets).
+  See the examples below for more details.
+
+  \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter} parameters for XCMS feature finding should
+  be split in two different values: \itemize{
+
+  \item The minimum and maximum ranges for \code{peakwidth} are optimized by setting \code{min_peakwidth} and
+  \code{max_peakwidth}, respectively.
+
+  \item The \code{k} and \code{I} parameters contained in \code{prefilter} are split in \code{prefilter} and
+  \code{value_of_prefilter}, respectively.
+
+  }
+
+  \emph{Similary}, for KPIC2, the following parameters should be split: \itemize{
+
+  \item the \code{width} parameter (feature optimization) is optimized by specifying the \code{min_width} and
+  \code{max_width} parameters.
+
+  \item the \code{tolerance} and \code{weight} parameters (feature grouping optimization) are optimized by setting
+  \code{mz_tolerance}/\code{rt_tolerance} and \code{mz_weight}/\code{rt_weight} parameters, respectively.
+
   }
 }
 
 \section{Functions}{
- The \code{optimizeFeatureFinding} and
-  \code{optimizeFeatureGrouping} are the functions to be used to optimize
-  parameters for feature finding and grouping, respectively. These functions
-  are analogous to \code{\link[IPO]{optimizeXcmsSet}} and
-  \code{\link[IPO]{optimizeRetGroup}} from \pkg{IPO}.
+ The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping} are the functions to be used
+  to optimize parameters for feature finding and grouping, respectively. These functions are analogous to
+  \code{\link[IPO]{optimizeXcmsSet}} and \code{\link[IPO]{optimizeRetGroup}} from \pkg{IPO}.
 
-  The \code{generateFeatureOptPSet} and \code{generateFGroupsOptPSet} functions
-  may be used to generate a parameter set for feature finding and grouping,
-  respectively. Some algorithm dependent default parameter optimization ranges
-  will be returned. These functions are analogous to
-  \code{\link[IPO]{getDefaultXcmsSetStartingParams}} and
-  \code{\link[IPO]{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However,
-  unlike their IPO counterparts, these functions will not output default fixed
-  values. The \code{generateFGroupsOptPSet} will only generate defaults for
+  The \code{generateFeatureOptPSet} and \code{generateFGroupsOptPSet} functions may be used to generate a parameter
+  set for feature finding and grouping, respectively. Some algorithm dependent default parameter optimization ranges
+  will be returned. These functions are analogous to \code{\link[IPO]{getDefaultXcmsSetStartingParams}} and
+  \code{\link[IPO]{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However, unlike their IPO counterparts, these
+  functions will not output default fixed values. The \code{generateFGroupsOptPSet} will only generate defaults for
   density grouping if \code{algorithm="xcms"}.
 
-  The \code{getDefFeaturesOptParamRanges} and
-  \code{getDefFGroupsOptParamRanges} return the default absolute optimization
-  parameter ranges for feature finding and grouping, respectively. These
-  functions are useful if you want to set the \code{paramRanges} function
-  argument.
+  The \code{getDefFeaturesOptParamRanges} and \code{getDefFGroupsOptParamRanges} return the default absolute
+  optimization parameter ranges for feature finding and grouping, respectively. These functions are useful if you
+  want to set the \code{paramRanges} function argument.
 }
 
 \section{Potential suboptimal results by optimization model}{
- After each
-  experiment iteration an optimimum parameter set is found by generating a
-  model containing the tested parameters and their responses. Sometimes the
-  actual response from the parameters derived from the model is actually
-  signficantly lower than expected. When the response is lower than the
-  maximum reponse found during the experiment, the parameters belonging to
-  this experimental maximum may be choosen instead. The
-  \code{maxModelDeviation} argument sets the maximum deviation in response
-  between the modelled and experimental maxima. The value is relative:
-  \samp{0} means that experimental values will always be favored when leading
-  to improved responses, whereas \code{1} will effectively disable this
-  procedure (and return to 'regular' IPO behaviour).
+ After each experiment iteration an optimimum parameter
+  set is found by generating a model containing the tested parameters and their responses. Sometimes the actual
+  response from the parameters derived from the model is actually signficantly lower than expected. When the response
+  is lower than the maximum reponse found during the experiment, the parameters belonging to this experimental
+  maximum may be choosen instead. The \code{maxModelDeviation} argument sets the maximum deviation in response
+  between the modelled and experimental maxima. The value is relative: \samp{0} means that experimental values will
+  always be favored when leading to improved responses, whereas \code{1} will effectively disable this procedure (and
+  return to 'regular' IPO behaviour).
 }
 
 \section{Source}{
- The code and methodology is a direct adaptation from the
-  \href{https://github.com/rietho/IPO}{IPO R package}.
+ The code and methodology is a direct adaptation from the \href{https://github.com/rietho/IPO}{IPO R
+  package}.
 }
 
 \examples{

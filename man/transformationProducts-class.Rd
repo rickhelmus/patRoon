@@ -33,7 +33,7 @@
 \S4method{as.data.table}{transformationProducts}(x)
 }
 \arguments{
-\item{i}{A numeric or character value which is used to select parents by
+\item{i}{For \code{[}/\code{[[}: A numeric or character value which is used to select parents by
 their index or name, respectively (for the order/names see \code{names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all parents are selected.\cr\cr For \code{[[}: should be a scalar value.}
 

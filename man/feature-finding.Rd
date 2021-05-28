@@ -114,6 +114,7 @@ importFeaturesXCMS3(xdata, analysisInfo)
 used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"xcms3"}, \code{"envipick"}, \code{"sirius"}, \code{"kpic2"}, \code{"safd"}}
 
 \item{...}{further parameters passed to \code{\link[xcms]{xcmsSet}} (\code{findFeaturesXCMS}),
+\code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}} (\code{findFeaturesXCMS3}),
 \code{\link[enviPick]{enviPickwrap}} (\code{featurefinderEnviPick}),
 \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}} (\code{findFeaturesKPIC2}) or to selected feature
 finding or importing algorithms (\code{findFeatures} and \code{importFeatures}).}
@@ -220,6 +221,14 @@ retention time) that is used to find the closest data point to the
 retention time to obtain the intensity of a feature (this is needed since
 OpenMS does not provide this data).}
 
+\item{profPath}{A \code{character} vector with paths to the profile MS data for each analysis (will be re-cycled if
+necessary). See the \verb{Using SAFD} section for more details.}
+
+\item{mzRange}{The \emph{m/z} window to be imported (passed to the \code{import_files_MS1} function).}
+
+\item{maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS}{Parameters directly
+passed to the \code{safd_s3D} function.}
+
 \item{method}{The method setting used by XCMS peak finding, see
 \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}}
 
@@ -244,12 +253,9 @@ base class. The next step in a general workflow is to group and align these feat
 may have a large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is
 largely dependent upon applied analysis methodology and instrumentation.
 
-\code{findFeatures} is a generic function that will find features
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{findFeaturesOpenMS} and
-  \code{findFeaturesBruker}. While these functions may be called directly,
-  \code{findFeatures} provides a generic interface and is therefore usually
-  preferred.
+\code{findFeatures} is a generic function that will find features using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as \code{findFeaturesOpenMS} and \code{findFeaturesBruker}. While these
+  functions may be called directly, \code{findFeatures} provides a generic interface and is therefore usually preferred.
 
 \code{importFeatures} is a generic function to import feature groups
   produced by other software. The actual functionality is provided by
@@ -279,13 +285,12 @@ largely dependent upon applied analysis methodology and instrumentation.
   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}
    TOPP tool (see \url{http://www.openms.de}).
 
-\code{findFeaturesSAFD} uses the
-  \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
-  package to extract features.
+\code{findFeaturesSAFD} uses \href{https://bitbucket.org/SSamanipour/safd.jl/src/master/}{SAFD} to obtain
+  features. This functionality is still experimental. Please see the \verb{Using SAFD} section below for more
+  details.
 
-\code{findFeaturesSIRIUS} uses the
-  \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
-  package to extract features.
+\code{findFeaturesSIRIUS} uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find
+  features. The features are collected by running the \command{lcms-align} command for every analysis.
 
 \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
   function from the \pkg{xcms} package to find features.
@@ -325,18 +330,26 @@ The file format of analyses for \code{findFeaturesOpenMS} must be
   \file{mzML}. This functionality has been tested with OpenMS version >= 2.0.
   Please make sure it is installed and its binaries are added to the PATH
   environment variable or the \code{patRoon.path.OpenMS} option is set.
-
-\code{findFeaturesSAFD} Requires analysis files to be in the
-  \code{mzXML} format.
-
-\code{findFeaturesSIRIUS} Requires analysis files to be in the
-  \code{mzXML} format.
 }
 \section{Parallelization}{
  \code{generateFeaturesOpenMS} uses multiprocessing to parallelize
   computations. Please see the parallelization section in the handbook for
   more details and \link[=patRoon-package]{patRoon options} for configuration
   options.
+}
+
+\section{Using SAFD}{
+ The support for SAFD is still experimental, and its interface might change in the future.
+
+  In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
+  everything works, \emph{e.g.} by running the test data.
+
+  This algorithm only supports profile (\emph{i.e.} not centroided) MS data. Since other \code{patRoon} functionality
+  typically relies on the centroided data, MS data must be available in \emph{both} forms. The centroided data is
+  specified through the 'regular' \link[=analysis-information]{analysis info} mechanism, whereas the location of the
+  profile data is specified through the \code{profPath} argument. The base file names (\emph{i.e.} the file name
+  without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+  profile data must be \code{mzXML}.
 }
 
 \references{
@@ -347,6 +360,10 @@ The file format of analyses for \code{findFeaturesOpenMS} must be
   \addCitations{Rcpp}{1} \cr\cr
   \addCitations{Rcpp}{2} \cr\cr
   \addCitations{Rcpp}{3}
+
+\insertRef{Samanipour2019}{patRoon}
+
+\insertRef{Dhrkop2019}{patRoon}
 
 \addCitations{xcms}{1} \cr\cr
    \addCitations{xcms}{2} \cr\cr

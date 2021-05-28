@@ -125,12 +125,9 @@ plotting functionality typically uses group averaged peak lists.
 Several functions exist to automatically extract MS peak lists for feature
 groups.
 
-\code{generateMSPeakLists} is a generic function that will generate MS peak lists
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{generateMSPeakListsMzR} and
-  \code{generateMSPeakListsDA}. While these functions may be called directly,
-  \code{generateMSPeakLists} provides a generic interface and is therefore usually
-  preferred.
+\code{generateMSPeakLists} is a generic function that will generate MS peak lists using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as \code{generateMSPeakListsMzR} and \code{generateMSPeakListsDA}. While these
+  functions may be called directly, \code{generateMSPeakLists} provides a generic interface and is therefore usually preferred.
 
 \code{generateMSPeakListsDA} uses Bruker DataAnalysis to generate MS
   peak lists. Naturally, this only works with analyses in the Bruker data

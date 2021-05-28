@@ -42,42 +42,33 @@ feature with highest intensity (of all features from all groups).
 Set to \samp{0} or \code{NULL}
 to skip this step.}
 
-\item{preAbsMinIntensity, preRelMinIntensity}{As
-\code{absMinIntensity}/\code{relMinIntensity}, but applied \emph{before}
-any other filters. This is typically used to speed-up subsequent filter
-steps. However, care must be taken that a sufficiently low value is choosen
-that is not expected to affect subsequent filtering steps. See below why
-this may be important.}
+\item{preAbsMinIntensity, preRelMinIntensity}{As \code{absMinIntensity}/\code{relMinIntensity}, but applied
+\emph{before} any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
+taken that a sufficiently low value is choosen that is not expected to affect subsequent filtering steps. See below
+why this may be important.}
 
-\item{absMinAnalyses, relMinAnalyses}{Feature groups are only kept when they
-contain data for at least this (absolute or relative) amount of analyses.
-Set to \code{NULL} to ignore.}
+\item{absMinAnalyses, relMinAnalyses}{Feature groups are only kept when they contain data for at least this (absolute
+or relative) amount of analyses. Set to \code{NULL} to ignore.}
 
-\item{absMinReplicates, relMinReplicates}{Feature groups are only kept when
-they contain data for at least this (absolute or relative) amount of
-replicates. Set to \code{NULL} to ignore.}
+\item{absMinReplicates, relMinReplicates}{Feature groups are only kept when they contain data for at least this
+(absolute or relative) amount of replicates. Set to \code{NULL} to ignore.}
 
-\item{absMinFeatures, relMinFeatures}{Analyses are only kept when they contain
-at least this (absolute or relative) amount of features. Set to \code{NULL}
-to ignore.}
+\item{absMinFeatures, relMinFeatures}{Analyses are only kept when they contain at least this (absolute or relative)
+amount of features. Set to \code{NULL} to ignore.}
 
-\item{absMinReplicateAbundance, relMinReplicateAbundance}{Minimum
-absolute/relative abundance that a grouped feature should be present within
-a replicate group. If this mimimum is not met all features within the
-replicate group are removed. Set to \code{NULL} to skip this step.}
+\item{absMinReplicateAbundance, relMinReplicateAbundance}{Minimum absolute/relative abundance that a grouped feature
+should be present within a replicate group. If this mimimum is not met all features within the replicate group are
+removed. Set to \code{NULL} to skip this step.}
 
-\item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of
-intensity values for features within a replicate group. If the RSD is above
-this value all features within the replicate group are removed. Set to
+\item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of intensity values for features within a
+replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 \code{NULL} to ignore.}
 
-\item{blankThreshold}{Feature groups that are also present in blank analyses
-(see \link[=analysis-information]{analysis info}) are filtered out unless
-their relative intensity is above this threshold. For instance, a value of
-\samp{5} means that only features with an intensity five times higher than
-that of the blank are kept. The relative intensity values between blanks
-and non-blanks are determined from the mean of all non-zero blank
-intensities. Set to \code{NULL} to skip this step.}
+\item{blankThreshold}{Feature groups that are also present in blank analyses (see
+\link[=analysis-information]{analysis info}) are filtered out unless their relative intensity is above this
+threshold. For instance, a value of \samp{5} means that only features with an intensity five times higher than that
+of the blank are kept. The relative intensity values between blanks and non-blanks are determined from the mean of
+all non-zero blank intensities. Set to \code{NULL} to skip this step.}
 
 \item{retentionRange, mzRange, mzDefectRange, chromWidthRange}{Range of
 retention time (in seconds), \emph{m/z}, mass defect (defined as the
@@ -90,12 +81,16 @@ to skip this step.}
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
 
-\item{removeBlanks}{Set to \code{TRUE} to remove all analyses that belong to
-replicate groups that are specified as a blank in the
-\link{analysis-information}. This is useful to simplify the analyses in the
-specified \code{\link{featureGroups}} object after blank subtraction. When
-both \code{blankThreshold} and this argument are set, blank subtraction is
-performed prior to removing any analyses.}
+\item{removeBlanks}{Set to \code{TRUE} to remove all analyses that belong to replicate groups that are specified as a
+blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
+\code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
+set, blank subtraction is performed prior to removing any analyses.}
+
+\item{checkFeaturesSession}{If set then features and/or feature groups are removed that were selected for removal
+(see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
+\code{\link{predictCheckFeaturesSession}} functions. The value of \code{checkFeaturesSession} should either by a
+path to the session file or \code{TRUE}, in which case the default session file name is used. If \code{negate=TRUE}
+then all non-selected features/feature groups are removed instead.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed
 in opposite manner.}
@@ -118,60 +113,53 @@ A filtered \code{\link{featureGroups}} object. Feature groups that
 Basic rule based filtering of feature groups.
 }
 \details{
-\code{filter} performs common rule based filtering of feature groups
-  such as blank subtraction, minimum intensity and minimum replicate
-  abundance. Removing of features occurs by zeroing their intensity values.
-  Furthermore, feature groups that are left completely empty (\emph{i.e.} all
-  intensities are zero) will be automatically removed.
+\code{filter} performs common rule based filtering of feature groups such as blank subtraction, minimum
+  intensity and minimum replicate abundance. Removing of features occurs by zeroing their intensity values.
+  Furthermore, feature groups that are left completely empty (\emph{i.e.} all intensities are zero) will be
+  automatically removed.
 
 \code{replicateGroupSubtract} removes feature groups present in a
   given set of replicate groups (unless intensities are above a given
   threshold). The replicate groups that are subtracted will be removed.
 }
 \section{Filter order}{
- When multiple arguments are specified to
-  \code{filter}, multiple filters are applied in sequence. Since some of
-  these filters may affect each other, choosing their order correctly may be
-  important for effective data filtering. For instance, when an intensity
-  filter removes features from blank analyses, a subsequent blank filter may
-  not adequately perform blank subtraction. Similarly, when intensity and
-  blank filters are executed after the replicate abundance filter it may be
-  necessary to ensure minimum replicate abundance again as the intensity and
-  blank filters may have removed some features within a replicate group.
+ When multiple arguments are specified to \code{filter}, multiple filters are applied in
+  sequence. Since some of these filters may affect each other, choosing their order correctly may be important for
+  effective data filtering. For instance, when an intensity filter removes features from blank analyses, a subsequent
+  blank filter may not adequately perform blank subtraction. Similarly, when intensity and blank filters are executed
+  after the replicate abundance filter it may be necessary to ensure minimum replicate abundance again as the
+  intensity and blank filters may have removed some features within a replicate group.
 
   With this in mind, filters (if specified) occur in the following order:
 
   \enumerate{
 
-  \item Pre-Intensity filters (\emph{i.e.} \code{preAbsMinIntensity} and
-  \code{preRelMinIntensity}).
+  \item Features/feature groups selected for removal by the session specified by \code{checkFeaturesSession}.
 
-  \item Chromatography and mass filters (\emph{i.e} \code{retentionRange},
-  \code{mzRange}, \code{mzDefectRange} and \code{chromWidthRange}).
+  \item Pre-Intensity filters (\emph{i.e.} \code{preAbsMinIntensity} and \code{preRelMinIntensity}).
 
-  \item Replicate abundance filters (\emph{i.e.}
-  \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
+  \item Chromatography and mass filters (\emph{i.e} \code{retentionRange}, \code{mzRange}, \code{mzDefectRange} and
+  \code{chromWidthRange}).
+
+  \item Replicate abundance filters (\emph{i.e.} \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
   \code{maxReplicateIntRSD}).
 
   \item Blank filter (\emph{i.e.} blankThreshold).
 
-  \item Intensity filters (\emph{i.e.} \code{absMinIntensity} and
-  \code{relMinIntensity}).
+  \item Intensity filters (\emph{i.e.} \code{absMinIntensity} and \code{relMinIntensity}).
 
-  \item Replicate abundance filters (2nd time, only if previous filters
-  affected results).
+  \item Replicate abundance filters (2nd time, only if previous filters affected results).
 
-  \item General abundance filters (\emph{i.e.} \code{absMinAnalyses},
-  \code{relMinAnalyses}, \code{absMinReplicates}, \code{relMinReplicates},
-  \code{absMinFeatures} and \code{relMinFeatures}).
+  \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
+  \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
 
-  \item Replicate group filter (\emph{i.e.} \code{rGroups}) and blank
-  analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
+  \item Replicate group filter (\emph{i.e.} \code{rGroups}) and blank analyses removal (\emph{i.e.} if
+  \code{removeBlanks=TRUE}).
 
   }
 
-  If another filtering order is desired then \code{filter} should be called
-  multiple times with only one filter argument at a time.
+  If another filtering order is desired then \code{filter} should be called multiple times with only one filter
+  argument at a time.
 }
 
 \seealso{

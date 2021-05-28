@@ -239,31 +239,27 @@ setMethod("as.data.table", "components", function(x)
 
 #' @describeIn components Provides rule based filtering for components.
 #'
-#' @param size Should be a two sized vector with the minimum/maximum size of a
-#'   component. Set to \code{NULL} to ignore.
-#' @param adducts Remove any feature groups within components that do not match
-#'   given adduct rules. If \code{adducts} is a logical then only results are
-#'   kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
-#'   (\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more
-#'   \code{\link{adduct}} objects (or something that can be converted to it with
-#'   \code{\link{as.adduct}}) then only results are kept that match the given
+#' @param size Should be a two sized vector with the minimum/maximum size of a component. Set to \code{NULL} to ignore.
+#' @param adducts Remove any feature groups within components that do not match given adduct rules. If \code{adducts} is
+#'   a logical then only results are kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
+#'   (\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more \code{\link{adduct}} objects (or
+#'   something that can be converted to it with \code{\link{as.adduct}}) then only results are kept that match the given
 #'   adducts. Set to \code{NULL} to ignore this filter.
-#' @param isotopes Only keep results that match a given isotope rule. If
-#'   \code{isotopes} is a logical then only results are kept with
-#'   (\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope
-#'   assignment. Otherwise \code{isotopes} should be a numeric vector with
-#'   isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic results,
-#'   \samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this
-#'   filter.
-#' @param rtIncrement,mzIncrement Should be a two sized vector with the
-#'   minimum/maximum retention or mz increment of a homologous series. Set to
-#'   \code{NULL} to ignore.
+#' @param isotopes Only keep results that match a given isotope rule. If \code{isotopes} is a logical then only results
+#'   are kept with (\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope assignment. Otherwise
+#'   \code{isotopes} should be a numeric vector with isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic
+#'   results, \samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this filter.
+#' @param rtIncrement,mzIncrement Should be a two sized vector with the minimum/maximum retention or mz increment of a
+#'   homologous series. Set to \code{NULL} to ignore.
+#' @param checkComponentsSession If set then components and/or feature groups are removed that were selected for removal
+#'   (see \link{check-GUI} and the \code{\link{checkComponents}} function). The value of \code{checkComponentsSession}
+#'   should either by a path to the session file or \code{TRUE}, in which case the default session file name is used. If
+#'   \code{negate=TRUE} then all non-selected data is removed instead.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
-#' @note \code{filter} Applies only those filters for which a component has data
-#'   available. For instance, filtering by adduct will only filter any results
-#'   within a component if that component contains adduct information.
+#' @note \code{filter} Applies only those filters for which a component has data available. For instance, filtering by
+#'   adduct will only filter any results within a component if that component contains adduct information.
 #'
 #' @export
 setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, isotopes = NULL, rtIncrement = NULL,

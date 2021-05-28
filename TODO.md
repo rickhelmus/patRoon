@@ -32,6 +32,7 @@
     - load OpenMS intensities in parallel
         - either with futures or with MP and cache intensities afterwards
     - OpenMS: alignment may yield negative RTs...
+    - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
 
 ## Annotation
 
@@ -159,10 +160,6 @@
 - features
     - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
     - topMostByRGroup: handbook?
-    - check features
-        - session filter: argument and its order
-        - MC import/export
-        - session filters: TRUE will use default yml file name
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
 - suspect screening

@@ -151,8 +151,7 @@
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
     - finish featureAnnotations class
     - update adduct default: check adduct annotations
-    - features
-        - FCParams for as.data.table, plotVolcano and getFCParams
+    - references for FC calculation?
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -230,11 +229,10 @@
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - OpenMS/cliqueMS adducts?
-    - checkComponents/delete: for NT/TP components all fGroups are removed
     - update docs for reduced removal: only clust affected, remove note about reduced
     - extraOpts --> `...` for nontarget
 - TPs
-    - mention Bas as author for log2fc, spec similarity/shift etc
+    - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR
     - predictTPsBioTransformer
         - use identifier as fallback for naming when no compoundName is present

@@ -150,6 +150,9 @@
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
     - finish featureAnnotations class
+    - update adduct default: check adduct annotations
+    - features
+        - FCParams for as.data.table, plotVolcano and getFCParams
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -158,7 +161,6 @@
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - check UIs and import functions
 - features
-    - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
     - topMostByRGroup: handbook?
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr

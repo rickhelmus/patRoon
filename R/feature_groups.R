@@ -73,8 +73,8 @@ NULL
 #'   \code{\link{featureTable}}).
 #' @slot groupQualities,groupScores A \code{\link{data.table}} with qualities/scores for each feature group (see the
 #'   \code{calculatePeakQualities} method).
-#' @slot annotations A \code{\link{data.table}} with adduct/isotope annotations for each group (see the
-#'   \code{selectIons} method).
+#' @slot annotations A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
+#'   method).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -241,7 +241,8 @@ setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 #' @export
 setMethod("annotations", "featureGroups", function(obj) obj@annotations)
 
-#' @describeIn featureGroups Returns a named \code{character} with adducts assigned to each feature group.
+#' @describeIn featureGroups Returns a named \code{character} with adduct annotations assigned to each feature group (if
+#'   available).
 #' @export
 setMethod("adducts", "featureGroups", function(obj)
 {
@@ -250,7 +251,10 @@ setMethod("adducts", "featureGroups", function(obj)
     return(setNames(annotations(obj)$adduct, annotations(obj)$group))
 })
 
-#' @describeIn featureGroups Sets adducts for feature groups.
+#' @describeIn featureGroups Sets adduct annotations for feature groups.
+#' @param value For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The
+#'   length should equal the number of feature groups. Can be named with feature group names to customize the assignment
+#'   order.
 #' @export
 setReplaceMethod("adducts", "featureGroups", function(obj, value)
 {
@@ -1738,6 +1742,35 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     return(obj)
 })
 
+#' @describeIn featureGroups uses \link[=component-generation]{componentization} results to select feature groups with
+#'   preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
+#'   (de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
+#'   copied from the components to the \code{annotations} slot. If the adduct for a feature group is unknown, its
+#'   annotation is defaulted to the 'preferred' adduct, and hence, the feature group will never be removed. Furthermore,
+#'   if a component does not contain an annotation with the preferred adduct, the most intense feature group is selected
+#'   instead. Similarly, if no isotope annotation is available, the feature group is assumed to be monoisotopic and thus
+#'   not removed. An important advantage of \code{selectIons} is that it may considerably simplify your dataset.
+#'   Furthermore, the adduct assignments allow formula/compound annotation steps later in the workflow to improve their
+#'   annotation accuracy. On the other hand, it is important the componentization results are reliable. Hence, it is
+#'   highly recommended that, prior to calling \code{selectIons}, the settings to \code{\link{generateComponents}} are
+#'   optimized and its results are reviewed with \code{\link{checkComponents}}. Finally, the \code{adducts<-} method can
+#'   be used to manually correct adduct assignments afterwards if necessary.
+#'
+#' @param components The \code{components} object that was generated for the given \code{featureGroups} object.
+#'   Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
+#'   from \pkg{RAMClustR} and \pkg{cliqueMS}.
+#' @param prefAdduct The 'preferred adduct' (see method description). This is often \code{"[M+H]+"} or \code{"[M-H]-"}.
+#' @param onlyMonoIso Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. Feature groups
+#'   are never removed by this setting if no isotope annotations are available.
+#' @param chargeMismatch Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
+#'   values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignore adduct annotation), \code{"none"}
+#'   (ignore both annotations) and \code{"ignore"} (don't check for charge mismatches). \emph{Important}: when
+#'   \command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
+#'   Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.
+#'
+#' @return \code{selectIons} returns a \code{featureGroups} object with only the selected feature groups and amended
+#'   with adduct annotations.
+#'
 #' @export
 setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE,
                                                   chargeMismatch = "adduct")

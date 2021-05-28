@@ -32,7 +32,9 @@
 \alias{[,featureGroups,ANY,ANY,missing-method}
 \alias{[[,featureGroups,ANY,ANY-method}
 \alias{$,featureGroups-method}
+\alias{delete,featureGroups-method}
 \alias{export,featureGroups-method}
+\alias{getFCParams}
 \alias{as.data.table,featureGroups-method}
 \alias{plot,featureGroups,ANY-method}
 \alias{plotInt,featureGroups-method}
@@ -40,9 +42,12 @@
 \alias{plotChroms,featureGroups-method}
 \alias{plotVenn,featureGroups-method}
 \alias{plotUpSet,featureGroups-method}
+\alias{plotVolcano,featureGroups-method}
 \alias{unique,featureGroups-method}
 \alias{overlap,featureGroups-method}
 \alias{overlap}
+\alias{calculatePeakQualities,featureGroups-method}
+\alias{selectIons,featureGroups-method}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
@@ -119,7 +124,11 @@
 
 \S4method{$}{featureGroups}(x, name)
 
+\S4method{delete}{featureGroups}(obj, i = NULL, j = NULL, ...)
+
 \S4method{export}{featureGroups}(obj, type, out)
+
+getFCParams(rGroups, ...)
 
 \S4method{as.data.table}{featureGroups}(
   x,
@@ -191,9 +200,35 @@
 
 \S4method{plotUpSet}{featureGroups}(obj, which = NULL, nsets = length(which), nintersects = NA, ...)
 
+\S4method{plotVolcano}{featureGroups}(
+  obj,
+  FCParams,
+  showLegend = TRUE,
+  averageFunc = mean,
+  col = NULL,
+  pch = 19,
+  ...
+)
+
 \S4method{unique}{featureGroups}(x, which, relativeTo = NULL, outer = FALSE)
 
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive)
+
+\S4method{calculatePeakQualities}{featureGroups}(
+  obj,
+  weights,
+  flatnessFactor,
+  avgFunc = mean,
+  parallel = TRUE
+)
+
+\S4method{selectIons}{featureGroups}(
+  fGroups,
+  components,
+  prefAdduct,
+  onlyMonoIso = TRUE,
+  chargeMismatch = "adduct"
+)
 
 \S4method{sets}{featureGroupsSet}(obj)
 
@@ -264,24 +299,38 @@
 \S4method{unset}{featureGroupsSet}(obj, set)
 }
 \arguments{
-\item{areas}{If set to \code{TRUE} then areas are considered instead of peak
-intensities.}
+\item{areas}{If set to \code{TRUE} then areas are considered instead of peak intensities.
+
+  For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.}
 
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
-\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+\item{value}{For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The
+length should equal the number of feature groups. Can be named with feature group names to customize the assignment
+order.}
+
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
+analyses as numeric index, logical or character, \code{j} the feature groups as numeric index, logical or character. If either is
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
+feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
+\code{\dots} to \code{delete}. The return value of this function specifies the analyses of the features in the group to be removed (same format as \code{i}).}
 
-\item{\dots}{Ignored for \code{"["} operator or passed to
-\code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}),
-\code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
-plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
-(\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
+\item{\dots}{For the \code{"["} operator: ignored.
 
-\item{rGroups}{An optional \code{character} vector: if specified only keep
-results for the given replicate groups (equivalent to the \code{rGroups}
-argument to \code{\link[=filter,featureGroups-method]{filter}}).}
+  For \code{delete}: passed to the function specified as \code{j}.
+
+  For \code{getFCParams}: optional named arguments that override defaults.
+
+  Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
+  (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+  (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
+
+\item{rGroups}{For \code{[}: An optional \code{character} vector: if specified only keep results for the given
+  replicate groups (equivalent to the \code{rGroups} argument to \code{\link[=filter,featureGroups-method]{filter}}).
+
+  For \code{getFCParams}: a \code{character} vector with the names of the two replicate groups to be compared.}
 
 \item{drop}{ignored.}
 
@@ -289,52 +338,53 @@ argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{out}{The destination file for the exported data.}
 
-\item{average}{If \code{TRUE} then data within replicate groups are averaged.}
+\item{average}{If \code{TRUE} then data within replicate groups are averaged.
 
-\item{features}{If \code{TRUE} then feature specific data will be added. If
-\code{average=TRUE} this data will be averaged for each feature group.}
+  For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.}
 
-\item{regression}{Set to \code{TRUE} to add regression data for each feature
-group. For this a linear model is created (intensity/area [depending on
-\code{areas} argument] \emph{vs} concentration). The model concentrations
-(e.g. of a set of standards) is derived from the \code{conc} column of the
-\link[=analysis-information]{analysis information}. From this model the
-intercept, slope and R2 is added to the output. In addition, when
-\code{features=TRUE}, concentrations for each feature are added. Note that
-no regression information is added when no \code{conc} column is present in
-the analysis information or when less than two concentrations are specified
+\item{features}{If \code{TRUE} then feature specific data will be added. If \code{average=TRUE} this data will be
+averaged for each feature group.}
+
+\item{qualities}{Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
+both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
+\code{qualities=FALSE} then nothing is reported.}
+
+\item{regression}{Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
+created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
+(e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
+information}. From this model the intercept, slope and R2 is added to the output. In addition, when
+\code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
+no \code{conc} column is present in the analysis information or when less than two concentrations are specified
 (\emph{i.e.} the minimum amount).}
 
-\item{averageFunc}{Function used for averaging. Used when \code{average=TRUE}
-or \code{FCParams != NULL}}
+\item{averageFunc}{Function used for averaging.
 
-\item{normFunc}{Function that should be used for normalization of data. The
-function is called for all intensities/areas of a feature group and these
-quantities are divided by the result of the function call. For example,
-when \code{\link{max}} is used normalized intensities will be between zero
-and one. If all quantities are zero then the function will not be called.
-Set to \code{NULL} to perform no normalization.}
+for \code{as.data.table}: only used when \code{average=TRUE} or \code{FCParams != NULL}.}
 
-\item{colourBy}{Sets the automatic colour selection: \code{"none"} for a
-single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
-per replicate/feature group.}
+\item{normFunc}{Function that should be used for normalization of data. The function is called for all
+intensities/areas of a feature group and these quantities are divided by the result of the function call. For
+example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
+zero then the function will not be called. Set to \code{NULL} to perform no normalization.}
+
+\item{FCParams}{A parameter list to calculate Fold change data (see \code{getFCParams} and the
+\verb{Fold change calculation} section).
+
+For \code{as.data.table}: set to \code{NULL} to not perform FC calculations.}
+
+\item{colourBy}{Sets the automatic colour selection: \code{"none"} for a single colour or
+\code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.}
 
 \item{onlyUnique}{If \code{TRUE} and \code{colourBy="rGroups"} then only
 feature groups that are unique to a replicate group are plotted.}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 
-\item{showLegend}{If \code{TRUE} a legend will be shown with either replicate
-groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-"fGroups"}, only for \code{plotChroms}). If \code{colourBy} is
-\code{"none"} no legend will be shown.}
+\item{showLegend}{Plot a legend if \code{TRUE}.}
 
-\item{col}{Colour(s) used. If \code{col=NULL} then colours are automatically
-generated.}
+\item{col}{Colour(s) used. If \code{col=NULL} then colours are automatically generated.}
 
-\item{pch, type, lty}{Common plotting parameters passed to \emph{e.g.}
-\code{\link[graphics]{plot}}. For \code{plot}: if \code{pch=NULL} then
-values are automatically assigned.}
+\item{pch, type, lty}{Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
+if \code{pch=NULL} then values are automatically assigned.}
 
 \item{xnames}{Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.}
 
@@ -354,42 +404,40 @@ to disable outer groups.}
 \item{addIntraOuterGroupLinks}{If \code{TRUE} then links will be added within
 outer groups.}
 
-\item{rtWindow}{Retention time (in seconds) that will be subtracted/added to
-respectively the minimum and maximum retention time of the plotted feature
-groups. Thus, setting this value to a positive value will 'zoom out' on the
+\item{rtWindow}{Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
+retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
 retention time axis.}
 
-\item{topMost}{Only plot EICs from features within this number of top most
-intense analyses. If \code{NULL} then all analyses are used for plotted.}
+\item{mzExpWindow}{In case the \emph{m/z} window to plot an EIC for a particular analysis is not known (\emph{i.e.}
+no feature was detected of the feature group to be plot and \code{onlyPresent=FALSE}) then the EIC \emph{m/z} range
+is estimated from the range for the complete feature group and expanded by the offset defined by
+\code{mzExpWindow}.}
 
-\item{topMostByRGroup}{If set to \code{TRUE} and \code{topMost} is set: only
-plot EICs for the top most features in each replicate group. For instance,
-when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
+\item{topMost}{Only plot EICs from features within this number of top most intense analyses. If \code{NULL} then all
+analyses are used for plotted.}
+
+\item{topMostByRGroup}{If set to \code{TRUE} and \code{topMost} is set: only plot EICs for the top most features in
+each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
 plotted for the most intense feature of each replicate group.}
 
-\item{EICs}{Internal parameter for now and should be kept at \code{NULL}
-(default).}
+\item{EICs}{Internal parameter for now and should be kept at \code{NULL} (default).}
 
-\item{showPeakArea}{Set to \code{TRUE} to display integrated chromatographic
-peak ranges by filling (shading) their areas.}
+\item{showPeakArea}{Set to \code{TRUE} to display integrated chromatographic peak ranges by filling (shading) their
+areas.}
 
-\item{showFGroupRect}{Set to \code{TRUE} to mark the full retention/intensity
-range of all features within a feature group by drawing a rectangle around
-it.}
+\item{showFGroupRect}{Set to \code{TRUE} to mark the full retention/intensity range of all features within a feature
+group by drawing a rectangle around it.}
 
-\item{title}{Character string used for title of the plot. If \code{NULL} a
-title will be automatically generated.}
+\item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{onlyPresent}{If \code{TRUE} then EICs will only be generated for
-analyses in which a particular feature group was detected. Disabling this
-option might be useful to see if any features were 'missed'.}
+\item{onlyPresent}{If \code{TRUE} then EICs will only be generated for analyses in which a particular feature group
+was detected. Disabling this option might be useful to see if any features were 'missed'.}
 
-\item{annotate}{If set to \code{"ret"} and/or \code{"mz"} then retention
-and/or \emph{m/z} values will be drawn for each plotted feature group.}
+\item{annotate}{If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
+each plotted feature group.}
 
-\item{showProgress}{if set to \code{TRUE} then a text progressbar will be
-displayed when all EICs are being plot. Set to \code{"none"} to disable any
-annotation.}
+\item{showProgress}{if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
+to \code{"none"} to disable any annotation.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
@@ -398,13 +446,11 @@ annotation.}
 
   For plotting functions: set to \code{NULL} for all replicate groups.
 
-  For \code{plotVenn}: alternatively a named \code{list} containing elements
-  of \code{character} vectors with replicate groups to compare. For instance,
-  \code{which=list(infl = c("influent-A", "influent-B"), effl =
-  c("effluent-A", "effluent-B"))}, will compare the features in replicate
-  groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}. The
-  names of the list are used for labelling in the plot, and will be made
-  automatically if not specified.}
+  For \code{plotVenn}: alternatively a named \code{list} containing elements of \code{character} vectors with
+  replicate groups to compare. For instance, \code{which=list(infl = c("influent-A", "influent-B"), effl =
+  c("effluent-A", "effluent-B"))}, will compare the features in replicate groups \samp{"influent-A/B"} against those
+  in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
+  if not specified.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 
@@ -420,10 +466,36 @@ parameter.}
 \item{exclusive}{If \code{TRUE} then all feature groups are removed that are
 not unique to the given replicate groups.}
 
-\item{mzWindow}{The \emph{m/z} value (in Da) which will be subtracted/added
-to a feature group \emph{m/z} value to determine the width of its EIC.}
+\item{weights}{A named \code{numeric} vector that defines the weight for each score to calculate the
+\verb{totalScore}. The names of the vector follow the score names. Unspecified weights are defaulted to \samp{1}.
+Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.}
+
+\item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
+\code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.}
+
+\item{avgFunc}{The function used to average the peak qualities and scores for each feature group.}
+
+\item{components}{The \code{components} object that was generated for the given \code{featureGroups} object.
+Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
+from \pkg{RAMClustR} and \pkg{cliqueMS}.}
+
+\item{prefAdduct}{The 'preferred adduct' (see method description). This is often \code{"[M+H]+"} or \code{"[M-H]-"}.}
+
+\item{onlyMonoIso}{Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. Feature groups
+are never removed by this setting if no isotope annotations are available.}
+
+\item{chargeMismatch}{Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
+values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignore adduct annotation), \code{"none"}
+(ignore both annotations) and \code{"ignore"} (don't check for charge mismatches). \emph{Important}: when
+\command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
+Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
+
+\item{negate}{If set to \code{TRUE} then filtering operations are performed
+in opposite manner.}
 }
 \value{
+\code{delete} returns the object for which the specified data was removed.
+
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
   the utilized \pkg{\link{VennDiagram}} plotting function.
@@ -434,18 +506,24 @@ to a feature group \emph{m/z} value to determine the width of its EIC.}
 The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
+
+\code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
+
+\code{selectIons} returns a \code{featureGroups} object with only the selected feature groups and amended
+  with adduct annotations.
 }
 \description{
 This class holds all the information for grouped features.
 }
 \details{
-The \code{featureGroup} class is the workhorse of \pkg{patRoon}: almost all
-functionality operate on its instantiated objects. The class holds all
-information from grouped features (obtained from \code{\link{features}}).
-This class itself is \code{virtual}, hence, objects are not created directly
-from it. Instead, 'feature groupers' such as \code{\link{groupFeaturesXCMS}}
-return a \code{featureGroups} derived object after performing the actual
-grouping of features across analyses.
+The \code{featureGroup} class is the workhorse of \pkg{patRoon}: almost all functionality operate on its instantiated
+objects. The class holds all information from grouped features (obtained from \code{\link{features}}). This class
+itself is \code{virtual}, hence, objects are not created directly from it. Instead, 'feature groupers' such as
+\code{\link{groupFeaturesXCMS}} return a \code{featureGroups} derived object after performing the actual grouping of
+features across analyses.
+
+\code{getFCParams} creates a parameter \code{list} to calculate Fold changes (see the
+  \verb{Fold change calculation} section).
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -481,9 +559,10 @@ replicate groups for which data is present in this object.
 
 \item \code{annotations}: Accessor for \code{annotations} slot.
 
-\item \code{adducts}: Returns a named \code{character} with adducts assigned to each feature group.
+\item \code{adducts}: Returns a named \code{character} with adduct annotations assigned to each feature group (if
+available).
 
-\item \code{adducts<-}: Sets adducts for feature groups.
+\item \code{adducts<-}: Sets adduct annotations for feature groups.
 
 \item \code{[}: Subset on analyses/feature groups.
 
@@ -491,13 +570,15 @@ replicate groups for which data is present in this object.
 
 \item \code{$}: Extract intensity values for a feature group.
 
+\item \code{delete}: Completely deletes specified feature groups.
+
 \item \code{export}: Exports feature groups to a \file{.csv} file that
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 analyte database) or that is suitable as input for the \verb{Targeted peak
 detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 
-\item \code{as.data.table}: Obtain a summary table (a \code{\link{data.table}})
-with retention, \emph{m/z}, intensity and optionally other feature data.
+\item \code{as.data.table}: Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
+and optionally other feature data.
 
 \item \code{plot}: Generates an \emph{m/z} \emph{vs} retention time
 plot for all featue groups. Optionally highlights unique/overlapping
@@ -512,8 +593,7 @@ groups. In addition, analyses/replicates sharing similar properties
 (\emph{e.g.} location, age, type) may be grouped to enhance visualization
 between these 'outer groups'.
 
-\item \code{plotChroms}: Plots extracted ion chromatograms (EICs) of feature
-groups.
+\item \code{plotChroms}: Plots extracted ion chromatograms (EICs) of feature groups.
 
 \item \code{plotVenn}: plots a Venn diagram (using
 \pkg{\link{VennDiagram}}) outlining unique and shared feature groups
@@ -523,11 +603,37 @@ between up to five replicate groups.
 \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
 groups between given replicate groups.
 
+\item \code{plotVolcano}: Plots Fold change data in a 'Volcona plot'.
+
 \item \code{unique}: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).
 
 \item \code{overlap}: Obtain a subset with feature groups that overlap
 between a set of specified replicate group(s).
+
+\item \code{calculatePeakQualities}: Calculates peak and group qualities for all features and feature groups. The peak qualities
+(and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
+function}, and subsequentially averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
+\verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
+publication cited below for more details). Similarly to \code{\link{features}} method, these metrics are scored by
+normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+\verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
+\code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
+Pass/Fail ML models from \pkg{MetaClean}.
+
+\item \code{selectIons}: uses \link[=component-generation]{componentization} results to select feature groups with
+preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
+(de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
+copied from the components to the \code{annotations} slot. If the adduct for a feature group is unknown, its
+annotation is defaulted to the 'preferred' adduct, and hence, the feature group will never be removed. Furthermore,
+if a component does not contain an annotation with the preferred adduct, the most intense feature group is selected
+instead. Similarly, if no isotope annotation is available, the feature group is assumed to be monoisotopic and thus
+not removed. An important advantage of \code{selectIons} is that it may considerably simplify your dataset.
+Furthermore, the adduct assignments allow formula/compound annotation steps later in the workflow to improve their
+annotation accuracy. On the other hand, it is important the componentization results are reliable. Hence, it is
+highly recommended that, prior to calling \code{selectIons}, the settings to \code{\link{generateComponents}} are
+optimized and its results are reviewed with \code{\link{checkComponents}}. Finally, the \code{adducts<-} method can
+be used to manually correct adduct assignments afterwards if necessary.
 
 \item \code{sets}: Obtains the set names of this object.
 }}
@@ -535,26 +641,49 @@ between a set of specified replicate group(s).
 \section{Slots}{
 
 \describe{
-\item{\code{groups}}{Matrix (\code{\link{data.table}}) with intensities for each
-feature group (columns) per analysis (rows). Access with \code{groups}
-method.}
+\item{\code{groups}}{Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
+Access with \code{groups} method.}
 
-\item{\code{analysisInfo,features}}{\link[=analysis-information]{Analysis info} and
-\code{\link{features}} class associated with this object. Access with
-\code{analysisInfo} and \code{featureTable} methods, respectively.}
+\item{\code{analysisInfo,features}}{\link[=analysis-information]{Analysis info} and \code{\link{features}} class associated
+with this object. Access with \code{analysisInfo} and \code{featureTable} methods, respectively.}
 
-\item{\code{groupInfo}}{\code{data.frame} with retention time (\code{rts} column, in
-seconds) and \emph{m/z} (\code{mzs} column) for each feature group. Access
-with \code{groupInfo} method.}
+\item{\code{groupInfo}}{\code{data.frame} with retention time (\code{rts} column, in seconds) and \emph{m/z} (\code{mzs}
+column) for each feature group. Access with \code{groupInfo} method.}
 
-\item{\code{ftindex}}{Matrix (\code{\link{data.table}}) with feature indices for each
-feature group (columns) per analysis (rows). Each index corresponds to the
-row within the feature table of the analysis (see
+\item{\code{ftindex}}{Matrix (\code{\link{data.table}}) with feature indices for each feature group (columns) per analysis
+(rows). Each index corresponds to the row within the feature table of the analysis (see
 \code{\link{featureTable}}).}
 
-\item{\code{annotations}}{A (\code{\link{data.table}}) with adduct/isotope
-annotations for each group (see \code{\link{selectIons}}).}
+\item{\code{groupQualities,groupScores}}{A \code{\link{data.table}} with qualities/scores for each feature group (see the
+\code{calculatePeakQualities} method).}
+
+\item{\code{annotations}}{A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
+method).}
 }}
+
+\section{Fold change calculation}{
+ the \code{as.data.table} and \code{plotVolcano} methods can be used to
+  calculate/plot (log2) Fold changes (FC) between two replicate groups to easily identify significant changes. The
+  calculation process is configured through a pramater list, which can be constructed with the \code{getFCParams}
+  function. The parameter list has the following entries: \itemize{
+
+  \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
+  \code{getFCParams}).
+
+  \item \code{thresholdFC}: the threshold log FC for a feature group to be classified as increasing/decreasing.
+
+  \item \code{thresholdPV}: the threshold log P for a feature group to be significantly different.
+
+  \item \code{zeroMethod},\code{zeroValue}: how to handle zero values when calculating the FC: \code{add} adds an
+  offset to zero values, \code{"fixed"} sets zero values to a fixed number and \code{"omit"} removes zero data. The
+  number that is added/set by the former two options is defined by \code{zeroValue}.
+
+  \item \code{PVTestFunc}: a function that is used to calculate P values (usually using \code{\link{t.test}}).
+  
+  \item \code{PVAdjFunc}: a function that is used to adjust P values (usually using \code{\link{p.adjust}})
+
+  }
+}
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \itemize{         \item{\code{\link{featureGroupsScreeningSet}}}       }       \item{\code{\link{featureGroupsUnset}}}       \item{\code{\link{featureGroupsScreening}}}       \itemize{         \item{\code{\link{featureGroupsSetScreeningUnset}}}       }       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsKPIC2}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsSIRIUS}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
@@ -565,4 +694,9 @@ annotations for each group (see \code{\link{selectIons}}).}
 
 \insertRef{Conway2017}{patRoon} \cr\cr
   \insertRef{Lex2014}{patRoon}
+
+\insertRef{Chetnik2020}{patRoon}
+}
+\author{
+The code to calculate and plot Fold change data was created by Bas van de Velde.
 }

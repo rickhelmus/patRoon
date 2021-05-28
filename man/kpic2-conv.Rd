@@ -13,8 +13,10 @@
 \arguments{
 \item{obj}{The \code{features} object that should be converted.}
 
-\item{loadRawData, \dots}{Set to \code{TRUE} if analyses were exported as
-\code{mzXML} or \code{mzML} files (ignored by \code{featuresKPIC2} method).}
+\item{loadRawData}{Set to \code{TRUE} if analyses are available as \code{mzXML} or \code{mzML} files. Otherwise MS
+data is not loaded, and some dummy data (\emph{e.g.} file paths) is used in the returned object.}
+
+\item{\dots}{Ignored}
 }
 \description{
 Converts a \code{\link{features}} object to an \pkg{KPIC} object.

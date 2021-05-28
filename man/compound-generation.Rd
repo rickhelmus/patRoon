@@ -267,12 +267,9 @@ quite time consuming, especially for large feature group sets. Therefore,
 this is often one of the last steps within the workflow and not performed
 before feature groups have been prioritized.
 
-\code{generateCompounds} is a generic function that will generate compounds
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{generateCompoundsMetFrag} and
-  \code{generateCompoundsSIRIUS}. While these functions may be called directly,
-  \code{generateCompounds} provides a generic interface and is therefore usually
-  preferred.
+\code{generateCompounds} is a generic function that will generate compounds using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS}. While these
+  functions may be called directly, \code{generateCompounds} provides a generic interface and is therefore usually preferred.
 
 \code{compoundScorings} displays an overview of scorings may be
   applied to rank candidate compounds (see \verb{Scorings} section below).

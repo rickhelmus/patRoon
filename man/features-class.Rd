@@ -19,6 +19,7 @@
 \alias{[[,features,ANY,missing-method}
 \alias{$,features-method}
 \alias{delete,features-method}
+\alias{calculatePeakQualities,features-method}
 \alias{filter,featuresSet-method}
 \alias{featuresBruker-class}
 \alias{featuresBruker}
@@ -74,6 +75,8 @@
 
 \S4method{delete}{features}(obj, i = NULL, j = NULL, ...)
 
+\S4method{calculatePeakQualities}{features}(obj, weights, flatnessFactor, parallel = TRUE)
+
 \S4method{filter}{featuresSet}(obj, ..., negate = FALSE, sets = NULL)
 
 \S4method{delete}{featuresKPIC2}(obj, i = NULL, j = NULL, ...)
@@ -102,15 +105,26 @@ to skip this step.}
 \item{negate}{If set to \code{TRUE} then filtering operations are performed
 in opposite manner.}
 
-\item{i}{A numeric or character value which is used to select analyses by
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a scalar value.}
+(similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a scalar value.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
+analyses as numeric index, logical or character, \code{j} the features as numeric index (row) of the feature. If either is
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
+analysis, with the feature table (a \code{data.table}) as first argument, the analysis name as second argument, and any other arguments passed as
+\code{\dots} to \code{delete}. The return value of this function specifies the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
-\item{\dots}{Ignored.}
+\item{\dots}{For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.}
 
 \item{drop, j}{ignored.}
 
 \item{name}{The analysis name (partially matched).}
+
+\item{weights}{A named \code{numeric} vector that defines the weight for each score to calculate the
+\verb{totalScore}. The names of the vector follow the score names. Unspecified weights are defaulted to \samp{1}.
+Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.}
+
+\item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
+\code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.}
 }
 \value{
 \code{featureTable}: A \code{list} containing a
@@ -120,6 +134,10 @@ their index or name, respectively (for the order/names see \code{analyses()}).\c
   analysis name (\code{analysis}), its path (\code{path}), and other columns
   such as replicate group name (\code{group}) and blank reference
   (\code{blank}).
+
+\code{delete} returns the object for which the specified data was removed.
+
+\code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 }
 \description{
 Holds information for all features present within a set of analysis.
@@ -163,6 +181,14 @@ amounts of features.
 
 \item \code{delete}: Completely deletes specified features.
 
+\item \code{calculatePeakQualities}: Calculates peak qualities for each feature. This uses \pkg{\link{MetaClean}} \R package to
+calculate the following metrics: \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality},
+\verb{Symmetry}, \verb{Gaussian Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and
+\verb{Zig-Zag index}. Please see the \pkg{MetaClean} publication (referenced below) for more details. For each
+metric, an additional score is calculated by normalizing all feature values (unless the quality metric definition
+has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature
+is calculated by the (weighted) sum of all score values.
+
 \item \code{filter}: Performs common rule based filtering of features. Note
 that this (and much more) functionality is also provided by the
 \code{filter} method defined for \code{\link{featureGroups}}. However,
@@ -180,10 +206,17 @@ amounts of features.
 for access.}
 }}
 
+\note{
+For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the
+  \verb{Gaussian Similarity} metric, in which case it will be set to \samp{0}.
+}
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{features}}}}     \itemize{       \item{\code{\link{featuresSet}}}       \item{\code{\link{featuresUnset}}}       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresKPIC2}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresSAFD}}}       \item{\code{\link{featuresSIRIUS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}       \item{\code{\link{featuresXCMS3}}}     }   } }
 }
 
+\references{
+\insertRef{Chetnik2020}{patRoon}
+}
 \seealso{
 \code{\link{feature-finding}}
 }

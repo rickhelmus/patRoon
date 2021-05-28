@@ -134,6 +134,8 @@ treeCutDynamic(
 \item{\dots}{Any further method specific arguments. See method documentation
 for details.}
 
+\item{weights, flatnessFactor}{See method documentation.}
+
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
 

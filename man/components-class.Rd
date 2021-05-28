@@ -86,11 +86,17 @@
 \arguments{
 \item{obj, object, x}{The \code{component} object.}
 
-\item{i, j}{A numeric or character value which is used to select components/feature groups by
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.}
+(similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
+components as numeric index, logical or character, \code{j} the feature groups as numeric index/logical (relative to component) or character. If either is
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
+component, with the component (a \code{data.table}) as first argument, the component name as second argument, and any other arguments passed as
+\code{\dots} to \code{delete}. The return value of this function specifies the feature groups to be removed (same format as \code{j}).}
 
-\item{\dots}{For \code{plotChroms}: Further (optional) arguments passed to the
+\item{\dots}{For \code{delete}: passed to the function specified as \code{j}.
+
+  For \code{plotChroms}: Further (optional) arguments passed to the
   \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
   \code{topMost} arguments cannot be set as these are set by this method.
@@ -105,28 +111,26 @@ their index or name, respectively (for the order/names see \code{names()/groupNa
 
 \item{name}{The component name (partially matched).}
 
-\item{size}{Should be a two sized vector with the minimum/maximum size of a
-component. Set to \code{NULL} to ignore.}
+\item{size}{Should be a two sized vector with the minimum/maximum size of a component. Set to \code{NULL} to ignore.}
 
-\item{adducts}{Remove any feature groups within components that do not match
-given adduct rules. If \code{adducts} is a logical then only results are
-kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
-(\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more
-\code{\link{adduct}} objects (or something that can be converted to it with
-\code{\link{as.adduct}}) then only results are kept that match the given
+\item{adducts}{Remove any feature groups within components that do not match given adduct rules. If \code{adducts} is
+a logical then only results are kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
+(\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more \code{\link{adduct}} objects (or
+something that can be converted to it with \code{\link{as.adduct}}) then only results are kept that match the given
 adducts. Set to \code{NULL} to ignore this filter.}
 
-\item{isotopes}{Only keep results that match a given isotope rule. If
-\code{isotopes} is a logical then only results are kept with
-(\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope
-assignment. Otherwise \code{isotopes} should be a numeric vector with
-isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic results,
-\samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this
-filter.}
+\item{isotopes}{Only keep results that match a given isotope rule. If \code{isotopes} is a logical then only results
+are kept with (\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope assignment. Otherwise
+\code{isotopes} should be a numeric vector with isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic
+results, \samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this filter.}
 
-\item{rtIncrement, mzIncrement}{Should be a two sized vector with the
-minimum/maximum retention or mz increment of a homologous series. Set to
-\code{NULL} to ignore.}
+\item{rtIncrement, mzIncrement}{Should be a two sized vector with the minimum/maximum retention or mz increment of a
+homologous series. Set to \code{NULL} to ignore.}
+
+\item{checkComponentsSession}{If set then components and/or feature groups are removed that were selected for removal
+(see \link{check-GUI} and the \code{\link{checkComponents}} function). The value of \code{checkComponentsSession}
+should either by a path to the session file or \code{TRUE}, in which case the default session file name is used. If
+\code{negate=TRUE} then all non-selected data is removed instead.}
 
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
@@ -165,6 +169,8 @@ The subset operator (\code{"["}) and \code{filter} method return the
   The reason for this is that it is often very difficult or impossible to
   subset the algorithmic data.
 
+\code{delete} returns the object for which the specified data was removed.
+
 \code{consensus} returns a \code{components} object that is produced
   by merging multiple specified \code{components} objects.
 }
@@ -202,7 +208,7 @@ feature groups for which data is present in this object.
 
 \item \code{$}: Extracts a component table by component name.
 
-\item \code{delete}: Deletes (parts of) components
+\item \code{delete}: Completely deletes specified (parts of) components.
 
 \item \code{as.data.table}: Returns all component data in a table.
 
@@ -233,9 +239,8 @@ for each component. Use the \code{componentInfo} method for access.}
 }}
 
 \note{
-\code{filter} Applies only those filters for which a component has data
-  available. For instance, filtering by adduct will only filter any results
-  within a component if that component contains adduct information.
+\code{filter} Applies only those filters for which a component has data available. For instance, filtering by
+  adduct will only filter any results within a component if that component contains adduct information.
 }
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsSet}}}       \itemize{         \item{\code{\link{componentsNTSet}}}       }       \item{\code{\link{componentsUnset}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsFeatures}}}       \itemize{         \item{\code{\link{componentsCliqueMS}}}         \item{\code{\link{componentsOpenMS}}}       }       \item{\code{\link{componentsClust}}}       \itemize{         \item{\code{\link{componentsIntClust}}}         \item{\code{\link{componentsSpecClust}}}       }       \item{\code{\link{componentsNT}}}       \itemize{         \item{\code{\link{componentsNTUnset}}}       }       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsTPs}}}     }   } }

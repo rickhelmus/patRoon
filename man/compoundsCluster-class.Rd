@@ -68,7 +68,7 @@
 \item{use.names}{A logical value specifying whether the returned vector
 should be named with the feature group names.}
 
-\item{i}{A numeric or character value which is used to select feature groups by
+\item{i}{For \code{[}: A numeric or character value which is used to select feature groups by
 their index or name, respectively (for the order/names see \code{groupNames()}). Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.}
 

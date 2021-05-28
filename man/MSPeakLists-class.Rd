@@ -56,7 +56,6 @@
   deIsotopeMSMS = FALSE,
   withMSMS = FALSE,
   annotatedBy = NULL,
-  absMzDev = 0.002,
   retainPrecursorMSMS = TRUE,
   reAverage = FALSE,
   negate = FALSE
@@ -93,7 +92,7 @@ getDefIsolatePrecParams(...)
 \arguments{
 \item{obj, x, object}{The \code{\link{MSPeakLists}} object to access.}
 
-\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
@@ -140,9 +139,6 @@ presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 which MS/MS data is available. if \code{negate=TRUE} then only results
 \emph{without} MS/MS data will be retained.}
 
-\item{absMzDev}{Maximum deviation for \emph{m/z} alignment (in Da). Sets the
-\code{t} argument of \code{\link{SpectrumSimilarity}}.}
-
 \item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be
 filtered out from MS/MS peak lists (note that precursors are never removed
 from MS peak lists). The \code{negate} argument does not affect this
@@ -177,6 +173,9 @@ comparison should be made.}
 
 \item{doPlot}{Set to \code{TRUE} to make a head-to-tail plot. Otherwise only
 the similarity will be returned.}
+
+\item{absMzDev}{Maximum deviation for \emph{m/z} alignment (in Da). Sets the
+\code{t} argument of \code{\link{SpectrumSimilarity}}.}
 
 \item{relMinIntensity}{Relative intensity threshold. Sets the \code{b}
 argument of \code{\link{SpectrumSimilarity}}.}

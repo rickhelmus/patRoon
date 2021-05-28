@@ -88,7 +88,7 @@
 \item{features}{If \code{TRUE} returns formula data for features, otherwise
 for feature groups.}
 
-\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 

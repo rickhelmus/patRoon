@@ -227,12 +227,9 @@ that in both situations subsequent algorithms that use formula data (\emph{e.g.}
 \link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore, please
 note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
 
-\code{generateFormulas} is a generic function that will generate formulae
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{generateFormulasDA} and
-  \code{generateFormulasGenForm}. While these functions may be called directly,
-  \code{generateFormulas} provides a generic interface and is therefore usually
-  preferred.
+\code{generateFormulas} is a generic function that will generate formulae using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as \code{generateFormulasDA} and \code{generateFormulasGenForm}. While these
+  functions may be called directly, \code{generateFormulas} provides a generic interface and is therefore usually preferred.
 
 \code{generateFormulasDA} uses Bruker DataAnalysis to generate
   chemical formulae. This method supports scoring based on overlap between

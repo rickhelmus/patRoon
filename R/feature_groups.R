@@ -14,10 +14,16 @@ NULL
 #' features across analyses.
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
+#' @param rGroups For \code{[}: An optional \code{character} vector: if specified only keep results for the given
+#'   replicate groups (equivalent to the \code{rGroups} argument to \code{\link[=filter,featureGroups-method]{filter}}).
+#'
+#'   For \code{getFCParams}: a \code{character} vector with the names of the two replicate groups to be compared.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param \dots For the \code{"["} operator: ignored.
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
+#'
+#'   For \code{getFCParams}: optional named arguments that override defaults.
 #'
 #'   Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
 #'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
@@ -25,6 +31,9 @@ NULL
 #' @param average If \code{TRUE} then data within replicate groups are averaged.
 #'
 #'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
+#' @param averageFunc Function used for averaging.
+#'   
+#'   for \code{as.data.table}: only used when \code{average=TRUE} or \code{FCParams != NULL}.
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak intensities.
 #'
 #'   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.
@@ -42,9 +51,11 @@ NULL
 #'   if not specified.
 #' @param colourBy Sets the automatic colour selection: \code{"none"} for a single colour or
 #'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.
-#' @param showLegend If \code{TRUE} a legend will be shown with either replicate groups (\code{colourBy == "rGroups"})
-#'   or feature groups (\code{colourBy == "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is \code{"none"}
-#'   no legend will be shown.
+#' @param showLegend Plot a legend if \code{TRUE}.
+#' @param FCParams A parameter list to calculate Fold change data (see \code{getFCParams} and the
+#'   \verb{Fold change calculation} section).
+#'   
+#'   For \code{as.data.table}: set to \code{NULL} to not perform FC calculations.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -75,6 +86,30 @@ NULL
 #'   \code{calculatePeakQualities} method).
 #' @slot annotations A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
 #'   method).
+#'
+#' @section Fold change calculation: the \code{as.data.table} and \code{plotVolcano} methods can be used to
+#'   calculate/plot (log2) Fold changes (FC) between two replicate groups to easily identify significant changes. The
+#'   calculation process is configured through a pramater list, which can be constructed with the \code{getFCParams}
+#'   function. The parameter list has the following entries: \itemize{
+#'
+#'   \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
+#'   \code{getFCParams}).
+#'
+#'   \item \code{thresholdFC}: the threshold log FC for a feature group to be classified as increasing/decreasing.
+#'
+#'   \item \code{thresholdPV}: the threshold log P for a feature group to be significantly different.
+#'
+#'   \item \code{zeroMethod},\code{zeroValue}: how to handle zero values when calculating the FC: \code{add} adds an
+#'   offset to zero values, \code{"fixed"} sets zero values to a fixed number and \code{"omit"} removes zero data. The
+#'   number that is added/set by the former two options is defined by \code{zeroValue}.
+#'
+#'   \item \code{PVTestFunc}: a function that is used to calculate P values (usually using \code{\link{t.test}}).
+#'   
+#'   \item \code{PVAdjFunc}: a function that is used to adjust P values (usually using \code{\link{p.adjust}})
+#'
+#'   }
+#'   
+#' @author The code to calculate and plot Fold change data was created by Bas van de Velde.
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -274,9 +309,6 @@ setReplaceMethod("adducts", "featureGroups", function(obj, value)
 })
 
 #' @describeIn featureGroups Subset on analyses/feature groups.
-#' @param rGroups An optional \code{character} vector: if specified only keep
-#'   results for the given replicate groups (equivalent to the \code{rGroups}
-#'   argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, drop = TRUE)
 {
@@ -536,11 +568,13 @@ setMethod("export", "featureGroups", function(obj, type, out)
     }
 })
 
+#' @details \code{getFCParams} creates a parameter \code{list} to calculate Fold changes (see the
+#'   \verb{Fold change calculation} section).
+#' @rdname featureGroups-class
 #' @export
 getFCParams <- function(rGroups, ...)
 {
-    # FC params: rGroups, testFunc, method to handle zeros for FC (zeroMethod?), p.adjust function,
-    #    FC/PV significance limits
+    checkmate::assertCharacter(rGroups, min.chars = 1, len = 2, any.missing = FALSE)
     
     def <- list(rGroups = rGroups,
                 thresholdFC = 0.25,
@@ -567,7 +601,6 @@ getFCParams <- function(rGroups, ...)
 #'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
 #'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
-#' @param averageFunc Function used for averaging. Used when \code{average=TRUE} or \code{FCParams != NULL}
 #' @param normFunc Function that should be used for normalization of data. The function is called for all
 #'   intensities/areas of a feature group and these quantities are divided by the result of the function call. For
 #'   example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
@@ -1497,6 +1530,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 
+#' @describeIn featureGroups Plots Fold change data in a 'Volcona plot'.
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean, col = NULL,
                                                    pch = 19, ...)

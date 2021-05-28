@@ -158,22 +158,19 @@
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - check UIs and import functions
 - features
-    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
     - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
-    - mzWindow --> mzExpWindow
-    - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?
-    - session filter: argument and its order
-    - groupQualities/Scores slots
-    - GaussianSimilarity: NAs are made zero
-    - as.data.table: qualities argument
-    - calculatePeakQualities(), also generic
+    - check features
+        - session filter: argument and its order
+        - MC import/export
+        - session filters: TRUE will use default yml file name
+    - groupQualities/Scores
+        - slots
+        - GaussianSimilarity: NAs are made zero
+        - as.data.table: qualities argument
+        - calculatePeakQualities(), also generic
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
-    - MC import/export
-    - session filters: TRUE will use default yml file name
-    - xcms-conv
-        - set/... arg
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
@@ -232,6 +229,9 @@
     - suspects
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same
+    - features
+        - xcms-conv
+            - set/... arg
 - components
     - OpenMS: qTry == "feature" currently not supported
     - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
@@ -282,6 +282,7 @@
     - groupFeatures: feat arg --> obj
     - XMCS(3): `exportedData` --> `loadRawData`
     - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
+    - clarify reportCSV() now only reports remaining features?
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

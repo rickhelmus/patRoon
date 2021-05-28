@@ -7,13 +7,11 @@ NULL
 #'
 #' This class holds all the information for grouped features.
 #'
-#' The \code{featureGroup} class is the workhorse of \pkg{patRoon}: almost all
-#' functionality operate on its instantiated objects. The class holds all
-#' information from grouped features (obtained from \code{\link{features}}).
-#' This class itself is \code{virtual}, hence, objects are not created directly
-#' from it. Instead, 'feature groupers' such as \code{\link{groupFeaturesXCMS}}
-#' return a \code{featureGroups} derived object after performing the actual
-#' grouping of features across analyses.
+#' The \code{featureGroup} class is the workhorse of \pkg{patRoon}: almost all functionality operate on its instantiated
+#' objects. The class holds all information from grouped features (obtained from \code{\link{features}}). This class
+#' itself is \code{virtual}, hence, objects are not created directly from it. Instead, 'feature groupers' such as
+#' \code{\link{groupFeaturesXCMS}} return a \code{featureGroups} derived object after performing the actual grouping of
+#' features across analyses.
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
 #' @param retMin Plot retention time in minutes (instead of seconds).
@@ -25,31 +23,28 @@ NULL
 #'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average If \code{TRUE} then data within replicate groups are averaged.
-#' @param areas If set to \code{TRUE} then areas are considered instead of peak
-#'   intensities.
-#' @param pch,type,lty Common plotting parameters passed to \emph{e.g.}
-#'   \code{\link[graphics]{plot}}. For \code{plot}: if \code{pch=NULL} then
-#'   values are automatically assigned.
-#' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
-#'   generated.
+#' 
+#'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
+#' @param areas If set to \code{TRUE} then areas are considered instead of peak intensities.
+#' 
+#'   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.
+#' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
+#'   if \code{pch=NULL} then values are automatically assigned.
+#' @param col Colour(s) used. If \code{col=NULL} then colours are automatically generated.
 #' @param which A character vector with replicate groups used for comparison.
 #'
 #'   For plotting functions: set to \code{NULL} for all replicate groups.
 #'
-#'   For \code{plotVenn}: alternatively a named \code{list} containing elements
-#'   of \code{character} vectors with replicate groups to compare. For instance,
-#'   \code{which=list(infl = c("influent-A", "influent-B"), effl =
-#'   c("effluent-A", "effluent-B"))}, will compare the features in replicate
-#'   groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}. The
-#'   names of the list are used for labelling in the plot, and will be made
-#'   automatically if not specified.
-#' @param colourBy Sets the automatic colour selection: \code{"none"} for a
-#'   single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
-#'   per replicate/feature group.
-#' @param showLegend If \code{TRUE} a legend will be shown with either replicate
-#'   groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-#'   "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is
-#'   \code{"none"} no legend will be shown.
+#'   For \code{plotVenn}: alternatively a named \code{list} containing elements of \code{character} vectors with
+#'   replicate groups to compare. For instance, \code{which=list(infl = c("influent-A", "influent-B"), effl =
+#'   c("effluent-A", "effluent-B"))}, will compare the features in replicate groups \samp{"influent-A/B"} against those
+#'   in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
+#'   if not specified.
+#' @param colourBy Sets the automatic colour selection: \code{"none"} for a single colour or
+#'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.
+#' @param showLegend If \code{TRUE} a legend will be shown with either replicate groups (\code{colourBy == "rGroups"})
+#'   or feature groups (\code{colourBy == "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is \code{"none"}
+#'   no legend will be shown.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -67,21 +62,17 @@ NULL
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args
 #'
-#' @slot groups Matrix (\code{\link{data.table}}) with intensities for each
-#'   feature group (columns) per analysis (rows). Access with \code{groups}
-#'   method.
-#' @slot analysisInfo,features \link[=analysis-information]{Analysis info} and
-#'   \code{\link{features}} class associated with this object. Access with
-#'   \code{analysisInfo} and \code{featureTable} methods, respectively.
-#' @slot groupInfo \code{data.frame} with retention time (\code{rts} column, in
-#'   seconds) and \emph{m/z} (\code{mzs} column) for each feature group. Access
-#'   with \code{groupInfo} method.
-#' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each
-#'   feature group (columns) per analysis (rows). Each index corresponds to the
-#'   row within the feature table of the analysis (see
+#' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
+#'   Access with \code{groups} method.
+#' @slot analysisInfo,features \link[=analysis-information]{Analysis info} and \code{\link{features}} class associated
+#'   with this object. Access with \code{analysisInfo} and \code{featureTable} methods, respectively.
+#' @slot groupInfo \code{data.frame} with retention time (\code{rts} column, in seconds) and \emph{m/z} (\code{mzs}
+#'   column) for each feature group. Access with \code{groupInfo} method.
+#' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each feature group (columns) per analysis
+#'   (rows). Each index corresponds to the row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
-#' @slot annotations A (\code{\link{data.table}}) with adduct/isotope
-#'   annotations for each group (see \code{\link{selectIons}}).
+#' @slot annotations A (\code{\link{data.table}}) with adduct/isotope annotations for each group (see
+#'   \code{\link{selectIons}}).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -1154,38 +1145,32 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     circlize::circos.clear()
 })
 
-#' @describeIn featureGroups Plots extracted ion chromatograms (EICs) of feature
-#'   groups.
+#' @describeIn featureGroups Plots extracted ion chromatograms (EICs) of feature groups.
 #'
-#' @param rtWindow Retention time (in seconds) that will be subtracted/added to
-#'   respectively the minimum and maximum retention time of the plotted feature
-#'   groups. Thus, setting this value to a positive value will 'zoom out' on the
+#' @param rtWindow Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
+#'   retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
 #'   retention time axis.
-#' @param mzWindow The \emph{m/z} value (in Da) which will be subtracted/added
-#'   to a feature group \emph{m/z} value to determine the width of its EIC.
-#' @param topMost Only plot EICs from features within this number of top most
-#'   intense analyses. If \code{NULL} then all analyses are used for plotted.
-#' @param topMostByRGroup If set to \code{TRUE} and \code{topMost} is set: only
-#'   plot EICs for the top most features in each replicate group. For instance,
-#'   when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
+#' @param mzExpWindow In case the \emph{m/z} window to plot an EIC for a particular analysis is not known (\emph{i.e.}
+#'   no feature was detected of the feature group to be plot and \code{onlyPresent=FALSE}) then the EIC \emph{m/z} range
+#'   is estimated from the range for the complete feature group and expanded by the offset defined by
+#'   \code{mzExpWindow}.
+#' @param topMost Only plot EICs from features within this number of top most intense analyses. If \code{NULL} then all
+#'   analyses are used for plotted.
+#' @param topMostByRGroup If set to \code{TRUE} and \code{topMost} is set: only plot EICs for the top most features in
+#'   each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
 #'   plotted for the most intense feature of each replicate group.
-#' @param EICs Internal parameter for now and should be kept at \code{NULL}
-#'   (default).
-#' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic
-#'   peak ranges by filling (shading) their areas.
-#' @param showFGroupRect Set to \code{TRUE} to mark the full retention/intensity
-#'   range of all features within a feature group by drawing a rectangle around
-#'   it.
-#' @param title Character string used for title of the plot. If \code{NULL} a
-#'   title will be automatically generated.
-#' @param onlyPresent If \code{TRUE} then EICs will only be generated for
-#'   analyses in which a particular feature group was detected. Disabling this
-#'   option might be useful to see if any features were 'missed'.
-#' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention
-#'   and/or \emph{m/z} values will be drawn for each plotted feature group.
-#' @param showProgress if set to \code{TRUE} then a text progressbar will be
-#'   displayed when all EICs are being plot. Set to \code{"none"} to disable any
-#'   annotation.
+#' @param EICs Internal parameter for now and should be kept at \code{NULL} (default).
+#' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic peak ranges by filling (shading) their
+#'   areas.
+#' @param showFGroupRect Set to \code{TRUE} to mark the full retention/intensity range of all features within a feature
+#'   group by drawing a rectangle around it.
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param onlyPresent If \code{TRUE} then EICs will only be generated for analyses in which a particular feature group
+#'   was detected. Disabling this option might be useful to see if any features were 'missed'.
+#' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
+#'   each plotted feature group.
+#' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
+#'   to \code{"none"} to disable any annotation.
 #'
 #' @template plot-lim
 #'

@@ -19,7 +19,7 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 #                outPath = getWorkPath(), to = "mzXML", algorithm = "openms",
 #                logPath = NULL)
 epAnaInfo <- makeMZXMLs(anaInfoOne)
-ffEP <- findFeatures(epAnaInfo, "envipick")
+ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
 ffEmpty <- getTestFeatures(anaInfoOne, noiseThrInt = 1E9)
 
@@ -46,7 +46,7 @@ test_that("verify feature finder output", {
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),
                  OpenMSFTable(getTestFeatures(anaInfo,
-                                              extraOpts = list("-algorithm:common:noise_threshold_int" = 1000))))
+                                              extraOpts = list("-algorithm:common:noise_threshold_int" = 30000))))
 
     skip_if_not(doDATests())
     expect_known_value(featureTable(ffDA), testFile("ff-DA"))
@@ -66,8 +66,8 @@ test_that("verify show output", {
 
 test_that("verify empty object can be generated", {
     expect_length(ffEmpty, 0)
-    expect_length(suppressWarnings(findFeatures(anaInfoOne, "xcms", snthresh = 1E9)), 0)
-    expect_length(findFeatures(epAnaInfo, "envipick", minint = 1E8, maxint = 1E9), 0)
+    expect_length(suppressWarnings(findFeatures(anaInfoOne, "xcms", noise = 1E9)), 0)
+    expect_length(findFeatures(epAnaInfo, "envipick", minint = 1E8, maxint = 1E9, minpeak = 100), 0) # add minpeak to speed-up
 
     skip_if_not(doDATests())
     expect_length(ffDAEmpty, 0)

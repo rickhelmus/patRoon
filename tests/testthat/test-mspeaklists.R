@@ -337,6 +337,7 @@ if (testWithSets())
 {
     fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
     plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet, "mzr")
+    plotSetSpecFG <- groupNames(setObjects(plistsMSMS)[[2]])[12]
 }
 
 test_that("sets functionality", {
@@ -351,10 +352,10 @@ test_that("sets functionality", {
     expect_setequal(groupNames(unset(plistsOneEmptySet, "positive")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
     expect_length(unset(plistsOneEmptySet, "negative"), 0)
     
-    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
+    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = plotSetSpecFG,
                                                            MSLevel = 2, perSet = FALSE))
-    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
+    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = plotSetSpecFG,
                                                                   MSLevel = 2, perSet = TRUE, mirror = FALSE))
-    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[7],
+    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = plotSetSpecFG,
                                                                   MSLevel = 2, perSet = TRUE, mirror = TRUE))
 })

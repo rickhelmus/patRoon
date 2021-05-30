@@ -1,1 +1,1 @@
-A compoundsSet objectHierarchy:compounds,workflowStepSet    |-- compoundsSet      |-- compoundsConsensusSet---Algorithm: metfrag-setNumber of feature groups with compounds in this object: 9Number of compounds: 9 (total), 1.0 (mean), 1 - 1 (min - max)Sets: positive, negative
+A compoundsSet objectHierarchy:compounds,workflowStepSet    |-- compoundsSet      |-- compoundsConsensusSet---Algorithm: metfrag-setNumber of feature groups with compounds in this object: 8Number of compounds: 8 (total), 1.0 (mean), 1 - 1 (min - max)Sets: positive, negative

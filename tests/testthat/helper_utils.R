@@ -8,7 +8,7 @@ getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaIn
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
 {
-    fGroups <- doScreen(getTestFGroups(getTestAnaInfoAnn()), patRoonData::suspectsPos, onlyHits = TRUE)
+    fGroups <- doScreen(getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 1E4), patRoonData::suspectsPos, onlyHits = TRUE)
     # just focus on few targets also present in MF test DB
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
@@ -30,17 +30,15 @@ if (testWithSets())
         return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
     }
     getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), doFilter = TRUE, ...)
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
     {
         an <- isAnaInfoNeg(anaInfo)
         if (any(an))
-            ret <- makeSet(findFeatures(anaInfo[!an, ], "openms", ...),
-                           findFeatures(anaInfo[an, ], "openms", ...),
+            ret <- makeSet(findFeatures(anaInfo[!an, ], "openms", noiseThrInt = noiseThrInt, ...),
+                           findFeatures(anaInfo[an, ], "openms", noiseThrInt = noiseThrInt, ...),
                            adducts = c("[M+H]+", "[M-H]-"))
         else
-            ret <- makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+")
-        if (doFilter)
-            ret <- filter(ret, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
+            ret <- makeSet(findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...), adducts = "[M+H]+")
         return(ret)
         
     }
@@ -90,11 +88,9 @@ if (testWithSets())
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
     getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), doFilter = TRUE, ...)
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
     {
-        ret <- findFeatures(anaInfo, "openms", ...)
-        if (doFilter)
-            ret <- filter(ret, absMinIntensity = 5E4) # reduce a bit as we don't need all of them for testing...
+        ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
         return(ret)
     }
     

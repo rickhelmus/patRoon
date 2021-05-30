@@ -1,1 +1,1 @@
-A transformationProductsLibrary objectHierarchy:transformationProducts    |-- transformationProductsLibrary---Algorithm: libraryParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Linuron, Venlafaxine (6 total)Total TPs: 41
+A transformationProductsLibrary objectHierarchy:transformationProducts    |-- transformationProductsLibrary---Algorithm: libraryParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Venlafaxine (5 total)Total TPs: 33

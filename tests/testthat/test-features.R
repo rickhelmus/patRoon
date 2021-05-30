@@ -6,8 +6,8 @@ anaInfo <- getTestAnaInfo()
 anaInfoOne <- getTestAnaInfo()[4, ]
 
 ffOpenMS <- getTestFeatures(anaInfo)
-ffXCMS <- findFeatures(anaInfoOne, "xcms")
-ffXCMS3 <- findFeatures(anaInfoOne, "xcms3")
+ffXCMS <- findFeatures(anaInfoOne, "xcms", noise = 3E4)
+ffXCMS3 <- findFeatures(anaInfoOne, "xcms3", xcms::CentWaveParam(noise = 3E4))
 # UNDONE: ignore warnings about clusters...
 ffKPIC2 <- withCallingHandlers(findFeatures(anaInfoOne, "kpic2", level = 1E5),
                                warning = function(w) if (grepl("number of clusters", w, fixed = TRUE)) invokeRestart("muffleWarning"))

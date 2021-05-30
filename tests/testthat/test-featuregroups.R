@@ -2,7 +2,7 @@ context("feature groups")
 
 initXCMS()
 
-fList <- getTestFeatures()
+fList <- getTestFeatures(noiseThrInt = 1E5)
 
 fgOpenMS <- groupFeatures(fList, "openms")
 # BUG: old XCMS obiwarp doesn' work with non sets test data
@@ -15,7 +15,7 @@ fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first ana
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
 # modify replicate groups so we can test averaging
 anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "standard-2", "standard-2")
-fListConc <- findFeatures(anaInfoConc, "openms")
+fListConc <- getTestFeatures(anaInfoConc)
 fgOpenMSConc <- groupFeatures(fListConc, "openms")
 
 fListEmpty <- getEmptyFeatures()

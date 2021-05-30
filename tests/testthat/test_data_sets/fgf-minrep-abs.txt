@@ -1,1 +1,1 @@
-Applying minimum replicates filter... Done! Filtered 579 (21.17%) features and 242 (39.48%) feature groups. Remaining: 2156 features in 371 groups.
+Applying minimum replicates filter... Done! Filtered 222 (37.88%) features and 91 (57.59%) feature groups. Remaining: 364 features in 67 groups.

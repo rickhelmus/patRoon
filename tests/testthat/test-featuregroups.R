@@ -515,7 +515,7 @@ test_that("sets functionality", {
     expect_lt(length(filter(fgOpenMS, relMinSets = 1)), length(fgOpenMS))
     expect_setequal(adducts(fgOpenMS, set = "negative"), "[M-H]-")
     
-    expect_equal(adducts(fgOpenMSDiffAdduct, set = "positive")[names(fgOpenMSDiffAdduct)[3]], "[M+K]+",
+    expect_equal(adducts(fgOpenMSDiffAdduct, set = "positive")[names(fgOpenMSDiffAdduct[, sets = "positive"])[3]], "[M+K]+",
                  check.attributes = FALSE)
     expect_false(length(fgOpenMSDiffAdductRG) == length(fgOpenMS)) # different adducts: different grouping
     expect_setequal(adducts(fgOpenMSDiffAdductRG, set = "positive"), "[M+K]+")

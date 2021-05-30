@@ -1,1 +1,1 @@
-A componentsIntClust objectHierarchy:componentsClust    |-- componentsIntClust---Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (11 total)Number of unique feature groups in this object: 50Size of components: 50 (total), 4.5 (mean), 1 - 12 (min - max)
+A componentsIntClust objectHierarchy:componentsClust    |-- componentsIntClust---Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (11 total)Number of unique feature groups in this object: 50Size of components: 50 (total), 4.5 (mean), 1 - 10 (min - max)

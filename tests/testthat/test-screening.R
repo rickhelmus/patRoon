@@ -14,7 +14,7 @@ susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := convertToFormulaBabel(SMILES, "smi")]
 
-fGroups <- getTestFGroups(getTestAnaInfoAnn(), doFilter = FALSE, noiseThrInt = 1E4) # UNDONE
+fGroups <- getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 1E4)
 fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
 fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))

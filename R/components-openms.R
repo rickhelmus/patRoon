@@ -15,7 +15,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                                                                 qTry = "heuristic",
                                                                 potentialAdducts = defaultOpenMSAdducts(ionization),
                                                                 minRTOverlap = 0.66, retWindow = 1,
-                                                                mzWindow = 0.005, minSize = 2,
+                                                                absMzDev = 0.005, minSize = 2,
                                                                 relMinAdductAbundance = 0.75,
                                                                 adductConflictsUsePref = TRUE,
                                                                 NMConflicts = c("preferential", "mostAbundant", "mostIntense"),
@@ -29,7 +29,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     checkmate::assertChoice(qTry, c("heuristic", "all"))
     checkmate::assertNumeric(potentialAdducts, lower = 0, upper = 1, any.missing = FALSE, min.len = 2,
                              names = "unique", add = ac)
-    aapply(checkmate::assertNumber, . ~ retWindow + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
+    aapply(checkmate::assertNumber, . ~ retWindow + absMzDev + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertNumber(minRTOverlap, lower = 0, upper = 1, add = ac)
     checkmate::assertFlag(adductConflictsUsePref, add = ac)
@@ -56,7 +56,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     
     params <- list(ionization = ionization, chargeMin = chargeMin, chargeMax = chargeMax, chargeSpan = chargeSpan,
                    qTry = qTry, potentialAdducts = pa, minRTOverlap = minRTOverlap,
-                   retWindow = retWindow, mzWindow = mzWindow, extraOpts = extraOpts)
+                   retWindow = retWindow, absMzDev = absMzDev, extraOpts = extraOpts)
     baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
     printf("Annotating all features with OpenMS for %d analyses ...\n", nrow(anaInfo))
@@ -96,7 +96,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
         return(c(cmd, list(outFile = outFile), cmdMAD))
     }, logSubDir = "openms", cacheName = "componentsOpenMS")
     
-    return(componentsOpenMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+    return(componentsOpenMS(fGroups = fGroups, absMzDev = absMzDev, minSize = minSize,
                             relMinAdductAbundance = relMinAdductAbundance,
                             adductConflictsUsePref = adductConflictsUsePref, NMConflicts = NMConflicts,
                             prefAdducts = prefAdducts, featureComponents = featComponents))
@@ -111,7 +111,7 @@ setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ...)
 
 
 getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMax, chargeSpan, qTry,
-                                potentialAdducts, minRTOverlap, retWindow, mzWindow, extraOpts)
+                                potentialAdducts, minRTOverlap, retWindow, absMzDev, extraOpts)
 {
     boolToChr <- function(b) if (b) "true" else "false"
     
@@ -127,7 +127,7 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_span_max" = chargeSpan,
                      "-algorithm:MetaboliteFeatureDeconvolution:q_try" = qTry,
                      "-algorithm:MetaboliteFeatureDeconvolution:retention_max_diff" = retWindow,
-                     "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = mzWindow,
+                     "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = absMzDev,
                      "-algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap" = minRTOverlap)
     
     if (!is.null(extraOpts))

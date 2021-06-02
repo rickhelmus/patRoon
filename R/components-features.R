@@ -6,7 +6,7 @@ NULL
 componentsFeatures <- setClass("componentsFeatures", slots = c(featureComponents = "list"),
                                contains = "components")
 
-setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize, mzWindow, relMinAdductAbundance,
+setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize, absMzDev, relMinAdductAbundance,
                                                        adductConflictsUsePref, NMConflicts, prefAdducts,
                                                        featureComponents = list(), ...)
 {
@@ -88,7 +88,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
         
         usedGroups[ct$group] <<- TRUE
         
-        if (!allSame(ct$neutralMass, function(x1, x2) numLTE(abs(x1 - x2), mzWindow)))
+        if (!allSame(ct$neutralMass, function(x1, x2) numLTE(abs(x1 - x2), absMzDev)))
         {
             # conflict in neutral masses --> only retain those with most abundant neutral mass
             # UNDONE: handle ties?
@@ -98,7 +98,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
             
             # since we must work with mass tolerances, first cluster presumably masses together
             hc <- fastcluster::hclust(dist(ct$neutralMass))
-            ct[, clust := cutree(hc, h = mzWindow)]
+            ct[, clust := cutree(hc, h = absMzDev)]
             ct[, clust_size := .N, by = "clust"]
             
             for (cnf in NMConflicts)

@@ -49,11 +49,23 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # Filter adducts not abundantly assigned to same feature group
     cmpTab <- cmpTab[is.na(abundance) | numGTE(abundance, relMinAdductAbundance)]
     
-    # Only keep the preferential or most abundantly assigned adduct for each feature group
+    if (adductConflictsUsePref && length(prefAdducts) > 0)
+    {
+        # for fGroups with features that have a preferential adduct: remove all others or ones that are lower ranked
+        cmpTab[!is.na(adduct_ion), prefInd := match(adduct_ion, prefAdducts, nomatch = length(prefAdducts) + 1),
+               by = "group"]
+        cmpTab[, keep := is.na(adduct_ion) | prefInd == min(prefInd), by = "group"]
+        browser()
+        # NOTE: below leaves features untouched if none of the adducts are preferential, since prefInd will be the same
+        # for all and thus all are equal to min(prefInd)
+        cmpTab <- cmpTab[is.na(adduct_ion) | prefInd == min(prefInd), by = "group"][, -"prefInd"]
+    }
+    
+    # Only the most abundantly assigned adduct for each feature group. NOTE: if preferential adducts were selected above
+    # then these are now always the most abundant.
     # UNDONE: handle ties?
     cmpTab[!is.na(adduct_ion), keep :=
-               uniqueN(adduct_ion) == 1 | (adductConflictsUsePref & adduct_ion %chin% prefAdducts) |
-               adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
+               uniqueN(adduct_ion) == 1 | adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
     cmpTab <- cmpTab[is.na(adduct_ion) | keep == TRUE][, keep := NULL]
 
     # Start making group components; for each feature group:
@@ -92,7 +104,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
             for (cnf in NMConflicts)
             {
                 bestCL <- integer()
-                if (cnf == "preferential")
+                if (cnf == "preferential" && length(prefAdducts) > 0)
                 {
                     ct[, prefAdductMatch := match(adduct_ion, prefAdducts, nomatch = length(prefAdducts) + 1),
                        by = "clust"]

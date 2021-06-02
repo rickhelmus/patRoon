@@ -168,7 +168,6 @@
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
     - mention mz column can now be NA
-    - form/compRanks: not updated when subsetting on sets
     - logPath for annotateSuspects()
 - annotation
     - add note scoreRanges original values of slot for compounds
@@ -226,6 +225,7 @@
     - suspects
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same
+        - form/compRanks: not updated when subsetting on sets
     - features
         - groupFeatures: align doesn't work for sets with KPIC/XCMS
         - xcms-conv

@@ -151,10 +151,10 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
-    - finish featureAnnotations class
     - update adduct default: check adduct annotations
     - references for FC calculation?
     - refer to OrgMassSpecR for cosine MS/MS similarity?
+    - components: add class hierarchies to new classes
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -172,6 +172,7 @@
     - form/compRanks: not updated when subsetting on sets
     - logPath for annotateSuspects()
 - annotation
+    - add note scoreRanges original values of slot for compounds
     - absAlignMzDev
     - as.data.table(formulas, average=T): now removes most cols
     - formulasDA: update that MSPeakLists now is necessary (obtained via FFM PLs)

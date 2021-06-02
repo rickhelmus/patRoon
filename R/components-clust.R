@@ -53,6 +53,9 @@ verifyCompNotAltered <- function(obj)
 #' @template components_noint
 #' @template components-altered-note
 #' 
+#' @templateVar class componentsClust
+#' @template class-hierarchy
+#' 
 #' @export
 componentsClust <- setClass("componentsClust",
                             slots = c(distm = "dist", clust = "hclust",

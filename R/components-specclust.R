@@ -11,6 +11,9 @@ NULL
 #'
 #' @seealso \code{\link{componentsClust}} for other relevant methods and \link{component-generation}
 #'
+#' @templateVar class componentsSpecClust
+#' @template class-hierarchy
+#'
 #' @export
 componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClust")
 

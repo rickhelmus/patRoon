@@ -51,7 +51,8 @@ verifyCompNotAltered <- function(obj)
 #' @seealso \code{\link{components}} and \link{component-generation}
 #'
 #' @template components_noint
-#'
+#' @template components-altered-note
+#' 
 #' @export
 componentsClust <- setClass("componentsClust",
                             slots = c(distm = "dist", clust = "hclust",

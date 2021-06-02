@@ -188,7 +188,6 @@
 - components
     - cliqueMS
         - mention fork is needed?
-    - update docs for reduced removal: only clust affected, remove note about reduced
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses

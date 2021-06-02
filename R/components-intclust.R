@@ -20,6 +20,9 @@ NULL
 #'
 #' @seealso \code{\link{componentsClust}} for other relevant methods and \link{component-generation}
 #'
+#' @templateVar class componentsIntClust
+#' @template class-hierarchy
+#'
 #' @export
 componentsIntClust <- setClass("componentsIntClust",
                                slots = c(clusterm = "matrix"),

@@ -154,7 +154,6 @@
     - update adduct default: check adduct annotations
     - references for FC calculation?
     - refer to OrgMassSpecR for cosine MS/MS similarity?
-    - components: add class hierarchies to new classes
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)

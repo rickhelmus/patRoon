@@ -1,6 +1,6 @@
 # BUG: need another block (in this case @param) before brew code block to avoid useless warnings about missing title/description
 
-#' @param <%=if (!exists("selj")) "drop,j" else "drop" %> ignored.
+#' @param <%=if (!exists("selj") && !exists("del")) "drop,j" else "drop" %> ignored.
 #' 
 #' <% fmt <- "@param { vars } For { ops }: A numeric or character value which is used to select { sel } by
 #' their index or name, respectively (for the order/names see \\code{{{ selOrder }}})." %>

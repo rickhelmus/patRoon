@@ -150,7 +150,6 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     }
     
     return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))
-    return(obj)
 })
 
 #' @describeIn compounds Adds formula ranking data from a \code{\link{formulas}}

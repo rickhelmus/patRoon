@@ -52,6 +52,7 @@
         - change checkPackage GH link once PRs are merged
         - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
             - Perhaps just document limitation?
+        - maxCharge --> chargeMax (same as OpenMS)? update docs
     - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
     - OpenMS: handle potentialAdducts per set
     - prefAdducts: also include eg Na by default?
@@ -139,6 +140,7 @@
     - peak qualities
         - filter (once implemented)
     - as.data.table: normalization?
+- components: somehow verify adductConflictsUsePref
 
 
 
@@ -169,12 +171,7 @@
     - form/compRanks: not updated when subsetting on sets
     - logPath for annotateSuspects()
 - annotation
-    - minMSMSPeaks and annotatedBy MSPeakLists filters
-    - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
     - absAlignMzDev
-    - compounds vs formulas formats?
-        - formulas: each line is the best candidate from an analysis/set
-    - set ranking: same as compounds consensus (but no weights (yet))
     - as.data.table(formulas, average=T): now removes most cols
     - formulasDA: update that MSPeakLists now is necessary (obtained via FFM PLs)
     - new/changed as.data.table args
@@ -185,6 +182,14 @@
     - MSPL
         - reAverage for subset/filter
         - ID column, used by fragInfo
+        - minMSMSPeaks and annotatedBy MSPeakLists filters
+        - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
+- components
+    - cliqueMS
+        - mention fork is needed?
+    - OpenMS/cliqueMS adducts?
+    - update docs for reduced removal: only clust affected, remove note about reduced
+    - extraOpts --> `...` for nontarget
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses
@@ -218,6 +223,7 @@
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
         - @export multi methods?
         - algo consensus: done on setObjects
+        - set ranking: same as compounds consensus (but no weights (yet))
     - suspects
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same
@@ -225,12 +231,6 @@
         - groupFeatures: align doesn't work for sets with KPIC/XCMS
         - xcms-conv
             - set/... arg
-- components
-    - OpenMS: qTry == "feature" currently not supported
-    - OpenMS: adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
-    - OpenMS/cliqueMS adducts?
-    - update docs for reduced removal: only clust affected, remove note about reduced
-    - extraOpts --> `...` for nontarget
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR

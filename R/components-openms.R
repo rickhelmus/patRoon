@@ -2,6 +2,35 @@
 #' @include components-features.R
 NULL
 
+#' @details \code{generateComponentsOpenMS} uses the
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+#'    utility (see \url{http://www.openms.de}) to generate components. Features that show highly similar chromatographic
+#'   elution profiles are grouped, and subsequently annotated with their adducts.
+#'
+#' @param chargeMin,chargeMax The minimum/maximum charge to consider. Corresponds to the
+#'   \command{algorithm:MetaboliteFeatureDeconvolution:charge_min}/\command{algorithm:MetaboliteFeatureDeconvolution:charge_min}
+#'    options.
+#' @param chargeSpan The maximum charge span for a single analyte. Corresponds to
+#'   \command{algorithm:MetaboliteFeatureDeconvolution:charge_span_max}.
+#' @param qTry Sets how charges are determined. Corresponds to \command{algorithm:MetaboliteFeatureDeconvolution:q_try}.
+#'   Valid options are \code{"heuristic"} and \code{"all"} (the \code{"feature"} option from \command{OpenMS} is
+#'   currently not supported).
+#' @param potentialAdducts The adducts to consider. Should be a \code{numeric} vector with probabilities for each
+#'   adduct, \emph{e.g.} \code{potentialAdducts=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2)}. Note that the sum of probabilities
+#'   should always be \samp{1}. Furthermore, note that additions of multiple adducts should be controlled by the
+#'   \code{chargeMin}/\code{chargeMax} arguments (and \emph{not} with \code{potentialAdducts}), \emph{e.g.} if
+#'   \code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
+#'   \command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+#'    for more details. The defaults adducts to consider in \pkg{patRoon} (which are \emph{not} the same as
+#'   \command{OpenMS}) can be ontained with \code{defaultOpenMSAdducts}.
+#' @param minRTOverlap,retWindow Sets feature retention tolerances when grouping features. Sets the
+#'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
+#'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.
+#'
+#' @references \insertRef{Bielow2010}{patRoon}
+#'
+#' @rdname component-generation
 #' @export
 componentsOpenMS <- setClass("componentsOpenMS", contains = "componentsFeatures")
 
@@ -141,6 +170,8 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
                 args = c(settingsArgs, "-in", inFile, "-out_cm", outFile)))
 }
 
+#' @details \code{defaultOpenMSAdducts} returns the default adducts and their probabilities when the OpenMS algorithm is
+#'   used for componentization. See the \code{potentialAdducts} argument for more details.
 #' @rdname component-generation
 #' @export
 defaultOpenMSAdducts <- function(ionization)

@@ -49,6 +49,44 @@ getDefIsolatePrecParamsRD <- function()
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
+#' MS spectral similarity calculation parameters
+#'
+#' Parameters relevant for calculation of similarities between mass spectra.
+#'
+#' For the calculation of spectral similarities the following parameters exist:
+#'
+#' \itemize{
+#'
+#' \item \code{method} The similarity method: either \code{"cosine"} or \code{"jaccard"}.
+#'
+#' \item \code{removePrecursor} If \code{TRUE} then precursor peaks (\emph{i.e.} the mass peak corresponding to the
+#' feature) are removed prior to similarity calculation.
+#'
+#' \item \code{mzWeight},\code{intWeight} Mass and intensity weights used for cosine calculation.
+#'
+#' \item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra.
+#'
+#' \item \code{relMinIntensity} The minimum intensity for mass peaks. Peaks with lower intensities are not considered
+#' for similarity calculation.
+#'
+#' \item \code{minPeaks} Only consider spectra that have at least this amount of peaks.
+#'
+#' \item \code{shift} If and how shifting is applied prior to similarity calculation. Valid options are: \code{"none"}
+#' (no shifting), \code{"precursor"} (all mass peaks of the second spectrum are shifted by the mass difference between
+#' the precursors of both spectra) or \code{"both"} (the spectra are first binned without shifting, and peaks still
+#' unaligned are then shifted as is done when \code{shift="precursor"}).
+#'
+#' \item \code{setCombinedMethod} TBD.
+#'
+#' }
+#'
+#' These parameters are typically passed as a named \code{list} as the \code{specSimParams} argument to functions that
+#' do spectral similarity calculations. The \code{getDefSpecSimParams} function can be used to generate such parameter
+#' list with defaults.
+#'
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @name specSimParams
 #' @export
 getDefSpecSimParams <- function(...)
 {

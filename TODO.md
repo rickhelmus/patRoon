@@ -154,6 +154,7 @@
     - finish featureAnnotations class
     - update adduct default: check adduct annotations
     - references for FC calculation?
+    - refer to OrgMassSpecR for cosine MS/MS similarity?
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -224,6 +225,7 @@
         - @export multi methods?
         - algo consensus: done on setObjects
         - set ranking: same as compounds consensus (but no weights (yet))
+        - setCombinedMethod for specSimParams
     - suspects
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same

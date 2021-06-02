@@ -676,6 +676,8 @@ NULL
 #'
 #'   For \code{generateComponentsOpenMS}: Sets the \command{algorithm:MetaboliteFeatureDeconvolution:mass_max_diff}
 #'   option.
+#' @param method Clustering method that should be applied (passed to
+#'   \code{\link[hclust:fastcluster]{fastcluster::hclust}}).
 #' @param relMinAdductAbundance The minimum relative abundance (\samp{0-1}) that an adduct should be assigned to
 #'   features within the same feature group. See the \verb{Feature components} section for more details.
 #' @param adductConflictsUsePref If set to \code{TRUE}, and not all adduct assigments to the features within a feature
@@ -688,6 +690,8 @@ NULL
 #'   will be executed in the given order until one succeeds. See the \verb{Feature components} section for more details.
 #' @param prefAdducts A \code{character} vector with one or more \emph{preferential adducts}. See the \verb{Feature
 #'   components} section for more details.
+#'
+#' @template dynamictreecut
 #'
 #' @section Feature components: Components resulting from \code{generateComponentsCliqueMS} and
 #'   \code{generateComponentsOpenMS} are based on so called \emph{feature components}. Unlike other algorithms,
@@ -722,13 +726,16 @@ NULL
 #'   }
 #'
 #' @return A \code{\link{components}} (derived) object containing all generated components. The algorithms based on
-#'   'feature components' return a \code{\link{componentsFeatures}} derived object.
+#'   'feature components' return a \code{\link{componentsFeatures}} derived object. \code{generateComponentsIntClust}
+#'   and generateComponentsSpecClust return objects dervied from \code{\link{componentsSpecClust}}.
 #'
 #' @note For \code{generateComponentsCAMERA} and \code{generateComponentsRAMClustR}: the \code{minSize} and
 #'   \code{relMinReplicates} arguments provide additional filtering functionality not provided by \pkg{CAMERA} or
 #'   \pkg{RAMClustR} (except \code{minSize}). Note that these filters are enabled by default, hence, final results may
 #'   be different than what CAMERA/RAMClustR normally would return.
 #'
+#' @references \insertRef{Scholle2018}{patRoon} \cr\cr \addCitations{fastcluster}{1}
+#' 
 #' @name component-generation
 NULL
 

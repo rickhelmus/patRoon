@@ -662,10 +662,9 @@ NULL
 #'   (relative) amount of replicate analyses. For instance, \samp{0.5} means that at least half of the replicates should
 #'   contain data for a particular feature group in a component. In this calculation replicates that are fully absent
 #'   within a component are not taken in to account. See note below.
-#' @param extraOpts Named character vector with extra arguments directly passed to \code{\link{homol.search}}
-#'   (\code{generateComponentsNontarget}), \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}
-#'   (\code{generateComponentsCAMERA}) or as extra command line parameters to \command{MetaboliteAdductDecharger}
-#'   (\code{generateComponentsCAMERA}). Set to \code{NULL} to ignore.
+#' @param extraOpts Named character vector with extra arguments directly passed to
+#'   \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}} (\code{generateComponentsCAMERA}) or as extra command line
+#'   parameters to \command{MetaboliteAdductDecharger} (\code{generateComponentsCAMERA}). Set to \code{NULL} to ignore.
 #' @param rtDev,absMzDev,relMzDev Maximum deviation for retention time or absolute/relative \emph{m/z}.
 #'
 #'   For \code{generateComponentsRAMClustR}: Sets the \code{mzabs.error} and \code{ppm.error} arguments to
@@ -735,7 +734,7 @@ NULL
 #'   be different than what CAMERA/RAMClustR normally would return.
 #'
 #' @references \insertRef{Scholle2018}{patRoon} \cr\cr \addCitations{fastcluster}{1}
-#' 
+#'
 #' @name component-generation
 NULL
 

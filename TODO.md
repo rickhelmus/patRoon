@@ -188,9 +188,7 @@
 - components
     - cliqueMS
         - mention fork is needed?
-    - OpenMS/cliqueMS adducts?
     - update docs for reduced removal: only clust affected, remove note about reduced
-    - extraOpts --> `...` for nontarget
 - sets
     - setObjects() can be used for specific slots such as algo objects and MF settings
     - filter() for features/fGroups: apply to neutral masses

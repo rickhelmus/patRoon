@@ -2,6 +2,7 @@
 #' @include components-features.R
 NULL
 
+#' @rdname components-class
 #' @export
 componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list"),
                                contains = "componentsFeatures")
@@ -9,6 +10,23 @@ componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list")
 setMethod("initialize", "componentsCliqueMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cliquems", ...))
 
+#' @details \code{generateComponentsCliqueMS} uses \href{https://github.com/osenan/cliqueMS}{cliqueMS} to generate
+#'   components using the \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}} function. The grouping of features in
+#'   each component ('clique') is based on high similarity of chromatographic elution profiles. All features in each
+#'   component are then annotated with the \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}} and
+#'   \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}} functions.
+#'
+#' @param maxCharge,maxGrade,ppm Arguments passed to \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}} and/or
+#'   \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}.
+#' @param adductInfo Sets the \code{adinfo} argument to \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}.
+#'   If \code{NULL} then the default adduct information from \pkg{cliqueMS} is used (\emph{i.e.} the
+#'   \code{positive.adinfo}/\code{negative.adinfo} package datasets).
+#' @param extraOptsCli,extraOptsIso,extraOptsAnn Named \code{list} with further arguments to be passed to
+#'   \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}}, \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}}
+#'   and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.
+#'
+#' @references \insertRef{Senan2019}{patRoon}
+#'
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 1,

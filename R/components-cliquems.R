@@ -14,7 +14,7 @@ setMethod("initialize", "componentsCliqueMS",
 setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,
                                                                   adductInfo = NULL,
-                                                                  mzWindow = 0.005, minSize = 2,
+                                                                  absMzDev = 0.005, minSize = 2,
                                                                   relMinAdductAbundance = 0.75,
                                                                   adductConflictsUsePref = TRUE,
                                                                   NMConflicts = c("preferential", "mostAbundant", "mostIntense"),
@@ -27,7 +27,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
     aapply(checkmate::assertCount, . ~ maxCharge + maxGrade + minSize, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ ppm + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
+    aapply(checkmate::assertNumber, . ~ ppm + absMzDev + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertDataFrame(adductInfo, any.missing = FALSE, col.names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertFlag(adductConflictsUsePref, add = ac)
@@ -39,7 +39,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
-        return(componentsCliqueMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+        return(componentsCliqueMS(fGroups = fGroups, absMzDev = absMzDev, minSize = minSize,
                                   relMinAdductAbundance = relMinAdductAbundance))
         
     anas <- analyses(fGroups)
@@ -62,7 +62,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     }
 
     db <- openCacheDBScope()
-    baseHash <- makeHash(ionization, maxCharge, maxGrade, ppm, adductInfo, mzWindow, minSize, relMinAdductAbundance,
+    baseHash <- makeHash(ionization, maxCharge, maxGrade, ppm, adductInfo, absMzDev, minSize, relMinAdductAbundance,
                          extraOptsCli, extraOptsIso, extraOptsAnn)
     hashes <- sapply(featureTable(fGroups), makeHash, baseHash)
     cachedCliques <- sapply(hashes, loadCacheData, category = "componentsCliqueMS", dbArg = db, simplify = FALSE)
@@ -158,7 +158,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
         printf("Done!\n")
     }
     
-    return(componentsCliqueMS(cliques = allCliques, fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+    return(componentsCliqueMS(cliques = allCliques, fGroups = fGroups, absMzDev = absMzDev, minSize = minSize,
                               relMinAdductAbundance = relMinAdductAbundance,
                               adductConflictsUsePref = adductConflictsUsePref, NMConflicts = NMConflicts,
                               prefAdducts = prefAdducts, featureComponents = featComponents))

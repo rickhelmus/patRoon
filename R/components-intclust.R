@@ -16,6 +16,8 @@ NULL
 #' @param \dots Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}),
 #'   \code{\link[graphics]{plot}} (\code{plotInt}).
 #'
+#' @template components-altered-note
+#'
 #' @seealso \code{\link{componentsClust}} for other relevant methods and \link{component-generation}
 #'
 #' @export

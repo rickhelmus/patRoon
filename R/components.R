@@ -49,13 +49,6 @@ NULL
 #' @templateVar dollarOpName component
 #' @template sub_sel_del-args
 #'
-#' @return The subset operator (\code{"["}) and \code{filter} method return the
-#'   data subset in an object from the \code{componentsReduced} class. This
-#'   object does not contain any algorithm specific data and as such, algorithm
-#'   specific methods (\emph{e.g.} \code{treeCut}) will not work on this object.
-#'   The reason for this is that it is often very difficult or impossible to
-#'   subset the algorithmic data.
-#'
 #' @templateVar class components
 #' @template class-hierarchy
 #'

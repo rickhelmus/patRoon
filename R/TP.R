@@ -2,21 +2,21 @@
 #' @include workflow-step.R
 NULL
 
-#' Base transformation product (TP) products class
+#' Base transformation products (TP) class
 #'
 #' Holds information for all TPs for a set of parents.
 #'
-#' This class holds all generated data for transformation products for
-#' a set of parents. The class is \code{virtual} and derived objects are
-#' created by \link[=TP-generation]{TP predictors}.
+#' This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
+#' derived objects are created by \link[=TP-generation]{TP generators}.
 #'
 #' @param obj,x,object \code{transformationProducts} object to be accessed
 #'
-#' @seealso \code{\link{TP-generation}}
+#' @seealso Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for
+#'   specific algorithm methods and \code{\link{TP-generation}}
 #'
-#' @slot parents Table with all parents with products. Use the
+#' @slot parents A \code{\link{data.table}} with metadata for all parents that have TPs in this object. Use the
 #'   \code{parents} method for access.
-#' @slot products List of TPs for each parent. Use the
+#' @slot products A \code{list} with \code{\link{data.table}} entries with TP information for each parent. Use the
 #'   \code{products} method for access.
 #'
 #' @templateVar seli parents
@@ -33,24 +33,21 @@ transformationProducts <- setClass("transformationProducts",
                           contains = c("VIRTUAL", "workflowStep"))
 
 #' @describeIn transformationProducts Accessor method for the \code{parents} slot of a
-#'   \code{transformationProducts} class. This is a \code{data.table} with all parents
-#'   used for products.
+#'   \code{transformationProducts} class.
 #' @aliases parents
 #' @export
 setMethod("parents", "transformationProducts", function(TPs) TPs@parents)
 
-#' @describeIn transformationProducts Accessor method for the \code{products} slot of
-#'   a \code{transformationProducts} class. Each TP result is stored as a
-#'   \code{\link{data.table}}.
+#' @describeIn transformationProducts Accessor method for the \code{products} slot.
 #' @aliases products
 #' @export
 setMethod("products", "transformationProducts", function(TPs) TPs@products)
 
-#' @describeIn components Obtain total number of products.
+#' @describeIn components Obtain total number of transformation products.
 #' @export
 setMethod("length", "transformationProducts", function(x) if (length(products(x)) == 0) 0 else sum(sapply(products(x), nrow)))
 
-#' @describeIn transformationProducts Obtain the names of all parents with TPs.
+#' @describeIn transformationProducts Obtain the names of all parents in this object.
 #' @export
 setMethod("names", "transformationProducts", function(x) parents(x)$name)
 
@@ -98,6 +95,9 @@ setMethod("$", "transformationProducts", function(x, name)
 #' @export
 setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "parent"))
 
+#' @describeIn transformationProducts Converts this object to a suspect list that can be used as input for
+#'   \code{\link{screenSuspects}}.
+#' @param includeParents If \code{TRUE} then parents are also included in the returned suspect list.
 #' @export
 setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents)
 {
@@ -130,6 +130,15 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 })
 
 
+#' @templateVar func generateTPs
+#' @templateVar what generate transformation products
+#' @templateVar ex1 generateTPsBT
+#' @templateVar ex2 generateTPsLogic
+#' @templateVar algos biotransformer,logic,library
+#' @template generic-algo
+#' 
+#' @rdname TP-generation
+#' @aliases generateTPs
 #' @export
 generateTPs <- function(algorithm, ...)
 {

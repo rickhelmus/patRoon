@@ -2,56 +2,31 @@
 #' @include feature_annotations.R
 NULL
 
-#' Formula lists class
+#' Formula annotations class
 #'
 #' Contains data of generated chemical formulae for given feature groups.
 #'
-#' \code{formulas} objects are obtained from \link[=formula-generation]{formula
-#' generators}.
+#' \code{formulas} objects are obtained from \link[=formula-generation]{formula generators}. This class is derived from
+#' the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 #'
-#' @slot formulas,featureFormulas Lists of all generated formulae. Use the
+#' @slot featureFormulas A \code{list} with all generated formulae for each analysis/feature group. Use the
 #'   \code{annotations} method for access.
-#' @slot scoreRanges The original min/max values of all scorings when candidate
-#'   results were generated. This is used for normalization.
 #'
-#' @param obj,x,object,formulas The \code{formulas} object.
-#' @param \dots For \code{plotSpectrum}: Further arguments passed to
-#'   \code{\link[graphics]{plot}}.
+#' @param obj,x,object The \code{formulas} object.
+#' @param \dots For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 #'
-#'   Others: Any further (and unique) \code{formulas} objects.
-#' @param OM For \code{as.data.table}: if set to \code{TRUE} several columns
-#'   with information relevant for organic matter (OM) characterization will be
-#'   added (e.g. elemental ratios, classification). This will also make sure
-#'   that \code{countElements} contains at least C, H, N, O, P and S.
+#'   For \code{delete}: passed to the function specified as \code{j}.
 #'
-#'   For \code{filter}: If \code{TRUE} then several filters are applied to
-#'   exclude unlikely formula candidates present in organic matter (OM). See
-#'   Source section for details.
-#' @param labels A \code{character} with names to use for labelling. If
-#'   \code{NULL} labels are automatically generated.
-#'
-#' @templateVar seli analyses
-#' @templateVar selOrderi analyses()
-#' @templateVar selj feature groups
-#' @templateVar selOrderj groupNames()
-#' @templateVar optionalji TRUE
-#' @templateVar dollarOpName feature group
-#' @template sub_sel_del-args
+#'   For \code{consensus}: Any further (and unique) \code{formulas} objects.
+#' @param index The candidate index (row). For \code{plotSpectrum} two indices can be specified to compare spectra. In
+#'   this case \code{groupName} and \code{analysis} (if not \code{NULL}) should specify values for the spectra to
+#'   compare.
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
-#' @section Source: Calculation of the aromaticity index (AI) and related double
-#'   bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
-#'   classification is performed by the rules described in Abdulla 2013.
-#'   Filtering of OM related molecules is performed as described in Koch 2006
-#'   and Kujawinski 2006. (see references).
-#'
-#' @references \insertRef{Koch2015}{patRoon} \cr\cr
-#'   \insertRef{Abdulla2013}{patRoon} \cr\cr
-#'   \insertRef{Koch2006}{patRoon} \cr\cr
-#'   \insertRef{Kujawinski2006}{patRoon}
+#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and \link{formula-generation}.
 #'
 #' @templateVar class formulas
 #' @template class-hierarchy
@@ -137,10 +112,11 @@ setMethod("show", "formulas", function(object)
     printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
 })
 
-#' @describeIn formulas Extract a formula table. If both arguments (\code{i} and
-#'   \code{j}) are specified, the feature specific formula table belonging to
-#'   the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
-#'   formula table for the feature group specified by \code{j} is returned.
+#' @describeIn formulas Extracts a formula table, either for a feature group or for features in an analysis.
+#' @param i,j If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and \code{j} the feature
+#'   group of the feature for which annotations should be returned. Otherwise \code{i} specifies the feature group for
+#'   which group annotations should be returned. \code{i}/\code{j} can be specified as \code{integer} index or as a
+#'   \code{character} name.
 #' @export
 setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 {
@@ -185,26 +161,15 @@ setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @describeIn formulas Generates a table with all candidate formulae for each
-#'   feature group and other information such as element counts.
+#' @describeIn formulas Generates a table with all candidate formulae for each feature group and other information such
+#'   as element counts.
 #'
-#' @param average If set to \code{TRUE} an 'average formula' is generated for
-#'   each feature group by combining all elements from all candidates and
-#'   averaging their amounts. This obviously leads to non-existing formulae,
-#'   however, this data may be useful to deal with multiple candidate formulae
-#'   per feature group when performing elemental characterization.
-#' @param countElements,countFragElements A \code{character} vector with
-#'   elements that should be counted for each MS(/MS) formula candidate. For
-#'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
-#'   amounts of each formula. Note that the neutral formula
-#'   (\code{neutral_formula} column) is used to count elements of non-fragmented
-#'   formulae, whereas the charged formula of fragments (\code{ion_formula}
-#'   column in \code{fragInfo} data) is used for fragments. Set to \code{NULL} to not count any
-#'   elements.
-#'
-#' @template as_data_table-args
-#'
-#' @return \code{as.data.table} returns a \code{\link{data.table}}.
+#' @param average If set to \code{TRUE} an 'average formula' is generated for each feature group by combining all
+#'   elements from all candidates and averaging their amounts. This obviously leads to non-existing formulae, however,
+#'   this data may be useful to deal with multiple candidate formulae per feature group when performing elemental
+#'   characterization.
+#' @param fGroups,fragments,countElements,countFragElements,OM Passed to the
+#'   \code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}} method.
 #'
 #' @export
 setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = FALSE, countElements = NULL,
@@ -270,17 +235,18 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
                               onlyAnnotated))
 })
 
-#' @describeIn formulas Plots an annotated spectrum for a given candidate
-#'   formula of a feature or feature group.
+#' @describeIn formulas Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
+#'   spectra can be compared by specifying a two-sized vector for the \code{index}, \code{groupName} and (if desired)
+#'   \code{analysis} arguments.
 #'
-#' @param precursor The formula of the precursor (in neutral form).
-#' @param analysis A \code{character} specifying the analysis for which the
-#'   annotated spectrum should be plotted. If \code{NULL} then annotation
-#'   results for the complete feature group will be plotted.
-#' @param title The title of the plot. Set to \code{NULL} for an automatically
-#'   generated title.
+#' @param analysis A \code{character} specifying the analysis (or analyses when comparing spectra) for which the
+#'   annotated spectrum should be plotted. If \code{NULL} then annotation results for the complete feature group will be
+#'   plotted.
+#' @param title The title of the plot. Set to \code{NULL} for an automatically generated title.
 #'
 #' @template plotSpec-args
+#'
+#' @template specSimParams-arg
 #'
 #' @template useGGplot2
 #'
@@ -288,8 +254,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #'
 #' @template fsubscript_source
 #'
-#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
-#'   object}} if \code{useGGPlot2} is \code{TRUE}.
+#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
@@ -428,6 +393,8 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
 #'
 #' @templateVar what formulas
 #' @template consensus-common-args
+#'
+#' @param labels A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.
 #'
 #' @return \code{consensus} returns a \code{formulas} object that is produced by
 #'   merging results from multiple \code{formulas} objects.

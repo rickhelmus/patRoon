@@ -2,41 +2,34 @@
 #' @include feature_annotations.R
 NULL
 
-#' Compound lists class
+#' Compound annotations class
 #'
-#' Contains data of generated chemical compounds for given feature groups.
+#' Contains data for compound annotations for feature groups.
 #'
-#' \code{compounds} objects are obtained from
-#' \link[=compound-generation]{compound generators}.
+#' \code{compounds} objects are obtained from \link[=compound-generation]{compound generators}. This class is derived
+#' from the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 #'
-#' @slot compounds Lists of all generated compounds. Use the \code{compounds}
-#'   method for access.
-#' @slot scoreTypes A \code{character} with all the score types that were used
-#'   when generating the compounds.
-#' @slot scoreRanges The original min/max values of all scorings when candidate
-#'   results were generated. This is used for normalization.
+#' @param formulas The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
+#'   and \code{annotatedPeakList}: set to \code{NULL} to ignore.
+#' @param obj,object,compounds The \code{compound} object.
+#' @param index The numeric index of the candidate structure.
 #'
-#' @param formulas The \code{\link{formulas}} object that should be used for
-#'   scoring/annotation. For \code{plotSpectrum}: set to \code{NULL} to ignore.
-#' @param obj,object,x,compounds The \code{compound} object.
-#' @param index The numeric index of the candidate structure. Multiple indices
-#'   (\emph{i.e.} vector with length >=2) may be specified for
-#'   \code{plotStructure} and are mandatory for \code{getMCS}. Alternatively,
-#'   \samp{-1} may be specified to these methods to select all candidates. When
-#'   multiple indices are specified for \code{plotStructure}, their maximum
-#'   common substructure will be drawn.
-#' @param \dots For \code{plotSpectrum}: Further arguments passed to
-#'   \code{\link[graphics]{plot}}.
+#'   For \code{plotStructure} and \code{getMCS}: multiple indices (\emph{i.e.} vector with length >=2) should be
+#'   specified to plot/calculate the most common substructure (MCS). Alternatively, \samp{-1} may be specified to select
+#'   all candidates.
 #'
-#'   Others: Any further (and unique) \code{compounds} objects.
+#'   For \code{plotSpectrum}: two indices can be specified to compare spectra. In this case \code{groupName} should
+#'   specify values for the spectra to compare.
+#' @param \dots For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 #'
-#' @templateVar seli feature groups
-#' @templateVar selOrderi groupNames()
-#' @templateVar dollarOpName feature group
-#' @template sub_sel_del-args
+#'   For \code{delete}: passed to the function specified as \code{j}.
 #'
-#' @return \code{plotSpectrum} and \code{plotStructure} will return a
-#'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
+#'   for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
+#'
+#'   For \code{consensus}: any further (and unique) \code{compounds} objects.
+#'
+#' @return \code{plotSpectrum} and \code{plotStructure} will return a \code{\link[=ggplot2]{ggplot object}} if
+#'   \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @template plotSpec-args
 #'
@@ -45,6 +38,8 @@ NULL
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
+#'
+#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and \link{compound-generation}.
 #'
 #' @templateVar class compounds
 #' @template class-hierarchy
@@ -104,29 +99,16 @@ setMethod("identifiers", "compounds", function(compounds)
                   function(grp) unlist(strsplit(as.character(compTable[[grp]]$identifier), ";")), simplify = FALSE))
 })
 
-#' @describeIn compounds Provides rule based filtering for generated compounds.
-#'   Useful to eliminate unlikely candidates and speed up further processing.
+#' @describeIn compounds Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
+#'   and speed up further processing. Also see the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}}
+#'   method.
 #'
-#' @param minExplainedPeaks,minScore,minFragScore,minFormulaScore Minimum number
-#'   of explained peaks, overall score, in-silico fragmentation score and
-#'   formula score, respectively. Set to \code{NULL} to ignore. The
-#'   \code{scoreLimits} argument allows for more advanced score filtering.
-#' @param scoreLimits Filter results by their scores. Should be a named
-#'   \code{list} that contains two-sized numeric vectors with the
-#'   minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
-#'   limits). The names of each element should follow the values returned by
-#'   \code{\link{compoundScorings}()$name}. For instance,
-#'   \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies that
-#'   \code{numberPatents} should be at least \samp{10}. For more details of
-#'   scorings see \code{\link{compoundScorings}}. Note that a result without a
-#'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
-#' @param topMost Only keep a maximum of \code{topMost} candidates with highest
-#'   score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.
-#' @param negate If \code{TRUE} then filters are applied in opposite manner.
+#' @param minExplainedPeaks,scoreLimits Passed to the
+#'   \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #'
-#' @template element-args
-#'
-#' @return \code{filter} returns a filtered \code{compounds} object.
+#' @param minScore,minFragScore,minFormulaScore Minimum overall score, in-silico fragmentation score and formula score,
+#'   respectively. Set to \code{NULL} to ignore. The \code{scoreLimits} argument allows for more advanced score
+#'   filtering.
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
@@ -462,21 +444,21 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
     return(ret[])
 })
 
-#' @describeIn compounds Plots an annotated spectrum for a given candidate
-#'   compound for a feature group.
+#' @describeIn compounds Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
+#'   be compared by specifying a two-sized vector for the \code{index} and \code{groupName} arguments.
 #'
-#' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the
-#'   spectrum.
-#' @param title The title of the plot. If \code{NULL} a title will be
-#'   automatically made.
-#' @param maxMolSize Numeric vector of size two with the maximum width/height of
-#'   the candidate structure (relative to the plot size).
-#' @param molRes Numeric vector of size two with the resolution of the candidate
-#'   structure (in pixels).
+#' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the spectrum. Currently not supported when
+#'   comparing spectra.
+#' @param title The title of the plot. If \code{NULL} a title will be automatically made.
+#' @param maxMolSize Numeric vector of size two with the maximum width/height of the candidate structure (relative to
+#'   the plot size).
+#' @param molRes Numeric vector of size two with the resolution of the candidate structure (in pixels).
+#'
+#' @template specSimParams-arg
+#' 
+#' @template plot-lim
 #'
 #' @template fsubscript_source
-#'
-#' @template plot-lim
 #'
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
@@ -604,8 +586,10 @@ setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 #' @templateVar what compounds
 #' @template consensus-common-args
 #'
-#' @return \code{consensus} returns a \code{compounds} object that is produced
-#'   by merging multiple specified \code{compounds} objects.
+#' @param labels A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.
+#'
+#' @return \code{consensus} returns a \code{compounds} object that is produced by merging multiple specified
+#'   \code{compounds} objects.
 #'
 #' @export
 setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,

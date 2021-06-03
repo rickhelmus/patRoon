@@ -210,56 +210,45 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
     return(ret)
 })
 
-#' @describeIn featureGroupsScreening Incorporates annotation data obtained
-#'   during the workflow to annotate suspects with matched known MS/MS
-#'   fragments, formula/candidate ranks and automatic estimation of
-#'   identification levels. See the \verb{Suspect annotation} section for more
-#'   details. The estimation of identification levels for each suspect is logged
-#'   in the \code{log/ident} directory.
+#' @describeIn featureGroupsScreening Incorporates annotation data obtained during the workflow to annotate suspects
+#'   with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
+#'   the \verb{Suspect annotation} section for more details. The estimation of identification levels for each suspect is
+#'   logged in the \code{log/ident} directory.
 #'
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
 #' @template norm-args
 #'
-#' @param MSPeakLists,formulas,compounds Annotation data
-#'   (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
-#'   \code{\link{compounds}}) obtained for this \code{featureGroupsScreening}
-#'   object. All arguments can be \code{NULL} to exclude it from the annotation.
+#' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
+#'   \code{\link{compounds}}) obtained for this \code{featureGroupsScreening} object. All arguments can be \code{NULL}
+#'   to exclude it from the annotation.
 #' @param absMzDev Maximum absolute \emph{m/z} deviation.
-#' @param relMinMSMSIntensity Minimum relative intensity (\samp{0-1}) threshold
-#'   applied when calculating annotation similarities.
-#' @param simMSMSMethod Either \code{"cosine"} or \code{"jaccard"}: used to
-#'   compare MS/MS peak lists for annotation similarity calculation.
-#' @param checkFragments Which type(s) of MS/MS fragments from workflow data
-#'   should be checked to evaluate the number of suspect fragment matches
-#'   (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns
-#'   in the suspect list). Valid values are: \code{"mz"}, \code{"formula"},
-#'   \code{"compounds"}. The former uses \emph{m/z} values in the specified
-#'   \code{MSPeakLists} object, whereas the others use the formulae that were
-#'   annotated to MS/MS peaks in the given \code{formulas} or \code{compounds}
-#'   objects. Multiple values are possible: in this case the maximum number of
-#'   fragment matches will be reported.
-#' @param IDFile A file path to a YAML file with rules used for estimation of
-#'   identification levels. See the \verb{Suspect annotation} section for more
-#'   details. If not specified then a default rules file will be used.
+#' @param relMinMSMSIntensity Minimum relative intensity (\samp{0-1}) threshold applied when calculating annotation
+#'   similarities.
+#' @param simMSMSMethod Either \code{"cosine"} or \code{"jaccard"}: used to compare MS/MS peak lists for annotation
+#'   similarity calculation.
+#' @param checkFragments Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
+#'   suspect fragment matches (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns in the suspect
+#'   list). Valid values are: \code{"mz"}, \code{"formula"}, \code{"compounds"}. The former uses \emph{m/z} values in
+#'   the specified \code{MSPeakLists} object, whereas the others use the formulae that were annotated to MS/MS peaks in
+#'   the given \code{formulas} or \code{compounds} objects. Multiple values are possible: in this case the maximum
+#'   number of fragment matches will be reported.
+#' @param IDFile A file path to a YAML file with rules used for estimation of identification levels. See the
+#'   \verb{Suspect annotation} section for more details. If not specified then a default rules file will be used.
+#' @param logPath A directory path to store logging information. If \code{NULL} then logging is disabled.
 #'
-#' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
-#'   object, which is a \code{\link{featureGroups}} object amended with
-#'   annotation data.
+#' @return \code{annotateSuspects} returns a \code{featureGroupsScreening} object, which is a
+#'   \code{\link{featureGroups}} object amended with annotation data.
 #'
-#' @note The \code{relMinMSMSIntensity} filter argument to
-#'   \code{annotateSuspects} is applied \emph{after} removing the precursor ion
-#'   from the peak lists (if present). Thus, intensity scales may be different
-#'   when this filter is applied when the most abundant peak resulted from the
-#'   precursor ion.
+#' @note The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is applied \emph{after} removing the
+#'   precursor ion from the peak lists (if present). Thus, intensity scales may be different when this filter is applied
+#'   when the most abundant peak resulted from the precursor ion.
 #'
-#' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski
-#'   <\email{emma.schymanski@@uni.lu}> (contributions to identification level
-#'   rules), Bas van de Velde (contributions to spectral similarity
-#'   calculation).
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
+#'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
 #'
-#' @section Source: Cosine spectral similarity calculation was based on the code
-#'   from \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
+#' @section Source: Cosine spectral similarity calculation was based on the code from
+#'   \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
 #'
 #' @aliases annotateSuspects
 #' @export

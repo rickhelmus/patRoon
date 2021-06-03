@@ -152,24 +152,22 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
-    - update adduct default: check adduct annotations
+    - update adduct/ionization params (also suspect screening): can be \code{NULL} if fGroups are annotated/sets
     - references for FC calculation?
     - refer to OrgMassSpecR for cosine MS/MS similarity?
+        - now still done in annotateSuspects()
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
 - ffOpenMS etc: analyses also needs to be available for hashing
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
-- check UIs and import functions
 - features
     - topMostByRGroup: handbook?
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
 - suspect screening
     - explain three mass matching methods (see comments doScreenSuspects())
-    - mention mz column can now be NA
-    - logPath for annotateSuspects()
 - annotation
     - new/changed as.data.table args
         - maxFormulas/maxFragFormulas removed (handbook)

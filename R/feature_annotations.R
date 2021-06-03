@@ -56,6 +56,8 @@ NULL
 #' @references \insertRef{Koch2015}{patRoon} \cr\cr \insertRef{Abdulla2013}{patRoon} \cr\cr
 #'   \insertRef{Koch2006}{patRoon} \cr\cr \insertRef{Kujawinski2006}{patRoon}
 #'
+#' @seealso The derived \code{\link{formulas}} and \code{\link{compounds}} classes.
+#'
 #' @templateVar class featureAnnotations
 #' @template class-hierarchy
 #'

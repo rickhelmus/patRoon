@@ -29,9 +29,9 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @template specSimParams-arg
 #'
 #' @template components-altered-note
-#' 
-#' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Bas van de Velde (contributions to spectral binning and similarity
-#'   calculation).
+#'
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Bas van de Velde (major contributions to spectral binning and
+#'   similarity calculation).
 #'
 #' @rdname component-generation
 #' @export

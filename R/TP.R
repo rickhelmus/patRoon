@@ -9,7 +9,7 @@ NULL
 #' This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
 #' derived objects are created by \link[=TP-generation]{TP generators}.
 #'
-#' @param obj,x,object \code{transformationProducts} object to be accessed
+#' @param TPs,x,object \code{transformationProducts} object to be accessed
 #'
 #' @seealso Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for
 #'   specific algorithm methods and \code{\link{TP-generation}}
@@ -62,6 +62,7 @@ setMethod("show", "transformationProducts", function(object)
 })
 
 #' @describeIn transformationProducts Subset on parents.
+#' @param \dots Unused.
 #' @export
 setMethod("[", c("transformationProducts", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -132,11 +133,13 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 
 #' @templateVar func generateTPs
 #' @templateVar what generate transformation products
-#' @templateVar ex1 generateTPsBT
+#' @templateVar ex1 generateTPsBioTransformer
 #' @templateVar ex2 generateTPsLogic
 #' @templateVar algos biotransformer,logic,library
 #' @template generic-algo
-#' 
+#'
+#' @param ... Any parameters to be passed to the selected TP generation algorithm.
+#'
 #' @rdname TP-generation
 #' @aliases generateTPs
 #' @export

@@ -224,12 +224,11 @@
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR
+        - add also as contributor to eg DESCRIPTION
     - predictTPsBioTransformer
         - use identifier as fallback for naming when no compoundName is present
-        - citations, also EnviPath
         - compound similarities
-    - FCParams/plotVolcano
-    - update spectrumSimilarity()
+            - refer to componentization in minSimilarity description
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
         - min peaks always applied lastly
     - mention that retDirMatch filter ignores any zero values for TP_retDir/retDir (ie to be safe)
@@ -239,6 +238,9 @@
     - generateComponentsTPs()
         - if pred is NULL using filter() is crucial
         - shift ignored from specSimParams
+    - Section on custom libs/reactions, mention in TPLibrary/transformations argument
+    - logic: mention results can be filtered with TP components
+    - explain retDir somewhere
     
 
 ## NEWS

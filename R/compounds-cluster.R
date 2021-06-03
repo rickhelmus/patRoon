@@ -297,16 +297,14 @@ setMethod("plotSilhouettes", "compoundsCluster", function(obj, kSeq, groupName, 
 #'
 #' @param obj The \code{\link{compounds}} object to be clustered.
 #' @param method The clustering method passed to \code{\link{hclust}}.
-#' @param fpType The type of structural fingerprint that should be calculated.
-#'   See the \code{type} argument of the \code{\link{get.fingerprint}} function
-#'   of \CRANpkg{rcdk}.
-#' @param fpSimMethod The similarity method (i.e. not dissimilarity!) to be used
-#'   for generating the distance matrix. See the \code{method} argument of the
-#'   \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.
 #'
+#' @template fp-args
 #' @template dynamictreecut
 #'
 #' @return \code{makeHCluster} returns an \code{\link{compoundsCluster}} object.
+#' 
+#' @references \addCitations{rcdk}{1}
+#' 
 #' @rdname compounds-cluster
 #' @aliases makeHCluster
 #' @export

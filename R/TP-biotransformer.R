@@ -2,6 +2,24 @@
 #' @include TP.R
 NULL
 
+#' Class to store transformation products (TPs) predicted by BioTransformer
+#'
+#' This class is used to store prediction results that are generated with
+#' \href{http://biotransformer.ca/}{BioTransformer}.
+#'
+#' Objects from this class are generate with \code{\link{generateTPsBioTransformer}}. This class is derived from the
+#' \code{\link{transformationProducts}} base class, please see its documentation for more details.
+#'
+#' @param obj,TPs \code{transformationProductsBTs} object to be accessed
+#'
+#' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
+#'   \code{\link{TP-generation}}
+#'
+#' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
+#'
+#' @templateVar class transformationProductsBT
+#' @template class-hierarchy
+#'
 #' @export
 transformationProductsBT <- setClass("transformationProductsBT", contains = "transformationProducts")
 
@@ -104,6 +122,25 @@ BTMPPrepareHandler <- function(cmd)
     return(cmd)
 }
 
+#' @details \code{generateTPsBioTransformer} uses \href{http://biotransformer.ca/}{BioTransformer} to predict TPs. An
+#'   important advantage of this algorithm is that it provides full structural information for TPs. However, to do so,
+#'   structural information also needs to be present for the parents. Afterwards, structural similarities between the
+#'   parent and its TPs are calculated, which can be used to \link[=filter,transformationProductsBT-method]{filter} the
+#'   results. In order to use this function the \file{.jar} command line utility should be installed and specified in
+#'   the \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
+#'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
+#'
+#' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
+#'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
+#' @param steps The number of steps for the predictions. Sets the \command{-s} command line option.
+#' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
+#'
+#' @template fp-args
+#'
+#' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon} \cr\cr
+#'   \addCitations{rcdk}{1}
+#'
+#' @rdname TP-generation
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
                                       skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
@@ -150,6 +187,8 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
     return(transformationProductsBT(parents = parents, products = results))
 }
 
+#' @templateVar class transformationProductsBT
+#' @template convertToMFDB
 #' @export
 setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includeParents)
 {
@@ -170,12 +209,22 @@ setMethod("linkParentsToFGroups", "transformationProductsBT", function(TPs, fGro
     return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
 })
 
+#' @describeIn transformationProductsBT Performs rule-based filtering of the \command{BioTransformer} predictions.
+#'   Useful to simplify and clean-up the data.
+#'
+#' @param removeEqualFormulas If \code{TRUE} then the TPs that have an equal formula as their parent are removed.
+#' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
+#'   details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be
+#'   useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
+#'   MS/MS spectral similarity.
+#' @param negate If \code{TRUE} then filters are performed in opposite manner.
+#'
+#' @return \code{filter} returns a filtered \code{transformationProductsBT} object.
+#'
 #' @export
 setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormulas = FALSE, minSimilarity = NULL,
                                                          negate = FALSE)
 {
-    # UNDONE: move to base class?
-
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(removeEqualFormulas, add = ac)
     checkmate::assertNumber(minSimilarity, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)

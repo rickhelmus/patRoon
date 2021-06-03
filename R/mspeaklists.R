@@ -586,7 +586,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                   specSimParams = getDefSpecSimParams(),
-                                                  useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
@@ -596,7 +596,6 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
-    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -616,7 +615,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         if (useGGPlot2)
             return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
         
-        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
+        makeMSPlot(getMSPlotData(spec, 2), 1, xlim, ylim, main = title, ...)
     }
     else
     {
@@ -629,7 +628,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         
         binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE)
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, useGGPlot2, ...)
     }
 })
 

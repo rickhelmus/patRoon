@@ -118,7 +118,8 @@ setMethod("$", "featureAnnotations", function(x, name)
 #' @describeIn featureAnnotations Generates a table with all annotation data for each feature group and other
 #'   information such as element counts.
 #'
-#' @param fragments If \code{TRUE} then information on annotated fragments will be included.
+#' @param fragments If \code{TRUE} then information on annotated fragments will be included. Automatically set to
+#'   \code{TRUE} if \code{countFragElements} is set.
 #' @param countElements,countFragElements A \code{character} vector with elements that should be counted for each
 #'   candidate's formula. For instance, \code{c("C", "H")} adds columns for both carbon and hydrogen amounts of each
 #'   formula. Note that the neutral formula (\code{neutral_formula} column) is used to count elements of non-fragmented

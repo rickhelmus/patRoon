@@ -517,12 +517,12 @@ NULL
 #' formula was found in multiple features within the group, the reported scorings and mass errors are averaged and other
 #' numeric values are those from the feature in the analysis of the \code{"analysis"} column. The calculation of
 #' formulae on 'feature level' might result in a more thorough formula search and better removal of outliers (controlled
-#' by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature group
-#' level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by using
-#' group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses. Note
-#' that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}} and
-#' \link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore, please
-#' note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
+#' by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature
+#' group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by
+#' using group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses.
+#' Note that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}}
+#' and \link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore,
+#' please note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
 #'
 #' @param fGroups \code{\link{featureGroups}} object for which formulae should be generated. This should be the same or
 #'   a subset of the object that was used to create the specified \code{MSPeakLists} (only relevant for algorithms using
@@ -550,6 +550,9 @@ NULL
 #'   commandline options.
 #' @param topMost Only keep this number of candidates (per feature group) with highest score. For \command{SIRIUS}: Sets
 #'   the \option{--candidates} commandline option.
+#' @param absAlignMzDev When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
+#'   values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
+#'   \code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.
 #'
 #' @templateVar genForm TRUE
 #' @template form-args

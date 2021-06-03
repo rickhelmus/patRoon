@@ -167,7 +167,7 @@ setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
 #' @param average If set to \code{TRUE} an 'average formula' is generated for each feature group by combining all
 #'   elements from all candidates and averaging their amounts. This obviously leads to non-existing formulae, however,
 #'   this data may be useful to deal with multiple candidate formulae per feature group when performing elemental
-#'   characterization.
+#'   characterization. Setting this to \code{TRUE} disables reporting of most other data.
 #' @param fGroups,fragments,countElements,countFragElements,OM Passed to the
 #'   \code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}} method.
 #'

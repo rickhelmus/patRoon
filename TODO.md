@@ -170,15 +170,10 @@
     - mention mz column can now be NA
     - logPath for annotateSuspects()
 - annotation
-    - add note scoreRanges original values of slot for compounds
-    - absAlignMzDev
-    - as.data.table(formulas, average=T): now removes most cols
-    - formulasDA: update that MSPeakLists now is necessary (obtained via FFM PLs)
     - new/changed as.data.table args
         - maxFormulas/maxFragFormulas removed (handbook)
     - generateFormulas: MSPeakLists argument
-        - also update handbook, tutorial...
-    - as.data.table(): countFragElements implies fragments=TRUE
+        - update handbook, tutorial...
     - MSPL
         - reAverage for subset/filter
         - ID column, used by fragInfo

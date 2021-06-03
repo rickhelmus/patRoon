@@ -45,8 +45,7 @@ NULL
 
 #' Workflow solutions for mass-spectrometry based non-target analysis.
 #'
-#' \Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields =
-#' "Description")}
+#' \Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields = "Description")}
 #'
 #' @section Package options:
 #'
@@ -54,85 +53,68 @@ NULL
 #'
 #'   \itemize{
 #'
-#'   \item \code{patRoon.cache.mode}: A \code{character} setting the current
-#'   caching mode: \code{"save"} and \code{"load"} will only save/load results
-#'   to/from the cache, \code{"both"} (default) will do both and \code{"none"}
-#'   to completely disable caching. This option can be changed anytime, which
-#'   might be useful, for instance, to temporarily disable cached results before
-#'   running a function.
+#'   \item \code{patRoon.cache.mode}: A \code{character} setting the current caching mode: \code{"save"} and
+#'   \code{"load"} will only save/load results to/from the cache, \code{"both"} (default) will do both and \code{"none"}
+#'   to completely disable caching. This option can be changed anytime, which might be useful, for instance, to
+#'   temporarily disable cached results before running a function.
 #'
-#'   \item \code{patRoon.cache.fileName}: a \code{character} specifying the name
-#'   of the cache file (default is \file{cache.sqlite}).
+#'   \item \code{patRoon.cache.fileName}: a \code{character} specifying the name of the cache file (default is
+#'   \file{cache.sqlite}).
 #'
-#'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that
-#'   should be initiated in parallel. A good starting point is the number of
-#'   physical cores, which is the default as detected by
-#'   \code{\link[parallel]{detectCores}}. This option is only used when
-#'   \option{patRoon.MP.method="classic"}.
-#'   
-#'   \item \code{patRoon.MP.method}: Either \code{"classic"} or \code{"future"}.
-#'   The former is the default and uses \code{\link{processx}} to execute
-#'   multiple commands in parallel. When \code{"future"} the
-#'   \code{\link{future.apply}} package is used for parallelization, which is
-#'   especially useful for \emph{e.g.} cluster computing.
-#'   
-#'   \item \code{patRoon.MP.futureSched}: Sets the \code{future.scheduling} function
-#'   argument for \code{\link{future_lapply}}. Only used if
-#'   \option{patRoon.MP.method="future"}.
-#'   
-#'   \item \code{patRoon.MP.logPath}: The path used for logging of output from
-#'   commands executed by multiprocess. Set to \code{FALSE} to disable logging.
-#'   
-#'   \item \code{patRoon.path.pwiz}: The path in which the
-#'   \command{ProteoWizard} binaries are installed. If unset an attempt is made
-#'   to find this directory from the Windows registry and \option{PATH}
-#'   environment variable.
+#'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that should be initiated in parallel. A good
+#'   starting point is the number of physical cores, which is the default as detected by
+#'   \code{\link[parallel]{detectCores}}. This option is only used when \option{patRoon.MP.method="classic"}.
 #'
-#'   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm}
-#'   executable. If not set (the default) the internal \code{GenForm} binary is
-#'   used. Only set if you want to override the executable.
+#'   \item \code{patRoon.MP.method}: Either \code{"classic"} or \code{"future"}. The former is the default and uses
+#'   \code{\link{processx}} to execute multiple commands in parallel. When \code{"future"} the
+#'   \code{\link{future.apply}} package is used for parallelization, which is especially useful for \emph{e.g.} cluster
+#'   computing.
 #'
-#'   \item \code{patRoon.path.MetFragCL}: The complete file path to the MetFrag
-#'   CL \file{jar} file that \emph{must} be set when using
-#'   \code{\link{generateCompoundsMetFrag}}. Example:
-#'   \code{"C:/MetFrag2.4.2-CL.jar"}.
+#'   \item \code{patRoon.MP.futureSched}: Sets the \code{future.scheduling} function argument for
+#'   \code{\link{future_lapply}}. Only used if \option{patRoon.MP.method="future"}.
 #'
-#'   \item \code{patRoon.path.MetFragCompTox}: The complete file path to the
-#'   CompTox database \file{csv} file. See \code{\link{generateCompounds}} for
-#'   more details.
-#'   
-#'   \item \code{patRoon.path.MetFragPubChemLite}: The complete file path to the
-#'   PubChem database \file{csv} file. See \code{\link{generateCompounds}} for
-#'   more details.
+#'   \item \code{patRoon.MP.logPath}: The path used for logging of output from commands executed by multiprocess. Set to
+#'   \code{FALSE} to disable logging.
 #'
-#'   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
-#'   installed. Unless the binaries can be located via the \option{PATH}
-#'   environment variable, this \emph{must} be set when using
-#'   \code{\link{generateFormulasSIRIUS}} or
-#'   \code{\link{generateCompoundsSIRIUS}}. Example:
-#'   \code{"C:/sirius-win64-3.5.1"}.
+#'   \item \code{patRoon.path.pwiz}: The path in which the \command{ProteoWizard} binaries are installed. If unset an
+#'   attempt is made to find this directory from the Windows registry and \option{PATH} environment variable.
 #'
-#'   \item \code{patRoon.path.OpenMS}: The path in which the \command{OpenMS}
-#'   binaries are installed. Usually the location is added to the \option{PATH}
-#'   environment variable when OpenMS is installed, in which case this option
+#'   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm} executable. If not set (the default) the
+#'   internal \code{GenForm} binary is used. Only set if you want to override the executable.
+#'
+#'   \item \code{patRoon.path.MetFragCL}: The complete file path to the MetFrag CL \file{jar} file that \emph{must} be
+#'   set when using \code{\link{generateCompoundsMetFrag}}. Example: \code{"C:/MetFrag2.4.2-CL.jar"}.
+#'
+#'   \item \code{patRoon.path.MetFragCompTox}: The complete file path to the CompTox database \file{csv} file. See
+#'   \code{\link{generateCompounds}} for more details.
+#'
+#'   \item \code{patRoon.path.MetFragPubChemLite}: The complete file path to the PubChem database \file{csv} file. See
+#'   \code{\link{generateCompounds}} for more details.
+#'
+#'   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is installed. Unless the binaries can be located
+#'   via the \option{PATH} environment variable, this \emph{must} be set when using \code{\link{generateFormulasSIRIUS}}
+#'   or \code{\link{generateCompoundsSIRIUS}}. Example: \code{"C:/sirius-win64-3.5.1"}.
+#'
+#'   \item \code{patRoon.path.OpenMS}: The path in which the \command{OpenMS} binaries are installed. Usually the
+#'   location is added to the \option{PATH} environment variable when OpenMS is installed, in which case this option can
+#'   be left empty.
+#'
+#'   \item \code{patRoon.path.pngquant}: The path of the \command{pngquant} binary that is used when optimizing
+#'   \file{.png} plots generated by \code{\link{reportHTML}} (with \code{optimizePng} set to \code{TRUE}). If the binary
+#'   can be located through the \option{PATH} environment variable this option can remain empty. Note that some of the
+#'   functionality of \code{reportHTML} only locates the binary through the \option{PATH} environment variable, hence,
+#'   it is recommended to set up \option{PATH} instead.
+#'
+#'   \item \code{patRoon.path.obabel}: The path in which the \command{OpenBabel} binaries are installed. Usually the
+#'   location is added to the \option{PATH} environment variable when OpenBabel is installed, in which case this option
 #'   can be left empty.
 #'
-#'   \item \code{patRoon.path.pngquant}: The path of the \command{pngquant}
-#'   binary that is used when optimizing \file{.png} plots generated by
-#'   \code{\link{reportHTML}} (with \code{optimizePng} set to \code{TRUE}). If the
-#'   binary can be located through the \option{PATH} environment variable this
-#'   option can remain empty. Note that some of the functionality of
-#'   \code{reportHTML} only locates the binary through the \option{PATH}
-#'   environment variable, hence, it is recommended to set up \option{PATH}
-#'   instead.
+#'   \item \code{patRoon.path.BiotransFormer} The full file path to the \command{biotransformer} \file{.jar} command
+#'   line utility. This needs to be set when \code{\link{generateTPsBioTransformer}} is used. For more details see
+#'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
 #'
-#'   \item \code{patRoon.path.obabel}: The path in which the \command{OpenBabel}
-#'   binaries are installed. Usually the location is added to the \option{PATH}
-#'   environment variable when OpenBabel is installed, in which case this option
-#'   can be left empty.
-#'   
 #'   }
-#'
+#'   
 "_PACKAGE"
 
 #' Analysis information
@@ -739,6 +721,66 @@ NULL
 #' @references \insertRef{Scholle2018}{patRoon} \cr\cr \addCitations{fastcluster}{1}
 #'
 #' @name component-generation
+NULL
+
+#' Generation of transformation products (TPs)
+#'
+#' Functionality to automatically obtain transformation products for a given list of parent compounds.
+#'
+#' Several algorithms are available that obtain TPs for a set of parent compounds. Depending on the algorithm, the
+#' parents can be a suspect list, all the candidates in a \code{\link{compounds}} object or the screening results or all
+#' feature groups from a \code{\link{featureGroups}} object. The resulting objects can (again depending on the used
+#' algorithm) then be used for conversion to suspect lists (\code{\link{convertToSuspects}}), a \command{MetFrag}
+#' database (\code{\link{convertToMFDB}}) or further processed to generate parent to TP links from features
+#' (\code{\link{generateComponentsTPs}}).
+#'
+#' @param parents The parents for which transformation products should be obtained. This can be (1) a suspect list (see
+#'   \link[=suspect-screening]{suspect screening} for more information), (2) the resulting output
+#'   \code{\link{screenSuspects}} or (3) a \code{\link{compounds}} annotation object. In the former two cases, the
+#'   suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.
+#'
+#'   For \code{generateTPsLibrary}: can be \code{NULL}, in this case TPs for all parents in the library are obtained.
+#' @param skipInvalid If set to \code{TRUE} then the parents will be skipped (with a warning) for which insufficient
+#'   information (\emph{e.g.} SMILES) is available.
+#'
+#' @template adduct-arg
+#'
+#' @section Custom TP libraries and transformations: The \code{TPLibrary} argument is used to specify a custom TP
+#'   library for \code{generateTPsLibrary}. This should be a \code{data.frame} where each row specifies a TP for a
+#'   parent, with the following columns: \itemize{
+#'
+#'   \item \code{parent_name} The name of the parent.
+#'
+#'   \item \code{parent_SMILES} The \acronym{SMILES} of the parent structure.
+#'
+#'   \item \code{TP_name} The name of the TP.
+#'
+#'   \item \code{TP_SMILES} The \acronym{SMILES} of the TP structure.
+#'
+#'   }
+#'
+#'   More columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
+#'   by repeating the value within \code{parent_} columns.
+#'
+#'   Similarly, the \code{transformations} argument to \code{generateTPsLogic} is used to specify custom rules to
+#'   calculate transformation products. This should be a \code{data.frame} with the following columns: \itemize{
+#'
+#'   \item \code{transformation} The name of the chemical transformation
+#'
+#'   \item \code{add} The elements that are added by this reaction (\emph{e.g.} \code{"O"}).
+#'
+#'   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
+#'
+#'   \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
+#'   separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
+#'   (no significant change or unknown).
+#'
+#'   }
+#'
+#' @seealso The \code{\link{transformationProducts}} class and derived classes \code{\link{transformationProductsBT}}
+#'   and \code{\link{transformationProductsLibrary}} for methods to post-process TP data.
+#'
+#' @name TP-generation
 NULL
 
 #' Target and suspect screening

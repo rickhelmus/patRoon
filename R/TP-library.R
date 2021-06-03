@@ -2,6 +2,21 @@
 #' @include TP.R
 NULL
 
+#' Class to store transformation products (TPs) obtained from a library
+#'
+#' This class is used to store prediction results that are available in a TP library.
+#'
+#' Objects from this class are generate with \code{\link{generateTPsLibrary}}. This class is derived from the
+#' \code{\link{transformationProducts}} base class, please see its documentation for more details.
+#'
+#' @param obj,TPs \code{transformationProductsLibrary} object to be accessed
+#'
+#' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
+#'   \code{\link{TP-generation}}
+#'
+#' @templateVar class transformationProductsLibrary
+#' @template class-hierarchy
+#'
 #' @export
 transformationProductsLibrary <- setClass("transformationProductsLibrary", contains = "transformationProducts")
 
@@ -9,9 +24,20 @@ setMethod("initialize", "transformationProductsLibrary",
           function(.Object, ...) callNextMethod(.Object, algorithm = "library", ...))
 
 
+#' @details \code{generateTPsLibrary} obtains transformation products from a library. Similar to
+#'   \code{generateTPsBioTransformer}, this algorithm relies and provides structural information for parents/TPs
+#'   (\acronym{SMILES}). By default, a library is used that is based on data from
+#'   \href{https://pubchem.ncbi.nlm.nih.gov}{PubChem}. However, it also possible to use your own library.
+#'
+#' @param TPLibrary If \code{NULL}, a default \href{https://pubchem.ncbi.nlm.nih.gov}{PubChem} based library is used.
+#'   Otherwise, \code{TPLibrary} should be a \code{data.frame}. See section below.
+#' @param matchParentsBy A \code{character} that specifies how the input parents are matched with the data from the TP
+#'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.
+#'
+#' @rdname TP-generation
 #' @export
 generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
-                               matchSuspectsBy = "InChIKey")
+                               matchParentsBy = "InChIKey")
 {
     # UNDONE: default match by IK or IK1?
     
@@ -37,7 +63,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertFlag(skipInvalid, add = ac)
-    checkmate::assertChoice(matchSuspectsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
+    checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(TPLibrary))
@@ -72,15 +98,15 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
         parents <- getTPParents(parents, adduct, skipInvalid)
         
         # match with library
-        if (matchSuspectsBy == "InChIKey1")
+        if (matchParentsBy == "InChIKey1")
         {
             dataLib <- getIKBlock1(TPLibrary$parent_InChIKey)
             dataSusp <- getIKBlock1(parents$InChIKey)
         }
         else
         {
-            dataLib <- TPLibrary[[paste0("parent_", matchSuspectsBy)]]
-            dataSusp <- parents[[matchSuspectsBy]]
+            dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
+            dataSusp <- parents[[matchParentsBy]]
         }
         
         # rename from suspect list
@@ -129,6 +155,8 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
     return(transformationProductsLibrary(parents = parents, products = results))
 }
 
+#' @templateVar class transformationProductsLibrary
+#' @template convertToMFDB
 #' @export
 setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, includeParents)
 {

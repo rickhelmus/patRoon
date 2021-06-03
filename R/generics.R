@@ -115,8 +115,6 @@ setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGene
 setGeneric("generateTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("generateTPsComponents"))
 setGeneric("parents", function(TPs) standardGeneric("parents"))
 setGeneric("products", function(TPs) standardGeneric("products"))
-setGeneric("convertToMFDB", function(TPs, out, includeParents = TRUE) standardGeneric("convertToMFDB"))
-setGeneric("convertToSuspects", function(TPs, includeParents = TRUE) standardGeneric("convertToSuspects"))
 setGeneric("needsScreening", function(TPs) standardGeneric("needsScreening"))
 setGeneric("linkParentsToFGroups", function(TPs, fGroups) standardGeneric("linkParentsToFGroups"))
 setGeneric("linkTPsToFGroups", function(TPs, fGroups) standardGeneric("linkTPsToFGroups"))
@@ -210,15 +208,25 @@ setGeneric("clusterProperties", function(obj) standardGeneric("clusterProperties
 #' @template generics
 setGeneric("clusters", function(obj) standardGeneric("clusters"))
 
-#' @templateVar func cutClusters
-#' @templateVar desc Returns assigned cluster indices of a cut cluster.
-#' @template generics
-setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
-
 #' @templateVar func consensus
 #' @templateVar desc combines and merges data from various algorithms to generate a consensus.
 #' @template generics
 setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
+
+#' @templateVar func convertToMFDB
+#' @templateVar desc Exports the object to a local database that can be used with \command{MetFrag}.
+#' @template generics
+setGeneric("convertToMFDB", function(TPs, out, ...) standardGeneric("convertToMFDB"))
+
+#' @templateVar func convertToSuspects
+#' @templateVar desc Converts an object to a suspect list.
+#' @template generics
+setGeneric("convertToSuspects", function(TPs, ...) standardGeneric("convertToSuspects"))
+
+#' @templateVar func cutClusters
+#' @templateVar desc Returns assigned cluster indices of a cut cluster.
+#' @template generics
+setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 
 #' @templateVar func defaultExclNormScores
 #' @templateVar desc Returns default scorings that are excluded from normalization.

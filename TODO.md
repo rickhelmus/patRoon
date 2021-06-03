@@ -43,6 +43,7 @@
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
 - update GenForm
+- plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons?
 
 
 ## Components
@@ -175,10 +176,7 @@
     - generateFormulas: MSPeakLists argument
         - update handbook, tutorial...
     - MSPL
-        - reAverage for subset/filter
-        - ID column, used by fragInfo
-        - minMSMSPeaks and annotatedBy MSPeakLists filters
-        - clearly mention (refs, handbook) that MSPeakLists should not be filtered/subset after annotation
+        - handbook: clearly mention that MSPeakLists should not be filtered/subset after annotation
 - components
     - cliqueMS
         - mention fork is needed?

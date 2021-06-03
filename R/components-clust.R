@@ -42,7 +42,6 @@ verifyCompNotAltered <- function(obj)
 #' @slot altered Set to \code{TRUE} if the object was altered (\emph{e.g.} filtered) after its creation.
 #'
 #' @param x,obj A \code{componentsClust} (derived) object.
-#' @param col The colour used for plotting. Set to \code{NULL} for automatic colours.
 #' @param \dots Further options passed to \code{\link{plot.dendrogram}} (\code{plot}) or \code{\link[graphics]{plot}}
 #'   (\code{plotSilhouettes}).
 #'

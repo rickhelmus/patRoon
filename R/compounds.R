@@ -39,6 +39,10 @@ NULL
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
+#' @note The values ranges in the \code{scoreLimits} slot, which are used for normalization of scores, are based on the
+#'   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
+#'   \code{\link{generateCompounds}}).
+#'
 #' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and \link{compound-generation}.
 #'
 #' @templateVar class compounds

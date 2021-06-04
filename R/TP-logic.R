@@ -71,7 +71,7 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
 })
 
 #' @details \code{generateTPsLogic} applies \emph{metabolic logic} to predict transformation products. With this
-#'   algorithm, TPs are predicted from common (environmental) chemical reactions, such as hydroxylation, demthylation
+#'   algorithm, TPs are predicted from common (environmental) chemical reactions, such as hydroxylation, demethylation
 #'   etc. The generated TPs result from calculating the mass differences between a parent feature after it underwent the
 #'   reaction. While this only results in little information on chemical properties of the TP, an advantage of this
 #'   method is that it does not rely on structural information of the parent, which may be unknown in a full non-target
@@ -83,7 +83,7 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
 #' @param transformations A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
 #'   section below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).
 #'
-#' @section Source: The algorihtm of \code{generateTPsLogic} is directly based on the work done by Schollee \emph{et
+#' @section Source: The algorithm of \code{generateTPsLogic} is directly based on the work done by Schollee \emph{et
 #'   al.} (see references).
 #'
 #' @references \insertRef{Scholle2015}{patRoon}

@@ -9,6 +9,13 @@ NULL
 #' This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
 #' derived objects are created by \link[=TP-generation]{TP generators}.
 #'
+#' The TP data in objects from this class include a \code{retDir} column. These are \code{numeric} values that hint what
+#' the the chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will
+#' elute earlier, \samp{1} it will elute later and \samp{0} that there is no significant difference or the direction is
+#' unknown. These values are based on a typical reversed phase separation. When \code{\link{generateTPsBioTransformer}}
+#' or \code{\link{generateTPsLibrary}} was used to generate the data, the \code{retDir} values are based on calculated
+#' \code{log P} values of the parent and its TPs.
+#'
 #' @param TPs,x,object \code{transformationProducts} object to be accessed
 #'
 #' @seealso Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for

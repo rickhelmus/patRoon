@@ -749,17 +749,15 @@ NULL
 #'   library for \code{generateTPsLibrary}. This should be a \code{data.frame} where each row specifies a TP for a
 #'   parent, with the following columns: \itemize{
 #'
-#'   \item \code{parent_name} The name of the parent.
+#'   \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
 #'
-#'   \item \code{parent_SMILES} The \acronym{SMILES} of the parent structure.
+#'   \item \code{parent_SMILES} and \code{TP_SMILES} The \acronym{SMILES} of the parent structure.
 #'
-#'   \item \code{TP_name} The name of the TP.
-#'
-#'   \item \code{TP_SMILES} The \acronym{SMILES} of the TP structure.
+#'   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP (\strong{optional}).
 #'
 #'   }
 #'
-#'   More columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
+#'   Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
 #'   by repeating the value within \code{parent_} columns.
 #'
 #'   Similarly, the \code{transformations} argument to \code{generateTPsLogic} is used to specify custom rules to
@@ -776,6 +774,9 @@ NULL
 #'   (no significant change or unknown).
 #'
 #'   }
+#'
+#' @note When the \code{parents} argument is a \code{\link{compounds}} object, the candidate library \code{identifier}
+#'   is used in case the candidate has no defined \code{compoundName}.
 #'
 #' @seealso The \code{\link{transformationProducts}} class and derived classes \code{\link{transformationProductsBT}}
 #'   and \code{\link{transformationProductsLibrary}} for methods to post-process TP data.

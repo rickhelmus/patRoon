@@ -216,7 +216,7 @@ setMethod("linkParentsToFGroups", "transformationProductsBT", function(TPs, fGro
 #' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
 #'   details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be
 #'   useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
-#'   MS/MS spectral similarity.
+#'   MS/MS spectral similarity (which can be evaluated after componentization with \code{\link{generateComponentsTPs}}.
 #' @param negate If \code{TRUE} then filters are performed in opposite manner.
 #'
 #' @return \code{filter} returns a filtered \code{transformationProductsBT} object.

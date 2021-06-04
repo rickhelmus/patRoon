@@ -175,39 +175,49 @@
         - update handbook, tutorial...
     - MSPL
         - handbook: clearly mention that MSPeakLists should not be filtered/subset after annotation
+    - explain xlim/ylim behavior for annotations/mols for plotSpec()
 - components
     - cliqueMS
         - mention fork is needed?
 - sets
-    - setObjects() can be used for specific slots such as algo objects and MF settings
-    - filter() for features/fGroups: apply to neutral masses
-    - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
-    - intclust/specclust/TPs is not a componentsSet
-    - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
     - find nice way to re-use docs
-    - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
-    - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
-        - this could mean really different results if subsetting on sets is done prior to filtering
-        - put message() in sync function?
-    - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
-        - put message() in sync function?
-        - although subsetting doesn't sync anymore --> clearly document all this!
-    - document for every object how consensus/merge is done
-    - update/check version nr mentioned in filter() for MSPeakLists
-    - explain xlim/ylim behavior for annotations/mols for plotSpec()
-    - SIRIUS: batch calculations done per adduct
-    - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
-    - update/check version nr mentioned in filter() for MSPeakLists
-    - explain xlim/ylim behavior for annotations/mols for plotSpec()
-    - update for featThreshold and featThresholdAnn
-        - put featThreshold in common arguments handbook table?
-    - overlap/unique/plotVenn for sets: sets arg overrides `which`
-    - adducts<-
-        - for sets: make clear that order/names are taken from annTab[set == s]
-        - for sets: example with reGroup
-    - as.data.table() for formulas: formula column removed if average=T
-    - unset(fGroups) will get adduct annotated fGroups
-    - annotation
+        - combine with non-sets doc pages?
+            - add section with notes for sets (how data is merged/consensus, specific notes for methods etc)
+            - don't add method descriptions
+            - add sets specific params (note that they are specific in description?)
+    - General
+        - setObjects() can be used for specific slots such as algo objects and MF settings
+        - document for every object how consensus/merge is done
+        - sets(), unset()
+        - make general doc page?
+    - features
+        - filter(): apply to neutral masses
+        - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
+        - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
+            - overlap/unique/plotVenn for sets: sets arg overrides `which`
+        - adducts<-
+            - for sets: make clear that order/names are taken from annTab[set == s]
+            - for sets: example with reGroup
+        - unset(fGroups) will get adduct annotated fGroups
+        - groupFeatures: align doesn't work for sets with KPIC/XCMS
+        - xcms-conv: set/... args
+    - components
+        - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
+        - intclust/specclust/TPs is not a componentsSet
+    - Annotation
+        - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
+            - still relevant?
+        - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
+            - this could mean really different results if subsetting on sets is done prior to filtering
+            - put message() in sync function?
+        - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
+            - put message() in sync function?
+            - although subsetting doesn't sync anymore --> clearly document all this!
+        - update/check version nr mentioned in filter() for MSPeakLists
+        - SIRIUS: batch calculations done per adduct
+        - update for featThreshold and featThresholdAnn
+            - put featThreshold in common arguments handbook table?
+        - as.data.table() for formulas: formula column removed if average=T
         - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
         - @export multi methods?
         - algo consensus: done on setObjects
@@ -217,10 +227,6 @@
         - different rank columns
         - estIDLevel: best case, sublevels stripped if not the same
         - form/compRanks: not updated when subsetting on sets
-    - features
-        - groupFeatures: align doesn't work for sets with KPIC/XCMS
-        - xcms-conv
-            - set/... arg
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR

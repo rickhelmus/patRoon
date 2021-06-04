@@ -18,7 +18,7 @@
 \alias{annotatedPeakList,compounds-method}
 \alias{plotSpectrum,compounds-method}
 \alias{consensus,compounds-method}
-\title{Compound lists class}
+\title{Compound annotations class}
 \usage{
 \S4method{show}{compounds}(object)
 
@@ -101,30 +101,25 @@
 )
 }
 \arguments{
-\item{obj, object, x, compounds}{The \code{compound} object.}
+\item{obj, object, compounds}{The \code{compound} object.}
 
-\item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimum number
-of explained peaks, overall score, in-silico fragmentation score and
-formula score, respectively. Set to \code{NULL} to ignore. The
-\code{scoreLimits} argument allows for more advanced score filtering.}
+\item{minExplainedPeaks, scoreLimits}{Passed to the
+\code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
 
-\item{scoreLimits}{Filter results by their scores. Should be a named
-\code{list} that contains two-sized numeric vectors with the
-minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
-limits). The names of each element should follow the values returned by
-\code{\link{compoundScorings}()$name}. For instance,
-\code{scoreLimits=list(numberPatents=c(10, Inf))} specifies that
-\code{numberPatents} should be at least \samp{10}. For more details of
-scorings see \code{\link{compoundScorings}}. Note that a result without a
-specified scoring is never removed. Set to \code{NULL} to skip this filter.}
+\item{minScore, minFragScore, minFormulaScore}{Minimum overall score, in-silico fragmentation score and formula score,
+respectively. Set to \code{NULL} to ignore. The \code{scoreLimits} argument allows for more advanced score
+filtering.}
 
-\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
-  \code{\link[graphics]{plot}}.
+\item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 
-  Others: Any further (and unique) \code{compounds} objects.}
+  For \code{delete}: passed to the function specified as \code{j}.
 
-\item{formulas}{The \code{\link{formulas}} object that should be used for
-scoring/annotation. For \code{plotSpectrum}: set to \code{NULL} to ignore.}
+  for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
+
+  For \code{consensus}: any further (and unique) \code{compounds} objects.}
+
+\item{formulas}{The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
+and \code{annotatedPeakList}: set to \code{NULL} to ignore.}
 
 \item{updateScore}{If set to \code{TRUE} then the \code{score} column is
 updated by adding the normalized \option{formulaScore} (weighted by
@@ -134,14 +129,16 @@ updated by adding the normalized \option{formulaScore} (weighted by
 \item{formulaScoreWeight}{Weight used to update scoring (see
 \code{updateScore} parameter).}
 
-\item{index}{The numeric index of the candidate structure. Multiple indices
-(\emph{i.e.} vector with length >=2) may be specified for
-\code{plotStructure} and are mandatory for \code{getMCS}. Alternatively,
-\samp{-1} may be specified to these methods to select all candidates. When
-multiple indices are specified for \code{plotStructure}, their maximum
-common substructure will be drawn.}
+\item{index}{The numeric index of the candidate structure.
 
-\item{groupName}{The name of the feature group to which the candidate
+  For \code{plotStructure} and \code{getMCS}: multiple indices (\emph{i.e.} vector with length >=2) should be
+  specified to plot/calculate the most common substructure (MCS). Alternatively, \samp{-1} may be specified to select
+  all candidates.
+
+  For \code{plotSpectrum}: two indices can be specified to compare spectra. In this case \code{groupName} should
+  specify values for the spectra to compare.}
+
+\item{groupName}{The name of the feature group (or feature groups when comparing spectra) to which the candidate
 belongs.}
 
 \item{width, height}{The dimensions (in pixels) of the raster image that
@@ -178,26 +175,29 @@ results were removed after they were generated (\emph{e.g.} by use of
 have been used to rank data (see the \code{scoreTypes} argument to
 \code{\link{generateCompoundsMetFrag}} for more details).}
 
-\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
-generate the candidate}
+\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to generate the candidate}
 
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
 
-\item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
-spectrum.}
+\item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the spectrum. Currently not supported when
+comparing spectra.}
 
-\item{title}{The title of the plot. If \code{NULL} a title will be
-automatically made.}
+\item{title}{The title of the plot. If \code{NULL} a title will be automatically made.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
+See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
+
+\item{mincex}{The formula annotation labels are automatically scaled. The \code{mincex} argument forces a minimum
+\code{cex} value for readability.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
-\item{maxMolSize}{Numeric vector of size two with the maximum width/height of
-the candidate structure (relative to the plot size).}
+\item{maxMolSize}{Numeric vector of size two with the maximum width/height of the candidate structure (relative to
+the plot size).}
 
-\item{molRes}{Numeric vector of size two with the resolution of the candidate
-structure (in pixels).}
+\item{molRes}{Numeric vector of size two with the resolution of the candidate structure (in pixels).}
 
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
@@ -223,43 +223,11 @@ ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of \samp{1} means equal weights for all considered
 objects.}
 
-\item{drop, j}{ignored.}
-
-\item{i}{For \code{[}/\code{[[}: A numeric or character value which is used to select feature groups by
-their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a scalar value.}
-
-\item{name}{The feature group name (partially matched).}
-
-\item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
-score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.}
-
-\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
-
-\item{elements}{Only retain candidate formulae (neutral form) that match a
-given elemental restriction. The format of \code{elements} is a
-\code{character} string with elements that should be present where each
-element is followed by a valid amount or a range thereof. If no number is
-specified then \samp{1} is assumed. For instance,
-\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
-\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
-should be present, respectively. When \code{length(elements)>1} formulas
-are tested to follow at least one of the given elemental restrictions. For
-instance, \code{elements=c("P", "S")} specifies that either one phosphorus
-or one sulphur atom should be present. Set to \code{NULL} to ignore this
-filter.}
-
-\item{fragElements, lossElements}{Specifies elemental restrictions for
-fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow (or not follow if
-\code{negate=TRUE}) the given restrictions. See \code{elements} for the
-used format.}
+\item{labels}{A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.}
 }
 \value{
-\code{plotSpectrum} and \code{plotStructure} will return a
-  \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
-
-\code{filter} returns a filtered \code{compounds} object.
+\code{plotSpectrum} and \code{plotStructure} will return a \code{\link[=ggplot2]{ggplot object}} if
+  \code{useGGPlot2} is \code{TRUE}.
 
 \code{addFormulaScoring} returns a \code{compounds} object updated
   with formula scoring.
@@ -267,15 +235,15 @@ used format.}
 \code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
 
-\code{consensus} returns a \code{compounds} object that is produced
-  by merging multiple specified \code{compounds} objects.
+\code{consensus} returns a \code{compounds} object that is produced by merging multiple specified
+  \code{compounds} objects.
 }
 \description{
-Contains data of generated chemical compounds for given feature groups.
+Contains data for compound annotations for feature groups.
 }
 \details{
-\code{compounds} objects are obtained from
-\link[=compound-generation]{compound generators}.
+\code{compounds} objects are obtained from \link[=compound-generation]{compound generators}. This class is derived
+from the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -286,8 +254,9 @@ character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
 \code{identifiers} option of \code{\link{generateCompoundsMetFrag}}.
 
-\item \code{filter}: Provides rule based filtering for generated compounds.
-Useful to eliminate unlikely candidates and speed up further processing.
+\item \code{filter}: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
+and speed up further processing. Also see the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}}
+method.
 
 \item \code{addFormulaScoring}: Adds formula ranking data from a \code{\link{formulas}}
 object as an extra compound candidate scoring (\code{formulaScore} column).
@@ -309,8 +278,8 @@ substructure (MCS) of the selected candidates is drawn.
 \item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
 given candidate compound for a feature group.
 
-\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate
-compound for a feature group.
+\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
+be compared by specifying a two-sized vector for the \code{index} and \code{groupName} arguments.
 
 \item \code{consensus}: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
@@ -322,19 +291,11 @@ score will be \samp{0}). The original rankings for each object is stored in
 the \code{rank} columns.
 }}
 
-\section{Slots}{
-
-\describe{
-\item{\code{compounds}}{Lists of all generated compounds. Use the \code{compounds}
-method for access.}
-
-\item{\code{scoreTypes}}{A \code{character} with all the score types that were used
-when generating the compounds.}
-
-\item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
-results were generated. This is used for normalization.}
-}}
-
+\note{
+The values ranges in the \code{scoreLimits} slot, which are used for normalization of scores, are based on the
+  \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
+  \code{\link{generateCompounds}}).
+}
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{featureAnnotations}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}       \item{\code{\link{compoundsSet}}}       \itemize{         \item{\code{\link{compoundsConsensusSet}}}       }       \item{\code{\link{compoundsUnset}}}     }   } }
 }
@@ -347,4 +308,7 @@ results were generated. This is used for normalization.}
 
 \references{
 \addCitations{rcdk}{1}
+}
+\seealso{
+The \code{\link{featureAnnotations}} base class for more relevant methods and \link{compound-generation}.
 }

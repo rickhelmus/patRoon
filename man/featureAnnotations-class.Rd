@@ -4,13 +4,69 @@
 \name{featureAnnotations-class}
 \alias{featureAnnotations-class}
 \alias{featureAnnotations}
+\alias{annotations,featureAnnotations-method}
+\alias{groupNames,featureAnnotations-method}
+\alias{length,featureAnnotations-method}
+\alias{[,featureAnnotations,ANY,missing,missing-method}
+\alias{[[,featureAnnotations,ANY,missing-method}
+\alias{$,featureAnnotations-method}
+\alias{as.data.table,featureAnnotations-method}
 \alias{delete,featureAnnotations-method}
+\alias{filter,featureAnnotations-method}
+\alias{plotVenn,featureAnnotations-method}
+\alias{plotUpSet,featureAnnotations-method}
 \title{Base feature annotations class}
 \usage{
+\S4method{annotations}{featureAnnotations}(obj)
+
+\S4method{groupNames}{featureAnnotations}(obj)
+
+\S4method{length}{featureAnnotations}(x)
+
+\S4method{[}{featureAnnotations,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
+
+\S4method{[[}{featureAnnotations,ANY,missing}(x, i, j)
+
+\S4method{$}{featureAnnotations}(x, name)
+
+\S4method{as.data.table}{featureAnnotations}(
+  x,
+  fGroups = NULL,
+  fragments = FALSE,
+  countElements = NULL,
+  countFragElements = NULL,
+  OM = FALSE,
+  normalizeScores = "none",
+  excludeNormScores = defaultExclNormScores(x)
+)
+
 \S4method{delete}{featureAnnotations}(obj, i = NULL, j = NULL, ...)
+
+\S4method{filter}{featureAnnotations}(
+  obj,
+  minExplainedPeaks = NULL,
+  scoreLimits = NULL,
+  elements = NULL,
+  fragElements = NULL,
+  lossElements = NULL,
+  topMost = NULL,
+  OM = FALSE,
+  negate = FALSE
+)
+
+\S4method{plotVenn}{featureAnnotations}(obj, ..., labels = NULL, vennArgs = NULL)
+
+\S4method{plotUpSet}{featureAnnotations}(
+  obj,
+  ...,
+  labels = NULL,
+  nsets = length(list(...)) + 1,
+  nintersects = NA,
+  upsetArgs = NULL
+)
 }
 \arguments{
-\item{obj, x, object}{\code{featureAnnotations} object to be accessed}
+\item{obj, x}{\code{featureAnnotations} object to be accessed}
 
 \item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select feature groups by
 their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
@@ -20,44 +76,187 @@ feature groups as numeric index, logical or character, \code{j} the candidates a
 feature group, with the annotation table (a \code{data.table}) as first argument, the feature group name as second argument, and any other arguments passed as
 \code{\dots} to \code{delete}. The return value of this function specifies the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
-\item{\dots}{Ignored.}
+\item{\dots}{For the \code{"["} operator: ignored.
 
-\item{drop, j}{ignored.}
+  For \code{delete}: passed to the function specified as \code{j}.
+  
+  Others: Any further (and unique) \code{featureAnnotations} objects.}
+
+\item{drop}{ignored.}
 
 \item{name}{The feature group name (partially matched).}
+
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate this object. If not \code{NULL} it is used to add feature group
+information (retention and \emph{m/z} values).}
+
+\item{fragments}{If \code{TRUE} then information on annotated fragments will be included. Automatically set to
+\code{TRUE} if \code{countFragElements} is set.}
+
+\item{countElements, countFragElements}{A \code{character} vector with elements that should be counted for each
+candidate's formula. For instance, \code{c("C", "H")} adds columns for both carbon and hydrogen amounts of each
+formula. Note that the neutral formula (\code{neutral_formula} column) is used to count elements of non-fragmented
+formulae, whereas the charged formula of fragments (\code{ion_formula} column in \code{fragInfo} data) is used for
+fragments. Set to \code{NULL} to not count any elements.}
+
+\item{OM}{For \code{as.data.table}: if set to \code{TRUE} several columns with information relevant for organic
+  matter (OM) characterization will be added (e.g. elemental ratios, classification). This will also make sure that
+  \code{countElements} contains at least C, H, N, O, P and S.
+
+  For \code{filter}: If \code{TRUE} then several filters are applied to exclude unlikely formula candidates present
+  in organic matter (OM). See Source section for details.}
+
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+annotation scorings occurs. Either
+\code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+\command{SIRIUS}) is always performed as min-max. Furthermore, currently
+normalization for \code{compounds} takes the original min/max scoring
+values into account when candidates were generated. Thus, for
+\code{compounds} scoring, normalization is not affected when candidate
+results were removed after they were generated (\emph{e.g.} by use of
+\code{filter}).}
+
+\item{excludeNormScores}{A
+  \code{character} vector specifying any compound scoring names that
+  should \emph{not} be normalized. Set to \code{NULL} to normalize all
+  scorings. Note that whether any normalization occurs is set by the
+  \code{excludeNormScores} argument.
+
+  For \code{compounds}: By default \code{score} and
+  \code{individualMoNAScore} are set to mimic the behavior of the
+  \command{MetFrag} web interface.}
+
+\item{minExplainedPeaks}{Minimum number of explained peaks. Set to \code{NULL} to ignore.}
+
+\item{scoreLimits}{Filter results by their scores. Should be a named \code{list} that contains two-sized numeric
+vectors with the minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no limits). The names of each
+element should follow the name column of the table returned by \code{\link{formulaScorings}} and
+\code{\link{compoundScorings}()$name}. For instance, \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies
+that \code{numberPatents} should be at least \samp{10}. Note that a result without a specified scoring is never
+removed. Set to \code{NULL} to skip this filter.}
+
+\item{elements}{Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of \code{elements} is a
+\code{character} string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then \samp{1} is assumed. For instance,
+\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
+\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When \code{length(elements)>1} formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, \code{elements=c("P", "S")} specifies that either one phosphorus
+or one sulphur atom should be present. Set to \code{NULL} to ignore this
+filter.}
+
+\item{fragElements, lossElements}{Specifies elemental restrictions for
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow (or not follow if
+\code{negate=TRUE}) the given restrictions. See \code{elements} for the
+used format.}
+
+\item{topMost}{Only keep a maximum of \code{topMost} candidates with highest score (or least highest if
+\code{negate=TRUE}). Set to \code{NULL} to ignore.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
+
+\item{labels}{A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.}
+
+\item{vennArgs}{A \code{list} with further arguments passed to \pkg{VennDiagram} plotting functions. Set to
+\code{NULL} to ignore.}
+
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
+
+\item{upsetArgs}{A list with any further arguments to be passed to \code{\link[UpSetR]{upset}}. Set to \code{NULL} to
+ignore.}
 }
 \value{
+\code{as.data.table} returns a \code{\link{data.table}}.
+
 \code{delete} returns the object for which the specified data was removed.
+
+\code{filter} returns a filtered \code{featureAnnotations} object.
+
+\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
+\item \code{gList} the \code{gList} object that was returned by
+  the utilized \pkg{\link{VennDiagram}} plotting function.
+\item \code{areas} The total area for each plotted group.
+\item \code{intersectionCounts} The number of intersections between groups.
+}
+
+The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
+from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
+\code{\link{draw.triple.venn}}).
 }
 \description{
-Holds information for all feature (group) annotations.
+Holds information for all feature group annotations.
 }
 \details{
-This class provides a way to store intensity, retention times, \emph{m/z} and
-other data for all features in a set of analyses. The class is \code{virtual}
-and derived objects are created by 'feature finders' such as
-\code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and
-\code{findFeaturesBruker}.
+This class stores annotation data for feature groups, such as molecular formulae, SMILES identifiers, compound names
+etc. The class of objects that are generated by formula and compound annotation (\code{\link{generateFormulas}} and
+\code{\link{generateCompounds}}) are based on this class.
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{annotations}: Accessor for the \code{groupAnnotations} slot.
+
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups for which data is present in this object.
+
+\item \code{length}: Obtain total number of candidates.
+
+\item \code{[}: Subset on feature groups.
+
+\item \code{[[}: Extracts annotation data for a feature group.
+
+\item \code{$}: Extracts annotation data for a feature group.
+
+\item \code{as.data.table}: Generates a table with all annotation data for each feature group and other
+information such as element counts.
+
 \item \code{delete}: Completely deletes specified annotations.
+
+\item \code{filter}: Provides rule based filtering for feature group annotations. Useful to eliminate
+unlikely candidates and speed up further processing.
+
+\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
+candidates of up to five different \code{featureAnnotations} objects.
+
+\item \code{plotUpSet}: plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining
+unique and shared formula candidates between different \code{featureAnnotations} objects.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{features}}{List of features per analysis file. Use the
-\code{featureTable} method for access.}
+\item{\code{groupAnnotations}}{A \code{list} with for each annotated feature group a \code{data.table} with annotation data.
+Use the \code{annotations} method for access.}
 
-\item{\code{analysisInfo}}{Analysis group information. Use the \code{analysisInfo} method
-for access.}
+\item{\code{scoreTypes}}{A \code{character} with all the score types present in this object.}
+
+\item{\code{scoreRanges}}{The minimum and maximum score values of all candidates for each feature group. Used for
+normalization.}
 }}
 
-\section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{features}}}}     \itemize{       \item{\code{\link{featuresSet}}}       \item{\code{\link{featuresUnset}}}       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresKPIC2}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresSAFD}}}       \item{\code{\link{featuresSIRIUS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}       \item{\code{\link{featuresXCMS3}}}     }   } }
+\section{Source}{
+ Calculation of the aromaticity index (AI) and related double bond equivalents (DBE_AI) is performed
+  as described in Koch 2015. Formula classification is performed by the rules described in Abdulla 2013. Filtering of
+  OM related molecules is performed as described in Koch 2006 and Kujawinski 2006. (see references).
 }
 
+\section{S4 class hierarchy}{
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureAnnotations}}}}     \itemize{       \item{\code{\link{formulas}}}       \itemize{         \item{\code{\link{formulasConsensus}}}         \item{\code{\link{formulasSet}}}         \itemize{           \item{\code{\link{formulasConsensusSet}}}         }         \item{\code{\link{formulasUnset}}}       }       \item{\code{\link{compounds}}}       \itemize{         \item{\code{\link{compoundsConsensus}}}         \item{\code{\link{compoundsMF}}}         \item{\code{\link{compoundsSet}}}         \itemize{           \item{\code{\link{compoundsConsensusSet}}}         }         \item{\code{\link{compoundsUnset}}}       }     }   } }
+}
+
+\references{
+\insertRef{Koch2015}{patRoon} \cr\cr \insertRef{Abdulla2013}{patRoon} \cr\cr
+  \insertRef{Koch2006}{patRoon} \cr\cr \insertRef{Kujawinski2006}{patRoon}
+
+\insertRef{Conway2017}{patRoon} \cr\cr \insertRef{Lex2014}{patRoon}
+}
 \seealso{
-\code{\link{feature-finding}}
+\code{\link{formulas-class}} and \code{\link{compounds-class}}
+
+The derived \code{\link{formulas}} and \code{\link{compounds}} classes.
 }

@@ -82,9 +82,8 @@ used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
 \item{...}{Any parameters to be passed to the selected formula generation
 algorithm.}
 
-\item{precursorMzSearchWindow}{Search window for \emph{m/z} values (+/- the
-feature \emph{m/z}) used to find back feature data of precursor/parent ions
-from MS/MS spectra (this data is not readily available from
+\item{precursorMzSearchWindow}{Search window for \emph{m/z} values (+/- the feature \emph{m/z}) used to find back
+feature data of precursor/parent ions from MS/MS spectra (this data is not readily available from
 \command{SmartFormula3D} results).}
 
 \item{MSMode}{Whether formulae should be generated only from MS data (\code{"ms"}), MS/MS data (\code{"msms"}) or
@@ -108,6 +107,10 @@ formula should be present in at least 75\% of the features inside a feature grou
 \item{featThresholdAnn}{As \code{featThreshold}, but only considers features with annotations. For instance,
 \code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75\% of the features with
 annotations inside a feature group.}
+
+\item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
+values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
+\code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.}
 
 \item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting \code{close=TRUE}
@@ -220,29 +223,25 @@ each feature. The results are then combined for final assignment of candidate fo
 formula was found in multiple features within the group, the reported scorings and mass errors are averaged and other
 numeric values are those from the feature in the analysis of the \code{"analysis"} column. The calculation of
 formulae on 'feature level' might result in a more thorough formula search and better removal of outliers (controlled
-by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature group
-level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by using
-group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses. Note
-that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}} and
-\link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore, please
-note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
+by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature
+group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by
+using group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses.
+Note that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}}
+and \link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore,
+please note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
 
 \code{generateFormulas} is a generic function that will generate formulae using one of the supported algorithms. The actual
   functionality is provided by algorithm specific functions such as \code{generateFormulasDA} and \code{generateFormulasGenForm}. While these
   functions may be called directly, \code{generateFormulas} provides a generic interface and is therefore usually preferred.
 
-\code{generateFormulasDA} uses Bruker DataAnalysis to generate
-  chemical formulae. This method supports scoring based on overlap between
-  measured and theoretical isotopic patterns (both MS and MS/MS data) and the
-  presence of 'fitting' MS/MS fragments. The method will iterate through all
-  features (or "Compounds" in DataAnalysis terms) and call
-  \command{SmartFormula} (and \command{SmartFormula3D} if MS/MS data is
-  available) to generate all formulae. Parameters affecting formula
-  calculation have to be set in advance within the DataAnalysis method for
-  each analysis (\emph{e.g.} by \code{\link{setDAMethod}}). This method
-  requires that features were obtained with
-  \code{\link{findFeaturesBruker}}. Unlike other algorithms, there is no
-  prior need to generate \code{\link[=MSPeakLists]{MS peak lists}}.
+\code{generateFormulasDA} uses Bruker DataAnalysis to generate chemical formulae. This method supports
+  scoring based on overlap between measured and theoretical isotopic patterns (both MS and MS/MS data) and the
+  presence of 'fitting' MS/MS fragments. The method will iterate through all features (or "Compounds" in DataAnalysis
+  terms) and call \command{SmartFormula} (and \command{SmartFormula3D} if MS/MS data is available) to generate all
+  formulae. Parameters affecting formula calculation have to be set in advance within the DataAnalysis method for
+  each analysis (\emph{e.g.} by \code{\link{setDAMethod}}). This method requires that features were obtained with
+  \code{\link{findFeaturesBruker}}. It is recommended, but not mandatory, that the \code{\link{MSPeakLists}} are also
+  generated by DataAnalysis.
 
 \code{generateFormulasGenForm} uses
   \href{https://sourceforge.net/projects/genform/}{GenForm} to generate

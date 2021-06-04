@@ -226,7 +226,6 @@
         - cosine based on OrgMassSpecR
         - add also as contributor to eg DESCRIPTION
     - predictTPsBioTransformer
-        - use identifier as fallback for naming when no compoundName is present
         - compound similarities
             - refer to componentization in minSimilarity description
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
@@ -238,9 +237,7 @@
     - generateComponentsTPs()
         - if pred is NULL using filter() is crucial
         - shift ignored from specSimParams
-    - Section on custom libs/reactions, mention in TPLibrary/transformations argument
     - logic: mention results can be filtered with TP components
-    - explain retDir somewhere
     
 
 ## NEWS

@@ -21,13 +21,11 @@
 
 \item{method}{The clustering method passed to \code{\link{hclust}}.}
 
-\item{fpType}{The type of structural fingerprint that should be calculated.
-See the \code{type} argument of the \code{\link{get.fingerprint}} function
-of \CRANpkg{rcdk}.}
+\item{fpType}{The type of structural fingerprint that should be calculated. See the \code{type} argument of the
+\code{\link{get.fingerprint}} function of \CRANpkg{rcdk}.}
 
-\item{fpSimMethod}{The similarity method (i.e. not dissimilarity!) to be used
-for generating the distance matrix. See the \code{method} argument of the
-\code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.}
+\item{fpSimMethod}{The method for calculating similarities (i.e. not dissimilarity!). See the \code{method} argument
+of the \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
@@ -64,6 +62,9 @@ resulting clusters can then be characterized by evaluating their
   of \CRANpkg{rcdk}.
 }
 
+\references{
+\addCitations{rcdk}{1}
+}
 \seealso{
 compoundsCluster
 }

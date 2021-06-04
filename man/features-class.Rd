@@ -115,7 +115,7 @@ analysis, with the feature table (a \code{data.table}) as first argument, the an
 
 \item{\dots}{For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.}
 
-\item{drop, j}{ignored.}
+\item{drop}{ignored.}
 
 \item{name}{The analysis name (partially matched).}
 

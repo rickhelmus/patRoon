@@ -15,7 +15,7 @@
 \alias{plotSpectrum,formulas-method}
 \alias{plotScores,formulas-method}
 \alias{consensus,formulas-method}
-\title{Formula lists class}
+\title{Formula annotations class}
 \usage{
 \S4method{annotations}{formulas}(obj, features = FALSE)
 
@@ -83,36 +83,18 @@
 )
 }
 \arguments{
-\item{obj, x, object, formulas}{The \code{formulas} object.}
+\item{obj, x, object}{The \code{formulas} object.}
 
 \item{features}{If \code{TRUE} returns formula data for features, otherwise
 for feature groups.}
 
-\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses/feature groups by
-their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
+\item{i, j}{If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and \code{j} the feature
+group of the feature for which annotations should be returned. Otherwise \code{i} specifies the feature group for
+which group annotations should be returned. \code{i}/\code{j} can be specified as \code{integer} index or as a
+\code{character} name.}
 
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate this object. If not \code{NULL} it is used to add feature group
-information (retention and \emph{m/z} values).}
-
-\item{countElements, countFragElements}{A \code{character} vector with
-elements that should be counted for each MS(/MS) formula candidate. For
-instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
-amounts of each formula. Note that the neutral formula
-(\code{neutral_formula} column) is used to count elements of non-fragmented
-formulae, whereas the charged formula of fragments (\code{ion_formula}
-column in \code{fragInfo} data) is used for fragments. Set to \code{NULL} to not count any
-elements.}
-
-\item{OM}{For \code{as.data.table}: if set to \code{TRUE} several columns
-  with information relevant for organic matter (OM) characterization will be
-  added (e.g. elemental ratios, classification). This will also make sure
-  that \code{countElements} contains at least C, H, N, O, P and S.
-
-  For \code{filter}: If \code{TRUE} then several filters are applied to
-  exclude unlikely formula candidates present in organic matter (OM). See
-  Source section for details.}
+\item{fGroups, fragments, countElements, countFragElements, OM}{Passed to the
+\code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}} method.}
 
 \item{normalizeScores}{A \code{character} that specifies how normalization of
 annotation scorings occurs. Either
@@ -136,40 +118,48 @@ results were removed after they were generated (\emph{e.g.} by use of
   \code{individualMoNAScore} are set to mimic the behavior of the
   \command{MetFrag} web interface.}
 
-\item{average}{If set to \code{TRUE} an 'average formula' is generated for
-each feature group by combining all elements from all candidates and
-averaging their amounts. This obviously leads to non-existing formulae,
-however, this data may be useful to deal with multiple candidate formulae
-per feature group when performing elemental characterization.}
+\item{average}{If set to \code{TRUE} an 'average formula' is generated for each feature group by combining all
+elements from all candidates and averaging their amounts. This obviously leads to non-existing formulae, however,
+this data may be useful to deal with multiple candidate formulae per feature group when performing elemental
+characterization. Setting this to \code{TRUE} disables reporting of most other data.}
 
-\item{groupName}{The name of the feature group to which the candidate
+\item{index}{The candidate index (row). For \code{plotSpectrum} two indices can be specified to compare spectra. In
+this case \code{groupName} and \code{analysis} (if not \code{NULL}) should specify values for the spectra to
+compare.}
+
+\item{groupName}{The name of the feature group (or feature groups when comparing spectra) to which the candidate
 belongs.}
 
-\item{analysis}{A \code{character} specifying the analysis for which the
-annotated spectrum should be plotted. If \code{NULL} then annotation
-results for the complete feature group will be plotted.}
+\item{analysis}{A \code{character} specifying the analysis (or analyses when comparing spectra) for which the
+annotated spectrum should be plotted. If \code{NULL} then annotation results for the complete feature group will be
+plotted.}
 
-\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
-generate the candidate}
+\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to generate the candidate}
 
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
 
-\item{title}{The title of the plot. Set to \code{NULL} for an automatically
-generated title.}
+\item{title}{The title of the plot. Set to \code{NULL} for an automatically generated title.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
+See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
 plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
+\item{mincex}{The formula annotation labels are automatically scaled. The \code{mincex} argument forces a minimum
+\code{cex} value for readability.}
+
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
-\item{\dots}{For \code{plotSpectrum}: Further arguments passed to
-  \code{\link[graphics]{plot}}.
+\item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 
-  Others: Any further (and unique) \code{formulas} objects.}
+  For \code{delete}: passed to the function specified as \code{j}.
+
+  For \code{consensus}: Any further (and unique) \code{formulas} objects.}
 
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
@@ -195,14 +185,7 @@ ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of \samp{1} means equal weights for all considered
 objects.}
 
-\item{labels}{A \code{character} with names to use for labelling. If
-\code{NULL} labels are automatically generated.}
-
-\item{drop}{ignored.}
-
-\item{name}{The feature group name (partially matched).}
-
-\item{precursor}{The formula of the precursor (in neutral form).}
+\item{labels}{A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.}
 }
 \value{
 \code{annotations} returns a \code{list} containing for each feature
@@ -210,10 +193,7 @@ objects.}
   with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.
 
-\code{as.data.table} returns a \code{\link{data.table}}.
-
-\code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
-  object}} if \code{useGGPlot2} is \code{TRUE}.
+\code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 
 \code{consensus} returns a \code{formulas} object that is produced by
   merging results from multiple \code{formulas} objects.
@@ -222,8 +202,8 @@ objects.}
 Contains data of generated chemical formulae for given feature groups.
 }
 \details{
-\code{formulas} objects are obtained from \link[=formula-generation]{formula
-generators}.
+\code{formulas} objects are obtained from \link[=formula-generation]{formula generators}. This class is derived from
+the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -234,19 +214,17 @@ analyses for which data is present in this object.
 
 \item \code{show}: Show summary information for this object.
 
-\item \code{[[}: Extract a formula table. If both arguments (\code{i} and
-\code{j}) are specified, the feature specific formula table belonging to
-the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
-formula table for the feature group specified by \code{j} is returned.
+\item \code{[[}: Extracts a formula table, either for a feature group or for features in an analysis.
 
-\item \code{as.data.table}: Generates a table with all candidate formulae for each
-feature group and other information such as element counts.
+\item \code{as.data.table}: Generates a table with all candidate formulae for each feature group and other information such
+as element counts.
 
 \item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
 given candidate formula.
 
-\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate
-formula of a feature or feature group.
+\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
+spectra can be compared by specifying a two-sized vector for the \code{index}, \code{groupName} and (if desired)
+\code{analysis} arguments.
 
 \item \code{plotScores}: Plots a barplot with scoring of a candidate formula.
 
@@ -263,32 +241,20 @@ the \code{rank} columns.
 \section{Slots}{
 
 \describe{
-\item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the
+\item{\code{featureFormulas}}{A \code{list} with all generated formulae for each analysis/feature group. Use the
 \code{annotations} method for access.}
-
-\item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
-results were generated. This is used for normalization.}
 }}
-
-\section{Source}{
- Calculation of the aromaticity index (AI) and related double
-  bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
-  classification is performed by the rules described in Abdulla 2013.
-  Filtering of OM related molecules is performed as described in Koch 2006
-  and Kujawinski 2006. (see references).
-
- Subscripting of formulae for plots generated by
-  \code{plotSpectrum} is based on the \code{chemistry2expression} function
-  from the \href{https://github.com/schymane/ReSOLUTION}{ReSOLUTION} package.
-}
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{featureAnnotations}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}     \itemize{       \item{\code{\link{formulasConsensus}}}       \item{\code{\link{formulasSet}}}       \itemize{         \item{\code{\link{formulasConsensusSet}}}       }       \item{\code{\link{formulasUnset}}}     }   } }
 }
 
-\references{
-\insertRef{Koch2015}{patRoon} \cr\cr
-  \insertRef{Abdulla2013}{patRoon} \cr\cr
-  \insertRef{Koch2006}{patRoon} \cr\cr
-  \insertRef{Kujawinski2006}{patRoon}
+\section{Source}{
+ Subscripting of formulae for plots generated by
+  \code{plotSpectrum} is based on the \code{chemistry2expression} function
+  from the \href{https://github.com/schymane/ReSOLUTION}{ReSOLUTION} package.
+}
+
+\seealso{
+The \code{\link{featureAnnotations}} base class for more relevant methods and \link{formula-generation}.
 }

@@ -12,8 +12,10 @@
 \alias{calculatePeakQualities}
 \alias{clusterProperties}
 \alias{clusters}
-\alias{cutClusters}
 \alias{consensus}
+\alias{convertToMFDB}
+\alias{convertToSuspects}
+\alias{cutClusters}
 \alias{defaultExclNormScores}
 \alias{export}
 \alias{featureTable}
@@ -70,9 +72,13 @@ clusterProperties(obj)
 
 clusters(obj)
 
-cutClusters(obj)
-
 consensus(obj, ...)
+
+convertToMFDB(TPs, out, ...)
+
+convertToSuspects(TPs, ...)
+
+cutClusters(obj)
 
 defaultExclNormScores(obj)
 
@@ -221,16 +227,28 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=clusters,componentsClust-method]{componentsClust}}; \code{\link[=clusters,compoundsCluster-method]{compoundsCluster}}.
 }
 
-\code{cutClusters} Returns assigned cluster indices of a cut cluster.
-
-\itemize{
-    \item Methods are defined for: \code{\link[=cutClusters,componentsClust-method]{componentsClust}}; \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
-}
-
 \code{consensus} combines and merges data from various algorithms to generate a consensus.
 
 \itemize{
     \item Methods are defined for: \code{\link[=consensus,components-method]{components}}; \code{\link[=consensus,componentsSet-method]{componentsSet}}; \code{\link[=consensus,compounds-method]{compounds}}; \code{\link[=consensus,compoundsSet-method]{compoundsSet}}; \code{\link[=consensus,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=consensus,featureGroupsComparisonSet-method]{featureGroupsComparisonSet}}; \code{\link[=consensus,formulas-method]{formulas}}; \code{\link[=consensus,formulasSet-method]{formulasSet}}.
+}
+
+\code{convertToMFDB} Exports the object to a local database that can be used with \command{MetFrag}.
+
+\itemize{
+    \item Methods are defined for: .
+}
+
+\code{convertToSuspects} Converts an object to a suspect list.
+
+\itemize{
+    \item Methods are defined for: .
+}
+
+\code{cutClusters} Returns assigned cluster indices of a cut cluster.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=cutClusters,componentsClust-method]{componentsClust}}; \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{defaultExclNormScores} Returns default scorings that are excluded from normalization.

@@ -62,8 +62,6 @@ transformationProductsLogic <- setClass("transformationProductsLogic", contains 
 setMethod("initialize", "transformationProductsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-setMethod("needsScreening", "transformationProductsComponents", function(TPs) FALSE)
-
 setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, fGroups)
 {
     fg <- intersect(names(TPs), names(fGroups))

@@ -2,7 +2,7 @@ context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 2E4) # lower intensity threshold a bit to get benzotriazole in both polarities with sets
 # convert to screening results to simplify things a bit
-fGroups <- doScreen(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+fGroups <- doScreen(fGroups, patRoonData::suspectsPos[c(1:7, 33, 34, 36), ], onlyHits = TRUE) # focus on some +/- suspects and one with a non C fragment
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
@@ -73,12 +73,12 @@ test_that("basic subsetting", {
     expect_equal(length(formsGF[FALSE]), 0)
     expect_length(formsGFEmpty[1:5], 0)
 
-    expect_equivalent(formsGF[[2, 15]], annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
-    expect_equivalent(formsGF[[analyses(formsGF)[2], groupNames(formsGF)[15]]],
-                      annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[15]]])
+    expect_equivalent(formsGF[[2, 5]], annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[5]]])
+    expect_equivalent(formsGF[[analyses(formsGF)[2], groupNames(formsGF)[5]]],
+                      annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[5]]])
 
-    expect_equivalent(formsGF[[15]], annotations(formsGF)[[15]])
-    expect_equivalent(formsGF[[groupNames(formsGF)[15]]], annotations(formsGF)[[15]])
+    expect_equivalent(formsGF[[5]], annotations(formsGF)[[5]])
+    expect_equivalent(formsGF[[groupNames(formsGF)[5]]], annotations(formsGF)[[5]])
     expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
 
@@ -232,7 +232,7 @@ test_that("annotation works", {
     expect_true(any(grepl("sirius", anPLCons$mergedBy)))
 })
 
-reportGroups <- groupNames(formsGFWithMSMS)[1:10]
+reportGroups <- groupNames(formsGFWithMSMS)[1:5]
 test_that("reporting works", {
     expect_error(reportCSV(fGroups, getWorkPath(), formulas = formsGF), NA)
     for (grp in groupNames(formsGF))

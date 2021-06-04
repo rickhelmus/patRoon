@@ -639,6 +639,8 @@ NULL
 #' generally useful to provide more information for compound annotation and reduce the data size and thus complexity.
 #'
 #' @param fGroups \code{\link{featureGroups}} object for which components should be generated.
+#'
+#'   For \code{generateComponentsTPs}: also see the \code{fGroupsTPs} argument.
 #' @param ionization Which ionization polarity was used to generate the data: should be \code{"positive"} or
 #'   \code{"negative"}.
 #' @param minSize The minimum size of a component. Smaller components than this size will be removed. For
@@ -674,6 +676,11 @@ NULL
 #'   will be executed in the given order until one succeeds. See the \verb{Feature components} section for more details.
 #' @param prefAdducts A \code{character} vector with one or more \emph{preferential adducts}. See the \verb{Feature
 #'   components} section for more details.
+#' @param MSPeakLists The \code{\link{MSPeakLists}} object for the given feature groups that should be used for MS
+#'   spectral similarity calculations. For \code{generateComponentsTPs} it can be \code{NULL}, in which case no
+#'   calculations are performed.
+#'
+#' @template specSimParams-arg
 #'
 #' @template dynamictreecut
 #'
@@ -709,9 +716,14 @@ NULL
 #'
 #'   }
 #'
-#' @return A \code{\link{components}} (derived) object containing all generated components. The algorithms based on
-#'   'feature components' return a \code{\link{componentsFeatures}} derived object. \code{generateComponentsIntClust}
-#'   and generateComponentsSpecClust return objects dervied from \code{\link{componentsSpecClust}}.
+#' @return A \code{\link{components}} (derived) object containing all generated components.
+#'
+#'   The algorithms based on 'feature components' return a \code{\link{componentsFeatures}} derived object.
+#'
+#'   \code{generateComponentsIntClust} and \code{generateComponentsSpecClust} return objects derived from
+#'   \code{\link{componentsSpecClust}}.
+#'   
+#'   \code{generateComponentsTPs} returns objects derived from \code{\link{componentsTPs}}.
 #'
 #' @note For \code{generateComponentsCAMERA} and \code{generateComponentsRAMClustR}: the \code{minSize} and
 #'   \code{relMinReplicates} arguments provide additional filtering functionality not provided by \pkg{CAMERA} or

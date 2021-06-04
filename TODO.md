@@ -225,19 +225,12 @@
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR
         - add also as contributor to eg DESCRIPTION
-    - predictTPsBioTransformer
-        - compound similarities
-            - refer to componentization in minSimilarity description
     - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
         - min peaks always applied lastly
-    - mention that retDirMatch filter ignores any zero values for TP_retDir/retDir (ie to be safe)
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - doc somewhere plotInt order with sets
     - refs for PC transformations
-    - generateComponentsTPs()
-        - if pred is NULL using filter() is crucial
-        - shift ignored from specSimParams
-    - logic: mention results can be filtered with TP components
+    - logic: mention results can be filtered with TP components?
     
 
 ## NEWS

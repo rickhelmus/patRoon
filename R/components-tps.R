@@ -278,6 +278,19 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     return(ret[])
 }
 
+#' Components based on parent and transformation product (TP) linkage.
+#'
+#' This class is derived from \code{\link{components}} and is used to store components that result from linking feature
+#' groups that are (predicted to be) parents with feature groups that (are predicted to be) transformation products. For
+#' more details, see \code{\link{generateComponentsTPs}}.
+#'
+#' @param x,obj A \code{componentsTPs} object.
+#'
+#' @seealso \code{\link{components}} for other relevant methods and \link{component-generation}
+#'
+#' @templateVar class componentsTPs
+#' @template class-hierarchy
+#'
 #' @template components_noint
 #' @export
 componentsTPs <- setClass("componentsTPs", contains = "components")
@@ -299,7 +312,7 @@ setMethod("collapseComponents", "componentsTPs", function(obj)
     return(obj)
 })
 
-#' @describeIn componentsTPs Returns all component data in a table.
+#' @describeIn componentsTPs Returns all component data as a \code{\link{data.table}}.
 #' @export
 setMethod("as.data.table", "componentsTPs", function(x)
 {
@@ -312,6 +325,29 @@ setMethod("as.data.table", "componentsTPs", function(x)
     return(callNextMethod(x))
 })
 
+#' @describeIn componentsTPs Provides various rule based filtering options to clean and prioritize TP data.
+#'
+#' @param \dots,verbose Further arguments passed to the base \code{\link[=filter,components-method]{filter method}}.
+#' @param retDirMatch If set to \code{TRUE}, only keep TPs for which the retention time direction (\code{retDir}, see
+#'   Details in \link{componentsTPs}) matches with the observed direction. TPs will never be removed if the
+#'   expected/observed direction is \samp{0} (\emph{i.e.} unknown or not significantly different than the parent).
+#' @param minSpecSim,minSpecSimPrec,minSpecSimBoth The minimum spectral similarity of a TP compared to its parent
+#'   (\samp{0-1}). The \code{minSpecSimPrec} and \code{minSpecSimBoth} apply to binned data that is shifted with the
+#'   \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral similarity
+#'   parameters} for more details). Set to \code{NULL} to ignore.
+#' @param minFragMatches,minNLMatches Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
+#'   to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
+#'   \link{component-generation} for more details.
+#' @param formulas A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
+#'   additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
+#'   \code{\link{generateTPsLogic}}). To verify elemental additions, only TPs with at least one candidate formula that
+#'   has these elements are kept. Similarly, for elemental subtractions, any of the parent candidate formulae must
+#'   contain the subtraction elements. Note that TPs are currently not filtered if either the parent or the TP has no
+#'   formula annotations. Set to \code{NULL} to ignore.
+#' @param negate If \code{TRUE} then filters are applied in opposite manner.
+#'
+#' @return \code{filter} returns a filtered \code{componentsTPs} object.
+#'
 #' @export
 setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                                               minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
@@ -422,12 +458,9 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     return(obj)
 })
 
-#' @describeIn componentsTPs Plots an interactive network graph for linked
-#'   components. Components are linked when (partial) overlap occurs of their
-#'   containing transformation products. The graph is constructed with the
-#'   \pkg{\link{igraph}} package and rendered with \pkg{\link{visNetwork}}.
-#'
-#' @param obj The \code{componentsTPs} object to plot.
+#' @describeIn componentsTPs Plots an interactive network graph for linked components. Components are linked with each
+#'   other if one or more transformation products overlap. The graph is constructed with the \pkg{\link{igraph}} package
+#'   and rendered with \pkg{\link{visNetwork}}.
 #'
 #' @template plotGraph
 #'
@@ -446,14 +479,90 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
     makeGraph(obj, onlyLinked, titles)
 })
 
+#' @details \code{generateComponentsTPs} generates components by linking feature groups of transformation products and
+#'   their parents. Moreover, this method typically employs data from \link[=TP-generation]{generated transformation
+#'   products} to find parents and their TPs. However, this data is not necessary, and components can also be made based
+#'   on MS/MS similarity and/or other annotation similarities between the parent and its TPs. For more details see the
+#'   \verb{Linking parents and transformation products} section below.
+#'
+#' @param fGroupsTPs A \code{\link{featureGroups}} object containing the feature groups that are expected to be
+#'   transformation products. If a distinction between parents and TPs is not yet known, \code{fGroupsTPs} should equal
+#'   the \code{fGroups} argument. Otherwise, \code{fGroups} should only contain the parent feature groups, and both
+#'   \code{fGroups} and \code{fGroupsTPs} \emph{must} be a subset of the same \code{\link{featureGroups}} object.
+#' @param ignoreParents If \code{TRUE} then feature groups present in both \code{fGroups} and \code{fGroupsTPs} are not
+#'   considered as TPs.
+#' @param TPs A \code{\link{transformationProducts}} object. Set to \code{NULL} to perform linking without this data.
+#' @param formulas,compounds A \code{\link{formulas}}/\code{\link{compounds}} object to calculate annotation
+#'   similarities between parents and TPs. If \code{NULL} then this data is not calculated. For more details see the
+#'   \verb{Linking parents and transformation products} section below.
+#' @param minRTDiff Minimum retention time difference between the parent and a TP to determine whether a TP elutes
+#'   prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
+#'
+#' @section Linking parents and transformation products: With \code{generateComponentsTPs}, each component consists of
+#'   feature groups that are considered to be transformation products for one parent (the parent that 'belongs' to the
+#'   component can be retrieved with the \code{\link{componentInfo}} method). The parent feature groups are taken from
+#'   the \code{fGroups} parameter, while the feature groups for TPs are taken from \code{fGroupsTPs}. If a feature group
+#'   occurs in both variables, it may therefore be considered as both a parent or TP.
+#'
+#'   If transformation product data is given, \emph{i.e.} the \code{TPs} argument is set, then a suspect screening of
+#'   the TPs must be performed in advance (see \code{\link{screenSuspects}} and \code{\link{convertToSuspects}} to
+#'   create the suspect list). Furthermore, if TPs were generated with \code{\link{generateTPsBioTransformer}} or
+#'   \code{\link{generateTPsLibrary}} then the suspect screening must also include the parents (\emph{i.e.} by setting
+#'   \code{includeParents=TRUE} when calling \code{convertToSuspects}). The suspect screening is necessary for the
+#'   componentization algorithm to map the feature groups of the parent or TP. If the the suspect screening yields
+#'   multiple TP hits, all will be reported. Similarly, if the suspect screening contains multiple hits for a parent, a
+#'   component is made for each of the parent hits.
+#'
+#'   In case no transformation product data is provided (\code{TPs=NULL}), the componentization algorithm simply assumes
+#'   that each feature group from \code{fGroupsTPs} is a potential TP for every parent feature group in \code{fGroups}.
+#'   For this reason, it is highly recommended to specify which feature groups are parents/TPs (see the
+#'   \code{fGroupsTPs} argument description above) and \emph{crucial} that the data is post-processed, for instance by
+#'   only retaining TPs that have high annotation similarity with their parents (see the
+#'   \code{\link[=filter,componentsTPs-method]{filter}} method for \code{\link{componentsTPs}}).
+#'
+#'   An typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
+#'   calculating Fold Changes (see the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for
+#'   feature groups and \code{\link{plotVolcano}}). Of course, other statistical techniques from \R are also suitable.
+#'
+#'   During componentization, several characteristics are calculated which may be useful for post-processing: \itemize{
+#'
+#'   \item \code{specSimilarity}: the MS/MS spectral similarity between the feature groups of the TP and its parent
+#'   (\samp{0-1}).
+#'
+#'   \item \code{specSimilarityPrec},\code{specSimilarityBoth}: as \code{specSimilarity}, but calculated with binned
+#'   data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
+#'   similarity parameters} for more details).
+#'
+#'   \item \code{fragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
+#'   parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
+#'   prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
+#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragMatches} is
+#'   mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when \code{TPs=NULL}
+#'   or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used, it is highly
+#'   recommended that the annotation objects are first processed with the \code{\link{filter}} method, for instance, to
+#'   select only the top ranked candidates.
+#'
+#'   \item \code{neutralLossMatches} As \code{fragmentMatches}, but counting overlapping neutral loss formulae.
+#'
+#'   \item \code{retDir} The retention time direction of the TP relative to its parent. See Details in
+#'   \link{componentsTPs}. If TP data was specified, the expected direction is stored in \code{TP_retDir}.
+#'
+#'   \item \code{retDiff},\code{mzDiff},\code{formulaDiff} The retention time, \emph{m/z} and formula difference between
+#'   the parent and TP (latter only available if data TP formula is available).
+#'
+#'   }
+#'
+#' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always
+#'   calculates similarities with all supported options.
+#'
+#'
+#' @rdname component-generation
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,
                                                              TPs = NULL, MSPeakLists = NULL, formulas = NULL,
                                                              compounds = NULL, minRTDiff = 20,
                                                              specSimParams = getDefSpecSimParams())
 {
-    # UNDONE: doc when fGroups/fGroupsTPs needs to be fGroupsScreening
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
            c("featureGroups", "transformationProducts", "MSPeakLists", "formulas", "compounds"),

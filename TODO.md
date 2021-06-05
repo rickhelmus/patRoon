@@ -33,6 +33,7 @@
         - either with futures or with MP and cache intensities afterwards
     - OpenMS: alignment may yield negative RTs...
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
+    - XCMS: multiple features grouped in same analysis?
 
 ## Annotation
 
@@ -80,6 +81,7 @@
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
     - disable parallellization (by default)?
+    - check output if type != "env"
 - metabolic logic
     - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
 - predictTPsComponents

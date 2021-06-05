@@ -54,11 +54,10 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
         # for fGroups with features that have a preferential adduct: remove all others or ones that are lower ranked
         cmpTab[!is.na(adduct_ion), prefInd := match(adduct_ion, prefAdducts, nomatch = length(prefAdducts) + 1),
                by = "group"]
-        cmpTab[, keep := is.na(adduct_ion) | prefInd == min(prefInd), by = "group"]
-        browser()
         # NOTE: below leaves features untouched if none of the adducts are preferential, since prefInd will be the same
         # for all and thus all are equal to min(prefInd)
-        cmpTab <- cmpTab[is.na(adduct_ion) | prefInd == min(prefInd), by = "group"][, -"prefInd"]
+        cmpTab[, keep := is.na(adduct_ion) | prefInd == min(prefInd), by = "group"]
+        cmpTab <- cmpTab[is.na(adduct_ion) | keep == TRUE][, keep := NULL]
     }
     
     # Only the most abundantly assigned adduct for each feature group. NOTE: if preferential adducts were selected above
@@ -166,9 +165,11 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # NOTE: minSize should be >= 1 to filter out empty components
     comps <- comps[sapply(comps, nrow) >= minSize]
     
-    comps <- calculateComponentIntensities(comps, fGroups)
-    
-    names(comps) <- paste0("CMP", seq_along(comps))
+    if (length(comps) > 0)
+    {
+        comps <- calculateComponentIntensities(comps, fGroups)
+        names(comps) <- paste0("CMP", seq_along(comps))
+    }
     
     cInfo <- data.table(name = names(comps), cmp_ret = sapply(comps, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(comps, function(cmp) sd(cmp$ret)),

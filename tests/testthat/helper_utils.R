@@ -280,7 +280,8 @@ expect_reportHTML <- function(object)
     rpFile <- getWorkPath("report.html")
     unlink(getWorkPath("report.html")) # in case it already exists
     
-    withr::with_options(list(patRoon.cache.mode = "save"), act <- quasi_label(rlang::enquo(object)))
+    clearCache("reportPlots") # reset cached plots
+    act <- quasi_label(rlang::enquo(object))
     
     expect(file.exists(rpFile), "failed to generate report")
 

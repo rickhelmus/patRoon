@@ -235,6 +235,9 @@ test_that("annotatedBy filter for MSPL", {
 # be fixed by setting a small delay between starting up processes (delayBetweenProc arg of executeMultiProcess())
 jnatiTestDir <- file.path(tempdir(), "jnati-test")
 test_that("MetFrag uninitialized jniinchi workaround", {
+    # this test has been working for a very long time and eats up quite some time, disabled for now
+    skip("not needed anymore")
+    
     skip_if_not(doMetFrag)
 
     # temporarily change jnati workdir so it can be safely wiped
@@ -252,6 +255,9 @@ test_that("MetFrag uninitialized jniinchi workaround", {
 })
 
 test_that("MetFrag can timeout", {
+    # this test is probably obsolete, skip for now to save time
+    skip("already tested with multiProc tests")
+    
     skip_if_not(doMetFrag)
     withr::with_options(c(patRoon.cache.mode = "none"), {
         # call with unreasonably short timeout...

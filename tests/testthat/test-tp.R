@@ -143,7 +143,7 @@ test_that("basic usage", {
     testMFDB(TPsBTComp)
 })
 
-fGroupsMore <- getTestFGroups()
+fGroupsMore <- getTestFGroups(getTestAnaInfoAnn())
 componTPsNone <- generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL)
 componTPsNoneTPDiff <- generateComponents(fGroupsMore[, 1:25], "tp", fGroupsMore[, 26:50], TPs = NULL)
 
@@ -222,6 +222,11 @@ componTPsRetFN <- filter(componTPsLogic, retDirMatch = TRUE, negate = TRUE)
 
 if (doMetFrag)
 {
+    # HACK: add unlikely element so we can easily test formula filter below
+    componTPsLogicMod <- componTPsLogic
+    componTPsLogicMod@components[[1]] <- copy(componTPsLogicMod@components[[1]])
+    componTPsLogicMod@components[[1]][, trans_add := "Cl"]
+    
     plistsLogicAnn <- generateMSPeakLists(fGroupsTPsLogic, "mzr")
     formsLogicAnn <- doGenForms(fGroupsTPsLogic, plistsLogicAnn, "genform", calculateFeatures = FALSE)
 }
@@ -236,8 +241,8 @@ test_that("TP component usage", {
     
     skip_if_not(doMetFrag)
     
-    expect_lt(nrow(as.data.table(filter(componTPsLogic, formulas = formsLogicAnn))),
-              nrow(as.data.table(componTPsLogic)))
+    expect_lt(nrow(as.data.table(filter(componTPsLogicMod, formulas = formsLogicAnn))),
+              nrow(as.data.table(componTPsLogicMod)))
     
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSim = 0.2), "specSimilarity"), 0.2)
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2), "specSimilarityPrec"), 0.2)

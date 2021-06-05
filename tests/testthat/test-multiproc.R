@@ -106,10 +106,16 @@ test_that("multi-process functionality", {
 })
 
 test_that("multi-process future functionality", {
+    
     withr::local_options(list(patRoon.MP.method = "future"))
-    future::plan("multisession", workers = 2)
-    withr::defer(future::plan("sequential"))
-
+    
+    # for now don't change to multisession on CI, as this sometimes can add several minutes(!) of waiting time...
+    if (!testthat:::on_ci())
+    {
+        future::plan("multisession", workers = 2)
+        withr::defer(future::plan("sequential"))
+    }
+    
     performMPTest(10)
     performMPTest(3, failFirst = TRUE, errorHandler = ehandler, procTimeout = 5)
 

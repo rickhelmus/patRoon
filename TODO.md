@@ -34,6 +34,7 @@
     - OpenMS: alignment may yield negative RTs...
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
     - XCMS: multiple features grouped in same analysis?
+        - can be, but now handled by default method="medret" param. Make this configurable?
 
 ## Annotation
 

@@ -73,6 +73,7 @@
     - disallow commas, minus and algo consensus labels in set names
     - screening: filter on set specific rank cols? Or all?
         - for now all if no sets columns are present (ie not ID level and ranks)
+    - (dis)allow makeSet for featuresSet objects?
 
 
 ## TPs
@@ -201,12 +202,7 @@
         - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
     - features
-        - class
-            - sets method (new)
-            - filter, [: sets argument
-            - unset (new)
-                - ionize masses
-        - makeSet
+        - makeSet (features method)
     - fGroups
         - class
             - adducts<-
@@ -217,6 +213,7 @@
             - explain grouping
             - groupFeatures: align doesn't work for sets with KPIC/XCMS
             - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
+        - makeSet (fGroups method)
     - components
         - class
             - [, filter: sets arg

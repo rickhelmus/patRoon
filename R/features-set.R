@@ -68,13 +68,31 @@ doMakeFeaturesSet <- function(featuresList, adducts)
                        algorithm = makeSetAlgorithm(featuresList)))
 }
 
+#' @param set \setsWF The name of the set.
+#' @param sets \setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
+#'   \code{negate=TRUE}).
+#'
+#' @section Sets workflows: \setsWFClass{featuresSet}{features}
+#'
+#'   \setsWFNewMethodsFeat{featuresUnset}{The adduct annotations for the selected set (\emph{e.g.} as passed to
+#'   \code{makeSet}) are used to convert all feature masses to ionic \emph{m/z} values. }
+#'
+#'   \setsWFChangedMethods{
+#'
+#'   \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
+#'   presence in) sets. See the \code{sets} argument description.
+#'
+#'   }
+#'
+#' @rdname features-class
 #' @export
 featuresSet <- setClass("featuresSet", contains = "features")
 
+#' @rdname features-class
 #' @export
 setMethod("sets", "featuresSet", function(obj) unique(analysisInfo(obj)$set))
 
-#' @describeIn featuresSet Shows summary information for this object.
+#' @rdname features-class
 #' @export
 setMethod("show", "featuresSet", function(object)
 {
@@ -82,7 +100,7 @@ setMethod("show", "featuresSet", function(object)
     printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
 })
 
-#' @describeIn featuresSet Returns all feature data in a table.
+#' @rdname features-class
 #' @export
 setMethod("as.data.table", "featuresSet", function(x)
 {
@@ -93,8 +111,7 @@ setMethod("as.data.table", "featuresSet", function(x)
     return(ret[])
 })
 
-#' @describeIn featuresSet Subset on analyses.
-#' @param \dots Ignored.
+#' @rdname features-class
 #' @export
 setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
 {
@@ -108,13 +125,7 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
     return(x)
 })
 
-#' @describeIn features Performs common rule based filtering of features. Note
-#'   that this (and much more) functionality is also provided by the
-#'   \code{filter} method defined for \code{\link{featureGroups}}. However,
-#'   filtering a \code{features} object may be useful to avoid grouping large
-#'   amounts of features.
-#' @templateVar feat TRUE
-#' @template feat-filter-args
+#' @rdname features-class
 #' @export
 setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NULL)
 {
@@ -136,6 +147,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
+#' @rdname features-class
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
 {
@@ -156,7 +168,12 @@ setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
     return(doMakeFeaturesSet(featuresList, adducts))
 })
 
+#' @rdname features-class
+#' @export
 featuresUnset <- setClass("featuresUnset", contains = "features")
+
+#' @rdname features-class
+#' @export
 setMethod("unset", "featuresSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)

@@ -199,6 +199,7 @@
         - unset(): returns Unset class
         - make general doc page?
         - adduct/ionization args cannot be used: automatically set from set annotation data
+        - order of sets section
     - features
         - class
             - sets method (new)
@@ -208,24 +209,10 @@
         - makeSet
     - fGroups
         - class
-            - sets method (new)
-            - adducts method: set arg
             - adducts<-
-                - sets arg
-                - make clear that order/names are taken from annTab[set == s]
                 - example with reGroup
-            - [: sets arg
-            - filter(): sets/absMinSets/relMinSets args, apply to neutral masses
+                    - ?
             - xcms-conv: set/... args
-            - as.data.table: normalization performed per set
-            - plotInt: sets arg (splits trend plot per set)
-            - overlap/unique/plotVenn for sets: sets arg overrides `which`
-            - selectIons(): clearly document that re-group --> new group names! (eg workflow objects now incompatible)
-            - makeSet: doesn't work yet for sets objects
-            - unset
-                - ionizes masses
-                - will get adduct annotated fGroups
-            - annTab slot is changed
         - generators
             - explain grouping
             - groupFeatures: align doesn't work for sets with KPIC/XCMS

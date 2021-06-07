@@ -1,15 +1,28 @@
 #' @include main.R
 #' @include compounds.R
 #' @include workflow-step-set.R
+#' @include utils-feat_annotations-set.R
 NULL
 
 # NOTE: some methods are set in utils-feat_annotations-set.R
 
-
+# NOTE: can't break the long line below
+#' @templateVar class compoundsSet
+#' @templateVar parent compounds
+#' @templateVar generator generateCompounds
+#' @templateVar classUnset compoundsUnset
+#' @templateVar exObj compounds
+#' @templateVar extraMethods \item \code{addFormulaScoring} Adds the formula scorings to the original data and re-creates the annotation set consensus (see below for implications).
+#' @template featAnnSets-class
+#'
+#' @rdname compounds-class
+#' @export
 compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", setThresholdAnn = "numeric",
                                                    origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
 
+#' @rdname compounds-class
+#' @export
 compoundsConsensusSet <- setClass("compoundsConsensusSet", slots = c(mergedConsensusNames = "character"),
                                   contains = "compoundsSet")
 
@@ -26,13 +39,29 @@ setMethod("updateSetConsensus", "compoundsSet", function(obj)
     return(obj)
 })
 
-#' @describeIn compoundsSet Shows summary information for this object.
+setMethod("mergedConsensusNames", "compoundsSet", doFeatAnnMCNSets)
+setMethod("mergedConsensusNames", "compoundsConsensusSet", doFeatAnnMCNSetsCons)
+
+#' @rdname compounds-class
 #' @export
 setMethod("show", "compoundsSet", function(object)
 {
     callAllNextMethods(object, show, firstClass = "compounds", startFrom = "compoundsSet")
 })
 
+#' @rdname compounds-class
+#' @export
+setMethod("delete", "compoundsSet", doFeatAnnDeleteSets)
+
+#' @rdname compounds-class
+#' @export
+setMethod("[", "compoundsSet", doFeatAnnSubsetSets)
+
+#' @rdname compounds-class
+#' @export
+setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
+
+#' @rdname compounds-class
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                    plotStruct = TRUE, title = NULL,
@@ -160,6 +189,8 @@ setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MS
                     perSet, mirror))
 })
 
+#' @rdname compounds-class
+#' @export
 setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, updateScore,
                                                         formulaScoreWeight)
 {
@@ -173,6 +204,8 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     return(compounds)
 })
 
+#' @rdname compounds-class
+#' @export
 setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL, ...)
 {
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
@@ -189,6 +222,7 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, M
     return(doAnnotatePeakListSet(obj, index, groupName, MSPeakLists, formulas, ...))
 })
 
+#' @rdname compounds-class
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                 uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
@@ -243,7 +277,12 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
 }
 
 
+#' @rdname compounds-class
+#' @export
 compoundsUnset <- setClass("compoundsUnset", contains = "compounds")
+
+#' @rdname compounds-class
+#' @export
 setMethod("unset", "compoundsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
@@ -252,6 +291,8 @@ setMethod("unset", "compoundsSet", function(obj, set)
                           algorithm = paste0(algorithm(obj), "_unset")))
 })
 
+#' @rdname compounds-class
+#' @export
 setMethod("unset", "compoundsConsensusSet", function(obj, set)
 {
     # get rid of overall consensus cols, as they interfere when set specific are renamed in the parent unset method

@@ -49,7 +49,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   discussed below.
 #'
 #'   \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
-#'   presence in) sets. See the \code{sets} argument description.
+#'   presence in) sets. See the argument descriptions.
 #'
 #'   \item \code{as.data.table}: normalization of intensities is performed per set.
 #'
@@ -153,14 +153,11 @@ setMethod("show", "featureGroupsSet", function(object)
     printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
 })
 
-#' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
+#' @rdname featureGroups-class
 #' @export
 setMethod("featureTable", "featureGroupsSet", function(obj) featureTable(obj@features))
 
-#' @describeIn featureGroupsSet Subset on analyses/feature groups.
-#' @param rGroups An optional \code{character} vector: if specified only keep
-#'   results for the given replicate groups (equivalent to the \code{rGroups}
-#'   argument to \code{\link[=filter,featureGroups-method]{filter}}).
+#' @rdname featureGroups-class
 #' @export
 setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 {

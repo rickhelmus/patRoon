@@ -331,23 +331,7 @@ doFeatAnnUnset <- function(obj, set)
     return(ann)
 }
 
-# HACK: formulas/compounds share a lot of methods, but there is no clean and proper way to do this with multiple
-# inheritance. Instead, simply automatically define the same method for both
-
-setMethodMult("mergedConsensusNames", c("formulasSet", "compoundsSet"), function(obj, sets)
-{
-    return(if (sets) patRoon:::sets(obj) else character())
-})
-
-setMethodMult("mergedConsensusNames", c("formulasConsensusSet", "compoundsConsensusSet"), function(obj, sets)
-{
-    if (sets)
-        return(c(sets(obj), obj@mergedConsensusNames, sapply(obj@mergedConsensusNames, paste0, "-", sets(obj))))
-    return(obj@mergedConsensusNames)
-})
-
-
-setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ...)
+doFeatAnnDeleteSets <- function(obj, i, j, ...)
 {
     old <- obj
     obj <- callNextMethod()
@@ -381,10 +365,9 @@ setMethodMult("delete", c("formulasSet", "compoundsSet"), function(obj, i, j, ..
     })
     
     return(obj)
-})
-                  
-setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compoundsSet", "ANY", "missing", "missing")),
-              function(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
+}
+
+doFeatAnnSubsetSets <- function(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertSets(x, sets, TRUE, add = ac)
@@ -417,7 +400,7 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
                         s <- unlist(strsplit(set, ","))
                         paste0(setdiff(s, rmSets), collapse = ",")
                     }, by = seq_len(nrow(ct))]
-             
+                    
                     # update fragInfos
                     ct[, fragInfo := lapply(fragInfo, function(fi) fi[!set %chin% rmSets])]
                     
@@ -447,10 +430,9 @@ setMethodMult("[", list(c("formulasSet", "ANY", "missing", "missing"), c("compou
         x <- updateSetConsensus(x)
     
     return(x)
-})
+}
 
-setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., sets = NULL, updateConsensus = FALSE,
-                                                                   negate = FALSE)
+doFeatAnnFilterSets <- function(obj, ..., sets = NULL, updateConsensus = FALSE, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     assertSets(obj, sets, TRUE, add = ac)
@@ -484,4 +466,14 @@ setMethodMult("filter", c("formulasSet", "compoundsSet"), function(obj, ..., set
     }
     
     return(obj)
-})
+}
+
+doFeatAnnMCNSets <- function(obj, sets) return(if (sets) patRoon:::sets(obj) else character())
+
+doFeatAnnMCNSetsCons <- function(obj, sets)
+{
+    if (sets)
+        return(c(sets(obj), obj@mergedConsensusNames, sapply(obj@mergedConsensusNames, paste0, "-", sets(obj))))
+    return(obj@mergedConsensusNames)
+}
+

@@ -21,9 +21,20 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 }
 
 #' @param set \setsWF The name of the set.
+#' @param sets \setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
+#'   \code{negate=TRUE}).
+#'
+#'   For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
+#'   \link[=analysis-information]{analysis information}).
+#'
+#'   For \code{plotVenn}, \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its
+#'   meaning and is used to specify the names of the sets to be compared.
+#' @param absMinSets,relMinSets \setsWF Feature groups are only kept when they contain data for at least this (absolute
+#'   or relative) amount of sets. Set to \code{NULL} to ignore.
 #'
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
+#' @slot annotations \setsWF As the \code{featureGroups} slot, but contains the annotation data per set.
 #'
 #' @section Sets workflows: \setsWFClass{featureGroupsSet}{featureGroups}
 #'
@@ -42,10 +53,15 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'
 #'   \item \code{as.data.table}: normalization of intensities is performed per set.
 #'
+#'   \item \code{export} Only allows to export data from one set. The \code{unset} method is used prior to exporting the
+#'   data.
+#'
 #'   \item \code{overlap}, \code{unique}, \code{plotVenn}, \code{plotInt} allow to handle data per set. See the
 #'   \code{sets} argument description.
 #'
 #'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
+#'
+#'   \item \code{makeSet} Currently not yet supported for set objects.
 #'
 #'   }
 #'

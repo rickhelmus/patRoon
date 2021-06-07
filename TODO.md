@@ -46,6 +46,8 @@
 - default setThresholdAnn=0?
 - update GenForm
 - plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons?
+- update for featThreshold and featThresholdAnn
+    - put featThreshold in common arguments handbook table?
 
 
 ## Components
@@ -144,6 +146,7 @@
     - peak qualities
         - filter (once implemented)
     - as.data.table: normalization?
+    - plotInt sets arg?
 - components: somehow verify adductConflictsUsePref
 
 
@@ -187,49 +190,100 @@
         - combine with non-sets doc pages?
             - add section with notes for sets (how data is merged/consensus, specific notes for methods etc)
             - don't add method descriptions
+            - except new ones (eg unset)? or some other way than describeIn
             - add sets specific params (note that they are specific in description?)
     - General
         - setObjects() can be used for specific slots such as algo objects and MF settings
         - document for every object how consensus/merge is done
-        - sets(), unset()
+        - sets()
+        - unset(): returns Unset class
         - make general doc page?
+        - adduct/ionization args cannot be used: automatically set from set annotation data
     - features
-        - filter(): apply to neutral masses
-        - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
-        - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
+        - class
+            - sets method (new)
+            - filter, [: sets argument
+            - unset (new)
+                - ionize masses
+        - makeSet
+    - fGroups
+        - class
+            - sets method (new)
+            - adducts method: set arg
+            - adducts<-
+                - sets arg
+                - make clear that order/names are taken from annTab[set == s]
+                - example with reGroup
+            - [: sets arg
+            - filter(): sets/absMinSets/relMinSets args, apply to neutral masses
+            - xcms-conv: set/... args
+            - as.data.table: normalization performed per set
+            - plotInt: sets arg (splits trend plot per set)
             - overlap/unique/plotVenn for sets: sets arg overrides `which`
-        - adducts<-
-            - for sets: make clear that order/names are taken from annTab[set == s]
-            - for sets: example with reGroup
-        - unset(fGroups) will get adduct annotated fGroups
-        - groupFeatures: align doesn't work for sets with KPIC/XCMS
-        - xcms-conv: set/... args
+            - selectIons(): clearly document that re-group --> new group names! (eg workflow objects now incompatible)
+            - makeSet: doesn't work yet for sets objects
+            - unset
+                - ionizes masses
+                - will get adduct annotated fGroups
+            - annTab slot is changed
+        - generators
+            - explain grouping
+            - groupFeatures: align doesn't work for sets with KPIC/XCMS
+            - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
     - components
-        - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
-        - intclust/specclust/TPs is not a componentsSet
-    - Annotation
-        - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
-            - still relevant?
-        - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
-            - this could mean really different results if subsetting on sets is done prior to filtering
-            - put message() in sync function?
-        - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
-            - put message() in sync function?
-            - although subsetting doesn't sync anymore --> clearly document all this!
-        - update/check version nr mentioned in filter() for MSPeakLists
-        - SIRIUS: batch calculations done per adduct
-        - update for featThreshold and featThresholdAnn
-            - put featThreshold in common arguments handbook table?
-        - as.data.table() for formulas: formula column removed if average=T
-        - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
-        - @export multi methods?
-        - algo consensus: done on setObjects
-        - set ranking: same as compounds consensus (but no weights (yet))
-        - setCombinedMethod for specSimParams
+        - class
+            - [, filter: sets arg
+            - unset
+                - simply gets set specific components, re-names to original names
+            - plotGraph,componentsNTSet-method: set arg
+            - componentsSet: clearly mention it is simply a merge between sets
+        - generators
+            - generateComponentsTPs: calculates also annotation similarities per set
+    - MSPeakLists
+        - class
+            - analysisInfo slot and method
+            - [, filter: sets arg
+            - plotSpectrum: can split per set: perSet and mirror args
+            - unset
+                - only keeps peaklists from the specified set
+            - spectrumSimilarity: how overal spectrum simlarity is obtained
+            - spectrumSimilarity/annotatedBy filter: done per set (obvious?)
+            - update/check version nr mentioned in filter() for MSPeakLists
+                - still relevant?
+            - setCombinedMethod for specSimParams
+        - generators
+            - explain 'consensus'
+    - Annotation (formulas/compounds)
+        - class
+            - [, filter (multi-methods): sets and updateConsensus arguments
+                - explain the two different approaches set by updateConsensus
+                - subsetting on sets with updateConsensus=FALSE: set coverage columns are not updated
+            - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
+            - as.data.table() for formulas: formula column removed if average=T
+            - consensus
+                - done on setObjects
+                - setThreshold/setThresholdAnn args
+            - plotSpectrum: can split per set: perSet and mirror args
+            - annotatedPeakList: combines from different sets
+            - unset
+                - gets all annotations present in specified set (present _after_ consensus)
+            - @export multi methods?
+                - not possible, split methods anyway...?
+        - generators
+            - setThreshold and setThresholdAnn args
+            - SIRIUS: batch calculations done per adduct
+            - explain consensus
+                - set ranking: same as compounds consensus (but no weights (yet))
     - suspects
-        - different rank columns
-        - estIDLevel: best case, sublevels stripped if not the same
-        - form/compRanks: not updated when subsetting on sets
+        - class
+            - [, filter: sets arg (from fGroupsSet methods)
+            - unset
+                - as fGroups, with screening results for specified set
+        - generators
+            - explain merging results
+            - different rank columns
+            - estIDLevel: best case, sublevels stripped if not the same
+            - form/compRanks: not updated when subsetting on sets
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR

@@ -20,13 +20,47 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
     }, "minSets", verbose))
 }
 
+#' @param set \setsWF The name of the set.
+#'
+#' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
+#'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
+#'
+#' @section Sets workflows: \setsWFClass{featureGroupsSet}{featureGroups}
+#'
+#'   \setsWFNewMethodsFeat{featureGroupsUnset}{The adduct annotations for the selected set are used to convert all
+#'   feature (group) masses to ionic \emph{m/z} values. The annotations persist in the converted object. }
+#'
+#'   \setsWFChangedMethods{
+#'
+#'   \item \code{adducts}, \code{adducts<-} require the \code{set} argument. The order of the data that is
+#'   returned/changed follows that of the \code{annotations} slot. Furthermore, \code{adducts<-} will perform a
+#'   re-grouping of features when its \code{reGroup} parameter is set to \code{TRUE}. The implications for this are
+#'   discussed below.
+#'
+#'   \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
+#'   presence in) sets. See the \code{sets} argument description.
+#'
+#'   \item \code{as.data.table}: normalization of intensities is performed per set.
+#'
+#'   \item \code{overlap}, \code{unique}, \code{plotVenn}, \code{plotInt} allow to handle data per set. See the
+#'   \code{sets} argument description.
+#'
+#'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
+#'
+#'   }
+#'
+#'   A re-grouping of features occurs if \code{selectIons} is called or \code{adducts<-} is used with
+#'   \code{reGroup=TRUE}. Afterwards, it is very likely that feature group names are changed. Since data generated later
+#'   in the workflow (\emph{e.g.} annotation steps) rely on feature group names, these objects are \strong{not valid}
+#'   anymore, and \strong{must} be re-generated.
+#'
 #' @rdname featureGroups-class
 #' @export
 featureGroupsSet <- setClass("featureGroupsSet",
                              slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical"),
                              contains = "featureGroups")
 
-#' @describeIn featureGroups Obtains the set names of this object.
+#' @rdname featureGroups-class
 #' @export
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 

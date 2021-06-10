@@ -3,8 +3,8 @@ NULL
 
 #' (Virtual) base class for sets related workflow objects
 #'
-#' This class is the base for many \link[=setswf]{sets workflows} related classes. This class is virtual, and therefore
-#' never created directly.
+#' This class is the base for many \link[=sets-workflow]{sets workflows} related classes. This class is virtual, and
+#' therefore never created directly.
 #'
 #' The most important purpose of this class is to hold data that is specific for a set. These \emph{set objects} are
 #' typically objects with classes from a regular non-sets workflow (\emph{e.g.} \code{\link{components}},

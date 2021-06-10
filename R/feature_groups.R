@@ -25,7 +25,7 @@ NULL
 #'
 #'   For \code{getFCParams}: optional named arguments that override defaults.
 #'   
-#'   For \link[=setswf]{sets workflows}: passed to parent method.
+#'   For \link[=sets-workflow]{sets workflows}: passed to parent method.
 #'
 #'   Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
 #'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}

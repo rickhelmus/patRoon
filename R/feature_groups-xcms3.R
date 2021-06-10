@@ -44,6 +44,7 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
     return(doGroupFeaturesXCMS3(xdata, feat, rtalign, loadRawData, groupParam, retAlignParam, verbose))
 })
 
+#' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),

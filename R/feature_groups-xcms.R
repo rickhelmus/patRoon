@@ -37,6 +37,8 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
     return(doGroupFeaturesXCMS(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose))
 })
 
+#' @rdname feature-grouping
+#' @export
 setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

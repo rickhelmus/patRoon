@@ -147,7 +147,9 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
-#' @rdname features-class
+#' @template makeSet
+#' @rdname feature-finding
+#' @return \code{makeSet} returns a \code{\link{featuresSet}} object.
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
 {

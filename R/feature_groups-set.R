@@ -61,8 +61,6 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'
 #'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
 #'
-#'   \item \code{makeSet} Currently not yet supported for set objects.
-#'
 #'   }
 #'
 #'   A re-grouping of features occurs if \code{selectIons} is called or \code{adducts<-} is used with
@@ -417,6 +415,8 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
+#' @rdname feature-grouping
+#' @export
 setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose = TRUE)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
@@ -459,7 +459,17 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     return(ret)
 })
 
-#' @rdname featureGroups-class
+#' @templateVar adductsNULL TRUE
+#' @template makeSet
+#'
+#' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument description.
+#' @param groupArgs A \code{list} with arguments directly passed to \code{groupFeatures} (can be named). Example:
+#'   \code{groupArgs=list(maxAlignMZ=0.002)}.
+#'
+#' @return \code{makeSet} and the \code{\link{featuresSet}} method of \code{groupFeatures} return a
+#'   \code{\link{featuresGroupsSet}} object.
+#'
+#' @rdname feature-grouping
 #' @export
 setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
                                                adducts = NULL, labels = NULL)
@@ -524,7 +534,8 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
 })
 
-#' @rdname featureGroups-class
+#' @note \code{makeSet} Currently does not support making sets from \code{\link{featureGroupsSet}} objects.
+#' @rdname feature-grouping
 #' @export
 setMethod("makeSet", "featureGroupsSet", function(obj, ...)
 {

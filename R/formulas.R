@@ -248,18 +248,14 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #'
 #' @template specSimParams-arg
 #'
-#' @template useGGplot2
-#'
 #' @template plot-lim
 #'
 #' @template fsubscript_source
 #'
-#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
-#'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                title = NULL, specSimParams = getDefSpecSimParams(),
-                                               useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                               mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -272,7 +268,6 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
@@ -288,9 +283,6 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
 
         if (is.null(title))
             title <- subscriptFormula(obj[[groupName]]$neutral_formula[index])
-        
-        if (useGGPlot2)
-            return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
         
         makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, ..., main = title)
     }
@@ -315,19 +307,19 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2],
                                                                             analysis[2], MSPeakLists), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                      title = NULL, specSimParams = getDefSpecSimParams(),
-                                                     useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                                     mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     if (length(groupName) > 1)
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,
-                     useGGPlot2 = useGGPlot2, mincex = mincex, xlim = xlim, ylim = ylim, ...)
+                     mincex = mincex, xlim = xlim, ylim = ylim, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1],
                                                                analysis = analysis[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2],
@@ -335,14 +327,14 @@ setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analys
     }
     
     return(makeHash(index, annotatedPeakList(obj, index, groupName, analysis, MSPeakLists),
-                    title, useGGPlot2, mincex, xlim, ylim, ...))
+                    title, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn formulas Plots a barplot with scoring of a candidate formula.
 #'
 #' @export
 setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = NULL, normalizeScores = "max",
-                                             excludeNormScores = defaultExclNormScores(obj), useGGPlot2 = FALSE)
+                                             excludeNormScores = defaultExclNormScores(obj))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -350,7 +342,6 @@ setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = N
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(analysis))
@@ -369,12 +360,11 @@ setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = N
     
     scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcn)
 
-    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
+    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn)
 })
 
 setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis = NULL, normalizeScores = "max",
-                                                 excludeNormScores = defaultExclNormScores(obj),
-                                                 useGGPlot2 = FALSE)
+                                                 excludeNormScores = defaultExclNormScores(obj))
 {
     if (is.null(analysis))
         annTable <- annotations(obj)[[groupName]]
@@ -385,7 +375,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
     else if (normalizeScores == "none")
         annTable <- annTable[index]
     
-    return(makeHash(index, annTable, normalizeScores, excludeNormScores, useGGPlot2))
+    return(makeHash(index, annTable, normalizeScores, excludeNormScores))
 })
 
 #' @templateVar what formulas

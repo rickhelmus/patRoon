@@ -551,16 +551,12 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'   should be specified.
 #' @param title The title of the plot. If \code{NULL} a title will be automatically made.
 #'
-#' @template useGGplot2
-#'
 #' @template plot-lim
-#'
-#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                   specSimParams = getDefSpecSimParams(),
-                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+                                                  xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
@@ -569,7 +565,6 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -586,9 +581,6 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         if (is.null(spec))
             return(NULL)
         
-        if (useGGPlot2)
-            return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
-        
         makeMSPlot(getMSPlotData(spec, 2), 1, xlim, ylim, main = title, ...)
     }
     else
@@ -602,7 +594,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         
         binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE)
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)
     }
 })
 

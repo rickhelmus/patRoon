@@ -229,8 +229,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                      specSimParams = getDefSpecSimParams(),
-                                                     useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                     perSet = TRUE, mirror = TRUE, ...)
+                                                     xlim = NULL, ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
@@ -240,11 +239,11 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ perSet, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     argsParent <- list(groupName = groupName, analysis = analysis, MSLevel = MSLevel, title = title,
-                       specSimParams = specSimParams, useGGPlot2 = useGGPlot2, xlim = xlim, ylim = ylim, ...)
+                       specSimParams = specSimParams, xlim = xlim, ylim = ylim, ...)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(do.call(callNextMethod, c(list(obj), argsParent)))
@@ -263,7 +262,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         specs <- lapply(specs, setnames, "set", "mergedBy")
         
         plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, 1, xlim, ylim, useGGPlot2, ...))
+        return(makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...))
     }
     else
     {
@@ -301,17 +300,15 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         }
         
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), mirror, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                         specSimParams = getDefSpecSimParams(),
-                                                         useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                         perSet = TRUE, mirror = TRUE, ...)
+                                                         specSimParams = getDefSpecSimParams(), xlim = NULL,
+                                                         ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
-    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, useGGPlot2, xlim,
-                                   ylim, ...),
+    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, xlim, ylim, ...),
                     perSet, mirror))
 })
 

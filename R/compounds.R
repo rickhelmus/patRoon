@@ -28,12 +28,7 @@ NULL
 #'
 #'   For \code{consensus}: any further (and unique) \code{compounds} objects.
 #'
-#' @return \code{plotSpectrum} and \code{plotStructure} will return a \code{\link[=ggplot2]{ggplot object}} if
-#'   \code{useGGPlot2} is \code{TRUE}.
-#'
 #' @template plotSpec-args
-#'
-#' @template useGGplot2
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
@@ -283,13 +278,12 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
 #' @references \addCitations{rcdk}{1}
 #'
 #' @export
-setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500, useGGPlot2 = FALSE)
+setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = -1, any.missing = FALSE, min.len = 1, unique = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
 
     compTable <- annotations(obj)[[groupName]]
@@ -303,18 +297,15 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
         mol <- getMoleculesFromSMILES(compTable$SMILES[index], emptyIfFails = TRUE)[[1]]
 
     img <- getRCDKStructurePlot(mol, width, height)
-    if (useGGPlot2)
-        cowplot::ggdraw() + cowplot::draw_image(img)
-    else
-        plot(img)
+    plot(img)
 })
 
 setMethod("plotStructureHash", "compounds", function(obj, index, groupName, width = 500,
-                                                     height = 500, useGGPlot2 = FALSE)
+                                                     height = 500)
 {
     compTable <- annotations(obj)[[groupName]]
     SMI <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable$SMILES[index]
-    return(makeHash(SMI, width, height, useGGPlot2))
+    return(makeHash(SMI, width, height))
 })
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
@@ -326,7 +317,7 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
                                               excludeNormScores = defaultExclNormScores(obj),
-                                              onlyUsed = TRUE, useGGPlot2 = FALSE)
+                                              onlyUsed = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -334,7 +325,6 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyUsed, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
 
     annTable <- annotations(obj)[[groupName]]
@@ -351,12 +341,12 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
     
-    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
+    makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn)
 })
 
 setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normalizeScores = "max",
                                                   excludeNormScores = defaultExclNormScores(obj),
-                                                  onlyUsed = TRUE, useGGPlot2 = FALSE)
+                                                  onlyUsed = TRUE)
 {
     annTable <- annotations(obj)[[groupName]]
     if (is.null(annTable) || nrow(annTable) == 0 || index > nrow(annTable))
@@ -364,7 +354,7 @@ setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normali
     else if (normalizeScores == "none")
         annTable <- annTable[index]
     
-    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
+    return(makeHash(index, annTable, normalizeScores, excludeNormScores, onlyUsed))
 })
 
 #' @describeIn compounds Returns an MS/MS peak list annotated with data from a
@@ -467,7 +457,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                 plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
-                                                useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                mincex = 0.9, xlim = NULL, ylim = NULL,
                                                 maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -478,7 +468,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
+    checkmate::assertFlag(plotStruct, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
@@ -505,11 +495,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (is.null(title))
             title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$neutral_formula)
         
-        if (!useGGPlot2)
-            makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ..., mol = mol,
-                       maxMolSize = maxMolSize, molRes = molRes)
-        else
-            return(makeMSPlotGG(getMSPlotData(spec, 2), mol = mol) + ggtitle(title))
+        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ..., mol = mol,
+                   maxMolSize = maxMolSize, molRes = molRes)
     }
     else
     {
@@ -538,13 +525,13 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2], MSPeakLists,
                                                                             formulas), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                     plotStruct = TRUE, title = NULL,
-                                                    specSimParams = getDefSpecSimParams(), useGGPlot2 = FALSE,
+                                                    specSimParams = getDefSpecSimParams(),
                                                     mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
@@ -552,8 +539,8 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, formulas = formulas, plotStruct = plotStruct, title = title,
-                     specSimParams = specSimParams, useGGPlot2 = useGGPlot2, mincex = mincex,
-                     xlim = xlim, ylim = ylim, maxMolSize = maxMolSize, molRes = molRes, ...)
+                     specSimParams = specSimParams, mincex = mincex, xlim = xlim, ylim = ylim, maxMolSize = maxMolSize,
+                     molRes = molRes, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
     }
@@ -562,7 +549,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
     
     return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
-                    plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
+                    plotStruct, title, mincex, xlim, ylim, ...))
 })
 
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)

@@ -375,13 +375,10 @@ setMethod("findFGroup", "components", function(obj, fGroup)
 #'   should be a character with the name of the feature group. Setting this to
 #'   \code{NULL} will not mark any peak.
 #'
-#' @template useGGplot2
-#'
 #' @template plot-lim
 #'
 #' @export
-setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE,
-                                                 xlim = NULL, ylim = NULL, ...)
+setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -389,7 +386,6 @@ setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, 
         checkChoiceSilent(index, names(obj))
     , .var.name = index)
     checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(useGGPlot2, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -449,66 +445,49 @@ setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, 
     plotData[nzchar(label), label := paste(label, round(mz, 4), sep = "\n")]
     plotData[!nzchar(label), label := as.character(round(mz, 4))]
 
-    if (!useGGPlot2)
-    {
-        allCateg <- unique(plotData$categ)
-        specCols <- getBrewerPal(length(allCateg), "Dark2")
-        names(specCols) <- allCateg
-
-        intMax <- max(plotData$intensity)
-        mzRange <- range(plotData$mz)
-
-        makeLegend <- function(x, y, ...) legend(x, y, allCateg, col = specCols[as.character(allCateg)],
-                                                 text.col = specCols[as.character(allCateg)], lty = 1,
-                                                 xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...)
-
-        oldp <- par(no.readonly = TRUE)
-        plot.new()
-
-        leg <- makeLegend(0, 0, plot = FALSE)
-        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-
-        if (is.null(xlim))
-            xlim <- mzRange
-        if (is.null(ylim))
-            ylim <- c(0, intMax * 1.25)
-
-        plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
-             type = "n", bty = "l", ...)
-
-        segments(plotData$mz, 0, plotData$mz, plotData$intensity,
-                 col = specCols[as.character(plotData$categ)], lwd = plotData$lwd * 2)
-
-        tyOffset <- max(plotData$intensity * 0.02)
-        tx <- plotData$mz
-        ty <- plotData$intensity + tyOffset
-
-        text(tx, ty, plotData$label, srt = 90, adj = 0, cex = 0.75)
-
-        makeLegend(par("usr")[2], par("usr")[4])
-
-        par(oldp)
-    }
-    else
-    {
-        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "label")) +
-            geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "categ",
-                                    size = "lwd")) + scale_size(range = range(plotData$lwd), guide = FALSE) +
-            ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1,
-                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2) +
-
-            xlab("m/z") + ylab("Intensity") +
-            cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
-
-        return(ret)
-    }
+    allCateg <- unique(plotData$categ)
+    specCols <- getBrewerPal(length(allCateg), "Dark2")
+    names(specCols) <- allCateg
+    
+    intMax <- max(plotData$intensity)
+    mzRange <- range(plotData$mz)
+    
+    makeLegend <- function(x, y, ...) legend(x, y, allCateg, col = specCols[as.character(allCateg)],
+                                             text.col = specCols[as.character(allCateg)], lty = 1,
+                                             xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...)
+    
+    oldp <- par(no.readonly = TRUE)
+    plot.new()
+    
+    leg <- makeLegend(0, 0, plot = FALSE)
+    lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+    par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    
+    if (is.null(xlim))
+        xlim <- mzRange
+    if (is.null(ylim))
+        ylim <- c(0, intMax * 1.25)
+    
+    plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
+         type = "n", bty = "l", ...)
+    
+    segments(plotData$mz, 0, plotData$mz, plotData$intensity,
+             col = specCols[as.character(plotData$categ)], lwd = plotData$lwd * 2)
+    
+    tyOffset <- max(plotData$intensity * 0.02)
+    tx <- plotData$mz
+    ty <- plotData$intensity + tyOffset
+    
+    text(tx, ty, plotData$label, srt = 90, adj = 0, cex = 0.75)
+    
+    makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
 })
 
-setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE,
-                                                     xlim = NULL, ylim = NULL, ...)
+setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
 {
-    return(makeHash(obj[[index]], markFGroup, useGGPlot2, xlim, ylim, ...))
+    return(makeHash(obj[[index]], markFGroup, xlim, ylim, ...))
 })
 
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all

@@ -118,7 +118,7 @@ getMSPlotData <- function(spec, marklwd, markWhich = NULL)
     return(plotData)
 }
 
-makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
+makeScoresPlot <- function(scoreTable, mcn)
 {
     scores <- setnames(transpose(scoreTable), "score")
     scores[, type := names(scoreTable)]
@@ -135,75 +135,51 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
         }
     }
     
-    if (!useGGPlot2)
+    oldp <- par(no.readonly = TRUE)
+    maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
+    omai <- par("mai")
+    par(mai = c(maxStrW, 0.5, omai[3], 0))
+    
+    if (length(mcn) > 1)
+        cols <- getBrewerPal(length(unique(scores$merged)), "Paired")
+    else
+        cols <- getBrewerPal(nrow(scores), "Paired")
+    
+    bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
+    
+    if (length(mcn) > 1)
     {
-        oldp <- par(no.readonly = TRUE)
-        maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
-        omai <- par("mai")
-        par(mai = c(maxStrW, 0.5, omai[3], 0))
+        scSplit <- split(scores, by = "type", keep.by = FALSE)
+        scSplit <- sapply(names(scSplit), function(mb) setnames(scSplit[[mb]], "score", mb), simplify = FALSE) # assign column names
         
-        if (length(mcn) > 1)
-            cols <- getBrewerPal(length(unique(scores$merged)), "Paired")
-        else
-            cols <- getBrewerPal(nrow(scores), "Paired")
-        
-        bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
-        
-        if (length(mcn) > 1)
+        plotTab <- Reduce(function(left, right)
         {
-            scSplit <- split(scores, by = "type", keep.by = FALSE)
-            scSplit <- sapply(names(scSplit), function(mb) setnames(scSplit[[mb]], "score", mb), simplify = FALSE) # assign column names
-            
-            plotTab <- Reduce(function(left, right)
-            {
-                merge(left, right, by = "merged", all = TRUE)
-            }, scSplit)
-            
-            plot.new()
-            
-            makeLegend <- function(x, y, ...) legend(x, y, unique(scores$merged), col = cols, lwd = 1, xpd = NA, ncol = 1,
-                                                     cex = 0.75, bty = "n", ...)
-            
-            # auto legend positioning: https://stackoverflow.com/a/34624632/9264518
-            leg <- makeLegend(0, 0, plot = FALSE)
-            lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-            par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-            bpvals <- as.matrix(plotTab[, -"merged"])
-            bp <- do.call(barplot, c(list(bpvals, beside = TRUE), bpargs))
-            bpsc <- as.vector(bpvals)
-            makeLegend(par("usr")[2], par("usr")[4])
-        }
-        else
-        {
-            bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
-            bpsc <- scores$score
-        }
+            merge(left, right, by = "merged", all = TRUE)
+        }, scSplit)
         
-        text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
+        plot.new()
         
-        par(oldp)
+        makeLegend <- function(x, y, ...) legend(x, y, unique(scores$merged), col = cols, lwd = 1, xpd = NA, ncol = 1,
+                                                 cex = 0.75, bty = "n", ...)
+        
+        # auto legend positioning: https://stackoverflow.com/a/34624632/9264518
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+        bpvals <- as.matrix(plotTab[, -"merged"])
+        bp <- do.call(barplot, c(list(bpvals, beside = TRUE), bpargs))
+        bpsc <- as.vector(bpvals)
+        makeLegend(par("usr")[2], par("usr")[4])
     }
     else
     {
-        scorePlot <- ggplot(scores, aes_string(x = "type", y = "score")) +
-            cowplot::theme_cowplot(font_size = 12) +
-            theme(axis.title.y = element_blank(), axis.title.x = element_blank(), # axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-                  legend.position = "top", legend.title = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1)) +
-            guides(colour = guide_legend(nrow = 3, ncol = 2, byrow = TRUE))
-        
-        
-        if (length(mcn) > 1)
-            scorePlot <- scorePlot + geom_bar(stat = "identity", position = "dodge",
-                                              aes_string(colour = "merged", fill = "merged"))
-        else
-        {
-            scorePlot <- scorePlot +
-                geom_bar(stat = "identity", aes_string(colour = "type", fill = "type")) +
-                theme(legend.position = "none")
-        }
-        
-        return(scorePlot)
+        bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
+        bpsc <- scores$score
     }
+    
+    text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
+        
+    par(oldp)
 }
 
 # spec may be annotated
@@ -375,37 +351,6 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
     }
 }
 
-makeMSPlotGG <- function(plotData, ..., mol = NULL)
-{
-    # BUG: throws errors when parse=TRUE and all labels are empty
-    if (!is.null(plotData$ion_formula) && any(!is.na(plotData$ion_formula)))
-    {
-        plotData[!is.na(ion_formula), ion_formula := subscriptFormula(ion_formula, parse = FALSE)]
-        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "ion_formula")) +
-            ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
-                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2,
-                                     na.rm = TRUE)
-    }
-    else
-        ret <- ggplot(plotData, aes_string(x = "mz", y = 0))
-    
-    ret <- ret + xlim(range(plotData$mz) * c(0.9, 1.1)) +
-        geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "legend", size = "lwd")) +
-        scale_size(range = c(0.5, 2), guide = FALSE) + xlab("m/z") + ylab("Intensity") +
-        cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
-    
-    if (!is.null(mol))
-    {
-        img <- getRCDKStructurePlot(mol[[1]], 100, 100, transparent = FALSE)
-        
-        pos <- 0.8; size <- 1 - pos
-        ret <- ret + scale_y_continuous(expand = expansion(c(0.1, size + 0.1))) # add space for image
-        ret <- cowplot::ggdraw(ret) + cowplot::draw_image(img, pos, pos, size, size)
-    }
-    
-    return(ret)
-}
-
 getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
 {
     specs <- lapply(specs, copy)
@@ -422,18 +367,9 @@ getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
     return(plotData)
 }
 
-makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL, maxMolSize = NULL,
+makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, ..., mol = NULL, maxMolSize = NULL,
                               molRes = NULL)
 {
-    
-    if (useGGPlot2)
-    {
-        stop("Not yet supported") # UNDONE
-        # NOTE: suppress message about replacing y axis
-        return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
-                                    ggplot2::scale_y_continuous(labels = abs(ticks))))
-    }
-    
     makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
                main = title, ..., mol = mol, maxMolSize = maxMolSize, molRes = molRes)
 }

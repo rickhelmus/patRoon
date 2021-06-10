@@ -2,8 +2,6 @@
 
 ## General
 
-- ggplot: remove?
-    - Otherwise fix plotSpectrum() (sets) for title and ticks and possibly others
 - newProject
     - sets: add specific options for annotation and others?
     - TP workflow
@@ -236,6 +234,7 @@
 
 ## NEWS
 
+- ggplot2 support removed
 - progressr
 - newProject
     - DA mslists: MSMSType now correctly bbCID if DIA is requested

@@ -812,6 +812,22 @@ NULL
 #' @name suspect-screening
 NULL
 
+#' Sets workflows
+#'
+#' With sets workflows in \pkg{patRoon} a complete non-target (or suspect) screening workflow is performed with sample
+#' analyses that were measured with different MS methods (typically positive and negative ionization).
+#'
+#' The analyses files that were measured with a different method are grouped in \emph{sets}. In the most typical case,
+#' there is a \code{"positive"} and \code{"negative"} set, for the positively/negatively ionized data, respectively.
+#' However, other distinctions than polarity are also possible (although currently the chromatographic method should be
+#' the same between sets). A sets workflow is typically initiated with the \code{\link{makeSets}} method. The handbook
+#' contains much more details about sets workflows.
+#'
+#' @seealso \code{\link{workflowStepSet}}, the \verb{Sets workflows} sections in other documentation pages and the
+#'   \pkg{patRoon} handbook.
+#' @name sets-workflow
+NULL
+
 #' Bruker DataAnalysis utilities
 #'
 #' Miscellaneous utility functions which interface with Bruker DataAnalysis

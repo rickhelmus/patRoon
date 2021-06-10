@@ -187,13 +187,19 @@
     - cliqueMS
         - mention fork is needed?
 - sets
+    - Handbook
+        - "In LC-HRMS screening workflows the samples are often measured twice: with positive and negative ionization. Most data
+           processing steps are only suitable for one polarity, for instance, due to the fact that the \emph{m/z} values in mass
+           spectra are inherently different (\emph{e.g.} \code{[M+H]+} \emph{vs} \code{[M-H]-}) and MS/MS fragmentation occurs
+           differently. To avoid the need to perform the data processing workflow twice, \emph{i.e.} for positive and negative
+           mode, the so called \emph{sets workflow} was introduced."
+       - "In the future, sets with different chromatographic methods may also be supported, "
     - General
         - document for every object how consensus/merge is done
-        - make general doc page?
         - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
         - dots args
-        - general sets description page --> check links to it
+        - docs for generics (eg sets, unset)
     - features
         - makeSet (features method)
     - fGroups

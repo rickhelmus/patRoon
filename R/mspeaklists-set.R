@@ -24,6 +24,39 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
     return(MSPeakListsSet)
 }
 
+#' @param set \setsWF The name of the set.
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
+#'
+#' @slot analysisInfo \setsWF  \link[=analysis-information]{Analysis information}. Use the \code{analysisInfo} method
+#'   for access.
+#'
+#' @section Sets workflows: \setsWFClass{MSPeakListsSet}{MSPeakLists}
+#'
+#'   \setsWFNewMethodsSOExtra{MSPeakListsUnset}{Only the MS peaks that are present in the specified set are kept.}{
+#'
+#'   \item \code{analysisInfo} Returns the  \link[=analysis-information]{analysis info} for this object.
+#'
+#'   }
+#'
+#'   \setsWFChangedMethods{
+#'
+#'   \item \code{filter} and the subset operator (\code{[}) Can be used to select data that is only present for selected
+#'   sets. The \code{filter} method is applied for each set individually, and afterwards the results are combined again
+#'   (see \code{\link{generateMSPeakLists}}). Note that this has important implications for \emph{e.g.} relative
+#'   intensity filters (\code{relMSIntThr}/\code{relMSMSIntThr}), \code{topMSPeaks}/\code{topMSMSPeaks} and
+#'   \code{minMSMSPeaks}. Similarly, when the \code{annotatedBy} filter is applied, each set specific MS peak list is
+#'   filtered by the annotation results from only that set.
+#'
+#'   \item \code{plotSpectrum} Is able to highlight set specific mass peaks (\code{perSet} and \code{mirror} arguments).
+#'
+#'   \item \code{spectrumSimilarity} First calculates similarities for each spectral pair per set (\emph{e.g.} all
+#'   positive mode spectra are compared and then all negative mode spectra are compared). This data is then combined
+#'   into an overall similarity value. How this combination is performed depends on the \code{setCombineMethod} field of
+#'   the \code{\link{specSimParams}} argument.
+#'
+#'   }
+#'
+#' @rdname MSPeakLists-class
 #' @export
 MSPeakListsSet <- setClass("MSPeakListsSet",
                            slots = c(analysisInfo = "data.frame"),
@@ -65,24 +98,18 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 })
 
 
-#' @describeIn MSPeakListsSet Get analysis information
-#' @return \code{analysisInfo}: A \code{data.frame} containing a column with
-#'   analysis name (\code{analysis}), its path (\code{path}), and other columns
-#'   such as replicate group name (\code{group}) and blank reference
-#'   (\code{blank}).
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("analysisInfo", "MSPeakListsSet", function(obj) obj@analysisInfo)
 
-#' @describeIn MSPeakListsSet Shows summary information for this object.
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("show", "MSPeakListsSet", function(object)
 {
     callAllNextMethods(object, show, firstClass = "MSPeakLists", startFrom = "MSPeakListsSet")
 })
 
-#' @describeIn MSPeakListsSet Subset on analyses/feature groups.
-#' @param reAverage Set to \code{TRUE} to regenerate averaged MS peak lists
-#'   after subsetting analyses.
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = FALSE,
                                                                       sets = NULL, drop = TRUE)
@@ -115,13 +142,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     return(x)
 })
 
-#' @describeIn MSPeakListsSet Returns all MS peak list data in a table.
-#'
-#' @param averaged If \code{TRUE} then feature group averaged peak list data is
-#'   used.
-#'
-#' @template as_data_table-args
-#'
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE)
 {
@@ -142,6 +163,7 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
     return(ret[])
 })
 
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursorMSMS = TRUE,
                                                reAverage = FALSE, negate = FALSE, sets = NULL)
@@ -201,6 +223,9 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
     return(obj)
 })
 
+#' @param perSet,mirror \setsWF If \code{perSet=TRUE} then the set specific mass peaks are annotated separately.
+#'   Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a mirror plot is generated.
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                      specSimParams = getDefSpecSimParams(),
@@ -290,6 +315,7 @@ setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysi
                     perSet, mirror))
 })
 
+#' @rdname MSPeakLists-class
 #' @export
 setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, groupName2 = NULL, analysis1 = NULL,
                                                            analysis2 = NULL, MSLevel = 1,
@@ -381,7 +407,12 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
     return(ret)
 }
 
+#' @rdname MSPeakLists-class
+#' @export
 MSPeakListsUnset <- setClass("MSPeakListsUnset", contains = "MSPeakLists")
+
+#' @rdname MSPeakLists-class
+#' @export
 setMethod("unset", "MSPeakListsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)

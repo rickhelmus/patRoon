@@ -1,7 +1,6 @@
 #' @param set \setsWF The name of the set.
-#' @param sets \setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
-#'   \code{negate=TRUE}). Note: if \code{updateConsensus=FALSE} then the \code{setCoverage} column of the annotation
-#'   results is not updated.
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}). Note: if
+#'   \code{updateConsensus=FALSE} then the \code{setCoverage} column of the annotation results is not updated.
 #' @param updateConsensus \setsWF If \code{TRUE} then the annonation consensus among set results is updated. See the
 #'   \verb{Sets workflows} section for more details.
 #' @param perSet,mirror \setsWF If \code{perSet=TRUE} then the set specific mass peaks are annotated separately.

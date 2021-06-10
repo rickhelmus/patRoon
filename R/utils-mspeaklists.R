@@ -76,7 +76,10 @@ getDefIsolatePrecParamsRD <- function()
 #' the precursors of both spectra) or \code{"both"} (the spectra are first binned without shifting, and peaks still
 #' unaligned are then shifted as is done when \code{shift="precursor"}).
 #'
-#' \item \code{setCombinedMethod} TBD.
+#' \item \code{setCombinedMethod} \setsWF Determines how spectral similarities from different sets are combined.
+#' Possible values are \code{"mean"}, \code{"min"} or \code{"max"}, which calculates the combined value as the mean,
+#' minimum or maximum value, respectively. \code{NA} values (\emph{e.g.} if a set does not have peak list data to
+#' combine) are removed in advance.
 #'
 #' }
 #'

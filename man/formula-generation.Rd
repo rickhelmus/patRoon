@@ -6,8 +6,11 @@
 \alias{generateFormulas,featureGroups-method}
 \alias{generateFormulas}
 \alias{generateFormulasDA,featureGroups-method}
+\alias{generateFormulasDA,featureGroupsSet-method}
 \alias{generateFormulasGenForm,featureGroups-method}
+\alias{generateFormulasGenForm,featureGroupsSet-method}
 \alias{generateFormulasSIRIUS,featureGroups-method}
+\alias{generateFormulasSIRIUS,featureGroupsSet-method}
 \alias{formulaScorings}
 \title{Automatic chemical formula generation}
 \usage{
@@ -25,6 +28,8 @@
   save = TRUE,
   close = save
 )
+
+\S4method{generateFormulasDA}{featureGroupsSet}(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
 
 \S4method{generateFormulasGenForm}{featureGroups}(
   fGroups,
@@ -44,6 +49,14 @@
   timeout = 120,
   topMost = 50,
   batchSize = 8
+)
+
+\S4method{generateFormulasGenForm}{featureGroupsSet}(
+  fGroups,
+  MSPeakLists,
+  ...,
+  setThreshold = 0,
+  setThresholdAnn = 0.75
 )
 
 \S4method{generateFormulasSIRIUS}{featureGroups}(
@@ -67,6 +80,14 @@
   splitBatches = FALSE
 )
 
+\S4method{generateFormulasSIRIUS}{featureGroupsSet}(
+  fGroups,
+  MSPeakLists,
+  ...,
+  setThreshold = 0,
+  setThresholdAnn = 0.75
+)
+
 formulaScorings()
 }
 \arguments{
@@ -79,8 +100,9 @@ a subset of the object that was used to create the specified \code{MSPeakLists} 
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
 
-\item{...}{Any parameters to be passed to the selected formula generation
-algorithm.}
+\item{\dots}{Any parameters to be passed to the selected formula generation algorithm.
+
+  For sets workflows: further arguments directly passed to the non-sets method.}
 
 \item{precursorMzSearchWindow}{Search window for \emph{m/z} values (+/- the feature \emph{m/z}) used to find back
 feature data of precursor/parent ions from MS/MS spectra (this data is not readily available from
@@ -118,6 +140,12 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 \code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
 likely what you want as otherwise any processed data is lost.}
+
+\item{setThreshold}{\setsWF Minimum abundance for a candidate among all sets (\samp{0-1}). For instance, a value of
+\samp{1} means that the candidate needs to be present in all the set data.}
+
+\item{setThresholdAnn}{\setsWF As \code{setThreshold}, but only taking into account the set data that contain
+annotations for the feature group of the candidate.}
 
 \item{relMzDev}{Maximum relative deviation between the measured and candidate
 formula \emph{m/z} values (in ppm). Sets the \option{ppm}
@@ -174,37 +202,31 @@ runtimes (such as \command{GenForm}) can significantly increase parallel
 performance. For more information see \code{\link{executeMultiProcess}}.
 Note that this is ignored if \option{patRoon.MP.method="future"}.}
 
-\item{profile}{Name of the configuration profile, for example:
-\option{"qtof"}, \option{"orbitrap"}, \option{"fticr"}. Sets the
-\option{--profile} commandline option.}
+\item{profile}{Name of the configuration profile, for example: \option{"qtof"}, \option{"orbitrap"},
+\option{"fticr"}. Sets the \option{--profile} commandline option.}
 
-\item{database}{If not \code{NULL},
-use a database for retrieval of formula candidates. Possible values are:
-\option{"pubchem"}, \option{"bio"}, \option{"kegg"}, \option{"hmdb"}. Sets
-the \option{--database} commandline option.}
+\item{database}{If not \code{NULL}, use a database for retrieval of formula
+candidates. Possible values are: \option{"pubchem"}, \option{"bio"}, \option{"kegg"}, \option{"hmdb"}. Sets the
+\option{--database} commandline option.}
 
-\item{noise}{Median intensity of the noise (\code{NULL} ignores this
-parameter). Sets the \option{--noise} commandline option.}
+\item{noise}{Median intensity of the noise (\code{NULL} ignores this parameter). Sets the \option{--noise}
+commandline option.}
 
-\item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL}
-then the default of all cores will be used.}
+\item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
+used.}
 
-\item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any
-extra commandline parameters for \command{SIRIUS}. For \command{SIRIUS}
-versions \code{<4.4} there is no distinction between general and formula
-options. Otherwise commandline options specified in \code{extraOptsGeneral}
-are added prior to the \code{formula} command, while options specified in
-\code{extraOptsFormula} are added in afterwards. See the \command{SIRIUS}
+\item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any extra commandline parameters for
+\command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula
+options. Otherwise commandline options specified in \code{extraOptsGeneral} are added prior to the \code{formula}
+command, while options specified in \code{extraOptsFormula} are added in afterwards. See the \command{SIRIUS}
 manual for more details. Set to \code{NULL} to ignore.}
 
 \item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
 
-\item{splitBatches}{If \code{TRUE} then the calculations done by
-\command{SIRIUS} will be evenly split over multiple \command{SIRIUS} calls
-(which may be run in parallel depending on the \link[=patRoon-package]{set
-package options}). If \code{splitBatches=FALSE} then all feature
-calculations are performed from a single \command{SIRIUS} execution, which
-is often the fastest if calculations are performed on a single computer.}
+\item{splitBatches}{If \code{TRUE} then the calculations done by \command{SIRIUS} will be evenly split over multiple
+\command{SIRIUS} calls (which may be run in parallel depending on the \link[=patRoon-package]{set package
+options}). If \code{splitBatches=FALSE} then all feature calculations are performed from a single \command{SIRIUS}
+execution, which is often the fastest if calculations are performed on a single computer.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.
@@ -273,15 +295,39 @@ If any errors related to \command{DCOM} appear it might be necessary to
   excessive computational times by terminating long running commands (set by
   the \code{timeout} argument).
 
-For annotations performed with \command{SIRIUS} it is often the fastest
-  to keep the default \code{splitBatches=FALSE}. In this case, all
-  \command{SIRIUS} output will be printed to the terminal (unless
-  \code{verbose=FALSE} or \option{patRoon.MP.method="future"}).
+For annotations performed with \command{SIRIUS} it is often the fastest to keep the default
+  \code{splitBatches=FALSE}. In this case, all \command{SIRIUS} output will be printed to the terminal (unless
+  \code{verbose=FALSE} or \option{patRoon.MP.method="future"}). Furthermore, please note that only annotations to be
+  performed for the same adduct are grouped in a single batch execution.
 }
 \section{Scorings}{
  Each algorithm implements their own scoring system. Their names have been harmonized where
   possible. An overview is obtained with the \code{formulaScorings} function:
   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
+}
+
+\section{Sets workflows}{
+ With a \link[=sets-workflow]{sets workflow}, annotation is first performed for each set.
+  This is important, since the annotation algorithms typically cannot work with data from mixed ionization modes. The
+  annotation results are then combined to generate a \emph{sets consensus}: \itemize{
+
+  \item The annotation tables for each feature group from the set specific data are combined. Rows with overlapping
+  candidates (determined by the neutral formula) are merged.
+
+  \item Set specific data (\emph{e.g.} the ionic formula) is retained by renaming their columns with set specific
+  names.
+
+  \item The MS/MS fragment annotations (\code{fragInfo} column) from each set are combined.
+
+  \item The scorings for each set are averaged to calculate overall scores.
+
+  \item The candidates are re-ranked based on their average ranking among the set data (if a candidate is absent in a
+  set it is assigned the poorest rank in that set).
+
+  \item The coverage of each candidate among sets is calculated. Depending on the \code{setThreshold} and
+  \code{setThresholdAnn} arguments, candidates with low abundance are removed.
+
+  }
 }
 
 \section{Parallelization}{
@@ -371,9 +417,8 @@ Explanation:
 \references{
 \insertRef{Meringer2011}{patRoon}
 
-\insertRef{Dhrkop2019}{patRoon} \cr\cr
-  \insertRef{Duhrkop2015}{patRoon} \cr\cr \insertRef{Duhrkop2015-2}{patRoon}
-  \cr\cr \insertRef{Bcker2008}{patRoon}
+\insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
+  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{formulas-class}}. The

@@ -20,7 +20,16 @@
 \alias{$,features-method}
 \alias{delete,features-method}
 \alias{calculatePeakQualities,features-method}
+\alias{featuresSet-class}
+\alias{featuresSet}
+\alias{sets,featuresSet-method}
+\alias{show,featuresSet-method}
+\alias{as.data.table,featuresSet-method}
+\alias{[,featuresSet,ANY,missing,missing-method}
 \alias{filter,featuresSet-method}
+\alias{featuresUnset-class}
+\alias{featuresUnset}
+\alias{unset,featuresSet-method}
 \alias{featuresBruker-class}
 \alias{featuresBruker}
 \alias{featuresEnviPick-class}
@@ -77,7 +86,17 @@
 
 \S4method{calculatePeakQualities}{features}(obj, weights, flatnessFactor, parallel = TRUE)
 
+\S4method{sets}{featuresSet}(obj)
+
+\S4method{show}{featuresSet}(object)
+
+\S4method{as.data.table}{featuresSet}(x)
+
+\S4method{[}{featuresSet,ANY,missing,missing}(x, i, ..., sets = NULL, drop = TRUE)
+
 \S4method{filter}{featuresSet}(obj, ..., negate = FALSE, sets = NULL)
+
+\S4method{unset}{featuresSet}(obj, set)
 
 \S4method{delete}{featuresKPIC2}(obj, i = NULL, j = NULL, ...)
 
@@ -125,6 +144,11 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 \code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.}
+
+\item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
+\code{negate=TRUE}).}
+
+\item{set}{\setsWF The name of the set.}
 }
 \value{
 \code{featureTable}: A \code{list} containing a
@@ -188,12 +212,6 @@ calculate the following metrics: \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \
 metric, an additional score is calculated by normalizing all feature values (unless the quality metric definition
 has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature
 is calculated by the (weighted) sum of all score values.
-
-\item \code{filter}: Performs common rule based filtering of features. Note
-that this (and much more) functionality is also provided by the
-\code{filter} method defined for \code{\link{featureGroups}}. However,
-filtering a \code{features} object may be useful to avoid grouping large
-amounts of features.
 }}
 
 \section{Slots}{
@@ -212,6 +230,20 @@ For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA
 }
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{features}}}}     \itemize{       \item{\code{\link{featuresSet}}}       \item{\code{\link{featuresUnset}}}       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresKPIC2}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresSAFD}}}       \item{\code{\link{featuresSIRIUS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}       \item{\code{\link{featuresXCMS3}}}     }   } }
+}
+
+\section{Sets workflows}{
+ \setsWFClass{featuresSet}{features}
+
+  \setsWFNewMethodsFeat{featuresUnset}{The adduct annotations for the selected set (\emph{e.g.} as passed to
+  \code{makeSet}) are used to convert all feature masses to ionic \emph{m/z} values. }
+
+  \setsWFChangedMethods{
+
+  \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
+  presence in) sets. See the \code{sets} argument description.
+
+  }
 }
 
 \references{

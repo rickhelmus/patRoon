@@ -55,6 +55,8 @@
 \alias{adducts<-,featureGroupsSet-method}
 \alias{delete,featureGroupsSet-method}
 \alias{show,featureGroupsSet-method}
+\alias{featureTable,featureGroupsSet-method}
+\alias{[,featureGroupsSet,ANY,ANY,missing-method}
 \alias{export,featureGroupsSet-method}
 \alias{as.data.table,featureGroupsSet-method}
 \alias{filter,featureGroupsSet-method}
@@ -63,8 +65,6 @@
 \alias{unique,featureGroupsSet-method}
 \alias{overlap,featureGroupsSet-method}
 \alias{selectIons,featureGroupsSet-method}
-\alias{makeSet,featureGroups-method}
-\alias{makeSet,featureGroupsSet-method}
 \alias{featureGroupsUnset-class}
 \alias{featureGroupsUnset}
 \alias{unset,featureGroupsSet-method}
@@ -240,6 +240,10 @@ getFCParams(rGroups, ...)
 
 \S4method{show}{featureGroupsSet}(object)
 
+\S4method{featureTable}{featureGroupsSet}(obj)
+
+\S4method{[}{featureGroupsSet,ANY,ANY,missing}(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
+
 \S4method{export}{featureGroupsSet}(obj, type, out, set)
 
 \S4method{as.data.table}{featureGroupsSet}(
@@ -284,18 +288,6 @@ getFCParams(rGroups, ...)
 
 \S4method{selectIons}{featureGroupsSet}(fGroups, components, prefAdduct, ...)
 
-\S4method{makeSet}{featureGroups}(
-  obj,
-  ...,
-  groupAlgo,
-  groupArgs = NULL,
-  verbose = TRUE,
-  adducts = NULL,
-  labels = NULL
-)
-
-\S4method{makeSet}{featureGroupsSet}(obj, ...)
-
 \S4method{unset}{featureGroupsSet}(obj, set)
 }
 \arguments{
@@ -322,6 +314,8 @@ feature group, with a vector of the group intensities as first argument, the gro
   For \code{delete}: passed to the function specified as \code{j}.
 
   For \code{getFCParams}: optional named arguments that override defaults.
+  
+  For \link[=sets-workflow]{sets workflows}: passed to parent method.
 
   Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
@@ -490,8 +484,22 @@ values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignor
 \command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
+\item{set}{\setsWF The name of the set.}
+
+\item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
+  \code{negate=TRUE}).
+
+  For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
+  \link[=analysis-information]{analysis information}).
+
+  For \code{plotVenn}, \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its
+  meaning and is used to specify the names of the sets to be compared.}
+
 \item{negate}{If set to \code{TRUE} then filtering operations are performed
 in opposite manner.}
+
+\item{absMinSets, relMinSets}{\setsWF Feature groups are only kept when they contain data for at least this (absolute
+or relative) amount of sets. Set to \code{NULL} to ignore.}
 }
 \value{
 \code{delete} returns the object for which the specified data was removed.
@@ -634,8 +642,6 @@ annotation accuracy. On the other hand, it is important the componentization res
 highly recommended that, prior to calling \code{selectIons}, the settings to \code{\link{generateComponents}} are
 optimized and its results are reviewed with \code{\link{checkComponents}}. Finally, the \code{adducts<-} method can
 be used to manually correct adduct assignments afterwards if necessary.
-
-\item \code{sets}: Obtains the set names of this object.
 }}
 
 \section{Slots}{
@@ -659,6 +665,11 @@ column) for each feature group. Access with \code{groupInfo} method.}
 
 \item{\code{annotations}}{A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
 method).}
+
+\item{\code{groupAlgo,groupArgs,groupVerbose}}{\setsWF Grouping parameters that were used when this object was created. Used
+by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.}
+
+\item{\code{annotations}}{\setsWF As the \code{featureGroups} slot, but contains the annotation data per set.}
 }}
 
 \section{Fold change calculation}{
@@ -687,6 +698,40 @@ method).}
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \itemize{         \item{\code{\link{featureGroupsScreeningSet}}}       }       \item{\code{\link{featureGroupsUnset}}}       \item{\code{\link{featureGroupsScreening}}}       \itemize{         \item{\code{\link{featureGroupsSetScreeningUnset}}}       }       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsKPIC2}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsSIRIUS}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
+}
+
+\section{Sets workflows}{
+ \setsWFClass{featureGroupsSet}{featureGroups}
+
+  \setsWFNewMethodsFeat{featureGroupsUnset}{The adduct annotations for the selected set are used to convert all
+  feature (group) masses to ionic \emph{m/z} values. The annotations persist in the converted object. }
+
+  \setsWFChangedMethods{
+
+  \item \code{adducts}, \code{adducts<-} require the \code{set} argument. The order of the data that is
+  returned/changed follows that of the \code{annotations} slot. Furthermore, \code{adducts<-} will perform a
+  re-grouping of features when its \code{reGroup} parameter is set to \code{TRUE}. The implications for this are
+  discussed below.
+
+  \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
+  presence in) sets. See the argument descriptions.
+
+  \item \code{as.data.table}: normalization of intensities is performed per set.
+
+  \item \code{export} Only allows to export data from one set. The \code{unset} method is used prior to exporting the
+  data.
+
+  \item \code{overlap}, \code{unique}, \code{plotVenn}, \code{plotInt} allow to handle data per set. See the
+  \code{sets} argument description.
+
+  \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
+
+  }
+
+  A re-grouping of features occurs if \code{selectIons} is called or \code{adducts<-} is used with
+  \code{reGroup=TRUE}. Afterwards, it is very likely that feature group names are changed. Since data generated later
+  in the workflow (\emph{e.g.} annotation steps) rely on feature group names, these objects are \strong{not valid}
+  anymore, and \strong{must} be re-generated.
 }
 
 \references{

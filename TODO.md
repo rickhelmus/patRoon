@@ -187,21 +187,13 @@
     - cliqueMS
         - mention fork is needed?
 - sets
-    - find nice way to re-use docs
-        - combine with non-sets doc pages?
-            - add section with notes for sets (how data is merged/consensus, specific notes for methods etc)
-            - don't add method descriptions
-            - except new ones (eg unset)? or some other way than describeIn
-            - add sets specific params (note that they are specific in description?)
     - General
-        - setObjects() can be used for specific slots such as algo objects and MF settings
         - document for every object how consensus/merge is done
-        - sets()
-        - unset(): returns Unset class
         - make general doc page?
         - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
-        - dots args (formulas/compounds)
+        - dots args
+        - general sets description page --> check links to it
     - features
         - makeSet (features method)
     - fGroups
@@ -216,10 +208,6 @@
             - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
         - makeSet (fGroups method)
     - components
-        - class
-            - [, filter: sets arg
-            - unset
-                - simply gets set specific components, re-names to original names
         - generators
             - generateComponentsTPs: calculates also annotation similarities per set
             - componentsSet:
@@ -240,7 +228,6 @@
         - generators (screenSuspects)
             - explain merging results
             - suspects arg can be a list
-    - workflowStepSet
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR

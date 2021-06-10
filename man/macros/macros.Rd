@@ -5,5 +5,6 @@
 \newcommand{\setsWFUnset}{\item \code{unset} Converts the object data for a specified set into a 'non-set' object (\code{#1}), which allows it to be used in 'regular' workflows. #2}
 \newcommand{\setsWFNewMethodsFeat}{The following methods are specifically defined for sets workflows: \itemize{ \item \code{sets} Returns the set names for this object. \setsWFUnset{#1}{#2} }}
 \newcommand{\setsWFNewMethodsSO}{The following methods are specifically defined for sets workflows: \itemize{\item All the methods from base class \code{\link{workflowStepSet}}. \setsWFUnset{#1}{#2} }}
+\newcommand{\setsWFNewMethodsSOExtra}{The following methods are specifically defined for sets workflows: \itemize{\item All the methods from base class \code{\link{workflowStepSet}}. \setsWFUnset{#1}{#2} #3 }}
 \newcommand{\setsWFChangedMethods}{The following methods are changed or with new functionality: \itemize{#1}}
 

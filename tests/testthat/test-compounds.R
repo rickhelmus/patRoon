@@ -350,7 +350,6 @@ test_that("plotting works", {
     expect_doppel("compound-spec_sim", function() plotSpectrum(compsMFIso, index = c(1, 1), c(anPLGroup, anPLGroup2),
                                                                MSPeakLists = plists, plotStruct = FALSE))
     expect_plot(plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = TRUE))
-    # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[1], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[1]))
@@ -370,10 +369,6 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))
-    
-    skip_if(testWithSets())
-    
-    expect_ggplot(plotSpectrum(compsMFIso, 1, names(annotations(compsMFIso))[2], plists, useGGPlot2 = TRUE))
 })
 
 if (testWithSets())

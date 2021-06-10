@@ -63,8 +63,8 @@ setMethod("filter", "formulasSet", doFeatAnnFilterSets)
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                   title = NULL, specSimParams = getDefSpecSimParams(),
-                                                  useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
-                                                  ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
+                                                  mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
+                                                  mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -79,12 +79,12 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet + mirror, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ perSet + mirror, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(callNextMethod(obj, index, groupName, analysis, MSPeakLists, title, specSimParams = specSimParams,
-                              useGGPlot2, mincex, xlim, ylim, ...))
+                              mincex, xlim, ylim, ...))
     
     if (length(groupName) == 1)
     {
@@ -108,7 +108,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         })
         
         plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...))
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...))
     }
     else
     {
@@ -153,17 +153,17 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, useGGPlot2, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
     }
 })
 
 setMethod("plotSpectrumHash", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                       title = NULL, specSimParams = getDefSpecSimParams(),
-                                                      useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                      mincex = 0.9, xlim = NULL, ylim = NULL,
                                                       perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, analysis, MSPeakLists,
-                                   title, specSimParams, useGGPlot2, mincex, xlim, ylim, ...),
+                                   title, specSimParams, mincex, xlim, ylim, ...),
                     perSet, mirror))
 })
 

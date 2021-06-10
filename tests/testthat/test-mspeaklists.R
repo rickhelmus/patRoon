@@ -316,21 +316,6 @@ test_that("plotting works", {
     expect_doppel("mspl-spec_sim-avg-msms", function() plotSpectrum(plistsMSMS,
                                                                     groupName = c(groupNames(plistsMSMS)[14], groupNames(plistsMSMS)[15]),
                                                                     MSLevel = 2))
-    
-    
-    
-    skip_if(testWithSets())
-    
-    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70],
-                               analysis = analyses(plists)[1], MSLevel = 1,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
-                               analysis = analyses(plistsMSMS)[1], MSLevel = 2,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plists, groupName = groupNames(plists)[70], MSLevel = 1,
-                               useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2], MSLevel = 2,
-                               useGGPlot2 = TRUE))
 })
 
 if (testWithSets())

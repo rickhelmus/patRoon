@@ -9,7 +9,6 @@
 #' @import data.table
 #' @import shiny
 #' @import cluster
-#' @import ggplot2
 NULL # need this for doc generation
 
 # Need to import these as functions generated with checkmate/withr don't always take namespace in to account

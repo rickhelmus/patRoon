@@ -12,6 +12,7 @@ NULL
 #' @templateVar generator generateCompounds
 #' @templateVar classUnset compoundsUnset
 #' @templateVar exObj compounds
+#' @templateVar consAlgo2 MetFrag
 #' @templateVar extraMethods \item \code{addFormulaScoring} Adds the formula scorings to the original data and re-creates the annotation set consensus (see below for implications).
 #' @template featAnnSets-class
 #'

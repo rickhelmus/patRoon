@@ -237,15 +237,9 @@
             - explain consensus
                 - set ranking: same as compounds consensus (but no weights (yet))
     - suspects
-        - class
-            - [, filter: sets arg (from fGroupsSet methods)
-            - unset
-                - as fGroups, with screening results for specified set
-        - generators
+        - generators (screenSuspects)
             - explain merging results
-            - different rank columns
-            - estIDLevel: best case, sublevels stripped if not the same
-            - form/compRanks: not updated when subsetting on sets
+            - suspects arg can be a list
     - workflowStepSet
 - TPs
     - mention Bas as author for spec similarity/shift etc

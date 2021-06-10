@@ -12,17 +12,34 @@ syncComponentsSetObjects <- function(componentsSet)
     return(componentsSet)
 }
 
-componentsSet <- setClass("componentsSet", slots = c(setObjects = "list"),
-                          contains = c("components", "workflowStepSet"))
+#' @param set \setsWF The name of the set.
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
+#'
+#' @section Sets workflows: \setsWFClass{componentsSet}{components}
+#'
+#'   \setsWFNewMethodsSO{componentsUnset}{Only the components in the specified set are kept.}
+#'
+#'   \setsWFChangedMethods{
+#'
+#'   \item \code{filter} and the subset operator (\code{[}) Can be used to select components that are only present for
+#'   selected sets.
+#'
+#'   }
+#'
+#' @rdname components-class
+#' @export
+componentsSet <- setClass("componentsSet", contains = c("components", "workflowStepSet"))
 
 
-#' @describeIn componentsSet Shows summary information for this object.
+#' @rdname components-class
 #' @export
 setMethod("show", "componentsSet", function(object)
 {
     callAllNextMethods(object, show, firstClass = "components", startFrom = "componentsSet")
 })
 
+#' @rdname components-class
+#' @export
 setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
     if (length(x) == 0)
@@ -41,6 +58,7 @@ setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..
     return(x)
 })
 
+#' @rdname components-class
 #' @export
 setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = NULL)
 {
@@ -62,6 +80,7 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
     return(obj)
 })
 
+#' @rdname components-class
 #' @export
 setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
 {
@@ -89,6 +108,7 @@ setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
+#' @rdname components-class
 #' @export
 setMethod("consensus", "componentsSet", function(obj, ...)
 {
@@ -142,7 +162,12 @@ generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., set
 }
 
 
+#' @rdname components-class
+#' @export
 componentsUnset <- setClass("componentsUnset", contains = "components")
+
+#' @rdname components-class
+#' @export
 setMethod("unset", "componentsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)

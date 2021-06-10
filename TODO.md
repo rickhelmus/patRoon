@@ -220,10 +220,11 @@
             - [, filter: sets arg
             - unset
                 - simply gets set specific components, re-names to original names
-            - plotGraph,componentsNTSet-method: set arg
-            - componentsSet: clearly mention it is simply a merge between sets
         - generators
             - generateComponentsTPs: calculates also annotation similarities per set
+            - componentsSet:
+                - clearly mention it is simply a merge between sets
+                - components are renamed
     - MSPeakLists
         - generators
             - explain 'consensus'
@@ -245,6 +246,7 @@
             - different rank columns
             - estIDLevel: best case, sublevels stripped if not the same
             - form/compRanks: not updated when subsetting on sets
+    - workflowStepSet
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR

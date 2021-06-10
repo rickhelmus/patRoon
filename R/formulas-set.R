@@ -11,6 +11,7 @@ NULL
 #' @templateVar generator generateFormulas
 #' @templateVar classUnset formulasUnset
 #' @templateVar exObj formulas
+#' @templateVar consAlgo2 GenForm
 #' @template featAnnSets-class
 #'
 #' @rdname formulas-class

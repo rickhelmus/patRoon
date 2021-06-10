@@ -201,6 +201,7 @@
         - make general doc page?
         - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
+        - dots args (formulas/compounds)
     - features
         - makeSet (features method)
     - fGroups
@@ -229,8 +230,6 @@
     - Annotation (formulas/compounds)
         - class
             - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
-            - dots args (formulas/compounds)
-            - filterSets args for consensus
         - generators
             - setThreshold and setThresholdAnn args
             - SIRIUS: batch calculations done per adduct

@@ -169,6 +169,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                      algorithm = "sirius"))
 })
 
+#' @rdname compound-generation
+#' @export
 setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
                                                                   setThresholdAnn = 0.75)
 {

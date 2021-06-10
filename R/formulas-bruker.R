@@ -275,6 +275,8 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
     return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
 })
 
+#' @rdname formula-generation
+#' @export
 setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
 {
     generateFormulasSet(fGroups, MSPeakLists, generateFormulasDA, ..., setThreshold = setThreshold,

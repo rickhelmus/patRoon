@@ -773,6 +773,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                        settings = mfSettings))
 })
 
+#' @rdname compound-generation
+#' @export
 setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
                                                                    setThresholdAnn = 0.75)
 {

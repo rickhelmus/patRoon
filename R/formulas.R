@@ -438,9 +438,6 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
 #' @templateVar algos bruker,genform,sirius
 #' @template generic-algo
 #'
-#' @param ... Any parameters to be passed to the selected formula generation
-#'   algorithm.
-#'
 #' @rdname formula-generation
 #' @aliases generateFormulas
 #' @export

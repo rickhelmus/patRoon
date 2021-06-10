@@ -119,6 +119,36 @@ syncScreeningSetObjects <- function(obj)
     return(obj)
 }
 
+#' @param set \setsWF The name of the set.
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
+#'
+#' @section Sets workflows: \setsWFClass{featureGroupsScreeningSet}{featureGroupsScreening}
+#'
+#'   \setsWFNewMethodsSO{featureGroupsScreeningUnset}{Only the screening results present in the specified set are kept.}
+#'
+#'   \setsWFChangedMethods{
+#'
+#'   \item \code{annotateSuspects} Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
+#'   identification levels etc are calculated for each set. Subsequently, these results are merged in the final
+#'   \code{screenInfo}. In addition, an overall \code{formRank} and \code{compRank} column is created based on the
+#'   rankings of the suspect candidate in the set consensus data. Furthermore, an overall \code{estIDLevel} is generated
+#'   that is based on the 'best' estimated identification level among the sets data (\emph{i.e.} the lowest). In case
+#'   there is a tie between sub-levels (\emph{e.g.} \samp{3a} and \samp{3b}), then the sub-level is stripped
+#'   (\emph{e.g.} \samp{3}).
+#'
+#'   \item \code{filter} All filters releated to estimated identification levels and formula/compound rankings  are
+#'   applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
+#'   are only removed if none of the set data confirms to the filter.
+#'
+#'   }
+#'
+#'   This class derives also from \code{\link{featureGroupsSet}}. Please see its documentation for more relevant details
+#'   with sets workflows.
+#'
+#'   Note that the \code{formRank} and \code{compRank} columns are \emph{not} updated when the data is subset.
+#'
+#' @rdname featureGroupsScreening-class
+#' @export
 featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
                                       slots = c(screenInfo = "data.table"),
                                       contains = c("featureGroupsSet", "workflowStepSet"))
@@ -126,10 +156,13 @@ featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
 setMethod("initialize", "featureGroupsScreeningSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening-set", ...))
 
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("screenInfo", "featureGroupsScreeningSet", function(obj) obj@screenInfo)
 
 setMethod("mergedConsensusNames", "featureGroupsScreeningSet", function(obj) sets(obj))
 
+#' @rdname featureGroupsScreening-class
 #' @export
 setMethod("show", "featureGroupsScreeningSet", function(object)
 {
@@ -137,6 +170,8 @@ setMethod("show", "featureGroupsScreeningSet", function(object)
     doScreeningShow(object)
 })
 
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
                                                                                  suspects = NULL, sets = NULL,
                                                                                  drop = TRUE)
@@ -162,6 +197,7 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
     return(x)
 })
 
+#' @rdname featureGroupsScreening-class
 #' @export
 setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, ...)
 {
@@ -172,6 +208,8 @@ setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NUL
     return(obj)
 })
 
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collapseSuspects = ",",
                                                                  onlyHits = FALSE)
 {
@@ -185,6 +223,8 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
     return(ret)    
 })
 
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -269,6 +309,8 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     return(fGroups)
 })
 
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = NULL,
                                                           selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
@@ -366,8 +408,13 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 })
 
 
+#' @rdname featureGroupsScreening-class
+#' @export
 featureGroupsSetScreeningUnset <- setClass("featureGroupsSetScreeningUnset",
                                            contains = "featureGroupsScreening")
+
+#' @rdname featureGroupsScreening-class
+#' @export
 setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)

@@ -7,7 +7,7 @@
 \alias{convertToMFDB,transformationProductsLibrary-method}
 \title{Class to store transformation products (TPs) obtained from a library}
 \usage{
-\S4method{convertToMFDB}{transformationProductsLibrary}(TPs, out, includeParents)
+\S4method{convertToMFDB}{transformationProductsLibrary}(TPs, out, includeParents = TRUE)
 }
 \arguments{
 \item{out}{The file name of the the output \command{MetFrag} database.}

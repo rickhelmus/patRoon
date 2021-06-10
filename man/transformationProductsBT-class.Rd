@@ -8,7 +8,7 @@
 \alias{filter,transformationProductsBT-method}
 \title{Class to store transformation products (TPs) predicted by BioTransformer}
 \usage{
-\S4method{convertToMFDB}{transformationProductsBT}(TPs, out, includeParents)
+\S4method{convertToMFDB}{transformationProductsBT}(TPs, out, includeParents = TRUE)
 
 \S4method{filter}{transformationProductsBT}(obj, removeEqualFormulas = FALSE, minSimilarity = NULL, negate = FALSE)
 }
@@ -24,7 +24,7 @@
 \item{minSimilarity}{Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
 details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be
 useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
-MS/MS spectral similarity.}
+MS/MS spectral similarity (which can be evaluated after componentization with \code{\link{generateComponentsTPs}}.}
 
 \item{negate}{If \code{TRUE} then filters are performed in opposite manner.}
 }

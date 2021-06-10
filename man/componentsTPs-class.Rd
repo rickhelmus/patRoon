@@ -33,7 +33,8 @@
 \item{\dots, verbose}{Further arguments passed to the base \code{\link[=filter,components-method]{filter method}}.}
 
 \item{retDirMatch}{If set to \code{TRUE}, only keep TPs for which the retention time direction (\code{retDir}, see
-Details in \link{componentsTPs}) matches with the observed direction.}
+Details in \link{componentsTPs}) matches with the observed direction. TPs will never be removed if the
+expected/observed direction is \samp{0} (\emph{i.e.} unknown or not significantly different than the parent).}
 
 \item{minSpecSim, minSpecSimPrec, minSpecSimBoth}{The minimum spectral similarity of a TP compared to its parent
 (\samp{0-1}). The \code{minSpecSimPrec} and \code{minSpecSimBoth} apply to binned data that is shifted with the
@@ -41,7 +42,8 @@ Details in \link{componentsTPs}) matches with the observed direction.}
 parameters} for more details). Set to \code{NULL} to ignore.}
 
 \item{minFragMatches, minNLMatches}{Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
-to \code{NULL} to ignore.}
+to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
+\link{component-generation} for more details.}
 
 \item{formulas}{A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
 additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from

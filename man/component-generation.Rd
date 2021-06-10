@@ -292,16 +292,17 @@ See the \link[=specSimParams]{spectral similarity parameters} documentation for 
 
 \item{fGroupsTPs}{A \code{\link{featureGroups}} object containing the feature groups that are expected to be
 transformation products. If a distinction between parents and TPs is not yet known, \code{fGroupsTPs} should equal
-the \code{fGroups} argument. Otherwise, \code{fGroups} should contain the parent feature groups, and both
+the \code{fGroups} argument. Otherwise, \code{fGroups} should only contain the parent feature groups, and both
 \code{fGroups} and \code{fGroupsTPs} \emph{must} be a subset of the same \code{\link{featureGroups}} object.}
 
-\item{ignoreParents}{If \code{TRUE} then any of the overlapping feature groups from the \code{fGroups} and
-\code{fGroupsTPs} are not considered as TPs.}
+\item{ignoreParents}{If \code{TRUE} then feature groups present in both \code{fGroups} and \code{fGroupsTPs} are not
+considered as TPs.}
 
 \item{TPs}{A \code{\link{transformationProducts}} object. Set to \code{NULL} to perform linking without this data.}
 
 \item{formulas, compounds}{A \code{\link{formulas}}/\code{\link{compounds}} object to calculate annotation
-similarities between parents and TPs. If \code{NULL} then this data is not calculated.}
+similarities between parents and TPs. If \code{NULL} then this data is not calculated. For more details see the
+\verb{Linking parents and transformation products} section below.}
 
 \item{minRTDiff}{Minimum retention time difference between the parent and a TP to determine whether a TP elutes
 prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))}
@@ -382,11 +383,8 @@ generally useful to provide more information for compound annotation and reduce 
 \code{generateComponentsTPs} generates components by linking feature groups of transformation products and
   their parents. Moreover, this method typically employs data from \link[=TP-generation]{generated transformation
   products} to find parents and their TPs. However, this data is not necessary, and components can also be made based
-  on MS/MS similarity and/or other annotation similarities between the parent and its TPs. To improve
-  componentization (and crucial when no TP data is provided), it is possible to specify upfront which feature groups
-  are likely to be parents or TPs. Such distinction can be made, for instance, by calculating log Fold changes (see
-  the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for feature groups and
-  \code{\link{plotVolcano}}) or other statistical techniques from \R.
+  on MS/MS similarity and/or other annotation similarities between the parent and its TPs. For more details see the
+  \verb{Linking parents and transformation products} section below.
 }
 \note{
 For \code{generateComponentsCAMERA} and \code{generateComponentsRAMClustR}: the \code{minSize} and
@@ -456,8 +454,7 @@ The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateC
 
   An typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
   calculating Fold Changes (see the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for
-  feature groups and \code{\link{plotVolcano}}). Of course, any other statistical techniques from \R are also
-  suitable.
+  feature groups and \code{\link{plotVolcano}}). Of course, other statistical techniques from \R are also suitable.
 
   During componentization, several characteristics are calculated which may be useful for post-processing: \itemize{
 

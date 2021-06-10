@@ -194,6 +194,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
 })
 
+#' @rdname formula-generation
+#' @export
 setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
                                                                  setThresholdAnn = 0.75)
 {

@@ -561,6 +561,9 @@ NULL
 #'   a subset of the object that was used to create the specified \code{MSPeakLists} (only relevant for algorithms using
 #'   \code{MSPeakLists}). In the case of a subset only the remaining feature groups in the subset are considered.
 #' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
+#' @param \dots Any parameters to be passed to the selected formula generation algorithm.
+#'
+#'   For sets workflows: further arguments directly passed to the non-sets method.
 #' @param MSMode Whether formulae should be generated only from MS data (\code{"ms"}), MS/MS data (\code{"msms"}) or
 #'   both (\code{"both"}).
 #'
@@ -596,6 +599,9 @@ NULL
 #'   possible. An overview is obtained with the \code{formulaScorings} function:
 #'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
 #'
+#' @templateVar UID neutral formula
+#' @template featAnnSets-gen
+#'
 #' @templateVar what \code{generateFormulasGenForm} and \code{generateFormulasSIRIUS}
 #' @template uses-multiProc
 #'
@@ -609,69 +615,58 @@ NULL
 
 #' Automatic compound identification
 #'
-#' Functionality to automatically identify chemical compounds from feature
-#' groups.
+#' Functionality to automatically identify chemical compounds from feature groups.
 #'
-#' Several algorithms are provided to automatically identify compounds for given
-#' feature groups. To this end, each measured masses for all feature groups are
-#' searched within online database(s) (\emph{e.g.}
-#' \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem}) to retrieve a list of
-#' potential candidate chemical compounds. Depending on the algorithm and its
-#' parameters, further scoring of candidates is then performed using, for
-#' instance, matching of measured and theoretical isotopic patterns, presence
-#' within other data sources such as patent databases and similarity of measured
-#' and in-silico predicted MS/MS fragments. Note that this process is often
-#' quite time consuming, especially for large feature group sets. Therefore,
-#' this is often one of the last steps within the workflow and not performed
-#' before feature groups have been prioritized.
+#' Several algorithms are provided to automatically identify compounds for given feature groups. To this end, each
+#' measured masses for all feature groups are searched within online database(s) (\emph{e.g.}
+#' \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem}) to retrieve a list of potential candidate chemical compounds.
+#' Depending on the algorithm and its parameters, further scoring of candidates is then performed using, for instance,
+#' matching of measured and theoretical isotopic patterns, presence within other data sources such as patent databases
+#' and similarity of measured and in-silico predicted MS/MS fragments. Note that this process is often quite time
+#' consuming, especially for large feature group sets. Therefore, this is often one of the last steps within the
+#' workflow and not performed before feature groups have been prioritized.
 #'
-#' @param fGroups \code{\link{featureGroups}} object for which compounds should
-#'   be identified. This should be the same or a subset of the object that was
-#'   used to create the specified \code{MSPeakLists}. In the case of a subset
-#'   only the remaining feature groups in the subset are considered.
-#' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for
-#'   the supplied \code{fGroups}.
-#' @param errorRetries Maximum number of retries after an error occurred. This
-#'   may be useful to handle e.g. connection errors.
-#' @param topMost Only keep this number of candidates (per feature group) with
-#'   highest score. Set to \code{NULL} to always keep all candidates,
-#'   however, please note that this may result in significant usage of CPU/RAM
-#'   resources for large numbers of candidates.
+#' @param fGroups \code{\link{featureGroups}} object for which compounds should be identified. This should be the same
+#'   or a subset of the object that was used to create the specified \code{MSPeakLists}. In the case of a subset only
+#'   the remaining feature groups in the subset are considered.
+#' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
+#' @param \dots Any parameters to be passed to the selected compound generation algorithm.
 #'
-#' @param extraOpts For \command{MetFrag}: A named \code{list} containing
-#'   further settings to be passed to \code{\link[metfRag]{run.metfrag}}. See
-#'   the \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR}
-#'   and \href{http://ipb-halle.github.io/MetFrag/projects/metfragcl/}{MetFrag
-#'   CL} homepages for all available options.
+#'   For sets workflows: further arguments directly passed to the non-sets method.
+#' @param errorRetries Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
+#'   errors.
+#' @param topMost Only keep this number of candidates (per feature group) with highest score. Set to \code{NULL} to
+#'   always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
+#'   large numbers of candidates.
+#' @param extraOpts For \command{MetFrag}: A named \code{list} containing further settings to be passed to
+#'   \code{\link[metfRag]{run.metfrag}}. See the \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR}
+#'   and \href{http://ipb-halle.github.io/MetFrag/projects/metfragcl/}{MetFrag CL} homepages for all available options.
 #'
-#'   For \command{SIRIUS}: a \code{character} vector with any extra commandline
-#'   parameters for formula prediction. See the SIRIUS manual for more details.
+#'   For \command{SIRIUS}: a \code{character} vector with any extra commandline parameters for formula prediction. See
+#'   the SIRIUS manual for more details.
 #'
 #'   Set to \code{NULL} to ignore.
 #'
 #' @template adduct-arg
 #'
-#' @section Scorings: Each algorithm implements their own scoring system. Their
-#'   names have been simplified and harmonized where possible and are used for
-#'   reporting and in the case \command{MetFrag} is used to specify how
-#'   compounds should be scored (\code{scoreTypes} argument). The
-#'   \code{compoundScorings} function can be used to get an overview of both the
-#'   algorithm specific and generic scoring names. For instance, the table below
-#'   shows all scorings for \command{MetFrag}: (some columns are omitted)
+#' @section Scorings: Each algorithm implements their own scoring system. Their names have been simplified and
+#'   harmonized where possible and are used for reporting and in the case \command{MetFrag} is used to specify how
+#'   compounds should be scored (\code{scoreTypes} argument). The \code{compoundScorings} function can be used to get an
+#'   overview of both the algorithm specific and generic scoring names. For instance, the table below shows all scorings
+#'   for \command{MetFrag}: (some columns are omitted)
 #'
-#' @eval paste("@@section Scorings:",
-#'   patRoon:::tabularRD(patRoon::compoundScorings("metfrag")[, 1:3]))
+#' @eval paste("@@section Scorings:", patRoon:::tabularRD(patRoon::compoundScorings("metfrag")[, 1:3]))
 #'
-#' @section Scorings: In addition, the \code{compoundScorings} function is also
-#'   useful to programatically generate  a set of scorings to be used by
-#'   \command{MetFrag}. For instance, the following can be given to the
-#'   \code{scoreTypes} argument to use all default scorings for PubChem:
-#'   \code{compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name}.
+#' @section Scorings: In addition, the \code{compoundScorings} function is also useful to programatically generate  a
+#'   set of scorings to be used by \command{MetFrag}. For instance, the following can be given to the \code{scoreTypes}
+#'   argument to use all default scorings for PubChem: \code{compoundScorings("metfrag", "pubchem",
+#'   onlyDefault=TRUE)$name}.
 #'
-#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate
-#'   Scores} section on the
-#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR
-#'   homepage}.
+#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores} section on the
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR homepage}.
+#'
+#' @templateVar UID first-block \acronym{InChIKey}
+#' @template featAnnSets-gen
 #'
 #' @templateVar what \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS}
 #' @template uses-multiProc

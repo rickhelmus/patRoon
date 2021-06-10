@@ -647,9 +647,6 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' @templateVar algos metfrag,sirius
 #' @template generic-algo
 #'
-#' @param ... Any parameters to be passed to the selected compound generation
-#'   algorithm.
-#'
 #' @rdname compound-generation
 #' @aliases generateCompounds
 #' @export

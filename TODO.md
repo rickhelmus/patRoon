@@ -183,6 +183,7 @@
     - MSPL
         - handbook: clearly mention that MSPeakLists should not be filtered/subset after annotation
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
+    - SIRIUS: batch calculations done per adduct
 - components
     - cliqueMS
         - mention fork is needed?
@@ -218,11 +219,6 @@
     - Annotation (formulas/compounds)
         - class
             - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
-        - generators
-            - setThreshold and setThresholdAnn args
-            - SIRIUS: batch calculations done per adduct
-            - explain consensus
-                - set ranking: same as compounds consensus (but no weights (yet))
     - suspects
         - generators (screenSuspects)
             - explain merging results

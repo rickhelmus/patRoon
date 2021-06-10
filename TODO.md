@@ -183,7 +183,6 @@
     - MSPL
         - handbook: clearly mention that MSPeakLists should not be filtered/subset after annotation
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
-    - SIRIUS: batch calculations done per adduct
 - components
     - cliqueMS
         - mention fork is needed?

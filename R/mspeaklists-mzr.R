@@ -146,6 +146,8 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
                        origFGNames = gNames, algorithm = "mzr"))
 })
 
+#' @rdname MSPeakLists-generation
+#' @export
 setMethod("generateMSPeakListsMzR", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakListsMzR, ...)

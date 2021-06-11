@@ -210,9 +210,6 @@
             - componentsSet:
                 - clearly mention it is simply a merge between sets
                 - components are renamed
-    - MSPeakLists
-        - generators
-            - explain 'consensus'
     - Annotation (formulas/compounds)
         - class
             - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?

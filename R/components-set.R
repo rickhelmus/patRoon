@@ -146,9 +146,7 @@ generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., set
         {
             s <- sets(fGroupsSet)[i]
             at <- annTable[set == s]
-            # UNDONE: default to positive OK?
-            ion <- if (nrow(at) == 0 || as.adduct(at$adduct[1])@charge >= 0) "positive" else "negative"
-            setArgs[[i]]$ionization <- ion
+            setArgs[[i]]$ionization <- getIonizationFromAnnTable(at)
         }
     }
         

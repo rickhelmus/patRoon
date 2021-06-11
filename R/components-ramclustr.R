@@ -35,7 +35,8 @@ setMethod("initialize", "componentsRC",
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,
-                                                                   normalize = "TIC", ionization, absMzDev = 0.002, relMzDev = 5,
+                                                                   normalize = "TIC", ionization = NULL,
+                                                                   absMzDev = 0.002, relMzDev = 5,
                                                                    minSize = 2, relMinReplicates = 0.5,
                                                                    RCExperimentVals = list(design = list(platform = "LC-MS"),
                                                                                            instrument = list(ionization = ionization, MSlevs = 1)),
@@ -47,7 +48,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ st + sr + maxt + hmax, lower = 0, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertString(normalize, add = ac)
-    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCount(minSize, positive = TRUE, add = ac)

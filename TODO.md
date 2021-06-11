@@ -162,6 +162,9 @@
     - refer to OrgMassSpecR for cosine MS/MS similarity?
         - now still done in annotateSuspects()
     - fix devtools::check_man() issues
+    - verify if all new generics have docs
+    - update/add aliases
+    - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -171,8 +174,13 @@
         - MSPL: clearly mention that MSPeakLists should not be filtered/subset after annotation
         - new/changed as.data.table args
             - maxFormulas/maxFragFormulas removed
-- update/add aliases
-- remove some aliases for generics now not unique to one class (eg unique/overlap)
+    - sets
+        - "In LC-HRMS screening workflows the samples are often measured twice: with positive and negative ionization. Most data
+           processing steps are only suitable for one polarity, for instance, due to the fact that the \emph{m/z} values in mass
+           spectra are inherently different (\emph{e.g.} \code{[M+H]+} \emph{vs} \code{[M-H]-}) and MS/MS fragmentation occurs
+           differently. To avoid the need to perform the data processing workflow twice, \emph{i.e.} for positive and negative
+           mode, the so called \emph{sets workflow} was introduced."
+        - "In the future, sets with different chromatographic methods may also be supported, "
 - features
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
@@ -185,32 +193,18 @@
     - cliqueMS
         - mention fork is needed?
 - sets
-    - Handbook
-        - "In LC-HRMS screening workflows the samples are often measured twice: with positive and negative ionization. Most data
-           processing steps are only suitable for one polarity, for instance, due to the fact that the \emph{m/z} values in mass
-           spectra are inherently different (\emph{e.g.} \code{[M+H]+} \emph{vs} \code{[M-H]-}) and MS/MS fragmentation occurs
-           differently. To avoid the need to perform the data processing workflow twice, \emph{i.e.} for positive and negative
-           mode, the so called \emph{sets workflow} was introduced."
-       - "In the future, sets with different chromatographic methods may also be supported, "
     - General
         - order of sets section
-        - docs for generics (eg sets, unset)
     - fGroups
-        - class
-            - adducts<-
-                - example with reGroup
-                    - ?
+            - adducts<-: example with reGroup
+                - ?
     - Annotation (formulas/compounds)
-        - class
-            - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
+        - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
 - TPs
     - mention Bas as author for spec similarity/shift etc
         - cosine based on OrgMassSpecR
         - add also as contributor to eg DESCRIPTION
-    - document that relative intensity and min peaks filter for spec sim is applied after removing precursors
-        - min peaks always applied lastly
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
-    - doc somewhere plotInt order with sets
     - refs for PC transformations
     - logic: mention results can be filtered with TP components?
     

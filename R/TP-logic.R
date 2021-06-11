@@ -105,6 +105,7 @@ setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, a
     return(transformationProductsLogic(parents = res$parents, products = res$products))
 })
 
+#' @rdname TP-generation
 #' @export
 setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
 {

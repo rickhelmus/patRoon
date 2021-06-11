@@ -459,7 +459,7 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     return(ret)
 })
 
-#' @templateVar adductsNULL TRUE
+#' @templateVar adductNULL TRUE
 #' @template makeSet
 #'
 #' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument description.

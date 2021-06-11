@@ -32,6 +32,8 @@ NULL
 #'
 #'   For \code{consensus}: \code{components} objects that should be used to
 #'   generate the consensus.
+#'   
+#'   \setsPassedArgs1{components}
 #'
 #' @templateVar seli components
 #' @templateVar selOrderi names()

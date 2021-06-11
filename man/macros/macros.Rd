@@ -7,4 +7,6 @@
 \newcommand{\setsWFNewMethodsSO}{The following methods are specifically defined for sets workflows: \itemize{\item All the methods from base class \code{\link{workflowStepSet}}. \setsWFUnset{#1}{#2} }}
 \newcommand{\setsWFNewMethodsSOExtra}{The following methods are specifically defined for sets workflows: \itemize{\item All the methods from base class \code{\link{workflowStepSet}}. \setsWFUnset{#1}{#2} #3 }}
 \newcommand{\setsWFChangedMethods}{The following methods are changed or with new functionality: \itemize{#1}}
+\newcommand{\setsPassedArgs}{For \link[=sets-workflow]{sets workflow} methods: further arguments passed to the base #1.}
+\newcommand{\setsPassedArgs1}{\setsPassedArgs{\code{\link{#1}} method}}
 

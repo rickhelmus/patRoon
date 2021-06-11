@@ -43,7 +43,9 @@ printFeatStats <- function(fList)
 #' @templateVar dollarOpName analysis
 #' @template sub_sel_del-args
 #'
-#' @param \dots For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.
+#' @param \dots For \code{delete}: passed to the function specified as \code{j}.
+#'   
+#'   \setsPassedArgs1{features}
 #'
 #' @templateVar class features
 #' @template class-hierarchy

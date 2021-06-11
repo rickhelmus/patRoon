@@ -167,7 +167,7 @@
             - add also as contributor to eg DESCRIPTION
 - handbook
     - KPIC2, cliqueMS installation
-    - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
+    - update MP section on what uses it (e.g. SIRIUS features, SAFD, OpenMS components, ...)
     - features
         - topMostByRGroup?
     - annotation
@@ -181,10 +181,7 @@
            differently. To avoid the need to perform the data processing workflow twice, \emph{i.e.} for positive and negative
            mode, the so called \emph{sets workflow} was introduced."
         - "In the future, sets with different chromatographic methods may also be supported, "
-- features
-    - reportHTML: EICs made if annotations, even if not specified in reportPlots
-    - progressr
-    - ffOpenMS etc: analyses also needs to be available for hashing
+- progressr
 - annotation
     - generateFormulas: MSPeakLists argument
         - update handbook, tutorial...

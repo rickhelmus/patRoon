@@ -110,9 +110,6 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### Sets
 
-setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
-setGeneric("sets", function(obj) standardGeneric("sets"))
-setGeneric("unset", function(obj, set) standardGeneric("unset"))
 setGeneric("updateSetConsensus", function(obj) standardGeneric("updateSetConsensus"))
 
 ### TP generation
@@ -352,6 +349,16 @@ setGeneric("plotVolcano", function(obj, ...) standardGeneric("plotVolcano"))
 #' @template generics
 setGeneric("replicateGroups", function(obj) standardGeneric("replicateGroups"))
 
+#' @templateVar func setObjects
+#' @templateVar desc returns the \emph{set objects} of this object. See the documentation of \code{\link{workflowStepSet}}.
+#' @template generics
+setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
+
+#' @templateVar func sets
+#' @templateVar desc returns the names of the sets inside this object. See the documentation for \link[=sets-workflow]{sets workflows}.
+#' @template generics
+setGeneric("sets", function(obj) standardGeneric("sets"))
+
 #' @templateVar func treeCut
 #' @templateVar desc Manually cut a cluster.
 #' @template generics
@@ -364,6 +371,11 @@ setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("tr
 #' @template dynamictreecut
 setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
                                       minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
+
+#' @templateVar func unset
+#' @templateVar desc Converts this object to a regular non-set object. See the documentation for \link[=sets-workflow]{sets workflows}.
+#' @template generics
+setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
 
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", rtWindow = 30,

@@ -496,7 +496,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #' @param rtWindow,mzWindow The retention time window (in seconds) and \emph{m/z} window that will be used for matching
 #'   a suspect (+/- feature data).
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
-#'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format} section below.
+#'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format} and \verb{Matching
+#'   of suspect masses} sections below.
 #' @param skipInvalid If set to \code{TRUE} then suspects with invalid data (\emph{e.g.} missing names or other missing
 #'   data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no \code{mz}
 #'   column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.
@@ -521,12 +522,28 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #'   the aforementioned columns)
 #'
 #'   \item \code{adduct} A \code{character} that can be converted with \code{\link{as.adduct}}. (\strong{mandatory}
-#'   unless data from the \code{mz} column is available or the \code{adduct} argument is set)
+#'   unless data from the \code{mz} column is available, the \code{adduct} argument is set or \code{fGroups} has adduct
+#'   annotations)
 #'
 #'   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS fragments (specified as \emph{m/z} or
 #'   formulae, respectively). Multiple values can be specified by separating them with a semicolon (\verb{;}). This data
 #'   is used by \code{\link{annotateSuspects}} to report detected MS/MS fragments and calculate identification levels.
 #'   (\strong{optional})
+#'
+#'   }
+#'
+#' @section Matching of suspect masses: How the mass of a suspect is matched with the mass of a feature depends on the
+#'   available data: \itemize{
+#'
+#'   \item If the suspect has data from the \code{mz} column of the suspect list, then the this data is matched with the
+#'   detected feature \emph{m/z}.
+#'
+#'   \item Otherwise, if the suspect has data in the \code{adduct} column of the suspect list, this data is used to
+#'   calculate its \code{mz} value, which is then used like above.
+#'
+#'   \item In the last case, the neutral mass of the suspect is matched with the neutral mass of the feature. Hence,
+#'   either the \code{adduct} argument needs to be specified, or the \code{featureGroups} input object must have adduct
+#'   annotations.
 #'
 #'   }
 #'

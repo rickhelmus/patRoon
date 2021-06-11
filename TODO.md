@@ -165,22 +165,21 @@
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
-- ffOpenMS etc: analyses also needs to be available for hashing
+    - features
+        - topMostByRGroup?
+    - annotation
+        - MSPL: clearly mention that MSPeakLists should not be filtered/subset after annotation
+        - new/changed as.data.table args
+            - maxFormulas/maxFragFormulas removed
 - update/add aliases
 - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - features
-    - topMostByRGroup: handbook?
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - progressr
-- suspect screening
-    - explain three mass matching methods (see comments doScreenSuspects())
+    - ffOpenMS etc: analyses also needs to be available for hashing
 - annotation
-    - new/changed as.data.table args
-        - maxFormulas/maxFragFormulas removed (handbook)
     - generateFormulas: MSPeakLists argument
         - update handbook, tutorial...
-    - MSPL
-        - handbook: clearly mention that MSPeakLists should not be filtered/subset after annotation
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
 - components
     - cliqueMS
@@ -298,6 +297,7 @@
     - Updated TASQ support
     - numericIDLevel: handle NAs
     - logPath for annotateSuspects()
+    - mass matching has changed
 - components
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency

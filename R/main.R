@@ -179,7 +179,7 @@ NULL
 #'   workflow}.
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
-#' @templateVar what \code{generateFeaturesOpenMS}
+#' @templateVar what \code{findFeaturesOpenMS}, \code{findFeaturesSIRIUS} and \code{findFeaturesSAFD}
 #' @template uses-multiProc
 #'
 #' @note The file format of analyses for \code{findFeaturesXCMS} and \code{findFeaturesXCMS3} must be \code{mzML} or

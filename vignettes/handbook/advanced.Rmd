@@ -313,7 +313,7 @@ Tool                  | Used by                                      | Notes
 --------------------- | -------------------------------------------- | ---------------------------------
 `msConvert`           | `convertMSFiles(algorithm="pwiz", ...)`      |
 `FileConverter`       | `convertMSFiles(algorithm="openms", ...)`    |
-`FeatureFinderMetabo` | `generateFeatures(algorithm="openms", ...)`  |
+`FeatureFinderMetabo` | `findFeatures(algorithm="openms", ...)`      |
 `GenForm`             | `generateFormulas(agorithm="genform", ...)`  |
 `SIRIUS`              | `generateFormulas(agorithm="sirius", ...)`, `generateCompounds(agorithm="sirius", ...)`  | Only if `splitBatches=TRUE`
 `MetFrag`             | `generateCompounds(agorithm="metfrag", ...)` |

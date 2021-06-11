@@ -35,6 +35,12 @@ setMethod("initialize", "componentsOpenMS",
 #'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.
 #'
+#' @templateVar what \code{generateComponentsOpenMS}
+#' @template uses-multiProc
+#'
+#' @section Parallelization: Note that for caching purposes, the analyses files must always exist on the local host
+#'   computer, even if it is not participating in computations.
+#'
 #' @references \insertRef{Bielow2010}{patRoon}
 #'
 #' @aliases generateComponentsOpenMS

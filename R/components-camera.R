@@ -165,6 +165,8 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
     return(ret)
 })
 
+#' @rdname component-generation
+#' @export
 setMethod("generateComponentsCAMERA", "featureGroupsSet", function(fGroups, ...)
 {
     generateComponentsSet(fGroups, generateComponentsCAMERA, setIonization = TRUE, ...)

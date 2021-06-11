@@ -7,6 +7,7 @@ NULL
 #'
 #' @param formula A \code{character} vector with formulae to convert.
 #'
+#' @templateVar plain TRUE
 #' @template adduct-arg
 #'
 #' @examples as.adduct("[M+H]+")

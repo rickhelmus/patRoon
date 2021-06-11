@@ -13,6 +13,8 @@ NULL
 #'   likely that \emph{e.g.} plotting methods will use wrong MS/MS data.
 #' @param MSLevel The MS level: \samp{1} for regular MS, \samp{2} for MSMS.
 #' @param \dots Further arguments passed to \code{\link[graphics]{plot}}.
+#' 
+#'   \setsPassedArgs1{MSPeakLists}
 #'
 #' @template plot-lim
 #' @template specSimParams-arg

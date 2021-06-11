@@ -8,120 +8,92 @@ screeningSlots <- c(screenInfo = "data.table")
 
 #' Class for suspect screened feature groups.
 #'
-#' This class derives from \code{\link{featureGroups}} and adds suspect
-#' screening information.
+#' This class derives from \code{\link{featureGroups}} and adds suspect screening information.
 #'
 #' @param obj,object,x,fGroups The \code{featureGroupsScreening} object.
-#' @param \dots Passed to the base \code{\link{featureGroups}} method.
-#' @param onlyHits For \code{as.data.table}: if \code{TRUE} then only feature
-#'   groups with suspect hits are reported.
+#' @param \dots Further arguments passed to the base method.
+#' @param onlyHits For \code{as.data.table}: if \code{TRUE} then only feature groups with suspect hits are reported.
 #'
 #'   For \code{filter} \itemize{
 #'
-#'   \item if \code{negate=FALSE} and \code{onlyHits=TRUE} then all feature
-#'   groups without suspect hits will be removed. Otherwise nothing will be
-#'   done.
+#'   \item if \code{negate=FALSE} and \code{onlyHits=TRUE} then all feature groups without suspect hits will be removed.
+#'   Otherwise nothing will be done.
 #'
-#'   \item if \code{negate=TRUE} then \code{onlyHits=TRUE} will select feature
-#'   groups without suspect hits, \code{onlyHits=FALSE} will only retain feature
-#'   groups with suspect matches and this filter is ignored if
+#'   \item if \code{negate=TRUE} then \code{onlyHits=TRUE} will select feature groups without suspect hits,
+#'   \code{onlyHits=FALSE} will only retain feature groups with suspect matches and this filter is ignored if
 #'   \code{onlyHits=NULL}.
 #'
 #'   }
 #'
-#' @slot screenInfo A (\code{\link{data.table}}) with results from suspect
-#'   screening. This table will be amended with annotation data when
-#'   \code{annotateSuspects} is run.
+#' @slot screenInfo A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
+#'   annotation data when \code{annotateSuspects} is run.
 #'
-#' @section Suspect annotation: The \code{annotateSuspects} method is used to
-#'   annotate suspects after \code{\link{screenSuspects}} was used to collect
-#'   suspect screening results and other workflow steps such as formula and
-#'   compound annotation steps have been completed. The annotation results,
-#'   which can be acquired with the \code{as.data.table} and \code{screenInfo}
-#'   methods, amends the current screening data with the following columns:
+#' @section Suspect annotation: The \code{annotateSuspects} method is used to annotate suspects after
+#'   \code{\link{screenSuspects}} was used to collect suspect screening results and other workflow steps such as formula
+#'   and compound annotation steps have been completed. The annotation results, which can be acquired with the
+#'   \code{as.data.table} and \code{screenInfo} methods, amends the current screening data with the following columns:
 #'
 #'   \itemize{
 #'
-#'   \item \code{formRank},\code{compRank} The rank of the suspect
-#'   within the formula/compound annotation results.
+#'   \item \code{formRank},\code{compRank} The rank of the suspect within the formula/compound annotation results.
 #'
-#'   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity
-#'   measure between measured and annotated MS/MS peaks from annotation of
-#'   formulae, compounds or both. The similarity is calculated as the spectral
-#'   similarity between a peaklist with (a) all MS/MS peaks and (b) only
-#'   annotated peaks. Thus, a value of one means that all MS/MS peaks were
-#'   annotated. If both formula and compound annotations are available then
-#'   \code{annSimBoth} is calculated after combining all the annotated peaks,
-#'   otherwise \code{annSimBoth} equals the available value for
-#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be
-#'   configured with the \code{relMinMSMSIntensity} and \code{simMSMSMethod}
-#'   arguments to \code{annotateSuspects}.
+#'   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity measure between measured and annotated
+#'   MS/MS peaks from annotation of formulae, compounds or both. The similarity is calculated as the spectral similarity
+#'   between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
+#'   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
+#'   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
+#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the
+#'   \code{relMinMSMSIntensity} and \code{simMSMSMethod} arguments to \code{annotateSuspects}.
 #'
-#'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be
-#'   matched for this suspect (based on the \code{fragments_*} columns from the
-#'   suspect list).
+#'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
+#'   \code{fragments_*} columns from the suspect list).
 #'
-#'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and
-#'   relative amount of experimental MS/MS peaks that were matched from the
-#'   fragments specified in the suspect list. The value for
-#'   \code{maxFragMatchesRel} is relative to the value for \code{maxFrags}. The
-#'   calculation of this column is influenced by the \code{checkFragments}
-#'   argument to \code{annotateSuspects}.
+#'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and relative amount of experimental MS/MS peaks
+#'   that were matched from the fragments specified in the suspect list. The value for \code{maxFragMatchesRel} is
+#'   relative to the value for \code{maxFrags}. The calculation of this column is influenced by the
+#'   \code{checkFragments} argument to \code{annotateSuspects}.
 #'
-#'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification
-#'   level, roughly following that of \insertCite{Schymanski2014}{patRoon}.
-#'   However, please note that this value is only an estimation, and manual
-#'   interpretation is still necessary to assign final identification levels.
-#'   The estimation is done through a set of rules, see the \verb{Identification
-#'   level rules} section below.
+#'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification level, roughly following that of
+#'   \insertCite{Schymanski2014}{patRoon}. However, please note that this value is only an estimation, and manual
+#'   interpretation is still necessary to assign final identification levels. The estimation is done through a set of
+#'   rules, see the \verb{Identification level rules} section below.
 #'
 #'   }
 #'
-#'   Note that only columns are present is sufficient data is available for
-#'   their calculation.
+#'   Note that only columns are present is sufficient data is available for their calculation.
 #'
-#' @section Identification level rules: The estimation of identification levels
-#'   is configured through a YAML file which specifies the rules for each level.
-#'   The default file is shown below.
+#' @section Identification level rules: The estimation of identification levels is configured through a YAML file which
+#'   specifies the rules for each level. The default file is shown below.
 #'
-#' @eval paste0("@@section Identification level rules: \\preformatted{",
-#'   patRoon:::readAllFile(system.file("misc", "IDLevelRules.yml", package =
-#'   "patRoon")), "}")
+#' @eval paste0("@@section Identification level rules: \\preformatted{", patRoon:::readAllFile(system.file("misc",
+#'   "IDLevelRules.yml", package = "patRoon")), "}")
 #'
-#' @section Identification level rules: Most of the file should be
-#'   self-explanatory. Some notes:
+#' @section Identification level rules: Most of the file should be self-explanatory. Some notes:
 #'
 #'   \itemize{
 #'
-#'   \item Each rule is either a field of \code{suspectFragments} (minimum
-#'   number of MS/MS fragments matched from suspect list), \code{retention}
-#'   (maximum retention deviation from suspect list), \code{rank} (the maximum
-#'   annotation rank from formula or compound annotations), \code{all} (this
-#'   level is always matched) or any of the scorings available from the formula
-#'   or compound annotations.
+#'   \item Each rule is either a field of \code{suspectFragments} (minimum number of MS/MS fragments matched from
+#'   suspect list), \code{retention} (maximum retention deviation from suspect list), \code{rank} (the maximum
+#'   annotation rank from formula or compound annotations), \code{all} (this level is always matched) or any of the
+#'   scorings available from the formula or compound annotations.
 #'
-#'   \item In case any of the rules could be applied to either formula or
-#'   compound annotations, the annotation type must be specified with the
-#'   \code{type} field (\code{formula} or \code{compound}).
+#'   \item In case any of the rules could be applied to either formula or compound annotations, the annotation type must
+#'   be specified with the \code{type} field (\code{formula} or \code{compound}).
 #'
-#'   \item Identification levels should start with a number and may optionally
-#'   be followed by a alphabetic character. The lowest levels are checked first.
+#'   \item Identification levels should start with a number and may optionally be followed by a alphabetic character.
+#'   The lowest levels are checked first.
 #'
-#'   \item If \code{relative=yes} then the relative scoring will be used for
-#'   testing.
+#'   \item If \code{relative=yes} then the relative scoring will be used for testing.
 #'
-#'   \item For \code{suspectFragments}: if the number of fragments from the
-#'   suspect list (\code{maxFrags} column) is less then the minimum rule value,
-#'   the minimum is adjusted to the number of available fragments.
+#'   \item For \code{suspectFragments}: if the number of fragments from the suspect list (\code{maxFrags} column) is
+#'   less then the minimum rule value, the minimum is adjusted to the number of available fragments.
 #'
 #'   }
 #'
-#'   A template rules file can be generated with the
-#'   \code{\link{genIDLevelRulesFile}} function, and this file can subsequently
-#'   passed to \code{annotateSuspects}. The file format is highly flexible and
-#'   (sub)levels can be added or removed if desired. Note that the default file
-#'   is currently only suitable when annotation is performed with GenForm and
-#'   MetFrag, for other algorithms it is crucial to modify the rules.
+#'   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can
+#'   subsequently passed to \code{annotateSuspects}. The file format is highly flexible and (sub)levels can be added or
+#'   removed if desired. Note that the default file is currently only suitable when annotation is performed with GenForm
+#'   and MetFrag, for other algorithms it is crucial to modify the rules.
 #'
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy

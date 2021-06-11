@@ -92,7 +92,7 @@ featureGroupsComparisonSet <- setClass("featureGroupsComparisonSet", contains = 
 #' @param which A character vector specifying one or more labels of compared
 #'   feature groups. For \code{plotVenn}: if \code{NULL} then all compared
 #'   groups are used.
-
+#'
 #' @name featureGroups-compare
 NULL
 

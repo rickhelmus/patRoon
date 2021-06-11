@@ -27,6 +27,8 @@ NULL
 #'   for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #'
 #'   For \code{consensus}: any further (and unique) \code{compounds} objects.
+#'   
+#'   \setsPassedArgs1{compounds}
 #'
 #' @template plotSpec-args
 #'

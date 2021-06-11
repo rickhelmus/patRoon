@@ -18,6 +18,8 @@ NULL
 #'   For \code{delete}: passed to the function specified as \code{j}.
 #'
 #'   For \code{consensus}: Any further (and unique) \code{formulas} objects.
+#'   
+#'   \setsPassedArgs1{formulas}
 #' @param index The candidate index (row). For \code{plotSpectrum} two indices can be specified to compare spectra. In
 #'   this case \code{groupName} and \code{analysis} (if not \code{NULL}) should specify values for the spectra to
 #'   compare.

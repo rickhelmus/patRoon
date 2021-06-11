@@ -194,7 +194,6 @@
        - "In the future, sets with different chromatographic methods may also be supported, "
     - General
         - order of sets section
-        - dots args
         - docs for generics (eg sets, unset)
     - fGroups
         - class

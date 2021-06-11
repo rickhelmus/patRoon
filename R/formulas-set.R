@@ -54,7 +54,7 @@ setMethod("delete", "formulasSet", doFeatAnnDeleteSets)
 #' @param drop Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #' @rdname formulas-class
 #' @export
-setMethod("[", "formulasSet", doFeatAnnSubsetSets)
+setMethod("[", c("formulasSet", "ANY", "missing", "missing"), doFeatAnnSubsetSets)
 
 #' @param negate Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #' @rdname formulas-class

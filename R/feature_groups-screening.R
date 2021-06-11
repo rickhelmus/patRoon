@@ -483,73 +483,60 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 })
 
 
-#' @details \code{screenSuspects} is used to perform suspect screening. The
-#'   input \code{\link{featureGroups}} object will be screened for suspects by
-#'   \emph{m/z} values and optionally retention times. Afterwards, any feature
-#'   groups not matched may be kept or removed, depending whether a full
-#'   non-target analysis is desired.
+#' @details \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object
+#'   will be screened for suspects by \emph{m/z} values and optionally retention times. Afterwards, any feature groups
+#'   not matched may be kept or removed, depending whether a full non-target analysis is desired.
 #'
-#' @param fGroups The \code{\link{featureGroups}} object that should be
-#'   screened.
-#' @param suspects A \code{data.frame} with suspect information. See the
-#'   \verb{Suspect list format} section below.
-#' @param rtWindow,mzWindow The retention time window (in seconds) and
-#'   \emph{m/z} window that will be used for matching a suspect (+/- feature
-#'   data).
-#' @param adduct An \code{\link{adduct}} object (or something that can be
-#'   converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-#'   \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format}
-#'   section below.
-#' @param skipInvalid If set to \code{TRUE} then suspects with invalid data
-#'   (\emph{e.g.} missing names or other missing data) will be ignored with a
-#'   warning. Similarly, any suspects for which mass calculation failed (when no
-#'   \code{mz} column is present in the suspect list), for instance, due to
-#'   invalid \code{SMILES}, will be ignored with a warning.
-#' @param onlyHits If \code{TRUE} then all feature groups not matched by any of
-#'   the suspects will be removed.
+#' @param fGroups The \code{\link{featureGroups}} object that should be screened.
+#' @param suspects A \code{data.frame} with suspect information. See the \verb{Suspect list format} section below.
 #'
-#' @section Suspect list format: the \code{suspects} argument for
-#'   \code{screenSuspects} should be a \code{data.frame} with the following
-#'   mandatory and optional columns:
+#'   \setsWF Can also be a \code{list} with suspect lists to be used for each set (otherwise the same suspect lists is
+#'   used for all sets). The \code{list} can be named with the sets names to mark which suspect list is to be used with
+#'   which set (\emph{e.g.} \code{suspects=list(positive=suspsPos, negative=suspsNeg)}).
+#' @param rtWindow,mzWindow The retention time window (in seconds) and \emph{m/z} window that will be used for matching
+#'   a suspect (+/- feature data).
+#' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+#'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format} section below.
+#' @param skipInvalid If set to \code{TRUE} then suspects with invalid data (\emph{e.g.} missing names or other missing
+#'   data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no \code{mz}
+#'   column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.
+#' @param onlyHits If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.
+#'
+#' @section Suspect list format: the \code{suspects} argument for \code{screenSuspects} should be a \code{data.frame}
+#'   with the following mandatory and optional columns:
 #'
 #'   \itemize{
 #'
-#'   \item \code{name} The suspect name. Must be file-compatible.
-#'   (\strong{mandatory})
+#'   \item \code{name} The suspect name. Must be file-compatible. (\strong{mandatory})
 #'
-#'   \item \code{rt} The retention time (in seconds) for the suspect. If
-#'   specified the suspect will only be matched if its retention matches the
-#'   experimental value (tolerance defined by the \code{rtWindow} argument).
+#'   \item \code{rt} The retention time (in seconds) for the suspect. If specified the suspect will only be matched if
+#'   its retention matches the experimental value (tolerance defined by the \code{rtWindow} argument).
 #'   (\strong{optional})
 #'
-#'   \item \code{neutralMass},\code{formula},\code{SMILES},\code{InChI} The
-#'   neutral monoisotopic mass, chemical formula, SMILES or InChI for the
-#'   suspect. (data from one of these columns are \strong{mandatory} in case no
-#'   value from the \code{mz} column is available for a suspect)
+#'   \item \code{neutralMass},\code{formula},\code{SMILES},\code{InChI} The neutral monoisotopic mass, chemical formula,
+#'   SMILES or InChI for the suspect. (data from one of these columns are \strong{mandatory} in case no value from the
+#'   \code{mz} column is available for a suspect)
 #'
-#'   \item \code{mz} The ionized \emph{m/z} of the suspect. (\strong{mandatory}
-#'   unless it can be calculated from one of the aforementioned columns)
+#'   \item \code{mz} The ionized \emph{m/z} of the suspect. (\strong{mandatory} unless it can be calculated from one of
+#'   the aforementioned columns)
 #'
-#'   \item \code{adduct} A \code{character} that can be converted with
-#'   \code{\link{as.adduct}}. (\strong{mandatory} unless data from the \code{mz}
-#'   column is available or the \code{adduct} argument is set)
+#'   \item \code{adduct} A \code{character} that can be converted with \code{\link{as.adduct}}. (\strong{mandatory}
+#'   unless data from the \code{mz} column is available or the \code{adduct} argument is set)
 #'
-#'   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS
-#'   fragments (specified as \emph{m/z} or formulae, respectively). Multiple
-#'   values can be specified by separating them with a semicolon (\verb{;}).
-#'   This data is used by \code{\link{annotateSuspects}} to report detected
-#'   MS/MS fragments and calculate identification levels. (\strong{optional})
+#'   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS fragments (specified as \emph{m/z} or
+#'   formulae, respectively). Multiple values can be specified by separating them with a semicolon (\verb{;}). This data
+#'   is used by \code{\link{annotateSuspects}} to report detected MS/MS fragments and calculate identification levels.
+#'   (\strong{optional})
 #'
 #'   }
 #'
 #'
-#' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}}
-#'   object, which is a copy of the input \code{fGroups} object amended with
-#'   additional screening information.
+#' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}} object, which is a copy of the input
+#'   \code{fGroups} object amended with additional screening information.
 #'
 #' @note For \code{screenSuspects} in some cases you may need to install
-#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
-#'   only InChI data is available for mass calculation).
+#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when only InChI data is available for mass
+#'   calculation).
 #'
 #' @seealso \code{featureGroupsScreening}
 #'

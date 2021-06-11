@@ -854,14 +854,18 @@ NULL
 #'
 #' Utilities to screen for analytes with known or suspected identity.
 #'
-#' Besides 'full non-target analysis', where compounds may be identified with
-#' little to no prior knowledge, a common strategy is to screen for compounds
-#' with known or suspected identity. This may be a generally favorable approach
-#' if possible, as it can significantly reduce the load on data interpretation.
+#' Besides 'full non-target analysis', where compounds may be identified with little to no prior knowledge, a common
+#' strategy is to screen for compounds with known or suspected identity. This may be a generally favorable approach if
+#' possible, as it can significantly reduce the load on data interpretation.
 #'
-#' @note Both \code{screenSuspects} and \code{importFeatureGroupsBrukerTASQ} may
-#'   use the suspect names to base file names used for reporting, logging etc.
-#'   Therefore, it is important that these are file-compatible names.
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{screenSuspects} performs suspect screening
+#'   for each set separately, and the screening results are combined afterwards. The \code{sets} column in the
+#'   \code{screenInfo} data marks in which sets the suspect hit was found.
+#'   
+#'   \code{importFeatureGroupsBrukerTASQ} Is currently not supported for sets workflows.
+#'
+#' @note Both \code{screenSuspects} and \code{importFeatureGroupsBrukerTASQ} may use the suspect names to base file
+#'   names used for reporting, logging etc. Therefore, it is important that these are file-compatible names.
 #'
 #' @name suspect-screening
 NULL

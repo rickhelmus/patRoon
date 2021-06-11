@@ -58,7 +58,7 @@ setMethod("delete", "compoundsSet", doFeatAnnDeleteSets)
 #'   method.
 #' @rdname compounds-class
 #' @export
-setMethod("[", "compoundsSet", doFeatAnnSubsetSets)
+setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), doFeatAnnSubsetSets)
 
 #' @rdname compounds-class
 #' @param negate Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.

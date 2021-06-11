@@ -50,12 +50,21 @@ getXCMSnExp(obj, verbose = TRUE, ...)
 
 \item{verbose}{If \code{FALSE} then no text output is shown.}
 
-\item{\dots}{Ignored.}
+\item{\dots}{\setsWF Further arguments passed to non-sets method.
+
+  Otherwise ignored.}
 
 \item{loadRawData}{Set to \code{TRUE} if analyses are available as \code{mzXML} or \code{mzML} files. Otherwise MS
 data is not loaded, and some dummy data (\emph{e.g.} file paths) is used in the returned object.}
+
+\item{set}{\setsWF The name of the set to be exported.}
 }
 \description{
-Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an
-\code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
+Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an \code{\link{xcmsSet}} or
+\code{\link{XCMSnExp}} object.
 }
+\section{Sets workflows}{
+ In a \link[=sets-workflow]{sets workflow}, \code{\link{unset}} is used to convert the
+  feature (group) data before the object is exported.
+}
+

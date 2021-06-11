@@ -11,7 +11,7 @@ analyses that were measured with different MS methods (typically positive and ne
 The analyses files that were measured with a different method are grouped in \emph{sets}. In the most typical case,
 there is a \code{"positive"} and \code{"negative"} set, for the positively/negatively ionized data, respectively.
 However, other distinctions than polarity are also possible (although currently the chromatographic method should be
-the same between sets). A sets workflow is typically initiated with the \code{\link{makeSets}} method. The handbook
+the same between sets). A sets workflow is typically initiated with the \code{\link{makeSet}} method. The handbook
 contains much more details about sets workflows.
 }
 \seealso{

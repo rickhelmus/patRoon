@@ -10,11 +10,11 @@
 \S4method{convertToMFDB}{transformationProductsLibrary}(TPs, out, includeParents = TRUE)
 }
 \arguments{
+\item{TPs}{\code{transformationProductsLibrary} object to be accessed}
+
 \item{out}{The file name of the the output \command{MetFrag} database.}
 
 \item{includeParents}{Set to \code{TRUE} to include the parents in the database.}
-
-\item{obj, TPs}{\code{transformationProductsLibrary} object to be accessed}
 }
 \description{
 This class is used to store prediction results that are available in a TP library.

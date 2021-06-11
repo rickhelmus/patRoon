@@ -16,16 +16,23 @@
 \alias{importFeatureGroupsBrukerPA}
 \alias{importFeatureGroupsEnviMass}
 \alias{groupFeaturesKPIC2,features-method}
+\alias{groupFeaturesKPIC2}
 \alias{groupFeaturesKPIC2,featuresSet-method}
 \alias{importFeatureGroupsKPIC2}
+\alias{delete,featureGroupsKPIC2-method}
 \alias{groupFeaturesOpenMS,features-method}
+\alias{groupFeaturesOpenMS}
 \alias{groupFeaturesSIRIUS}
 \alias{groupFeaturesXCMS,features-method}
+\alias{groupFeaturesXCMS}
 \alias{groupFeaturesXCMS,featuresSet-method}
 \alias{importFeatureGroupsXCMS}
+\alias{delete,featureGroupsXCMS-method}
 \alias{groupFeaturesXCMS3,features-method}
+\alias{groupFeaturesXCMS3}
 \alias{groupFeaturesXCMS3,featuresSet-method}
 \alias{importFeatureGroupsXCMS3}
+\alias{delete,featureGroupsXCMS3-method}
 \title{Grouping of features}
 \usage{
 \S4method{groupFeatures}{features}(obj, algorithm, ..., verbose = TRUE)
@@ -76,6 +83,8 @@ importFeatureGroupsEnviMass(path, feat, positive)
 
 importFeatureGroupsKPIC2(picsSetGrouped, analysisInfo)
 
+\S4method{delete}{featureGroupsKPIC2}(obj, ...)
+
 \S4method{groupFeaturesOpenMS}{features}(
   feat,
   rtalign = TRUE,
@@ -104,6 +113,8 @@ groupFeaturesSIRIUS(analysisInfo, verbose = TRUE)
 
 importFeatureGroupsXCMS(xs, analysisInfo)
 
+\S4method{delete}{featureGroupsXCMS}(obj, ...)
+
 \S4method{groupFeaturesXCMS3}{features}(
   feat,
   rtalign = TRUE,
@@ -120,6 +131,8 @@ importFeatureGroupsXCMS(xs, analysisInfo)
 )
 
 importFeatureGroupsXCMS3(xdata, analysisInfo)
+
+\S4method{delete}{featureGroupsXCMS3}(obj, ...)
 }
 \arguments{
 \item{obj}{Either a \code{\link{features}} object to be grouped, or a \code{data.frame} with
@@ -153,7 +166,8 @@ export).}
 
 \item{adducts}{The adduct assignments to each set. Should either be a \code{list} with \code{\link{adduct}} objects
 or a \code{character} vector (\emph{e.g.} \code{"[M+H]+"}). The order should follow that of the objects given to
-the \code{obj} and \code{\dots} arguments.}
+the \code{obj} and \code{\dots} arguments. if \code{NULL} then adduct annotations
+are used.}
 
 \item{labels}{The labels, or \emph{set names}, for each set to be created. The order should follow that of the
 objects given to the \code{obj} and \code{\dots} arguments. If \code{NULL}, then labels are automatically generated
@@ -223,7 +237,7 @@ ignore.}
 An object of a class which is derived from \code{\link{featureGroups}}.
 
 \code{makeSet} and the \code{\link{featuresSet}} method of \code{groupFeatures} return a
-  \code{\link{featuresGroupsSet}} object.
+  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Functions and classes for grouping of features across analyses.
@@ -345,7 +359,7 @@ The \code{data.frame} method for \code{groupFeatures} is a special case that cur
 
   With both approaches the resulting \code{\link{featureGroupsSet}} object will contain adduct annotations, either
   based on those already present from input \code{featureGroups} objects or as specified by the \code{adducts}
-  argument to \code{makeSets}.
+  argument to \code{makeSet}.
 
   \strong{NOTE} the \code{loadRawData} and arguments related to retention time alignment (\emph{e.g.} \code{rtalign},
   \code{retcorArgs}) are currently not supported for sets workflows when using algorithms from \pkg{KPIC2} or

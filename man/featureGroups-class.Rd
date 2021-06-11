@@ -315,7 +315,7 @@ feature group, with a vector of the group intensities as first argument, the gro
 
   For \code{getFCParams}: optional named arguments that override defaults.
   
-  For \link[=sets-workflow]{sets workflows}: passed to parent method.
+  \setsPassedArgs1{featureGroups}
 
   Otherwise passed to \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
@@ -465,7 +465,7 @@ not unique to the given replicate groups.}
 Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.}
 
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
-\code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.}
+\code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
 
 \item{avgFunc}{The function used to average the peak qualities and scores for each feature group.}
 
@@ -485,6 +485,9 @@ values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignor
 Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
 \item{set}{\setsWF The name of the set.}
+
+\item{reGroup}{Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
+\verb{Sets workflow} section for more details.}
 
 \item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
   \code{negate=TRUE}).

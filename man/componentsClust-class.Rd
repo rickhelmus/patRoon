@@ -4,6 +4,7 @@
 \name{componentsClust-class}
 \alias{componentsClust-class}
 \alias{componentsClust}
+\alias{delete,componentsClust-method}
 \alias{clusters,componentsClust-method}
 \alias{cutClusters,componentsClust-method}
 \alias{clusterProperties,componentsClust-method}
@@ -13,6 +14,8 @@
 \alias{plotSilhouettes,componentsClust-method}
 \title{Base class for components that are based on hierarchical clustered data.}
 \usage{
+\S4method{delete}{componentsClust}(obj, ...)
+
 \S4method{clusters}{componentsClust}(obj)
 
 \S4method{cutClusters}{componentsClust}(obj)
@@ -35,6 +38,9 @@
 \S4method{plotSilhouettes}{componentsClust}(obj, kSeq, pch = 16, type = "b", ...)
 }
 \arguments{
+\item{\dots}{Further options passed to \code{\link{plot.dendrogram}} (\code{plot}) or \code{\link[graphics]{plot}}
+(\code{plotSilhouettes}).}
+
 \item{k, h}{Desired number of clusters or tree height to be used for cutting the dendrogram, respectively. One or the
 other must be specified. Analogous to \code{\link{cutree}}.}
 
@@ -55,9 +61,6 @@ the default is only \code{TRUE} when this is not the case.}
 \code{TRUE} then a legend will be shown which outlines cluster numbers and
 their colours. By default \code{TRUE} for small amount of clusters to avoid
 overflowing the plot.}
-
-\item{\dots}{Further options passed to \code{\link{plot.dendrogram}} (\code{plot}) or \code{\link[graphics]{plot}}
-(\code{plotSilhouettes}).}
 
 \item{kSeq}{An integer vector containing the sequence that should be used for
 average silhouette width calculation.}

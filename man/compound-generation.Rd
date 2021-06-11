@@ -7,8 +7,10 @@
 \alias{generateCompounds}
 \alias{compoundScorings}
 \alias{generateCompoundsMetFrag,featureGroups-method}
+\alias{generateCompoundsMetFrag}
 \alias{generateCompoundsMetFrag,featureGroupsSet-method}
 \alias{generateCompoundsSIRIUS,featureGroups-method}
+\alias{generateCompoundsSIRIUS}
 \alias{generateCompoundsSIRIUS,featureGroupsSet-method}
 \title{Automatic compound identification}
 \usage{
@@ -134,9 +136,12 @@ Sets the \option{FragmentPeakMatchRelativeMassDeviation} option.}
 \item{fragAbsMzDev}{Absolute mass deviation (in Da) for fragment matching.
 Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.}
 
-\item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-\code{"[M+Na]+"}.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+  Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
+  adduct annotations then these are used if \code{adducts=NULL}.
+
+  \setsWF The \code{adduct} argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.}
 
 \item{extendedPubChem}{If \code{database="pubchem"}: whether to use the
 \emph{extended} database that includes information for compound scoring

@@ -27,10 +27,12 @@ feature) are removed prior to similarity calculation.
 
 \item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra.
 
-\item \code{relMinIntensity} The minimum intensity for mass peaks. Peaks with lower intensities are not considered
-for similarity calculation.
+\item \code{relMinIntensity} The minimum relative intensity for mass peaks (\samp{0-1}). Peaks with lower intensities
+are not considered for similarity calculation. The relative intensities are called after the precursor peak is
+removed when \code{removePrecursor=TRUE}.
 
-\item \code{minPeaks} Only consider spectra that have at least this amount of peaks.
+\item \code{minPeaks} Only consider spectra that have at least this amount of peaks (\emph{after} the spectrum is
+filtered).
 
 \item \code{shift} If and how shifting is applied prior to similarity calculation. Valid options are: \code{"none"}
 (no shifting), \code{"precursor"} (all mass peaks of the second spectrum are shifted by the mass difference between

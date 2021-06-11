@@ -19,7 +19,6 @@
 \alias{defaultExclNormScores}
 \alias{export}
 \alias{featureTable}
-\alias{featureTable<-}
 \alias{filter}
 \alias{getFeatures}
 \alias{getMCS}
@@ -38,8 +37,11 @@
 \alias{delete}
 \alias{plotVolcano}
 \alias{replicateGroups}
+\alias{setObjects}
+\alias{sets}
 \alias{treeCut}
 \alias{treeCutDynamic}
+\alias{unset}
 \alias{[}
 \alias{[[}
 \alias{$}
@@ -86,8 +88,6 @@ export(obj, type, out, ...)
 
 featureTable(obj, ...)
 
-featureTable(obj) <- value
-
 filter(obj, ...)
 
 getFeatures(obj)
@@ -124,6 +124,10 @@ plotVolcano(obj, ...)
 
 replicateGroups(obj)
 
+setObjects(obj)
+
+sets(obj)
+
 treeCut(obj, k = NULL, h = NULL, ...)
 
 treeCutDynamic(
@@ -133,6 +137,8 @@ treeCutDynamic(
   minModuleSize = 1,
   ...
 )
+
+unset(obj, set)
 }
 \arguments{
 \item{obj}{The object the generic should be applied to.}
@@ -140,7 +146,15 @@ treeCutDynamic(
 \item{\dots}{Any further method specific arguments. See method documentation
 for details.}
 
+\item{value}{The replacement value.}
+
 \item{weights, flatnessFactor}{See method documentation.}
+
+\item{TPs}{The \code{\link{transformationProducts}} derived object.}
+
+\item{out}{Output file.}
+
+\item{type}{The export type.}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
@@ -158,7 +172,7 @@ average silhouette width calculation.}
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
 
-\item{fTable}{New value for the \code{features} slot: a \code{list} with \code{data.table} items for each analysis.}
+\item{set}{The name of the set.}
 }
 \description{
 Various (S4) generic functions providing a common interface for common tasks
@@ -264,12 +278,6 @@ please refer to the linked method documentation for each generic.
 }
 
 \code{featureTable} returns feature information.
-
-\itemize{
-    \item Methods are defined for: \code{\link[=featureTable,featureGroups-method]{featureGroups}}; \code{\link[=featureTable,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=featureTable,features-method]{features}}.
-}
-
-\code{featureTable} updates feature information.
 
 \itemize{
     \item Methods are defined for: \code{\link[=featureTable,featureGroups-method]{featureGroups}}; \code{\link[=featureTable,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=featureTable,features-method]{features}}.
@@ -383,6 +391,18 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=replicateGroups,featureGroups-method]{featureGroups}}; \code{\link[=replicateGroups,features-method]{features}}.
 }
 
+\code{setObjects} returns the \emph{set objects} of this object. See the documentation of \code{\link{workflowStepSet}}.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=setObjects,workflowStepSet-method]{workflowStepSet}}.
+}
+
+\code{sets} returns the names of the sets inside this object. See the documentation for \link[=sets-workflow]{sets workflows}.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=sets,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=sets,featuresSet-method]{featuresSet}}; \code{\link[=sets,workflowStepSet-method]{workflowStepSet}}.
+}
+
 \code{treeCut} Manually cut a cluster.
 
 \itemize{
@@ -393,6 +413,12 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=treeCutDynamic,componentsClust-method]{componentsClust}}; \code{\link[=treeCutDynamic,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{unset} Converts this object to a regular non-set object. See the documentation for \link[=sets-workflow]{sets workflows}.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=unset,componentsNTSet-method]{componentsNTSet}}; \code{\link[=unset,componentsSet-method]{componentsSet}}; \code{\link[=unset,compoundsConsensusSet-method]{compoundsConsensusSet}}; \code{\link[=unset,compoundsSet-method]{compoundsSet}}; \code{\link[=unset,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=unset,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=unset,featuresSet-method]{featuresSet}}; \code{\link[=unset,formulasConsensusSet-method]{formulasConsensusSet}}; \code{\link[=unset,formulasSet-method]{formulasSet}}; \code{\link[=unset,MSPeakListsSet-method]{MSPeakListsSet}}.
 }
 }
 \section{Other generics}{

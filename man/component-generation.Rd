@@ -3,40 +3,51 @@
 %   R/components-cliquems.R, R/components-intclust.R, R/components-nontarget.R,
 %   R/components-openms.R, R/components-ramclustr.R, R/components-specclust.R,
 %   R/components-tps.R
-\docType{class}
 \name{component-generation}
 \alias{component-generation}
 \alias{generateComponents,featureGroups-method}
 \alias{generateComponents}
 \alias{generateComponentsCAMERA,featureGroups-method}
+\alias{generateComponentsCAMERA}
+\alias{generateComponentsCAMERA,featureGroupsSet-method}
 \alias{generateComponentsCliqueMS,featureGroups-method}
+\alias{generateComponentsCliqueMS}
 \alias{generateComponentsCliqueMS,featureGroupsSet-method}
 \alias{generateComponentsIntClust,featureGroups-method}
+\alias{generateComponentsIntClust}
 \alias{generateComponentsNontarget,featureGroups-method}
-\alias{componentsOpenMS-class}
-\alias{componentsOpenMS}
+\alias{generateComponentsNontarget}
+\alias{generateComponentsNontarget,featureGroupsSet-method}
 \alias{generateComponentsOpenMS,featureGroups-method}
+\alias{generateComponentsOpenMS}
 \alias{generateComponentsOpenMS,featureGroupsSet-method}
 \alias{defaultOpenMSAdducts}
 \alias{generateComponentsRAMClustR,featureGroups-method}
+\alias{generateComponentsRAMClustR}
+\alias{generateComponentsRAMClustR,featureGroupsSet-method}
 \alias{generateComponentsSpecClust,featureGroups-method}
+\alias{generateComponentsSpecClust}
 \alias{generateComponentsTPs,featureGroups-method}
+\alias{generateComponentsTPs}
+\alias{generateComponentsTPs,featureGroupsSet-method}
 \title{Grouping feature groups in components}
 \usage{
 \S4method{generateComponents}{featureGroups}(fGroups, algorithm, ...)
 
 \S4method{generateComponentsCAMERA}{featureGroups}(
   fGroups,
-  ionization,
+  ionization = NULL,
   onlyIsotopes = FALSE,
   minSize = 2,
   relMinReplicates = 0.5,
   extraOpts = NULL
 )
 
+\S4method{generateComponentsCAMERA}{featureGroupsSet}(fGroups, ...)
+
 \S4method{generateComponentsCliqueMS}{featureGroups}(
   fGroups,
-  ionization,
+  ionization = NULL,
   maxCharge = 1,
   maxGrade = 2,
   ppm = 10,
@@ -68,7 +79,7 @@
 
 \S4method{generateComponentsNontarget}{featureGroups}(
   fGroups,
-  ionization,
+  ionization = NULL,
   rtRange = c(-120, 120),
   mzRange = c(5, 120),
   elements = c("C", "H", "O"),
@@ -79,9 +90,11 @@
   ...
 )
 
+\S4method{generateComponentsNontarget}{featureGroupsSet}(fGroups, ...)
+
 \S4method{generateComponentsOpenMS}{featureGroups}(
   fGroups,
-  ionization,
+  ionization = NULL,
   chargeMin = 1,
   chargeMax = 1,
   chargeSpan = 3,
@@ -109,7 +122,7 @@ defaultOpenMSAdducts(ionization)
   maxt = 12,
   hmax = 0.3,
   normalize = "TIC",
-  ionization,
+  ionization = NULL,
   absMzDev = 0.002,
   relMzDev = 5,
   minSize = 2,
@@ -119,6 +132,8 @@ defaultOpenMSAdducts(ionization)
   extraOptsRC = NULL,
   extraOptsFM = NULL
 )
+
+\S4method{generateComponentsRAMClustR}{featureGroupsSet}(fGroups, ...)
 
 \S4method{generateComponentsSpecClust}{featureGroups}(
   fGroups,
@@ -141,6 +156,18 @@ defaultOpenMSAdducts(ionization)
   minRTDiff = 20,
   specSimParams = getDefSpecSimParams()
 )
+
+\S4method{generateComponentsTPs}{featureGroupsSet}(
+  fGroups,
+  fGroupsTPs = fGroups,
+  ignoreParents = FALSE,
+  TPs = NULL,
+  MSPeakLists = NULL,
+  formulas = NULL,
+  compounds = NULL,
+  minRTDiff = 20,
+  specSimParams = getDefSpecSimParams()
+)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which components should be generated.
@@ -150,11 +177,16 @@ defaultOpenMSAdducts(ionization)
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"ramclustr"}, \code{"camera"}, \code{"nontarget"}, \code{"intclust"}, \code{"openms"}, \code{"cliquems"}, \code{"specclust"}, \code{"tp"}}
 
-\item{...}{Any parameters to be passed to the selected component generation
-algorithm.}
+\item{\dots}{Any parameters to be passed to the selected component generation algorithm.
+
+  For sets workflows: further arguments directly passed to the non-sets method.}
 
 \item{ionization}{Which ionization polarity was used to generate the data: should be \code{"positive"} or
-\code{"negative"}.}
+  \code{"negative"}. If the \code{featureGroups} object has adduct annotations, and \code{ionization=NULL}, the
+  ionization will be detected automatically.
+
+  \setsWF This parameter is not supported for sets workflows, as the ionization will always be detected
+  automatically.}
 
 \item{onlyIsotopes}{Logical value. If \code{TRUE} only isotopes are
 considered when generating components (faster). Corresponds to \code{quick}
@@ -200,7 +232,7 @@ components} section for more details.}
 and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.}
 
 \item{method}{Clustering method that should be applied (passed to
-\code{\link[hclust:fastcluster]{fastcluster::hclust}}).}
+\code{\link[fastcluster:hclust]{fastcluster::hclust}}).}
 
 \item{metric}{Distance metric used to calculate the distance matrix (passed to \code{\link{daisy}}).}
 
@@ -314,7 +346,7 @@ A \code{\link{components}} (derived) object containing all generated components.
 
   \code{generateComponentsIntClust} and \code{generateComponentsSpecClust} return objects derived from
   \code{\link{componentsSpecClust}}.
-  
+
   \code{generateComponentsTPs} returns objects derived from \code{\link{componentsTPs}}.
 }
 \description{
@@ -346,7 +378,7 @@ generally useful to provide more information for compound annotation and reduce 
 \code{generateComponentsIntClust} generates components based on intensity profiles of feature groups.
   Hierarchical clustering is performed on normalized (and optionally replicate averaged) intensity data and the
   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The distance matrix is calculated
-  with \code{\link{daisy}} and clustering is performed with \code{\link[hclust:fastcluster]{fastcluster::hclust}}.
+  with \code{\link{daisy}} and clustering is performed with \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
   The clustering of the resulting components can be further visualized and modified using the methods defined for
   \code{\link{componentsIntClust}}.
 
@@ -378,7 +410,7 @@ generally useful to provide more information for compound annotation and reduce 
 \code{generateComponentsSpecClust} generates components based on MS/MS similarity between feature groups.
   The similarities are converted to a distance matrix and used as input for hierarchical clustering, and the
   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The clustering is performed with
-  \code{\link[hclust:fastcluster]{fastcluster::hclust}}.
+  \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
 
 \code{generateComponentsTPs} generates components by linking feature groups of transformation products and
   their parents. Moreover, this method typically employs data from \link[=TP-generation]{generated transformation
@@ -427,6 +459,44 @@ The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateC
   \item the \code{minSize} filter is applied.
 
   }
+}
+
+\section{Sets workflows}{
+ In a \link[=sets-workflow]{sets workflow} the componentization data is generated differently
+  depending on the used algorithm: \itemize{
+
+  \item The componentization algorithms that support annotation of adducts/isotopes, \emph{e.g.} \pkg{RAMClustR},
+  \pkg{CAMERA} and \command{OpenMS}, first perform componentization for each set independently. This is necessary,
+  because \emph{e.g.} adducts are specific to the MS ionization mode that was used. The resulting components are then
+  all combined in a \code{\link{componentsSet}} object. Note that the components themselves are never merged. The
+  components are renamed to include the set name for which they were generated (\emph{e.g.} \code{"CMP1"} becomes
+  \code{"CMP1-positive"}).
+
+  \item For componentization with \pkg{nontarget} a similar strategy is applied as above. However, the output is
+  stored in a \code{\link{componentsNTSet}} object, which supports additional methods such as \code{plotGraph}.
+
+  \item For the componentization based on hierarchical clustering, \emph{i.e.} the \code{"intclust"} and
+  \code{"specclust"} algorithms, the output format is not different than for a non-sets workflow. However, for
+  intensity based clustering, normalization of feature intensities occurs per set. For MS/MS based clustering,
+  spectral similarities from each sets are combined as is described for the
+  \code{\link[=spectrumSimilarity,MSPeakListsSet-method]{spectrumSimilarity}} method for sets workflows.
+
+  \item For componentization of transformation products, the output class is the same (\code{\link{componentsTPs}}).
+  However, the component tables are amended with extra information such as overall/specific set spectrum
+  similarities. As sets data is mixed, transformation products are able to be linked with a parent, even if they were
+  not measured in the same set.
+
+  }
+}
+
+\section{Parallelization}{
+ \code{generateComponentsOpenMS} uses multiprocessing to parallelize
+  computations. Please see the parallelization section in the handbook for
+  more details and \link[=patRoon-package]{patRoon options} for configuration
+  options.
+
+ Note that for caching purposes, the analyses files must always exist on the local host
+  computer, even if it is not participating in computations.
 }
 
 \section{Linking parents and transformation products}{

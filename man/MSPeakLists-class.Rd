@@ -81,7 +81,6 @@
   MSLevel = 1,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   xlim = NULL,
   ylim = NULL,
   ...
@@ -124,7 +123,6 @@
   MSLevel = 1,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   xlim = NULL,
   ylim = NULL,
   perSet = TRUE,
@@ -155,7 +153,9 @@ getDefIsolatePrecParams(...)
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.}
+\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.
+
+  \setsPassedArgs1{MSPeakLists}}
 
 \item{reAverage}{Set to \code{TRUE} to regenerate group averaged MS peak lists. \strong{NOTE} it is very important
 that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
@@ -215,11 +215,6 @@ should be specified.}
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
-\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
-plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
-allows nicely repelled text for annotation. However, base plot is generally
-faster.}
-
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
@@ -257,8 +252,6 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
 
 \code{averagedPeakLists} returns a nested list of feature group
   averaged peak lists in a similar format as \code{peakLists}.
-
-\code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.

@@ -203,7 +203,6 @@
             - adducts<-
                 - example with reGroup
                     - ?
-            - xcms-conv: set/... args
     - Annotation (formulas/compounds)
         - class
             - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?

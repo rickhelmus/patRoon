@@ -197,12 +197,10 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, loadRawData)
     return(obj@xs)
 })
 
-# UNDONE: mention that object will be unset
 #' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featuresSet", function(obj, ..., set) getXCMSSet(unset(obj, set), ...))
 
-# UNDONE: mention that object will be unset
 #' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., set) getXCMSSet(unset(obj, set), ...))
@@ -328,12 +326,10 @@ setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, loadRawDat
     return(obj@xdata)
 })
 
-# UNDONE: mention that object will be unset
 #' @rdname xcms-conv
 #' @export
 setMethod("getXCMSnExp", "featuresSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))
 
-# UNDONE: mention that object will be unset
 #' @rdname xcms-conv
 #' @export
 setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))

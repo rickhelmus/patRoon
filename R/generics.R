@@ -29,15 +29,21 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 
 #' Conversion to XCMS objects
 #'
-#' Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an
-#' \code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
+#' Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an \code{\link{xcmsSet}} or
+#' \code{\link{XCMSnExp}} object.
 #'
 #' @param obj The object that should be converted.
-#' @param \dots Ignored.
+#' @param \dots \setsWF Further arguments passed to non-sets method.
+#'
+#'   Otherwise ignored.
 #' @param verbose If \code{FALSE} then no text output is shown.
-#' 
+#' @param set \setsWF The name of the set to be exported.
+#'
 #' @template loadrawdata-arg
-#' 
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{\link{unset}} is used to convert the
+#'   feature (group) data before the object is exported.
+#'
 #' @rdname xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 

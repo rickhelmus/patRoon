@@ -363,6 +363,8 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     return(obj)
 })
 
+#' @rdname suspect-screening
+#' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                          adduct, skipInvalid, onlyHits)
 {

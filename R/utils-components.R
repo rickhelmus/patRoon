@@ -106,3 +106,24 @@ printComponentsFiltered <- function(old, new)
            oldn - newn, if (oldn == 0) 0 else (1 - (newn / oldn)) * 100,
            oldresn - newresn, if (oldresn == 0) 0 else (1 - (newresn / oldresn)) * 100, newn, newresn)
 }
+
+getIonizationFromAnnTable <- function(annTable)
+{
+    # UNDONE: default to positive OK?
+    
+    if (nrow(annTable) == 0)
+        return("positive")
+    
+    allAdducts <- lapply(unique(annTable$adduct), as.adduct)
+    allCharges <- sapply(allAdducts, slot, "charge")
+    chRange <- range(allCharges)
+    if (all(chRange < 0))
+        return("negative")
+    else if (all(chRange >= 0))
+        return("positive")
+    
+    warning("Cannot determine ionization: both positive and negative adducts annotations are present. Defaulting to positive.",
+            call. = FALSE)
+    
+    return("positive")
+}

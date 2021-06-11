@@ -99,15 +99,16 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #'
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
-                                                                   elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
+setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization = NULL, rtRange = c(-120, 120),
+                                                                   mzRange = c(5, 120), elements = c("C", "H", "O"),
+                                                                   rtDev = 30, absMzDev = 0.002,
                                                                    absMzDevLink = absMzDev * 2, 
                                                                    traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
                                                                    ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
     checkmate::assertNumeric(rtRange, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, min.len = 1, add = ac)

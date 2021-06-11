@@ -39,6 +39,22 @@ checkAndToAdduct <- function(adduct, fGroups = NULL, .var.name = "adduct")
     return(as.adduct(adduct))
 }
 
+checkAndGetIonization <- function(ionization, fGroups, .var.name = "ionization", add = NULL)
+{
+    # if fGroups != NULL and the fGroups are annotated then ioniation arg is optional
+    if (is.null(ionization))
+    {
+        if (length(fGroups) > 0 && nrow(annotations(fGroups)) == 0)
+            stop("The input feature groups are not annotated and no ionization is specified. ",
+                 "Please either perform annotations (eg with selectIons()) or specify an adduct.")
+        return(getIonizationFromAnnTable(annotations(fGroups)))
+    }
+    
+    checkmate::assertChoice(ionization, c("positive", "negative"), .var.name = .var.name, add = add)
+
+    return(ionization)    
+}
+
 adductMZDelta <- function(adduct)
 {
     # NOTE: rcdk::get.formula (getFormulaMass()) makes elemental counts absolute

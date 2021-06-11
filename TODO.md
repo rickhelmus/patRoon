@@ -161,6 +161,7 @@
     - references for FC calculation?
     - refer to OrgMassSpecR for cosine MS/MS similarity?
         - now still done in annotateSuspects()
+    - fix devtools::check_man() issues
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -193,7 +194,6 @@
            mode, the so called \emph{sets workflow} was introduced."
        - "In the future, sets with different chromatographic methods may also be supported, "
     - General
-        - document for every object how consensus/merge is done
         - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
         - dots args
@@ -313,6 +313,7 @@
 - xnames/showLegend args for plotInt
 - newProject: switch to new system and tweaks
 - as.data.table(formulas, average=T): now removes most cols
+- adduct/ionization args optional if fGroups is adduct annotated
 
 
 # Lower priority

@@ -39,7 +39,7 @@ setMethod("initialize", "componentsOpenMS",
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization, chargeMin = 1,
+setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization = NULL, chargeMin = 1,
                                                                 chargeMax = 1, chargeSpan = 3,
                                                                 qTry = "heuristic",
                                                                 potentialAdducts = defaultOpenMSAdducts(ionization),
@@ -52,7 +52,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                                                                 extraOpts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
     aapply(checkmate::assertCount, . ~ chargeMin + chargeMax + chargeSpan + minSize,
            positive = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(qTry, c("heuristic", "all"))

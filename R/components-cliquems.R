@@ -29,7 +29,7 @@ setMethod("initialize", "componentsCliqueMS",
 #'
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 1,
+setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization = NULL, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,
                                                                   adductInfo = NULL,
                                                                   absMzDev = 0.005, minSize = 2,
@@ -43,7 +43,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
     aapply(checkmate::assertCount, . ~ maxCharge + maxGrade + minSize, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ ppm + absMzDev + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))

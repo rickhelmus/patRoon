@@ -26,12 +26,12 @@ setMethod("initialize", "componentsCamera",
 #'
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization, onlyIsotopes = FALSE,
+setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization = NULL, onlyIsotopes = FALSE,
                                                                 minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
     checkmate::assertFlag(onlyIsotopes, add = ac)
     checkmate::assertCount(minSize, positive = TRUE, add = ac)
     checkmate::assertNumber(relMinReplicates, lower = 0, finite = TRUE, add = ac)

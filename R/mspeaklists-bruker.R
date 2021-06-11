@@ -23,6 +23,7 @@ NULL
 #'
 #' @template DA-restart-note
 #'
+#' @aliases generateMSPeakListsDA
 #' @rdname MSPeakLists-generation
 #' @export
 setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, minMSIntensity = 500,
@@ -158,6 +159,7 @@ setMethod("generateMSPeakListsDA", "featureGroupsSet", function(fGroups, ...)
 #'   are generated in advance by Bruker DataAnalysis, no further parameters
 #'   exist to customize its operation.
 #'
+#' @aliases generateMSPeakListsDAFMF
 #' @rdname MSPeakLists-generation
 #' @export
 setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,

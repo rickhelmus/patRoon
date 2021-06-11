@@ -306,6 +306,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'
 #' @references \insertRef{Meringer2011}{patRoon}
 #'
+#' @aliases generateFormulasGenForm
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,

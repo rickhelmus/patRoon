@@ -19,6 +19,7 @@ NULL
 #'   prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value
 #'   should be \code{NULL}.
 #'
+#' @aliases generateMSPeakListsMzR
 #' @rdname MSPeakLists-generation
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,

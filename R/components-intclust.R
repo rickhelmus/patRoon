@@ -63,7 +63,7 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity
 #'   profiles of the feature groups within a given cluster.
 #' @param index Numeric component/cluster index.
-#' @param lty Passed to \code{\link{lines}}.
+#' @param pch,type,lty Passed to \code{\link{lines}}.
 #' @export
 setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
                                                     lty = 3, col = NULL, ...)
@@ -96,7 +96,7 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #' @details \code{generateComponentsIntClust} generates components based on intensity profiles of feature groups.
 #'   Hierarchical clustering is performed on normalized (and optionally replicate averaged) intensity data and the
 #'   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The distance matrix is calculated
-#'   with \code{\link{daisy}} and clustering is performed with \code{\link[hclust:fastcluster]{fastcluster::hclust}}.
+#'   with \code{\link{daisy}} and clustering is performed with \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
 #'   The clustering of the resulting components can be further visualized and modified using the methods defined for
 #'   \code{\link{componentsIntClust}}.
 #'
@@ -104,6 +104,7 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #' @param normFunc,average Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
 #'   normalization and averaging of data.
 #'
+#' @aliases generateComponentsIntClust
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",

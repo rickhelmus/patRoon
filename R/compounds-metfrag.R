@@ -548,6 +548,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'
+#' @aliases generateCompoundsMetFrag
 #' @rdname compound-generation
 #' @export
 setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists, method = "CL",

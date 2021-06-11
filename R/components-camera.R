@@ -24,6 +24,7 @@ setMethod("initialize", "componentsCamera",
 #'
 #' @references \addCitations{CAMERA}{1}
 #'
+#' @aliases generateComponentsCAMERA
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization = NULL, onlyIsotopes = FALSE,

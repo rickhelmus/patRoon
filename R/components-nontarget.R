@@ -97,6 +97,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #'
 #' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 #'
+#' @aliases generateComponentsNontarget
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization = NULL, rtRange = c(-120, 120),

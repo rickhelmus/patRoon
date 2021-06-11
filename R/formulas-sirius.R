@@ -115,6 +115,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 #' 
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
+#' @aliases generateFormulasSIRIUS
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,

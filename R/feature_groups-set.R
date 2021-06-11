@@ -89,6 +89,8 @@ setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 })
 
 #' @rdname featureGroups-class
+#' @param reGroup Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
+#'   \verb{Sets workflow} section for more details.
 #' @export
 setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
 {
@@ -467,7 +469,7 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
 #'   \code{groupArgs=list(maxAlignMZ=0.002)}.
 #'
 #' @return \code{makeSet} and the \code{\link{featuresSet}} method of \code{groupFeatures} return a
-#'   \code{\link{featuresGroupsSet}} object.
+#'   \code{\link{featureGroupsSet}} object.
 #'
 #' @rdname feature-grouping
 #' @export

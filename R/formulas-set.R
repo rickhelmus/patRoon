@@ -51,10 +51,12 @@ setMethod("show", "formulasSet", function(object)
 #' @export
 setMethod("delete", "formulasSet", doFeatAnnDeleteSets)
 
+#' @param drop Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #' @rdname formulas-class
 #' @export
 setMethod("[", "formulasSet", doFeatAnnSubsetSets)
 
+#' @param negate Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #' @rdname formulas-class
 #' @export
 setMethod("filter", "formulasSet", doFeatAnnFilterSets)

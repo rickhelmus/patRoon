@@ -90,6 +90,7 @@ setMethod("initialize", "componentsClust", function(.Object, distm, method, gInf
                           properties = properties, altered = FALSE, ...))
 })
 
+#' @rdname componentsClust-class
 #' @export
 setMethod("delete", "componentsClust", function(obj, ...)
 {

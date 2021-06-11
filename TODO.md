@@ -157,14 +157,14 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
-    - update adduct params for suspect screening
-    - references for FC calculation?
-    - refer to OrgMassSpecR for cosine MS/MS similarity?
-        - now still done in annotateSuspects()
-    - fix devtools::check_man() issues
-    - verify if all new generics have docs
-    - update/add aliases
-    - remove some aliases for generics now not unique to one class (eg unique/overlap)
+    - references
+        - FC calculation?
+        - PC transformations
+        - refer to OrgMassSpecR for cosine MS/MS similarity?
+        - mention Bas as author for spec similarity/shift etc
+            - cosine based on OrgMassSpecR
+                - now still done in annotateSuspects()
+            - add also as contributor to eg DESCRIPTION
 - handbook
     - KPIC2, cliqueMS installation
     - update MP section on what uses it (e.g. SIRIUS features, SAFD, ...)
@@ -188,7 +188,6 @@
 - annotation
     - generateFormulas: MSPeakLists argument
         - update handbook, tutorial...
-    - explain xlim/ylim behavior for annotations/mols for plotSpec()
 - components
     - cliqueMS
         - mention fork is needed?
@@ -201,11 +200,7 @@
     - Annotation (formulas/compounds)
         - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
 - TPs
-    - mention Bas as author for spec similarity/shift etc
-        - cosine based on OrgMassSpecR
-        - add also as contributor to eg DESCRIPTION
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
-    - refs for PC transformations
     - logic: mention results can be filtered with TP components?
     
 

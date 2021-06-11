@@ -1,5 +1,7 @@
 
-### Feature groups
+### Features and feature groups
+
+setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
 
 setGeneric("groupTable", function(object, ...) standardGeneric("groupTable"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
@@ -149,6 +151,9 @@ setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGe
 #' please refer to the linked method documentation for each generic.
 #'
 #' @param obj The object the generic should be applied to.
+#' @param TPs The \code{\link{transformationProducts}} derived object.
+#' @param out Output file.
+#' @param value The replacement value.
 #' @param \dots Any further method specific arguments. See method documentation
 #'   for details.
 #'
@@ -196,8 +201,8 @@ setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
-#' @param weights,flatnessFactor See method documentation.
 #' @template generics
+#' @param weights,flatnessFactor See method documentation.
 setGeneric("calculatePeakQualities", function(obj, weights = NULL,
                                               flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))
 
@@ -239,18 +244,13 @@ setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNo
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.
 #' @template generics
+#' @param type The export type.
 setGeneric("export", function(obj, type, out, ...) standardGeneric("export"))
 
 #' @templateVar func featureTable
 #' @templateVar desc returns feature information.
 #' @template generics
 setGeneric("featureTable", function(obj, ...) standardGeneric("featureTable"))
-
-#' @templateVar func featureTable
-#' @templateVar desc updates feature information.
-#' @param fTable New value for the \code{features} slot: a \code{list} with \code{data.table} items for each analysis.
-#' @template generics
-setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
 
 #' @templateVar func filter
 #' @templateVar desc provides various functionality to do post-filtering of data.
@@ -282,7 +282,6 @@ setGeneric("makeSet", function(obj, ...) standardGeneric("makeSet"))
 #' @template generics
 #'
 #' @template plotChord-args
-#'
 setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...) standardGeneric("plotChord"))
 
 #' @templateVar func plotChroms
@@ -375,6 +374,7 @@ setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
 #' @templateVar func unset
 #' @templateVar desc Converts this object to a regular non-set object. See the documentation for \link[=sets-workflow]{sets workflows}.
 #' @template generics
+#' @param set The name of the set.
 setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
 

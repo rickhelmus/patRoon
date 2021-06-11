@@ -2,6 +2,13 @@
 #' @include components-features.R
 NULL
 
+#' @rdname components-class
+#' @export
+componentsOpenMS <- setClass("componentsOpenMS", contains = "componentsFeatures")
+
+setMethod("initialize", "componentsOpenMS",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
+
 #' @details \code{generateComponentsOpenMS} uses the
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
 #'    utility (see \url{http://www.openms.de}) to generate components. Features that show highly similar chromatographic
@@ -30,13 +37,7 @@ NULL
 #'
 #' @references \insertRef{Bielow2010}{patRoon}
 #'
-#' @rdname component-generation
-#' @export
-componentsOpenMS <- setClass("componentsOpenMS", contains = "componentsFeatures")
-
-setMethod("initialize", "componentsOpenMS",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
-
+#' @aliases generateComponentsOpenMS
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization = NULL, chargeMin = 1,

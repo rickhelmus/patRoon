@@ -18,11 +18,17 @@ NULL
 #'   For \code{delete}: passed to the function specified as \code{j}.
 #'
 #'   For \code{consensus}: Any further (and unique) \code{formulas} objects.
-#'   
+#'
 #'   \setsPassedArgs1{formulas}
 #' @param index The candidate index (row). For \code{plotSpectrum} two indices can be specified to compare spectra. In
 #'   this case \code{groupName} and \code{analysis} (if not \code{NULL}) should specify values for the spectra to
 #'   compare.
+#' @param i,j For \code{[[}: If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and
+#'   \code{j} the feature group of the feature for which annotations should be returned. Otherwise \code{i} specifies
+#'   the feature group for which group annotations should be returned. \code{i}/\code{j} can be specified as
+#'   \code{integer} index or as a \code{character} name.
+#'   
+#'   Otherwise passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
@@ -86,6 +92,7 @@ setMethod("annotations", "formulas", function(obj, features = FALSE) if (feature
 #' @export
 setMethod("analyses", "formulas", function(obj) names(obj@featureFormulas))
 
+#' @describeIn formulas Returns default scorings that are excluded from normalization.
 #' @export
 setMethod("defaultExclNormScores", "formulas", function(obj) character())
 
@@ -115,10 +122,6 @@ setMethod("show", "formulas", function(object)
 })
 
 #' @describeIn formulas Extracts a formula table, either for a feature group or for features in an analysis.
-#' @param i,j If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and \code{j} the feature
-#'   group of the feature for which annotations should be returned. Otherwise \code{i} specifies the feature group for
-#'   which group annotations should be returned. \code{i}/\code{j} can be specified as \code{integer} index or as a
-#'   \code{character} name.
 #' @export
 setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 {
@@ -145,6 +148,7 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
     return(callNextMethod())
 })
 
+#' @rdname formulas-class
 #' @export
 setMethod("delete", "formulas", function(obj, i = NULL, j = NULL, ...)
 {

@@ -2,6 +2,7 @@
 #' @include components.R
 NULL
 
+#' @rdname components-class
 #' @export
 componentsFeatures <- setClass("componentsFeatures", slots = c(featureComponents = "list"),
                                contains = "components")
@@ -181,6 +182,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
                           componentInfo = cInfo, ...))
 })
 
+#' @rdname components-class
 #' @export
 setMethod("show", "componentsFeatures", function(object)
 {

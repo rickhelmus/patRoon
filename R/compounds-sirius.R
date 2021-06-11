@@ -111,6 +111,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #'   Sets the \option{--candidates} commandline option.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
+#' @aliases generateCompoundsSIRIUS
 #' @rdname compound-generation
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,

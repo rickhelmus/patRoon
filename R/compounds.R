@@ -11,7 +11,7 @@ NULL
 #'
 #' @param formulas The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
 #'   and \code{annotatedPeakList}: set to \code{NULL} to ignore.
-#' @param obj,object,compounds The \code{compound} object.
+#' @param obj,object,compounds,x The \code{compound} object.
 #' @param index The numeric index of the candidate structure.
 #'
 #'   For \code{plotStructure} and \code{getMCS}: multiple indices (\emph{i.e.} vector with length >=2) should be
@@ -63,7 +63,7 @@ compoundsConsensus <- setClass("compoundsConsensus",
                                contains = "compounds")
 setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@mergedConsensusNames)
 
-
+#' @describeIn compounds Returns default scorings that are excluded from normalization.
 #' @export
 setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount"))
 

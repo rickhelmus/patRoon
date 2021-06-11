@@ -23,11 +23,12 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @details \code{generateComponentsSpecClust} generates components based on MS/MS similarity between feature groups.
 #'   The similarities are converted to a distance matrix and used as input for hierarchical clustering, and the
 #'   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The clustering is performed with
-#'   \code{\link[hclust:fastcluster]{fastcluster::hclust}}.
+#'   \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
 #'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Bas van de Velde (major contributions to spectral binning and
 #'   similarity calculation).
 #'
+#' @aliases generateComponentsSpecClust
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",

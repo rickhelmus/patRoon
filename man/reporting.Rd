@@ -171,6 +171,9 @@ Options are: \code{"compounds"} (only to those with compounds results),
 be generated to display hierarchical clustering results. Set to
 \code{FALSE} for a 'regular' static plot.}
 
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
+See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
+
 \item{selfContained}{If \code{TRUE} the output will be a standalone HTML file
 which contains all graphics and script dependencies. When \code{FALSE}, the
 latter will be placed in an additional directory (\file{report_files})

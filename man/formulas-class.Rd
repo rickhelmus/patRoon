@@ -8,8 +8,10 @@
 \alias{formulasConsensus}
 \alias{annotations,formulas-method}
 \alias{analyses,formulas-method}
+\alias{defaultExclNormScores,formulas-method}
 \alias{show,formulas-method}
 \alias{[[,formulas,ANY,ANY-method}
+\alias{delete,formulas-method}
 \alias{as.data.table,formulas-method}
 \alias{annotatedPeakList,formulas-method}
 \alias{plotSpectrum,formulas-method}
@@ -36,9 +38,13 @@
 
 \S4method{analyses}{formulas}(obj)
 
+\S4method{defaultExclNormScores}{formulas}(obj)
+
 \S4method{show}{formulas}(object)
 
 \S4method{[[}{formulas,ANY,ANY}(x, i, j)
+
+\S4method{delete}{formulas}(obj, i = NULL, j = NULL, ...)
 
 \S4method{as.data.table}{formulas}(
   x,
@@ -69,7 +75,6 @@
   MSPeakLists,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
@@ -82,8 +87,7 @@
   groupName,
   analysis = NULL,
   normalizeScores = "max",
-  excludeNormScores = defaultExclNormScores(obj),
-  useGGPlot2 = FALSE
+  excludeNormScores = defaultExclNormScores(obj)
 )
 
 \S4method{consensus}{formulas}(
@@ -113,7 +117,6 @@
   MSPeakLists,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
@@ -148,10 +151,20 @@
 \item{features}{If \code{TRUE} returns formula data for features, otherwise
 for feature groups.}
 
-\item{i, j}{If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and \code{j} the feature
-group of the feature for which annotations should be returned. Otherwise \code{i} specifies the feature group for
-which group annotations should be returned. \code{i}/\code{j} can be specified as \code{integer} index or as a
-\code{character} name.}
+\item{i, j}{For \code{[[}: If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and
+\code{j} the feature group of the feature for which annotations should be returned. Otherwise \code{i} specifies
+the feature group for which group annotations should be returned. \code{i}/\code{j} can be specified as
+\code{integer} index or as a \code{character} name.
+
+Otherwise passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
+
+\item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
+
+  For \code{delete}: passed to the function specified as \code{j}.
+
+  For \code{consensus}: Any further (and unique) \code{formulas} objects.
+
+  \setsPassedArgs1{formulas}}
 
 \item{fGroups, fragments, countElements, countFragElements, OM}{Passed to the
 \code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}} method.}
@@ -204,22 +217,11 @@ not be annotated.}
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
-\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
-plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
-allows nicely repelled text for annotation. However, base plot is generally
-faster.}
-
 \item{mincex}{The formula annotation labels are automatically scaled. The \code{mincex} argument forces a minimum
 \code{cex} value for readability.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
-
-\item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
-
-  For \code{delete}: passed to the function specified as \code{j}.
-
-  For \code{consensus}: Any further (and unique) \code{formulas} objects.}
 
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
@@ -253,8 +255,15 @@ objects.}
 \item{updateConsensus}{\setsWF If \code{TRUE} then the annonation consensus among set results is updated. See the
 \verb{Sets workflows} section for more details.}
 
+\item{drop}{Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
+
+\item{negate}{Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
+
 \item{perSet, mirror}{\setsWF If \code{perSet=TRUE} then the set specific mass peaks are annotated separately.
 Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a mirror plot is generated.}
+
+\item{filterSets}{\setsWF Controls how algorithms concensus abundance filters are applied. See the \verb{Sets
+workflows} section below.}
 
 \item{setThreshold, setThresholdAnn}{\setsWF Thresholds used to create the annotation set consensus. See
 \code{\link{generateFormulas}}.}
@@ -266,8 +275,6 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
   group (or feature if \code{features=TRUE}) a \code{\link{data.table}}
   with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.
-
-\code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 
 \code{consensus} returns a \code{formulas} object that is produced by
   merging results from multiple \code{formulas} objects.
@@ -285,6 +292,8 @@ the \code{\link{featureAnnotations}} class, please see its documentation for mor
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
+
+\item \code{defaultExclNormScores}: Returns default scorings that are excluded from normalization.
 
 \item \code{show}: Show summary information for this object.
 

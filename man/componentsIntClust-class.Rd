@@ -35,7 +35,7 @@
 
 \item{index}{Numeric component/cluster index.}
 
-\item{lty}{Passed to \code{\link{lines}}.}
+\item{pch, type, lty}{Passed to \code{\link{lines}}.}
 }
 \value{
 \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or

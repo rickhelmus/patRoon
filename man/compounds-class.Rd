@@ -6,6 +6,7 @@
 \alias{compounds}
 \alias{compoundsConsensus-class}
 \alias{compoundsConsensus}
+\alias{defaultExclNormScores,compounds-method}
 \alias{show,compounds-method}
 \alias{identifiers,compounds-method}
 \alias{identifiers}
@@ -36,6 +37,8 @@
 \alias{unset,compoundsConsensusSet-method}
 \title{Compound annotations class}
 \usage{
+\S4method{defaultExclNormScores}{compounds}(obj)
+
 \S4method{show}{compounds}(object)
 
 \S4method{identifiers}{compounds}(compounds)
@@ -59,14 +62,7 @@
 
 \S4method{getMCS}{compounds}(obj, index, groupName)
 
-\S4method{plotStructure}{compounds}(
-  obj,
-  index,
-  groupName,
-  width = 500,
-  height = 500,
-  useGGPlot2 = FALSE
-)
+\S4method{plotStructure}{compounds}(obj, index, groupName, width = 500, height = 500)
 
 \S4method{plotScores}{compounds}(
   obj,
@@ -74,8 +70,7 @@
   groupName,
   normalizeScores = "max",
   excludeNormScores = defaultExclNormScores(obj),
-  onlyUsed = TRUE,
-  useGGPlot2 = FALSE
+  onlyUsed = TRUE
 )
 
 \S4method{annotatedPeakList}{compounds}(
@@ -96,7 +91,6 @@
   plotStruct = TRUE,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
@@ -133,7 +127,6 @@
   plotStruct = TRUE,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
-  useGGPlot2 = FALSE,
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
@@ -172,7 +165,7 @@
 \S4method{unset}{compoundsConsensusSet}(obj, set)
 }
 \arguments{
-\item{obj, object, compounds}{The \code{compound} object.}
+\item{obj, object, compounds, x}{The \code{compound} object.}
 
 \item{minExplainedPeaks, scoreLimits}{Passed to the
 \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
@@ -187,7 +180,9 @@ filtering.}
 
   for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 
-  For \code{consensus}: any further (and unique) \code{compounds} objects.}
+  For \code{consensus}: any further (and unique) \code{compounds} objects.
+  
+  \setsPassedArgs1{compounds}}
 
 \item{formulas}{The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
 and \code{annotatedPeakList}: set to \code{NULL} to ignore.}
@@ -214,11 +209,6 @@ belongs.}
 
 \item{width, height}{The dimensions (in pixels) of the raster image that
 should be plotted.}
-
-\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
-plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
-allows nicely repelled text for annotation. However, base plot is generally
-faster.}
 
 \item{normalizeScores}{A \code{character} that specifies how normalization of
 annotation scorings occurs. Either
@@ -296,14 +286,22 @@ objects.}
 
 \item{labels}{A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.}
 
+\item{i, j, drop}{Passed to the \code{\link[=[,featureAnnotations,ANY,missing,missing-method]{featureAnnotations}}
+method.}
+
 \item{sets}{\setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}). Note: if
 \code{updateConsensus=FALSE} then the \code{setCoverage} column of the annotation results is not updated.}
 
 \item{updateConsensus}{\setsWF If \code{TRUE} then the annonation consensus among set results is updated. See the
 \verb{Sets workflows} section for more details.}
 
+\item{negate}{Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
+
 \item{perSet, mirror}{\setsWF If \code{perSet=TRUE} then the set specific mass peaks are annotated separately.
 Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a mirror plot is generated.}
+
+\item{filterSets}{\setsWF Controls how algorithms concensus abundance filters are applied. See the \verb{Sets
+workflows} section below.}
 
 \item{setThreshold, setThresholdAnn}{\setsWF Thresholds used to create the annotation set consensus. See
 \code{\link{generateCompounds}}.}
@@ -311,9 +309,6 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
 \item{set}{\setsWF The name of the set.}
 }
 \value{
-\code{plotSpectrum} and \code{plotStructure} will return a \code{\link[=ggplot2]{ggplot object}} if
-  \code{useGGPlot2} is \code{TRUE}.
-
 \code{addFormulaScoring} returns a \code{compounds} object updated
   with formula scoring.
 
@@ -332,6 +327,8 @@ from the \code{\link{featureAnnotations}} class, please see its documentation fo
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{defaultExclNormScores}: Returns default scorings that are excluded from normalization.
+
 \item \code{show}: Show summary information for this object.
 
 \item \code{identifiers}: Returns a list containing for each feature group a

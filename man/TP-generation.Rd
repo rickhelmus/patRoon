@@ -7,6 +7,8 @@
 \alias{generateTPsBioTransformer}
 \alias{generateTPsLibrary}
 \alias{generateTPsLogic,featureGroups-method}
+\alias{generateTPsLogic}
+\alias{generateTPsLogic,featureGroupsSet-method}
 \title{Generation of transformation products (TPs)}
 \usage{
 generateTPs(algorithm, ...)
@@ -31,6 +33,8 @@ generateTPsLibrary(
 )
 
 \S4method{generateTPsLogic}{featureGroups}(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
+
+\S4method{generateTPsLogic}{featureGroupsSet}(fGroups, minMass = 40, transformations = NULL)
 }
 \arguments{
 \item{algorithm}{A character string describing the algorithm that should be
@@ -52,9 +56,12 @@ used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}}
 
 \item{extraOpts}{A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.}
 
-\item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-\code{"[M+Na]+"}.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+  Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
+  adduct annotations then these are used if \code{adducts=NULL}.
+
+  \setsWF The \code{adduct} argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.}
 
 \item{skipInvalid}{If set to \code{TRUE} then the parents will be skipped (with a warning) for which insufficient
 information (\emph{e.g.} SMILES) is available.}

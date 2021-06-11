@@ -6,10 +6,13 @@
 \alias{generateFormulas,featureGroups-method}
 \alias{generateFormulas}
 \alias{generateFormulasDA,featureGroups-method}
+\alias{generateFormulasDA}
 \alias{generateFormulasDA,featureGroupsSet-method}
 \alias{generateFormulasGenForm,featureGroups-method}
+\alias{generateFormulasGenForm}
 \alias{generateFormulasGenForm,featureGroupsSet-method}
 \alias{generateFormulasSIRIUS,featureGroups-method}
+\alias{generateFormulasSIRIUS}
 \alias{generateFormulasSIRIUS,featureGroupsSet-method}
 \alias{formulaScorings}
 \title{Automatic chemical formula generation}
@@ -118,9 +121,12 @@ feature data of precursor/parent ions from MS/MS spectra (this data is not readi
   MS/MS data and combines the results (duplicated formulae are removed). This is useful when poor MS/MS data would
   exclude proper candidates.}
 
-\item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-\code{"[M+Na]+"}.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+  Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
+  adduct annotations then these are used if \code{adducts=NULL}.
+
+  \setsWF The \code{adduct} argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.}
 
 \item{featThreshold}{If \code{calculateFeatures=TRUE}: minimum presence (\samp{0-1}) of a formula in all features
 before it is considered as a candidate for a feature group. For instance, \code{featThreshold=0.75} dictates that a

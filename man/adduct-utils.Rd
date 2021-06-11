@@ -41,7 +41,7 @@ string, a \code{numeric} \command{MetFrag} adduct identifier
   
   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
   
-  \code{"cliquems"} is the format used by \pkg{\link[=cliqueMS-package]{cliqueMS}}.}
+  \code{"cliquems"} is the format used by \pkg{cliqueMS}.}
 
 \item{isPositive}{A logical that specifies whether the adduct should be
 positive. Should only be set when \code{format="metfrag"} and \code{x} is a
@@ -51,9 +51,8 @@ positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 
 \item{formula}{A \code{character} vector with formulae to convert.}
 
-\item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-\code{"[M+Na]+"}.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}.}
 }
 \description{
 Several utility functions to work with adducts.

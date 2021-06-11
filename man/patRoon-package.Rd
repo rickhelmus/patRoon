@@ -28,9 +28,8 @@
   \code{\link[parallel]{detectCores}}. This option is only used when \option{patRoon.MP.method="classic"}.
 
   \item \code{patRoon.MP.method}: Either \code{"classic"} or \code{"future"}. The former is the default and uses
-  \code{\link{processx}} to execute multiple commands in parallel. When \code{"future"} the
-  \code{\link{future.apply}} package is used for parallelization, which is especially useful for \emph{e.g.} cluster
-  computing.
+  \CRANpkg{processx} to execute multiple commands in parallel. When \code{"future"} the \code{\link{future.apply}}
+  package is used for parallelization, which is especially useful for \emph{e.g.} cluster computing.
 
   \item \code{patRoon.MP.futureSched}: Sets the \code{future.scheduling} function argument for
   \code{\link{future_lapply}}. Only used if \option{patRoon.MP.method="future"}.

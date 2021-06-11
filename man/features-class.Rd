@@ -132,7 +132,9 @@ analyses as numeric index, logical or character, \code{j} the features as numeri
 analysis, with the feature table (a \code{data.table}) as first argument, the analysis name as second argument, and any other arguments passed as
 \code{\dots} to \code{delete}. The return value of this function specifies the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
-\item{\dots}{For \code{delete}: passed to the function specified as \code{j}, otherwise ignored.}
+\item{\dots}{For \code{delete}: passed to the function specified as \code{j}.
+
+\setsPassedArgs1{features}}
 
 \item{drop}{ignored.}
 
@@ -143,7 +145,7 @@ analysis, with the feature table (a \code{data.table}) as first argument, the an
 Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.}
 
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
-\code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.}
+\code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
 
 \item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
 \code{negate=TRUE}).}
@@ -205,13 +207,14 @@ amounts of features.
 
 \item \code{delete}: Completely deletes specified features.
 
-\item \code{calculatePeakQualities}: Calculates peak qualities for each feature. This uses \pkg{\link{MetaClean}} \R package to
-calculate the following metrics: \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality},
-\verb{Symmetry}, \verb{Gaussian Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and
-\verb{Zig-Zag index}. Please see the \pkg{MetaClean} publication (referenced below) for more details. For each
-metric, an additional score is calculated by normalizing all feature values (unless the quality metric definition
-has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature
-is calculated by the (weighted) sum of all score values.
+\item \code{calculatePeakQualities}: Calculates peak qualities for each feature. This uses
+\href{https://github.com/KelseyChetnik/MetaClean/}{MetaClean} \R package to calculate the following metrics:
+\verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality}, \verb{Symmetry}, \verb{Gaussian
+Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \verb{Zig-Zag index}. Please see the
+\pkg{MetaClean} publication (referenced below) for more details. For each metric, an additional score is calculated
+by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
+(worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
+score values.
 }}
 
 \section{Slots}{
@@ -225,8 +228,8 @@ for access.}
 }}
 
 \note{
-For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the
-  \verb{Gaussian Similarity} metric, in which case it will be set to \samp{0}.
+For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
+  Similarity} metric, in which case it will be set to \samp{0}.
 }
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{features}}}}     \itemize{       \item{\code{\link{featuresSet}}}       \item{\code{\link{featuresUnset}}}       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresKPIC2}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresSAFD}}}       \item{\code{\link{featuresSIRIUS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}       \item{\code{\link{featuresXCMS3}}}     }   } }

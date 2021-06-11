@@ -6,8 +6,14 @@
 \alias{generateMSPeakLists,featureGroups-method}
 \alias{generateMSPeakLists}
 \alias{generateMSPeakListsDA,featureGroups-method}
+\alias{generateMSPeakListsDA}
+\alias{generateMSPeakListsDA,featureGroupsSet-method}
 \alias{generateMSPeakListsDAFMF,featureGroups-method}
+\alias{generateMSPeakListsDAFMF}
+\alias{generateMSPeakListsDAFMF,featureGroupsSet-method}
 \alias{generateMSPeakListsMzR,featureGroups-method}
+\alias{generateMSPeakListsMzR}
+\alias{generateMSPeakListsMzR,featureGroupsSet-method}
 \alias{getDefAvgPListParams}
 \title{Generation of MS Peak Lists}
 \usage{
@@ -26,6 +32,8 @@
   avgFGroupParams = getDefAvgPListParams()
 )
 
+\S4method{generateMSPeakListsDA}{featureGroupsSet}(fGroups, ...)
+
 \S4method{generateMSPeakListsDAFMF}{featureGroups}(
   fGroups,
   minMSIntensity = 500,
@@ -34,6 +42,8 @@
   save = close,
   avgFGroupParams = getDefAvgPListParams()
 )
+
+\S4method{generateMSPeakListsDAFMF}{featureGroupsSet}(fGroups, ...)
 
 \S4method{generateMSPeakListsMzR}{featureGroups}(
   fGroups,
@@ -44,31 +54,31 @@
   avgFGroupParams = getDefAvgPListParams()
 )
 
+\S4method{generateMSPeakListsMzR}{featureGroupsSet}(fGroups, ...)
+
 getDefAvgPListParams(...)
 }
 \arguments{
-\item{fGroups}{The \code{\link{featureGroups}} object from which MS peak
-lists should be extracted.}
+\item{fGroups}{The \code{\link{featureGroups}} object from which MS peak lists should be extracted.}
 
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"bruker"}, \code{"brukerfmf"}, \code{"mzr"}}
 
-\item{\dots}{For \code{generateMSPeakLists}: Any parameters to be passed to
-  the selected MS peak lists generation algorithm.
+\item{\dots}{For \code{generateMSPeakLists}: Any parameters to be passed to the selected MS peak lists generation
+  algorithm.
 
-  For \code{getDefAvgPListParams}: Optional named arguments that override
-  defaults.}
+  For \code{getDefAvgPListParams}: Optional named arguments that override defaults.
+  
+  For sets workflows: further arguments passed to the non-sets workflow method.}
 
 \item{bgsubtr}{If \code{TRUE} background will be subtracted using the
 'spectral' algorithm.}
 
-\item{maxMSRtWindow}{Maximum chromatographic peak window used for spectrum
-averaging (in seconds, +/- retention time). If \code{NULL} all spectra from
-a feature will be taken into account. Lower to decrease processing time.}
+\item{maxMSRtWindow}{Maximum chromatographic peak window used for spectrum averaging (in seconds, +/- retention
+time). If \code{NULL} all spectra from a feature will be taken into account. Lower to decrease processing time.}
 
-\item{minMSIntensity, minMSMSIntensity}{Minimum intensity for peak lists
-obtained with DataAnalysis. Highly recommended to set \samp{>0} as DA tends
-to report many very low intensity peaks.}
+\item{minMSIntensity, minMSMSIntensity}{Minimum intensity for peak lists obtained with DataAnalysis. Highly
+recommended to set \samp{>0} as DA tends to report many very low intensity peaks.}
 
 \item{clear}{Remove any existing chromatogram traces/mass spectra prior to
 making new ones.}
@@ -91,39 +101,32 @@ Data-Independent MS/MS experiments, where precursor ions are not isolated
 prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value
 should be \code{NULL}.}
 
-\item{topMost}{Only extract MS peak lists from a maximum of \code{topMost}
-analyses with highest intensity. If \code{NULL} all analyses will be used.}
+\item{topMost}{Only extract MS peak lists from a maximum of \code{topMost} analyses with highest intensity. If
+\code{NULL} all analyses will be used.}
 
-\item{avgFeatParams, avgFGroupParams}{A \code{list} with parameters used for
-averaging of peak lists for individual features and feature groups,
-respectively (see below).}
+\item{avgFeatParams, avgFGroupParams}{A \code{list} with parameters used for averaging of peak lists for individual
+features and feature groups, respectively (see below).}
 }
 \value{
-A \code{\link{MSPeakLists}} object that can be used for formulae
-  calculation and compound identification.
+A \code{\link{MSPeakLists}} object that can be used for formulae calculation and compound identification.
 }
 \description{
 Functionality to generate MS peak lists.
 }
 \details{
-Formula calculation and identification tools rely on mass spectra that belong
-to features of interest. For processing, MS (and MS/MS) spectra are typically
-reduced to a table with a column containing measured \emph{m/z} values and a
-column containing their intensities. These 'MS peak lists' can then be used
-for \link[=formula-generation]{formula generation} and
-\link[=compound-generation]{compound generation}.
+Formula calculation and identification tools rely on mass spectra that belong to features of interest. For
+processing, MS (and MS/MS) spectra are typically reduced to a table with a column containing measured \emph{m/z}
+values and a column containing their intensities. These 'MS peak lists' can then be used for
+\link[=formula-generation]{formula generation} and \link[=compound-generation]{compound generation}.
 
-MS and MS/MS peak lists are first generated for all features (or a subset, if
-the \code{topMost} argument is set). During this step multiple spectra over
-the feature elution profile are averaged. Subsequently, peak lists will be
-generated for each feature group by averaging peak lists of the features
-within the group. Functionality that uses peak lists will either use data
-from individual features or from group averaged peak lists. For instance, the
-former may be used by formulae calculation, while compound identification and
-plotting functionality typically uses group averaged peak lists.
+MS and MS/MS peak lists are first generated for all features (or a subset, if the \code{topMost} argument is set).
+During this step multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be
+generated for each feature group by averaging peak lists of the features within the group. Functionality that uses
+peak lists will either use data from individual features or from group averaged peak lists. For instance, the former
+may be used by formulae calculation, while compound identification and plotting functionality typically uses group
+averaged peak lists.
 
-Several functions exist to automatically extract MS peak lists for feature
-groups.
+Several functions exist to automatically extract MS peak lists for feature groups.
 
 \code{generateMSPeakLists} is a generic function that will generate MS peak lists using one of the supported algorithms. The actual
   functionality is provided by algorithm specific functions such as \code{generateMSPeakListsMzR} and \code{generateMSPeakListsDA}. While these
@@ -163,71 +166,63 @@ If any errors related to \command{DCOM} appear it might be necessary to
   with DataAnalayis can be used for this.
 }
 \section{Peak list averaging parameters}{
- The parameters set used for
-  averaging peak lists are set by the \code{avgFeatParams} and
-  \code{avgFGroupParams} arguments. This should be a named \code{list} with
-  the following values: \itemize{
+ The parameters set used for averaging peak lists are set by the
+  \code{avgFeatParams} and \code{avgFGroupParams} arguments. This should be a named \code{list} with the following
+  values: \itemize{
 
-  \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering
-  \emph{m/z} values when spectra are averaged. For \code{method="hclust"}
-  this corresponds to the cluster height, while for \code{method="distance"}
-  this value is used to find nearby masses (+/- window).  Too small windows
-  will prevent clustering \emph{m/z} values (thus erroneously treating equal
-  masses along spectra as different), whereas too big windows may cluster
-  unrelated \emph{m/z} values from different or even the same spectrum
-  together.
+  \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering \emph{m/z} values when spectra are
+  averaged. For \code{method="hclust"} this corresponds to the cluster height, while for \code{method="distance"}
+  this value is used to find nearby masses (+/- window).  Too small windows will prevent clustering \emph{m/z} values
+  (thus erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
+  \emph{m/z} values from different or even the same spectrum together.
 
-  \item \code{topMost} Only retain this maximum number of MS peaks when
-  generating averaged spectra. Lowering this number may exclude more
-  irrelevant (noisy) MS peaks and decrease processing time, whereas higher
-  values may avoid excluding lower intense MS peaks that may still be of
-  interest.
+  \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
+  number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
+  excluding lower intense MS peaks that may still be of interest.
 
-  \item \code{minIntensityPre} MS peaks with intensities below this value
-  will be removed (applied prior to selection by \code{topMost}) before
-  averaging.
+  \item \code{minIntensityPre} MS peaks with intensities below this value will be removed (applied prior to selection
+  by \code{topMost}) before averaging.
 
-  \item \code{minIntensityPost} MS peaks with intensities below this value
-  will be removed after averaging.
+  \item \code{minIntensityPost} MS peaks with intensities below this value will be removed after averaging.
 
-  \item \code{avgFun} Function that is used to calculate average \emph{m/z}
-  values.
+  \item \code{avgFun} Function that is used to calculate average \emph{m/z} values.
 
-  \item \code{method} Method used for producing averaged MS spectra. Valid
-  values are \code{"hclust"}, used for hierarchical clustering (using the
-  \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the
-  between peak distance. The latter method may reduces processing time and
-  memory requirements, at the potential cost of reduced accuracy.
+  \item \code{method} Method used for producing averaged MS spectra. Valid values are \code{"hclust"}, used for
+  hierarchical clustering (using the \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the between
+  peak distance. The latter method may reduces processing time and memory requirements, at the potential cost of
+  reduced accuracy.
 
-  \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then
-  peak lists without a precursor peak are removed. Note that even when this
-  is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak
-  lists (\emph{e.g.} formulae calulcation) will still skip calculation if a
-  precursor is not found.
+  \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then peak lists without a precursor peak are
+  removed. Note that even when this is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak lists
+  (\emph{e.g.} formulae calulcation) will still skip calculation if a precursor is not found.
 
-  \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then
-  always retain the precursor mass peak even if is not amongst the
-  \code{topMost} peaks. Note that MS precursor mass peaks are always kept.
-  Furthermore, note that precursor peaks in both MS and MS/MS data may still
-  be removed by intensity thresholds (this is unlike the
-  \code{\link[=filter,MSPeakLists-method]{filter}} method function).
+  \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then always retain the precursor mass peak
+  even if is not amongst the \code{topMost} peaks. Note that MS precursor mass peaks are always kept. Furthermore,
+  note that precursor peaks in both MS and MS/MS data may still be removed by intensity thresholds (this is unlike
+  the \code{\link[=filter,MSPeakLists-method]{filter}} method function).
 
   }
 
-  Note that when Bruker algorithms are used these parameters only control
-  generation of feature groups averaged peak lists: how peak lists for
-  features are generated is controlled by DataAnalysis.
+  Note that when Bruker algorithms are used these parameters only control generation of feature groups averaged peak
+  lists: how peak lists for features are generated is controlled by DataAnalysis.
 
-  The \code{getDefAvgPListParams} function can be used to generate a default
-  parameter list. The current defaults are:
+  The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The current defaults
+  are:
 
 \code{clusterMzWindow=0.005}; \code{topMost=50}; \code{minIntensityPre=500}; \code{minIntensityPost=500}; \code{avgFun=mean}; \code{method="hclust"}; \code{pruneMissingPrecursorMS=TRUE}; \code{retainPrecursorMSMS=TRUE}
 }
 
+\section{Sets workflows}{
+ With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made
+  per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
+  ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled
+  in the final peak lists. However, please note that annotation and other functionality typically uses only the set
+  specific peak lists, as this functionality cannot work with mixed peak lists.
+}
+
 \section{Source}{
- Averaging of mass spectra algorithms used by are based on
-  the \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
-  archived on CRAN).
+ Averaging of mass spectra algorithms used by are based on the
+  \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
 }
 
 \references{

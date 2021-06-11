@@ -94,7 +94,7 @@ executed again. Furthermore, functionality is provided to import and export sess
 
 \code{getMCTrainData} converts a session created by \code{checkFeatures} to a \code{data.frame} that can be
   used by the \pkg{MetaClean} to train a new model. The output format is comparable to that from
-  \code{\link{getPeakQualityMetrics}}.
+  \code{\link[MetaClean]{getPeakQualityMetrics}}.
 
 \code{predictCheckFeaturesSession} Uses ML data from \pkg{MetaClean} to predict the quality (Pass/Fail) of
   feature group data, and converts this to a session which can be reviewed with \code{checkFeatures} and used to

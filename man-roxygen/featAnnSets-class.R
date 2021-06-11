@@ -7,6 +7,8 @@
 #'   Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a mirror plot is generated.
 #' @param setThreshold,setThresholdAnn \setsWF Thresholds used to create the annotation set consensus. See
 #'   \code{\link{<%=generator%>}}.
+#' @param filterSets \setsWF Controls how algorithms concensus abundance filters are applied. See the \verb{Sets
+#'   workflows} section below.
 #'
 #' @slot setThreshold,setThresholdAnn \setsWF A copy of the equally named arguments that were passed when this object
 #'   was created by \code{\link{<%=generator%>}}.

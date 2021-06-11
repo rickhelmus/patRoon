@@ -280,26 +280,27 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @describeIn features Calculates peak qualities for each feature. This uses \pkg{\link{MetaClean}} \R package to
-#'   calculate the following metrics: \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality},
-#'   \verb{Symmetry}, \verb{Gaussian Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and
-#'   \verb{Zig-Zag index}. Please see the \pkg{MetaClean} publication (referenced below) for more details. For each
-#'   metric, an additional score is calculated by normalizing all feature values (unless the quality metric definition
-#'   has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature
-#'   is calculated by the (weighted) sum of all score values.
+#' @describeIn features Calculates peak qualities for each feature. This uses
+#'   \href{https://github.com/KelseyChetnik/MetaClean/}{MetaClean} \R package to calculate the following metrics:
+#'   \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality}, \verb{Symmetry}, \verb{Gaussian
+#'   Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \verb{Zig-Zag index}. Please see the
+#'   \pkg{MetaClean} publication (referenced below) for more details. For each metric, an additional score is calculated
+#'   by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
+#'   (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
+#'   score values.
 #'
 #' @param weights A named \code{numeric} vector that defines the weight for each score to calculate the
 #'   \verb{totalScore}. The names of the vector follow the score names. Unspecified weights are defaulted to \samp{1}.
 #'   Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.
 #' @param flatnessFactor Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
-#'   \code{\link{calculateJaggedness}} and \code{\link{calculateModality}}.
+#'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
 #'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
-#' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the
-#'   \verb{Gaussian Similarity} metric, in which case it will be set to \samp{0}.
+#' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
+#'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {

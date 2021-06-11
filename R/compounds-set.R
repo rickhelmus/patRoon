@@ -15,7 +15,7 @@ NULL
 #' @templateVar consAlgo2 MetFrag
 #' @templateVar extraMethods \item \code{addFormulaScoring} Adds the formula scorings to the original data and re-creates the annotation set consensus (see below for implications).
 #' @template featAnnSets-class
-#'
+#' 
 #' @rdname compounds-class
 #' @export
 compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", setThresholdAnn = "numeric",
@@ -54,11 +54,14 @@ setMethod("show", "compoundsSet", function(object)
 #' @export
 setMethod("delete", "compoundsSet", doFeatAnnDeleteSets)
 
+#' @param i,j,drop Passed to the \code{\link[=[,featureAnnotations,ANY,missing,missing-method]{featureAnnotations}}
+#'   method.
 #' @rdname compounds-class
 #' @export
 setMethod("[", "compoundsSet", doFeatAnnSubsetSets)
 
 #' @rdname compounds-class
+#' @param negate Passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #' @export
 setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
 

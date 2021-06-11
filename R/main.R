@@ -65,9 +65,8 @@ NULL
 #'   \code{\link[parallel]{detectCores}}. This option is only used when \option{patRoon.MP.method="classic"}.
 #'
 #'   \item \code{patRoon.MP.method}: Either \code{"classic"} or \code{"future"}. The former is the default and uses
-#'   \code{\link{processx}} to execute multiple commands in parallel. When \code{"future"} the
-#'   \code{\link{future.apply}} package is used for parallelization, which is especially useful for \emph{e.g.} cluster
-#'   computing.
+#'   \CRANpkg{processx} to execute multiple commands in parallel. When \code{"future"} the \code{\link{future.apply}}
+#'   package is used for parallelization, which is especially useful for \emph{e.g.} cluster computing.
 #'
 #'   \item \code{patRoon.MP.futureSched}: Sets the \code{future.scheduling} function argument for
 #'   \code{\link{future_lapply}}. Only used if \option{patRoon.MP.method="future"}.
@@ -193,7 +192,7 @@ NULL
 #'   analyses names \strong{must} be unique across different sets. In the last step the features are \emph{neutralized}:
 #'   the specified \code{adducts} to \code{makeSet} is used calculate the neutral monoisotopic mass for each feature per
 #'   set. This neutralization is important to group features afterwards (see the details on sets workflows in
-#'   \link[feature-grouping]{feature grouping}).
+#'   \link[=feature-grouping]{feature grouping}).
 #'
 #' @name feature-finding
 #' @return An object of a class which is derived from \code{\link{features}}.
@@ -262,7 +261,7 @@ NULL
 #'
 #'   With both approaches the resulting \code{\link{featureGroupsSet}} object will contain adduct annotations, either
 #'   based on those already present from input \code{featureGroups} objects or as specified by the \code{adducts}
-#'   argument to \code{makeSets}.
+#'   argument to \code{makeSet}.
 #'
 #'   \strong{NOTE} the \code{loadRawData} and arguments related to retention time alignment (\emph{e.g.} \code{rtalign},
 #'   \code{retcorArgs}) are currently not supported for sets workflows when using algorithms from \pkg{KPIC2} or
@@ -695,7 +694,7 @@ NULL
 #'   For \code{generateComponentsOpenMS}: Sets the \command{algorithm:MetaboliteFeatureDeconvolution:mass_max_diff}
 #'   option.
 #' @param method Clustering method that should be applied (passed to
-#'   \code{\link[hclust:fastcluster]{fastcluster::hclust}}).
+#'   \code{\link[fastcluster:hclust]{fastcluster::hclust}}).
 #' @param relMinAdductAbundance The minimum relative abundance (\samp{0-1}) that an adduct should be assigned to
 #'   features within the same feature group. See the \verb{Feature components} section for more details.
 #' @param adductConflictsUsePref If set to \code{TRUE}, and not all adduct assigments to the features within a feature
@@ -882,7 +881,7 @@ NULL
 #' The analyses files that were measured with a different method are grouped in \emph{sets}. In the most typical case,
 #' there is a \code{"positive"} and \code{"negative"} set, for the positively/negatively ionized data, respectively.
 #' However, other distinctions than polarity are also possible (although currently the chromatographic method should be
-#' the same between sets). A sets workflow is typically initiated with the \code{\link{makeSets}} method. The handbook
+#' the same between sets). A sets workflow is typically initiated with the \code{\link{makeSet}} method. The handbook
 #' contains much more details about sets workflows.
 #'
 #' @seealso \code{\link{workflowStepSet}}, the \verb{Sets workflows} sections in other documentation pages and the

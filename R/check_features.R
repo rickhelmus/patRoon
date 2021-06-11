@@ -423,7 +423,7 @@ convertQualitiesToMCData <- function(fGroups)
 
 #' @details \code{getMCTrainData} converts a session created by \code{checkFeatures} to a \code{data.frame} that can be
 #'   used by the \pkg{MetaClean} to train a new model. The output format is comparable to that from
-#'   \code{\link{getPeakQualityMetrics}}.
+#'   \code{\link[MetaClean]{getPeakQualityMetrics}}.
 #' @note \code{getMCTrainData} only uses session data for selected feature groups. Selected features for removal are
 #'   ignored, as this is not supported by \pkg{MetaClean}.
 #' @rdname check-GUI

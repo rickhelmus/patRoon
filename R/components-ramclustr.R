@@ -32,6 +32,7 @@ setMethod("initialize", "componentsRC",
 #' @references \insertRef{Broeckling2013}{patRoon} \cr\cr
 #'   \insertRef{Broeckling2014}{patRoon}
 #'
+#' @aliases generateComponentsRAMClustR
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,

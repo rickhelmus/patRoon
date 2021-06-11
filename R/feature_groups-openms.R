@@ -40,6 +40,7 @@ setMethod("initialize", "featureGroupsOpenMS",
 #'
 #' @template refs-openms
 #'
+#' @aliases groupFeaturesOpenMS
 #' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,

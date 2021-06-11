@@ -9,7 +9,7 @@ NULL
 #' Objects from this class are generate with \code{\link{generateTPsLibrary}}. This class is derived from the
 #' \code{\link{transformationProducts}} base class, please see its documentation for more details.
 #'
-#' @param obj,TPs \code{transformationProductsLibrary} object to be accessed
+#' @param TPs \code{transformationProductsLibrary} object to be accessed
 #'
 #' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
 #'   \code{\link{TP-generation}}

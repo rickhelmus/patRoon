@@ -131,6 +131,7 @@ setMethod("show", "featureGroupsScreening", function(object)
 #' @param suspects An optional \code{character} vector with suspect names. If
 #'   specified, only \code{featureGroups} will be kept that are assigned to
 #'   these suspects.
+#' @param drop Ignored.
 #'
 #' @export
 setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
@@ -146,6 +147,7 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
     return(x)
 })
 
+#' @rdname featureGroupsScreening-class
 #' @export
 setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, ...)
 {

@@ -555,7 +555,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always
 #'   calculates similarities with all supported options.
 #'
-#'
+#' @aliases generateComponentsTPs
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,

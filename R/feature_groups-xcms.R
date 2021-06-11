@@ -20,6 +20,7 @@ setMethod("initialize", "featureGroupsXCMS",
 #'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
+#' @aliases groupFeaturesXCMS
 #' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
@@ -152,6 +153,8 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
     return(importFeatureGroupsXCMSFromFeat(xs, analysisInfo, feat))
 }
 
+#' @rdname feature-grouping
+#' @export
 setMethod("delete", "featureGroupsXCMS", function(obj, ...)
 {
     # UNDONE: update individual features somehow too?

@@ -21,6 +21,7 @@ setMethod("initialize", "featureGroupsKPIC2",
 #'
 #' @references \insertRef{Ji2017}{patRoon}
 #'
+#' @aliases groupFeaturesKPIC2
 #' @rdname feature-grouping
 #' @export
 setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
@@ -149,6 +150,8 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
     return(importFeatureGroupsKPIC2FromFeat(picsSetGrouped, analysisInfo, feat))
 }
 
+#' @rdname feature-grouping
+#' @export
 setMethod("delete", "featureGroupsKPIC2", function(obj, ...)
 {
     obj <- callNextMethod()

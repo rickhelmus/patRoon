@@ -75,9 +75,9 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 #' @details \code{findFeaturesKPIC2} uses the
 #'   \href{https://github.com/hcji/KPIC2}{KPIC2} \R package to extract features.
 #'
-#' @param kmeans If \code{TRUE} then \code{\link{getPIC.kmeans}} is used to
-#'   obtain PICs, otherwise it is \code{\link{getPIC}}.
-#' @param level Passed to \code{\link{getPIC}} or \code{\link{getPIC.kmeans}}
+#' @param kmeans If \code{TRUE} then \code{\link[KPIC]{getPIC.kmeans}} is used to
+#'   obtain PICs, otherwise it is \code{\link[KPIC]{getPIC}}.
+#' @param level Passed to \code{\link[KPIC]{getPIC}} or \code{\link[KPIC]{getPIC.kmeans}}
 #'
 #' @references \insertRef{Ji2017}{patRoon}
 #'
@@ -151,7 +151,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
 #'   \pkg{KPIC2} package to a new \code{\link{features}} object.
 #'
 #' @param picsList A \code{list} with a \code{pics} objects obtained with
-#'   \code{\link{getPIC}} or \code{\link{getPIC.kmeans}} for each analysis.
+#'   \code{\link[KPIC]{getPIC}} or \code{\link[KPIC]{getPIC.kmeans}} for each analysis.
 #'
 #' @rdname feature-finding
 #' @export

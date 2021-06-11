@@ -345,6 +345,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     return(ret)
 })
 
+#' @rdname component-generation
+#' @export
 setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ...)
 {
     return(generateComponentsSet(fGroups, generateComponentsNontarget, setIonization = TRUE, ...,

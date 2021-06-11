@@ -666,6 +666,9 @@ NULL
 #' @param fGroups \code{\link{featureGroups}} object for which components should be generated.
 #'
 #'   For \code{generateComponentsTPs}: also see the \code{fGroupsTPs} argument.
+#' @param \dots Any parameters to be passed to the selected component generation algorithm.
+#'   
+#'   For sets workflows: further arguments directly passed to the non-sets method.
 #' @param ionization Which ionization polarity was used to generate the data: should be \code{"positive"} or
 #'   \code{"negative"}.
 #' @param minSize The minimum size of a component. Smaller components than this size will be removed. For
@@ -747,8 +750,34 @@ NULL
 #'
 #'   \code{generateComponentsIntClust} and \code{generateComponentsSpecClust} return objects derived from
 #'   \code{\link{componentsSpecClust}}.
-#'   
+#'
 #'   \code{generateComponentsTPs} returns objects derived from \code{\link{componentsTPs}}.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the componentization data is generated differently
+#'   depending on the used algorithm: \itemize{
+#'
+#'   \item The componentization algorithms that support annotation of adducts/isotopes, \emph{e.g.} \pkg{RAMClustR},
+#'   \pkg{CAMERA} and \command{OpenMS}, first perform componentization for each set independently. This is necessary,
+#'   because \emph{e.g.} adducts are specific to the MS ionization mode that was used. The resulting components are then
+#'   all combined in a \code{\link{componentsSet}} object. Note that the components themselves are never merged. The
+#'   components are renamed to include the set name for which they were generated (\emph{e.g.} \code{"CMP1"} becomes
+#'   \code{"CMP1-positive"}).
+#'
+#'   \item For componentization with \pkg{nontarget} a similar strategy is applied as above. However, the output is
+#'   stored in a \code{\link{componentsNTSet}} object, which supports additional methods such as \code{plotGraph}.
+#'
+#'   \item For the componentization based on hierarchical clustering, \emph{i.e.} the \code{"intclust"} and
+#'   \code{"specclust"} algorithms, the output format is not different than for a non-sets workflow. However, for
+#'   intensity based clustering, normalization of feature intensities occurs per set. For MS/MS based clustering,
+#'   spectral similarities from each sets are combined as is described for the
+#'   \code{\link[=spectrumSimilarity,MSPeakListsSet-method]{spectrumSimilarity}} method for sets workflows.
+#'
+#'   \item For componentization of transformation products, the output class is the same (\code{\link{componentsTPs}}).
+#'   However, the component tables are amended with extra information such as overall/specific set spectrum
+#'   similarities. As sets data is mixed, transformation products are able to be linked with a parent, even if they were
+#'   not measured in the same set.
+#'
+#'   }
 #'
 #' @note For \code{generateComponentsCAMERA} and \code{generateComponentsRAMClustR}: the \code{minSize} and
 #'   \code{relMinReplicates} arguments provide additional filtering functionality not provided by \pkg{CAMERA} or

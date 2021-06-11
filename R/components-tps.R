@@ -580,6 +580,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
                               specSimParams = specSimParams))
 })
 
+#' @rdname component-generation
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,
                                                                 TPs = NULL, MSPeakLists = NULL, formulas = NULL,

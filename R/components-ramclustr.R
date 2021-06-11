@@ -184,6 +184,8 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
     return(ret)
 })
 
+#' @rdname component-generation
+#' @export
 setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, ...)
 {
     generateComponentsSet(fGroups, generateComponentsRAMClustR, setIonization = TRUE, ...)

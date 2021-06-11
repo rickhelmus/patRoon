@@ -569,9 +569,6 @@ setMethod("consensus", "components", function(obj, ...)
 #' @templateVar algos ramclustr,camera,nontarget,intclust,openms,cliquems,specclust,tp
 #' @template generic-algo
 #'
-#' @param ... Any parameters to be passed to the selected component generation
-#'   algorithm.
-#'
 #' @rdname component-generation
 #' @aliases generateComponents
 #' @export

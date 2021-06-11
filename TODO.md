@@ -157,7 +157,7 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
-    - update adduct/ionization params (also suspect screening): can be \code{NULL} if fGroups are annotated/sets
+    - update adduct params for suspect screening
     - references for FC calculation?
     - refer to OrgMassSpecR for cosine MS/MS similarity?
         - now still done in annotateSuspects()
@@ -194,7 +194,6 @@
            mode, the so called \emph{sets workflow} was introduced."
        - "In the future, sets with different chromatographic methods may also be supported, "
     - General
-        - adduct/ionization args cannot be used: automatically set from set annotation data
         - order of sets section
         - dots args
         - docs for generics (eg sets, unset)

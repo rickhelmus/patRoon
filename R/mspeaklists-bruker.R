@@ -143,6 +143,8 @@ setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = 
                        origFGNames = gNames, algorithm = "bruker"))
 })
 
+#' @rdname MSPeakLists-generation
+#' @export
 setMethod("generateMSPeakListsDA", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakListsDA, ...)
@@ -259,6 +261,8 @@ setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIn
                        origFGNames = gNames, algorithm = "Bruker_DataAnalysis_FMF"))
 })
 
+#' @rdname MSPeakLists-generation
+#' @export
 setMethod("generateMSPeakListsDAFMF", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakListsDAFMF, ...)

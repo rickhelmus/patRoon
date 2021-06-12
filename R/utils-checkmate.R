@@ -15,6 +15,17 @@ checkRange <- function(x, null.ok = FALSE)
 }
 assertRange <- checkmate::makeAssertionFunction(checkRange)
 
+assertScoreRange <- function(x, scNames, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, null.ok = TRUE, types = "numeric", .var.name = .var.name, add = add)
+    if (!is.null(x))
+    {
+        checkmate::assertNames(names(x), type = "unique", subset.of = scNames, .var.name = .var.name,
+                               add = add)
+        checkmate::qassertr(x, "N2", .var.name = .var.name)
+    }
+}
+
 checkS4 <- function(x, null.ok = FALSE)
 {
     if (is.null(x))

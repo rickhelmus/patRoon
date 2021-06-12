@@ -133,13 +133,16 @@ setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), id
 #' @export
 setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinIntensity = NULL,
                                          retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
-                                         chromWidthRange = NULL, negate = FALSE)
+                                         chromWidthRange = NULL, qualityRange = NULL, qualScores = TRUE,
+                                         negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity, lower = 0, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(negate, add = ac)
+    aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
+           fixed = list(add = ac))
+    assertScoreRange(qualityRange, if (qualScores) featureScoreNames() else featureQualityNames(), add = ac)
+    aapply(checkmate::assertFlag, . ~ qualScores + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -158,9 +161,17 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
         absIntPred <- if (!negate) function(x) x >= absMinIntensity else function(x) x < absMinIntensity
         relIntPred <- if (!negate) function(x, m) (x / m) >= relMinIntensity else function(x, m) (x / m) < relMinIntensity
         rangePred <- function(x, range) numGTE(x, range[1]) & numLTE(x, range[2])
-
         if (negate)
             rangePred <- Negate(rangePred)
+        scorePred <- function(scTab, qr)
+        {
+            qualsOK <- scTab[, Map(.SD, qr, f = `%inrange%`), by = seq_len(nrow(scTab))]
+            qualsOK <- qualsOK[, -1] # remove dummy by column
+            if (negate)
+                qualsOK[, keep := any(!unlist(.SD)), by = seq_len(nrow(qualsOK))]
+            qualsOK[, keep := all(unlist(.SD)), by = seq_len(nrow(qualsOK))]
+            return(qualsOK$keep)
+        }
 
         obj <- delete(obj, j = function(ft, ...)
         {
@@ -187,6 +198,9 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
             
             if (!is.null(chromWidthRange))
                 ft[keep == TRUE, keep := rangePred(retmax - retmin, chromWidthRange)]
+
+            if (!is.null(qualityRange))
+                ft[keep == TRUE, keep := scorePred(.SD, qualityRange), .SDcols = names(qualityRange)]
             
             return(!ft$keep)
         })

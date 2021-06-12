@@ -230,6 +230,50 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
+featQualityFilter <- function(fGroups, qualityRanges, negate)
+{
+    ftindex <- groupFeatIndex(fGroups)
+    fTable <- featureTable(fGroups)
+    anas <- analyses(fGroups)
+    
+    return(doFGroupsFilter(fGroups, "feature quality", c(qualityRanges, negate), function(fGroups)
+    {
+        pred <- function(finds)
+        {
+            qualsOK <- lapply(seq_along(finds), function(i)
+            {
+                if (finds[i] == 0)
+                    return(rep(FALSE, length(qualityRanges)))
+                qRow <- fTable[[anas[i]]][finds[i], names(qualityRanges), with = FALSE]
+                return(mapply(qRow, qualityRanges, FUN = `%inrange%`))
+            })
+            if (negate)
+                return(sapply(qualsOK, function(qo) all(qo)))
+            return(sapply(qualsOK, function(qo) any(!qo)))
+        }
+        
+        delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                              names(fGroups))
+        delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
+        return(delete(fGroups, j = delGroups))
+    }, "feat_quality"))
+}
+
+groupQualityFilter <- function(fGroups, qualityRanges, doScores, negate)
+{
+    return(doFGroupsFilter(fGroups, "group quality", c(qualityRanges, doScores, negate), function(fGroups)
+    {
+        pred <- function(q, qr) q %inrange% qr
+        if (negate)
+            pred <- Negate(pred)
+        tab <- copy(if (doScores) groupScores(fGroups) else groupQualities(fGroups))
+        checkHow <- if (negate) any else all
+        tab[, keep := checkHow(mapply(.SD, qualityRanges, FUN = pred)), by = seq_len(nrow(tab)),
+            .SDcols = names(qualityRanges)]
+        return(fGroups[, tab[keep == TRUE]$group])
+    }, "group_quality"))
+}
+
 checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 {
     return(doFGroupsFilter(fGroups, "checked features session", c(makeFileHash(checkFeaturesSession), negate), function(fGroups)
@@ -344,7 +388,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
-                                              chromWidthRange = NULL, rGroups = NULL, removeBlanks = FALSE,
+                                              chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
+                                              qualScores = TRUE, rGroups = NULL, removeBlanks = FALSE,
                                               checkFeaturesSession = NULL, negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
@@ -356,9 +401,14 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateIntRSD +
                blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
+    aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
+           fixed = list(add = ac))
+    fqNames <- if (qualScores) featureScoreNames() else featureQualityNames()
+    aapply(assertScoreRange, . ~ featQualityRange + groupQualityRange,
+           list(fqNames, c(fqNames, if (qualScores) featureGroupScoreNames() else featureGroupQualityNames())),
+                fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ qualScores + removeBlanks + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -382,6 +432,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(retentionMzFilter, mzRange, otherArgs = list(what = "mz"))
     obj <- maybeDoFilter(retentionMzFilter, mzDefectRange, otherArgs = list(what = "mzDefect"))
     obj <- maybeDoFilter(chromWidthFilter, chromWidthRange)
+    obj <- maybeDoFilter(featQualityFilter, featQualityRange)
+    obj <- maybeDoFilter(groupQualityFilter, groupQualityRange, otherArgs = list(doScores = qualScores))
 
     # replicate round #1
     obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)

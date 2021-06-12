@@ -275,13 +275,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
            null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
-    if (!is.null(scoreLimits))
-    {
-        scCols <- annScoreNames(obj, FALSE)
-        checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
-        checkmate::qassertr(scoreLimits, "N2")
-    }
+    assertScoreRange(scoreLimits, annScoreNames(obj, FALSE), add = ac)
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))

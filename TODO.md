@@ -21,7 +21,6 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - misc
     - topMostByRGroup: make default? or only for reporting?
-    - quality/score filters
     - updatePICSet(): also sync peaks list? otherwise doc
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
@@ -143,7 +142,7 @@
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
     - peak qualities
-        - filter (once implemented)
+        - filter (features/fGroups)
     - as.data.table: normalization?
     - plotInt sets arg?
 - components: somehow verify adductConflictsUsePref
@@ -153,6 +152,7 @@
 ## docs
 
 - ref docs
+    - quality/score filters
     - delete()
         - mention j=DT for fGroups method?
     - parallelize args

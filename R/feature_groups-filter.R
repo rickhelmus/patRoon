@@ -194,7 +194,6 @@ chromWidthFilter <- function(fGroups, range, negate)
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anas <- analyses(fGroups)
-    gNames <- names(fGroups)
 
     return(doFGroupsFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
     {
@@ -252,6 +251,8 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
                 return(if (negate) !anaRm else anaRm)
             })
         }
+        
+        return(fGroups)
     }, "checkedFeatures"))
 }
 

@@ -259,18 +259,30 @@ featQualityFilter <- function(fGroups, qualityRanges, negate)
     }, "feat_quality"))
 }
 
-groupQualityFilter <- function(fGroups, qualityRanges, doScores, negate)
+groupQualityFilter <- function(fGroups, qualityRanges, negate)
 {
-    return(doFGroupsFilter(fGroups, "group quality", c(qualityRanges, doScores, negate), function(fGroups)
+    qRanges <- qualityRanges[names(qualityRanges) %in% featureQualityNames()]
+    qRangesScore <- qualityRanges[names(qualityRanges) %in% featureQualityNames(scores = TRUE)]
+    
+    return(doFGroupsFilter(fGroups, "group quality", c(qualityRanges, negate), function(fGroups)
     {
         pred <- function(q, qr) q %inrange% qr
         if (negate)
             pred <- Negate(pred)
-        tab <- copy(if (doScores) groupScores(fGroups) else groupQualities(fGroups))
         checkHow <- if (negate) any else all
-        tab[, keep := checkHow(mapply(.SD, qualityRanges, FUN = pred)), by = seq_len(nrow(tab)),
-            .SDcols = names(qualityRanges)]
-        return(fGroups[, tab[keep == TRUE]$group])
+        
+        doF <- function(fg, qr, tab)
+        {
+            tab <- copy(tab)
+            tab[, keep := checkHow(mapply(.SD, qr, FUN = pred)), by = seq_len(nrow(tab)), .SDcols = names(qr)]
+            return(fg[, tab[keep == TRUE]$group])
+        }
+        
+        if (length(qRanges) > 0)
+            fGroups <- doF(fGroups, qRanges, groupQualities(fGroups))
+        if (length(qRangesScore) > 0)
+            fGroups <- doF(fGroups, qRangesScore, groupScores(fGroups))
+        return(fGroups)
     }, "group_quality"))
 }
 
@@ -389,8 +401,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              qualScores = TRUE, rGroups = NULL, removeBlanks = FALSE,
-                                              checkFeaturesSession = NULL, negate = FALSE)
+                                              rGroups = NULL, removeBlanks = FALSE, checkFeaturesSession = NULL,
+                                              negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -403,12 +415,11 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
-    fqNames <- if (qualScores) featureScoreNames() else featureQualityNames()
     aapply(assertScoreRange, . ~ featQualityRange + groupQualityRange,
-           list(fqNames, c(fqNames, if (qualScores) featureGroupScoreNames() else featureGroupQualityNames())),
-                fixed = list(add = ac))
+           list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
+                c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ qualScores + removeBlanks + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -433,7 +444,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(retentionMzFilter, mzDefectRange, otherArgs = list(what = "mzDefect"))
     obj <- maybeDoFilter(chromWidthFilter, chromWidthRange)
     obj <- maybeDoFilter(featQualityFilter, featQualityRange)
-    obj <- maybeDoFilter(groupQualityFilter, groupQualityRange, otherArgs = list(doScores = qualScores))
+    obj <- maybeDoFilter(groupQualityFilter, groupQualityRange)
 
     # replicate round #1
     obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)

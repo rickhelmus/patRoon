@@ -133,15 +133,15 @@ setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), id
 #' @export
 setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinIntensity = NULL,
                                          retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
-                                         chromWidthRange = NULL, qualityRange = NULL, qualScores = TRUE,
-                                         negate = FALSE)
+                                         chromWidthRange = NULL, qualityRange = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity, lower = 0, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
-    assertScoreRange(qualityRange, if (qualScores) featureScoreNames() else featureQualityNames(), add = ac)
+    assertScoreRange(qualityRange, c(featureQualityNames(group = FALSE),
+                                     featureQualityNames(group = FALSE, scores = TRUE)), add = ac)
     aapply(checkmate::assertFlag, . ~ qualScores + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -319,8 +319,8 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
     featQualities <- featureQualities()
-    featQualityNames <- featureQualityNames()
-    featScoreNames <- featureScoreNames()
+    featQualityNames <- featureQualityNames(group = FALSE)
+    featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",

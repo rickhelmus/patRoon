@@ -18,11 +18,14 @@ anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "stan
 fListConc <- getTestFeatures(anaInfoConc)
 fgOpenMSConc <- groupFeatures(fListConc, "openms")
 
+fgOpenMSQ <- calculatePeakQualities(fgOpenMS)
+
 fListEmpty <- getEmptyFeatures()
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 fgKPIC2Empty <- groupFeatures(fListEmpty, "kpic2")
+fgOpenMSEmptyQ <- calculatePeakQualities(fgOpenMSEmpty)
 
 test_that("verify feature grouping output", {
     expect_known_value(groupTable(fgOpenMS), testFile("fg-openms"))
@@ -39,6 +42,7 @@ test_that("verify feature grouping output", {
     expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
     expect_known_value(groupTable(fgSIRIUS), testFile("fg-sirius"))
+    expect_known_value(groupTable(fgOpenMSQ), testFile("fg-openms-qual"))
 })
 
 test_that("verify show output", {
@@ -47,6 +51,7 @@ test_that("verify show output", {
     expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
     expect_known_show(fgKPIC2, testFile("fg-show-kpic2", text = TRUE))
     expect_known_show(fgSIRIUS, testFile("fg-show-sirius", text = TRUE))
+    expect_known_show(fgOpenMSQ, testFile("fg-show-openms-qual", text = TRUE))
 })
 
 test_that("empty objects work", {
@@ -54,6 +59,7 @@ test_that("empty objects work", {
     expect_length(fgXCMSEmpty, 0)
     expect_length(fgXCMS3Empty, 0)
     expect_length(fgKPIC2Empty, 0)
+    expect_length(fgOpenMSEmptyQ, 0)
 })
 
 if (!testWithSets())
@@ -202,10 +208,19 @@ test_that("as.data.table works", {
     checkmate::expect_names(names(fctbl), must.include = c("FC", "FC_log", "PV", "PV_log", "classification"))
     checkmate::expect_subset(fctbl$classification, c("insignificant", "FC", "increase", "decrease", "significant"))
 
+    expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMSQ, qualities = FALSE)) # nothing extra reported
+    expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMS, qualities = "both")) # nothing to report
+    checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "quality")), must.include = featureQualityNames())
+    checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "score")),
+                            must.include = featureQualityNames(scores = TRUE))
+    checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "both")),
+                            must.include = c(featureQualityNames(), featureQualityNames(scores = TRUE)))
+    
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, FCParams = FCParams)), 0)
+    expect_equal(nrow(as.data.table(fgOpenMSEmptyQ, qualities = "both")), 0)
 })
 
 test_that("unique works", {
@@ -243,6 +258,15 @@ featCounts <- function(fg, rel)
 }
 
 stdRGs <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
+
+qr <- list(ZigZag = c(0.2, 0.6), TPASRScore = c(0.5, 0.9))
+fgOpenMSQFF <- filter(fgOpenMSQ, featQualityRange = qr)
+fgOpenMSQFFTab <- as.data.table(fgOpenMSQFF, features = TRUE, qualities = "both")
+fgOpenMSQFG <- filter(fgOpenMSQ, groupQualityRange = qr)
+fgOpenMSQFFN <- filter(fgOpenMSQ, featQualityRange = qr, negate = TRUE)
+fgOpenMSQFFTabN <- as.data.table(fgOpenMSQFFN, features = TRUE, qualities = "both")
+fgOpenMSQFGN <- filter(fgOpenMSQ, groupQualityRange = qr, negate = TRUE)
+
 test_that("delete and filter", {
     checkmate::expect_names(analyses(delete(fgOpenMS, i = 1)), disjunct.from = analyses(fgOpenMS)[1])
     checkmate::expect_names(analyses(delete(fgOpenMS, i = analyses(fgOpenMS)[1])), disjunct.from = analyses(fgOpenMS)[1])
@@ -279,6 +303,18 @@ test_that("delete and filter", {
     expect_gte(min(featCounts(filter(fgOpenMS, relMinFeatures = 0.3), TRUE)), 0.3)
     expect_gte(min(featCounts(filter(fgOpenMS, absMinFeatures = length(fgOpenMS) * 0.3), FALSE)),
                length(fgOpenMS) * 0.3)
+    
+    expect_range(fgOpenMSQFFTab[[names(qr)[1]]], qr[[1]])
+    expect_range(fgOpenMSQFFTab[[names(qr)[2]]], qr[[2]])
+    expect_true(all(fgOpenMSQFFTabN[[names(qr)[1]]] < qr[[c(1, 1)]] | fgOpenMSQFFTabN[[names(qr)[1]]] > qr[[c(1, 2)]]))
+    expect_true(all(fgOpenMSQFFTabN[[names(qr)[2]]] < qr[[c(2, 1)]] | fgOpenMSQFFTabN[[names(qr)[2]]] > qr[[c(2, 2)]]))
+    
+    expect_range(groupQualities(fgOpenMSQFG)[[names(qr)[1]]], qr[[1]])
+    expect_range(groupScores(fgOpenMSQFG)[[names(qr)[2]]], qr[[2]])
+    expect_true(all(groupQualities(fgOpenMSQFGN)[[names(qr)[1]]] < qr[[c(1, 1)]] |
+                        groupQualities(fgOpenMSQFGN)[[names(qr)[1]]] > qr[[c(1, 2)]]))
+    expect_true(all(groupScores(fgOpenMSQFGN)[[names(qr)[2]]] < qr[[c(2, 1)]] |
+                        groupScores(fgOpenMSQFGN)[[names(qr)[2]]] > qr[[c(2, 2)]]))
 
     expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinAnalyses = 3), testFile("fgf-minana-abs", text = TRUE))

@@ -34,7 +34,7 @@ hiddenCols <- integer()
 if (hasFGroupScores(rmdVars$fGroups))
 {
     setnames(table, "totalScore", "Total score")
-    otherSc <- c(featureScoreNames(), featureGroupScoreNames())
+    otherSc <- featureQualityNames(scores = TRUE, totScore = FALSE)
     bts <- c(bts, list(list(text = "Total score", action = buttonFunc("Total score")),
                        list(text = "Other scores", action = buttonFunc(otherSc))))
     hiddenCols <- match(otherSc, names(table))

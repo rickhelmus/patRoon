@@ -30,8 +30,6 @@ featureQualities <- function()
          TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
          ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
 }
-featureQualityNames <- function() names(featureQualities())
-featureScoreNames <- function() paste0(featureQualityNames(), "Score")
 
 featureGroupQualities <- function()
 {
@@ -40,8 +38,22 @@ featureGroupQualities <- function()
         RetentionTimeConsistency = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
     )
 }
-featureGroupQualityNames <- function() names(featureGroupQualities())
-featureGroupScoreNames <- function() paste0(featureGroupQualityNames(), "Score")
+
+featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
+{
+    ret <- character()
+    if (feat)
+        ret <- names(featureQualities())
+    if (group)
+        ret <- c(ret, names(featureGroupQualities()))
+    if (scores)
+    {
+        ret <- paste0(ret, "Score")
+        if (totScore)
+            ret <- c(ret, "totalScore")
+    }
+    return(ret)
+}
 
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)

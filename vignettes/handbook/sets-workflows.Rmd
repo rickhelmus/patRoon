@@ -32,7 +32,7 @@ Converting this to a _sets workflow_:
 anaInfoPos <- patRoonData::exampleAnalysisInfo("positive")
 anaInfoNeg <- patRoonData::exampleAnalysisInfo("negative")
 fListPos <- findFeatures(anaInfoPos, "openms")
-fListNeg <- findFeatures(anaInfoPos, "openms")
+fListNeg <- findFeatures(anaInfoNeg, "openms")
 fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
 
 fGroups <- groupFeatures(fList, "openms")
@@ -56,6 +56,8 @@ This workflow will do all the steps for positive _and_ negative data. Only a few
 The key principle to make sets workflows work is performed by `makeSet`. This method function takes different `features` objects (or `featureGroups`, as discussed later) to combine the feature data across sets. During this step features are _neutralized_: the feature _m/z_ data is converted to neutral feature masses. This step ensures that when features are grouped with `groupFeatures`, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.
 
 The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use [adduct annotations] for neutralization; this is discussed later.
+
+> **NOTE** The [newProject tool](#newProject) can also be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
 
 ## Generating sets workflow data
 
@@ -134,8 +136,13 @@ TBD when selectIons/adducts() section is in place for regular workflows.
 UNDONE
 
 * make code active
+* link refs
 
-All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter] is also applicable to a sets workflow.
+All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter] (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the `as.data.table()` method can be used for general inspection:
+
+```{r setsProcData,eval=FALSE}
+as.data.table(compounds)
+```
 
 In addition, some the data processing functionality contains additional functionality for a sets workflow:
 
@@ -151,20 +158,25 @@ fGroupsOnlyPos <- unique(fGroups, which = "positive", sets = TRUE)
 
 plotVenn(fGroups, sets = TRUE) # compare positive/negative features
 
+# mirror plot
+plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists)
+
 ```
+
+The reference manual for the workflow objects contains specific notes applicable to sets workflows (`?featureGroups`, `?compounds` etc).
 
 ## Advanced
 
 ### Initiating a sets workflow from feature groups
 
-The `makeSet` function also be used to initiate a sets workflow from feature groups:
+The `makeSet` function can also be used to initiate a sets workflow from feature groups:
 
 ```{r initSetFG,eval=FALSE}
 # as before ...
 anaInfoPos <- patRoonData::exampleAnalysisInfo("positive")
 anaInfoNeg <- patRoonData::exampleAnalysisInfo("negative")
 fListPos <- findFeatures(anaInfoPos, "openms")
-fListNeg <- findFeatures(anaInfoPos, "openms")
+fListNeg <- findFeatures(anaInfoNeg, "openms")
 
 fGroupsPos <- groupFeatures(fListPos, "openms")
 fGroupsNeg <- groupFeatures(fListNeg, "openms")
@@ -175,7 +187,7 @@ fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms", adducts = c("[M
 
 ```
 
-In this case `makeSet` combines the positive and negative features, neutralizes them and re-groups them all together (with the algorithm specified by `groupAlgo`).
+In this case `makeSet` combines the positive and negative (un-grouped) features, neutralizes them and re-groups them all together (with the algorithm specified by `groupAlgo`).
 
 While this option involves some extra steps, an advantage is that allows processing the feature data before they are combined, e.g.:
 
@@ -191,6 +203,14 @@ fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms", adducts = c("[M
 
 ```
 
-### Inspecting set objects
+### Inspecting and converting set objects
 
-### Conversion to regular workflows
+The following generic functions may be used to inspect or convert data from sets workflows:
+
+Generic      | Purpose                               | Notes
+------------ | ------------------------------------- | ---------------------------------------
+`sets`       | Return the names of the sets in this object.
+`setObjects` | Obtain the raw data objects that were used to construct this object. | Not available for features and feature groups.
+`unset`      | Converts this object to a regular workflow object. | The `set` argument must be given to specify which of the set data is to be converted.
+
+These methods are heavily used internally, but rarely needed otherwise. More details can be found in the reference manual.

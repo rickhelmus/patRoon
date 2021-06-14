@@ -85,7 +85,7 @@ generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
 
 Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.
 
-### Automatic project generation with newProject()
+### Automatic project generation with newProject() {#newProject}
 
 The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducible research).
 

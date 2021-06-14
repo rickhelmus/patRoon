@@ -9,22 +9,20 @@ knitr::opts_chunk$set(
 
 source(file.path(vignDir, "shared", "init.R"))
 
-runData <- F
-doOpt <- runData
+runData <- T
+doOpt <- F
 if (runData)
 {
     # try to sync with tutorial so cache can be re-used
-    anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                    groups = c(rep("solvent", 3), rep("standard", 3)),
-                                    blanks = "solvent")
-    anaInfoRG <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                      groups = c(rep("repl1", 2),
-                                                 rep("repl2", 2),
-                                                 rep("repl3", 1),
-                                                 rep("repl4", 1)))
-    
+    anaInfo <- patRoonData::exampleAnalysisInfo()
+    anaInfoRG <- anaInfo
+    anaInfoRG$group <- c(rep("repl1", 2),
+                         rep("repl2", 2),
+                         rep("repl3", 1),
+                         rep("repl4", 1))
+
     # set max proc to 1 to limit FFM memory usage a bit on CI
-    getFeats <- function(ai) withr::with_options(list(patRoon.multiproc.max = 1), findFeatures(ai, "openms"))
+    getFeats <- function(ai) withr::with_options(list(patRoon.multiproc.max = 1), findFeatures(ai, "openms", noiseThrInt = 2E4))
     
     fList <- getFeats(anaInfo)
     fGroups <- fGroupsUF <- groupFeatures(fList, "openms")
@@ -48,15 +46,16 @@ if (runData)
                           blankThreshold = 5, removeBlanks = TRUE,
                           retentionRange = c(120, Inf), mzRange = NULL)
     
-    fGroupsAnn <- fGroups[, 1:5]    
+    fGroupsAnn <- screenSuspects(fGroups, patRoonData::suspectsPos[patRoonData::suspectsPos$name %in% c("1H-benzotriazole", "N-Phenyl urea",
+                                                                                                        "2-Hydroxyquinoline", "DEET"), ], onlyHits = TRUE)
     avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
     mslists <- generateMSPeakLists(fGroupsAnn, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
                                    avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
     mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
-    formulas <- formsGF <- generateFormulas(fGroupsAnn, "genform", mslists, relMzDev = 5,
+    formulas <- formsGF <- generateFormulas(fGroupsAnn, mslists, "genform", relMzDev = 5,
                                             adduct = "[M+H]+", elements = "CHNOPSCl",
                                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
-    formsSIR <- generateFormulas(fGroupsAnn, "sirius", mslists, elements = "CHNOPSCl",
+    formsSIR <- generateFormulas(fGroupsAnn, mslists, "sirius", elements = "CHNOPSCl", adduct = "[M+H]+",
                                  calculateFeatures = FALSE)
 
     compsMF <- compounds <-
@@ -66,7 +65,7 @@ if (runData)
     
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
     componInt <- generateComponents(fGroupsRG, "intclust")
-    componNT <- generateComponents(fGroupsUF, "nontarget", extraOpts = list(minlength=3), ionization = "positive")
+    componNT <- generateComponents(fGroupsUF[, 1:200], "nontarget", minlength = 3, ionization = "positive")
     
     compsClust <- makeHCluster(compsMF)
     
@@ -74,15 +73,15 @@ if (runData)
     {
         pSet <- generateFeatureOptPSet("openms")
         ftOpt <- optimizeFeatureFinding(anaInfo[1, ], "openms", pSet, maxIterations = 2,
-                                        paramRanges = list(noiseThrInt = c(500, Inf)))
+                                        paramRanges = list(noiseThrInt = c(1500, Inf)))
     }
     
-    # saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
-    #              fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
-    #              compsSIR = compsSIR, componCAM = componCAM, componInt = componInt, componNT = componNT,
-    #              compsClust = compsClust,
-    #              ftOpt = ftOpt),
-    #         "~/handbook-obj.Rds")
+    saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
+                 fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
+                 componCAM = componCAM, componInt = componInt, componNT = componNT,
+                 compsClust = compsClust,
+                 ftOpt = if (doOpt) ftOpt else NULL),
+            "~/handbook-obj.Rds")
 }
 ```
 

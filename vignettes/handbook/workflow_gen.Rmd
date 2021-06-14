@@ -197,7 +197,7 @@ After features have been grouped a so called suspect screening step may be perfo
 
 
 ```{r suspmz,eval=FALSE}
-suspects <- data.frame(name = c("1H-benzotriazole", "phenyl urea", "2-quinolol"),
+suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
                        mz = c(120.0556, 137.0709, 146.0600))
 fGroupsSusp <- screenSuspects(fGroups, suspects)
 ```
@@ -213,7 +213,7 @@ This example has a very simple suspect list with just three compounds. The forma
 Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the `SMILES`/`InChI`/`formula`/`neutralMass` columns should be provided. Whenever possible, it is _strongly_ recommended to fill in `SMILES` column (or `InChI`), as this will assist [annotation](#suspAnn). Applying this to the above example:
 
 ```{r suspSMI,eval=runData}
-suspects <- data.frame(name = c("1H-benzotriazole", "phenyl urea", "2-quinolol"),
+suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "Oc1ccc2ccccc2n1"))
 fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
 ```
@@ -222,7 +222,7 @@ Note that it is now necessary to specify the adduct, as this information is requ
 
 ```{r susp,eval=FALSE}
 # TBA is measured as positive molecular ion.
-suspects <- data.frame(name = c("1H-benzotriazole", "phenyl urea", "TBA"),
+suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "TBA"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "CCCC[N+](CCCC)(CCCC)CCCC"),
                        adduct = c("[M+H]+", "[M+H]+", "[M]+"))
 fGroupsSusp <- screenSuspects(fGroups, suspects)
@@ -241,7 +241,7 @@ The advantage of removing non-hits is that it may significantly reduce the compl
 The `fragments_mz` and `fragments_formula` columns in the suspect list can be used to specify known fragments for a suspect, which can help [suspect annotation](#suspAnn). The former specifies the ionized _m/z_ of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:
 
 ```{r suspFrags,eval=FALSE}
-suspects <- data.frame(name = c("1H-benzotriazole", "phenyl urea", "2-quinolol"),
+suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "Oc1ccc2ccccc2n1"),
                        fragments_formula = c("C6H6N", "C6H8N;C7H6NO", ""),
                        fragments_mz = c("", "", "118.0652"))

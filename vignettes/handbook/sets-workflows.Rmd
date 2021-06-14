@@ -159,7 +159,7 @@ fGroupsOnlyPos <- unique(fGroups, which = "positive", sets = TRUE)
 plotVenn(fGroups, sets = TRUE) # compare positive/negative features
 
 # mirror plot
-plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists)
+plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists)
 
 ```
 

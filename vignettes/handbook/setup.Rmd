@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 
 source(file.path(vignDir, "shared", "init.R"))
 
-runData <- TRUE
+runData <- F
 doOpt <- runData
 if (runData)
 {

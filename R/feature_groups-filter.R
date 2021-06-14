@@ -248,7 +248,7 @@ featQualityFilter <- function(fGroups, qualityRanges, negate)
                 return(mapply(qRow, qualityRanges, FUN = `%inrange%`))
             })
             if (negate)
-                return(sapply(qualsOK, function(qo) all(qo)))
+                return(sapply(qualsOK, function(qo) any(qo)))
             return(sapply(qualsOK, function(qo) any(!qo)))
         }
         

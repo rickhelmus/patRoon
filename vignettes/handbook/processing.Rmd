@@ -28,17 +28,17 @@ The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for
 fList[["standard-1"]][, 1:6]
 
 # Feature group intensities
-fGroups$M120_R328_81
-fGroups[[1, "M120_R328_81"]] # only first analysis
+fGroups$M120_R268_30
+fGroups[[1, "M120_R268_30"]] # only first analysis
 
 # obtains list MS/MS peak list  (feature group averaged datas)
-mslists[["M120_R328_81"]]$MSMS
+mslists[["M120_R268_30"]]$MSMS
 
 # get all formula candidates for a feature group
-formulas[["M120_R328_81"]][, 1:7]
+formulas[["M120_R268_30"]][, 1:7]
 
 # get all compound candidates for a feature group
-compounds[["M120_R328_81"]][, 1:4]
+compounds[["M120_R268_30"]][, 1:4]
 
 # get a table with information of a component
 components[["CMP7"]][, 1:6]
@@ -62,7 +62,7 @@ as.data.table(fGroups, average = TRUE) # average intensities for replicates
 # As above, but with extra suspect screening information
 # (select some columns to simplify the output below)
 as.data.table(fGroupsSusp, average = TRUE, collapseSuspects = NULL,
-              onlyHits = TRUE)[1:3, c("group", "name", "suspCompRank", "annSimBoth", "estIDLevel")]
+              onlyHits = TRUE)[1:3, c("group", "susp_name", "susp_compRank", "susp_annSimBoth", "susp_estIDLevel")]
 
 # Returns all peak lists for each feature group
 as.data.table(mslists)
@@ -81,12 +81,12 @@ as.data.table(components)[, 1:6]
 Finally, the `annotatedPeakList()` function is useful to inspect annotation results for a formula or compound candidate:
 
 ```{r annPList,eval=runData}
-# formula annotations for for a formula candidate of feature group M120_R328_81
-annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+# formula annotations for the first formula candidate of feature group M120_R268_30
+annotatedPeakList(formulas, index = 1, groupName = "M120_R268_30",
                   MSPeakLists = mslists)
 
-# compound annotation for first candidate of feature group M120_R328_81
-annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
+# compound annotation for first candidate of feature group M120_R268_30
+annotatedPeakList(compounds, index = 1, groupName = "M120_R268_30",
                   MSPeakLists = mslists)
 ```
 
@@ -97,8 +97,8 @@ More advanced examples for these functions are shown below.
 ```{r inspEx,eval=FALSE}
 # Feature table, can also be accessed by numeric index
 fList[[1]]
-mslists[["standard-1", "M120_R328_81"]] # feature data (instead of feature group averaged)
-formulas[[1, "M120_R328_81"]] # feature data (if available, i.e. calculateFeatures=TRUE)
+mslists[["standard-1", "M120_R268_30"]] # feature data (instead of feature group averaged)
+formulas[[1, "M120_R268_30"]] # feature data (if available, i.e. calculateFeatures=TRUE)
 components[["CMP1", 1]] # only for first feature group in component
 
 as.data.frame(fList) # classic data.frame format, works for all objects
@@ -117,9 +117,9 @@ as.data.table(formulas, OM = TRUE)
 as.data.table(compounds, fGroups = fGroups) # add feature group informaion
 as.data.table(compounds, fragments = TRUE) # include information of all annotated fragments
 
-annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+annotatedPeakList(formulas, index = 1, groupName = "M120_R268_30",
                   MSPeakLists = mslists, onlyAnnotated = TRUE) # only include annotated peaks
-annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
+annotatedPeakList(compounds, index = 1, groupName = "M120_R268_30",
                   MSPeakLists = mslists, formulas = formulas) # include formula annotations
 ```
 
@@ -424,7 +424,7 @@ In addition, feature groups can also be subset by given replicate groups (simila
 # equal as filter(fGroups, rGroups = ...)
 fGroups[, rGroups = c("repl1", "repl2")]
 # only keep feature groups assigned to given suspects
-fGroupsSusp[, suspects = c("1H-benzotriazole", "2-quinolol")]
+fGroupsSusp[, suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
 ```
 
 ### Prioritization workflow
@@ -547,9 +547,9 @@ The `plotStructure()` function will draw a chemical structure for a compound can
 
 ```{r plotStruct,eval=runData,out.width="25%",fig.show="hold"}
 # structure for first candidate
-plotStructure(compounds, index = 1, groupName = "M120_R328_81")
+plotStructure(compounds, index = 1, groupName = "M120_R268_30")
 # MCS for first three candidates
-plotStructure(compounds, index = 1:3, groupName = "M120_R328_81")
+plotStructure(compounds, index = 1:3, groupName = "M120_R268_30")
 ```
 
 Some other common and less common plotting operations are shown below.
@@ -570,16 +570,16 @@ plotChroms(fGroups[, 1], # only plot all features of first group
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 
 
-plotSpectrum(mslists, "M120_R328_81") # non-annotated MS spectrum
-plotSpectrum(mslists, "M120_R328_81", MSLevel = 2) # non-annotated MS/MS spectrum
+plotSpectrum(mslists, "M120_R268_30") # non-annotated MS spectrum
+plotSpectrum(mslists, "M120_R268_30", MSLevel = 2) # non-annotated MS/MS spectrum
 # formula annotated spectrum
-plotSpectrum(formulas, precursor = "C6H8N2", groupName = "M120_R328_81",
+plotSpectrum(formulas, index = 1, groupName = "M120_R268_30",
              MSPeakLists = mslists)
 # compound annotated spectrum, with added formula annotations
-plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists,
              formulas = formulas)
 # custom intensity range (e.g. to zoom in)
-plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists,
              ylim = c(0, 5000), plotStruct = FALSE)
 plotSpectrum(components, index = 7) # component spectrum
 ```
@@ -643,7 +643,7 @@ Generic             | Classes                                  | Remarks
 
 ```{r plotClust,eval=runData}
 plot(componInt) # dendrogram
-plot(compsClust, groupName = "M120_R328_81") # dendrogram for clustered compounds
+plot(compsClust, groupName = "M120_R268_30") # dendrogram for clustered compounds
 plotInt(componInt, index = 4) # intensities of 4th cluster
 ```
 

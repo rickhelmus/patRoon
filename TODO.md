@@ -58,7 +58,7 @@
     - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
     - OpenMS: handle potentialAdducts per set
     - prefAdducts: also include eg Na by default?
-
+- plotGraph doesn't show hoveovers anymore?
 
 ## sets
 
@@ -181,6 +181,13 @@
                     - before/after makeSet
                     - adducts()<-
                         - show example with reGroup=FALSE
+    - update
+        - suspect screening
+            - adducts
+            - TBA --> Aldicarb
+        - annotation
+            - as.data.table args
+            - annotatedPeakList: more interesting results (or improve BTA?)
 - progressr
 - annotation
     - generateFormulas: MSPeakLists argument
@@ -196,6 +203,7 @@
 - TPs
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?
+- fGroupsComparison doesn't work with sets yet
     
 
 ## NEWS

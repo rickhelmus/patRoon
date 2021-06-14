@@ -7,7 +7,7 @@ Workflow step         | Function                                          | Outp
 Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
 Finding features      | `findFeatures()`                                  | `features`
 Grouping features     | `groupFeatures()`                                 | `featureGroups`
-Suspect screening     | `screenSuspects()`                                | `featureGroups` 
+Suspect screening     | `screenSuspects()`                                | `featureGroupsScreening` 
 MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
 Formula annotation    | `generateFormulas()`                              | `formulas`
 Compound annotation   | `generateCompounds()`                             | `compounds`

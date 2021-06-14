@@ -21,7 +21,11 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
+ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
+
 ffEmpty <- getTestFeatures(anaInfoOne, noiseThrInt = 1E9)
+ffEmptyQ <- calculatePeakQualities(ffEmpty)
+
 
 if (doDATests())
 {
@@ -43,6 +47,8 @@ test_that("verify feature finder output", {
     expect_known_value(featureTable(ffKPIC2), testFile("ff-kpic2"))
     expect_known_value(featureTable(ffSIRIUS), testFile("ff-sirius"))
     
+    expect_known_value(featureTable(ffOpenMSQ), testFile("ff-openms-qual"))
+    
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),
                  OpenMSFTable(getTestFeatures(anaInfo,
@@ -60,6 +66,8 @@ test_that("verify show output", {
     expect_known_show(ffKPIC2, testFile("ff-show-kpic2", text = TRUE))
     expect_known_show(ffSIRIUS, testFile("ff-show-sirius", text = TRUE))
 
+    expect_known_show(ffOpenMSQ, testFile("ff-show-openms-qual", text = TRUE))
+    
     skip_if_not(doDATests())
     expect_known_show(ffDA, testFile("ff-DA", text = TRUE))
 })
@@ -68,6 +76,7 @@ test_that("verify empty object can be generated", {
     expect_length(ffEmpty, 0)
     expect_length(suppressWarnings(findFeatures(anaInfoOne, "xcms", noise = 1E9)), 0)
     expect_length(findFeatures(epAnaInfo, "envipick", minint = 1E8, maxint = 1E9, minpeak = 100), 0) # add minpeak to speed-up
+    expect_length(ffEmptyQ, 0)
 
     skip_if_not(doDATests())
     expect_length(ffDAEmpty, 0)
@@ -85,6 +94,12 @@ test_that("basic subsetting", {
     expect_equivalent(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
     expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
 })
+
+qr <- list(ZigZag = c(0.2, 0.6), TPASRScore = c(0.5, 0.9))
+ffOpenMSQF <- filter(ffOpenMSQ, qualityRange = qr)
+ffOpenMSQFTab <- as.data.table(ffOpenMSQF)
+ffOpenMSQFN <- filter(ffOpenMSQ, qualityRange = qr, negate = TRUE)
+ffOpenMSQFNTab <- as.data.table(ffOpenMSQFN)
 
 test_that("delete and filter", {
     checkmate::expect_names(analyses(delete(ffOpenMS, i = 1)), disjunct.from = analyses(ffOpenMS)[1])
@@ -112,6 +127,11 @@ test_that("delete and filter", {
     expect_lt(length(filter(ffOpenMS, chromWidthRange = c(0, 30))), length(ffOpenMS))
     expect_equivalent(filter(ffOpenMS, chromWidthRange = c(0, Inf)), ffOpenMS)
 
+    expect_range(ffOpenMSQFTab[[names(qr)[1]]], qr[[1]])
+    expect_range(ffOpenMSQFTab[[names(qr)[2]]], qr[[2]])
+    expect_true(all(ffOpenMSQFNTab[[names(qr)[1]]] < qr[[c(1, 1)]] | ffOpenMSQFNTab[[names(qr)[1]]] > qr[[c(1, 2)]]))
+    expect_true(all(ffOpenMSQFNTab[[names(qr)[2]]] < qr[[c(2, 1)]] | ffOpenMSQFNTab[[names(qr)[2]]] > qr[[c(2, 2)]]))
+    
     expect_known_output(filter(ffOpenMS, absMinIntensity = 500, retentionRange = c(120, Inf),
                                mzRange = c(100, 400)),
                         testFile("ff-combi", text = TRUE))
@@ -124,6 +144,9 @@ test_that("delete and filter", {
 
 test_that("basic usage", {
     expect_equal(nrow(as.data.table(ffOpenMS)), length(ffOpenMS))
+    checkmate::expect_names(names(as.data.table(ffOpenMSQ)),
+                                  must.include = c(featureQualityNames(group = FALSE),
+                                                   featureQualityNames(group = FALSE, scores = TRUE)))
 })
 
 XCMSImpXCMS <- getXCMSSet(ffXCMS)

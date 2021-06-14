@@ -339,9 +339,13 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
     checkmate::assertFlag(sets)
     if (sets)
     {
-        mySets <- get("sets", pos = 2)(obj)
+        mySets <- get("sets", pos = 2)(fGroups)
+        if (is.null(which))
+            which <- mySets
+        else
+            checkmate::assertSubset(which, mySets)
         ai <- analysisInfo(obj)
-        which = sapply(mySets, function(s) ai[ai$set == s, "group"], simplify = FALSE)
+        which = sapply(which, function(s) ai[ai$set == s, "group"], simplify = FALSE)
     }
     callNextMethod(obj, which = which, ...)
 })
@@ -353,6 +357,8 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
     checkmate::assertFlag(sets)
     if (sets)
     {
+        mySets <- get("sets", pos = 2)(fGroups)
+        checkmate::assertSubset(which, mySets, empty.ok = FALSE, add = ac)
         ai <- analysisInfo(x)
         which <- unique(ai[ai$set %in% which, "group"])
     }

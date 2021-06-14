@@ -53,7 +53,10 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     # plot.new()
     
     if (nobj == 1)
-        gRet <- do.call(draw.single.venn, c(list(area = areas), vennArgs))
+    {
+        gRet <- do.call(VennDiagram::draw.single.venn, c(list(area = areas), vennArgs))
+        icounts <- numeric()
+    }
     else if (nobj == 2)
     {
         icounts <- getIntersectCounts(list(c(1, 2)))

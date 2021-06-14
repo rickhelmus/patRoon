@@ -142,7 +142,7 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
            fixed = list(add = ac))
     assertScoreRange(qualityRange, c(featureQualityNames(group = FALSE),
                                      featureQualityNames(group = FALSE, scores = TRUE)), add = ac)
-    aapply(checkmate::assertFlag, . ~ qualScores + negate, fixed = list(add = ac))
+    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -318,6 +318,9 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
+    if (length(obj) == 0)
+        return(obj) # nothing to do...
+    
     featQualities <- featureQualities()
     featQualityNames <- featureQualityNames(group = FALSE)
     featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)

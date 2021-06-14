@@ -32,6 +32,7 @@
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
     - XCMS: multiple features grouped in same analysis?
         - can be, but now handled by default method="medret" param. Make this configurable?
+    - export featureQualityNames()
 
 ## Annotation
 
@@ -141,8 +142,6 @@
     - syncing of XCMS/KPIC2 objects
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
-    - peak qualities
-        - filter (features/fGroups)
     - as.data.table: normalization?
     - plotInt sets arg?
 - components: somehow verify adductConflictsUsePref

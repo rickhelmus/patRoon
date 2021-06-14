@@ -181,6 +181,30 @@
            differently. To avoid the need to perform the data processing workflow twice, \emph{i.e.} for positive and negative
            mode, the so called \emph{sets workflow} was introduced."
         - "In the future, sets with different chromatographic methods may also be supported, "
+        - general topics
+            - introduction
+                - All functionality derived from regular workflows.
+            - initiating/performing a sets workflow
+                - different workflows to initiate
+                    - directly from makeSet(fListPos, fListNeg)
+                    - start from fGroupsPos/Neg
+                - table with generators and how they merge/consensus/neutralize results
+                    - discuss setThreshold/setThesholdAnn for annotation
+                - example of full workflow
+                - selectIons for better componentization
+                    - before/after makeSet
+                    - adducts()<-
+                        - show example with reGroup=FALSE
+                - mention newProject
+            - Processing
+                - Regular processing functionality can be done: extration, subsetting, as.data.table, plotting, reporting...
+                - Set specific processing
+                    - subsetting and filtering
+                    - plotting
+                    - more?
+            - advanced
+                - how setObjects look like
+                - unsetting
 - progressr
 - annotation
     - generateFormulas: MSPeakLists argument
@@ -191,9 +215,6 @@
 - sets
     - General
         - order of sets section
-    - fGroups
-            - adducts<-: example with reGroup
-                - ?
     - Annotation (formulas/compounds)
         - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
 - TPs

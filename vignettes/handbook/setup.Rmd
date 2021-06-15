@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 
 source(file.path(vignDir, "shared", "init.R"))
 
-runData <- T
+runData <- F
 doOpt <- F
 if (runData)
 {
@@ -46,8 +46,10 @@ if (runData)
                           blankThreshold = 5, removeBlanks = TRUE,
                           retentionRange = c(120, Inf), mzRange = NULL)
     
-    fGroupsAnn <- screenSuspects(fGroups, patRoonData::suspectsPos[patRoonData::suspectsPos$name %in% c("1H-benzotriazole", "N-Phenyl urea",
-                                                                                                        "2-Hydroxyquinoline", "DEET"), ], onlyHits = TRUE)
+    fGroupsAnn <- screenSuspects(fGroups, patRoonData::suspectsPos[patRoonData::suspectsPos$name %in%
+                                                                       c("1H-benzotriazole", "N-Phenyl urea",
+                                                                         "2-Hydroxyquinoline", "DEET"), ],
+                                 onlyHits = TRUE)
     avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
     mslists <- generateMSPeakLists(fGroupsAnn, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
                                    avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
@@ -76,11 +78,22 @@ if (runData)
                                         paramRanges = list(noiseThrInt = c(1500, Inf)))
     }
     
+    fGroupsSets <- groupFeatures(makeSet(fList, getFeats(patRoonData::exampleAnalysisInfo("negative")),
+                                         adducts = c("[M+H]+", "[M-H]-")), "openms")
+    fGroupsSetsAnn <- screenSuspects(fGroupsSets, patRoonData::suspectsPos[patRoonData::suspectsPos$name
+                                                                           == "Monuron", -2],
+                                     onlyHits = TRUE)
+    mslistsSets <- generateMSPeakLists(fGroupsSetsAnn, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+                                       avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+    mslistsSets <- filter(mslistsSets, topMSMSPeaks = 10)
+    compoundsSets <- generateCompounds(fGroupsSetsAnn, mslistsSets, "metfrag", database = "pubchemlite")
+    
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
                  fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
-                 ftOpt = if (doOpt) ftOpt else NULL),
+                 ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,
+                 mslistsSets = mslistsSets, compoundsSets = compoundsSets),
             "~/handbook-obj.Rds")
 }
 ```

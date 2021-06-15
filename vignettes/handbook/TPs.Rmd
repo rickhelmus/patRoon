@@ -1,11 +1,57 @@
 # Transformation product screening
 
-A _transformation product_ (TP) is a chemical that was produced from a _parent_ chemical, for instance, as a result of chemical or biological processes. Screening of transformation products has various important applications, such as evaluating the environmental impact of TPs when formed in the environment or water treatment processes and studying how drugs are metabolized.
+This chapter describes the various functionality for screening of _transformation products_ (TPs), which are introduced since `patRoon` 2.0. Screening for TPs, i.e. chemicals that are formed from a _parent_ chemical by e.g. chemical or biological processes, has broad applications. For this reason, the TP screening related functionality is designed to be flexible, thus allowing one to use a workflow that is best suited for a particular study.
 
-Performing non-target screening of TPs brings complexity, since ...
+Regardless, the TP screening workflow in `patRoon` can be roughly summarized as follows:
 
+```{r TPWorkflow,echo=FALSE,out.width="100%"}
+plotGV("
+digraph Workflow {
+  graph [ rankdir = LR ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Parent screening' -> 'Obtaining TPs' -> 'TP screening' -> 'Linking parent/TPs'
+}", height = 90, width = 500)
+```
+
+* **Parent screening** During this step a common `patRoon` workflow is used to screen for the parent chemicals of interest. This could be a full non-target analysis with compound annotation or a relative simple suspect or target screening.
+* **Obtaining TPs** Data is obtained of potential TPs for the parents of interest. The TPs may originate from a library or predicted _in-silico_. Note that in some workflows this step is omitted (discussed later).
+* **TP screening** A suspect screening is performed to find the TPs in the analysis data. 
+* **Linking parents and TPs** In this step the parent features are linked with the TPs that surfaced from the last mentioned  suspect screening. Several post-processing functionality exists to improve and prioritize the data.
+
+The next sections will outline more details on these steps are performed and configured. The last section in this chapter outlines several example workflows.
 
 ## Obtaining transformation product data
+
+UNDONE: cite logic, refs below
+
+The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
+
+Algorithm        | Usage                                            | Remarks
+---------------- | ------------------------------------------------ | ------------------------------------------------
+[BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
+Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem] or custom)
+Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation)
+
+The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic does not depend on any parent information, and its simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
+
+### Parent input
+
+The parent structures for the `biotransformer` and `library` algorithms must be one the following:
+
+* A suspect list (follows the same format as [suspect screening])
+* A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening])
+* A `compounds` object obtained with [compound annotation]
+
+In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The latter case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation] are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter.
+
+For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data, for instance.
 
 ### Processing data
 

@@ -1,4 +1,4 @@
-rmd_files: [ "index.Rmd", "installation.Rmd", "concepts.Rmd", "workflow_gen.Rmd", "processing.Rmd", "sets-workflows.Rmd", "advanced.Rmd" ]
+rmd_files: [ "index.Rmd", "installation.Rmd", "concepts.Rmd", "workflow_gen.Rmd", "processing.Rmd", "sets-workflows.Rmd", "TPs.Rmd", "advanced.Rmd" ]
 #rmd_files: [ "_index.Rmd", "_concepts.Rmd" ]
 delete_merged_file: yes
 book_filename: "handbook.Rmd"

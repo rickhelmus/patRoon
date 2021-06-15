@@ -176,10 +176,12 @@
     - sets
         - general topics
             - initiating/performing a sets workflow
+                - init workflows: add link to adduct annotation section
                 - selectIons for better componentization
                     - before/after makeSet
                     - adducts()<-
                         - show example with reGroup=FALSE
+                - makeSet(fGroups): add link to checkUIs
     - update
         - suspect screening
             - adducts

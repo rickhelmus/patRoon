@@ -46,25 +46,42 @@ compounds <- generateCompounds(fGroups, mslists, "metfrag")
 reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
 ```
 
-This workflow will do all the steps for positive _and_ negative data. Only a few modifications were necessary:
+This workflow will do all the steps for positive _and_ negative data.
+
+```{r setsWorkflow,echo=FALSE,out.width="75%"}
+plotGV("
+digraph Workflow {
+  graph [ rankdir = TB, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 0.6,
+         fontsize = 16,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Pre-treatment (+)' -> 'Find features (+)' -> 'makeSet'
+    'Pre-treatment (-)' -> 'Find features (-)' -> 'makeSet'
+    'makeSet' -> 'Group features' -> 'Annotation, ...'
+}", height = 300, width = 250)
+```
+
+Only a few modifications were necessary:
 
 * The [analysis information](#anaInfo) is obtained for positive and negative data (i.e. per set)
 * Features are found for each set separately.
 * `makeSet` is used to combine the feature data
 * There is no need to specify the adduct anymore in the annotation steps.
 
-The key principle to make sets workflows work is performed by `makeSet`. This method function takes different `features` objects (or `featureGroups`, as discussed later) to combine the feature data across sets. During this step features are _neutralized_: the feature _m/z_ data is converted to neutral feature masses. This step ensures that when features are grouped with `groupFeatures`, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.
+> **NOTE** The `analysis` names for the [analysis information](#anaInfo) must be _unique_ for each row, even among sets. Furthermore, replicate groups should not contain analyses from different sets.
+
+The key principle to make sets workflows work is performed by `makeSet`. This method function takes different `features` objects (or `featureGroups`, discussed later) to combine the feature data across sets. During this step features are _neutralized_: the feature _m/z_ data is converted to neutral feature masses. This step ensures that when features are grouped with `groupFeatures`, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.
 
 The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use [adduct annotations] for neutralization; this is discussed later.
 
-> **NOTE** The [newProject tool](#newProject) can also be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
+> **NOTE** The [newProject tool](#newProject) can be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
 
 ## Generating sets workflow data
-
-UNDONE:
-
-* section link
-* mention this section is mostly theoretical
 
 As was shown in the previous section, the generation of workflow data with a sets workflow largely follows that as what was discussed in the previous chapters. The same generator functions are used:
 
@@ -101,7 +118,7 @@ In all cases data is used that is highly dependent on the MS method (eg polarity
 
 ### Formula and compound annotation
 
-For formula and compound annotation, the data generated for each set is combined to generate a _set consensus_. The annotation tables are merged, scores are averaged and candidates are re-ranked. More details can be found in the reference manual (e.g. `?generateCompounds`). In addition, it possible to only keep candidates that exist in a user defined minimum amount of sets. For this, the `setThreshold` and `setThresholdAnn` argument can be used:
+For formula and compound annotation, the data generated for each set is combined to generate a _set consensus_. The annotation tables are merged, scores are averaged and candidates are re-ranked. More details can be found in the reference manual (e.g. `?generateCompounds`). In addition, it possible to only keep candidates that exist in a minimum number of sets. For this, the `setThreshold` and `setThresholdAnn` argument can be used:
 
 ```{r setThreshold,eval=FALSE}
 # candidate must be present in all sets
@@ -110,7 +127,7 @@ formulas <- generateFormulas(fGroups, mslists, "genform", setThreshold = 1)
 compounds <- generateCompounds(fGroups, mslists, "metfrag", setThresholdAnn = 1)
 ```
 
-In the first example, a formula candidate for a feature group is only kept if it was found for all of the sets. In the second example, a compound candidate is only kept if it was present in all of the sets with annotation data available. The following examples of a common positive/negative sets workflow illustrates the difference:
+In the first example, a formula candidate for a feature group is only kept if it was found for all of the sets. In the second example, a compound candidate is only kept if it was present in all of the sets with annotation data available. The following examples of a common positive/negative sets workflow illustrate the differences:
 
 Candidate | annotations | candidate present | `setThreshold=1` | `setThresholdAnn=1`
 --------- | ----------- | ----------------- | ---------------- | ---------------------
@@ -133,34 +150,47 @@ TBD when selectIons/adducts() section is in place for regular workflows.
 
 ## Processing data
 
-UNDONE
+All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter](#processing) (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the `as.data.table()` method can be used for general inspection:
 
-* make code active
-* link refs
+```{r include=FALSE,eval=runData}
+fGroupsO <- fGroups
+fGroups <- fGroupsSets
+mslistsO <- mslists
+mslists <- mslistsSets
+compoundsO <- compounds
+compounds <- compoundsSets
+```
 
-All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter] (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the `as.data.table()` method can be used for general inspection:
-
-```{r setsProcData,eval=FALSE}
-as.data.table(compounds)
+```{r setsProcData,eval=runData}
+as.data.table(compounds)[1:5, c("group", "score", "compoundName", "set")]
 ```
 
 In addition, some the data processing functionality contains additional functionality for a sets workflow:
 
 ```{r setsProcDataExtra,eval=FALSE}
 
-fGroupsPos <- fGroups[, sets = "positive"] # only keep feature groups that have positive data
-fGroupsF <- filter(fGroups, relMinSets = 1) # only keep feature groups that have feature data for all sets
+# only keep feature groups that have positive data
+fGroupsPos <- fGroups[, sets = "positive"]
+# only keep feature groups that have feature data for all sets
+fGroupsF <- filter(fGroups, relMinSets = 1)
 
 # only keep feature groups with features present in both polarities
 fGroupsPosNeg <- overlap(fGroups, which = c("positive", "negative"), sets = TRUE)
 # only keep feature groups with features that are present only in positive mode
 fGroupsOnlyPos <- unique(fGroups, which = "positive", sets = TRUE)
+```
 
+And plotting:
+
+```{r setsProcDataExtraPlotting,eval=runData,fig.show="hold"}
 plotVenn(fGroups, sets = TRUE) # compare positive/negative features
+plotSpectrum(compounds, index = 1, groupName = "M198_R317_272", MSPeakLists = mslists)
+```
 
-# mirror plot
-plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists)
-
+```{r include=FALSE,eval=runData}
+fGroups <- fGroupsO
+mslists <- mslistsO
+compounds <- compoundsO
 ```
 
 The reference manual for the workflow objects contains specific notes applicable to sets workflows (`?featureGroups`, `?compounds` etc).
@@ -181,7 +211,8 @@ fListNeg <- findFeatures(anaInfoNeg, "openms")
 fGroupsPos <- groupFeatures(fListPos, "openms")
 fGroupsNeg <- groupFeatures(fListNeg, "openms")
 
-fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms", adducts = c("[M+H]+", "[M-H]-"))
+fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms",
+                   adducts = c("[M+H]+", "[M-H]-"))
 
 # do rest of the workflow...
 
@@ -199,9 +230,31 @@ fGroupsNeg <- groupFeatures(fListNeg, "openms")
 fGroupsPos <- filter(fGroupsPos, absMinIntensity = 1E4)
 fGroupsNeg <- filter(fGroupsNeg, absMinIntensity = 1E3)
 
-fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms", adducts = c("[M+H]+", "[M-H]-"))
+fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms",
+                   adducts = c("[M+H]+", "[M-H]-"))
 
 ```
+
+Visually, this workflow looks like this:
+
+```{r setsWorkflowG2,echo=FALSE,out.width="75%"}
+plotGV("
+digraph Workflow {
+  graph [ rankdir = TB, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 0.6,
+         fontsize = 16,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Find features (+)' -> 'Group features (+)' -> 'filter (+)' -> 'makeSet'
+    'Find features (-)' -> 'Group features (-)' -> 'filter (-)' -> 'makeSet'
+    'makeSet' -> '...'
+}", height = 300, width = 250)
+```
+Of course, any other processing steps on the feature groups data such as subsetting and [visually checking features] are also possible before the sets workflow is initiated.
 
 ### Inspecting and converting set objects
 
@@ -211,6 +264,6 @@ Generic      | Purpose                               | Notes
 ------------ | ------------------------------------- | ---------------------------------------
 `sets`       | Return the names of the sets in this object.
 `setObjects` | Obtain the raw data objects that were used to construct this object. | Not available for features and feature groups.
-`unset`      | Converts this object to a regular workflow object. | The `set` argument must be given to specify which of the set data is to be converted.
+`unset`      | Converts this object to a regular workflow object. | The `set` argument must be given to specify which of the set data is to be converted. This function will restore the original _m/z_ values of features.
 
 These methods are heavily used internally, but rarely needed otherwise. More details can be found in the reference manual.

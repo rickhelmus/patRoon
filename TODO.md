@@ -182,6 +182,36 @@
                     - adducts()<-
                         - show example with reGroup=FALSE
                 - makeSet(fGroups): add link to checkUIs
+    - TPs
+        - introduction
+            - Why TPs are important
+            - Complexity
+            - Toolbox
+        - TP generation
+            - generator functions
+            - input
+                - suspects
+                - screening results
+                - compounds
+                - fGroups
+            - processing (subset/as.data.table)
+            - custom Libraries/transformations
+                - or just refer to ref manual?
+                    - maybe a short example
+        - Linking parents with TPs
+            - generateComponentsTPs
+                - fGroupsTPs
+                - others
+            - post-processing
+                - explain retDir, frag/NLMatches
+                - highlight formula filter
+            - without TP input(?)
+        - Example workflows
+            - intro/motivation: flexible interface
+            - BT: target list --> BT TPs --> screenSuspects, MF etc
+            - Lib: fgScr --> Lib TPs --> screenSuspects --> min ID level --> etc
+            - logic: NTA --> log2FC --> logic TPs --> suspects --> formulas & filter formula (topMost=5) --> suspAnnotation, min level 4 --> filter componentization results --> ...
+            - Show schemes?
     - update
         - suspect screening
             - adducts

@@ -47,7 +47,7 @@ test_that("verify feature finder output", {
     expect_known_value(featureTable(ffKPIC2), testFile("ff-kpic2"))
     expect_known_value(featureTable(ffSIRIUS), testFile("ff-sirius"))
     
-    expect_known_value(featureTable(ffOpenMSQ), testFile("ff-openms-qual"))
+    expect_known_value(OpenMSFTable(ffOpenMSQ), testFile("ff-openms-qual"))
     
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),

@@ -513,7 +513,7 @@ The `annotateSuspects()` function will log decisions for identification level as
 
 > **NOTE**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
 
-## Componentization
+## Componentization {#componentization}
 
 In `patRoon` _componentization_ refers to grouping related feature groups together in components. Currently there are three different methodologies to generate components:
 

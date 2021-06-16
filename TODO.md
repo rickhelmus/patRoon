@@ -223,6 +223,7 @@
 - TPs
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?
+    - mention how sets filter work for componentsTPs?
 - fGroupsComparison doesn't work with sets yet
     
 

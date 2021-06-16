@@ -495,8 +495,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #' @param formulas,compounds A \code{\link{formulas}}/\code{\link{compounds}} object to calculate annotation
 #'   similarities between parents and TPs. If \code{NULL} then this data is not calculated. For more details see the
 #'   \verb{Linking parents and transformation products} section below.
-#' @param minRTDiff Minimum retention time difference between the parent and a TP to determine whether a TP elutes
-#'   prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
+#' @param minRTDiff Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
+#'   elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
 #'
 #' @section Linking parents and transformation products: With \code{generateComponentsTPs}, each component consists of
 #'   feature groups that are considered to be transformation products for one parent (the parent that 'belongs' to the

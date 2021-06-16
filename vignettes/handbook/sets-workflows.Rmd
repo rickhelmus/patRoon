@@ -1,4 +1,4 @@
-# Sets workflows
+# Sets workflows {#setsWorkflow}
 
 In LC-HRMS screening workflows it is typically desired to be able to detect a broad range of chemicals. For this reason, the samples are often measured twice: with positive and negative ionization. Most data processing steps are only suitable for data with the same polarity, for instance, due to the fact that the _m/z_ values in mass spectra are inherently different (e.g. `[M+H]+` vs `[M-H]-`) and MS/MS fragmentation occurs differently. As a result, the screening workflow has to be done twice, which generally requires more time and complicates comparing and interpretation of the complete (positive and negative) dataset.
 

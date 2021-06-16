@@ -52,3 +52,4 @@
 [processx]: https://github.com/r-lib/processx
 [progressr]: https://github.com/HenrikBengtsson/progressr
 [cliqueMS]: https://github.com/osenan/cliqueMS
+[BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/

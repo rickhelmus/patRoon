@@ -29,33 +29,161 @@ The next sections will outline more details on these steps are performed and con
 
 ## Obtaining transformation product data
 
-UNDONE: cite logic, refs below
+UNDONE: cite logic, refs below, adduct description in table
 
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
 Algorithm        | Usage                                            | Remarks
----------------- | ------------------------------------------------ | ------------------------------------------------
+---------------- | ------------------------------------------------ | ---------------------------------
 [BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
 Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem] or custom)
 Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation)
 
-The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic does not depend on any parent information, and its simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
+The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic only requires the feature mass, and this simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
+
+An overview of common arguments for TP generation is listed below.
+
+Argument                      | Algorithm(s)      | Remarks
+----------------------------- | ----------------- | --------------------------------------------------------
+`parents`                     | `biotransformer`, `library` | The input parents. See section below.
+`fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
+`type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
+`TPLibrary`/`transformations` | `library`/`logic` | [Custom TP library/transformation rules](#TPsCustom).
+`adduct`                      | All               | The assumed adduct of the parents (e.g. `"[M+H]+"`). See section below.
 
 ### Parent input
 
-The parent structures for the `biotransformer` and `library` algorithms must be one the following:
+UNDONE: links below, finish adduct discussion
 
-* A suspect list (follows the same format as [suspect screening])
-* A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening])
-* A `compounds` object obtained with [compound annotation]
+The input parent structures for the `biotransformer` and `library` algorithms must be one the following:
 
-In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The latter case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation] are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter.
+* A suspect list (follows the same format as [suspect screening](#suspscr))
+* A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
+* A `compounds` object obtained with [compound annotation](#compounds)
 
-For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data, for instance.
+In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation] are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
+
+For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data.
+
+Some typical examples:
+
+```{r eval=FALSE}
+# predict environmental TPs with BioTransformer for all parents in a suspect list
+TPsBT <- generateTPs("biotransformer", parents = patRoonData::suspectsPos,
+                     type = "env")
+# obtain all TPs from the default library
+TPsLib <- generateTPs("library")
+# get TPs for the parents from a suspect screening
+TPsLib <- generateTPs("library", parents = fGroupsScr)
+# calculate TPs for all feature groups
+TPsLogic <- generateTPs("logic", fGroups, adduct = "[M+H]+")
+```
+
+The `adduct` argument is only needed in the following scenarios:
+
+* There are no [adduct annotations] available. Note that in a [sets workflow](#setsWorkflow) these are always available.
+* In case the `biotransformer` / `library` algorithm is used: the parent input ...
 
 ### Processing data
 
-### Custom libraries and transformations
+UNODNE: links below
+
+Similar to other workflow data, several generic functions are available to inspect the data:
+
+Generic                            | Classes | Remarks                                                             
+-----------------------------------|---------|---------------------------------------------------------------------
+`length()`                         | All     | Returns the total number of transformation products
+`names()`                          | All     | Returns the names of the parents
+`parents()`                        | All     | Returns a table with information about the parents
+`products()`                       | All     | Returns a `list` with for each parent a table with TPs
+`as.data.table()`, `as.data.frame` | All     | Convert all the object information into a `data.table`/`data.frame`
+`"[["` / `"$"` operators           | All     | Extract TP information for a specified parent
+
+Some examples:
+
+```{r include=FALSE,eval=TRUE}
+# NOTE: this is always evaluated as it takes very little time...
+TPs <- generateTPs("library")
+```
+
+```{r TPsProcInsp,eval=TRUE}
+# just show a few columns in this example, there are many more!
+# note: the double dot syntax (..cols) is necessary since the data is stored as data.tables
+cols <- c("name", "formula", "LogP")
+parents(TPs)[1:5, ..cols]
+TPs[["DEET"]][, ..cols]
+TPs[[2]][, ..cols]
+as.data.frame(TPs)[1:5, 1:3]
+```
+
+In addition, the following generic functions are available to modify or convert the object data:
+
+Generic             | Classes                    | Remarks
+------------------- | -------------------------- | --------------------------------------------------------
+`"["` operator      | All                        | Subset this object on given parents
+`filter`            | `transformationProductsBT` | Filters this object
+`convertToSuspects` | All                        | Generates a suspect list of all TPs (and optionally parents) that is suitable for `screenSuspects`
+`convertToMFDB`     | `transformationProductsBT`, `transformationProductsLibrary` | Generates a [MetFrag] database for all TPs (and optionally parents)
+
+```{r TPsProcMod,eval=FALSE}
+TPs2 <- TPs[1:10] # only keep results for first ten parents
+
+# remove transformation products that have equal formulas as parents (ie isomers)
+# may simplify data as these are often difficult to identify
+TPsF <- filter(TPs, removeEqualFormulas = TRUE)
+
+# only keep TPs that have a structural similarity to their parent of >= 0.5
+TPsF <- filter(TPs, minSimilarity = 0.5)
+
+# do a suspect screening for all TPs and their parents
+suspL <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspL, onlyHits = TRUE)
+
+# use the TP data for a specialized MetFrag database
+convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
+compoundsTPs <- generateCompounds(fGroups, mslists, "metfrag", database = "csv",
+                                  extraOpts = list(LocalDatabasePath = "TP-database.csv"))
+```
+
+The `convertToSuspects` function is always part of a workflow with `biotransformer` or `library` TPs. This is discussed further in the next section. The `convertToMFDB` function is especially handy with `biotransformer` workflows, as it allows generating a compound database for TPs that may not be available in other databases. This is further demonstrated in the [first example].
+
+### Custom libraries and transformations {#TPsCustom}
+
+UNDONE: DB refs
+
+By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on X and Y, respectively). However, it is also possible to use custom data.
+
+To use a custom TP library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
+
+```{r TPsCustomDB,eval=TRUE}
+myTPLib <- data.frame(parent_name = c("1H-Benzotriazole", "1H-Benzotriazole", "DEET"),
+                      parent_SMILES = c("C1=CC2=NNN=C2C=C1", "C1=CC2=NNN=C2C=C1", "CCN(CC)C(=O)C1=CC=CC(=C1)C"),
+                      TP_name = c("1-Methylbenzotriazole", "1-Hydroxybenzotriazole", "N-ethyl-m-toluamide"),
+                      TP_SMILES = c("CN1C2=CC=CC=C2N=N1", "C1=CC=C2C(=C1)N=NN2O", "CCNC(=O)C1=CC=CC(=C1)C"))
+myTPLib
+```
+
+To use this library, simply pass it to the `TPLibrary` argument:
+
+```{r eval=FALSE}
+TPs <- generateTPs("library", TPLibrary = myTPLib)
+```
+
+Similarly, for `logic` a table with custom transformation rules can be specified for TP calculations:
+
+```{r TPCustomLogic,eval=TRUE}
+myTrans <- data.frame(transformation = c("hydroxylation", "demethylation"),
+                      add = c("O", ""),
+                      sub = c("", "CH2"),
+                      retDir = c(-1, -1))
+myTrans
+```
+
+The `add` and `sub` columns are used to denote the elements that are added or subtracted by the reaction. These are used to calculate mass differences between parents and TPs. The `retDir` column is used to indicate the retention time direction of the parent compared to the TP: `-1` (elutes before parent), `1` (elutes after parent) or `0` (similar or unknown). The next section describes how this data can be used to filter TPs. The custom rules can be used by passing them to the `transformations` argument:
+
+```{r eval=FALSE}
+TPs <- generateTPs("logic", fGroups, adduct = "[M+H]+", transformations = myTrans)
+```
 
 ## Linking parent and transformation product features
 

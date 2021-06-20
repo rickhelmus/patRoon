@@ -31,7 +31,7 @@ makeStructPlot <- function(SMI, out)
     })
 }
 
-plotIntMainArgs <- list(average = TRUE)
+plotIntMainArgs <- list(average = TRUE, normFunc = max)
 if (isFGSet(rmdVars$fGroups))
 {
     plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))

@@ -938,11 +938,11 @@ setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "
 #'   of feature groups within all analyses
 #' @param xnames Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.
 #' @export
-setMethod("plotInt", "featureGroups", function(obj, average = FALSE, xnames = TRUE, showLegend = FALSE, pch = 20,
-                                               type = "b", lty = 3, col = NULL, ...)
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, normFunc = NULL, xnames = TRUE, showLegend = FALSE,
+                                               pch = 20, type = "b", lty = 3, col = NULL, ...)
 {
     aapply(checkmate::assertFlag, . ~ average + xnames + showLegend)
-    doPlotFeatInts(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
+    doPlotFeatInts(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

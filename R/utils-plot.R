@@ -432,7 +432,7 @@ textPlot <- function(txt)
 
 noDataPlot <- function() textPlot("no data to plot")
 
-doPlotFeatInts <- function(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets)
+doPlotFeatInts <- function(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets)
 {
     if (xnames && doSets)
     {
@@ -447,7 +447,7 @@ doPlotFeatInts <- function(obj, average, xnames, showLegend, pch, type, lty, col
     }
     
     snames <- if (average) replicateGroups(obj) else analyses(obj)
-    tab <- transpose(as.data.table(obj, average = average)[, snames, with = FALSE])
+    tab <- transpose(as.data.table(obj, average = average, normFunc = normFunc)[, snames, with = FALSE])
     
     if (doSets)
     {

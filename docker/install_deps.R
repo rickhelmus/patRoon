@@ -18,7 +18,7 @@ BiocManager::install("ropls") # for KPIC2
 remotes::install_github("rickhelmus/KPIC2")
 remotes::install_github("rickhelmus/cliqueMS")
 BiocManager::install(c("BiocStyle", "Rgraphviz")) # for MetaClean
-install.packages("MetaClean")
+remotes::install_github("KelseyChetnik/MetaClean")
 remotes::install_github("KelseyChetnik/MetaCleanData")
 
 install.packages("desc")

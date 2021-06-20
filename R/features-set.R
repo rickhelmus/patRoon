@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include workflow-step-set.R
+#' @include features.R
 NULL
 
 neutralizeFeatures <- function(feat, adduct)

@@ -17,35 +17,24 @@
 		    - default to M+H/M-H for now with warning...
 	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 	    - check better for what is supported by SIRIUS?
-- importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - Check: units of plotChord() rt/mz graphs seems off
 - misc
     - topMostByRGroup: make default? or only for reporting?
-    - updatePICSet(): also sync peaks list? otherwise doc
-    - getEICsForFeatures method for kpic2?
-    - optimize hashing? Or further avoid hashing big objects/objects with lists?
-    - delete for features and fGroups
-        - XCMS: also update groups data? --> use new function once it hits BC
-    - load OpenMS intensities in parallel
-        - either with futures or with MP and cache intensities afterwards
+    - XCMS3/delete: also update groups data? --> use new function once it hits BC
     - OpenMS: alignment may yield negative RTs...
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
-    - XCMS: multiple features grouped in same analysis?
-        - can be, but now handled by default method="medret" param. Make this configurable?
     - export featureQualityNames()
+    - fix MapAligner exception with test-components
+
 
 ## Annotation
 
-- GenForm oc is FALSE by default. OK? Add to newProject?
-- ion_formula_mz --> ionMass?
 - min score filters: take maximum value of all merged columns?
     - changed for now, update docs if keep
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
 - update GenForm
 - plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons?
-- update for featThreshold and featThresholdAnn
-    - put featThreshold in common arguments handbook table?
 
 
 ## Components
@@ -53,25 +42,13 @@
 - feature components
     - cliqueMS
         - change checkPackage GH link once PRs are merged
-        - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
-            - Perhaps just document limitation?
         - maxCharge --> chargeMax (same as OpenMS)? update docs
-    - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
     - OpenMS: handle potentialAdducts per set
-    - prefAdducts: also include eg Na by default?
 - plotGraph doesn't show hoveovers anymore?
 
 ## sets
 
-- misc
-    - formulas/compounds: update set column when subsetting on sets?
-    - fix MapAligner exception with test-components
-    - compound/formula set consensus
-        - weights for ranking (like compound consensus)?
-    - disallow commas, minus and algo consensus labels in set names
-    - screening: filter on set specific rank cols? Or all?
-        - for now all if no sets columns are present (ie not ID level and ranks)
-    - (dis)allow makeSet for featuresSet objects?
+- formulas/compounds: update set column when subsetting on sets? --> update docs?
 
 
 ## TPs
@@ -83,14 +60,6 @@
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
     - disable parallellization (by default)?
-    - check output if type != "env"
-- metabolic logic
-    - cite 10.1021/acs.analchem.5b02905 and possibly others if more is included
-- predictTPsComponents
-    - fix if empty cTab for MSMS components
-    - doc that precursor should not occur in multiple components (is this relevant for users?)
-    - caching
-    - remove? doesn't seem useful anymore
 - log2fc
     - P values are calculated properly?
 - spectrumSimilarity
@@ -107,17 +76,12 @@
 - misc
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
-    - retDir: convert to character?
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
     - only keep relevant suspect list columns when input is screening object for lib/BT TPs
-    - BT/Lib: adduct argument necessary? if not update docs/handbook
 - reporting
     - padding between two tables?
     - default TP columns OK?
-    - fragMatches/NLMatches: doc that it's _not_ candidate specific
-        --> also add for candidate specific if possible? although this could be taken from suspect annotations
-        - otherwise maybe rename to eg allFragmentMatches
-    - plotInt: not normalized now? y axis isn't...
+    - fragMatches/NLMatches: rename to eg allFragmentMatches/allNLMatches? --> update docs
 
 ## Reporting
 
@@ -129,12 +93,9 @@
 - checkComponents() / checkFeatures()
     - server tests?
     - import
-    - MC integration (features)
 - test DA algorithms
     - formulas: check if fragInfo etc is correct
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
-- sets
-    - thoroughly test consensus for compounds/formulas and ranking with both set and algo consensus
 - new ranking for formulas/compounds consensus (and sets)
     - filterSets?
 - ensure peaklists are sorted
@@ -146,7 +107,6 @@
     - as.data.table: normalization?
     - plotInt sets arg?
 - components: somehow verify adductConflictsUsePref
-
 
 
 ## docs
@@ -174,6 +134,7 @@
         - MSPL: clearly mention that MSPeakLists should not be filtered/subset after annotation
         - new/changed as.data.table args
             - maxFormulas/maxFragFormulas removed
+        - put featThreshold in common arguments handbook table? Update for featThresholdAnn
     - sets
         - general topics
             - initiating/performing a sets workflow
@@ -190,6 +151,7 @@
                 - need to do suspect screening for BT/lib
                 - fGroupsTPs
                 - others
+                - BT/Lib: update adduct argument (not needed anymore)
             - post-processing
                 - explain retDir, frag/NLMatches
                 - highlight formula filter
@@ -339,7 +301,14 @@
 
 ## Features
 
-- import XCMS features: verify anaInfo (or remove necessity)
+- import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
+- getEICsForFeatures method for kpic2?
+- optimize hashing? Or further avoid hashing big objects/objects with lists?
+- load OpenMS intensities in parallel
+    - either with futures or with MP and cache intensities afterwards
+- XCMS: multiple features grouped in same analysis?
+    - can be, but now handled by default method="medret" param. Make this configurable?
+- updatePICSet(): also sync peaks list? otherwise doc
 
 
 ## Annotation
@@ -362,6 +331,10 @@
     - cache results
 - import check sessions?
     - needs way to match component names
+
+## Sets
+
+
 
 # Future
 
@@ -455,6 +428,17 @@
 - mass defect components
 - split peak correlation and adduct etc annotation? would allow better non-target integration
 - fillPeaks for CAMERA (and RAMClustR?)
+- feature components
+    - cliqueMS
+        - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
+            - Perhaps just document limitation?
+    - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
+    - prefAdducts: also include eg Na by default?
+
+
+## Sets
+- compound/formula set consensus
+    - weights for ranking (like compound consensus)?
 
 
 ## TPs

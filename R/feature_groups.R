@@ -941,61 +941,8 @@ setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, xnames = TRUE, showLegend = FALSE, pch = 20,
                                                type = "b", lty = 3, col = NULL, ...)
 {
-    # NOTE: keep in sync with sets method
-    
     aapply(checkmate::assertFlag, . ~ average + xnames + showLegend)
-
-    if (length(obj) == 0)
-    {
-        noDataPlot()
-        return(invisible(NULL))
-    }
-
-    if (average)
-    {
-        gTable <- averageGroups(obj)
-        snames <- replicateGroups(obj)
-    }
-    else
-    {
-        gTable <- groupTable(obj)
-        snames <- analyses(obj)
-    }
-
-    nsamp <- length(snames)
-
-    if (is.null(col))
-        col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(gTable))
-    
-    oldp <- par(no.readonly = TRUE)
-    if (showLegend)
-    {
-        makeLegend <- function(x, y, ...)
-        {
-            return(legend(x, y, names(obj), col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
-                          cex = 0.75, bty = "n", ...))
-        }
-        
-        plot.new()
-        leg <- makeLegend(0, 0, plot = FALSE)
-        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-    }
-    
-    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
-    
-    if (xnames)
-        axis(1, seq_len(nsamp), snames, las = 2)
-    else
-        axis(1, seq_len(nsamp), seq_len(nsamp))
-
-    for (i in seq_along(gTable))
-        lines(x = seq_len(nsamp), y = gTable[[i]], type = type, pch = pch, lty = lty, col = col[i], ...)
-    
-    if (showLegend)
-        makeLegend(par("usr")[2], par("usr")[4])
-    
-    par(oldp)
+    doPlotFeatInts(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

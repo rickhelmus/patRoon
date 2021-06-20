@@ -153,7 +153,7 @@ TPsLogicMore <- doGenLogicTPs(fGroupsMore[, 1:50])
 fGroupsTPsLogic <- doScreen(fGroupsMore, convertToSuspects(TPsLogicMore), onlyHits = TRUE)
 componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 
-fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp))
+fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp), onlyHits = TRUE)
 componTPsBT <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsBTSusp)
 
 if (doMetFrag)
@@ -238,6 +238,8 @@ test_that("TP component usage", {
                  as.data.table(componTPsRetF)[, -"size"])
     expect_equal(as.data.table(componTPsLogic)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetFN)[, -"size"])
+    
+    expect_reportHTML(makeReportHTML(fGroupsMoreScr, components = componTPsBT))
     
     skip_if_not(doMetFrag)
     

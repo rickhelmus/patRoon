@@ -32,7 +32,10 @@ prepareMakeSetAdducts <- function(objects, adducts, labels)
     adducts <- rep(adducts, length.out = length(objects))
     
     if (!is.null(labels))
+    {
+        assertSetLabels(labels, length(objects), .var.name = "labels")
         names(adducts) <- labels
+    }
     else
         names(adducts) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
     

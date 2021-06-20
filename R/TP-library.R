@@ -36,8 +36,7 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @rdname TP-generation
 #' @export
-generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, skipInvalid = TRUE,
-                               matchParentsBy = "InChIKey")
+generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = TRUE, matchParentsBy = "InChIKey")
 {
     # UNDONE: default match by IK or IK1?
     
@@ -95,7 +94,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, adduct = NULL, 
 
     if (!is.null(parents))
     {
-        parents <- getTPParents(parents, adduct, skipInvalid)
+        parents <- getTPParents(parents, skipInvalid)
         
         # match with library
         if (matchParentsBy == "InChIKey1")

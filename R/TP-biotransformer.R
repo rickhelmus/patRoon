@@ -142,7 +142,7 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @rdname TP-generation
 #' @export
-generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL, adduct = NULL,
+generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL,
                                       skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
 {
     checkmate::assert(
@@ -163,9 +163,9 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    parents <- getTPParents(parents, adduct, skipInvalid)
+    parents <- getTPParents(parents, skipInvalid)
 
-    baseHash <- makeHash(type, steps, extraOpts, adduct, skipInvalid, fpType, fpSimMethod)
+    baseHash <- makeHash(type, steps, extraOpts, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,

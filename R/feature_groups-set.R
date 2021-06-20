@@ -269,11 +269,12 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames = !sets, showLegend = sets, pch = 20,
-                                                  type = "b", lty = 3, col = NULL, ..., sets = FALSE)
+setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normFunc = NULL, xnames = !sets,
+                                                  showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL, ...,
+                                                  sets = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
-    doPlotFeatInts(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
+    doPlotFeatInts(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
 })
 
 #' @rdname featureGroups-class

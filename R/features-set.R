@@ -171,6 +171,14 @@ setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
     return(doMakeFeaturesSet(featuresList, adducts))
 })
 
+#' @note \code{makeSet} Currently does not support making sets from \code{\link{featuresSet}} objects.
+#' @rdname feature-finding
+#' @export
+setMethod("makeSet", "featuresSet", function(obj, ...)
+{
+    stop("Making a set from set objects is not supported", call. = FALSE)
+})
+
 #' @rdname features-class
 #' @export
 featuresUnset <- setClass("featuresUnset", contains = "features")

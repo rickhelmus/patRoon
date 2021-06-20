@@ -431,3 +431,77 @@ textPlot <- function(txt)
 }
 
 noDataPlot <- function() textPlot("no data to plot")
+
+doPlotFeatInts <- function(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets)
+{
+    if (xnames && doSets)
+    {
+        xnames <- FALSE
+        warning("xnames option is ignored if sets=TRUE", call. = FALSE)
+    }
+    
+    if (length(obj) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    snames <- if (average) replicateGroups(obj) else analyses(obj)
+    tab <- transpose(as.data.table(obj, average = average)[, snames, with = FALSE])
+    
+    if (doSets)
+    {
+        anaInfo <- analysisInfo(obj)
+        anaSets <- if (average) anaInfo[match(replicateGroups(obj), anaInfo$group), "set"] else anaInfo$set
+    }
+    
+    if (is.null(col))
+    {
+        if (doSets)
+            col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(sets(obj)))
+        else
+            col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(tab))
+    }
+    
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        legN <- if (doSets) sets(obj) else names(obj)
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, legN, col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+    
+    maxX <- if (doSets) max(table(anaSets)) else length(snames)
+    
+    plot(x = c(0, maxX), y = c(0, max(tab)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
+    
+    if (xnames)
+        axis(1, seq_len(maxX), snames, las = 2)
+    else
+        axis(1, seq_len(maxX), seq_len(maxX))
+    
+    makeLine <- function(y, col) lines(x = seq_along(y), y = y, type = type, pch = pch, lty = lty, col = col, ...)
+    for (i in seq_along(tab))
+    {
+        if (doSets)
+        {
+            for (s in seq_along(sets(obj)))
+                makeLine(tab[[i]][anaSets == sets(obj)[s]], col[s])
+        }
+        else
+            makeLine(tab[[i]], col[i])
+    }
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
+}

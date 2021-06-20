@@ -273,63 +273,7 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, xnames =
                                                   type = "b", lty = 3, col = NULL, ..., sets = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
-    
-    if (!sets)
-        return(callNextMethod(obj, average, xnames, showLegend, pch, type, lty, col, ...))
-    else if (xnames)
-        warning("xnames option is ignored if sets=TRUE")
-
-    if (length(obj) == 0)
-    {
-        noDataPlot()
-        return(invisible(NULL))
-    }
-
-    anaInfo <- analysisInfo(obj)    
-    if (average)
-    {
-        gTable <- copy(averageGroups(obj))
-        gTable[, set := anaInfo[match(replicateGroups(obj), anaInfo$group), "set"]]
-    }
-    else
-    {
-        gTable <- copy(groupTable(obj))
-        gTable[, set := anaInfo$set]
-    }
-    
-    if (is.null(col))
-        col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(sets(obj)))
-    
-    oldp <- par(no.readonly = TRUE)
-    if (showLegend)
-    {
-        makeLegend <- function(x, y, ...)
-        {
-            return(legend(x, y, sets(obj), col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
-                          cex = 0.75, bty = "n", ...))
-        }
-        
-        plot.new()
-        leg <- makeLegend(0, 0, plot = FALSE)
-        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-    }
-    
-    maxs <- max(table(gTable$set))
-    plot(x = c(0, maxs), y = c(0, max(gTable[, -"set"])), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
-    axis(1, seq_len(maxs), seq_len(maxs))
-    
-    for (s in seq_along(sets(obj)))
-    {
-        gt <- gTable[set == sets(obj)[s]]
-        for (g in names(obj))
-            lines(x = seq_len(nrow(gt)), y = gt[[g]], type = type, pch = pch, lty = lty, col = col[s], ...)
-    }
-    
-    if (showLegend)
-        makeLegend(par("usr")[2], par("usr")[4])
-    
-    par(oldp)
+    doPlotFeatInts(obj, average, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
 })
 
 #' @rdname featureGroups-class

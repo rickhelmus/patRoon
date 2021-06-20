@@ -436,6 +436,19 @@ assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkm
     # UNDONE: validate YAML?
 }
 
+checkSetLabels <- function(x, len)
+{
+    ret <- checkmate::checkCharacter(x, min.chars = 1, any.missing = FALSE, len = len, unique = TRUE)
+    if (isTRUE(ret) && any(grepl(",", x, fixed = TRUE)))
+        ret <- "Set labels cannot contain commas"
+    if (isTRUE(ret) && any(grepl("-", x, fixed = TRUE)))
+        ret <- "Set labels cannot contain minus signs (-)"
+    if (isTRUE(ret) && any(grepl("genform|sirius|bruker|metfrag", x)))
+        ret <- "Set labels cannot contain annotation algorithm names"
+    return(ret)
+}
+assertSetLabels <- checkmate::makeAssertionFunction(checkSetLabels)
+
 assertSets <- function(obj, s, multiple, null.ok = multiple, .var.name = checkmate::vname(s), add = NULL)
 {
     if (multiple)

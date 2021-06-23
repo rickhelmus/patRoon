@@ -78,6 +78,7 @@
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
     - only keep relevant suspect list columns when input is screening object for lib/BT TPs
+    - is the rt column for parents retained? --> handy for suspect screening with convertToSuspects
 - reporting
     - padding between two tables?
     - default TP columns OK?
@@ -147,22 +148,16 @@
             - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
     - TPs
         - Linking parents with TPs
-            - generateComponentsTPs
-                - need to do suspect screening for BT/lib
-                - fGroupsTPs
-                - others
-                - BT/Lib: update adduct argument (not needed anymore)
-            - post-processing
-                - explain retDir, frag/NLMatches
-                - highlight formula filter
-            - without TP input(?)
+            - fix UNDONEs
         - Example workflows
             - intro/motivation: flexible interface
             - BT: target list --> BT TPs --> screenSuspects, MF etc
                 - convertToMFDB
             - Lib: fgScr --> Lib TPs --> screenSuspects --> min ID level --> etc
+                - advantage componentization: nice reporting
             - logic: NTA --> log2FC --> logic TPs --> suspects --> formulas & filter formula (topMost=5) --> suspAnnotation, min level 4 --> filter componentization results --> ...
             - Show schemes?
+        - mention reporting
     - update
         - suspect screening
             - adducts

@@ -25,7 +25,7 @@ digraph Workflow {
 * **TP screening** A suspect screening is performed to find the TPs in the analysis data. 
 * **Linking parents and TPs** In the step the parent features are linked with the TP features. Several post-processing functionality exists to improve and prioritize the data.
 
-The next sections will outline more details on these steps are performed and configured. The last section in this chapter outlines several example workflows.
+The next sections will outline more details on these steps are performed and configured. The [last section](#TPsExamples) in this chapter outlines several example workflows.
 
 ## Obtaining transformation product data {#genTPs}
 
@@ -49,11 +49,9 @@ Argument                      | Algorithm(s)      | Remarks
 `fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
 `type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
 `TPLibrary`/`transformations` | `library`/`logic` | [Custom TP library/transformation rules](#TPsCustom).
-`adduct`                      | All               | The assumed adduct of the parents (e.g. `"[M+H]+"`). See section below.
+`adduct`                      | `logic`           | The assumed adduct of the parents (e.g. `"[M+H]+"`). Not needed when adduct annotations are available (or a [sets workflow](#setsWorkflow) is performed).
 
 ### Parent input
-
-UNDONE: links below, finish adduct discussion
 
 The input parent structures for the `biotransformer` and `library` algorithms must be one the following:
 
@@ -61,7 +59,7 @@ The input parent structures for the `biotransformer` and `library` algorithms mu
 * A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
 * A `compounds` object obtained with [compound annotation](#compounds)
 
-In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation] are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
+In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation](#compounds) are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
 
 For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data.
 
@@ -79,14 +77,7 @@ TPsLib <- generateTPs("library", parents = fGroupsScr)
 TPsLogic <- generateTPs("logic", fGroups, adduct = "[M+H]+")
 ```
 
-The `adduct` argument is only needed in the following scenarios:
-
-* There are no [adduct annotations] available. Note that in a [sets workflow](#setsWorkflow) these are always available.
-* In case the `biotransformer` / `library` algorithm is used: the parent input ...
-
 ### Processing data
-
-UNODNE: links below
 
 Similar to other workflow data, several generic functions are available to inspect the data:
 
@@ -136,8 +127,8 @@ TPsF <- filter(TPs, removeEqualFormulas = TRUE)
 TPsF <- filter(TPs, minSimilarity = 0.5)
 
 # do a suspect screening for all TPs and their parents
-suspL <- convertToSuspects(TPs, includeParents = TRUE)
-fGroupsScr <- screenSuspects(fGroups, suspL, onlyHits = TRUE)
+suspects <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 
 # use the TP data for a specialized MetFrag database
 convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
@@ -145,7 +136,7 @@ compoundsTPs <- generateCompounds(fGroups, mslists, "metfrag", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 ```
 
-The `convertToSuspects` function is always part of a workflow with `biotransformer` or `library` TPs. This is discussed further in the next section. The `convertToMFDB` function is especially handy with `biotransformer` workflows, as it allows generating a compound database for TPs that may not be available in other databases. This is further demonstrated in the [first example].
+The `convertToSuspects` function is always part of a workflow with `biotransformer` or `library` TPs. This is discussed further in the next section. The `convertToMFDB` function is especially handy with `biotransformer` workflows, as it allows generating a compound database for TPs that may not be available in other databases. This is further demonstrated in the [first example](#TPsEx1).
 
 ### Custom libraries and transformations {#TPsCustom}
 
@@ -191,8 +182,6 @@ This section discusses one of the most important steps in a TP screening workflo
 
 ### Componentization
 
-UNDONE: link to example
-
 Like [other algorithms]{#components}, the `generateComponents` generic function is used to generate TP components, by setting the `algorithm` parameter to `"TP"`.
 
 The following arguments are of importance:
@@ -214,7 +203,7 @@ The `fGroups`, `fGroupsTPs` and `ignoreParents` arguments are used by the compon
 2. `fGroups` and `fGroupsTPs` contain different subsets of the _same_ `featureGroups` object and `ignoreParents=FALSE`:  only the feature groups in `fGroups`/`fGroupsTPs` are considered as parents/TPs.
 3. As above, but with `ignoreParents=TRUE`: the same distinction is made as above, but any feature groups in `fGroupsTPs` are ignored if also present in `fGroups`.
 
-The first scenario is often used if it is unknown which feature groups may be parents or which are TPs. Furthermore, this scenario may also be used if the dataset is sufficiently simple, for instance, because a suspect screening with the results from `convertToSuspects` (discussed in the previous section) would reliably discriminate between parents and TPs. A workflow with the first scenario is demonstrated in the [first example].
+The first scenario is often used if it is unknown which feature groups may be parents or which are TPs. Furthermore, this scenario may also be used if the dataset is sufficiently simple, for instance, because a suspect screening with the results from `convertToSuspects` (discussed in the previous section) would reliably discriminate between parents and TPs. A workflow with the first scenario is demonstrated in the [second example](#TPsEx2).
 
 In all other cases it is recommended to use either the second or third scenario, since making a prior distinction between parent and TP feature groups greatly simplifies the dataset and reduces false positives. A relative simple example where this can be used is when there are two sample groups: before and after treatment.
 
@@ -233,9 +222,23 @@ componTP <- generateComponents(algorithm = "tp",
                                ignoreParents = TRUE)
 ```
 
-More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the [third example] a workflow is demonstrated where fold changes are used.
+More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the [third example](#TPsEx3) a workflow is demonstrated where fold changes are used.
 
 > **NOTE** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
+
+For the `library` and `biotransformer` algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the `convertToSuspects` function should be used to prepare the suspect list:
+
+```{r eval=FALSE}
+# set includeParents to TRUE since both the parents and TPs are needed
+suspects <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
+
+# do the componentization
+# a similar distinction between fGroups/fGroupsScr as discussed above can of course also be done
+componTP <- generateComponents(fGroups = fGroupsScr, ...)
+```
+
+Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to a TP suspect, all of them will be incorporated in the component.
 
 #### Annotation similarity calculation
 
@@ -270,14 +273,68 @@ The `TPs` argument to `generateComponents` can also be omitted. In this case eve
 
 When no transformation data is supplied it is crucial to make [a prior distinction](#TPsFGroups) between parent and TP feature groups. Afterwards, the MS/MS spectral and other annotation similarity filters mentioned in the previous section may be a powerful way to further prioritize data.
 
-The [fourth example] demonstrates such a workflow.
+The [fourth example](#TPsEx4) demonstrates such a workflow.
 
-## Example workflows
+## Example workflows {#TPsExamples}
 
-### Screen predicted TPs for targets
+### Screen predicted TPs for targets {#TPsEx1}
 
-### Screening library TPs for suspects
+```{r eval=FALSE}
+# predict TPs for a fixed list of parents
+TPs <- generateTPs("biotransformer", parents = patRoonData::suspectsPos)
 
-### Non-targeted screening of predicted TPs
+# screen for the TPs
+suspectsTPs <- convertToSuspects(TPs, includeParents = FALSE)
+fGroupsTPs <- screenSuspects(fGroups, suspectsTPs, onlyHits = TRUE)
 
-### Non-targeted screening of TPs by annotation similarities
+# perform annotation of TPs
+mslistsTPs <- generateMSPeakLists(fGroups, "mzr")
+
+# generate MetFrag database
+convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
+
+# and use it for compound annotation
+compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", database = "csv",
+                                  extraOpts = list(LocalDatabasePath = "TP-database.csv"))
+```
+
+### Screening TPs from a library for suspects {#TPsEx2}
+
+```{r eval=FALSE}
+# predict TPs for a fixed list of parents
+
+fGroupsScr <- screenSuspects(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+
+TPs <- generateTPs("library", parents = fGroupsScr)
+
+# screen for the TPs
+suspects <- convertToSuspects(TPs, includeParents = FALSE)
+fGroupsTPs <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
+
+# perform annotation of TPs
+mslistsTPs <- generateMSPeakLists(fGroups, "mzr")
+
+# generate MetFrag database
+convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
+
+# and use it for compound annotation
+compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", database = "csv",
+                                  extraOpts = list(LocalDatabasePath = "TP-database.csv"))
+
+# filter out candidates without in-silico MS/MS explanations
+compoundsTPs <- filter(compoundsTPs, minExplainedPeaks = 1)
+
+# and only keep TPs with high identification levels
+fGroupsTPs <- annotateSuspects(fGroupsTPs, MSPeakLists = mslistsTPs, compounds = compoundsTPs)
+fGroupsTPs <- filter(fGroupsTPs, maxLevel = 3)
+
+# generate components
+componTPs <- generateComponents(fGroupsTPs, "tp", MSPeakLists = mslistsTPs, compunds = compoundsTPs)
+
+reportHTML(fGroupsTPs, MSPeakLists = mslistsTPs, compounds = compoundsTPs, components = componTP)
+
+```
+
+### Non-targeted screening of predicted TPs {#TPsEx3}
+
+### Non-targeted screening of TPs by annotation similarities {#TPsEx4}

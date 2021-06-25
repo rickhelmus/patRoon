@@ -87,7 +87,7 @@ Alternatively, the `newProject()` function discussed in the next section can be 
 
 ### Automatic project generation with newProject() {#newProject}
 
-The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducible research).
+The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can recall what you have done before (i.e. reproducible research).
 
 The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
 
@@ -98,12 +98,12 @@ if (knitr::is_html_output()) {
     knitr::include_graphics(file.path(vignDir, "newp.png"))
 ```
 
-> **_NOTE_** At the moment `newProject()` _only_ works with (recent) versions of RStudio.
+> **_NOTE_** At the moment `newProject()` _only_ works with [RStudio].
 
 
 ## Features
 
-Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening: 
+Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening: 
 
 ```{r featWorkflow,echo=FALSE,out.width="75%"}
 plotGV("
@@ -396,7 +396,7 @@ Database            | Algorithm(s)            | Remarks
 
 #### Configuring MetFrag databases and scoring
 
-Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PUbChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PubChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
 
 ```{r compDB,eval=FALSE}
 # PubChem: the default

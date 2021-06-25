@@ -182,7 +182,7 @@ This section discusses one of the most important steps in a TP screening workflo
 
 ### Componentization
 
-Like [other algorithms]{#components}, the `generateComponents` generic function is used to generate TP components, by setting the `algorithm` parameter to `"TP"`.
+Like [other algorithms](#components), the `generateComponents` generic function is used to generate TP components, by setting the `algorithm` parameter to `"tp"`.
 
 The following arguments are of importance:
 
@@ -222,7 +222,7 @@ componTP <- generateComponents(algorithm = "tp",
                                ignoreParents = TRUE)
 ```
 
-More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the [third example](#TPsEx3) a workflow is demonstrated where fold changes are used.
+More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the [fourth example](#TPsEx4) a workflow is demonstrated where fold changes are used.
 
 > **NOTE** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
 
@@ -239,6 +239,17 @@ componTP <- generateComponents(fGroups = fGroupsScr, ...)
 ```
 
 Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to a TP suspect, all of them will be incorporated in the component.
+
+When TPs were generated with the `logic` algorithm a suspect screening must also be carried out in advance. However, in this case it is not necessary to include the parents (since each parent equals a feature group no mapping is necessary). The `onlyHits` variable to `screenSuspects` must not be set in order to keep the parents.
+
+```{r eval=FALSE}
+# only screen for TPs
+suspects <- convertToSuspects(TPs, includeParents = FALSE)
+# but keep all other feature groups as these may be parents
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
+
+# do the componentization...
+```
 
 #### Annotation similarity calculation
 
@@ -275,9 +286,25 @@ When no transformation data is supplied it is crucial to make [a prior distincti
 
 The [fourth example](#TPsEx4) demonstrates such a workflow.
 
+### Reporting TP components
+
+The TP components can be reported with the `reportHTML` function. This is done by setting the `components` function argument (i.e. equally to all other component types). The results will be displayed with a customized format that allows easy exploring of each parent with its TPs.
+
+```{r eval=FALSE}
+reportHTML(fGroups, components = componTP)
+```
+
 ## Example workflows {#TPsExamples}
 
+UNDONE: links
+
+The next subsections demonstrate several approaches to perform a TP screening workflow with `patRoon`. In all examples it is assumed that feature groups were already obtained (with the `findFeatures` and `groupFeatures` functions) and stored in the `fGroups` variable.
+
+The workflows with `patRoon` are designed to be flexible, and the examples here are primarily meant to implement your own workflow. Furthermore, some of the techniques used in the examples can also be combined. For instance, the [Fold change] classification and MS/MS similarity filters applied in the [fourth example](#TPsEx4) could also be applied to any of the other examples.
+
 ### Screen predicted TPs for targets {#TPsEx1}
+
+The first example is a simple workflow where TPs are predicted for a set of given parents with [BioTransformer] and subsequently screened. A [MetFrag] compound database is generated and used for annotation.
 
 ```{r eval=FALSE}
 # predict TPs for a fixed list of parents
@@ -288,53 +315,138 @@ suspectsTPs <- convertToSuspects(TPs, includeParents = FALSE)
 fGroupsTPs <- screenSuspects(fGroups, suspectsTPs, onlyHits = TRUE)
 
 # perform annotation of TPs
-mslistsTPs <- generateMSPeakLists(fGroups, "mzr")
-
-# generate MetFrag database
-convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
-
-# and use it for compound annotation
+mslistsTPs <- generateMSPeakLists(fGroupsTPs, "mzr")
+convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE) # generate MetFrag database
 compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 ```
 
 ### Screening TPs from a library for suspects {#TPsEx2}
 
+In this example TPs of interest are obtained for the parents that surfaced from of a suspect screening. The steps of this workflow are:
+
+1. Suspect screening parents.
+2. Obtain TPs for the suspect hits from a library.
+3. A second suspect screening is performed with both parents and TPs. Note that the parent data is needed for componentization.
+4. Both parents and TPs are annotated using a database generated from their chemical structures.
+5. Some prioritization is performed by
+    a. Only keeping candidate structures for which _in-silico_ fragmentation resulted in at least one annotated MS/MS peak.
+    b. Only keeping suspect hits with an estimated identification level of 3 or better.
+6. The TP components are made and only feature groups with parent/TP assignments are kept.
+7. All results are reported.
+
 ```{r eval=FALSE}
-# predict TPs for a fixed list of parents
+# step 1
+fGroupsParents <- screenSuspects(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+# step 2
+TPs <- generateTPs("library", parents = fGroupsParents)
 
-fGroupsScr <- screenSuspects(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+# step 3
+suspects <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 
-TPs <- generateTPs("library", parents = fGroupsScr)
-
-# screen for the TPs
-suspects <- convertToSuspects(TPs, includeParents = FALSE)
-fGroupsTPs <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
-
-# perform annotation of TPs
-mslistsTPs <- generateMSPeakLists(fGroups, "mzr")
-
-# generate MetFrag database
-convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
-
-# and use it for compound annotation
-compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", database = "csv",
+# step 4
+mslistsScr <- generateMSPeakLists(fGroupsScr, "mzr")
+convertToMFDB(TPs, "TP-database.csv", includeParents = TRUE)
+compoundsScr <- generateCompounds(fGroupsScr, mslistsScr, "metfrag", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 
-# filter out candidates without in-silico MS/MS explanations
-compoundsTPs <- filter(compoundsTPs, minExplainedPeaks = 1)
+# step 5a
+compoundsScr <- filter(compoundsScr, minExplainedPeaks = 1)
 
-# and only keep TPs with high identification levels
-fGroupsTPs <- annotateSuspects(fGroupsTPs, MSPeakLists = mslistsTPs, compounds = compoundsTPs)
-fGroupsTPs <- filter(fGroupsTPs, maxLevel = 3)
+# step 5b
+fGroupsScrAnn <- annotateSuspects(fGroupsScr, MSPeakLists = mslistsScr,
+                                  compounds = compoundsScr)
+fGroupsScrAnn <- filter(fGroupsScrAnn, maxLevel = 3, onlyHits = TRUE)
 
-# generate components
-componTPs <- generateComponents(fGroupsTPs, "tp", MSPeakLists = mslistsTPs, compunds = compoundsTPs)
+# step 6
+componTP <- generateComponents(fGroupsScrAnn, "tp", MSPeakLists = mslistsScr,
+                               compunds = compoundsScr)
+fGroupsScrAnn <- fGroupsScrAnn[, union(componentInfo(componTP)$parent_group,
+                                       groupNames(componTP))]
 
-reportHTML(fGroupsTPs, MSPeakLists = mslistsTPs, compounds = compoundsTPs, components = componTP)
-
+# step 7
+reportHTML(fGroupsScrAnn, MSPeakLists = mslistsScr, compounds = compoundsScr,
+           components = componTP)
 ```
 
 ### Non-targeted screening of predicted TPs {#TPsEx3}
 
+This example uses metabolic logic to calculate possible TPs for all feature groups from a complete non-target screening. This example demonstrates how a workflow can be performed when little is known about the identity of the parents. The steps of this workflow are:
+
+1. Formula annotations are performed for all feature groups.
+2. These results are then limited to the top 5 candidates, and only feature groups with annotations are kept.
+3. The TPs are calculated for all remaining feature groups.
+4. A suspect screening is performed to find the TPs. Unlike the previous example the parents are not screened, and feature groups without hits are kept ([discussed here](#TPsFGroups)).
+5. The components are generated
+6. The components are filtered:
+    a. The TPs must follow an expected [retention time direction]
+    b. The parent/TPs should have at least one candidate formula that fits with the transformation.
+7. Only feature groups are kept with parent/TP assignments and all results are reported.
+
+```{r eval=FALSE}
+# steps 1-2
+mslists <- generateMSPeakLists(fGroups, "mzr")
+formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
+formulas <- filter(formulas, topMost = 5)
+fGroups <- fGroups[, groupNames(formulas)]
+
+# step 3
+TPs <- generateTPs("logic", fGroups = fGroups, adduct = "[M+H]+")
+
+# step 4
+suspects <- convertToSuspects(TPs, includeParents = FALSE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
+
+# step 5
+componTP <- generateComponents(fGroups, "tp", MSPeakLists = mslists, formulas = formulas)
+
+# step 6
+componTP <- filter(componTP, retDirMatch = TRUE, formulas = formulas)
+
+# step 7
+fGroups <- fGroups[, union(componentInfo(componTP)$parent_group, groupNames(componTP))]
+reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
+```
+
 ### Non-targeted screening of TPs by annotation similarities {#TPsEx4}
+
+UNDONE: links
+
+This example shows a workflow where no TP data from a prediction or library is used. Instead, this workflow relies on statistics and MS/MS data to find feature groups which may potentially have a parent - TP relationship. The workflow is similar to that of the previous example. The steps of this workflow are:
+
+1. [Fold changes] (FC) between two sample groups are calculated to classify which feature groups are decreasing (i.e. parents) or increasing (i.e. TPs).
+2. Feature groups without classification are removed.
+3. Formula annotations are performed like the previous example.
+4. The componentization is performed and the FC classifications are used to specify which feature groups are to be considered parents or TPs.
+5. Only TPs are kept that show a high MS/MS spectral similarity and share at least one fragment with their parent.
+6. Only feature groups are kept with parent/TP assignments and all results are reported.
+
+```{r eval=FALSE}
+# step 1
+tab <- as.data.table(fGroups, FCParams = getFCParams(c("before", "after")))
+groupsParents <- tab[classification == "decrease"]$group
+groupsTPs <- tab[classification == "increase"]$group
+
+# step 2
+fGroups <- fGroups[, union(groupsParents, groupsTPs)]
+
+# step 3
+mslists <- generateMSPeakLists(fGroups, "mzr")
+formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
+formulas <- filter(formulas, topMost = 5)
+fGroups <- fGroups[, groupNames(formulas)]
+
+# step 4
+componTP <- generateComponents(algorithm = "tp",
+                               fGroups = fGroups[, groupsParents],
+                               fGroupsTPs = fGroups[, groupsTPs],
+                               MSPeakLists = mslists, formulas = formulas)
+
+# step 5
+componTP <- filter(componTP, minSpecSimBoth = 0.75, minFragMatches = 1)
+
+# step 6
+fGroups <- fGroups[, union(componentInfo(componTP)$parent_group, groupNames(componTP))]
+reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
+```

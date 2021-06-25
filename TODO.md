@@ -147,17 +147,7 @@
                 - makeSet(fGroups): add link to checkUIs
             - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
     - TPs
-        - Linking parents with TPs
-            - fix UNDONEs
-        - Example workflows
-            - intro/motivation: flexible interface
-            - BT: target list --> BT TPs --> screenSuspects, MF etc
-                - convertToMFDB
-            - Lib: fgScr --> Lib TPs --> screenSuspects --> min ID level --> etc
-                - advantage componentization: nice reporting
-            - logic: NTA --> log2FC --> logic TPs --> suspects --> formulas & filter formula (topMost=5) --> suspAnnotation, min level 4 --> filter componentization results --> ...
-            - Show schemes?
-        - mention reporting
+        - fix UNDONEs
     - update
         - suspect screening
             - adducts
@@ -209,6 +199,7 @@
     - XMCS(3): `exportedData` --> `loadRawData`
     - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
     - clarify reportCSV() now only reports remaining features?
+    - OpenMS: load intensities from FFM data (needs pre-release)
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
@@ -304,6 +295,11 @@
 - XCMS: multiple features grouped in same analysis?
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
+
+
+## Suspects
+
+- screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
 
 
 ## Annotation

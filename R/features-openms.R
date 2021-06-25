@@ -120,21 +120,31 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         
         # load intensities afterwards: we want to use the cache if possible,
         # which wouldn't be possible if future MP is used.
-        fList <- sapply(names(fList), function(ana)
+        
+        # NOTE: the latest OpenMS nightly builds now load peak heights, use them if available. They are loaded in the
+        # C++ parser.
+        intAvail <- FALSE
+        if (length(fList) > 0)
+            intAvail <- !any(is.na(fList[[1]]$intensity))
+        
+        if (!intAvail)
         {
-            if (verbose)
-                printf("Loading peak intensities for '%s'...\n", ana)
-            
-            fts <- loadIntensities(cmdQueue[[ana]]$dataFile, fList[[ana]], intSearchRTWindow)
-            
-            # BUG: OpenMS sporadically reports features with 0 intensity
-            # (noticed this with a feature of only two datapoints in hull).
-            fts <- fts[intensity > 0]
-            
-            return(fts)
-        }, simplify = FALSE)
+            fList <- sapply(names(fList), function(ana)
+            {
+                if (verbose)
+                    printf("Loading peak intensities for '%s'...\n", ana)
+                
+                fts <- loadIntensities(cmdQueue[[ana]]$dataFile, fList[[ana]], intSearchRTWindow)
+                
+                # BUG: OpenMS sporadically reports features with 0 intensity
+                # (noticed this with a feature of only two datapoints in hull).
+                fts <- fts[intensity > 0]
+                
+                return(fts)
+            }, simplify = FALSE)
+        }
     }
-
+    
     if (verbose)
     {
         printf("Done!\n")

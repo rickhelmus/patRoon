@@ -135,7 +135,6 @@
         - MSPL: clearly mention that MSPeakLists should not be filtered/subset after annotation
         - new/changed as.data.table args
             - maxFormulas/maxFragFormulas removed
-        - put featThreshold in common arguments handbook table? Update for featThresholdAnn
     - sets
         - general topics
             - initiating/performing a sets workflow
@@ -148,10 +147,30 @@
             - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
     - TPs
         - fix UNDONEs
+        - mention newProject when/if support is there
     - update
+        - introduction
+            - mention changes of patRoon 2.0?
+        - installation
+            - add new deps in manual installation, update RDCOMClient installation, options
+        - concepts: add sets(?) and TPs
+        - generating workflow data
+            - anaInfo: update for new patRoonData, no need to mention tutorial, also mention patRoonData anaInfo function?
+            - features: new algorithms
+                - mention SAFD is experimental
+            - formulas
+                - update: MSPL now needed for DA formulas
+                - put featThreshold in common arguments table
+                - update featThresholdAnn
+                - mention adduct arg not needed if selectIons is used?
+            - compounds
+                - need to update PCL link?
         - suspect screening
+            - don't mention that the interface was changed?
             - adducts
+                - mention adduct arg not needed if selectIons is used?
             - TBA --> Aldicarb
+            - update onlyHits (mentions recently changed)
         - annotation
             - as.data.table args
             - annotatedPeakList: more interesting results (or improve BTA?)

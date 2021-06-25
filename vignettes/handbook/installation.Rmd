@@ -15,9 +15,9 @@ installPatRoon()
 
 A simple text based wizard will start and asks you what to install and how to do it. You can re-run this installer at any time, for instance, if something went wrong or you want to install additional dependencies.
 
-## Docker image (experimental)
+## Docker image
 
-Docker images are provided to easily install a reproducible environment with `R`, `patRoon` and nearly all of its dependencies. This section assumes you have a basic understanding of [Docker] and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of `patRoon` were originally only used for automated testing, however, since these contain a complete working environment of `patRoon` they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), `R` dependencies and `MetFrag` libraries. Furthermore, as of recently the Docker image now also contains [RStudio] server, which makes using `patRoon` even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please [file a bug report][issues]!
+Docker images are provided to easily install a reproducible environment with `R`, `patRoon` and nearly all of its dependencies. This section assumes you have a basic understanding of [Docker] and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of `patRoon` were originally only used for automated testing, however, since these contain a complete working environment of `patRoon` they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), `R` dependencies and `MetFrag` libraries. Furthermore, the Docker image also contains [RStudio] server, which makes using `patRoon` even easier.
 
 Below are some example shell commands on how to run the image.
 
@@ -37,7 +37,7 @@ docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere patroonorg/patroo
 docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio/myvolume patroonorg/patroonrs /init
 ```
 
-Note that the first two commands run as the default user `rstudio`, while the last two as `root`. The last commands launch [RStudio] server. You can access it by browsing to `localhost:8787` and logging with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). The last command also links a local volume in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
+Note that the first two commands run as the default user `rstudio`, while the last two as `root`. The last commands launch [RStudio] server. You can access it by browsing to `localhost:8787` and logging in with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). The last command also links a local volume in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
 
 
 ## Manual installation
@@ -110,7 +110,7 @@ Finally, it is time to install `patRoon` itself. As mentioned before, Windows us
 # install from patRoonDeps (only Windows with latest R version)
 install.packages("patRoon", repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary")
 
-# optional, data for tutorial
+# optional example data
 install.packages("patRoonData", repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary")
 ```
 
@@ -119,8 +119,8 @@ install.packages("patRoonData", repos = "https://rickhelmus.github.io/patRoonDep
 ```{r eval=FALSE}
 remotes::install_github("rickhelmus/patRoon")
 
-# optional, data for tutorial
-remotes::install_github("rickhelmus/patRoonData") # example data used by tutorial
+# optional example data
+remotes::install_github("rickhelmus/patRoonData")
 ```
 
 Afterwards, you can run the `verifyDependencies()` function to see if `patRoon` can find all its dependencies (you may need to restart R beforehand)

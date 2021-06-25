@@ -10,7 +10,7 @@ namespace {
 struct feature
 {
     std::string id;
-    numType ret, mz, intensity;
+    numType ret, mz, area, intensity;
     numType retMin, retMax;
     numType mzMin, mzMax;
     int isoCount;
@@ -22,7 +22,7 @@ feature parseFeatureXMLBlock(pugi::xml_document &doc)
     
     feature ret;
     ret.id = featNode.attribute("id").value();
-    ret.intensity = getNumericFromXML(featNode.child("intensity").text());
+    ret.area = getNumericFromXML(featNode.child("intensity").text()); // intensity reported by OpenMS is actually the area
     
     for (auto pos: featNode.children("position"))
     {
@@ -62,6 +62,18 @@ feature parseFeatureXMLBlock(pugi::xml_document &doc)
         }
     }
     
+    ret.intensity = NA_REAL;
+    for (auto up : featNode.children("UserParam"))
+    {
+        const std::string type = up.attribute("type").value();
+        if (type != "float")
+            continue;
+        const std::string name = up.attribute("name").value();
+        if (name != "max_height")
+            continue;
+        ret.intensity = getNumericFromXML(up.attribute("value"));
+    }
+    
     return ret;
 }
 
@@ -71,7 +83,7 @@ feature parseFeatureXMLBlock(pugi::xml_document &doc)
 Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
 {
     std::vector<std::string> ids;
-    std::vector<numType> ints, rets, mzs, retMins, retMaxs, mzMins, mzMaxs;
+    std::vector<numType> areas, ints, rets, mzs, retMins, retMaxs, mzMins, mzMaxs;
     std::vector<int> isoCounts;
     
     parseXMLFile(Rcpp::as<const char *>(file), "<feature id=", "</feature>",
@@ -79,6 +91,7 @@ Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
                  {
                      feature f(parseFeatureXMLBlock(doc));
                      ids.push_back(f.id);
+                     areas.push_back(f.area);
                      ints.push_back(f.intensity);
                      rets.push_back(f.ret);
                      mzs.push_back(f.mz);
@@ -92,7 +105,8 @@ Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
     return Rcpp::DataFrame::create(Rcpp::Named("ID") = ids,
                                    Rcpp::Named("ret") = rets,
                                    Rcpp::Named("mz") = mzs,
-                                   Rcpp::Named("area") = ints, // intensity reported by OpenMS is actually the area
+                                   Rcpp::Named("area") = areas,
+                                   Rcpp::Named("intensity") = ints,
                                    Rcpp::Named("retmin") = retMins,
                                    Rcpp::Named("retmax") = retMaxs,
                                    Rcpp::Named("mzmin") = mzMins,

@@ -6,6 +6,7 @@
     - sets: add specific options for annotation and others?
     - TP workflow
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
+- update PCL links for installPatRoon?
 
 
 ## Features
@@ -156,33 +157,24 @@
             - add new deps in manual installation, update RDCOMClient installation, options
         - concepts: add sets(?) and TPs
         - generating workflow data
+            - suspect screening
+                - mention adduct arg not needed if annotations are available
             - formulas
-                - update: MSPL now needed for DA formulas
-                - put featThreshold in common arguments table
-                - update featThresholdAnn
-                - mention adduct arg not needed if selectIons is used?
+                - mention adduct arg not needed if selectIons is used
             - compounds
                 - need to update PCL link?
             - components
-                - mention TP methodology/algo
-                - mention new algos
-                - explain feature components and update general description
+                - mention selectIons can be used with components
+                - add link to checkComponents
                 - ionization arg: not needed if annotated
-                - nontarget: extraOpts --> ...
                 - section on MS/MS clustering
-            - suspect screening
-                - don't mention that the interface was changed?
-                - adducts
-                    - mention adduct arg not needed if selectIons is used?
-                - TBA --> Aldicarb
-                - update onlyHits (mentions recently changed)
-                - update mass matching?
             - selectIons/adduct() section (also in intro scheme?)
         - processing
             - update as.data.table examples for formulas (new/removed args)
             - annotation filter: update args availability for formulas/compounds
             - annotatedPeakList: more interesting results (or improve BTA?)
             - add section on delete() (or in advanced?)
+            - mention impact of filtering MSPL
             - add section of spec comparison
                 - separately handle plotting?
             - Visualization

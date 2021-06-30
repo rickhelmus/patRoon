@@ -211,8 +211,6 @@ fGroupsSIRIUS <- groupFeatures(anaInfo, "sirius") # find/group features with SIR
 
 ### Suspect screening {#suspscr}
 
-> **_NOTE_**: the suspect screening interface was changed in version 1.1. Please re-read this section and adjust your workflow correspondingly, as the old interface does _not_ work anymore.
-
 > **_NOTE_**: you may need to install [OpenBabel], for instance, when only InChI data is available for mass calculation.
 
 After features have been grouped a so called suspect screening step may be performed to find features that may correspond to suspects within a given suspect list. The `screenSuspects()` function is used for this purpose, for instance:
@@ -226,11 +224,13 @@ fGroupsSusp <- screenSuspects(fGroups, suspects)
 
 This example has a very simple suspect list with just three compounds. The format of the suspect list is quite flexible, and can contain the following columns:
 
-- `name`: The name of the suspect. Mandatory and should be file-name compatible (if not, the name will be automatically re-named to make it compatible).
+- `name`: The name of the suspect. Mandatory and should be unique and file-name compatible (if not, the name will be automatically re-named to make it compatible).
 - `rt`: The retention time in seconds. Optional. If specified any feature groups with a different retention time will not be considered to match suspects.
-- `mz`, `SMILES`, `InChI`, `formula`, `neutralMass`: _at least_ one of these columns must hold data for each suspect row. The `mz` column specifies the ionized mass of the suspect. If not available data from any of the other columns is used to calculate this automatically.
-- `adduct`: The adduct of the suspect. Adduct information is only required when no data from the `mz` column is available. The adduct can also be directly specified to `screenSuspects()` if it is the same for all suspects (see below).
+- `mz`, `SMILES`, `InChI`, `formula`, `neutralMass`: _at least_ one of these columns must hold data for each suspect row. The `mz` column specifies the ionized mass of the suspect. If this is not available then data from any of the other columns is used to determine the suspect mass.
+- `adduct`: The adduct of the suspect. Optional. Set this if you are sure that a suspect should be matched by a particular adduct ion and no data in the `mz` column is available.
 - `fragments_mz` and `fragments_formula`: optional columns that may assist [suspect annotation](#suspAnn).
+
+In most cases a suspect list is best made as a `csv` file which can then be imported with e.g. the `read.csv()` function. This is exactly what happen when you specify a suspect list when using the `newProject()` function.
 
 Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the `SMILES`/`InChI`/`formula`/`neutralMass` columns should be provided. Whenever possible, it is _strongly_ recommended to fill in `SMILES` column (or `InChI`), as this will assist [annotation](#suspAnn). Applying this to the above example:
 
@@ -240,25 +240,31 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
 fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
 ```
 
-Note that it is now necessary to specify the adduct, as this information is required to automatically calculate ionized masses. Alternatively, the adduct information can also be specified in the suspect list:
+Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set.
+
+Finally, when the adduct is known for a suspect it can be specified in the suspect list:
 
 ```{r susp,eval=FALSE}
 # TBA is measured as positive molecular ion.
-suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "TBA"),
-                       SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "CCCC[N+](CCCC)(CCCC)CCCC"),
-                       adduct = c("[M+H]+", "[M+H]+", "[M]+"))
+suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "Aldicarb"),
+                       SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "CC(C)(C=NOC(=O)NC)SC"),
+                       adduct = c("[M+H]+", "[M+H]+", "[M+Na]+"))
 fGroupsSusp <- screenSuspects(fGroups, suspects)
 ```
 
-Note that in most cases such a suspect list is best made as a `csv` file which can then be imported with e.g. the `read.csv()` function. This is exactly what happen when you specify a suspect list when using the `newProject()` function.
+To summarize:
 
-Note that unlike previous versions of `patRoon`, any feature groups that were not matched to a suspect are _not_ removed by default. If you want to remove these, you can use the `onlyHits` parameter:
+* If a suspect has data in the `mz` column it will be directly matched with the _m/z_ value of a feature group.
+* Otherwise, if the suspect has data in the `adduct` column, the `m/z` value for the suspect is calculated from its neutral mass and the adduct and then matched with the `m/z` of a feature group.
+* Otherwise, suspects and feature groups are matched by their the neutral mass.
+
+Note that any feature groups that were not matched to a suspect are _not_ removed by default. If you want to remove these, you can use the `onlyHits` parameter:
 
 ```{r suspOH,eval=FALSE}
 fGroupsSusp <- screenSuspects(fGroups, suspects, onlyHits = TRUE) # remove any non-hits immediately
 ```
 
-The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The `filter()` function (discussed [here](#filtering)) can also be used to remove any non-hits at a later stage.
+The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The `filter()` function (discussed [here](#filtering)) can also be used to remove feature groups without a hit at a later stage.
 
 The `fragments_mz` and `fragments_formula` columns in the suspect list can be used to specify known fragments for a suspect, which can help [suspect annotation](#suspAnn). The former specifies the ionized _m/z_ of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:
 
@@ -352,9 +358,9 @@ Algorithm    | Usage                                          | Remarks
 ------------ | ---------------------------------------------- | ------------------------------------------------
 [GenForm]    | `generateFormulas(algorithm = "genform", ...)` | Bundled with `patRoon`. Reasonable default.
 [SIRIUS]     | `generateFormulas(algorithm = "sirius", ...)`  | Requires MS/MS data.
-DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). MS peak lists are not needed. Uses _SmartFormula_ algorithms.
+DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). Uses _SmartFormula_ algorithms.
 
-Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature _m/z_ (e.g. >600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.
+Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature _m/z_ (e.g. >600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted, however, compared to other algorithms calculation is often relative slow.
 
 There are two methods for formula assignment:
 
@@ -372,7 +378,7 @@ Argument          | Algorithm(s)        | Remarks
 relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
 elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
 calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
-featThresholdAnn  | All                 | Minimum relative amount (_0-1_) amongst all features within a feature group that a formula candidate should be present (e.g. _1_ means that a candidate is only considered if it was assigned to all features). 
+featThresholdAnn  | All                 | Minimum relative amount (_0-1_) that a candidate formula for a feature group should be found among all annotated features (e.g. _1_ means that a candidate is only considered if it was assigned to all annotated features). 
 adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)).
 MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
 profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
@@ -380,11 +386,11 @@ profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"o
 Some typical examples:
 
 ```{r forms,eval=FALSE}
-formulasGF <- generateFormulas(fGroups, "genform", mslists) # GenForm, default settings
-formulasGF2 <- generateFormulas(fGroups, "genform", mslists, calculateFeatures = FALSE) # direct feature group assignment (faster)
-formulasSIR <- generateFormulas(fGroups, "sirius", mslists, elements = "CHNOPSClBr") # SIRIUS, common elements for pollutant
-formulasSIR2 <- generateFormulas(fGroups, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
-formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
+formulasGF <- generateFormulas(fGroups, mslists, "genform") # GenForm, default settings
+formulasGF2 <- generateFormulas(fGroups, mslists, "genform", calculateFeatures = FALSE) # direct feature group assignment (faster)
+formulasSIR <- generateFormulas(fGroups, mslists, "sirius", elements = "CHNOPSClBr") # SIRIUS, common elements for pollutant
+formulasSIR2 <- generateFormulas(fGroups, mslists, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
+formulasBr <- generateFormulas(fGroups, mslists, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
 ```
 
 ### Compounds {#compounds}
@@ -537,39 +543,48 @@ The `annotateSuspects()` function will log decisions for identification level as
 
 ## Componentization {#componentization}
 
-In `patRoon` _componentization_ refers to grouping related feature groups together in components. Currently there are three different methodologies to generate components:
+In `patRoon` _componentization_ refers to grouping related feature groups together in components. There are different methodologies to generate components:
 
 * Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).
 * Homologous series: features with increasing _m/z_ and retention time.
 * Intensity profiles: features that follow a similar intensity profile in the analyses.
+* MS/MS similarity: feature groups with similar MS/MS spectra are clustered.
+* Transformation products: Components are formed by grouping feature groups that have a parent/transformation product relationship. This is further discussed in [its own chapter](#TPs).
 
 The following algorithms are currently supported:
 
-Algorithm            | Usage                                              | Remarks
--------------------- | -------------------------------------------------- | --------------------------------------------
-[CAMERA]             | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
-[RAMClustR]          | `generateComponents(algorithm = "ramclustr", ...)` | As above.
-[nontarget]          | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
-Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+Algorithm               | Usage                                              | Remarks
+----------------------- | -------------------------------------------------- | --------------------------------------------
+[CAMERA]                | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
+[RAMClustR]             | `generateComponents(algorithm = "ramclustr", ...)` | As above.
+[cliqueMS]              | `generateComponents(algorithm = "cliquems", ...)`  | As above, but using _feature components_.
+[OpenMS]                | `generateComponents(algorithm = "openms", ...)`    | As above. Uses [MetaboliteAdductDecharger].
+[nontarget]             | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
+Intensity clustering    | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+MS/MS clustering        | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
+Transformation products | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
 
 > **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
 
 ### Features with similar chromatographic behaviour
 
-Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
+Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
 
-Some common function arguments to `generateComponents()` are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:
 
-Argument                     | Algorithm                 | Remarks
----------------------------- | ------------------------- | --------------------------------------------------------------------
-`ionization`                 | `"camera"`, `"ramclustr"` | Ionization mode: `"positive"` or `"negative"`
-`minSize`                    | `"camera"`, `"ramclustr"` | Minimum component size. Smaller components will be removed.
-`relMinReplicates`           | `"camera"`, `"ramclustr"` | See below.
-`st`, `sr`, `maxt`, `hmax`   | `"ramclustr"`             | Common parameters to influence clustering of [RAMClustR]. See `?ramclustR` for details.
-`extraOpts`                  | `"camera"`                | A list with extra argument passed to the `annotate()` function from [CAMERA].
-`extraOptsRC`, `extraOptsFM` | `"ramclustr"`             | A list with extra arguments passed to the `ramclustR()` and `do.findmain()` functions from [RAMClustR].
+Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
+------------- | ---------- | ---------- | ---------- | ----------
+\#1           | 100.08827  | Present    | Present    | Absent
+\#2           | 122.07021  | Present    | Present    | Absent
+\#3           | 138.04415  | Absent     | Absent     | Present
 
-Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the `relMinReplicates` argument of `generateComponents()`, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is _0.5_ (the default), a feature must be present in at least half of all replicate groups present in the component.
+Based on the mass differences from this example a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+` could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn't detected in the first two sample analysis. Based on this it seems unlikely that feature group _#3_ should be part of the component.
+
+For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicate groups in total, then only those feature groups are kept for which its features were detected in at least two different replicate groups (_i.e._ half of four).
+
+Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
+
+Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here]) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
 
 Some example usage is shown below.
 
@@ -585,6 +600,13 @@ componCAM2 <- generateComponents(fGroups, "camera", ionization = "positive",
 componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hmax = 0.4,
                                extraOptsRC = list(cor.method = "spearman"),
                                extraOptsFM = list(ppm.error = 5))
+
+# OpenMS with customized parameters
+componOpenMS <- generateComponents(fGroups, "openms", ionization = "positive", chargeMax = 2,
+                                   absMzDev = 0.002)
+
+# cliqueMS with default parameters
+componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative")
 ```
 
 
@@ -646,7 +668,7 @@ Argument             | Remarks
 `rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
 `elements`           | Vector with elements to consider.
 `rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
-`extraOpts`          | List with extra arguments passed to the `homol.search()` function.
+`...`                | Further arguments passed to the `homol.search()` function.
 
 ```{r compsNT,eval=FALSE}
 # default settings

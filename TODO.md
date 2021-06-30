@@ -148,6 +148,7 @@
     - TPs
         - fix UNDONEs
         - mention newProject when/if support is there
+        - verify examples
     - update
         - introduction
             - mention changes of patRoon 2.0?
@@ -155,9 +156,6 @@
             - add new deps in manual installation, update RDCOMClient installation, options
         - concepts: add sets(?) and TPs
         - generating workflow data
-            - anaInfo: update for new patRoonData, no need to mention tutorial, also mention patRoonData anaInfo function?
-            - features: new algorithms
-                - mention SAFD is experimental
             - formulas
                 - update: MSPL now needed for DA formulas
                 - put featThreshold in common arguments table
@@ -165,15 +163,44 @@
                 - mention adduct arg not needed if selectIons is used?
             - compounds
                 - need to update PCL link?
-        - suspect screening
-            - don't mention that the interface was changed?
-            - adducts
-                - mention adduct arg not needed if selectIons is used?
-            - TBA --> Aldicarb
-            - update onlyHits (mentions recently changed)
-        - annotation
-            - as.data.table args
+            - components
+                - mention TP methodology/algo
+                - mention new algos
+                - explain feature components and update general description
+                - ionization arg: not needed if annotated
+                - nontarget: extraOpts --> ...
+                - section on MS/MS clustering
+            - suspect screening
+                - don't mention that the interface was changed?
+                - adducts
+                    - mention adduct arg not needed if selectIons is used?
+                - TBA --> Aldicarb
+                - update onlyHits (mentions recently changed)
+                - update mass matching?
+            - selectIons/adduct() section (also in intro scheme?)
+        - processing
+            - update as.data.table examples for formulas (new/removed args)
+            - annotation filter: update args availability for formulas/compounds
             - annotatedPeakList: more interesting results (or improve BTA?)
+            - add section on delete() (or in advanced?)
+            - add section of spec comparison
+                - separately handle plotting?
+            - Visualization
+                - remove/update mzWindow for EIC plotting
+                - add new plotSpectrum args for annotation?
+                - remove old checkChromatograms section
+            - Add new checkChromatograms/checkComponents section
+        - advanced
+            - feat opt
+                - include KPIC2 in discussion
+                - note that SAFD is currently not supported?
+                - parallelization?
+            - exporting
+                - include KPIC2
+            - parallelization
+                - futures also for other things
+                - no more progressr
+                - why is there a citation at the end?
 - progressr
 - annotation
     - generateFormulas: MSPeakLists argument

@@ -74,14 +74,16 @@ The final bits of preparation is constructing the information for the analyses t
 * **blank**: which replicate group should be used for blank subtraction.
 * **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the `as.data.table()` method function (see `?featureGroups` for more information).
 
-The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:
+The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance:
 
 ```{r genAnaInfo,eval=TRUE}
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
 generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                     groups = c(rep("solvent", 3), rep("standard", 3)),
-                     blanks = "solvent")
+                     groups = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
+                     blanks = "solvent-pos")
 ```
+
+(Note that for the example data the `patRoonData::exampleAnalysisInfo()` function can also be used.)
 
 Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.
 
@@ -131,20 +133,29 @@ Algorithm        | Usage                                       | Remarks
 ---------------- | ------------------------------------------- | --------------
 [OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | Uses the [FeatureFinderMetabo] algorithm
 [XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | Uses `xcms::xcmsSet()` function
-[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | Imports an existing `xcmsSet` object.
+[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | Imports an existing `xcmsSet` object
 [XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | Uses `xcms::findChromPeaks()` from the new XCMS3 interface
-[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | Imports an existing `XCMSnExp` object.
+[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | Imports an existing `XCMSnExp` object
 [enviPick]       | `findFeatures(algorithm = "envipick", ...)` | Uses `enviPick::enviPickwrap()`
+[KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | Uses the [KPIC2] `R` package
+[KPIC2] (import) | `importFeatures(algorithm = "kpic2", ...)`  | Imports features from [KPIC2]
+[SIRIUS]         | `findFeatures(algorithm = "sirius", ...)`   | Uses [SIRIUS] to find features
+[SAFD]           | `findFeatures(algorithm = "safd", ...)`     | Uses the [SAFD] algorithm (experimental)
 DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | Uses Find Molecular Features from DataAnalysis (Bruker only)
 
-Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
+Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
 
 Algorithm        | Common parameters
 ---------------- | ---------------------------------------------------------------------------------
 [OpenMS]         | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
 [XCMS] / [XCMS3] | `peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave` / `?CentWaveParam`)
 [enviPick]       | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
+[KPIC2]          | `kmeans`, `level`, `min_snr` (see `?findFeatures` and `?getPIC` / `?getPIC.kmeans`)
+[SIRIUS]         | The `sirius` algorithm is currently parameterless
+[SAFD]           | `mzRange`, `maxNumbIter`, `resolution`, `minInt` (see `?findFeatures`)
 DataAnalysis     | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
+
+> **_NOTE_** Support for SAFD is still experimental and some extra work is required to set everything up. Please see the reference documentation for this algorithm (`?findFeatures`).
 
 > **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
 
@@ -157,8 +168,13 @@ Algorithm        | Usage                                                    | Re
 [XCMS] (import)  | `importFeatureGroupsXCMS(...)`                           | Imports an existing `xcmsSet` object.
 [XCMS3]          | `groupFeatures(algorithm = "xcms3", ...)`                | Uses `xcms::groupChromPeaks()` and `xcms::adjustRtime()` functions
 [XCMS3] (import) | `importFeatureGroupsXCMS3(...)`                          | Imports an existing `XCMSnExp` object.
+[KPIC2]          | `groupFeatures(algorithm = "kpic2", ...)`                | Uses the [KPIC2] package
+[KPIC2] (import) | `importFeatureGroupsKPIC2(...)`                          | Imports a `PIC set` object
+[SIRIUS]         | `groupFeatures(anaInfo, algorithm = "sirius")`           | Finds _and_ groups features with [SIRIUS]
 ProfileAnalysis  | `importFeatureGroups(algorithm = "brukerpa", ...)`       | Import `.csv` file exported from Bruker ProfileAnalysis
 TASQ             | `importFeatureGroups(algorithm = "brukertasq", ...)`     | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
+
+> **_NOTE_**: Grouping features with the `sirius` algorithm will perform both finding and grouping features with [SIRIUS]. This algorithm cannot work with features from another algorithm.
 
 Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
 
@@ -176,6 +192,8 @@ fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
 fListXCMSImp <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
 fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
 fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
+fListKPIC2 <- findFeatures(anaInfo, "kpic2", kmeans = TRUE, level = 1E4) # KPIC2
+fListSIRIUS <- findFeatures(anaInfo, "sirius") # SIRIUS
 
 # Grouping features
 fGroupsOMS <- groupFeatures(fListOMS, "openms") # OpenMS grouping, default settings
@@ -185,13 +203,17 @@ fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS f
 fGroupsXCMS <- groupFeatures(fListEP, "xcms3",
                              xcms::PeakDensityParam(sampleGroups = analInfo$group,
                                                     minFraction = 0))
+# group with KPIC2 and set some custom grouping/aligning parameters
+fGroupsKPIC2 <- groupFeatures(fListKPIC2, "kpic2", groupArgs = list(tolerance = c(0.002, 18)),
+                              alignArgs = list(move = "loess"))
+fGroupsSIRIUS <- groupFeatures(anaInfo, "sirius") # find/group features with SIRIUS
 ```
 
 ### Suspect screening {#suspscr}
 
 > **_NOTE_**: the suspect screening interface was changed in version 1.1. Please re-read this section and adjust your workflow correspondingly, as the old interface does _not_ work anymore.
 
-> **NOTE**: you may need to install [OpenBabel], for instance, when only InChI data is available for mass calculation.
+> **_NOTE_**: you may need to install [OpenBabel], for instance, when only InChI data is available for mass calculation.
 
 After features have been grouped a so called suspect screening step may be performed to find features that may correspond to suspects within a given suspect list. The `screenSuspects()` function is used for this purpose, for instance:
 
@@ -511,7 +533,7 @@ In general, the more data provided by the suspect list and to `annotateSuspects(
 
 The `annotateSuspects()` function will log decisions for identification level assignments to the `log/` sub-directory in the current working directory. This is useful to inspect level assignments and especially useful when you customized any rules.
 
-> **NOTE**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
+> **_NOTE_**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
 
 ## Componentization {#componentization}
 

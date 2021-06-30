@@ -142,7 +142,7 @@ compounds <- filter(compounds, minExplainedPeaks = 1)
 
 The following sections will provide a more detailed overview of available data filters.
 
-> **_NOTE_**  Some other `R` packages (notably `dplyr`) also provide a `filter()` generic function. To use the `filter()` function from different packages you need explicitly specify which one to use in your script. This can be done by prefixing it with the package name, e.g. `patRoon::filter(...)`, `dplyr::filter(...)` etc.
+> **_NOTE_**  Some other `R` packages (notably `dplyr`) also provide a `filter()` generic function. To use the `filter()` function from different packages you may need to explicitly specify which one to use in your script. This can be done by prefixing it with the package name, e.g. `patRoon::filter(...)`, `dplyr::filter(...)` etc.
 
 
 ### Features
@@ -220,7 +220,7 @@ Filter                                    | Classes                  | Remarks
 `minAnnSimForm`, `minAnnSimComp`, `minAnnSimBoth` | `featureGroupsScreening` | Remove suspect hits with annotation similarity scores below this value.
 `absMinFragMatches`, `relMinFragMatches`  | `featureGroupsScreening` | Only keep suspect hits with a minimum (relative) number of fragment matches from the suspect list.
 
-> **NOTE**: most filters only remove suspect hit results. Set `onlyHits=TRUE` to also remove any feature groups that end up without suspect hits.
+> **_NOTE_**: most filters only remove suspect hit results. Set `onlyHits=TRUE` to also remove any feature groups that end up without suspect hits.
 
 The `selectHitsBy` and `selectBestFGroups` filters are useful to remove duplicate hits (one suspect assigned to multiple feature groups or multiple feature groups assigned to the same suspect, respectively). The former selects based on either best identification level (`selectHitsBy="level"`) or highest mean intensity (`selectHitsBy="intensity"`). The `selectBestFGroups` can only be `TRUE`/`FALSE` and always selects by best identification level.
 

@@ -73,13 +73,13 @@ Only a few modifications were necessary:
 * `makeSet` is used to combine the feature data
 * There is no need to specify the adduct anymore in the annotation steps.
 
-> **NOTE** The `analysis` names for the [analysis information](#anaInfo) must be _unique_ for each row, even among sets. Furthermore, replicate groups should not contain analyses from different sets.
+> **_NOTE_** The `analysis` names for the [analysis information](#anaInfo) must be _unique_ for each row, even among sets. Furthermore, replicate groups should not contain analyses from different sets.
 
 The key principle to make sets workflows work is performed by `makeSet`. This method function takes different `features` objects (or `featureGroups`, discussed later) to combine the feature data across sets. During this step features are _neutralized_: the feature _m/z_ data is converted to neutral feature masses. This step ensures that when features are grouped with `groupFeatures`, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.
 
 The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use [adduct annotations] for neutralization; this is discussed later.
 
-> **NOTE** The [newProject tool](#newProject) can be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
+> **_NOTE_** The [newProject tool](#newProject) can be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
 
 ## Generating sets workflow data
 

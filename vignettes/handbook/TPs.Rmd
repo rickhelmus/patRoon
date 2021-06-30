@@ -224,7 +224,7 @@ componTP <- generateComponents(algorithm = "tp",
 
 More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the [fourth example](#TPsEx4) a workflow is demonstrated where fold changes are used.
 
-> **NOTE** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
+> **_NOTE_** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
 
 For the `library` and `biotransformer` algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the `convertToSuspects` function should be used to prepare the suspect list:
 

@@ -52,6 +52,7 @@
 [processx]: https://github.com/r-lib/processx
 [progressr]: https://github.com/HenrikBengtsson/progressr
 [cliqueMS]: https://github.com/osenan/cliqueMS
+[MetaboliteAdductDecharger]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html
 [BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/
 [KPIC2]: https://github.com/hcji/KPIC2
 [SAFD]: https://bitbucket.org/SSamanipour/safd.jl/src/master/

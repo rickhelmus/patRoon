@@ -164,7 +164,6 @@
                 - checkComponents link
         - processing
             - annotatedPeakList: more interesting results (or improve BTA?)
-            - add section on delete() (or in advanced?)
             - add section of spec comparison
                 - separately handle plotting?
             - Visualization

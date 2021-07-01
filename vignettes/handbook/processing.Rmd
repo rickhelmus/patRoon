@@ -478,6 +478,70 @@ fGroups <- fGroups[, groupsOfInterest]
 # "sample" replicate group were in the top 5
 ```
 
+## Deleting data
+
+The `delete()` generic function can be used to manually delete workflow data. This function is used internally within `patRoon` to implement filtering and subsetting operations, but may also be useful for advanced data processing.
+
+Like the subset operator this function accepts a `i` and `j` parameter to specify which data should be operated on:
+
+Class                   | Argument `i`  | Argument `j`
+----------------------- | ------------- | -------------
+`features`              | analysis      | feature index
+`featureGroups`         | analysis      | feature group
+`formulas`, `compounds` | feature group | candidate index
+`components`            | component     | feature group
+
+If `i` or `j` is not specified (`NULL`) then data is removed for the complete selection. Some examples are shown below:
+
+```{r del,eval=FALSE}
+# delete 2nd feature in analysis-1
+fList <- delete(fList, i = "analysis-1", j = 2)
+# delete first ten features in all analyses
+fList <- delete(fList, i = NULL, j = 1:10)
+
+# completely remove third/fourth analyses from feature groups
+fGroups <- delete(fGroups, i = 3:4)
+# delete specific feature group
+fGroups <- delete(fGroups, j = "M120_R268_30")
+# delete range of feature groups
+fGroups <- delete(fGroups, j = 500:750)
+
+# remove all results for a feature group
+formulas <- delete(formulas, i = "M120_R268_30")
+
+# remove top candidate for all feature groups
+compounds <- delete(compounds, j = 1)
+
+# remove a component
+components <- delete(components, i = "CMP1")
+# remove specific feature group from a component
+components <- delete(components, i = "CMP1", j = "M120_R268_30")
+# remove specific feature group from all components
+components <- delete(components, j = "M120_R268_30")
+```
+
+The `j` parameter can also be a function: in this case it is called repeatedly on parts of the data to select what should be deleted. How the function is called and what it should return depends on the workflow data class:
+
+Class                   | Called on every | First argument                   | Second argument    | Return value
+----------------------- | --------------- | -------------------------------- | ------------------ | -------------------------------------------
+`features`              | analysis        | `data.table` with features       | analysis name      | Features indices (as `integer` or `logical`)
+`featureGroups`         | feature group   | vector with group intensities    | feature group name | The analyses of the features to remove (as `character`, `integer`, `logical`)
+`formulas`, `compounds` | feature group   | `data.table` with annotations    | feature group name | Candidate indices (rows)
+`components`            | component       | `data.table` with the component  | component name     | The feature groups (as `character`, `integer`)
+
+Some examples for this:
+
+```{r delF,eval=FALSE}
+# remove features with intensities below 5000
+fList <- delete(fList, j = function(f, ...) f$intensity <= 5E3)
+
+# same, but for features in all feature groups from specific analyses
+fGroups <- delete(i = 1:3, j = function(g, ...) g <= 5E3)
+
+# remove formula candidates with high relative mass deviation
+formulas <- delete(formulas, j = function(ft, ...) ft$error > 5)
+```
+
 ## Unique and overlapping features {#unOv}
 
 Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be highly interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.

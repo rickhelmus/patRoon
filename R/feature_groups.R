@@ -1761,7 +1761,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE,
                                                   chargeMismatch = "adduct")
 {
-    # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
+    # UNDONE is intensity a proper measure? ie does it allow comparison if
     # isotopes/adducts are taken from different analyses?
     # UNDONE: add logging to see what happens
     
@@ -1813,7 +1813,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         else if (prefAdduct %in% adduct_ion)
             adduct_ion != prefAdduct
         else # fall back to most intense
-            !numEQ(intensity_rel, max(intensity_rel))
+            !numEQ(intensity, max(intensity))
     }, by = "name"]
     
     # remove unwanted isotopes/adducts

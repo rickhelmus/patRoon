@@ -240,7 +240,7 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
 fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
 ```
 
-Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set.
+Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the `adduct` function argument to `screenSuspects` or by [feature group adduct annotations](#incorpAdductIso).
 
 Finally, when the adduct is known for a suspect it can be specified in the suspect list:
 
@@ -298,7 +298,6 @@ Intensity clustering    | `generateComponents(algorithm = "intclust", ...)`  | G
 MS/MS clustering        | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
 Transformation products | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
 
-> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
 
 ### Features with similar chromatographic behaviour {#componentsChrom}
 
@@ -319,6 +318,8 @@ For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClu
 Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
 
 Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here]) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+
+Once the components with adduct and isotopes annotations are generated this data can be [used to prioritize and improve the workflow](#incorpAdductIso).
 
 Some example usage is shown below.
 
@@ -398,7 +399,7 @@ Common function arguments to `generateComponents()` are listed below.
 
 Argument             | Remarks
 -------------------- | -----------------------------------------------------------------------
-`ionization`         | Ionization mode: `"positive"` or `"negative"`
+`ionization`         | Ionization mode: `"positive"` or `"negative"`. Not needed if [adduct annotations](#incorpAdductIso) are available.
 `rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
 `elements`           | Vector with elements to consider.
 `rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
@@ -453,7 +454,7 @@ componMSMS <- generateComponents(fGroups, "specclust", MSPeakLists = mslists)
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```
 
-## Incorporating adduct and isotopic data
+## Incorporating adduct and isotopic data {#incorpAdductIso}
 
 With mass spectrometry it is common that multiple _m/z_ values are detected for a single compound. These may be different adducts (e.g. `[M+H]+`, `[M+Na]+`, `[M-H]-`), the different isotopes of the molecule or a combination thereof. When multiple _m/z_ values are measured for the same compound, the feature finding algorithm may yield a distinct feature for each, which adds complexity to the data. In [the previous section](#componentsChrom) it was discussed how componentization can help to find feature groups that belong to the same adduct and/or isotope clusters. This section explains how this data can be used to simplify the feature dataset. Furthermore, this section also covers adduct annotations for feature groups which may improve and simplify the general workflow.
 
@@ -492,6 +493,8 @@ adducts(fGroupsSel)[1:5] # adduct annotations set by selectIons()
 adducts(fGroupsSel)[3] <- "[M+Na]+" # modify annotation
 adducts(fGroupsSel)[1:5] # verify
 ```
+
+> **_NOTE_** Adduct annotations are always available with [sets workflows](#setsWorkflow).
 
 ### Using adduct annotations in the workflow
 
@@ -601,7 +604,7 @@ relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation f
 elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
 calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
 featThresholdAnn  | All                 | Minimum relative amount (_0-1_) that a candidate formula for a feature group should be found among all annotated features (e.g. _1_ means that a candidate is only considered if it was assigned to all annotated features). 
-adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)).
+adduct            | All                 | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)). Don't set this when [adduct annotations](#incorpAdductIso) are available.
 MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
 profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
 

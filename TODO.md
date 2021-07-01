@@ -128,14 +128,9 @@
                 - now still done in annotateSuspects()
             - add also as contributor to eg DESCRIPTION
 - handbook
-    - KPIC2, cliqueMS installation
-    - update MP section on what uses it (e.g. SIRIUS features, SAFD, OpenMS components, ...)
-    - features
-        - topMostByRGroup?
     - sets
         - general topics
             - initiating/performing a sets workflow
-                - init workflows: add link to adduct annotation section
                 - selectIons for better componentization
                     - before/after makeSet
                     - adducts()<-
@@ -177,13 +172,10 @@
                 - futures also for other things
                 - no more progressr
                 - why is there a citation at the end?
-- progressr
+                - update MP section on what uses it (e.g. SIRIUS features, SAFD, OpenMS components, ...)
 - annotation
     - generateFormulas: MSPeakLists argument
-        - update handbook, tutorial...
-- components
-    - cliqueMS
-        - mention fork is needed?
+        - update tutorial
 - sets
     - General
         - order of sets section

@@ -566,7 +566,7 @@ Transformation products | `generateComponents(algorithm = "tp", ...)`        | D
 
 > **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
 
-### Features with similar chromatographic behaviour
+### Features with similar chromatographic behaviour {#componentsChrom}
 
 Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
 
@@ -718,3 +718,47 @@ componMSMS <- generateComponents(fGroups, "specclust", MSPeakLists = mslists)
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```
+
+## Incorporating adduct and isotopic data
+
+With mass spectrometry it is common that multiple _m/z_ values are detected for a single compound. These may be different adducts (e.g. `[M+H]+`, `[M+Na]+`, `[M-H]-`), the different isotopes of the molecule or a combination thereof. When multiple _m/z_ values are measured for the same compound, the feature finding algorithm may yield a distinct feature for each, which adds complexity to the data. In [the previous section](#componentsChrom) it was discussed how componentization can help to find feature groups that belong to the same adduct and/or isotope clusters. This section explains how this data can be used to simplify the feature dataset. Furthermore, this section also covers adduct annotations for feature groups which may improve and simplify the general workflow.
+
+### Selecting features with preferential adducts/isotopes
+
+The `selectIons` function forms the bridge between feature group and componentization data. This function uses the adduct and isotope annotations to select _preferential_ feature groups. For adduct clusters this means that only the feature group that has a preferential adduct (e.g. `[M+H]+`) is kept while others (e.g. `[M+Na]+`) are removed. If none of the adduct annotations are considered preferential, the most intense feature group is kept instead. For isotopic clusters typically only the feature group with the monoisotopic mass (i.e. _M0_) is kept.
+
+The behavior of `selectIons` is configurable with the following parameters:
+
+Argument         | Remarks
+---------------- | -------------------------------------------------------
+`prefAdduct`     | The _preferential adduct_. Usually `"[M+H]+"` or `"[M-H]-"`.
+`onlyMonoIso`    | If `TRUE` and a feature group is with isotopic annotations then it is only kept if it is monoisotopic.
+`chargeMismatch` | How charge mismatches between adduct and isotope annotations are dealt with. Valid options are `"isotope"`, `"adduct"`, `"none"` or `"ignore"`. See the reference manual for `selectIons` for more details.
+
+In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and `onlyMonoIso=TRUE`, the feature group will not be removed.
+
+Although `selectIons` operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the `checkComponents` function [discussed later]. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.
+
+An example usage is shown below.
+
+```{r selectIons,eval=runData}
+fGroupsSel <- selectIons(fGroups, componCAM, "[M+H]+")
+```
+
+### Setting adduct annotations for feature groups
+
+The `adducts()` function can be used to obtain a character vector with adduct annotations for each feature group. When no adduct annotations are available it will simply return an empty character vector.
+
+When the `selectIons` function is used it will automatically add adduct annotations based on the componentization data. In addition, the `adducts()<-` function can be used to manually add or change adduct annotations.
+
+```{r featAdductAnn,eval=runData}
+adducts(fGroups) # no adduct annotations
+adducts(fGroupsSel)[1:5] # adduct annotations set by selectIons()
+
+adducts(fGroupsSel)[3] <- "[M+Na]+" # modify annotation
+adducts(fGroupsSel)[1:5] # verify
+```
+
+### Using adduct annotations in the workflow
+
+When feature groups have adduct annotations available this may simplify and improve the workflow. The `adduct` and `ionization` arguments used for suspect screening, formula/compound annotation and some componentization algorithms do not have to be set anymore, since this data can be obtained from the adduct annotations. Furthermore, these algorithms may improve their results, since the algorithms are now able to use adduct information for each feature group individually, instead of assuming that all feature groups have the same adduct.

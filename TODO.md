@@ -170,6 +170,9 @@
                 - section on MS/MS clustering
                     - add link to spec sim param
             - selectIons/adduct() section (also in intro scheme?)
+                - note only adduct/isotope components work?
+                - selectIons examples
+                - checkComponents link
         - processing
             - annotatedPeakList: more interesting results (or improve BTA?)
             - add section on delete() (or in advanced?)

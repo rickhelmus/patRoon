@@ -44,7 +44,9 @@ More details can be found in the reference manual (`?adduct` and ``?`adduct-util
 
 Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent [Isotopologue Parameter Optimization (IPO)](IPO) `R` package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.
 
-This section will introduce the most important concepts and functionalities. Please see the reference manual for more information (e.g. `` ?`feature-optimization` ``).
+This section will introduce the most important concepts and functionality. Please see the reference manual for more information (e.g. `` ?`feature-optimization` ``).
+
+> **_NOTE_** The [SIRIUS] and [SAFD] algorithms are currently not (yet) supported.
 
 ### Parameter sets
 
@@ -57,7 +59,7 @@ pSet <- generateFeatureOptPSet("openms", chromSNR = c(5, 10)) # add parameter
 pSet <- list(noiseThrInt = c(1000, 5000))
 ```
 
-When optimizing with [XCMS] a few things have to be considered. First of all, when using the XCMS3 interface (i.e. `algorithm="xcms3"`) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.
+When optimizing with [XCMS] or [KPIC2] a few things have to be considered. First of all, when using the XCMS3 interface (i.e. `algorithm="xcms3"`) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.
 
 ```{r fOptPSetXCMS1,eval=FALSE}
 pSet <- list(method = "centWave", ppm = c(2, 8))
@@ -67,11 +69,12 @@ pSet <- list(ppm = c(2, 8)) # same: centWave is default
 pSetFG <- generateFGroupsOptPSet("xcms3", groupMethod = "nearest", retAlignMethod = "peakgroups")
 ```
 
-In addition, when optimizing feature grouping (both XCMS interfaces) we need to set the grouping and retention alignment parameters in two different nested lists: these are `groupArgs`/`retcorArgs` (`algorithm="xcms"`) and `groupParams`/`retAlignParams` (`algorithm="xcms3"`). 
+In addition, when optimizing feature grouping (both `XCMS` interfaces and `KPIC2`) we need to set the grouping and retention alignment parameters in two different nested lists: these are `groupArgs`/`retcorArgs` (`algorithm="xcms"`), `groupParams`/`retAlignParams` (`algorithm="xcms3"`) or `groupArgs`/`alignArgs` (`algorithm="kpic2"`).
 
 ```{r fOptPSetXCMS2,eval=FALSE}
 pSetFG <- list(groupParams = list(bw = c(20, 30))) # xcms3
 pSetFG <- list(retcorArgs = list(gapInit = c(0, 7))) # xcms
+pSetFG <- list(groupArgs = list(mz_weight = c(0.3, 0.9))) # kpic2
 ```
 
 When a parameter set has been defined it should be used as input for the `optimizeFeatureFinding()` or `optimizeFeatureGrouping()` functions.
@@ -151,7 +154,7 @@ Please refer to the reference manual for more methods to inspect optimization re
 
 The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
 
-The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms]. Similarly, the `getXCMSnExp()` function can be used for conversion to an XCMS3 style `XCMSnExp` object. 
+The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms]. Similarly, the `getXCMSnExp()` function can be used for conversion to an XCMS3 style `XCMSnExp` object, and the `getPICSet()` function can be used to convert `features` to [KPIC2] data.
 
 Some examples for these functions are shown below.
 
@@ -160,14 +163,16 @@ export(fGroups, "brukertasq", out = "my_targets.csv")
 
 # convert features to xcmsSet.
 # NOTE: loadRawData should only be FALSE when the analysis data files cannot be
-# loaded by XCMS (e.g. when obtained with DataAnalysis)
+# loaded by the algorithm (e.g. when features were obtained with DataAnalysis and data was not exported to mz(X)ML)
 xset <- getXCMSSet(fList, loadRawData = TRUE)
 xsetg <- getXCMSSet(fGroups, loadRawData = TRUE) # get grouped xcmsSet
 
 # using the new XCMS3 interface
-# NOTE: for XCMS3 data currently always has to be exported
 xdata <- getXCMSnExp(fList)
 xdata <- getXCMSnExp(fGroups)
+
+# KPIC2 conversion. Like XCMS it optionally loads the raw data.
+picSet <- getPICSet(fList, loadRawData = TRUE)
 ```
 
 ## Algorithm consensus {#consensus}

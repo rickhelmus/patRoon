@@ -31,7 +31,7 @@ fList[["standard-1"]][, 1:6]
 fGroups$M120_R268_30
 fGroups[[1, "M120_R268_30"]] # only first analysis
 
-# obtains list MS/MS peak list  (feature group averaged datas)
+# obtains MS/MS peak list  (feature group averaged datas)
 mslists[["M120_R268_30"]]$MSMS
 
 # get all formula candidates for a feature group
@@ -104,17 +104,15 @@ components[["CMP1", 1]] # only for first feature group in component
 as.data.frame(fList) # classic data.frame format, works for all objects
 as.data.table(fGroups) # return non-averaged intensities (default)
 as.data.table(fGroups, features = TRUE) # include feature information
-as.data.table(mslists, averaged = FALSE) # peak lists each feature
+as.data.table(mslists, averaged = FALSE) # peak lists for each feature
 as.data.table(mslists, fGroups = fGroups) # add feature group information
 
 as.data.table(formulas, countElements = c("C", "H")) # include C/H counts (e.g. for van Krevelen plots)
-# report only top precursor and fragment formula. This yields in one row per feature group.
-as.data.table(formulas, maxFormulas = 1, maxFragFormulas = 1)
 # add various information for organic matter characterization (common elemental
 # counts/ratios, classifications etc)
 as.data.table(formulas, OM = TRUE)
 
-as.data.table(compounds, fGroups = fGroups) # add feature group informaion
+as.data.table(compounds, fGroups = fGroups) # add feature group information
 as.data.table(compounds, fragments = TRUE) # include information of all annotated fragments
 
 annotatedPeakList(formulas, index = 1, groupName = "M120_R268_30",
@@ -245,14 +243,16 @@ Filter                                        | Classes                        |
 `absMSIntThr`, `absMSMSIntThr`, `relMSIntThr`, `relMSMSIntThr` | `MSPeakLists` | Minimum intensity of mass peaks
 `topMSPeaks`, `topMSMSPeaks`                  | `MSPeakLists`                  | Only keep most intense mass peaks
 `withMSMS`                                    | `MSPeakLists`                  | Only keep results with MS/MS data
+`minMSMSPeaks`                                | `MSPeakLists`                  | Only keep an MS/MS peak list if it contains a minimum number of peaks (excluding the precursor peak)
+`annotatedBy`                                 | `MSPeakLists`                  | Only keep MS/MS peaks that have formula or compound annotations
 `minExplainedPeaks`                           | `formulas`, `compounds`        | Minimum number of annotated mass peaks
 `elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
 `topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
 `minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings
 `scoreLimits`                                 | `formulas`, `compounds`        | Minimum/Maximum scorings
-`OM`                                          | `formulas`                     | Only keep candidates with likely elemental composition found in organic matter
+`OM`                                          | `formulas`, `compounds`        | Only keep candidates with likely elemental composition found in organic matter
 
-Several intensity related filters are available to clean-up MS peak list data. For instance, the `topMSPeaks`/`topMSMSPeaks` filters provide a simple way to remove noisy data by only retaining a defined number of most intense mass peaks. Note that none of these filters will remove the mass peak of the feature from its MS peak list.
+Several intensity related filters are available to clean-up MS peak list data. For instance, the `topMSPeaks`/`topMSMSPeaks` filters provide a simple way to remove noisy data by only retaining a defined number of most intense mass peaks. Note that none of these filters will remove the precursor mass peak of the feature itself.
 
 The filters applicable to formula and compound annotation generally concern minimal scoring or chemical properties. The former is useful to remove unlikely candidates, whereas the second is useful to focus on certain study specific chemical properties (e.g. known neutral losses).
 
@@ -267,6 +267,12 @@ mslists <- filter(mslists,
 # only retain 10 most intens mass peaks
 # (feature mass is always retained)
 mslists <- filter(mslists, topMSPeaks = 10)
+
+# remove MS/MS peaks without compound annotations
+mslists <- filter(mslists, annotatedBy = compounds)
+
+# remove MS/MS peaks not annotated by either a formula or compound candidate
+mslists <- filter(mslists, annotatedBy = list(formulas, compounds))
 
 # only keep formulae with 1-10 sulphur or phosphorus elements
 formulas <- filter(formulas, elements = c("S1-10", "P1-10"))
@@ -288,6 +294,9 @@ compounds <- filter(compounds, minFragScore = 10)
 compounds <- filter(compounds,
                     scoreLimits = list(numberPatents = c(1, Inf))
 ```
+
+> **_NOTE_** As of `patRoon 2.0` MS peak lists are **not** re-generated after a filtering operation (unless the `reAverage` parameter is explicity set to `TRUE`). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the filter operation.
+
 
 ### Components
 
@@ -427,6 +436,9 @@ fGroups[, rGroups = c("repl1", "repl2")]
 fGroupsSusp[, suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
 ```
 
+> **_NOTE_** As of `patRoon 2.0` MS peak lists are **not** re-generated after a subsetting operation (unless the `reAverage` parameter is explicity set to `TRUE`). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the subset operation.
+
+
 ### Prioritization workflow
 
 An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:
@@ -522,9 +534,9 @@ The most common plotting functions are `plotChroms()`, which plots chromatograph
 Argument                                      | Generic                   | Remarks
 --------------------------------------------- | ------------------------- | -------------------------------------------------------------------
 `rtWindow`                                    | `plotChroms()`                   | Extra time (in s) +/- retention limits of plotted features (useful to zoom out)
-`mzWindow`                                    | `plotChroms()`                   | m/z width of EICs (in Da)
 `retMin`                                      | `plotChroms()`                   | If `TRUE` plot retention times in minutes
 `topMost`                                     | `plotChroms()`                   | Only draw this amount of highest intensity features in each group.
+`topMostByRGroup`                             | `plotChroms()`                   | If `TRUE` then the `topMost` parameter specifies the top most intense features in each replicate group to draw (e.g. `topMost=1` would draw the most intense feature for each replicate group). 
 `showPeakArea`, `showFGroupRect`              | `plotChroms()`                   | Fill peak areas / draw rectangles around feature groups?
 `title`                                       | `plotChroms()`, `plotSpectrum()` | Override plot title
 `colourBy`                                    | `plotChroms()`                   | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
@@ -535,6 +547,7 @@ Argument                                      | Generic                   | Rema
 `MSLevel`                                     | `plotSpectrum()`                 | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
 `formulas`                                    | `plotSpectrum()`                 | Whether `formula` annotation should be added (only `compounds`)
 `plotStruct`                                  | `plotSpectrum()`                 | Whether the structure should be added to the plot (only `compounds`)
+`mincex`                                      | `plotSpectrum()`                 | Minimum annotation font size (only `formulas`/`compounds`)
 
 Note that we can use [subsetting](#subset) to select which feature data we want to plot, e.g.
 
@@ -630,14 +643,14 @@ fGroups <- fGroupsO
 
 ### Hierarchical clustering results {#plotClust}
 
-In `patRoon` hierarchical clustering is used to generate components based on their intensity profiles (see [intensity clustering](#intclust)) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust)). The functions below can be used to visualize their results.
+In `patRoon` hierarchical clustering is used [for some componentization algorithms](#compClust) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust)). The functions below can be used to visualize their results.
 
 Generic             | Classes                                  | Remarks
 ------------------- | ---------------------------------------- | --------------------------------------------------
-`plot()`            | `componentsIntClust`, `compoundsCluster` | Plots a dendrogram
+`plot()`            | All                                      | Plots a dendrogram
 `plotInt()`         | `componentsIntClust`                     | Plots normalized intensity profiles in a cluster
 `plotHeatMap()`     | `componentsIntClust`                     | Plots an heatmap
-`plotSilhouettes()` | `componentsIntClust`                     | Plot silhouette information to determine the cluster amount
+`plotSilhouettes()` | `componentsClust`                        | Plot silhouette information to determine the cluster amount
 `plotStructure()`   | `compoundsCluster`                       | Plots the maximum common substructure (MCS) of a cluster
 
 

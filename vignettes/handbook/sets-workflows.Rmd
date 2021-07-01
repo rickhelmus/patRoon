@@ -77,7 +77,7 @@ Only a few modifications were necessary:
 
 The key principle to make sets workflows work is performed by `makeSet`. This method function takes different `features` objects (or `featureGroups`, discussed later) to combine the feature data across sets. During this step features are _neutralized_: the feature _m/z_ data is converted to neutral feature masses. This step ensures that when features are grouped with `groupFeatures`, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.
 
-The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use [adduct annotations] for neutralization; this is discussed later.
+The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use [adduct annotations](#incorpAdductIso) for neutralization; this is discussed later.
 
 > **_NOTE_** The [newProject tool](#newProject) can be used to easily generate a sets workflow. Simply select "both" for the _Ionization_ option.
 
@@ -142,7 +142,6 @@ For more information refer to the reference manual (e.g. `?generateCompounds`).
 When the componentization algorithms related to adduct/isotope annotations (e.g. [CAMERA], [RAMClustR] and [cliqueMS]) and [nontarget] are used, then componentization occurs per set and the final object (a `componentsSet` or `componentsNTSet`) contains all the components together. Since these algorithms are highly dependent upon MS data polarity, no attempt is made to merge components from different sets.
 
 The other componentization algorithms work on the complete data. For more details, see the reference manual (`?generateComponents`).
-
 
 ## Selecting adducts to improve grouping
 

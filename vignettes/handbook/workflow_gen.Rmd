@@ -8,10 +8,10 @@ Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
 Finding features      | `findFeatures()`                                  | `features`
 Grouping features     | `groupFeatures()`                                 | `featureGroups`
 Suspect screening     | `screenSuspects()`                                | `featureGroupsScreening` 
+Componentization      | `generateComponents()`                            | `components`
 MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
 Formula annotation    | `generateFormulas()`                              | `formulas`
 Compound annotation   | `generateCompounds()`                             | `compounds`
-Componentization      | `generateComponents()`                            | `components`
 
 All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of `R` is generally not important when using `patRoon` (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.
 
@@ -274,6 +274,228 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
                        fragments_formula = c("C6H6N", "C6H8N;C7H6NO", ""),
                        fragments_mz = c("", "", "118.0652"))
 ```
+
+## Componentization {#componentization}
+
+In `patRoon` _componentization_ refers to grouping related feature groups together in components. There are different methodologies to generate components:
+
+* Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).
+* Homologous series: features with increasing _m/z_ and retention time.
+* Intensity profiles: features that follow a similar intensity profile in the analyses.
+* MS/MS similarity: feature groups with similar MS/MS spectra are clustered.
+* Transformation products: Components are formed by grouping feature groups that have a parent/transformation product relationship. This is further discussed in [its own chapter](#TPs).
+
+The following algorithms are currently supported:
+
+Algorithm               | Usage                                              | Remarks
+----------------------- | -------------------------------------------------- | --------------------------------------------
+[CAMERA]                | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
+[RAMClustR]             | `generateComponents(algorithm = "ramclustr", ...)` | As above.
+[cliqueMS]              | `generateComponents(algorithm = "cliquems", ...)`  | As above, but using _feature components_.
+[OpenMS]                | `generateComponents(algorithm = "openms", ...)`    | As above. Uses [MetaboliteAdductDecharger].
+[nontarget]             | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
+Intensity clustering    | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+MS/MS clustering        | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
+Transformation products | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
+
+> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
+
+### Features with similar chromatographic behaviour {#componentsChrom}
+
+Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
+
+Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:
+
+Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
+------------- | ---------- | ---------- | ---------- | ----------
+\#1           | 100.08827  | Present    | Present    | Absent
+\#2           | 122.07021  | Present    | Present    | Absent
+\#3           | 138.04415  | Absent     | Absent     | Present
+
+Based on the mass differences from this example a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+` could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn't detected in the first two sample analysis. Based on this it seems unlikely that feature group _#3_ should be part of the component.
+
+For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicate groups in total, then only those feature groups are kept for which its features were detected in at least two different replicate groups (_i.e._ half of four).
+
+Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
+
+Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here]) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+
+Some example usage is shown below.
+
+```{r chromComps,eval=FALSE}
+# Use CAMERA with defaults
+componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
+
+# CAMERA with customized settings
+componCAM2 <- generateComponents(fGroups, "camera", ionization = "positive",
+                                 extraOpts = list(mzabs = 0.001, sigma = 5))
+
+# Use RAMClustR with customized parameters
+componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hmax = 0.4,
+                               extraOptsRC = list(cor.method = "spearman"),
+                               extraOptsFM = list(ppm.error = 5))
+
+# OpenMS with customized parameters
+componOpenMS <- generateComponents(fGroups, "openms", ionization = "positive", chargeMax = 2,
+                                   absMzDev = 0.002)
+
+# cliqueMS with default parameters
+componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative")
+```
+
+
+### Homologues series
+
+Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
+
+```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.",out.width="100%"}
+plotGV("
+digraph Homologs {
+  graph [ rankdir = LR, compound = true, style = invis ]
+  node [ shape = oval,
+         fixedsize = true,
+         width = 2.3,
+         height = 0.8,
+         fontsize = 25,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+  subgraph cluster3 {
+    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]
+    G -> H -> I -> J -> K [style=invis]
+  }
+
+  subgraph cluster4 {
+    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]
+    _I -> X -> _K -> L [style=invis]
+  }
+
+  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]
+  
+  I -> _I [constraint=false, style=dashed, arrowhead=none]
+  K -> _K [constraint=false, style=dashed, arrowhead=none]
+  
+  subgraph cluster1 {
+    C [fillcolor=skyblue]; D [fillcolor=skyblue]
+    A -> B -> C -> D [style=invis]
+  }
+
+  subgraph cluster2 {
+    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]
+    _C -> _D -> E -> F [style=invis]
+  }
+  
+  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]
+
+  C -> _C [constraint=false, style=dashed, arrowhead=none]
+  D -> _D [constraint=false, style=dashed, arrowhead=none]
+}", height = 250, width = 600)
+```
+
+The series that are linked can be interactively explored with the `plotGraph()` function (discussed [here](#vis_feat_ann)).
+
+Common function arguments to `generateComponents()` are listed below.
+
+Argument             | Remarks
+-------------------- | -----------------------------------------------------------------------
+`ionization`         | Ionization mode: `"positive"` or `"negative"`
+`rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
+`elements`           | Vector with elements to consider.
+`rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
+`...`                | Further arguments passed to the `homol.search()` function.
+
+```{r compsNT,eval=FALSE}
+# default settings
+componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+
+# customized settings
+componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
+                                elements = c("C", "H"), rtRange = c(-60, 60))
+```
+
+### Intensity and MS/MS similarity {#compClust}
+
+<!-- UNDONE: refs? -->
+
+The previous componentization methods utilized chemical properties to relate features. The two componentization algorithms described in this section use a statistical approach based on hierarchical clustering. The first algorithm normalizes all feature intensities and then clusters features with similar intensity profiles across sample analyses together. The second algorithm compares all MS/MS spectra from all feature groups, and then uses hierarchical clustering to generate components from feature groups that have a high MS/MS spectrum similarity.
+
+Some common arguments to `generateComponents()` are listed below. It is recommended to test various settings (especially for `method`) to optimize the clustering results.
+
+Argument                                      | Algorithm   | Default          | Remarks
+--------------------------------------------- | ----------- | ---------------- | ----------------------------------------------
+`method`                                      | All         | `"complete"`     | Clustering method. See `?hclust`
+`metric`                                      | `intclust`  | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
+`normFunc`                                    | `intclust`  | `max`            | Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.
+`average`                                     | `intclust`  | `TRUE`           | Whether intensities of replicates should first be averaged.
+`MSPeakLists`                                 | `specclust` | -                | The [MS peak lists] object used for spectral similarity calculations
+`specSimParams`                               | `specclust` | `getDefSpecSimParams()` | Parameters used for [spectral similarity calculation].
+`maxTreeHeight`, `deepSplit`, `minModuleSize` | All         | `1`, `TRUE`, `1` | Used for dynamic cluster assignment. See `?cutreeDynamicTree`.
+
+The components are generated by automatically assigning clusters using the [dynamicTreeCut] `R` package. However, the cluster assignment can be performed manually or with different parameters, as is demonstrated below.
+
+The resulting components are stored in an object from the `componentsIntClust` or `componentsSpecClust` S4 class, which are both derived from the `componentsClust` class (which in turn is derived from the `components` class). Several methods are defined that can be used on these objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant [visualization section](#plotClust). More info can be found in the reference manual (e.g. `?componentsIntClust`, `?componentsSpecClust` and `?componentsClust`).
+
+```{r intClust,eval=FALSE}
+# generate intensity profile components with default settings
+componInt <- generateComponents(fGroups, "intclust")
+
+# manually re-assign clusters
+componInt <- treeCut(componInt, k = 10)
+
+# automatic re-assignment of clusters (adjusted max tree height)
+componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
+
+# MS/MS similarity components
+componMSMS <- generateComponents(fGroups, "specclust", MSPeakLists = mslists)
+```
+
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```
+
+## Incorporating adduct and isotopic data
+
+With mass spectrometry it is common that multiple _m/z_ values are detected for a single compound. These may be different adducts (e.g. `[M+H]+`, `[M+Na]+`, `[M-H]-`), the different isotopes of the molecule or a combination thereof. When multiple _m/z_ values are measured for the same compound, the feature finding algorithm may yield a distinct feature for each, which adds complexity to the data. In [the previous section](#componentsChrom) it was discussed how componentization can help to find feature groups that belong to the same adduct and/or isotope clusters. This section explains how this data can be used to simplify the feature dataset. Furthermore, this section also covers adduct annotations for feature groups which may improve and simplify the general workflow.
+
+### Selecting features with preferential adducts/isotopes
+
+The `selectIons` function forms the bridge between feature group and componentization data. This function uses the adduct and isotope annotations to select _preferential_ feature groups. For adduct clusters this means that only the feature group that has a preferential adduct (e.g. `[M+H]+`) is kept while others (e.g. `[M+Na]+`) are removed. If none of the adduct annotations are considered preferential, the most intense feature group is kept instead. For isotopic clusters typically only the feature group with the monoisotopic mass (i.e. _M0_) is kept.
+
+The behavior of `selectIons` is configurable with the following parameters:
+
+Argument         | Remarks
+---------------- | -------------------------------------------------------
+`prefAdduct`     | The _preferential adduct_. Usually `"[M+H]+"` or `"[M-H]-"`.
+`onlyMonoIso`    | If `TRUE` and a feature group is with isotopic annotations then it is only kept if it is monoisotopic.
+`chargeMismatch` | How charge mismatches between adduct and isotope annotations are dealt with. Valid options are `"isotope"`, `"adduct"`, `"none"` or `"ignore"`. See the reference manual for `selectIons` for more details.
+
+In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and `onlyMonoIso=TRUE`, the feature group will not be removed.
+
+Although `selectIons` operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the `checkComponents` function [discussed later]. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.
+
+An example usage is shown below.
+
+```{r selectIons,eval=runData}
+fGroupsSel <- selectIons(fGroups, componCAM, "[M+H]+")
+```
+
+### Setting adduct annotations for feature groups
+
+The `adducts()` function can be used to obtain a character vector with adduct annotations for each feature group. When no adduct annotations are available it will simply return an empty character vector.
+
+When the `selectIons` function is used it will automatically add adduct annotations based on the componentization data. In addition, the `adducts()<-` function can be used to manually add or change adduct annotations.
+
+```{r featAdductAnn,eval=runData}
+adducts(fGroups) # no adduct annotations
+adducts(fGroupsSel)[1:5] # adduct annotations set by selectIons()
+
+adducts(fGroupsSel)[3] <- "[M+Na]+" # modify annotation
+adducts(fGroupsSel)[1:5] # verify
+```
+
+### Using adduct annotations in the workflow
+
+When feature groups have adduct annotations available this may simplify and improve the workflow. The `adduct` and `ionization` arguments used for suspect screening, formula/compound annotation and some componentization algorithms do not have to be set anymore, since this data can be obtained from the adduct annotations. Furthermore, these algorithms may improve their results, since the algorithms are now able to use adduct information for each feature group individually, instead of assuming that all feature groups have the same adduct.
 
 ## Annotation
 
@@ -540,225 +762,3 @@ In general, the more data provided by the suspect list and to `annotateSuspects(
 The `annotateSuspects()` function will log decisions for identification level assignments to the `log/` sub-directory in the current working directory. This is useful to inspect level assignments and especially useful when you customized any rules.
 
 > **_NOTE_**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
-
-## Componentization {#componentization}
-
-In `patRoon` _componentization_ refers to grouping related feature groups together in components. There are different methodologies to generate components:
-
-* Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).
-* Homologous series: features with increasing _m/z_ and retention time.
-* Intensity profiles: features that follow a similar intensity profile in the analyses.
-* MS/MS similarity: feature groups with similar MS/MS spectra are clustered.
-* Transformation products: Components are formed by grouping feature groups that have a parent/transformation product relationship. This is further discussed in [its own chapter](#TPs).
-
-The following algorithms are currently supported:
-
-Algorithm               | Usage                                              | Remarks
------------------------ | -------------------------------------------------- | --------------------------------------------
-[CAMERA]                | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
-[RAMClustR]             | `generateComponents(algorithm = "ramclustr", ...)` | As above.
-[cliqueMS]              | `generateComponents(algorithm = "cliquems", ...)`  | As above, but using _feature components_.
-[OpenMS]                | `generateComponents(algorithm = "openms", ...)`    | As above. Uses [MetaboliteAdductDecharger].
-[nontarget]             | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
-Intensity clustering    | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
-MS/MS clustering        | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
-Transformation products | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
-
-> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
-
-### Features with similar chromatographic behaviour {#componentsChrom}
-
-Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
-
-Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:
-
-Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
-------------- | ---------- | ---------- | ---------- | ----------
-\#1           | 100.08827  | Present    | Present    | Absent
-\#2           | 122.07021  | Present    | Present    | Absent
-\#3           | 138.04415  | Absent     | Absent     | Present
-
-Based on the mass differences from this example a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+` could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn't detected in the first two sample analysis. Based on this it seems unlikely that feature group _#3_ should be part of the component.
-
-For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicate groups in total, then only those feature groups are kept for which its features were detected in at least two different replicate groups (_i.e._ half of four).
-
-Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
-
-Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here]) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
-
-Some example usage is shown below.
-
-```{r chromComps,eval=FALSE}
-# Use CAMERA with defaults
-componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
-
-# CAMERA with customized settings
-componCAM2 <- generateComponents(fGroups, "camera", ionization = "positive",
-                                 extraOpts = list(mzabs = 0.001, sigma = 5))
-
-# Use RAMClustR with customized parameters
-componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hmax = 0.4,
-                               extraOptsRC = list(cor.method = "spearman"),
-                               extraOptsFM = list(ppm.error = 5))
-
-# OpenMS with customized parameters
-componOpenMS <- generateComponents(fGroups, "openms", ionization = "positive", chargeMax = 2,
-                                   absMzDev = 0.002)
-
-# cliqueMS with default parameters
-componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative")
-```
-
-
-### Homologues series
-
-Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
-
-```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.",out.width="100%"}
-plotGV("
-digraph Homologs {
-  graph [ rankdir = LR, compound = true, style = invis ]
-  node [ shape = oval,
-         fixedsize = true,
-         width = 2.3,
-         height = 0.8,
-         fontsize = 25,
-         fillcolor = darkseagreen1,
-         style = filled ]
-
-  subgraph cluster3 {
-    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]
-    G -> H -> I -> J -> K [style=invis]
-  }
-
-  subgraph cluster4 {
-    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]
-    _I -> X -> _K -> L [style=invis]
-  }
-
-  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]
-  
-  I -> _I [constraint=false, style=dashed, arrowhead=none]
-  K -> _K [constraint=false, style=dashed, arrowhead=none]
-  
-  subgraph cluster1 {
-    C [fillcolor=skyblue]; D [fillcolor=skyblue]
-    A -> B -> C -> D [style=invis]
-  }
-
-  subgraph cluster2 {
-    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]
-    _C -> _D -> E -> F [style=invis]
-  }
-  
-  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]
-
-  C -> _C [constraint=false, style=dashed, arrowhead=none]
-  D -> _D [constraint=false, style=dashed, arrowhead=none]
-}", height = 250, width = 600)
-```
-
-The series that are linked can be interactively explored with the `plotGraph()` function (discussed [here](#vis_feat_ann)).
-
-Common function arguments to `generateComponents()` are listed below.
-
-Argument             | Remarks
--------------------- | -----------------------------------------------------------------------
-`ionization`         | Ionization mode: `"positive"` or `"negative"`
-`rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
-`elements`           | Vector with elements to consider.
-`rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
-`...`                | Further arguments passed to the `homol.search()` function.
-
-```{r compsNT,eval=FALSE}
-# default settings
-componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
-
-# customized settings
-componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
-                                elements = c("C", "H"), rtRange = c(-60, 60))
-```
-
-### Intensity and MS/MS similarity {#compClust}
-
-<!-- UNDONE: refs? -->
-
-The previous componentization methods utilized chemical properties to relate features. The two componentization algorithms described in this section use a statistical approach based on hierarchical clustering. The first algorithm normalizes all feature intensities and then clusters features with similar intensity profiles across sample analyses together. The second algorithm compares all MS/MS spectra from all feature groups, and then uses hierarchical clustering to generate components from feature groups that have a high MS/MS spectrum similarity.
-
-Some common arguments to `generateComponents()` are listed below. It is recommended to test various settings (especially for `method`) to optimize the clustering results.
-
-Argument                                      | Algorithm   | Default          | Remarks
---------------------------------------------- | ----------- | ---------------- | ----------------------------------------------
-`method`                                      | All         | `"complete"`     | Clustering method. See `?hclust`
-`metric`                                      | `intclust`  | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
-`normFunc`                                    | `intclust`  | `max`            | Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.
-`average`                                     | `intclust`  | `TRUE`           | Whether intensities of replicates should first be averaged.
-`MSPeakLists`                                 | `specclust` | -                | The [MS peak lists] object used for spectral similarity calculations
-`specSimParams`                               | `specclust` | `getDefSpecSimParams()` | Parameters used for [spectral similarity calculation].
-`maxTreeHeight`, `deepSplit`, `minModuleSize` | All         | `1`, `TRUE`, `1` | Used for dynamic cluster assignment. See `?cutreeDynamicTree`.
-
-The components are generated by automatically assigning clusters using the [dynamicTreeCut] `R` package. However, the cluster assignment can be performed manually or with different parameters, as is demonstrated below.
-
-The resulting components are stored in an object from the `componentsIntClust` or `componentsSpecClust` S4 class, which are both derived from the `componentsClust` class (which in turn is derived from the `components` class). Several methods are defined that can be used on these objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant [visualization section](#plotClust). More info can be found in the reference manual (e.g. `?componentsIntClust`, `?componentsSpecClust` and `?componentsClust`).
-
-```{r intClust,eval=FALSE}
-# generate intensity profile components with default settings
-componInt <- generateComponents(fGroups, "intclust")
-
-# manually re-assign clusters
-componInt <- treeCut(componInt, k = 10)
-
-# automatic re-assignment of clusters (adjusted max tree height)
-componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
-
-# MS/MS similarity components
-componMSMS <- generateComponents(fGroups, "specclust", MSPeakLists = mslists)
-```
-
-
-```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
-```
-
-## Incorporating adduct and isotopic data
-
-With mass spectrometry it is common that multiple _m/z_ values are detected for a single compound. These may be different adducts (e.g. `[M+H]+`, `[M+Na]+`, `[M-H]-`), the different isotopes of the molecule or a combination thereof. When multiple _m/z_ values are measured for the same compound, the feature finding algorithm may yield a distinct feature for each, which adds complexity to the data. In [the previous section](#componentsChrom) it was discussed how componentization can help to find feature groups that belong to the same adduct and/or isotope clusters. This section explains how this data can be used to simplify the feature dataset. Furthermore, this section also covers adduct annotations for feature groups which may improve and simplify the general workflow.
-
-### Selecting features with preferential adducts/isotopes
-
-The `selectIons` function forms the bridge between feature group and componentization data. This function uses the adduct and isotope annotations to select _preferential_ feature groups. For adduct clusters this means that only the feature group that has a preferential adduct (e.g. `[M+H]+`) is kept while others (e.g. `[M+Na]+`) are removed. If none of the adduct annotations are considered preferential, the most intense feature group is kept instead. For isotopic clusters typically only the feature group with the monoisotopic mass (i.e. _M0_) is kept.
-
-The behavior of `selectIons` is configurable with the following parameters:
-
-Argument         | Remarks
----------------- | -------------------------------------------------------
-`prefAdduct`     | The _preferential adduct_. Usually `"[M+H]+"` or `"[M-H]-"`.
-`onlyMonoIso`    | If `TRUE` and a feature group is with isotopic annotations then it is only kept if it is monoisotopic.
-`chargeMismatch` | How charge mismatches between adduct and isotope annotations are dealt with. Valid options are `"isotope"`, `"adduct"`, `"none"` or `"ignore"`. See the reference manual for `selectIons` for more details.
-
-In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and `onlyMonoIso=TRUE`, the feature group will not be removed.
-
-Although `selectIons` operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the `checkComponents` function [discussed later]. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.
-
-An example usage is shown below.
-
-```{r selectIons,eval=runData}
-fGroupsSel <- selectIons(fGroups, componCAM, "[M+H]+")
-```
-
-### Setting adduct annotations for feature groups
-
-The `adducts()` function can be used to obtain a character vector with adduct annotations for each feature group. When no adduct annotations are available it will simply return an empty character vector.
-
-When the `selectIons` function is used it will automatically add adduct annotations based on the componentization data. In addition, the `adducts()<-` function can be used to manually add or change adduct annotations.
-
-```{r featAdductAnn,eval=runData}
-adducts(fGroups) # no adduct annotations
-adducts(fGroupsSel)[1:5] # adduct annotations set by selectIons()
-
-adducts(fGroupsSel)[3] <- "[M+Na]+" # modify annotation
-adducts(fGroupsSel)[1:5] # verify
-```
-
-### Using adduct annotations in the workflow
-
-When feature groups have adduct annotations available this may simplify and improve the workflow. The `adduct` and `ionization` arguments used for suspect screening, formula/compound annotation and some componentization algorithms do not have to be set anymore, since this data can be obtained from the adduct annotations. Furthermore, these algorithms may improve their results, since the algorithms are now able to use adduct information for each feature group individually, instead of assuming that all feature groups have the same adduct.

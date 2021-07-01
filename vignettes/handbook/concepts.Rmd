@@ -25,30 +25,30 @@ digraph workflow {
     'Data pre-treatment' -> 'Find features'
     'Find features' -> 'Group features'
   }
-  
+
   subgraph cluster2 {
     'Suspect screening' -> 'Group features' [minlen=3, style=dashed]
     'Find features' -> 'Suspect screening' [style=invis]
     'Group features' -> 'Suspect screening' [style=dashed]
   }
-  
+
   subgraph cluster3 {
+    Componentization
+  }
+  
+  subgraph cluster4 {
     graph [style = dashed ]
     color=blue
     'MS peak lists' 'Formula annotation'  'Compound Annotation'
   }
 
-  subgraph cluster4 {
-    Componentization
-  }
-  
-  'Group features' -> 'Formula annotation' [ltail=cluster1, lhead=cluster3, style=dashed]
-  'Group features' -> 'Componentization' [ltail=cluster1, lhead=cluster4, style=dashed]
+  'Group features' -> 'Componentization' [ltail=cluster1, lhead=cluster3, style=dashed, dir=both, minlen=3]
+  'Group features' -> 'Formula annotation' [ltail=cluster1, lhead=cluster4, style=dashed, minlen=3]
   
 }", height = 250, width = 750)
 ```
 
-Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _dashed line_. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief descripton of all steps is given below.
+Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _dashed line_. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief description of all steps is given below.
 
 During **data pre-treatment** raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of _m/z_ data or performing advanced filtering operations.
 
@@ -58,9 +58,9 @@ Features are found per analysis. Hence, in order to compare a feature across ana
 
 Depending on the study type, **suspect screening** is then performed to limit the features that should be considered for further processing. As its name suggests, with suspect screening only those features which are suspected to be present are considered for further processing. These suspects are retrieved from a suspect list which contains the _m/z_ and (optionally) retention times for each suspect. Typical suspect lists may be composed from databases with known pollutants or from predicted transformation products. Note that for a 'full' non-target analysis no suspect screening is performed, hence, this step is simply omitted and all features are to be considered.
 
-After features have been collected the next step typically involves **annotation**. During this step MS and MS/MS data are collected in so called **MS peak lists**, which are then used as input for formula and compound annotation. Formula annotation involves automatic calculation of possible formulae for each feature based on its _m/z_, isotopic pattern and MS/MS fragments, whereas compound annotation (or identification) involves the assignment of actual chemical structures to each feature. Note that during formula and compound annotation typically multiple candidates are assigned to a single feature. To assist interpretation of this data each candidate is therefore ranked on characteristics such as isotopic fit, number of explained MS/MS fragments and metadata from an online database such as number of scientific references or presence in common suspect lists.
+The feature group data may then be subjected to **componentization**. A **component** is defined as a collection of multiple feature groups that are somehow related to each other. Typical examples are features that belong to the same chemical compound (i.e. with different _m/z_ values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologous series and features that display a similar intensity trend across samples. If adducts or isotopes were annotated during componentization then this data may be used to prioritize the feature groups.
 
-Besides annotation, another step to perform after extraction of features is **componentization**. A **component** is defined as a collection of multiple feature groups that are somehow related to each other. Typical exmples are features that belong to the same chemical compound (i.e. with different _m/z_ values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologues series and features that display a similar intensity trend across samples.
+The last step in the workflow commonly involves **annotation**. During this step MS and MS/MS data are collected in so called **MS peak lists**, which are then used as input for formula and compound annotation. Formula annotation involves automatic calculation of possible formulae for each feature based on its _m/z_, isotopic pattern and MS/MS fragments, whereas compound annotation (or identification) involves the assignment of actual chemical structures to each feature. Note that during formula and compound annotation typically multiple candidates are assigned to a single feature. To assist interpretation of this data each candidate is therefore ranked on characteristics such as isotopic fit, number of explained MS/MS fragments and metadata from an online database such as number of scientific references or presence in common suspect lists.
 
 To summarize:
     
@@ -68,9 +68,9 @@ To summarize:
 * **Features** describe chromatographic and _m/z_ information (or 'peaks') in all analyses.
 * A **feature group** consists of equal features across analyses.
 * With **suspect screening** only features that are considered to be on a suspect list are considered further in the workflow.
+* **Componentization** involves consolidating different feature groups that have a relationship to each other in to a single component.
 * **MS peak lists** Summarizes all MS and MS/MS data that will be used for subsequent annotation.
 * During **formula** and **compound annotation** candidate formulae/structures will be assigned and ranked for each feature.
-* **Componentization** involves consolidating different feature groups that have a relationship to each other in to a single component.
 
 The next chapters will discuss how to generate this data and process it.
 

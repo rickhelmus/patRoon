@@ -29,7 +29,7 @@ The next sections will outline more details on these steps are performed and con
 
 ## Obtaining transformation product data {#genTPs}
 
-UNDONE: cite logic, refs below, adduct description in table
+UNDONE: cite logic, refs below
 
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
@@ -49,7 +49,7 @@ Argument                      | Algorithm(s)      | Remarks
 `fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
 `type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
 `TPLibrary`/`transformations` | `library`/`logic` | [Custom TP library/transformation rules](#TPsCustom).
-`adduct`                      | `logic`           | The assumed adduct of the parents (e.g. `"[M+H]+"`). Not needed when adduct annotations are available (or a [sets workflow](#setsWorkflow) is performed).
+`adduct`                      | `logic`           | The assumed adduct of the parents (e.g. `"[M+H]+"`). Not needed when [adduct annotations](#incorpAdductIso) are available.
 
 ### Parent input
 

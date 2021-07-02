@@ -507,6 +507,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
 
         for (i in seq_len(2))
         {
+            if (is.null(obj[[groupName[i]]]))
+                stop(paste("No data for specified feature group:", groupName[i]), call. = FALSE)
             if (index[i] > nrow(obj[[groupName[i]]]))
                 stop(sprintf("Specified candidate index out of range %d/%d", index[i], nrow(obj[[groupName[i]]])),
                      call. = FALSE)

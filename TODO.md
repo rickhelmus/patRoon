@@ -26,6 +26,8 @@
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
     - export featureQualityNames()
     - fix MapAligner exception with test-components
+    - add separate XCMS groupParam for prior alignment
+    - Somehow integrate XCMS::fillChromPeaks
 
 
 ## Annotation

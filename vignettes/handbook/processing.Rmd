@@ -819,44 +819,6 @@ plotHeatMap(componInt, interactive = TRUE) # interactive heatmap (with zoom-in!)
 plotSilhouettes(componInt, 5:20) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
-### Interactive plotting of chromatography data
-
-The `plotChroms()` function introduced before can be used to visualize chromatography data for one or more features. An interactive alternative is to call the `checkChromatograms()` function. This function will launch a GUI that allows you to browse through all features and inspect their EICs. Simply pass in the `featureGroups` object you want to inspect:
-
-```{r checkChrom1,eval=FALSE}
-checkChromatograms(fGroups)
-```
-
-Note that this tool does not work well yet with large number of analyses/features. For this reason, it may be worthwile to launch it with subsets of your data, e.g.
-
-```{r checkChrom2,eval=FALSE}
-checkChromatograms(fGroups[1:3, 1:250]) # only first 3 analyses and their first 500 feature groups
-```
-
-Another purpose of the `checkChromatograms()` function is to remove 'bad' features (e.g. those which are probably not really features, but just noise). The workflow for this is:
-
-1. Launch `checkChromatograms()` and remove any unwanted feature groups by disabling the _keep_ checkbox.
-2. Store the result of the `checkChromatograms()` function to a variable.
-3. Use this variable to subset the original feature groups.
-
-To do so:
-
-```{r checkChrom3,eval=FALSE}
-keep <- checkChromatograms(fGroups)
-fGroups <- fGroups[, keep]
-```
-
-Note that when you re-run `checkChromatograms()` you can restore the state of which feature groups should be kept/removed by passing the previous result to the  function:
-
-```{r checkChrom4,eval=FALSE}
-keep <- checkChromatograms(fGroups) # select feature groups
-
-# continue at a later stage
-keep <- checkChromatograms(fGroups, enabledFGroups = keep)
-```
-
-> **_NOTE_** Again, `checkChromatograms()` may be slow when processing larger datasets. The [reporting functionalities](#report) provide a good alternative to quickly get an overview of all EIC data.
-
 ### Generating EICs in DataAnalysis
 
 If you have Bruker data and the DataAnalysis software installed, you can automatically add EIC data in a DataAnalysis session. The `addDAEIC()` will do this for a single _m/z_ in one analysis, whereas the `addAllDAEICs()` function adds EICs for all features in a `featureGroups` object.
@@ -871,6 +833,57 @@ addDAEIC("mysample", "~/path/to/sample", mz = 100, ctype = "TIC",
 addAllDAEICs(fGroups) # add EICs for all features
 addAllDAEICs(fGroups[, 1:50]) # as usual, subsetting can be used for partial data
 ```
+
+## Interactively explore and review data {#intReview}
+
+The `checkFeatures` and `checkComponents` functions start a graphical user interface (GUI) which allows you to interactively explore and review feature and components data, respectively.
+
+```{r eval=FALSE}
+checkFeatures(fGroups) # inspect features and feature groups
+checkComponents(componCAM, fGroups) # inspect components
+```
+
+Both functions allow you to easily explore the data in an interactive way. Furthermore, these functions allow you to remove unwanted data. This is useful to remove for example features that are actually noise and feature groups that shouldn't be in the same component. To remove an unwanted feature, feature group or components, simply uncheck its 'keep' checkbox. The next step is to save the selections you made. A _check session_ is a file that stores which data should be removed. Once the session file is saved the `filter` function can be used to actually remove the data:
+
+```{r eval=FALSE}
+fGroupsF <- filter(fGroups, checkFeaturesSession = TRUE)
+componCAMF <- filter(componCAM, checkComponentsSession = TRUE)
+```
+
+If you saved the session and you re-launch the GUI it will restore the selections made earlier. The `clearSession` argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their 'keep state'.
+
+```{r eval=FALSE}
+checkFeatures(fGroups, clearSession = TRUE) # start GUI with fresh session
+```
+
+It is also possible to use multiple different sessions. This is especially useful if you do not want to overwrite previous session data or want to inspect different objects. In this case the session file name should be specified:
+
+```{r eval=FALSE}
+checkFeatures(fGroups, "mysession.yml")
+fGroupsF <- filter(fGroups, checkFeaturesSession = "mysession.yml")
+```
+
+The default session names are `"checked-features.yml"` and `"checked-components.yml"` for feature and component data, respectively.
+
+The extension of session file names is `.yml` since the [YAML] file format is used. An advantage of this format is that it is easily readable and editable with a text editor.
+
+Note that the session data is tied to the feature group names of your data. This means that, for instance, when you re-group your feature data after changing some parameters, the session data you prepared earlier cannot be used anymore. Since probably quite some manual work went into creating the session file, a special function is available to import a session that was made for previous data. This function tries its best to guess the new feature group name based on similarity of their retention times and _m/z_ values.
+
+```{r eval=FALSE}
+checkFeatures(fGroups) # do manual inspection
+
+fGroups <- groupFeatures(fList, ...) # re-group with different parameters
+
+importCheckFeaturesSession("checked-features.yml", "checked-features-new.yml", fGroups)
+
+checkFeatures(fGroups, session = "checked-features-new.yml") # inspect new data
+```
+
+Take care to monitor the messages that `importCheckFeaturesSession` may output, as it may be possible that some 'old' feature groups are not found or are matched by multiple candidates of the new dataset.
+
+Some additional parameters exist to the functions described in this section. As usualy check the reference manual for more details (_e.g._ `?checkFeatures`).
+
+> **_NOTE_** Although the GUI tools described here allow you to easily filter out results, it is highly recommended to first prioritize your data to avoid doing a lot of unneeded manual work.
 
 ## Reporting {#report}
 

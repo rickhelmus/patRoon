@@ -119,6 +119,7 @@
         - mention j=DT for fGroups method?
     - parallelize args
         - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
+    - order of sets sections
     - references
         - FC calculation?
         - PC transformations
@@ -151,22 +152,21 @@
             - compounds
                 - need to update PCL link?
             - components
-                - add link to checkComponents
                 - section on MS/MS clustering
                     - add link to spec sim param
             - selectIons/adduct() section (also in intro scheme?)
                 - note only adduct/isotope components work?
-                - checkComponents link
         - processing
             - annotatedPeakList: more interesting results (or improve BTA?)
             - Visualization
-                - remove old checkChromatograms section
                 - plot spec sim: remove plotStruct if defaults change
-            - Add new checkChromatograms/checkComponents section
             - Fold changes
+            - Peak qualities
+                - or combine with MC section in advanced?
         - advanced
             - feat opt
                 - parallelization?
+            - MC integration section
             - parallelization
                 - add link to quality calc
                 - why is there a citation at the end?
@@ -174,11 +174,6 @@
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial
-- sets
-    - General
-        - order of sets section
-    - Annotation (formulas/compounds)
-        - addFormulaScoring: generates new consensus --> recommended to do prior to filtering?
 - TPs
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?

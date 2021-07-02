@@ -462,8 +462,6 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
 prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
 {
     pl <- copy(pl)
-    # keep original indices, which may come in handy when eg merging annotation data later on
-    pl[, indexOrig := seq_len(nrow(pl))]
     
     if (removePrecursor)
         pl <- pl[precursor == FALSE]
@@ -510,14 +508,13 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
     {
         othernr <- if (nr == 1) 2 else 1
         # remove other columns and rename intensity
-        rmCols <- paste0(c("intensity_", "index_"), othernr)
+        rmCols <- paste0(c("intensity_", "ID_"), othernr)
         ret <- setnames(bin[get(paste0("intensity_", nr)) != 0, setdiff(names(bin), rmCols), with = FALSE],
-                        paste0(c("intensity_", "index_"), nr), c("intensity", "index"))
-        setorderv(ret, "index") # restore order
+                        paste0(c("intensity_", "ID_"), nr), c("intensity", "ID"))
+        setorderv(ret, "ID") # restore order
         
-        # re-add precursor / original indices
-        ret[, precursor := if (nr == 1) PLP1$specs[[1]]$precursor else PLP2$specs[[1]]$precursor]
-        ret[, indexOrig := if (nr == 1) PLP1$specs[[1]]$indexOrig else PLP2$specs[[1]]$indexOrig]
+        # re-add precursor
+        ret[, precursor := if (nr == 1) PLP1$specs[[1]][match(ret$ID, ID)]$precursor else PLP2$specs[[1]][match(ret$ID, ID)]$precursor]
         
         return(ret)
     }
@@ -559,11 +556,10 @@ expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
 
 mergeBinnedAndAnnPL <- function(binPL, annPL, which)
 {
-    # get rid of duplicate columns
-    annPL <- annPL[, setdiff(names(annPL), names(binPL)), with = FALSE]
+    # get rid of duplicate columns (except ID)
+    annPL <- annPL[, c("ID", setdiff(names(annPL), names(binPL))), with = FALSE]
     
-    annPL[, index := seq_len(nrow(annPL))] # for merging
-    annPL <- merge(binPL, annPL, by.x = "indexOrig", by.y = "index")
+    annPL <- merge(binPL, annPL, by = "ID")
     
     annPL[, which := which]
     return(annPL)

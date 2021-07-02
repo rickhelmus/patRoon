@@ -65,7 +65,7 @@ double getTotMZIntFromSpec(const Rcpp::NumericVector &peakMZs, const Rcpp::Numer
 struct BinnedSpectrum
 {
     std::vector<double> mzs, intsLeft, intsRight;
-    std::vector<int> indexLeft, indexRight;
+    std::vector<int> IDsLeft, IDsRight;
 };
     
 
@@ -227,11 +227,13 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
             const double m = binNone.mzs[i];
             if (binNone.intsLeft[i] == 0)
             {
+                specRightUn.IDs.push_back(binNone.IDsRight[i]);
                 specRightUn.mzs.push_back(m);
                 specRightUn.intensities.push_back(binNone.intsRight[i]);
             }
             else if (binNone.intsRight[i] == 0)
             {
+                specLeftUn.IDs.push_back(binNone.IDsLeft[i]);
                 specLeftUn.mzs.push_back(m);
                 specLeftUn.intensities.push_back(binNone.intsLeft[i]);
             }
@@ -240,6 +242,8 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
                 binOverlap.mzs.push_back(m);
                 binOverlap.intsLeft.push_back(binNone.intsLeft[i]);
                 binOverlap.intsRight.push_back(binNone.intsRight[i]);
+                binOverlap.IDsLeft.push_back(binNone.IDsLeft[i]);
+                binOverlap.IDsRight.push_back(binNone.IDsRight[i]);
             }
         }
         
@@ -250,6 +254,8 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
         binShift.mzs.insert(binShift.mzs.end(), binOverlap.mzs.begin(), binOverlap.mzs.end());
         binShift.intsLeft.insert(binShift.intsLeft.end(), binOverlap.intsLeft.begin(), binOverlap.intsLeft.end());
         binShift.intsRight.insert(binShift.intsRight.end(), binOverlap.intsRight.begin(), binOverlap.intsRight.end());
+        binShift.IDsLeft.insert(binShift.IDsLeft.end(), binOverlap.IDsLeft.begin(), binOverlap.IDsLeft.end());
+        binShift.IDsRight.insert(binShift.IDsRight.end(), binOverlap.IDsRight.begin(), binOverlap.IDsRight.end());
         
         // UNDONE: sort?
         
@@ -264,7 +270,7 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
     {
         const double leftMZ = specLeft.mzs[i];
         double rightMZ = 0, rightInt;
-        int rightInd;
+        int rightID;
         bool foundRight = false;
         
         while (lastRightInd < specRight.mzs.size())
@@ -283,7 +289,7 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
             if (leftMZ >= rmzmin && leftMZ <= rmzmax)
             {
                 // overlap
-                rightMZ = rmz; rightInt = specRight.intensities[lastRightInd]; rightInd = lastRightInd;
+                rightMZ = rmz; rightInt = specRight.intensities[lastRightInd]; rightID = specRight.IDs[lastRightInd];
                 foundRight = true;
                 usedRightInds.push_back(lastRightInd);
             }
@@ -298,16 +304,16 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
         {
             ret.mzs.push_back((leftMZ + rightMZ) / 2.0);
             ret.intsRight.push_back(rightInt);
-            ret.indexRight.push_back(rightInd + 1);
+            ret.IDsRight.push_back(rightID);
         }
         else
         {
             ret.mzs.push_back(leftMZ);
             ret.intsRight.push_back(0);
-            ret.indexRight.push_back(0);
+            ret.IDsRight.push_back(0);
         }
         ret.intsLeft.push_back(specLeft.intensities[i]);
-        ret.indexLeft.push_back(i + 1);
+        ret.IDsLeft.push_back(specLeft.IDs[i]);
     }
     
     // add missing from right
@@ -318,9 +324,9 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
         {
             ret.mzs.push_back(specRight.mzs[j]);
             ret.intsLeft.push_back(0);
-            ret.indexLeft.push_back(0);
+            ret.IDsLeft.push_back(0);
             ret.intsRight.push_back(specRight.intensities[j]);
-            ret.indexRight.push_back(j + 1);
+            ret.IDsRight.push_back(specRight.IDs[j]);
         }
     }
     
@@ -333,19 +339,18 @@ BinnedSpectrum doBinSpectra(const Spectrum &specLeft, Spectrum specRight,
 Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift,
                            Rcpp::NumericVector precDiff, Rcpp::NumericVector mzWindow)
 {
-    Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
-    Spectrum specRight{ sp2["mz"], sp2["intensity"] };
+    Spectrum specLeft{ sp1["ID"], sp1["mz"], sp1["intensity"] };
+    Spectrum specRight{ sp2["ID"], sp2["mz"], sp2["intensity"] };
     
     normalizeNums(specLeft.intensities); normalizeNums(specRight.intensities);
 
     BinnedSpectrum binnedSpec = doBinSpectra(specLeft, specRight, Rcpp::as<std::string>(shift),
                                              Rcpp::as<double>(precDiff), Rcpp::as<double>(mzWindow));
-    
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = binnedSpec.mzs,
                                    Rcpp::Named("intensity_1") = binnedSpec.intsLeft,
                                    Rcpp::Named("intensity_2") = binnedSpec.intsRight,
-                                   Rcpp::Named("index_1") = binnedSpec.indexLeft,
-                                   Rcpp::Named("index_2") = binnedSpec.indexRight);
+                                   Rcpp::Named("ID_1") = binnedSpec.IDsLeft,
+                                   Rcpp::Named("ID_2") = binnedSpec.IDsRight);
 }
 
 double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &method,
@@ -403,8 +408,8 @@ Rcpp::NumericVector calcSpecSimilarity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2,
                                        Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff,
                                        Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow)
 {
-    const Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
-    const Spectrum specRight{ sp2["mz"], sp2["intensity"] };
+    const Spectrum specLeft{ sp1["ID"], sp1["mz"], sp1["intensity"] };
+    const Spectrum specRight{ sp2["ID"], sp2["mz"], sp2["intensity"] };
     return Rcpp::NumericVector::create(doCalcSpecSimilarity(specLeft, specRight, Rcpp::as<std::string>(method),
                                                             Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
                                                             Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight),

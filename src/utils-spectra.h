@@ -5,6 +5,7 @@
 
 struct Spectrum
 {
+    std::vector<int> IDs;
     std::vector<double> mzs, intensities;
 };
 

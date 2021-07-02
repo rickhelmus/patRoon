@@ -18,8 +18,9 @@ Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector me
     for (size_t i=0; i<len; ++i)
     {
         const Rcpp::DataFrame sp = Rcpp::as<Rcpp::DataFrame>(specList[i]);
-        const Rcpp::NumericVector mzs = sp["mz"], ints = sp["intensity"];
-        spectra.push_back(Spectrum{ Rcpp::as<std::vector<double>>(mzs), Rcpp::as<std::vector<double>>(ints) });
+        const Rcpp::NumericVector ids = sp["ID"], mzs = sp["mz"], ints = sp["intensity"];
+        spectra.push_back(Spectrum{ Rcpp::as<std::vector<int>>(ids), Rcpp::as<std::vector<double>>(mzs),
+                                    Rcpp::as<std::vector<double>>(ints) });
     }
     
     for (size_t i=0; i<len; ++i)
@@ -55,14 +56,16 @@ Rcpp::NumericMatrix specDistRect(Rcpp::List specList1, Rcpp::List specList2, Rcp
     for (size_t i=0; i<len1; ++i)
     {
         const Rcpp::DataFrame sp = Rcpp::as<Rcpp::DataFrame>(specList1[i]);
-        const Rcpp::NumericVector mzs = sp["mz"], ints = sp["intensity"];
-        spectra1.push_back(Spectrum{ Rcpp::as<std::vector<double>>(mzs), Rcpp::as<std::vector<double>>(ints) });
+        const Rcpp::NumericVector ids = sp["ID"], mzs = sp["mz"], ints = sp["intensity"];
+        spectra1.push_back(Spectrum{ Rcpp::as<std::vector<int>>(ids), Rcpp::as<std::vector<double>>(mzs),
+                                     Rcpp::as<std::vector<double>>(ints) });
     }
     for (size_t i=0; i<len2; ++i)
     {
         const Rcpp::DataFrame sp = Rcpp::as<Rcpp::DataFrame>(specList2[i]);
-        const Rcpp::NumericVector mzs = sp["mz"], ints = sp["intensity"];
-        spectra2.push_back(Spectrum{ Rcpp::as<std::vector<double>>(mzs), Rcpp::as<std::vector<double>>(ints) });
+        const Rcpp::NumericVector ids = sp["ID"], mzs = sp["mz"], ints = sp["intensity"];
+        spectra2.push_back(Spectrum{ Rcpp::as<std::vector<int>>(ids), Rcpp::as<std::vector<double>>(mzs),
+                                     Rcpp::as<std::vector<double>>(ints) });
     }
 
     for (size_t i=0; i<len1; ++i)

@@ -168,10 +168,9 @@
             - feat opt
                 - parallelization?
             - parallelization
-                - futures also for other things
-                - no more progressr
+                - add link to quality calc
                 - why is there a citation at the end?
-                - update MP section on what uses it (e.g. SIRIUS features, SAFD, OpenMS components, ...)
+                - remove BT in MP table if decide for no parallelization
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

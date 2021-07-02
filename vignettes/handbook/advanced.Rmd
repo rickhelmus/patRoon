@@ -312,19 +312,52 @@ clearCache("all") # same as simply removing the file
 
 ## Parallelization
 
-`patRoon` relies on several external (command-line) tools to generate workflow data. Some of these tools are computationally heavy, and it may therefore take long before they finish processing large NTA datasets. In order to reduce computation times, these commands are executed in _parallel_. Running several commands simultaneously is especially advantageous on multi-core CPUs. The table below outlines the tools that are executed in parallel.
+Some steps in the non-target screening workflow are inherently computationally intensive. To reduce computational times `patRoon` is able to perform _parallelization_ for most of the important functionality. This is especially useful if you have a modern system with multiple CPU cores and sufficient RAM.
+
+For various technical reasons several parallelization techniques are used, these can be categorized as _parallelization of `R` functions_ and _multiprocessing_. The next sections describe both parallelization approaches in order to let you optimize the workflow.
+
+### Parellization of R functions
+
+Several functions of `patRoon` support parallelization.
+
+Function                 | Purpose                             | Remarks
+------------------------ | ----------------------------------- | ------------------------
+`findFeatures`           | Obtain feature data                 | Only `envipick` and `kpic2` algorithms
+`generateComponents`     | Generate components                 | Only `cliquems` algorithm.
+`optimizeFeatureFinding`, `optimizeFeatureGrouping` | Optimize feature finding/grouping parameters | Discussed [here](#fOpt).
+`calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here].
+
+The parallelization is achieved with the [future] and [future.apply] `R` packages. To enable parallelization of these functions the `parallel` argument must be set to `TRUE` and the future framework must be properly configured in advance. For example:
+
+```{r eval=FALSE}
+# setup three workers to run in parallel
+future::plan("multisession", workers = 3)
+
+# find features with enviPick in parallel
+fList <- findFeatures(anaInfo, "envipick", parallel = TRUE)
+```
+
+It is important to properly configure the right future plan. Please see the documentation of the [future] package for more details.
+
+### Multiprocessing
+
+`patRoon` relies on several external (command-line) tools to generate workflow data. These commands may be executed in _parallel_ to reduce computational times ('multiprocessing'). The table below outlines the tools that are executed in parallel.
 
 Tool                  | Used by                                      | Notes
 --------------------- | -------------------------------------------- | ---------------------------------
 `msConvert`           | `convertMSFiles(algorithm="pwiz", ...)`      |
 `FileConverter`       | `convertMSFiles(algorithm="openms", ...)`    |
 `FeatureFinderMetabo` | `findFeatures(algorithm="openms", ...)`      |
+`julia`               | `findFeatures(algorithm="safd", ...)`        |
+`SIRIUS`              | `findFeatures(algorithm="sirius", ...)`      |
+`MetaboliteAdductDecharger` | `generateComponents(algorithm="openms", ...)` |
 `GenForm`             | `generateFormulas(agorithm="genform", ...)`  |
 `SIRIUS`              | `generateFormulas(agorithm="sirius", ...)`, `generateCompounds(agorithm="sirius", ...)`  | Only if `splitBatches=TRUE`
 `MetFrag`             | `generateCompounds(agorithm="metfrag", ...)` |
 `pngquant`            | `reportHTML(...)`                            | Only if `optimizePng=TRUE`
+`BioTransformer`      | `generateTPs(algorithm = "biotransformer")`  |
 
-Two parallelization approaches are available: `classic`, which uses the [processx] `R` package to execute multiple tools in parallel, and `future`, where so called "futures" are created by the [future.apply] `R` package. An overview of the characteristics of both parallelization methods is shown below.
+Multiprocessing is either performed by executing processes in the background with the [processx] `R` package (_classic interface_) or by futures, which were introduced in the previous section. An overview of the characteristics of both parallelization techniques is shown below.
 
 `classic`                                           |  `future`
 --------------------------------------------------- | -------------------------------------------------------
@@ -334,9 +367,9 @@ only supports parallelization on the local computer | allows both local and clus
 
 Which method is used is controlled by the `patRoon.MP.method` package option. Note that `reportHTML()` will always use the classic method for `pngquant`.
 
-### Classic parallelization method
+#### Classic multiprocessing interface
 
-The classic method is the 'original' method implemented in `patRoon`, and is therefore well tested and optimized. It is easier to setup, works well with all tools, and is therefore the default method. It is enabled as follows:
+The classic interface is the 'original' method implemented in `patRoon`, and is therefore well tested and optimized. It is easier to setup, works well with all tools, and is therefore the default method. It is enabled as follows:
 
 ```{r eval=FALSE}
 options(patRoon.MP.method = "classic")
@@ -348,7 +381,7 @@ The number of parallel processes is configured through the `patRoon.MP.maxProcs`
 options(patRoon.MP.maxProcs = 2) # do not execute more than two tools in parallel. 
 ```
 
-This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved by using the `withOpt()` function.
+This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved with the `withOpt()` function.
 
 ```{r eval=FALSE}
 # do not execute more than two tools in parallel.
@@ -362,7 +395,7 @@ withOpt(MP.maxProcs = 4, {
 
 The `withOpt` function will temporarily change the given option(s) while executing a given code block and restore it afterwards (it is very similar to the `with_options()` function from the [withr] `R` package). Furthermore, notice how `withOpt()` does not require you to prefix the option names with `patRoon.`. 
 
-### Future parallelization method
+#### Multiprocessing with futures
 
 The primary goal of the "future" method is to allow parallel processing on one or more external computers. Since it uses the [future] `R` package, many approaches are supported, such as local parallelization (similar to the `classic` method), cluster computing via multiple networked computers and more advanced HPC approaches such as `slurm` via the [future.batchtools] `R` package. This parallelization method can be activated as follows:
 
@@ -378,9 +411,9 @@ future::plan("cluster", workers = 4)
 future::plan("cluster", workers = rep("otherpc", 4)) 
 ```
 
-It is important to properly configure the right future plan. Please see the documentation of the respective packages (_e.g._ [future] and [future.batchtools]) for more details.
+Please see the documentation of the respective packages (_e.g._ [future] and [future.batchtools]) for more details on how to configure the workers.
 
-The `withOpt()` function introduced in the previous section can also be used to temporarily switch between parallelization approaches, for instance:
+The `withOpt()` function introduced in the previous subsection can also be used to temporarily switch between parallelization approaches, for instance:
 
 ```{r eval=FALSE}
 # default to future parallelization
@@ -397,31 +430,23 @@ withOpt(MP.method = "classic", {
 # .. do more workflow
 ```
 
-By default, no progress bars are visible when using the future method (this may change in the future). The reason for this is that the [progressr] package, which is used to report progress, requires the user to configure _how_ progress should be reported. While this is a bit of extra work, it allows many different ways to report progress. You can find more information on the [progressr] website. While this may change in the future, for now each function should be wrapped within a call to `progressr::with_progress()`, e.g.
+#### Logging
 
-```{r eval=FALSE}
-# setup parallelization etc
+Most tools that are executed in parallel will log their output to text files. These files may contain valuable information, for instance, when an error occurred. By default, the logfiles are stored in the `log` directory placed in the current working directory. However, you can change this location by setting the `patRoon.MP.logPath` option. If you set this option to `FALSE` then no logging occurs.
 
-progressr::with_progress({
-    compounds <- generateCompounds(fGroups, "metfrag", ...)
-})
-```
+### Notes when using parallelization with futures
 
-Some more important notes when using the `future` parallelization method:
+Some important notes when using the `future` parallelization method:
 
-* As highlighted in the table at the beginning of this section, `GenForm` currently performs less optimal with future processing compared to with the `classic` approach. Nevertheless, it may still be interesting to use the `future` method to move the computations to another system to free up resources on your local system.
+* `GenForm` currently performs less optimal with future multiprocessing to the `classic` approach. Nevertheless, it may still be interesting to use the `future` method to move the computations to another system to free up resources on your local system.
 * Behind the scenes the [future.apply] package is used to schedule the tools to be executed. The `patRoon.MP.futureSched` option sets the value for the `future.scheduling` argument to the `future_lapply()` function, and therefore allows you to tweak the scheduling.
-* Make sure that `patRoon` and the tool to be executed (`MetFrag`, `SIRIUS` etc.) are exactly the _same_ version on all computing hosts.
+* Make sure that `patRoon` and in case of multiprocessing that the tool to be executed (`MetFrag`, `SIRIUS` etc.) are exactly the _same_ version on all computing hosts.
 * Make sure that `patRoon` is properly configured on all hosts, _e.g._ set the `patRoon.path.XXX` options to ensure all tools can be found.
 * For `MetFrag` annotation: if a local database such as `PubChemLite` is used, it must be present on each computing node as well. Furthermore, the local computer (even if not used for the computations) _also_ must have this file present. Like the previous point, make sure that the `patRoon.path.XXX` options are set properly.
-* If you encounter errors then it may be handy to switch to `future::plan("sequential")` and see if it works.
-* In order to restart the nodes, for instance after re-configuring `patRoon`, updating `R` packages etc, simply  re-execute `future::plan(...)`.
-* Setting the `future.debug` package option to `TRUE` may give you more insight what is happening and may therefore be interesting for debugging e.g. problems.
-* Take care to look for the log files (next section) if you encounter any errors.
+* If you encounter errors then it may be handy to switch to `future::plan("sequential")` and see if it works or you get more descriptive error messages.
+* In order to restart the nodes, for instance after re-configuring `patRoon`, updating `R` packages etc, simply re-execute `future::plan(...)`.
+* Setting the `future.debug` package option to `TRUE` may give you more insight what is happening to find problems.
 
-### Logging
-
-Most tools that are executed in parallel will log their output to text files. These files may be highly useful to check, for instance, if an error occurred. By default, the logfiles are stored in the `log` directory placed in the current working directory. However, you can change this location by setting the `patRoon.MP.logPath` option. If you set this option to `FALSE` than no logging occurs.
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```

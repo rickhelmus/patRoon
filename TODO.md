@@ -159,10 +159,9 @@
                 - checkComponents link
         - processing
             - annotatedPeakList: more interesting results (or improve BTA?)
-            - add section of spec comparison
-                - separately handle plotting?
             - Visualization
                 - remove old checkChromatograms section
+                - plot spec sim: remove plotStruct if defaults change
             - Add new checkChromatograms/checkComponents section
             - Fold changes
         - advanced

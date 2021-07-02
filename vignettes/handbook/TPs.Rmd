@@ -253,11 +253,9 @@ fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
 
 #### Annotation similarity calculation
 
-UNDONE: link to ms spec sims
-
 If additional annotation data for parents and TPs is given to the componentization algorithm, it will be used to calculate various similarity properties. Often, the chemical structure for a transformation product is similar to that of its parent. Hence, there is a good chance that a parent and its TPs also share similar MS/MS data.
 
-Firstly, if MS peak lists are provided, then the [spectrum similarity] is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section] for more details).
+Firstly, if MS peak lists are provided, then the [spectrum similarity](#specSim) is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section] for more details).
 
 In case `formulas` and/or `compounds` objects are specified, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (by using the formula annotations). This property is mainly used for non-target workflows where the identity for a parent and TP is not yet well established. For this reason, fragments and neutral losses reported for _all_ candidates for the parent/TP feature group are considered. Hence, it is highly recommend to pre-treat the annotation objects, for instance, with the `topMost` filter. If both `formulas` and `compounds` are given the results are pooled. Note that each unique fragment/neutral loss is only counted once, thus multiple formula/compound candidates with the same annotations will not skew the results.
 

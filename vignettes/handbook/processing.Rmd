@@ -31,7 +31,7 @@ fList[["standard-1"]][, 1:6]
 fGroups$M120_R268_30
 fGroups[[1, "M120_R268_30"]] # only first analysis
 
-# obtains MS/MS peak list  (feature group averaged datas)
+# obtains MS/MS peak list  (feature group averaged data)
 mslists[["M120_R268_30"]]$MSMS
 
 # get all formula candidates for a feature group
@@ -575,7 +575,76 @@ fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
                       exclusive = TRUE)
 ```
 
-In addition, several plotting functions are [discussed in the next section](#visComp) that visualize overlap and uniqueness of features.
+In addition, several plotting functions are [discussed in the visualization section](#visComp) that visualize overlap and uniqueness of features.
+
+## MS similarity {#specSim}
+
+The _spectral similarity_ is used to compare spectra from different features. For this purpose the `spectrumSimilarity` function can be used. This function operates on [MS peak lists], and accepts the following function arguments:
+
+Argument                   | Remarks
+-------------------------- | ---------------------------------------------------------------------------------------
+`MSPeakLists`              | The [MS peak lists] object from which peak lists data should be taken.
+`groupName1`, `groupName2` | The name(s) of the first and second feature group(s) to compare
+`analysis1`, `analysis2`   | The analysis names of the data to be compared. Set this when feature data (instead of feature group data) should be compared.
+`MSLevel`                  | The MS level: `1` or `2` for MS and MS/MS, respectively.
+`specSimParams`            | Parameters that define how similarities are calculated.
+`NAToZero`                 | If `TRUE` then `NA` values are converted to zeros. `NA` values are reported if a comparison cannot be made because of missing peak list data.
+
+The `specSimParams` argument defines the parameters for similarity calculations. It is a `list`, and the default values are obtained with the `getDefSpecSimParams()` function:
+
+```{r defSpecSimParams,eval=TRUE}
+getDefSpecSimParams()
+```
+
+The `method` field describes the calculation measure: this is either `"cosine"` or `"jaccard"`.
+
+The `shift` field is primarily useful when comparing MS/MS data and defines if and how a spectral shift should be performed prior to similarity calculation:
+
+* `"none"`: The default, no shifting is performed.
+* `"precursor"` The mass difference between the precursor mass of both spectra (_i.e._ the feature mass) is first calculated. This difference is then subtracted from each of the mass peaks of the second spectrum. This shifting increases similarity if the MS fragmentation process itself occurs similarly (_i.e._ if both features show similar neutral losses).
+* `"both`" This combines both shifting methods: first peaks are aligned that have the same mass, then the `precursor` strategy is applied for the remaining mass peaks. This shifting method yields higher similarities if either fragment masses or neutral losses are similar.
+
+To override a default setting, simply pass it as an argument to `getDefSpecSimParams`:
+
+```{r defSpecSimParamsOv,eval=FALSE}
+getDefSpecSimParams(shift = "both")
+```
+
+For more details on the various similarity calculation parameters see the reference manual (`?getDefSpecSimParams`).
+
+Some examples are shown below:
+
+```{r specSim,eval=runData}
+# similarity between MS spectra with default parameters
+spectrumSimilarity(mslists, groupName1 = "M120_R268_30", groupName2 = "M137_R249_53")
+
+# similarity between MS/MS spectra with default parameters
+spectrumSimilarity(mslists, groupName1 = "M120_R268_30", groupName2 = "M192_R355_191",
+                   MSLevel = 2)
+
+# As above, with jaccard calculation
+spectrumSimilarity(mslists, groupName1 = "M120_R268_30", groupName2 = "M192_R355_191",
+                   MSLevel = 2, specSimParams = getDefSpecSimParams(method = "jaccard"))
+
+# With shifting
+spectrumSimilarity(mslists, groupName1 = "M120_R268_30", groupName2 = "M192_R355_191",
+                   MSLevel = 2, specSimParams = getDefSpecSimParams(shift = "both"))
+```
+
+The `spectrumSimilarity` function can also be used to calculate _multiple_  similarities. Simply specify multiple feature group names for the `groupNameX` parameters. Alternatively, if you want to compare the same set of feature groups with each other pass their names only as the `groupName1` parameter:
+
+```{r specSimMult,eval=runData}
+# compare two pairs
+spectrumSimilarity(mslists,
+                   groupName1 = c("M120_R268_30", "M137_R249_53"),
+                   groupName2 = c("M146_R309_68", "M192_R355_191"),
+                   MSLevel = 2, specSimParams = getDefSpecSimParams(shift = "both"))
+
+# compare all
+spectrumSimilarity(mslists, groupName1 = groupNames(mslists),
+                   MSLevel = 2, specSimParams = getDefSpecSimParams(shift = "both"))
+```
+
 
 ## Visualization
 
@@ -667,7 +736,7 @@ plotGraph(componNT)
 ```
 
 
-### Comparing data {#visComp}
+### Overlapping and unique data {#visComp}
 
 There are three functions that can be used to visualize overlap and uniqueness between data:
 
@@ -703,6 +772,23 @@ plotVenn(formsGF, formsSIR,
 
 ```{r postPlotComp,include=FALSE,eval=runData}
 fGroups <- fGroupsO
+```
+
+### MS similarity
+
+The `plotSpectrum` function is also able to visually compare (annotated) spectra. This works for `MSPeakLists`, `formulas` and `compounds` object data.
+
+```{r plotSim,eval=runData}
+plotSpectrum(mslists, groupName = c("M120_R268_30", "M137_R249_53"), MSLevel = 2)
+plotSpectrum(compounds, groupName = c("M120_R268_30", "M146_R309_68"), index = c(1, 1),
+             MSPeakLists = mslists, plotStruct = FALSE)
+```
+
+The `specSimParams` argument, which was discussed in [MS similarity](#specSim), can be used to configure the similarity calculation:
+
+```{r plotSimParam,eval=runData}
+plotSpectrum(mslists, groupName = c("M120_R268_30", "M137_R249_53"), MSLevel = 2,
+             specSimParams = getDefSpecSimParams(shift = "both"))
 ```
 
 ### Hierarchical clustering results {#plotClust}

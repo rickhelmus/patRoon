@@ -151,22 +151,18 @@
         - generating workflow data
             - compounds
                 - need to update PCL link?
-            - components
-                - section on MS/MS clustering
-                    - add link to spec sim param
             - selectIons/adduct() section (also in intro scheme?)
                 - note only adduct/isotope components work?
         - processing
             - annotatedPeakList: more interesting results (or improve BTA?)
             - Visualization
                 - plot spec sim: remove plotStruct if defaults change
-            - Fold changes
             - Peak qualities
                 - or combine with MC section in advanced?
         - advanced
-            - feat opt
-                - parallelization?
             - MC integration section
+            - Fold changes
+                - or in Processing?
             - parallelization
                 - add link to quality calc
                 - why is there a citation at the end?

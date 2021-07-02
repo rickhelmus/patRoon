@@ -281,6 +281,48 @@ fGroupsTab <- as.data.table(fGroups, areas = TRUE, features = FALSE, regression 
 increasingFGroups <- fGroups[, fGroupsTab[RSQ >= 0.8, group]]
 ```
 
+## Fold changes {#FCCalc}
+
+A specific statistical way to prioritize feature data is by Fold changes (FC). This is a relative simple method to quickly identify (significant) changes between two sample groups. A typical use case is to compare the feature intensities before and after an experiment.
+
+To perform FC calculations we first need to specify its parameters. This is best achieved with the `getFCParams()` function:
+
+```{r FCParams,eval=TRUE}
+getFCParams(c("before", "after"))
+```
+
+In this example we generate a `list` with parameters in order to make a comparison between two replicate groups: `before` and `after`. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (`?featureGroups`).
+
+The `as.data.table` function for feature groups is used to perform the FC calculations.
+
+```{r include=FALSE,eval=runData}
+fGroupsO <- fGroups
+fGroups <- filter(fGroupsUF, absMinIntensity = 1E4)
+```
+
+```{r getFC,eval=runData}
+myFCParams <- getFCParams(c("solvent-pos", "standard-pos")) # compare solvent/standard
+as.data.table(fGroups, FCParams = myFCParams)[, c("group", "FC", "FC_log", "PV", "PV_log", "classification")]
+```
+
+The `classification` column allows you to easily identify if and how a feature changes between the two sample groups. This can also be used to prioritize feature groups:
+
+```{r eval=FALSE}
+tab <- as.data.table(fGroups, FCParams = myFCParams)
+# only keep feature groups that significantly increase or decrease
+fGroupsChanged <- fGroups[, tab[classification %in% c("increase", "decrease")]$group]
+```
+
+The `plotVolcano` function can be used to visually the FC data:
+
+```{r plotVolcano,eval=runData}
+plotVolcano(fGroups, myFCParams)
+```
+
+```{r include=FALSE,eval=runData}
+fGroups <- fGroupsO
+```
+
 ## Caching
 
 In `patRoon` lengthy processing operations such as finding features and generating annotation data is _cached_. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.

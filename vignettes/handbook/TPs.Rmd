@@ -294,11 +294,9 @@ reportHTML(fGroups, components = componTP)
 
 ## Example workflows {#TPsExamples}
 
-UNDONE: links
-
 The next subsections demonstrate several approaches to perform a TP screening workflow with `patRoon`. In all examples it is assumed that feature groups were already obtained (with the `findFeatures` and `groupFeatures` functions) and stored in the `fGroups` variable.
 
-The workflows with `patRoon` are designed to be flexible, and the examples here are primarily meant to implement your own workflow. Furthermore, some of the techniques used in the examples can also be combined. For instance, the [Fold change] classification and MS/MS similarity filters applied in the [fourth example](#TPsEx4) could also be applied to any of the other examples.
+The workflows with `patRoon` are designed to be flexible, and the examples here are primarily meant to implement your own workflow. Furthermore, some of the techniques used in the examples can also be combined. For instance, the [Fold change](#FCCalc) classification and MS/MS similarity filters applied in the [fourth example](#TPsEx4) could also be applied to any of the other examples.
 
 ### Screen predicted TPs for targets {#TPsEx1}
 
@@ -409,11 +407,9 @@ reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = com
 
 ### Non-targeted screening of TPs by annotation similarities {#TPsEx4}
 
-UNDONE: links
-
 This example shows a workflow where no TP data from a prediction or library is used. Instead, this workflow relies on statistics and MS/MS data to find feature groups which may potentially have a parent - TP relationship. The workflow is similar to that of the previous example. The steps of this workflow are:
 
-1. [Fold changes] (FC) between two sample groups are calculated to classify which feature groups are decreasing (i.e. parents) or increasing (i.e. TPs).
+1. [Fold changes](#FCCalc) (FC) between two sample groups are calculated to classify which feature groups are decreasing (i.e. parents) or increasing (i.e. TPs).
 2. Feature groups without classification are removed.
 3. Formula annotations are performed like the previous example.
 4. The componentization is performed and the FC classifications are used to specify which feature groups are to be considered parents or TPs.

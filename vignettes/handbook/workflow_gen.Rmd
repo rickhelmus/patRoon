@@ -317,7 +317,7 @@ For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClu
 
 Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
 
-Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here]) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here](#intReview)) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
 
 Once the components with adduct and isotopes annotations are generated this data can be [used to prioritize and improve the workflow](#incorpAdductIso).
 
@@ -472,7 +472,7 @@ Argument         | Remarks
 
 In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and `onlyMonoIso=TRUE`, the feature group will not be removed.
 
-Although `selectIons` operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the `checkComponents` function [discussed later]. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.
+Although `selectIons` operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the `checkComponents` function [discussed here](#intReview). Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.
 
 An example usage is shown below.
 

@@ -52,23 +52,34 @@ The manual installation is for users who don't use Windows or Docker, prefer to 
 
 When installing `patRoon` Windows users have the option to install from a customized ([miniCRAN]) repository (`patRoonDeps`). This repository provides a central repository for `patRoon` and all its R packages. An advantage is that installation will be faster and you will not need to install [Rtools]. Note that you will need to have the latest `R` version installed in order to use this repository.
 
-When you decide to use the `patRoonDeps` repository you can simply _skip_ this step. **Otherwise** (i.e. you will use regular repositories instead), execute the following:
+When you decide to use the `patRoonDeps` repository you can simply _skip_ this step. **Otherwise** (i.e. you will use regular repositories instead), the following will install the `R` dependencies.
 
 ```{r eval=FALSE}
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("CAMERA")
 
+# needed for finding/grouping features with KPIC2
+BiocManager::install("ropls")
+remotes::install_github("rickhelmus/KPIC2") 
+
 # needed for RAMClustR for componentization
 remotes::install_github("cbroeckl/RAMClustR")
+
+# needed for cliqueMS for componentization
+remotes::install_github("rickhelmus/cliqueMS") # note: repository is a fork with minor bug fixes
 
 # only needed for Bruker DataAnalysis integration
 install.packages("RDCOMClient", repos = "http://www.omegahat.net/R")
 
 # only when using the R interface (not recommended by default)
 remotes::install_github("c-ruttkies/MetFragR/metfRag")
+
+# needed for feature quality calculations with MetaClean
+BiocManager::install(c("BiocStyle", "Rgraphviz")) 
+remotes::install_github("KelseyChetnik/MetaClean")
 ```
 
-Note that the latter three commands concern installation of _optional_ packages. If you are unsure then you probably don't need them.
+Note that only the `CAMERA` installation is mandatory, the rest involves installation of _optional_ packages. If you are unsure which you need then you can always install the packages at a later stage.
 
 ### Other dependencies
 
@@ -83,11 +94,15 @@ Software                            | Remarks
 [MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
 [MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
 [MetFrag PubChemLite DB][PCLite-dl] | Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).
-[SIRIUS]                            | For formula and/or compound annotation.
+[SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
+[BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details.
+[SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
 [OpenBabel]                         | Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.
 [pngquant]                          | Used to reduce size of HTML reports, definitely optional.
 
-After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the `options()` R function, for instance:
+Most of these packages are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage.
+
+After installation of these dependencies you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the `options()` R function, for instance:
 
 ```{r, eval=FALSE}
 options(patRoon.path.pwiz = "C:/ProteoWizard") # location of ProteoWizard installation folder
@@ -97,6 +112,7 @@ options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant bi
 options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar") # full location to the jar file
 options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
 options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_14Jan2020_tier0.csv") # full location to desired PubChemLite CSV file
+options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
 options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
 ```
 

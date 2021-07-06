@@ -81,12 +81,12 @@ as.data.table(components)[, 1:6]
 Finally, the `annotatedPeakList()` function is useful to inspect annotation results for a formula or compound candidate:
 
 ```{r annPList,eval=runData}
-# formula annotations for the first formula candidate of feature group M120_R268_30
-annotatedPeakList(formulas, index = 1, groupName = "M120_R268_30",
+# formula annotations for the first formula candidate of feature group M137_R249_53
+annotatedPeakList(formulas, index = 1, groupName = "M137_R249_53",
                   MSPeakLists = mslists)
 
-# compound annotation for first candidate of feature group M120_R268_30
-annotatedPeakList(compounds, index = 1, groupName = "M120_R268_30",
+# compound annotation for first candidate of feature group M137_R249_53
+annotatedPeakList(compounds, index = 1, groupName = "M137_R249_53",
                   MSPeakLists = mslists)
 ```
 

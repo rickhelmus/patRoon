@@ -29,7 +29,7 @@ The next sections will outline more details on these steps are performed and con
 
 ## Obtaining transformation product data {#genTPs}
 
-UNDONE: cite logic, refs below
+UNDONE: cite PC
 
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
@@ -37,7 +37,7 @@ Algorithm        | Usage                                            | Remarks
 ---------------- | ------------------------------------------------ | ---------------------------------
 [BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
 Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem] or custom)
-Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation)
+Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
 
 The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic only requires the feature mass, and this simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
 
@@ -142,7 +142,7 @@ The `convertToSuspects` function is always part of a workflow with `biotransform
 
 UNDONE: DB refs
 
-By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on X and Y, respectively). However, it is also possible to use custom data.
+By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on X and @Scholle2015, respectively). However, it is also possible to use custom data.
 
 To use a custom TP library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
 
@@ -255,11 +255,11 @@ fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
 
 If additional annotation data for parents and TPs is given to the componentization algorithm, it will be used to calculate various similarity properties. Often, the chemical structure for a transformation product is similar to that of its parent. Hence, there is a good chance that a parent and its TPs also share similar MS/MS data.
 
-Firstly, if MS peak lists are provided, then the [spectrum similarity](#specSim) is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section] for more details).
+Firstly, if MS peak lists are provided, then the [spectrum similarity](#specSim) is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section](#specSim) for more details).
 
 In case `formulas` and/or `compounds` objects are specified, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (by using the formula annotations). This property is mainly used for non-target workflows where the identity for a parent and TP is not yet well established. For this reason, fragments and neutral losses reported for _all_ candidates for the parent/TP feature group are considered. Hence, it is highly recommend to pre-treat the annotation objects, for instance, with the `topMost` filter. If both `formulas` and `compounds` are given the results are pooled. Note that each unique fragment/neutral loss is only counted once, thus multiple formula/compound candidates with the same annotations will not skew the results.
 
-### Processing data
+### Processing data {#TPsProc}
 
 The output of TP componentization is an object of the `componentsTPs` class. This _derives_ from the 'regular' `components` class, therefore, all the data processing functionality described [before](#processing) (extraction, subsetting, filtering etc) are also valid for TP components.
 
@@ -268,7 +268,7 @@ Several additional filters are available to prioritize the data:
 Filter        | Remarks
 ------------- | -----------------------------------
 `retDirMatch` | If `TRUE` only keep TPs with an expected chromatographic retention direction compared to the parent.
-`minSpecSim`, `minSpecPrec`, `minSpecSimBoth` | The minimum spectrum similarity between the parent and TP. Calculated with no, `"precursor"` and `"both"` alignment shifting (see [spectrum similarity]).
+`minSpecSim`, `minSpecPrec`, `minSpecSimBoth` | The minimum spectrum similarity between the parent and TP. Calculated with no, `"precursor"` and `"both"` alignment shifting (see [spectrum similarity](#specSim)).
 `minFragMatches`, `minNLMatches` | Minimum number of formula fragment/neutral loss matches between parent and TP (discussed in previous section).
 `formulas`    | A `formulas` object used to further verify candidate TPs that were generated by the `logic` algorithm.
 
@@ -376,7 +376,7 @@ This example uses metabolic logic to calculate possible TPs for all feature grou
 4. A suspect screening is performed to find the TPs. Unlike the previous example the parents are not screened, and feature groups without hits are kept ([discussed here](#TPsFGroups)).
 5. The components are generated
 6. The components are filtered:
-    a. The TPs must follow an expected [retention time direction]
+    a. The TPs must follow an expected [retention time direction](#TPsProc)
     b. The parent/TPs should have at least one candidate formula that fits with the transformation.
 7. Only feature groups are kept with parent/TP assignments and all results are reported.
 

@@ -104,9 +104,9 @@ Workflow step               | Handling of set data
 --------------------------- | ------------------------------------------------------
 Finding/Grouping features   | Neutralization of _m/z_ values
 Suspect screening           | Merging results from screening performed for each set
+Componentization            | Algorithm dependent (discussed below)
 MS peak lists               | MS data is obtained and stored per set. The final peak lists are combined (_not_ averaged)
 Formula/Compound annotation | Annotation is performed for each set separately and used to generate a final consensus
-Componentization            | Algorithm dependent (discussed below)
 
 In most cases the algorithms of the workflow steps are first performed for each set, and this data is then merged. To illustrate the importance of this, consider these examples
 
@@ -115,6 +115,14 @@ In most cases the algorithms of the workflow steps are first performed for each 
 * Componentization in order to establish adduct assignments for the features
 
 In all cases data is used that is highly dependent on the MS method (eg polarity) that was used to acquire the sample data. Nevertheless, all the steps needed to obtain and combine set data are performed automatically in the background, and are therefore largely invisible.
+
+> **_NOTE_** Because feature groups in sets workflows always have [adduct annotations](#useAdductAnn), it is never required to specify the adduct or ionization mode when generating annotations, components or do suspect screening (_i.e._ the `adduct`/`ionization` arguments should not be specified).
+
+### Componentization
+
+When the componentization algorithms related to adduct/isotope annotations (e.g. [CAMERA], [RAMClustR] and [cliqueMS]) and [nontarget] are used, then componentization occurs per set and the final object (a `componentsSet` or `componentsNTSet`) contains all the components together. Since these algorithms are highly dependent upon MS data polarity, no attempt is made to merge components from different sets.
+
+The other componentization algorithms work on the complete data. For more details, see the reference manual (`?generateComponents`).
 
 ### Formula and compound annotation
 
@@ -136,12 +144,6 @@ Candidate | annotations | candidate present | `setThreshold=1` | `setThresholdAn
 \#3       | `+`         | `+`               | Remove           | Keep
 
 For more information refer to the reference manual (e.g. `?generateCompounds`).
-
-### Componentization
-
-When the componentization algorithms related to adduct/isotope annotations (e.g. [CAMERA], [RAMClustR] and [cliqueMS]) and [nontarget] are used, then componentization occurs per set and the final object (a `componentsSet` or `componentsNTSet`) contains all the components together. Since these algorithms are highly dependent upon MS data polarity, no attempt is made to merge components from different sets.
-
-The other componentization algorithms work on the complete data. For more details, see the reference manual (`?generateComponents`).
 
 ## Selecting adducts to improve grouping {#setsAdducts}
 

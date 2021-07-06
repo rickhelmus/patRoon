@@ -133,14 +133,7 @@
             - add also as contributor to eg DESCRIPTION
 - handbook
     - sets
-        - general topics
-            - initiating/performing a sets workflow
-                - selectIons for better componentization
-                    - before/after makeSet
-                    - adducts()<-
-                        - show example with reGroup=FALSE
-                - makeSet(fGroups): add link to checkUIs
-            - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
+        - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
     - TPs
         - fix UNDONEs
         - mention newProject when/if support is there
@@ -161,10 +154,7 @@
             - Visualization
                 - plot spec sim: remove plotStruct if defaults change
         - advanced
-            - Fold changes
-                - or in Processing?
             - parallelization
-                - add link to quality calc
                 - remove BT in MP table if decide for no parallelization
 - annotation
     - generateFormulas: MSPeakLists argument

@@ -150,6 +150,73 @@ plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp") # pretty perspective
 
 Please refer to the reference manual for more methods to inspect optimization results (e.g. `?optimizationResult`).
 
+## Chromatographic peak qualities {#peakQual}
+
+The algorithms used by `findFeatures` detect chromatographic peaks automatically to find the features. However, it is common that not all detected features have 'proper' chromatographic peaks, and some features could be just noise. The [MetaClean] `R` package supports various quality measures for chromatographic peaks. The quality measures include Gaussian fit, symmetry, sharpness and others. In addition, [MetaClean] averages all feature data for each feature group and adds a few additional group specific quality measures (_e.g._ retention time consistency). Please see @Chetnik2020 for more details. The calculations are integrated into `patRoon`, and are easily performed with the `calculatePeakQualities()` generic function.
+
+```{r calcQ,eval=runData}
+fList <- calculatePeakQualities(fList) # calculate for all features
+fGroups <- calculatePeakQualities(fGroups) # calculate for all features and groups
+```
+
+Most often the `featureGroups` method is only used, unless you want to filter features (discussed below) prior to grouping.
+
+An extension in `patRoon` is that the qualities are used to calculate _peak scores_. The score for each quality measure is calculated by normalizing and scaling the values into a `0-1` range, where zero is the worst and one the best. Note that most scores are relative, hence, the values should only be used to compare features among each other. Finally, a `totalScore` is calculated which sums all individual scores and serves as a rough overall score indicator for a feature (group).
+
+The qualities and scores are easily obtained with the `as.data.table()` function.
+
+```{r tabQ,eval=runData}
+# (limit rows/columns for clarity)
+as.data.table(fList)[1:5, 26:30]
+# the qualities argument is necessary to include the scores.
+# valid values are: "quality", "score" or "both"
+as.data.table(fGroups, qualities = "both")[1:5, 25:29]
+```
+
+The feature quality values can also be reviewed interactively with reports generated with `reportHTML` (see [Reporting]) and with `checkFeatures` (see [here](#intReview)). The `filter` function can be used filter out low scoring features and feature groups:
+
+```{r filterQ,eval=FALSE}
+# only keep features with at least 0.3 Modality score and 0.5 symmetry score
+fList <- filter(fList, qualityRange = list(ModalityScore = c(0.3, Inf),
+                                           SymmetryScore = c(0.5, Inf)))
+
+# same as above
+fGroups <- filter(fGroups, featQualityRange = list(ModalityScore = c(0.3, Inf),
+                                                   SymmetryScore = c(0.5, Inf)))
+
+# filter group averaged data
+fGroups <- filter(fGroups, groupQualityRange = list(totalScore = c(0.5, Inf)))
+```
+
+### Applying machine learning with MetaClean
+
+An important feature of [MetaClean] is to use the quality measures to train a machine learning model to automatically recognize 'good' and 'bad' features. `patRoon` provides a few extensions to simplify training and using a model. Furthermore, while `MetaClean` was primarily designed to work with [XCMS], the extensions of `patRoon` allow the usage of data from all the algorithms supported by `patRoon`.
+
+The `getMCTrainData` function can be used to convert data from a [feature check session](#intReview) to training data that can be used by [MetaClean]. This allows you to use interactively select good/bad peaks. The workflow looks like this:
+
+```{r trainMC,eval=FALSE}
+# untick the 'keep' checkbox for all 'bad' feature groups
+checkFeatures(fGroupsTrain, "train_session.yml")
+
+# get train data. This gives comparable data as MetaClean::getPeakQualityMetrics()
+trainData <- getMCTrainData(fGroupsTrain, "train_session.yml")
+
+# use train data with MetaClean with MetaClean::runCrossValidation(),
+# MetaClean::getEvaluationMeasures(), MetaClean::trainClassifier() etc
+# --> see the MetaClean vignette for details
+```
+
+Once you have created a model with [MetaClean] it can be used with the `predictCheckFeaturesSession()` function:
+
+```{r useModelMC,eval=FALSE}
+predictCheckFeaturesSession(fGroups, "model_session.yml", model)
+```
+
+This will generate another _check session file_: all the feature groups that are considered good will be with a 'keep' state, the others without. As [described elsewhere](#intReview), the `checkFeatures` function is used to review the results from a session and the `filter` function can be used to remove unwanted feature groups. Note that `calculatePeakQualitites()` must be called before `getMCTrainData`/`predictCheckFeaturesSession` can be used.
+
+> **_NOTE_** `MetaClean` only predicts at the feature group level. Thus, only the kept feature groups from a _feature check session_ will be used for training, and any indivual features that were marked as removed will be ignored.
+
+
 ## Exporting and converting feature data
 
 The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
@@ -367,7 +434,7 @@ Function                 | Purpose                             | Remarks
 `findFeatures`           | Obtain feature data                 | Only `envipick` and `kpic2` algorithms
 `generateComponents`     | Generate components                 | Only `cliquems` algorithm.
 `optimizeFeatureFinding`, `optimizeFeatureGrouping` | Optimize feature finding/grouping parameters | Discussed [here](#fOpt).
-`calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here].
+`calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here](#peakQual).
 
 The parallelization is achieved with the [future] and [future.apply] `R` packages. To enable parallelization of these functions the `parallel` argument must be set to `TRUE` and the future framework must be properly configured in advance. For example:
 

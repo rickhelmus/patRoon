@@ -496,7 +496,7 @@ adducts(fGroupsSel)[1:5] # verify
 
 > **_NOTE_** Adduct annotations are always available with [sets workflows](#setsWorkflow).
 
-### Using adduct annotations in the workflow
+### Using adduct annotations in the workflow {#useAdductAnn}
 
 When feature groups have adduct annotations available this may simplify and improve the workflow. The `adduct` and `ionization` arguments used for suspect screening, formula/compound annotation and some componentization algorithms do not have to be set anymore, since this data can be obtained from the adduct annotations. Furthermore, these algorithms may improve their results, since the algorithms are now able to use adduct information for each feature group individually, instead of assuming that all feature groups have the same adduct.
 

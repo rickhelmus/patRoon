@@ -132,10 +132,8 @@
                 - now still done in annotateSuspects()
             - add also as contributor to eg DESCRIPTION
 - handbook
-    - sets
-        - mention/repeat somewhere that adduct args are not needed for eg annotation and suspect screening?
     - TPs
-        - fix UNDONEs
+        - add PC links (see UNDONEs)
         - mention newProject when/if support is there
         - verify examples
     - update
@@ -143,19 +141,14 @@
             - mention changes of patRoon 2.0?
         - installation
             - add new deps in manual installation, update RDCOMClient installation, options
-        - concepts: add sets(?) and TPs
         - generating workflow data
             - compounds
                 - need to update PCL link?
-            - selectIons/adduct() section (also in intro scheme?)
-                - note only adduct/isotope components work?
         - processing
-            - annotatedPeakList: more interesting results (or improve BTA?)
             - Visualization
                 - plot spec sim: remove plotStruct if defaults change
         - advanced
-            - parallelization
-                - remove BT in MP table if decide for no parallelization
+            - parallelization: remove BT in MP table if decide for no parallelization
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

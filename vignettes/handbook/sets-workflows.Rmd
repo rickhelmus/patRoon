@@ -143,9 +143,68 @@ When the componentization algorithms related to adduct/isotope annotations (e.g.
 
 The other componentization algorithms work on the complete data. For more details, see the reference manual (`?generateComponents`).
 
-## Selecting adducts to improve grouping
+## Selecting adducts to improve grouping {#setsAdducts}
 
-TBD when selectIons/adducts() section is in place for regular workflows.
+The `selectIons()` and `adduct()` functions [discussed before](#incorpAdductIso) can also improve sets workflows. This is because the adduct annotations can be used to improve feature neutralization, which in turn will improve grouping features between positive and negative ionization data. Once adduct annotations are set the features will be re-neutralized and re-grouped.
+
+A typical workflow with  `selectIons` looks like this:
+
+```{r setsSelectIonsWorkflow,echo=FALSE,out.width="75%"}
+plotGV("
+digraph Workflow {
+  graph [ rankdir = TB, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 0.6,
+         fontsize = 16,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Pre-treatment (+)' -> 'Find features (+)' -> 'makeSet'
+    'Pre-treatment (-)' -> 'Find features (-)' -> 'makeSet'
+    'makeSet' -> 'Group features' -> Componentization -> selectIons -> 'Annotation, ...'
+}", height = 350, width = 250)
+```
+
+```{r setsSelectIons,eval=FALSE}
+# as before ...
+anaInfoPos <- patRoonData::exampleAnalysisInfo("positive")
+anaInfoNeg <- patRoonData::exampleAnalysisInfo("negative")
+fListPos <- findFeatures(anaInfoPos, "openms")
+fListNeg <- findFeatures(anaInfoNeg, "openms")
+
+fGroupsPos <- groupFeatures(fListPos, "openms")
+fGroupsNeg <- groupFeatures(fListNeg, "openms")
+fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
+
+fGroups <- groupFeatures(fList, "openms")
+fGroups <- filter(fGroups, absMinIntensity = 10000, relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                  blankThreshold = 5, removeBlanks = TRUE)
+
+components <- generateComponents(fGroups, "openms")
+fGroups <- selectIons(fGroups, components, c("[M+H]+", "[M-H]-"))
+
+# do rest of the workflow...
+```
+
+The first part of the workflow is exactly the same as was introduced in the beginning of this chapter. Furthermore, note that for sets workflows, `selectIons` needs a preferential adduct for each set.
+
+The `adducts` function can also be used to obtain and modify adduct annotations. For sets workflows, these functions operate _per set_:
+
+```{r setsAdduct,eval=FALSE}
+adducts(fGroups, set = "positive")[1:5]
+adducts(fGroups, set = "positive")[4] <- "[M+K]+"
+```
+
+If you want to modify annotations for multiple sets, it is best to delay the re-gouping step:
+
+```{r setsAdductNoRegroup,eval=FALSE}
+adducts(fGroups, set = "positive", reGroup = FALSE)[4] <- "[M+K]+"
+adducts(fGroups, set = "negative", reGroup = TRUE)[10] <- "[M-H2O]-"
+```
+
+Setting `reGroup=FALSE` will not perform any re-neutralization and re-grouping, which preserves feature group names and safes processing time. However, it is **crucial** that the re-grouping step is eventually performed at the end.
 
 ## Processing data
 
@@ -253,7 +312,8 @@ digraph Workflow {
     'makeSet' -> '...'
 }", height = 300, width = 250)
 ```
-Of course, any other processing steps on the feature groups data such as subsetting and [visually checking features] are also possible before the sets workflow is initiated.
+
+Of course, any other processing steps on the feature groups data such as subsetting and [visually checking features](#intReview) are also possible before the sets workflow is initiated. Furthermore, it is also possible to perform [adduct annotations](#incorpAdductIso) prior to grouping, which is an alternative way to improve neutralization to what [was discussed before](#setsAdducts). 
 
 ### Inspecting and converting set objects
 

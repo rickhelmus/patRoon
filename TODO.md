@@ -140,7 +140,7 @@
         - introduction
             - mention changes of patRoon 2.0?
         - installation
-            - add new deps in manual installation, update RDCOMClient installation, options
+            - update RDCOMClient installation?
         - generating workflow data
             - compounds
                 - need to update PCL link?

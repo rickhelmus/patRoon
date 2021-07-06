@@ -115,6 +115,7 @@
 
 ## docs
 
+- MC: mention that latest XCMS is needed for Gauss?
 - ref docs
     - quality/score filters
     - delete()
@@ -159,15 +160,11 @@
             - annotatedPeakList: more interesting results (or improve BTA?)
             - Visualization
                 - plot spec sim: remove plotStruct if defaults change
-            - Peak qualities
-                - or combine with MC section in advanced?
         - advanced
-            - MC integration section
             - Fold changes
                 - or in Processing?
             - parallelization
                 - add link to quality calc
-                - why is there a citation at the end?
                 - remove BT in MP table if decide for no parallelization
 - annotation
     - generateFormulas: MSPeakLists argument

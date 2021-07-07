@@ -46,9 +46,6 @@
 - log2fc
     - P values are calculated properly?
 - spectrumSimilarity
-    - plotting
-        - formulas/compounds
-            - doesn't work with structures at the moment, either fix or doc and set default to FALSE
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
@@ -116,9 +113,6 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-        - processing
-            - Visualization
-                - plot spec sim: remove plotStruct if defaults change
         - advanced
             - parallelization: remove BT in MP table if decide for no parallelization
 - annotation
@@ -202,6 +196,7 @@
     - formula_mz --> ion_formula_mz
     - MF now uses peaklist precursor mz instead of fGroup mz
     - scoreLimits filter: if consensus results are filtered, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all)
+    - plotSpectrum: plotStruct default changed to FALSE
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

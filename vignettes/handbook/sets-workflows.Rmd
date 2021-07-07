@@ -244,7 +244,8 @@ And plotting:
 
 ```{r setsProcDataExtraPlotting,eval=runData,fig.show="hold"}
 plotVenn(fGroups, sets = TRUE) # compare positive/negative features
-plotSpectrum(compounds, index = 1, groupName = "M198_R317_272", MSPeakLists = mslists)
+plotSpectrum(compounds, index = 1, groupName = "M198_R317_272", MSPeakLists = mslists,
+             plotStruct = TRUE)
 ```
 
 ```{r include=FALSE,eval=runData}

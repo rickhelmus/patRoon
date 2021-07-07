@@ -100,7 +100,7 @@ or \code{\link{generateTPsLibrary}} was used to generate the data, the \code{ret
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{transformationProducts}}}}     \itemize{       \item{\code{\link{transformationProductsBT}}}       \item{\code{\link{transformationProductsComponents}}}       \item{\code{\link{transformationProductsLibrary}}}       \item{\code{\link{transformationProductsLogic}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{transformationProducts}}}}     \itemize{       \item{\code{\link{transformationProductsBT}}}       \item{\code{\link{transformationProductsLibrary}}}       \item{\code{\link{transformationProductsLogic}}}     }   } }
 }
 
 \seealso{

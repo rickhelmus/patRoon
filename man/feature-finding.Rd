@@ -8,6 +8,7 @@
 \alias{findFeatures}
 \alias{importFeatures}
 \alias{makeSet,features-method}
+\alias{makeSet,featuresSet-method}
 \alias{findFeaturesBruker}
 \alias{findFeaturesEnviPick}
 \alias{importFeaturesEnviMass}
@@ -27,6 +28,8 @@ findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 importFeatures(analysisInfo, type, ...)
 
 \S4method{makeSet}{features}(obj, ..., adducts, labels = NULL)
+
+\S4method{makeSet}{featuresSet}(obj, ...)
 
 findFeaturesBruker(
   analysisInfo,
@@ -313,6 +316,8 @@ largely dependent upon applied analysis methodology and instrumentation.
 \note{
 The file format of analyses for \code{findFeaturesXCMS} and \code{findFeaturesXCMS3} must be \code{mzML} or
   \code{mzXML}.
+
+\code{makeSet} Currently does not support making sets from \code{\link{featuresSet}} objects.
 
 \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
   extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}

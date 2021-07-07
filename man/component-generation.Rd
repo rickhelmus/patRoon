@@ -43,7 +43,7 @@
   extraOpts = NULL
 )
 
-\S4method{generateComponentsCAMERA}{featureGroupsSet}(fGroups, ...)
+\S4method{generateComponentsCAMERA}{featureGroupsSet}(fGroups, ionization = NULL, ...)
 
 \S4method{generateComponentsCliqueMS}{featureGroups}(
   fGroups,
@@ -64,7 +64,7 @@
   parallel = TRUE
 )
 
-\S4method{generateComponentsCliqueMS}{featureGroupsSet}(fGroups, ...)
+\S4method{generateComponentsCliqueMS}{featureGroupsSet}(fGroups, ionization = NULL, ...)
 
 \S4method{generateComponentsIntClust}{featureGroups}(
   fGroups,
@@ -90,7 +90,7 @@
   ...
 )
 
-\S4method{generateComponentsNontarget}{featureGroupsSet}(fGroups, ...)
+\S4method{generateComponentsNontarget}{featureGroupsSet}(fGroups, ionization = NULL, ...)
 
 \S4method{generateComponentsOpenMS}{featureGroups}(
   fGroups,
@@ -99,7 +99,7 @@
   chargeMax = 1,
   chargeSpan = 3,
   qTry = "heuristic",
-  potentialAdducts = defaultOpenMSAdducts(ionization),
+  potentialAdducts = NULL,
   minRTOverlap = 0.66,
   retWindow = 1,
   absMzDev = 0.005,
@@ -111,18 +111,27 @@
   extraOpts = NULL
 )
 
-\S4method{generateComponentsOpenMS}{featureGroupsSet}(fGroups, ...)
+\S4method{generateComponentsOpenMS}{featureGroupsSet}(
+  fGroups,
+  ionization = NULL,
+  chargeMin = 1,
+  chargeMax = 1,
+  chargeSpan = 3,
+  qTry = "heuristic",
+  potentialAdducts = NULL,
+  ...
+)
 
 defaultOpenMSAdducts(ionization)
 
 \S4method{generateComponentsRAMClustR}{featureGroups}(
   fGroups,
+  ionization = NULL,
   st = NULL,
   sr = NULL,
   maxt = 12,
   hmax = 0.3,
   normalize = "TIC",
-  ionization = NULL,
   absMzDev = 0.002,
   relMzDev = 5,
   minSize = 2,
@@ -133,7 +142,7 @@ defaultOpenMSAdducts(ionization)
   extraOptsFM = NULL
 )
 
-\S4method{generateComponentsRAMClustR}{featureGroupsSet}(fGroups, ...)
+\S4method{generateComponentsRAMClustR}{featureGroupsSet}(fGroups, ionization = NULL, ...)
 
 \S4method{generateComponentsSpecClust}{featureGroups}(
   fGroups,
@@ -289,14 +298,18 @@ Valid options are \code{"heuristic"} and \code{"all"} (the \code{"feature"} opti
 currently not supported).}
 
 \item{potentialAdducts}{The adducts to consider. Should be a \code{numeric} vector with probabilities for each
-adduct, \emph{e.g.} \code{potentialAdducts=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2)}. Note that the sum of probabilities
-should always be \samp{1}. Furthermore, note that additions of multiple adducts should be controlled by the
-\code{chargeMin}/\code{chargeMax} arguments (and \emph{not} with \code{potentialAdducts}), \emph{e.g.} if
-\code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
-\command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
- for more details. The defaults adducts to consider in \pkg{patRoon} (which are \emph{not} the same as
-\command{OpenMS}) can be ontained with \code{defaultOpenMSAdducts}.}
+  adduct, \emph{e.g.} \code{potentialAdducts=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2)}. Note that the sum of probabilities
+  should always be \samp{1}. Furthermore, note that additions of multiple adducts should be controlled by the
+  \code{chargeMin}/\code{chargeMax} arguments (and \emph{not} with \code{potentialAdducts}), \emph{e.g.} if
+  \code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
+  \command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
+  \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+   for more details. If \code{NULL} then the a default is chosen with \code{defaultOpenMSAdducts} (which is
+  \emph{not} the same as \command{OpenMS}).
+
+  \setsWF Should be a \code{list} where each entry specifies the potential adducts for a set. Should either be named
+  with the sets names or follow the same order as \code{sets(fGroups)}. Example:
+  \code{potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" = 0.2))}}
 
 \item{minRTOverlap, retWindow}{Sets feature retention tolerances when grouping features. Sets the
 \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
@@ -336,8 +349,8 @@ considered as TPs.}
 similarities between parents and TPs. If \code{NULL} then this data is not calculated. For more details see the
 \verb{Linking parents and transformation products} section below.}
 
-\item{minRTDiff}{Minimum retention time difference between the parent and a TP to determine whether a TP elutes
-prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))}
+\item{minRTDiff}{Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
+elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))}
 }
 \value{
 A \code{\link{components}} (derived) object containing all generated components.
@@ -538,11 +551,11 @@ The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateC
   \item \code{fragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
   parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
   prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
-  candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragMatches} is
-  mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when \code{TPs=NULL}
-  or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used, it is highly
-  recommended that the annotation objects are first processed with the \code{\link{filter}} method, for instance, to
-  select only the top ranked candidates.
+  candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragmentMatches}
+  is mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when
+  \code{TPs=NULL} or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used,
+  it is highly recommended that the annotation objects are first processed with the \code{\link{filter}} method, for
+  instance, to select only the top ranked candidates.
 
   \item \code{neutralLossMatches} As \code{fragmentMatches}, but counting overlapping neutral loss formulae.
 

@@ -51,6 +51,15 @@ compoundScorings(
 \S4method{generateCompoundsMetFrag}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  method = "CL",
+  timeout = 300,
+  timeoutRetries = 2,
+  errorRetries = 2,
+  topMost = 100,
+  dbRelMzDev = 5,
+  fragRelMzDev = 5,
+  fragAbsMzDev = 0.002,
+  adduct = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0.75
@@ -79,6 +88,8 @@ compoundScorings(
 \S4method{generateCompoundsSIRIUS}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  relMzDev = 5,
+  adduct = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0.75

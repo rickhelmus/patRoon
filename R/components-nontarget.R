@@ -349,9 +349,9 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ...)
+setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {
-    return(generateComponentsSet(fGroups, generateComponentsNontarget, setIonization = TRUE, ...,
+    return(generateComponentsSet(fGroups, ionization, generateComponentsNontarget, setIonization = TRUE, ...,
                                  classGenerator = componentsNTSet))
 })
 

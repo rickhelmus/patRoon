@@ -368,7 +368,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                          adduct, skipInvalid, onlyHits)
 {
-    verifyNoAdductArg(adduct)
+    verifyNoAdductIonizationArg(adduct)
     
     if (checkmate::testDataFrame(suspects))
     {

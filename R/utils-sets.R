@@ -42,9 +42,9 @@ prepareMakeSetAdducts <- function(objects, adducts, labels)
     return(adducts)
 }
 
-verifyNoAdductArg <- function(adduct)
+verifyNoAdductIonizationArg <- function(adduct)
 {
     if (!is.null(adduct))
-        stop("Setting the adduct argument is not supported for sets workflows!", call. = FALSE)
+        stop("Setting the adduct/ionization argument is not supported for sets workflows!", call. = FALSE)
     
 }

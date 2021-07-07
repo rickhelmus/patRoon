@@ -39,7 +39,7 @@
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
 - predictTPsBioTransformer()
-    - Include BT in installation script and verifyDependencies()
+    - Include BT in installation script
     - do we still need to check for non-calculated formulae?
 - log2fc
     - P values are calculated properly?
@@ -48,8 +48,6 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
-- Consistency
-    - precursor diff: 1-2 or 2-1? --> verify all
 - misc
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
     - only keep relevant suspect list columns when input is screening object for lib/BT TPs

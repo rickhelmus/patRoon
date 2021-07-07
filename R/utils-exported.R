@@ -227,3 +227,27 @@ verifyDependencies <- function()
     
     invisible(NULL)
 }
+
+#' Returns chromatographic peak quality and score names for features and/or feature groups.
+#'
+#' @param feat If \code{TRUE} then names specific to features are returned.
+#' @param group If \code{TRUE} then names specific to groups are returned.
+#' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
+#' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
+#'
+#' @export
+featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
+{
+    ret <- character()
+    if (feat)
+        ret <- names(featureQualities())
+    if (group)
+        ret <- c(ret, names(featureGroupQualities()))
+    if (scores)
+    {
+        ret <- paste0(ret, "Score")
+        if (totScore)
+            ret <- c(ret, "totalScore")
+    }
+    return(ret)
+}

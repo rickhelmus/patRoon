@@ -134,8 +134,14 @@ BTMPPrepareHandler <- function(cmd)
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
 #' @param steps The number of steps for the predictions. Sets the \command{-s} command line option.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
+#' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
+#'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
+#'   Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.
 #'
 #' @template fp-args
+#'
+#' @templateVar what \code{generateTPsBioTransformer}
+#' @template uses-multiProc
 #'
 #' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon} \cr\cr
 #'   \addCitations{rcdk}{1}
@@ -143,7 +149,7 @@ BTMPPrepareHandler <- function(cmd)
 #' @rdname TP-generation
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL,
-                                      skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto")
+                                      skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -161,6 +167,7 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertFlag(skipInvalid, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
+    checkmate::assertFlag(MP, add = ac)
     checkmate::reportAssertions(ac)
 
     parents <- getTPParents(parents, skipInvalid)
@@ -176,6 +183,8 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
 
     if (length(cmdQueue) > 0)
     {
+        if (!MP)
+            withr::local_options(list(patRoon.MP.maxProcs = 1))
         results <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::BTMPFinishHandler,
                                        prepareHandler = patRoon:::BTMPPrepareHandler,
                                        cacheName = "generateTPsBT", setHash = setHash, logSubDir = "biotransformer")

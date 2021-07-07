@@ -6,7 +6,6 @@
     - sets: add specific options for annotation and others?
     - TP workflow
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
-- update PCL links for installPatRoon?
 
 
 ## Features
@@ -22,8 +21,6 @@
 
 ## Annotation
 
-- min score filters: take maximum value of all merged columns?
-    - changed for now, update docs if keep
 - default setThresholdAnn=0?
 - update GenForm
 
@@ -36,10 +33,6 @@
         - maxCharge --> chargeMax (same as OpenMS)? update docs
         - apply sort fix? https://github.com/osenan/cliqueMS/issues/8
     - OpenMS: handle potentialAdducts per set
-
-## sets
-
-- formulas/compounds: update set column when subsetting on sets? --> update docs?
 
 
 ## TPs
@@ -124,9 +117,6 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-        - generating workflow data
-            - compounds
-                - need to update PCL link?
         - processing
             - Visualization
                 - plot spec sim: remove plotStruct if defaults change
@@ -212,6 +202,7 @@
     - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
     - formula_mz --> ion_formula_mz
     - MF now uses peaklist precursor mz instead of fGroup mz
+    - scoreLimits filter: if consensus results are filtered, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all)
 - adducts
     - GenForm/MetFragAdducts()
         - now report generic format

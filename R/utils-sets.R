@@ -41,3 +41,10 @@ prepareMakeSetAdducts <- function(objects, adducts, labels)
     
     return(adducts)
 }
+
+verifyNoAdductArg <- function(adduct)
+{
+    if (!is.null(adduct))
+        stop("Setting the adduct argument is not supported for sets workflows!", call. = FALSE)
+    
+}

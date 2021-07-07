@@ -264,14 +264,15 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
 })
 
 
-generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold, setThresholdAnn)
+generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn)
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1.0, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
+    verifyNoAdductArg(adduct)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, msplArgs,
-                      f = function(fg, mspl) generator(fGroups = fg, MSPeakLists = mspl[[1]], ...))
+                      f = function(fg, mspl) generator(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...))
     setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
 
     cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, NULL)

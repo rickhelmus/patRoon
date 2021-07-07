@@ -776,9 +776,14 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
 
 #' @rdname compound-generation
 #' @export
-setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
+setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, method = "CL", timeout = 300,
+                                                                   timeoutRetries = 2, errorRetries = 2, topMost = 100,
+                                                                   dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                                                                   adduct = NULL, ..., setThreshold = 0,
                                                                    setThresholdAnn = 0.75)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsMetFrag, ..., setThreshold = setThreshold,
-                         setThresholdAnn = setThresholdAnn)
+    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsMetFrag, method = method, timeout = timeout,
+                         timeoutRetries = timeoutRetries, errorRetries = errorRetries, topMost = topMost,
+                         dbRelMzDev = dbRelMzDev, fragRelMzDev = fragRelMzDev, fragAbsMzDev = fragAbsMzDev, ...,
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
 })

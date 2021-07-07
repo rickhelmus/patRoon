@@ -36,7 +36,7 @@ getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = charac
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
-                                                          MSMode = "both", adduct, featThreshold = 0,
+                                                          MSMode = "both", adduct = NULL, featThreshold = 0,
                                                           featThresholdAnn = 0.75, absAlignMzDev = 0.002, save = TRUE,
                                                           close = save)
 {
@@ -278,8 +278,11 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
 
 #' @rdname formula-generation
 #' @export
-setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
+setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
+                                                             MSMode = "both", adduct = NULL, ..., setThreshold = 0,
+                                                             setThresholdAnn = 0.75)
 {
-    generateFormulasSet(fGroups, MSPeakLists, generateFormulasDA, ..., setThreshold = setThreshold,
-                        setThresholdAnn = setThresholdAnn)
+    generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasDA,
+                        precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,
+                        setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
 })

@@ -272,10 +272,13 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         compList <- list()
     }
     
+    printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
+           if (length(compList) > 0) sum(sapply(compList, nrow)) else 0)
+    
     ret <- componentsTPs(componentInfo = compInfo[], components = compList)
     saveCacheData("componentsTPs", ret, hash)
     
-    return(ret[])
+    return(ret)
 }
 
 #' Components based on parent and transformation product (TP) linkage.

@@ -38,7 +38,6 @@
 
 - componentsTP
     - precursor_rt etc are from suspect list, not really clear --> also for reporting
-    - show status after finishing
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
@@ -52,7 +51,6 @@
 - Consistency
     - precursor diff: 1-2 or 2-1? --> verify all
 - misc
-    - show method for new components classes
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
     - only keep relevant suspect list columns when input is screening object for lib/BT TPs
 - reporting

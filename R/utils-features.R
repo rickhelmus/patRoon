@@ -39,22 +39,6 @@ featureGroupQualities <- function()
     )
 }
 
-featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
-{
-    ret <- character()
-    if (feat)
-        ret <- names(featureQualities())
-    if (group)
-        ret <- c(ret, names(featureGroupQualities()))
-    if (scores)
-    {
-        ret <- paste0(ret, "Score")
-        if (totScore)
-            ret <- c(ret, "totalScore")
-    }
-    return(ret)
-}
-
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)
 {

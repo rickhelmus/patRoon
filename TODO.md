@@ -11,13 +11,11 @@
 
 ## Features
 
-- Check: units of plotChord() rt/mz graphs seems off
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - XCMS3/delete: also update groups data? --> use new function once it hits BC
     - OpenMS: alignment may yield negative RTs...
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
-    - export featureQualityNames()
     - fix MapAligner exception with test-components
     - add separate XCMS groupParam for prior alignment
     - Somehow integrate XCMS::fillChromPeaks

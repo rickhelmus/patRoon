@@ -458,7 +458,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                plotStruct = TRUE, title = NULL, specSimParams = getDefSpecSimParams(),
+                                                plotStruct = FALSE, title = NULL, specSimParams = getDefSpecSimParams(),
                                                 mincex = 0.9, xlim = NULL, ylim = NULL,
                                                 maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
@@ -534,7 +534,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                    plotStruct = TRUE, title = NULL,
+                                                    plotStruct = FALSE, title = NULL,
                                                     specSimParams = getDefSpecSimParams(),
                                                     mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)

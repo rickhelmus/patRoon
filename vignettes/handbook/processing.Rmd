@@ -723,7 +723,7 @@ plotSpectrum(formulas, index = 1, groupName = "M120_R268_30",
              MSPeakLists = mslists)
 # compound annotated spectrum, with added formula annotations
 plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists,
-             formulas = formulas)
+             formulas = formulas, plotStruct = TRUE)
 # custom intensity range (e.g. to zoom in)
 plotSpectrum(compounds, index = 1, groupName = "M120_R268_30", MSPeakLists = mslists,
              ylim = c(0, 5000), plotStruct = FALSE)
@@ -776,12 +776,12 @@ fGroups <- fGroupsO
 
 ### MS similarity
 
-The `plotSpectrum` function is also able to visually compare (annotated) spectra. This works for `MSPeakLists`, `formulas` and `compounds` object data.
+The `plotSpectrum` function is also useful to visually compare (annotated) spectra. This works for `MSPeakLists`, `formulas` and `compounds` object data.
 
 ```{r plotSim,eval=runData}
 plotSpectrum(mslists, groupName = c("M120_R268_30", "M137_R249_53"), MSLevel = 2)
 plotSpectrum(compounds, groupName = c("M120_R268_30", "M146_R309_68"), index = c(1, 1),
-             MSPeakLists = mslists, plotStruct = FALSE)
+             MSPeakLists = mslists)
 ```
 
 The `specSimParams` argument, which was discussed in [MS similarity](#specSim), can be used to configure the similarity calculation:

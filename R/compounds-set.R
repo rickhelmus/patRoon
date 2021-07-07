@@ -68,7 +68,7 @@ setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
 #' @rdname compounds-class
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL,
+                                                   plotStruct = FALSE, title = NULL,
                                                    specSimParams = getDefSpecSimParams(),
                                                    mincex = 0.9, xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
                                                    molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
@@ -184,7 +184,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = TRUE, title = NULL,
+                                                       plotStruct = FALSE, title = NULL,
                                                        specSimParams = getDefSpecSimParams(),
                                                        mincex = 0.9, xlim = NULL, ylim = NULL,
                                                        maxMolSize = c(0.2, 0.4), molRes = c(100, 100),

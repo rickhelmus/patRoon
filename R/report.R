@@ -405,7 +405,8 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                     scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
                     
                     screen(scr[1])
-                    plotSpectrum(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
+                    plotSpectrum(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas,
+                                 plotStruct = TRUE)
                     
                     screen(scr[3])
                     plotScores(compounds, idi, grp, normalizeScores, exclNormScores, onlyUsedScorings)

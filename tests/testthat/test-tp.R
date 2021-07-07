@@ -90,14 +90,14 @@ testMFDB <- function(...)
     outf <- tempfile(fileext = ".csv")
     convertToMFDB(..., out = outf, includeParents = FALSE); db <- fread(outf)
     cols <- c("Identifier", "MolecularFormula", "MonoisotopicMass",
-              "Precursor MonoisotopicMass", "SMILES", "InChI", "InChIKey",
-              "InChIKey1", "ALogP")
+              "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP", "LogP", "parent", "transformation",
+              "enzyme", "evidencedoi")
     
     checkmate::expect_data_table(MFDBNP, any.missing = FALSE, nrows = length(TPsLibScr))
     checkmate::expect_names(names(MFDBNP), subset.of = cols)
     
     convertToMFDB(..., out = outf, includeParents = TRUE); db <- fread(outf)
-    checkmate::expect_data_table(MFDBP, any.missing = FALSE, nrows = length(TPsLibScr) + nrow(parents(TPsLibScr)))
+    checkmate::expect_data_table(MFDBP, nrows = length(TPsLibScr) + nrow(parents(TPsLibScr)))
     checkmate::expect_names(names(MFDBP), subset.of = cols)
 }
 

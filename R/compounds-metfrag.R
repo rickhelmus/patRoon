@@ -144,15 +144,12 @@ unifyMFNames <- function(mfr)
                  ForIdentCategories = "categories",
 
                  # database generated from TP prediction
-                 precursor = "precursor",
+                 parent = "parent",
                  ALogP = "ALogP",
+                 LogP = "LogP",
                  transformation = "transformation",
-                 "Enzyme(s)" = "enzymes",
-                 Biosystem = "biosystem",
-                 "Precursor InChI" = "precursorInChI",
-                 "Precursor InChIKey" = "precursorInChIKey",
-                 "Precursor ALogP" = "precursorALogP",
-                 "Precursor MonoisotopicMass" = "precursorNeutralMass"
+                 enzyme = "enzyme",
+                 evidencedoi = "evidencedoi"
 
                  )
 

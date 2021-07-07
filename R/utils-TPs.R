@@ -44,8 +44,8 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     setnames(prodAll,
              c("name", "formula", "neutralMass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass"))
-    if (!is.null(prodAll[["parent_Major Isotope Mass"]])) # BT
-        setnames(prodAll, "parent_Major Isotope Mass", "Parent MonoisotopicMass")
+    if (!is.null(prodAll[["Enzyme(s)"]])) # BT
+        setnames(prodAll, "Enzyme(s)", "enzyme")
     
     if (includeParents)
     {
@@ -63,8 +63,8 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     # equalize identifiers and names
     prodAll[, CompoundName := Identifier]
     
-    keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
-                  "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
+    keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
+                  "ALogP", "LogP", "parent", "transformation", "enzyme", "evidencedoi")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }

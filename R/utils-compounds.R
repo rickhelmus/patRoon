@@ -168,7 +168,7 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
 
-    ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
+    ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP", "LogP"))
 
     # PubChemLite
     ctext <- addValText(ctext, "%s", c("FP", "compoundName2"))
@@ -180,7 +180,7 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     ctext <- addValText(ctext, "%s", c("tonnage", "categories"))
 
     # TP prediction DB
-    ctext <- addValText(ctext, "%s", c("precursor", "transformation", "enzymes"))
+    ctext <- addValText(ctext, "%s", c("parent", "transformation", "enzyme", "evidencedoi"))
 
     return(ctext)
 }

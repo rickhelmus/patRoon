@@ -164,7 +164,7 @@ setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, i
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
     
-    allTPs <- rbindlist(TPs@products)
+    allTPs <- rbindlist(TPs@products, idcol = "parent")
     
     doConvertToMFDB(allTPs, parents(TPs), out, includeParents)
 })

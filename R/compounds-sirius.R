@@ -172,9 +172,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 
 #' @rdname compound-generation
 #' @export
-setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
-                                                                  setThresholdAnn = 0.75)
+setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+                                                                  ..., setThreshold = 0, setThresholdAnn = 0.75)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsSIRIUS, ..., setThreshold = setThreshold,
-                         setThresholdAnn = setThresholdAnn)
+    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
 })

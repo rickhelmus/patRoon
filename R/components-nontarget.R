@@ -60,7 +60,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     hsFGroups <- sapply(cTable, function(cmp) paste0(cmp$group, collapse = ", "))
     hsRGroups <- sapply(cTable, function(cmp) paste0(unique(cmp$rGroup), collapse = ", "))
     titles <- sprintf("<b>%s</b> (RT: %.2f; m/z: %.4f; #%d)<br>fGroups: <i>%s</i><br>rGroups: <i>%s</i>",
-                      names(obj), cInfo$rt_increment, cInfo$mz_increment, cInfo$size, hsFGroups, hsRGroups)
+                      names(obj), cInfo$ret_increment, cInfo$mz_increment, cInfo$size, hsFGroups, hsRGroups)
 
     makeGraph(obj, onlyLinked, titles)
 })

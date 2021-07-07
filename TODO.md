@@ -11,13 +11,6 @@
 
 ## Features
 
-- neutralizing / ionization
-    - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
-    - what to do with unsupported adducts for annotation?
-	    - skip calculation with a warning?
-		    - default to M+H/M-H for now with warning...
-	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
-	    - check better for what is supported by SIRIUS?
 - Check: units of plotChord() rt/mz graphs seems off
 - misc
     - topMostByRGroup: make default? or only for reporting?
@@ -37,7 +30,6 @@
 - formulas filter: MSMSScore doesn't remove non-MS/MS peaks anymore, OK? If yes, doc. Otherwise re-add tests
 - default setThresholdAnn=0?
 - update GenForm
-- plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons?
 
 
 ## Components
@@ -47,7 +39,6 @@
         - change checkPackage GH link once PRs are merged
         - maxCharge --> chargeMax (same as OpenMS)? update docs
     - OpenMS: handle potentialAdducts per set
-- plotGraph doesn't show hoveovers anymore?
 
 ## sets
 
@@ -69,7 +60,6 @@
     - plotting
         - formulas/compounds
             - doesn't work with structures at the moment, either fix or doc and set default to FALSE
-            - put similarity in title (like for MSPL)?
     - defaults OK for sim params?
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
@@ -86,10 +76,6 @@
     - padding between two tables?
     - default TP columns OK?
     - fragMatches/NLMatches: rename to eg allFragmentMatches/allNLMatches? --> update docs
-
-## Reporting
-
-- featInfo: finished?
 
 
 ## tests
@@ -185,6 +171,7 @@
     - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
     - clarify reportCSV() now only reports remaining features?
     - OpenMS: load intensities from FFM data (needs pre-release)
+    - featInfo in HTML reports
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
@@ -272,6 +259,11 @@
 
 ## Features
 
+- adduct annotations
+    - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
+    - what to do with unsupported adducts for annotation?
+	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
+	    - check better for what is supported by SIRIUS?
 - import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
 - getEICsForFeatures method for kpic2?
 - optimize hashing? Or further avoid hashing big objects/objects with lists?
@@ -293,6 +285,7 @@
 - parallel MSPeakLists generation?
 - somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
 - DA formulas: also rank formula results like GF/SIRIUS?
+- plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons
 
 
 ## Components

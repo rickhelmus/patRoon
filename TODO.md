@@ -32,7 +32,6 @@
         - change checkPackage GH link once PRs are merged
         - maxCharge --> chargeMax (same as OpenMS)? update docs
         - apply sort fix? https://github.com/osenan/cliqueMS/issues/8
-    - OpenMS: handle potentialAdducts per set
 
 
 ## TPs

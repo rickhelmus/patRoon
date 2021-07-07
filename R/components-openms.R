@@ -29,8 +29,12 @@ setMethod("initialize", "componentsOpenMS",
 #'   \code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
-#'    for more details. The defaults adducts to consider in \pkg{patRoon} (which are \emph{not} the same as
-#'   \command{OpenMS}) can be ontained with \code{defaultOpenMSAdducts}.
+#'    for more details. If \code{NULL} then the a default is chosen with \code{defaultOpenMSAdducts} (which is
+#'   \emph{not} the same as \command{OpenMS}).
+#'
+#'   \setsWF Should be a \code{list} where each entry specifies the potential adducts for a set. Should either be named
+#'   with the sets names or follow the same order as \code{sets(fGroups)}. Example:
+#'   \code{potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" = 0.2))}
 #' @param minRTOverlap,retWindow Sets feature retention tolerances when grouping features. Sets the
 #'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.
@@ -49,7 +53,7 @@ setMethod("initialize", "componentsOpenMS",
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization = NULL, chargeMin = 1,
                                                                 chargeMax = 1, chargeSpan = 3,
                                                                 qTry = "heuristic",
-                                                                potentialAdducts = defaultOpenMSAdducts(ionization),
+                                                                potentialAdducts = NULL,
                                                                 minRTOverlap = 0.66, retWindow = 1,
                                                                 absMzDev = 0.005, minSize = 2,
                                                                 relMinAdductAbundance = 0.75,
@@ -64,7 +68,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
            positive = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(qTry, c("heuristic", "all"))
     checkmate::assertNumeric(potentialAdducts, lower = 0, upper = 1, any.missing = FALSE, min.len = 2,
-                             names = "unique", add = ac)
+                             names = "unique", null.ok = TRUE, add = ac)
     aapply(checkmate::assertNumber, . ~ retWindow + absMzDev + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertNumber(minRTOverlap, lower = 0, upper = 1, add = ac)
@@ -73,6 +77,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     checkmate::assertCharacter(prefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (is.null(potentialAdducts))
+        potentialAdducts <- defaultOpenMSAdducts(ionization)
     
     if (!numEQ(sum(potentialAdducts), 1))
         stop("The sum of all adduct probabilities should be one.")
@@ -140,9 +147,30 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
+setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ionization = NULL, chargeMin = 1,
+                                                                   chargeMax = 1, chargeSpan = 3, qTry = "heuristic",
+                                                                   potentialAdducts = NULL, ...)
 {
-    generateComponentsSet(fGroups, ionization, generateComponentsOpenMS, setIonization = TRUE, ...)
+    if (is.null(potentialAdducts))
+        potentialAdducts <- rep(list(NULL), length(sets(fGroups)))
+    else
+    {
+        checkmate::assertList(potentialAdducts, "numeric", any.missing = FALSE, all.missing = FALSE,
+                              len = length(sets(fGroups)))
+        checkmate::assert(
+            checkmate::checkNames(names(potentialAdducts), "unnamed"),
+            checkmate::checkNames(names(potentialAdducts), "unique", must.include = sets(fGroups)),
+            .var.name = "potentialAdducts"
+        )
+        if (checkmate::testNames(names(potentialAdducts), "unnamed"))
+            names(potentialAdducts) <- sets(fGroups)
+        
+        potentialAdducts <- potentialAdducts[sets(fGroups)]
+    }
+    
+    generateComponentsSet(fGroups, ionization, generateComponentsOpenMS, setIonization = TRUE, chargeMin = chargeMin,
+                          chargeMax = chargeMax, chargeSpan = chargeSpan, qTry = qTry, ...,
+                          setArgs = lapply(potentialAdducts, function(pa) list(potentialAdducts = pa)))
 })
 
 

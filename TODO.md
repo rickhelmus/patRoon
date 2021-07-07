@@ -17,7 +17,6 @@
     - OpenMS: alignment may yield negative RTs...
     - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
     - fix MapAligner exception with test-components
-    - add separate XCMS groupParam for prior alignment
     - Somehow integrate XCMS::fillChromPeaks
 
 
@@ -170,6 +169,7 @@
     - clarify reportCSV() now only reports remaining features?
     - OpenMS: load intensities from FFM data (needs pre-release)
     - featInfo in HTML reports
+    - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

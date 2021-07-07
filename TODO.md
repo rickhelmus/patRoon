@@ -15,8 +15,8 @@
     - topMostByRGroup: make default? or only for reporting?
     - XCMS3/delete: also update groups data? --> use new function once it hits BC
     - OpenMS: alignment may yield negative RTs...
-    - MetaClean: RetentionTimeConsistency or RetentionTimeCorrelation? both seem to be used...
-    - fix MapAligner exception with test-components
+    - OpenMS MapAligner exception
+        - seems to be related when little overlap between sets --> add note in doc?
     - Somehow integrate XCMS::fillChromPeaks
 
 
@@ -34,6 +34,7 @@
     - cliqueMS
         - change checkPackage GH link once PRs are merged
         - maxCharge --> chargeMax (same as OpenMS)? update docs
+        - apply sort fix? https://github.com/osenan/cliqueMS/issues/8
     - OpenMS: handle potentialAdducts per set
 
 ## sets

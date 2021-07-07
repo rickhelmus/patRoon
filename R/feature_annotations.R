@@ -258,7 +258,8 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #'   element should follow the name column of the table returned by \code{\link{formulaScorings}$name} and
 #'   \code{\link{compoundScorings}()$name}. For instance, \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies
 #'   that \code{numberPatents} should be at least \samp{10}. Note that a result without a specified scoring is never
-#'   removed. Set to \code{NULL} to skip this filter.
+#'   removed. If a score term exists multiple times, \emph{i.e.} due to a consensus, then a candidate is kept if at
+#'   least one of the terms falls within the range. Set to \code{NULL} to skip this filter.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest score (or least highest if
 #'   \code{negate=TRUE}). Set to \code{NULL} to ignore.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.

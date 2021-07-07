@@ -53,14 +53,11 @@
     - precursor diff: 1-2 or 2-1? --> verify all
 - misc
     - show method for new components classes
-    - truncate MP logfiles like with suspects, eg for long suspect names with BT
     - doConvertToMFDB/getCompInfoList: works fully for both BT and Lib columns?
     - only keep relevant suspect list columns when input is screening object for lib/BT TPs
-    - is the rt column for parents retained? --> handy for suspect screening with convertToSuspects
 - reporting
     - padding between two tables?
     - default TP columns OK?
-    - fragMatches/NLMatches: rename to eg allFragmentMatches/allNLMatches? --> update docs
 
 
 ## tests
@@ -209,6 +206,7 @@
     - numericIDLevel: handle NAs
     - logPath for annotateSuspects()
     - mass matching has changed
+    - suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows
 - components
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency

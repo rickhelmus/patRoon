@@ -156,6 +156,7 @@ getFCParams(rGroups, ...)
 \S4method{plotInt}{featureGroups}(
   obj,
   average = FALSE,
+  normFunc = NULL,
   xnames = TRUE,
   showLegend = FALSE,
   pch = 20,
@@ -270,6 +271,7 @@ getFCParams(rGroups, ...)
 \S4method{plotInt}{featureGroupsSet}(
   obj,
   average = FALSE,
+  normFunc = NULL,
   xnames = !sets,
   showLegend = sets,
   pch = 20,
@@ -624,10 +626,10 @@ between a set of specified replicate group(s).
 
 \item \code{calculatePeakQualities}: Calculates peak and group qualities for all features and feature groups. The peak qualities
 (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
-function}, and subsequentially averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
+function}, and subsequently averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
 \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
-publication cited below for more details). Similarly to \code{\link{features}} method, these metrics are scored by
-normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+publication cited below for more details). Similarly to the \code{\link{features}} method, these metrics are scored
+by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
 \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
 \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
 Pass/Fail ML models from \pkg{MetaClean}.

@@ -24,7 +24,7 @@
   MSPeakLists,
   precursorMzSearchWindow = 0.002,
   MSMode = "both",
-  adduct,
+  adduct = NULL,
   featThreshold = 0,
   featThresholdAnn = 0.75,
   absAlignMzDev = 0.002,
@@ -32,7 +32,16 @@
   close = save
 )
 
-\S4method{generateFormulasDA}{featureGroupsSet}(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
+\S4method{generateFormulasDA}{featureGroupsSet}(
+  fGroups,
+  MSPeakLists,
+  precursorMzSearchWindow = 0.002,
+  MSMode = "both",
+  adduct = NULL,
+  ...,
+  setThreshold = 0,
+  setThresholdAnn = 0.75
+)
 
 \S4method{generateFormulasGenForm}{featureGroups}(
   fGroups,
@@ -57,6 +66,8 @@
 \S4method{generateFormulasGenForm}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  relMzDev = 5,
+  adduct = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0.75
@@ -86,6 +97,8 @@
 \S4method{generateFormulasSIRIUS}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  relMzDev = 5,
+  adduct = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0.75

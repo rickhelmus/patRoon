@@ -120,6 +120,7 @@ importFeatureGroupsXCMS(xs, analysisInfo)
   rtalign = TRUE,
   loadRawData = TRUE,
   groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+  preGroupParam = groupParam,
   retAlignParam = xcms::ObiwarpParam(),
   verbose = TRUE
 )
@@ -228,8 +229,11 @@ ignore.}
 \item{xs}{An \code{\link{xcmsSet}} object.}
 
 \item{groupParam, retAlignParam}{parameter object that is directly passed to
-\code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
-\code{\link[xcms:adjustRtime]{xcms::adjustRtime}}, respectively.}
+\code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and \code{\link[xcms:adjustRtime]{xcms::adjustRtime}},
+respectively.}
+
+\item{preGroupParam}{grouping parameters applied when features are grouped \emph{prior} to alignment (only with peak
+groups alignment).}
 
 \item{xdata}{An \code{\link{XCMSnExp}} object.}
 }
@@ -318,13 +322,11 @@ The \code{data.frame} method for \code{groupFeatures} is a special case that cur
 \code{importFeatureGroupsXCMS} converts grouped features from an
   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
 
-\code{groupFeaturesXCMS3} uses the new interface from the \pkg{xcms}
-  package for grouping of features. Grouping of features and alignment of
-  their retention times are performed with the
-  \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
-  \code{\link[xcms:adjustRtime]{xcms::adjustRtime}} functions, respectively.
-  Both of these functions support an extensive amount of parameters that
-  modify their behaviour and may therefore require optimization.
+\code{groupFeaturesXCMS3} uses the new interface from the \pkg{xcms} package for grouping of features.
+  Grouping of features and alignment of their retention times are performed with the
+  \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and \code{\link[xcms:adjustRtime]{xcms::adjustRtime}}
+  functions, respectively. Both of these functions support an extensive amount of parameters that modify their
+  behaviour and may therefore require optimization.
 
 \code{importFeatureGroupsXCMS3} converts grouped features from an
   \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
@@ -379,8 +381,7 @@ The \code{data.frame} method for \code{groupFeatures} is a special case that cur
 
 \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 
-\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr
-  \addCitations{xcms}{3}
+\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 }
 \seealso{
 \code{\link{featureGroups-class}}

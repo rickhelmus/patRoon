@@ -18,16 +18,15 @@ generateTPsBioTransformer(
   type = "env",
   steps = 2,
   extraOpts = NULL,
-  adduct = NULL,
   skipInvalid = TRUE,
   fpType = "extended",
-  fpSimMethod = "tanimoto"
+  fpSimMethod = "tanimoto",
+  MP = FALSE
 )
 
 generateTPsLibrary(
   parents = NULL,
   TPLibrary = NULL,
-  adduct = NULL,
   skipInvalid = TRUE,
   matchParentsBy = "InChIKey"
 )
@@ -56,13 +55,6 @@ used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}}
 
 \item{extraOpts}{A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.}
 
-\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
-  Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
-  adduct annotations then these are used if \code{adducts=NULL}.
-
-  \setsWF The \code{adduct} argument is not supported for sets workflows, since the
-  adduct annotations will then always be used.}
-
 \item{skipInvalid}{If set to \code{TRUE} then the parents will be skipped (with a warning) for which insufficient
 information (\emph{e.g.} SMILES) is available.}
 
@@ -71,6 +63,10 @@ information (\emph{e.g.} SMILES) is available.}
 
 \item{fpSimMethod}{The method for calculating similarities (i.e. not dissimilarity!). See the \code{method} argument
 of the \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.}
+
+\item{MP}{If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
+parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
+Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.}
 
 \item{TPLibrary}{If \code{NULL}, a default \href{https://pubchem.ncbi.nlm.nih.gov}{PubChem} based library is used.
 Otherwise, \code{TPLibrary} should be a \code{data.frame}. See section below.}
@@ -82,6 +78,13 @@ library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"
 
 \item{minMass}{A \code{numeric} that specifies the minimum mass of calculated TPs. If below this mass it will be
 removed.}
+
+\item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+  Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
+  adduct annotations then these are used if \code{adducts=NULL}.
+
+  \setsWF The \code{adduct} argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.}
 
 \item{transformations}{A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
 section below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).}
@@ -155,6 +158,13 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
   (no significant change or unknown).
 
   }
+}
+
+\section{Parallelization}{
+ \code{generateTPsBioTransformer} uses multiprocessing to parallelize
+  computations. Please see the parallelization section in the handbook for
+  more details and \link[=patRoon-package]{patRoon options} for configuration
+  options.
 }
 
 \section{Source}{

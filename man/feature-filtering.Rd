@@ -27,6 +27,8 @@
   mzRange = NULL,
   mzDefectRange = NULL,
   chromWidthRange = NULL,
+  featQualityRange = NULL,
+  groupQualityRange = NULL,
   rGroups = NULL,
   removeBlanks = FALSE,
   checkFeaturesSession = NULL,

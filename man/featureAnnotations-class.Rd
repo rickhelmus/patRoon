@@ -132,10 +132,11 @@ results were removed after they were generated (\emph{e.g.} by use of
 
 \item{scoreLimits}{Filter results by their scores. Should be a named \code{list} that contains two-sized numeric
 vectors with the minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no limits). The names of each
-element should follow the name column of the table returned by \code{\link{formulaScorings}} and
+element should follow the name column of the table returned by \code{\link{formulaScorings}$name} and
 \code{\link{compoundScorings}()$name}. For instance, \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies
 that \code{numberPatents} should be at least \samp{10}. Note that a result without a specified scoring is never
-removed. Set to \code{NULL} to skip this filter.}
+removed. If a score term exists multiple times, \emph{i.e.} due to a consensus, then a candidate is kept if at
+least one of the terms falls within the range. Set to \code{NULL} to skip this filter.}
 
 \item{elements}{Only retain candidate formulae (neutral form) that match a
 given elemental restriction. The format of \code{elements} is a

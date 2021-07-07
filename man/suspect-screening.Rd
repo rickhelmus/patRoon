@@ -125,7 +125,9 @@ possible, as it can significantly reduce the load on data interpretation.
 }
 \note{
 Both \code{screenSuspects} and \code{importFeatureGroupsBrukerTASQ} may use the suspect names to base file
-  names used for reporting, logging etc. Therefore, it is important that these are file-compatible names.
+  names used for reporting, logging etc. Therefore, it is important that these are file-compatible names. For this
+  purpose, \code{screenSuspects} will automatically try to convert long, non-unique and/or otherwise incompatible
+  suspect names.
 
 For \code{screenSuspects} in some cases you may need to install
   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when only InChI data is available for mass
@@ -142,7 +144,7 @@ For \code{screenSuspects} in some cases you may need to install
  In a \link[=sets-workflow]{sets workflow}, \code{screenSuspects} performs suspect screening
   for each set separately, and the screening results are combined afterwards. The \code{sets} column in the
   \code{screenInfo} data marks in which sets the suspect hit was found.
-  
+
   \code{importFeatureGroupsBrukerTASQ} Is currently not supported for sets workflows.
 }
 

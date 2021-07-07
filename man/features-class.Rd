@@ -73,6 +73,7 @@
   mzRange = NULL,
   mzDefectRange = NULL,
   chromWidthRange = NULL,
+  qualityRange = NULL,
   negate = FALSE
 )
 

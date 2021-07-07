@@ -25,7 +25,7 @@
 \alias{compoundsConsensusSet}
 \alias{show,compoundsSet-method}
 \alias{delete,compoundsSet-method}
-\alias{[,compoundsSet,ANY,ANY,ANY-method}
+\alias{[,compoundsSet,ANY,missing,missing-method}
 \alias{filter,compoundsSet-method}
 \alias{plotSpectrum,compoundsSet-method}
 \alias{addFormulaScoring,compoundsSet-method}
@@ -88,7 +88,7 @@
   groupName,
   MSPeakLists,
   formulas = NULL,
-  plotStruct = TRUE,
+  plotStruct = FALSE,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,
@@ -114,7 +114,7 @@
 
 \S4method{delete}{compoundsSet}(obj, i, j, ...)
 
-\S4method{[}{compoundsSet,ANY,ANY,ANY}(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
+\S4method{[}{compoundsSet,ANY,missing,missing}(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
 
 \S4method{filter}{compoundsSet}(obj, ..., sets = NULL, updateConsensus = FALSE, negate = FALSE)
 
@@ -124,7 +124,7 @@
   groupName,
   MSPeakLists,
   formulas = NULL,
-  plotStruct = TRUE,
+  plotStruct = FALSE,
   title = NULL,
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,

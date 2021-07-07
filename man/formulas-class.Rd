@@ -23,7 +23,7 @@
 \alias{formulasConsensusSet}
 \alias{show,formulasSet-method}
 \alias{delete,formulasSet-method}
-\alias{[,formulasSet,ANY,ANY,ANY-method}
+\alias{[,formulasSet,ANY,missing,missing-method}
 \alias{filter,formulasSet-method}
 \alias{plotSpectrum,formulasSet-method}
 \alias{annotatedPeakList,formulasSet-method}
@@ -105,7 +105,7 @@
 
 \S4method{delete}{formulasSet}(obj, i, j, ...)
 
-\S4method{[}{formulasSet,ANY,ANY,ANY}(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
+\S4method{[}{formulasSet,ANY,missing,missing}(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
 
 \S4method{filter}{formulasSet}(obj, ..., sets = NULL, updateConsensus = FALSE, negate = FALSE)
 

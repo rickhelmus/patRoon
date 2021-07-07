@@ -20,9 +20,11 @@ plists <- generateMSPeakLists(fGroupsSimple, "mzr")
 compsSpec <- doGenComponents(fGroupsSimple, "specclust", plists)
 compsOpenMS <- doGenComponents(fGroups, "openms")
 compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)
-withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel = FALSE))
-withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0,
-                                                      adductConflictsUsePref = FALSE, parallel = FALSE))
+suppressWarnings({
+    withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel = FALSE))
+    withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0,
+                                                          adductConflictsUsePref = FALSE, parallel = FALSE))
+})
 
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none", componentInfo = data.table()))

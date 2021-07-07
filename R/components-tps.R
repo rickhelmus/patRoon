@@ -536,11 +536,11 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #'   \item \code{fragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
 #'   parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
 #'   prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
-#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragMatches} is
-#'   mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when \code{TPs=NULL}
-#'   or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used, it is highly
-#'   recommended that the annotation objects are first processed with the \code{\link{filter}} method, for instance, to
-#'   select only the top ranked candidates.
+#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragmentMatches}
+#'   is mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when
+#'   \code{TPs=NULL} or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used,
+#'   it is highly recommended that the annotation objects are first processed with the \code{\link{filter}} method, for
+#'   instance, to select only the top ranked candidates.
 #'
 #'   \item \code{neutralLossMatches} As \code{fragmentMatches}, but counting overlapping neutral loss formulae.
 #'

@@ -255,7 +255,7 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #' @param minExplainedPeaks Minimum number of explained peaks. Set to \code{NULL} to ignore.
 #' @param scoreLimits Filter results by their scores. Should be a named \code{list} that contains two-sized numeric
 #'   vectors with the minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no limits). The names of each
-#'   element should follow the name column of the table returned by \code{\link{formulaScorings}} and
+#'   element should follow the name column of the table returned by \code{\link{formulaScorings}$name} and
 #'   \code{\link{compoundScorings}()$name}. For instance, \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies
 #'   that \code{numberPatents} should be at least \samp{10}. Note that a result without a specified scoring is never
 #'   removed. Set to \code{NULL} to skip this filter.

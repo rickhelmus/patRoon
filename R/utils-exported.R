@@ -217,6 +217,7 @@ verifyDependencies <- function()
     check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
     check("MetFrag PubChemLite Database", getOption("patRoon.path.MetFragPubChemLite"), "patRoon.path.MetFragPubChemLite")
     check("OpenBabel", getCommandWithOptPath("obabel", "obabel", verify = FALSE), "patRoon.path.obabel")
+    check("BioTransformer", getOption("patRoon.path.BioTransformer"), "patRoon.path.BioTransformer")
     
     if (!OK)
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",

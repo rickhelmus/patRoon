@@ -131,11 +131,12 @@ setMethod("consensus", "componentsSet", function(obj, ...)
                          algorithm = paste0(unique(sapply(allComponents, algorithm)), collapse = ",")))
 })
 
-generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., setArgs = list(),
+generateComponentsSet <- function(fGroupsSet, ionization, generator, setIonization, ..., setArgs = list(),
                                   classGenerator = componentsSet)
 {
     annTable <- annotations(fGroupsSet)
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
+    verifyNoAdductIonizationArg(ionization)
     
     if (length(setArgs) == 0)
         setArgs <- vector("list", length(unsetFGroupsList))

@@ -140,9 +140,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ...)
+setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsOpenMS, setIonization = TRUE, ...)
+    generateComponentsSet(fGroups, ionization, generateComponentsOpenMS, setIonization = TRUE, ...)
 })
 
 

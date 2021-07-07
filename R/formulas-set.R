@@ -223,7 +223,7 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, .
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
-    verifyNoAdductArg(adduct)
+    verifyNoAdductIonizationArg(adduct)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, msplArgs,

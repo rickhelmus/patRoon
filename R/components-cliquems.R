@@ -185,8 +185,8 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, ...)
+setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsCliqueMS, setIonization = TRUE, ...)
+    generateComponentsSet(fGroups, ionization, generateComponentsCliqueMS, setIonization = TRUE, ...)
 })
 

@@ -35,8 +35,8 @@ setMethod("initialize", "componentsRC",
 #' @aliases generateComponentsRAMClustR
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,
-                                                                   normalize = "TIC", ionization = NULL,
+setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ionization = NULL, st = NULL, sr = NULL,
+                                                                   maxt = 12, hmax = 0.3, normalize = "TIC",
                                                                    absMzDev = 0.002, relMzDev = 5,
                                                                    minSize = 2, relMinReplicates = 0.5,
                                                                    RCExperimentVals = list(design = list(platform = "LC-MS"),

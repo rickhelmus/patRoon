@@ -69,6 +69,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
 
         # make name column file safe and unique
         sanNames <- fs::path_sanitize(suspects$name, replacement = "_")
+        sanNames <- strtrim(sanNames, 150) # UNDONE: make max length configurable?
         sanNames <- make.unique(sanNames, sep = "-")
         changedNames <- which(sanNames != suspects$name)
         if (length(changedNames) > 0)

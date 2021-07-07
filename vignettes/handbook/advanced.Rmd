@@ -464,7 +464,7 @@ Tool                  | Used by                                      | Notes
 `SIRIUS`              | `generateFormulas(agorithm="sirius", ...)`, `generateCompounds(agorithm="sirius", ...)`  | Only if `splitBatches=TRUE`
 `MetFrag`             | `generateCompounds(agorithm="metfrag", ...)` |
 `pngquant`            | `reportHTML(...)`                            | Only if `optimizePng=TRUE`
-`BioTransformer`      | `generateTPs(algorithm = "biotransformer")`  |
+`BioTransformer`      | `generateTPs(algorithm = "biotransformer")`  | Disabled by default (see `?generateTPs` for details).
 
 Multiprocessing is either performed by executing processes in the background with the [processx] `R` package (_classic interface_) or by futures, which were introduced in the previous section. An overview of the characteristics of both parallelization techniques is shown below.
 

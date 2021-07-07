@@ -42,7 +42,6 @@
 - predictTPsBioTransformer()
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
-    - disable parallellization (by default)?
 - log2fc
     - P values are calculated properly?
 - spectrumSimilarity
@@ -113,8 +112,6 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-        - advanced
-            - parallelization: remove BT in MP table if decide for no parallelization
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

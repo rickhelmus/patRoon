@@ -105,7 +105,6 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-    - results filter/subsetting
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

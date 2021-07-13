@@ -106,7 +106,6 @@
         - installation
             - update RDCOMClient installation?
     - results filter/subsetting
-        - update TP examples
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

@@ -385,7 +385,7 @@ This example uses metabolic logic to calculate possible TPs for all feature grou
 mslists <- generateMSPeakLists(fGroups, "mzr")
 formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
-fGroups <- fGroups[, groupNames(formulas)]
+fGroups <- fGroups[results = formulas]
 
 # step 3
 TPs <- generateTPs("logic", fGroups = fGroups, adduct = "[M+H]+")
@@ -401,7 +401,7 @@ componTP <- generateComponents(fGroups, "tp", MSPeakLists = mslists, formulas = 
 componTP <- filter(componTP, retDirMatch = TRUE, formulas = formulas)
 
 # step 7
-fGroups <- fGroups[, union(componentInfo(componTP)$parent_group, groupNames(componTP))]
+fGroups <- fGroups[results = componTP]
 reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
 ```
 
@@ -429,7 +429,7 @@ fGroups <- fGroups[, union(groupsParents, groupsTPs)]
 mslists <- generateMSPeakLists(fGroups, "mzr")
 formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
-fGroups <- fGroups[, groupNames(formulas)]
+fGroups <- fGroups[results = formulas]
 
 # step 4
 componTP <- generateComponents(algorithm = "tp",
@@ -441,6 +441,6 @@ componTP <- generateComponents(algorithm = "tp",
 componTP <- filter(componTP, minSpecSimBoth = 0.75, minFragMatches = 1)
 
 # step 6
-fGroups <- fGroups[, union(componentInfo(componTP)$parent_group, groupNames(componTP))]
+fGroups <- fGroups[results = componTP]
 reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
 ```

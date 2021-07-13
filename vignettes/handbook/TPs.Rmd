@@ -209,16 +209,16 @@ In all other cases it is recommended to use either the second or third scenario,
 
 ```{r eval=FALSE}
 componTP <- generateComponents(algorithm = "tp",
-                               fGroups = fGroups[, rGroups = "before"],
-                               fGroupsTPs = fGroups[, rGroups = "after"])
+                               fGroups = fGroups[rGroups = "before"],
+                               fGroupsTPs = fGroups[rGroups = "after"])
 ```
 
 In this example, only those feature groups present in the "before" replicate group are considered as parents, and those in "after" may be considered as a TP. Since it is likely that there will be some overlap in feature groups between both sample groups, the `ignoreParents` flag can be used to not consider any of the overlap for TP assignments:
 
 ```{r eval=FALSE}
 componTP <- generateComponents(algorithm = "tp",
-                               fGroups = fGroups[, rGroups = "before"],
-                               fGroupsTPs = fGroups[, rGroups = "after"],
+                               fGroups = fGroups[rGroups = "before"],
+                               fGroupsTPs = fGroups[rGroups = "after"],
                                ignoreParents = TRUE)
 ```
 

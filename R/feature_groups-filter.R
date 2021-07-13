@@ -230,6 +230,17 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
+resultsFilter <- function(fGroups, results, negate = FALSE, verbose = TRUE)
+{
+    return(doFGroupsFilter(fGroups, "results", c(results, negate), function(fGroups)
+    {
+        fgRes <- if (is.list(results)) unique(unlist(lapply(results, groupNamesResults))) else groupNamesResults(results)
+        if (negate)
+            fgRes <- setdiff(names(fGroups), fgRes)
+        return(fGroups[, fgRes])
+    }, verbose = verbose))
+}
+
 featQualityFilter <- function(fGroups, qualityRanges, negate)
 {
     ftindex <- groupFeatIndex(fGroups)
@@ -319,7 +330,7 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 #'
 #' @param preAbsMinIntensity,preRelMinIntensity As \code{absMinIntensity}/\code{relMinIntensity}, but applied
 #'   \emph{before} any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
-#'   taken that a sufficiently low value is choosen that is not expected to affect subsequent filtering steps. See below
+#'   taken that a sufficiently low value is chosen that is not expected to affect subsequent filtering steps. See below
 #'   why this may be important.
 #' @param absMinAnalyses,relMinAnalyses Feature groups are only kept when they contain data for at least this (absolute
 #'   or relative) amount of analyses. Set to \code{NULL} to ignore.
@@ -328,11 +339,15 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 #' @param absMinFeatures,relMinFeatures Analyses are only kept when they contain at least this (absolute or relative)
 #'   amount of features. Set to \code{NULL} to ignore.
 #' @param absMinReplicateAbundance,relMinReplicateAbundance Minimum absolute/relative abundance that a grouped feature
-#'   should be present within a replicate group. If this mimimum is not met all features within the replicate group are
+#'   should be present within a replicate group. If this minimum is not met all features within the replicate group are
 #'   removed. Set to \code{NULL} to skip this step.
 #' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
 #'   replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 #'   \code{NULL} to ignore.
+#' @param results Only keep feature groups that have results in the object specified by \code{results}. Valid classes
+#'   are \code{\link{featureAnnotations}} (\emph{e.g.} formula/compound annotations) and \code{\link{components}}. Can
+#'   also be a \code{list} with multiple objects: in this case a feature group is kept if it has a result in \emph{any}
+#'   of the objects. Set to \code{NULL} to ignore.
 #' @param blankThreshold Feature groups that are also present in blank analyses (see
 #'   \link[=analysis-information]{analysis info}) are filtered out unless their relative intensity is above this
 #'   threshold. For instance, a value of \samp{5} means that only features with an intensity five times higher than that
@@ -381,8 +396,8 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 #'   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
 #'   \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
 #'
-#'   \item Replicate group filter (\emph{i.e.} \code{rGroups}) and blank analyses removal (\emph{i.e.} if
-#'   \code{removeBlanks=TRUE}).
+#'   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
+#'   analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
 #'
 #'   }
 #'
@@ -401,8 +416,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, removeBlanks = FALSE, checkFeaturesSession = NULL,
-                                              negate = FALSE)
+                                              rGroups = NULL, results = NULL, removeBlanks = FALSE,
+                                              checkFeaturesSession = NULL, negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -419,6 +434,12 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
            list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
                 c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assert(checkmate::checkNull(results),
+                      checkmate::checkClass(results, "featureAnnotations"),
+                      checkmate::checkClass(results, "components"),
+                      checkmate::checkList(results, c("featureAnnotations", "components"), any.missing = FALSE,
+                                           min.len = 1),
+                      .var.name = "results")
     aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
@@ -463,6 +484,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(minFeaturesFilter, absMinFeatures, relMinFeatures)
 
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
+    obj <- maybeDoFilter(resultsFilter, results)
     if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$blank), negate = !negate)
 

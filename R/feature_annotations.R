@@ -73,6 +73,8 @@ setMethod("initialize", "featureAnnotations", function(.Object, ...)
     return(.Object)
 })
 
+setMethod("groupNamesResults", "featureAnnotations", function(obj) groupNames(obj))
+
 #' @describeIn featureAnnotations Accessor for the \code{groupAnnotations} slot.
 #' @export
 setMethod("annotations", "featureAnnotations", function(obj) obj@groupAnnotations)

@@ -30,6 +30,7 @@
   featQualityRange = NULL,
   groupQualityRange = NULL,
   rGroups = NULL,
+  results = NULL,
   removeBlanks = FALSE,
   checkFeaturesSession = NULL,
   negate = FALSE
@@ -46,7 +47,7 @@ to skip this step.}
 
 \item{preAbsMinIntensity, preRelMinIntensity}{As \code{absMinIntensity}/\code{relMinIntensity}, but applied
 \emph{before} any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
-taken that a sufficiently low value is choosen that is not expected to affect subsequent filtering steps. See below
+taken that a sufficiently low value is chosen that is not expected to affect subsequent filtering steps. See below
 why this may be important.}
 
 \item{absMinAnalyses, relMinAnalyses}{Feature groups are only kept when they contain data for at least this (absolute
@@ -59,7 +60,7 @@ or relative) amount of analyses. Set to \code{NULL} to ignore.}
 amount of features. Set to \code{NULL} to ignore.}
 
 \item{absMinReplicateAbundance, relMinReplicateAbundance}{Minimum absolute/relative abundance that a grouped feature
-should be present within a replicate group. If this mimimum is not met all features within the replicate group are
+should be present within a replicate group. If this minimum is not met all features within the replicate group are
 removed. Set to \code{NULL} to skip this step.}
 
 \item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of intensity values for features within a
@@ -82,6 +83,11 @@ to skip this step.}
 
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
+
+\item{results}{Only keep feature groups that have results in the object specified by \code{results}. Valid classes
+are \code{\link{featureAnnotations}} (\emph{e.g.} formula/compound annotations) and \code{\link{components}}. Can
+also be a \code{list} with multiple objects: in this case a feature group is kept if it has a result in \emph{any}
+of the objects. Set to \code{NULL} to ignore.}
 
 \item{removeBlanks}{Set to \code{TRUE} to remove all analyses that belong to replicate groups that are specified as a
 blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
@@ -155,8 +161,8 @@ Basic rule based filtering of feature groups.
   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
   \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
 
-  \item Replicate group filter (\emph{i.e.} \code{rGroups}) and blank analyses removal (\emph{i.e.} if
-  \code{removeBlanks=TRUE}).
+  \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
+  analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
 
   }
 

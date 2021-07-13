@@ -416,6 +416,8 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
                                   noDate = FALSE) standardGeneric("reportHTML"))
 
+setGeneric("groupNamesResults", function(obj) standardGeneric("groupNamesResults"))
+
 # Used for reporting
 setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))
 setGeneric("plotSpectrumHash", function(obj, ...) standardGeneric("plotSpectrumHash"))

@@ -99,11 +99,14 @@
         - add PC links (see UNDONEs)
         - mention newProject when/if support is there
         - verify examples
+        - also sync fGroups from components for first two examples?
     - update
         - introduction
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
+    - results filter/subsetting
+        - update TP examples
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial
@@ -142,6 +145,7 @@
     - OpenMS: load intensities from FFM data (needs pre-release)
     - featInfo in HTML reports
     - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
+    - results filter/subsetting
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

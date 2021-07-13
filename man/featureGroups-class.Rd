@@ -118,7 +118,7 @@
 
 \S4method{adducts}{featureGroups}(obj) <- value
 
-\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups, drop = TRUE)
+\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups, results, drop = TRUE)
 
 \S4method{[[}{featureGroups,ANY,ANY}(x, i, j)
 
@@ -327,6 +327,11 @@ feature group, with a vector of the group intensities as first argument, the gro
   replicate groups (equivalent to the \code{rGroups} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 
   For \code{getFCParams}: a \code{character} vector with the names of the two replicate groups to be compared.}
+
+\item{results}{Optional argument. If specified only feature groups with results in the specified object are kept. The
+class of \code{results} should be \code{\link{featureAnnotations}} or \code{\link{components}}. Multiple objects
+can be specified in a \code{list}: in this case a feature group is kept if it has a result in \emph{any} of the
+objects (equivalent to the \code{results} argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{drop}{ignored.}
 

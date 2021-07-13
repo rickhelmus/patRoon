@@ -99,7 +99,6 @@
         - add PC links (see UNDONEs)
         - mention newProject when/if support is there
         - verify examples
-        - also sync fGroups from components for first two examples?
     - update
         - introduction
             - mention changes of patRoon 2.0?

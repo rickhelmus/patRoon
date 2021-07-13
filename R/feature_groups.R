@@ -311,12 +311,18 @@ setReplaceMethod("adducts", "featureGroups", function(obj, value)
 })
 
 #' @describeIn featureGroups Subset on analyses/feature groups.
+#' @param results Optional argument. If specified only feature groups with results in the specified object are kept. The
+#'   class of \code{results} should be \code{\link{featureAnnotations}} or \code{\link{components}}. Multiple objects
+#'   can be specified in a \code{list}: in this case a feature group is kept if it has a result in \emph{any} of the
+#'   objects (equivalent to the \code{results} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
-setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, drop = TRUE)
+setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, results, drop = TRUE)
 {
     if (!missing(rGroups))
         x <- filter(x, rGroups = rGroups)
-
+    if (!missing(results))
+        x <- filter(x, results = results)
+    
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))

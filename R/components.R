@@ -71,6 +71,8 @@ setMethod("initialize", "components", function(.Object, ...)
 
 setMethod("collapseComponents", "components", function(obj) obj)
 
+setMethod("groupNamesResults", "components", function(obj) groupNames(obj))
+
 #' @describeIn components Accessor method for the \code{components} slot of a
 #'   \code{components} class. Each component is stored as a
 #'   \code{\link{data.table}}.

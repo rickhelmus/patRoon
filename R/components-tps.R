@@ -301,6 +301,13 @@ componentsTPs <- setClass("componentsTPs", contains = "components")
 setMethod("initialize", "componentsTPs",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "tp"))
 
+setMethod("groupNamesResults", "componentsTPs", function(obj)
+{
+    if (length(obj) == 0)
+        return(character())
+    return(union(componentInfo(obj)$parent_group, groupNames(obj)))
+})
+
 setMethod("collapseComponents", "componentsTPs", function(obj)
 {
     obj@components <- lapply(obj@components, function(cmp)

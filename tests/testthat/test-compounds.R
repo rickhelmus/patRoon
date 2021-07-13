@@ -217,7 +217,7 @@ verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
         doVerify(msplF, allObj)
 }
 
-test_that("annotatedBy filter for MSPL", {
+test_that("annotatedBy and results filters", {
     # NOTE: do these tests here, since we have all the objects ready: peaklists, compounds & formulas
     
     verifyMSPLAnFilter(plists, comps)
@@ -228,6 +228,12 @@ test_that("annotatedBy filter for MSPL", {
     verifyMSPLAnFilter(plists, comps, negate = TRUE)
     verifyMSPLAnFilter(plists, forms, negate = TRUE)
     verifyMSPLAnFilter(plists, comps, forms, negate = TRUE)
+    
+    expect_setequal(groupNames(comps), names(filter(fGroups, results = comps)))
+    expect_setequal(groupNames(comps), names(fGroups[, results = comps]))
+    expect_setequal(union(groupNames(forms), groupNames(comps)), names(filter(fGroups, results = list(forms, comps))))
+    expect_length(intersect(groupNames(comps), names(filter(fGroups, results = comps, negate = TRUE))), 0)
+    
 })
 
 # on a clean system, i.e. where ~/.jnati/repo/jnniinchi is not yet initialized, starting multiple

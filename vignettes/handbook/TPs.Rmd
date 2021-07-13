@@ -358,8 +358,7 @@ fGroupsScrAnn <- filter(fGroupsScrAnn, maxLevel = 3, onlyHits = TRUE)
 # step 6
 componTP <- generateComponents(fGroupsScrAnn, "tp", MSPeakLists = mslistsScr,
                                compunds = compoundsScr)
-fGroupsScrAnn <- fGroupsScrAnn[, union(componentInfo(componTP)$parent_group,
-                                       groupNames(componTP))]
+fGroupsScrAnn <- fGroupsScrAnn[results = componTP]
 
 # step 7
 reportHTML(fGroupsScrAnn, MSPeakLists = mslistsScr, compounds = compoundsScr,

@@ -159,6 +159,7 @@ Filter                                     | Classes                     | Remar
 `maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate group.
 `blankThreshold`                           | `featureGroups`             | Minimum intensity factor above blank intensity
 `rGroups`                                  | `featureGroups`             | Only keep (features of) these replicate groups
+`results`                                  | `featureGroups`             | Only keep feature groups with formula/compound annotations or componentization results
 
 Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. `blankThreshold` and `absMinReplicateAbundance`/`relMinReplicateAbundance`) are important filters and are highly recommended to always apply for cleaning up your dataset.
 
@@ -202,6 +203,11 @@ fGroups <- filter(fGroups, relMinReplicates = 0.2)
 # only keep data present in replicate groups "repl1" and "repl2"
 # all other features and analyses will be removed
 fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"))
+
+# only keep feature groups with compound annotations
+fGroups <- filter(fGroups, results = compounds)
+# only keep feature groups with formula or compound annotations
+fGroups <- filter(fGroups, results = list(formulas, compounds))
 ```
 
 ### Suspect screening
@@ -427,11 +433,13 @@ components[c("CMP1", "CMP5")]
 components[, groupNames(compounds)]
 ```
 
-In addition, feature groups can also be subset by given replicate groups (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
+In addition, feature groups can also be subset by given replicate groups or annotation/componentization results (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
 
 ```{r subsetRGSusp,eval=FALSE}
 # equal as filter(fGroups, rGroups = ...)
 fGroups[rGroups = c("repl1", "repl2")]
+# equal as filter(fGroups, results = ...)
+fGroups[results = compounds]
 # only keep feature groups assigned to given suspects
 fGroupsSusp[suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
 ```

@@ -72,7 +72,7 @@ To summarize:
 * **MS peak lists** Summarizes all MS and MS/MS data that will be used for subsequent annotation.
 * During **formula** and **compound annotation** candidate formulae/structures will be assigned and ranked for each feature.
 
-The next chapters will discuss how to generate this data and process it. Afterwards, several advanced topics are discussed such as [combining positive and negative ionization data](#setsWorkflow), [screening for transformation products](#TPs) and [other advanced functionality](#advanced).
+The next chapters will discuss how to generate this data and process it. Afterwards, several advanced topics are discussed such as [combining positive and negative ionization data](#setsWorkflow), [screening for transformation products](#TPs) and [other advanced functionality](#advanced_usage).
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```

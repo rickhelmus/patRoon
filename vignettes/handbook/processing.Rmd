@@ -431,9 +431,9 @@ In addition, feature groups can also be subset by given replicate groups (simila
 
 ```{r subsetRGSusp,eval=FALSE}
 # equal as filter(fGroups, rGroups = ...)
-fGroups[, rGroups = c("repl1", "repl2")]
+fGroups[rGroups = c("repl1", "repl2")]
 # only keep feature groups assigned to given suspects
-fGroupsSusp[, suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
+fGroupsSusp[suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
 ```
 
 > **_NOTE_** As of `patRoon 2.0` MS peak lists are **not** re-generated after a subsetting operation (unless the `reAverage` parameter is explicity set to `TRUE`). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the subset operation.

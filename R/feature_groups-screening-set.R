@@ -408,6 +408,32 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                      annotations = copy(annotations(fGroups))))
 })
 
+#' @export
+setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
+                                                                  adduct, skipInvalid, onlyHits, amend = FALSE)
+{
+    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
+    
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+    if (!amend)
+        return(fGroupsScreened)
+    
+    # amend screening results
+    
+    fGroups@setObjects <- Map(fGroups@setObjects, fGroupsScreened@setObjects, f = function(so, sos)
+    {
+        so@screenInfo <- rbind(so@screenInfo, sos@screenInfo, fill = TRUE)
+        so@screenInfo <- unique(so@screenInfo, by = c("name", "group"))
+        return(so)
+    })
+    fGroups@screenInfo <- mergeScreeningSetInfos(setObjects(fGroups))
+    
+    if (onlyHits)
+        fGroups <- fGroups[, scr$group]
+    
+    return(fGroups)
+})
+
 
 #' @rdname featureGroupsScreening-class
 #' @export

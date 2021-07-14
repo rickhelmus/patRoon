@@ -576,6 +576,29 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     return(ret)
 })
 
+#' @param amend If \code{TRUE} then screening results will be \emph{amended} to the original object.
+#' @rdname suspect-screening
+#' @export
+setMethod("screenSuspects", "featureGroupsScreening", function(fGroups, suspects, rtWindow, mzWindow,
+                                                               adduct, skipInvalid, onlyHits, amend = FALSE)
+{
+    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
+    
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+    if (!amend)
+        return(fGroupsScreened)
+    
+    # amend screening results
+    
+    fGroups@screenInfo <- rbind(fGroups@screenInfo, fGroupsScreened@screenInfo, fill = TRUE)
+    fGroups@screenInfo <- unique(fGroups@screenInfo, by = c("name", "group"))
+    
+    if (onlyHits)
+        fGroups <- fGroups[, scr$group]
+    
+    return(fGroups)
+})
+
 #' @details \code{numericIDLevel} Extracts the numeric part of a given
 #'   identification level (\emph{e.g.} \code{"3a"} becomes \samp{3}).
 #' @param level The identification level to be converted.

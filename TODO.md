@@ -23,6 +23,7 @@
 - screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
     - need to clear out any suspect annotations?
     - need to de-dup amended suspect names
+    - adjust TP handbook examples and NP workflows and add paragraph in HB
 
 
 ## Annotation
@@ -173,6 +174,7 @@
         - renamed analysis column from feature consensus formulae results to analysis_from
         - added analyses column in feature consensus formulae results
         - formulas as.data.table(average=TRUE): remove analysis_from column
+        - if multiple annotations are availale for a single MS/MS peak (ie due to calculateFeatures=T) then only the annotation with lowest m/z deviation is kept (and warning is emitted)
     - annotatedPeakList(): also add annotation columns for missing results (for consistency)
     - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown
     - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown

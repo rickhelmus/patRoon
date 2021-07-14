@@ -453,6 +453,15 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
                 # align remaining mzs
                 fi[, PLID := sapply(mz, function(x) spec[which.min(abs(x - mz))]$ID)]
                 fi[, mz := spec[match(PLID, ID)]$mz]
+                if (anyDuplicated(fi$PLID))
+                {
+                    warning("Matched different formula fragment annotations to single MS/MS peak. ",
+                            "Taking annotation with lowest m/z deviation. ",
+                            "Consider lowering absAlignMzDev and/or mass tolerances.", call. = FALSE)
+                    fi[, mzD := abs(mz - ion_formula_mz)]
+                    setorderv(fi, c("PLID", "mzD"))
+                    fi <- unique(fi, by = "PLID")[, -"mzD"]
+                }
             }
             
             return(fi)

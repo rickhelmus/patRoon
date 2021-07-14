@@ -859,7 +859,7 @@ getNewProjectUI <- function(destPath)
                             )
                         ),
                         conditionalPanel(
-                            condition = "(input.suspectList != \"\" || input.suspectListPos != \"\") && (input.formulaGen != \"\" || input.compIdent != \"\")",
+                            condition = "(input.ionization == \"both\" || input.suspectList != \"\") && (input.ionization != \"both\" || input.suspectListPos != \"\") && (input.formulaGen != \"\" || input.compIdent != \"\")",
                             fillRow(
                                 height = 90,
                                 fillCol(

@@ -4,6 +4,7 @@
 
 - newProject
     - sets: add specific options for annotation and others?
+    - TPs: don't do onlyHits=T when screening for parents (or separate fGroups)
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 
@@ -21,7 +22,7 @@
 
 - screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
     - need to clear out any suspect annotations?
-    - need to de-dup amended suspect names
+    - add tests
     - adjust TP handbook examples and NP workflows and add paragraph in HB
 
 

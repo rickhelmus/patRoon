@@ -153,6 +153,30 @@ getScriptCode <- function(input, analyses)
             list(name = "doFMF", value = TRUE, condition = input$featFinder == "Bruker")
         ))
     }
+    getAdductArg <- function(cond = TRUE) list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-",
+                                               quote = TRUE,
+                                               condition = input$ionization != "both" &&
+                                                   (!nzchar(input$components) || input$components == "nontarget" || !input$selectIons) &&
+                                                   cond)
+    addLoadSuspCall <- function(var, file)
+    {
+        addCall(var, "read.csv", list(
+            list(value = file, quote = TRUE),
+            list(name = "stringsAsFactors", value = FALSE)
+        ))
+    }
+    addScreenCall <- function(susp)
+    {
+        addCall("fGroups", "screenSuspects", list(
+            list(value = "fGroups"),
+            list(value = susp),
+            list(name = "rtWindow", value = 12),
+            list(name = "mzWindow", value = 0.005),
+            getAdductArg(),
+            list(name = "onlyHits", value = TRUE)
+        ))
+    }
+    
     
     addComment(paste("Script automatically generated on", date()))
     addNL()
@@ -302,14 +326,6 @@ getScriptCode <- function(input, analyses)
         {
             addComment("Load suspect list")
             
-            addLoadSuspCall <- function(var, file)
-            {
-                addCall(var, "read.csv", list(
-                    list(value = file, quote = TRUE),
-                    list(name = "stringsAsFactors", value = FALSE)
-                ))
-            }
-            
             if (input$ionization != "both")
                 addLoadSuspCall("suspList", input$suspectList)
             else
@@ -324,19 +340,6 @@ getScriptCode <- function(input, analyses)
             }
         }
         
-        addScreenCall <- function(susp)
-        {
-            addCall("fGroups", "screenSuspects", list(
-                list(value = "fGroups"),
-                list(value = susp),
-                list(name = "rtWindow", value = 12),
-                list(name = "mzWindow", value = 0.005),
-                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
-                     condition = input$ionization != "both"),
-                list(name = "onlyHits", value = TRUE)
-            ))
-        }
-        
         addNL()
         
         addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
@@ -346,6 +349,38 @@ getScriptCode <- function(input, analyses)
             addScreenCall("suspList")
         else
             addScreenCall(c("suspListPos", "suspListNeg"))
+    }
+    
+    if (input$doTPs)
+    {
+        addHeader("transformation products")
+        
+        if (input$TPGen != "Logic" && input$TPGenInput == "suspects")
+        {
+            addComment("Load parent suspect list")
+            addLoadSuspCall("suspListParents", input$TPSuspectList)
+            addNL()
+        }
+        
+        addComment("Obtain TPs")
+        addCall("TPs", "generateTPs", list(
+            list(value = tolower(input$TPGen), quote = TRUE),
+            list(name = "parents", value = switch(input$TPGenInput,
+                                                  suspects = "suspListParents",
+                                                  screening = "fGroups",
+                                                  all = "NULL"),
+                 condition = input$TPGen != "Logic"),
+            list(value = "fGroups", condition = input$TPGen == "Logic"),
+            getAdductArg(input$TPGen == "Logic")
+        ))
+        
+        addNL()
+        addComment("Screen TPs")
+        addCall("suspListTPs", "convertToSuspects", list(
+            list(value = "TPs"),
+            list(name = "includeParents", value = input$TPGen != "Logic")
+        ))
+        addScreenCall("suspListTPs")
     }
     
     doMSPL <- nzchar(input$formulaGen) || nzchar(input$compIdent)
@@ -391,8 +426,7 @@ getScriptCode <- function(input, analyses)
                 list(value = tolower(input$formulaGen), quote = TRUE),
                 list(name = "relMzDev", value = 5, condition = input$formulaGen != "Bruker"),
                 list(name = "precursorMzSearchWindow", value = 0.002, condition = input$formulaGen == "Bruker"),
-                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
-                     condition = input$ionization != "both"),
+                getAdductArg(),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$formulaGen != "Bruker"),
                 list(name = "oc", value = FALSE, condition = input$formulaGen == "GenForm"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$formulaGen == "SIRIUS"),
@@ -403,6 +437,13 @@ getScriptCode <- function(input, analyses)
         
         if (nzchar(input$compIdent))
         {
+            doTPDB <- input$compIdent == "MetFrag" && input$doTPs && input$TPGen != "Logic" && input$TPDoMFDB
+            if (doTPDB)
+                addCall(NULL, "convertToMFDB", list(
+                    list(value = "TPs"),
+                    list(value = "TP-database.csv", quote = TRUE),
+                    list(name = "includeParents", value = TRUE)))
+            
             addNL()
             addComment("Calculate compound structure candidates")
             addCall("compounds", "generateCompounds", list(
@@ -413,9 +454,10 @@ getScriptCode <- function(input, analyses)
                 list(name = "fragRelMzDev", value = 5, condition = input$compIdent == "MetFrag"),
                 list(name = "fragAbsMzDev", value = 0.002, condition = input$compIdent == "MetFrag"),
                 list(name = "relMzDev", value = 5, condition = input$compIdent == "SIRIUS"),
-                list(name = "adduct", value = if (input$ionization == "positive") "[M+H]+" else "[M-H]-", quote = TRUE,
-                     condition = input$ionization != "both"),
-                list(name = "database", value = "pubchem", quote = TRUE, condition = input$compIdent == "MetFrag"),
+                getAdductArg(),
+                list(name = "database", value = "pubchem", quote = TRUE, condition = input$compIdent == "MetFrag" && !doTPDB),
+                list(name = "database", value = "csv", quote = TRUE, condition = doTPDB),
+                list(name = "extraOpts", value = "list(LocalDatabasePath = \"TP-database.csv\")", condition = doTPDB),
                 list(name = "maxCandidatesToStop", value = 2500, condition = input$compIdent == "MetFrag"),
                 list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$compIdent == "SIRIUS"),
@@ -445,9 +487,50 @@ getScriptCode <- function(input, analyses)
         }
     }
     
+    if (input$doTPs)
+    {
+        addHeader("Parent and TP linkage")
+        
+        addComment("You probably want to prioritize the data before componentization. Please see the handbook for more info.")
+        addCall("componentsTP", "generateComponents", list(
+            list(value = "fGroups"),
+            list(value = "tp", quote = TRUE),
+            list(name = "fGroupsTPs", value = "fGroups"),
+            list(name = "TPs", value = "TPs"),
+            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+            list(name = "formulas", value = "formulas", condition = nzchar(input$formulaGen)),
+            list(name = "compounds", value = "compounds", condition = nzchar(input$compIdent))
+        ))
+        
+        addNL()
+        addComment("You may want to configure the filtering step below. See the manuals for more details.")
+        addCall("componentsTP", "filter", list(
+            list(value = "componentsTP"),
+            list(name = "retDirMatch", value = FALSE),
+            list(name = "minSpecSim", value = "NULL"),
+            list(name = "minSpecSimPrec", value = "NULL"),
+            list(name = "minSpecSimBoth", value = "NULL"),
+            list(name = "minFragMatches", value = "NULL"),
+            list(name = "minNLMatches", value = "NULL"),
+            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen),
+                 condition = input$TPGen == "Logic")
+        ))
+        
+        addNL()
+        addComment("Only keep linked feature groups")
+        addAssignment("fGroups", "fGroups[results = componentsTP]")
+    }
+    
     if (length(input$report) > 0)
     {
-        componIsNULL <- !nzchar(input$components) || (input$selectIons && input$components != "nontarget")
+        # UNDONE: for now TP components are always reported instead of others
+        componVal <- if (input$doTPs)
+            "componentsTP"
+        else if (nzchar(input$components) && (!input$selectIons || input$components == "nontarget"))
+            "components"
+        else
+            "NULL"
+        
         addHeader("reporting")
         addCall(NULL, "reportCSV", condition = "CSV" %in% input$report, list(
             list(value = "fGroups"),
@@ -455,7 +538,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = componIsNULL)
+            list(name = "components", value = componVal)
         ))
         addCall(NULL, "reportPDF", condition = "PDF" %in% input$report, list(
             list(value = "fGroups"),
@@ -463,7 +546,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = componIsNULL)
+            list(name = "components", value = componVal)
         ))
         addCall(NULL, "reportHTML", condition = "HTML" %in% input$report, list(
             list(value = "fGroups"),
@@ -471,7 +554,7 @@ getScriptCode <- function(input, analyses)
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = "components", isNULL = componIsNULL),
+            list(name = "components", value = componVal),
             list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
             list(name = "selfContained", value = FALSE),
             list(name = "openReport", value = TRUE)
@@ -527,6 +610,15 @@ doCreateProject <- function(input, analyses)
         else
             rstudioapi::navigateToFile(sp)
     }
+}
+
+getTPGenInputs <- function(isLib)
+{
+    ret <- c("Suspect list" = "suspects",
+             "Screening results" = "screening")
+    if (isLib)
+        ret <- c(ret, "All library parents" = "all")
+    return(ret)
 }
 
 getNewProjectUI <- function(destPath)
@@ -859,7 +951,7 @@ getNewProjectUI <- function(destPath)
                             )
                         ),
                         conditionalPanel(
-                            condition = "(input.ionization == \"both\" || input.suspectList != \"\") && (input.ionization != \"both\" || input.suspectListPos != \"\") && (input.formulaGen != \"\" || input.compIdent != \"\")",
+                            condition = "(input.exSuspList || (input.ionization != \"both\" && input.suspectList != \"\") || (input.ionization == \"both\" && input.suspectListPos != \"\")) && (input.formulaGen != \"\" || input.compIdent != \"\")",
                             fillRow(
                                 height = 90,
                                 fillCol(
@@ -878,7 +970,30 @@ getNewProjectUI <- function(destPath)
                 )
             ),
             miniUI::miniTabPanel(
-                "Reporting", icon = icon("file-medical-alt"), # scroll, paperclip, newspaper, file-medical-alt,
+                "TP screening", icon = icon("react"),
+                miniUI::miniContentPanel(
+                    fillCol(
+                        flex = NA,
+                        checkboxInput("doTPs", "Perform transformation product screening"),
+                        conditionalPanel(
+                            condition = "input.doTPs",
+                            selectInput("TPGen", "TP algorithm", c("BioTransformer", "Library", "Logic")),
+                            conditionalPanel(
+                                condition = "input.TPGen != \"Logic\"",
+                                selectInput("TPGenInput", "Parent input", getTPGenInputs(FALSE)),
+                                conditionalPanel(
+                                    condition = "input.TPGenInput == \"suspects\"",
+                                    fileSelect("TPSuspectList", "TPSuspButton", "Parent suspect list",
+                                               placeholder = "Please specify parent suspect list")
+                                ),
+                                checkboxInput("TPDoMFDB", "Generate TP MetFrag database", TRUE)
+                            )
+                        )
+                    )
+                )
+            ),
+            miniUI::miniTabPanel(
+                "Reporting", icon = icon("file-medical-alt"),
                 miniUI::miniContentPanel(
                     fillCol(
                         checkboxGroupInput("report", "Report generation",
@@ -1047,6 +1162,9 @@ newProject <- function(destPath = NULL)
                                                        file.path(input$destinationPath, input$scriptFile)),
                                                "Yes", "No"))
             {}
+            else if (input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "suspects" &&
+                     !nzchar(input$TPSuspectList))
+                rstudioapi::showDialog("No parent suspect list", "Please select a parent suspect list!", "")
             else
             {
                 anas <- if (input$ionization != "both") rValues$analyses else list(pos = rValues$analysesPos,
@@ -1183,6 +1301,23 @@ newProject <- function(destPath = NULL)
             else
                 shinyjs::toggleState("featFinder", input$featGrouper != "SIRIUS")
         })
+        
+        observeEvent(input$TPGen, {
+            updateSelectInput(inputId = "TPGenInput", choices = getTPGenInputs(input$TPGen == "Library"))
+        })
+        
+        observeEvent(input$TPGenInput, {
+            if (input$TPGenInput == "screening" &&
+                (!input$exSuspList && (input$ionization == "both" || !nzchar(input$suspectList)) &&
+                 (input$ionization != "both" || !nzchar(input$suspectListPos))))
+            {
+                rstudioapi::showDialog("Enable suspect screening",
+                                       "This requires a workflow with suspect screening. Please configure in the Features tab.", "")
+                updateSelectInput(inputId = "TPGenInput", selected = "suspects")
+            }
+        })
+        
+        observeEvent(input$TPSuspButton, selectSuspList("TPSuspectList"))
     }
 
     runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))

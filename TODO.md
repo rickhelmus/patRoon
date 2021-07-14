@@ -4,7 +4,6 @@
 
 - newProject
     - sets: add specific options for annotation and others?
-    - TP workflow
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 
@@ -104,7 +103,6 @@
 - handbook
     - TPs
         - add PC links (see UNDONEs)
-        - mention newProject when/if support is there
         - verify examples
     - update
         - introduction

@@ -27,6 +27,8 @@ digraph Workflow {
 
 The next sections will outline more details on these steps are performed and configured. The [last section](#TPsExamples) in this chapter outlines several example workflows.
 
+> **_NOTE_** The [newProject tool](#newProject) can be used to easily generate a workflow with transformation product screening.
+
 ## Obtaining transformation product data {#genTPs}
 
 UNDONE: cite PC

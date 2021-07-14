@@ -346,7 +346,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
 
     ret[, "intensity profile" := imgTags(sapply(TPPlots[TPPlotName(cName, cmp$group)], "[[", "int"))]
     return(ret)
-}))
+}), fill = TRUE) # fill: spectrum can be absent depending on candidate
 
 DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                     dom = "Blrtp", pageLength = 25, autoWidth = FALSE,

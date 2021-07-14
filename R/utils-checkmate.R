@@ -185,7 +185,7 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         cx <- copy(x)
         cx[, OK := any(!sapply(.SD, is.na)), by = seq_len(nrow(cx)), .SDcols = intersect(names(x), mzCols)]
         if (all(!cx$OK))
-            stop("Suspect list doesn not contain any (data to calculate) suspect masses", call. = FALSE)
+            stop("Suspect list does not contain any (data to calculate) suspect masses", call. = FALSE)
         else if (any(!cx$OK))
             stop("Suspect list does not contain any (data to calculate) suspect masses for row(s): ",
                  paste0(which(!cx$OK), collapse = ", "), call. = FALSE)

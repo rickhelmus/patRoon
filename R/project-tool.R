@@ -248,6 +248,37 @@ getScriptCode <- function(input, analyses)
         list(name = "mzRange", value = mzRange)
     ))
     
+    if (nzchar(input$components))
+    {
+        addHeader("componentization")
+        
+        addComment("Perform automatic generation of components")
+        addCall("components", "generateComponents", list(
+            list(value = "fGroups"),
+            list(value = tolower(input$components), quote = TRUE),
+            list(name = "ionization", value = input$ionization, quote = TRUE, condition = input$ionization != "both"),
+            list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
+            list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
+            list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
+            list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
+            list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
+        ))
+        
+        if (input$selectIons && input$components != "nontarget")
+        {
+            pa <- switch(input$ionization,
+                         positive = "[M+H]+",
+                         negative = "[M-H]-",
+                         both = c("[M+H]+", "[M-H]-"))
+            addCall("fGroups", "selectIons", list(
+                list(value = "fGroups"),
+                list(value = "components"),
+                list(name = "prefAdduct", value = pa, quote = TRUE),
+                list(name = "onlyMonoIso", value = TRUE)
+            ))
+        }
+    }
+    
     if (input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos)))
     {
@@ -319,69 +350,37 @@ getScriptCode <- function(input, analyses)
     
     doMSPL <- nzchar(input$formulaGen) || nzchar(input$compIdent)
     
-    if (nzchar(input$formulaGen) || nzchar(input$compIdent) || nzchar(input$components))
+    if (nzchar(input$formulaGen) || nzchar(input$compIdent))
     {
         addHeader("annotation")
         
-        if (nzchar(input$components))
-        {
-            addNL()
-            addComment("Perform automatic generation of components")
-            addCall("components", "generateComponents", list(
-                list(value = "fGroups"),
-                list(value = tolower(input$components), quote = TRUE),
-                list(name = "ionization", value = input$ionization, quote = TRUE, condition = input$ionization != "both"),
-                list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
-                list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
-                list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
-                list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
-                list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
-            ))
-            
-            if (input$selectIons)
-            {
-                pa <- switch(input$ionization,
-                             positive = "[M+H]+",
-                             negative = "[M-H]-",
-                             both = c("[M+H]+", "[M-H]-"))
-                addCall("fGroups", "selectIons", list(
-                    list(value = "fGroups"),
-                    list(value = "components"),
-                    list(name = "prefAdduct", value = pa, quote = TRUE),
-                    list(name = "onlyMonoIso", value = TRUE)
-                ))
-            }
-        }
+        useFMF <- input$featFinder == "Bruker" && input$peakListGen == "Bruker"
+        addComment("Retrieve MS peak lists")
+        addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
+        addCall("mslists", "generateMSPeakLists", list(
+            list(value = "fGroups"),
+            list(value = "mzr", quote = TRUE, condition = input$peakListGen == "mzR"),
+            list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = input$peakListGen == "Bruker"),
+            list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
+            list(name = "precursorMzWindow", value = if (input$DIA) "NULL" else input$precursorMzWindow,
+                 input$peakListGen == "mzR"),
+            list(name = "bgsubtr", value = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
+            list(name = "MSMSType", value = if (input$DIA) "BBCID" else "MSMS", quote = TRUE,
+                 condition = !useFMF && input$peakListGen == "Bruker"),
+            list(name = "avgFeatParams", value = "avgMSListParams", condition = input$peakListGen == "mzR"),
+            list(name = "avgFGroupParams", value = "avgMSListParams")
+        ))
+        addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
+        addCall("mslists", "filter", list(
+            list(value = "mslists"),
+            list(name = "absMSIntThr", value = "NULL"),
+            list(name = "absMSMSIntThr", value = "NULL"),
+            list(name = "relMSIntThr", value = "NULL"),
+            list(name = "relMSMSIntThr", value = 0.05),
+            list(name = "topMSPeaks", value = "NULL"),
+            list(name = "topMSMSPeaks", value = 25)
+        ))
         
-        if (doMSPL)
-        {
-            useFMF <- input$featFinder == "Bruker" && input$peakListGen == "Bruker"
-            addComment("Retrieve MS peak lists")
-            addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
-            addCall("mslists", "generateMSPeakLists", list(
-                list(value = "fGroups"),
-                list(value = "mzr", quote = TRUE, condition = input$peakListGen == "mzR"),
-                list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = input$peakListGen == "Bruker"),
-                list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
-                list(name = "precursorMzWindow", value = if (input$DIA) "NULL" else input$precursorMzWindow,
-                     input$peakListGen == "mzR"),
-                list(name = "bgsubtr", value = TRUE, condition = !useFMF && input$peakListGen == "Bruker"),
-                list(name = "MSMSType", value = if (input$DIA) "BBCID" else "MSMS", quote = TRUE,
-                     condition = !useFMF && input$peakListGen == "Bruker"),
-                list(name = "avgFeatParams", value = "avgMSListParams", condition = input$peakListGen == "mzR"),
-                list(name = "avgFGroupParams", value = "avgMSListParams")
-            ))
-            addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
-            addCall("mslists", "filter", list(
-                list(value = "mslists"),
-                list(name = "absMSIntThr", value = "NULL"),
-                list(name = "absMSMSIntThr", value = "NULL"),
-                list(name = "relMSIntThr", value = "NULL"),
-                list(name = "relMSMSIntThr", value = 0.05),
-                list(name = "topMSPeaks", value = "NULL"),
-                list(name = "topMSMSPeaks", value = 25)
-            ))
-        }
         if (nzchar(input$formulaGen))
         {
             addNL()

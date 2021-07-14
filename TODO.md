@@ -18,6 +18,12 @@
         - seems to be related when little overlap between sets --> add note in doc?
     - Somehow integrate XCMS::fillChromPeaks
 
+## Suspects
+
+- screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
+    - need to clear out any suspect annotations?
+    - need to de-dup amended suspect names
+
 
 ## Annotation
 
@@ -122,6 +128,7 @@
     - DA mslists: MSMSType now correctly bbCID if DIA is requested
         - added DIA checkbox because of this
     - added some default findFeatureOpenMS args
+    - componentization moved to before annotation & suspect screening
 - Features
     - as.data.table(fGroups): normalization, FC, averageFunc
     - topMostByRGroup/EICTopMostByRGroup
@@ -248,10 +255,6 @@
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
 
-
-## Suspects
-
-- screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
 
 
 ## Annotation

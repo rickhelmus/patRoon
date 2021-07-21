@@ -2,7 +2,8 @@ context("screening")
 
 susps <- as.data.table(patRoonData::suspectsPos)
 # take subset of suspects to speed things up a bit
-susps <- susps[name %in% fread(getMFTestDBPath())$Name | name == "2-Hydroxyquinoline"] # 2-OH quinoline: isomers present, handy for tests below
+# 2-OH quinoline: isomers present, handy for tests below. Aldicarb: has different adduct.
+susps <- susps[name %in% fread(getMFTestDBPath())$Name | name %in% c("2-Hydroxyquinoline", "Aldicarb")]
 susps[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
 if (testWithSets())
 {

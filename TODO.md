@@ -10,7 +10,6 @@
 ## Features
 
 - misc
-    - topMostByRGroup: make default? or only for reporting?
     - XCMS3/delete: also update groups data? --> use new function once it hits BC
     - OpenMS: alignment may yield negative RTs...
     - OpenMS MapAligner exception
@@ -221,6 +220,7 @@
 - newProject: switch to new system and tweaks
 - as.data.table(formulas, average=T): now removes most cols
 - adduct/ionization args optional if fGroups is adduct annotated
+- reportHTML/reportPDF: EICTopMostByRGroup=T && EICTopMost=1 by default
 
 
 # Lower priority

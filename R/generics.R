@@ -400,8 +400,8 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
-                                 EICGrid = c(2, 1), EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = NULL,
-                                 EICTopMostByRGroup = FALSE, EICOnlyPresent = TRUE,
+                                 EICGrid = c(2, 1), EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = 1,
+                                 EICTopMostByRGroup = TRUE, EICOnlyPresent = TRUE,
                                  clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
                                   formulas = NULL, formulasTopMost = 5,
@@ -411,8 +411,8 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
                                   MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), retMin = TRUE,
-                                  EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = NULL,
-                                  EICTopMostByRGroup = FALSE, EICOnlyPresent = TRUE, selfContained = TRUE,
+                                  EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = 1,
+                                  EICTopMostByRGroup = TRUE, EICOnlyPresent = TRUE, selfContained = TRUE,
                                   optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
                                   noDate = FALSE) standardGeneric("reportHTML"))
 

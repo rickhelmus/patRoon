@@ -169,6 +169,12 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
     if (!is.null(cd))
         return(cd)
 
+    # subset objects to speed up unsetting...
+    obj <- obj[groupName]
+    MSPeakLists = MSPeakLists[, groupName]
+    if (!is.null(formulas))
+        formulas <- formulas[groupName]
+    
     usObj <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     usMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists")
     if (!is.null(formulas))

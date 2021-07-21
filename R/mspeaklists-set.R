@@ -68,8 +68,6 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 {
     # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
     
-    cat("Merging set-averaged peak lists... ")
-
     hash <- makeHash(lapply(obj@setObjects, averagedPeakLists))
     avgPLists <- loadCacheData("MSPeakListsSetAvg", hash)
     
@@ -92,8 +90,6 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
         saveCacheData("MSPeakListsSetAvg", avgPLists, hash)
     }
 
-    cat("Done!\n")
-    
     return(avgPLists)
 })
 

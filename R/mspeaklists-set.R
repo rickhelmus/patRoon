@@ -426,7 +426,7 @@ setMethod("unset", "MSPeakListsSet", function(obj, set)
     
     return(MSPeakListsUnset(peakLists = if (hasSO) obj@setObjects[[1]]@peakLists else list(),
                             averagedPeakLists = if (hasSO) averagedPeakLists(obj@setObjects[[1]]) else list(),
-                            metadata = list(), avgPeakListArgs = avArgs, setIDs = FALSE,
+                            metadata = list(), avgPeakListArgs = avArgs, setIDs = FALSE, doAverage = FALSE,
                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })
 

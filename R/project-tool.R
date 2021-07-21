@@ -165,7 +165,7 @@ getScriptCode <- function(input, analyses)
             list(name = "stringsAsFactors", value = FALSE)
         ))
     }
-    addScreenCall <- function(susp)
+    addScreenCall <- function(susp, oh = TRUE, am = NULL)
     {
         addCall("fGroups", "screenSuspects", list(
             list(value = "fGroups"),
@@ -173,7 +173,8 @@ getScriptCode <- function(input, analyses)
             list(name = "rtWindow", value = 12),
             list(name = "mzWindow", value = 0.005),
             getAdductArg(),
-            list(name = "onlyHits", value = TRUE)
+            list(name = "onlyHits", value = oh),
+            list(name = "amend", value = am, condition = !is.null(am))
         ))
     }
     
@@ -340,16 +341,24 @@ getScriptCode <- function(input, analyses)
             }
         }
         
+        useScrForTPScreening <- input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "screening"
+        
         addNL()
         
-        addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
-        addComment("Set adduct to NULL if suspect list contains an adduct column")
+        if (useScrForTPScreening)
+            addComment("NOTE: onlyHits is set to FALSE to ensure TPs can be found below")
+        else
+            addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
+        if (input$ionization != "both")
+            addComment("Set adduct to NULL if suspect list contains an adduct column")
         
         if (input$ionization != "both" || (!input$exSuspList && !nzchar(input$suspectListNeg)))
-            addScreenCall("suspList")
+            addScreenCall("suspList", !useScrForTPScreening)
         else
-            addScreenCall(c("suspListPos", "suspListNeg"))
+            addScreenCall(c("suspListPos", "suspListNeg"), !useScrForTPScreening)
     }
+    else
+        useScrForTPScreening <- FALSE
     
     if (input$doTPs)
     {
@@ -378,9 +387,11 @@ getScriptCode <- function(input, analyses)
         addComment("Screen TPs")
         addCall("suspListTPs", "convertToSuspects", list(
             list(value = "TPs"),
-            list(name = "includeParents", value = input$TPGen != "Logic")
+            list(name = "includeParents", value = FALSE)
         ))
-        addScreenCall("suspListTPs")
+        if (useScrForTPScreening)
+            addComment("Amend with TP screening")
+        addScreenCall("suspListTPs", am = if (useScrForTPScreening) TRUE else NULL)
     }
     
     doMSPL <- nzchar(input$formulaGen) || nzchar(input$compIdent)

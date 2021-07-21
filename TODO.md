@@ -4,7 +4,6 @@
 
 - newProject
     - sets: add specific options for annotation and others?
-    - TPs: don't do onlyHits=T when screening for parents (or separate fGroups)
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 
 
@@ -17,11 +16,6 @@
     - OpenMS MapAligner exception
         - seems to be related when little overlap between sets --> add note in doc?
     - Somehow integrate XCMS::fillChromPeaks
-
-## Suspects
-
-- screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
-    - adjust TP handbook examples and NP workflows and add paragraph in HB
 
 
 ## Annotation
@@ -102,12 +96,14 @@
 - handbook
     - TPs
         - add PC links (see UNDONEs)
+        - update examples with amending suspect screening results
         - verify examples
     - update
         - introduction
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
+    - describe amending screening results
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

@@ -84,12 +84,12 @@ MSPeakLists <- setClass("MSPeakLists",
                         contains = "workflowStep")
 
 
-setMethod("initialize", "MSPeakLists", function(.Object, setIDs = TRUE, ...)
+setMethod("initialize", "MSPeakLists", function(.Object, setIDs = TRUE, doAverage = TRUE, ...)
 {
     .Object <- callNextMethod(.Object, ...)
 
     # average if not already done (eg unset objects may do themselves)
-    if (length(.Object@averagedPeakLists) == 0)
+    if (doAverage)
         .Object@averagedPeakLists <- averageMSPeakLists(.Object)
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)

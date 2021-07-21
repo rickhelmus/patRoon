@@ -426,10 +426,10 @@ setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspe
         so@screenInfo <- unique(so@screenInfo, by = c("name", "group"))
         return(so)
     })
-    fGroups@screenInfo <- mergeScreeningSetInfos(setObjects(fGroups))
+    fGroups <- syncScreeningSetObjects(fGroups)
     
     if (onlyHits)
-        fGroups <- fGroups[, scr$group]
+        fGroups <- fGroups[, fGroups@screenInfo$group]
     
     return(fGroups)
 })

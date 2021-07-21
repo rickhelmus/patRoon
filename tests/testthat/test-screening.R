@@ -268,6 +268,13 @@ test_that("Empty objects", {
     expect_length(filter(fGroupsScrAnnEmpty, minAnnSimForm = 0.0, onlyHits = TRUE), 0)
 })
 
+test_that("Addition works", {
+    # repeated screening shouldn't change object
+    expect_equal(scr, screenInfo(doScreen(fGroupsScr, susps, onlyHits = TRUE, amend = TRUE)))
+    expect_equal(scr, screenInfo(doScreen(fGroupsScrEmpty, susps, onlyHits = TRUE, amend = TRUE)))
+    expect_equal(scr, screenInfo(doScreen(doScreen(fGroups, susps[1:3]), susps[-(1:3)], onlyHits = TRUE, amend = TRUE)))
+})
+
 if (hasMF)
 {
     csvSuspCols <- c("susp_name", "susp_compRank", "susp_annSimBoth", "susp_estIDLevel")

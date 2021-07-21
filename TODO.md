@@ -21,8 +21,6 @@
 ## Suspects
 
 - screenSuspects can amend screening results? Handy for TP workflows where parents are from screening
-    - need to clear out any suspect annotations?
-    - add tests
     - adjust TP handbook examples and NP workflows and add paragraph in HB
 
 
@@ -265,6 +263,8 @@
 - somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
 - DA formulas: also rank formula results like GF/SIRIUS?
 - plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons
+- Support multiple MS/MS formula annotation candidates (ie same MS/MS peak annotated with different formulas)
+    - mainly relevant for GenForm
 
 
 ## Components

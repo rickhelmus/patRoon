@@ -46,8 +46,6 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
-- misc
-    - only keep relevant suspect list columns when input is screening object for lib/BT TPs
 - reporting
     - padding between two tables?
     - default TP columns OK?

@@ -16,7 +16,10 @@ getTPParents <- function(parents, skipInvalid)
     {
         parents <- copy(screenInfo(parents))
         parents <- unique(parents, by = "name")
-        parents[, group := NULL] # UNDONE: remove more columns?
+        # only keep columns that are relevant for suspect lists (ie when convertToSuspects is called)
+        keepCols <- c("name", "rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",
+                      "fragments_mz", "fragments_formula", "adduct")
+        parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
     
     if (is.null(parents[["SMILES"]]))

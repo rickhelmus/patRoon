@@ -20,11 +20,6 @@
     - Somehow integrate XCMS::fillChromPeaks
 
 
-## Annotation
-
-- default setThresholdAnn=0?
-
-
 ## Components
 
 - feature components

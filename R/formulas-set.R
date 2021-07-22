@@ -189,7 +189,7 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
 #' @export
 setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
-                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0.75)
+                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0)
 {
     allAnnObjs <- c(list(obj), list(...))
     

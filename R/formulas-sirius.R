@@ -198,7 +198,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL, ...,
-                                                                 setThreshold = 0, setThresholdAnn = 0.75)
+                                                                 setThreshold = 0, setThresholdAnn = 0)
 {
     generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasSIRIUS, relMzDev = relMzDev, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)

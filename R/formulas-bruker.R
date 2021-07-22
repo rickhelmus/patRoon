@@ -280,7 +280,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
 #' @export
 setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
                                                              MSMode = "both", adduct = NULL, ..., setThreshold = 0,
-                                                             setThresholdAnn = 0.75)
+                                                             setThresholdAnn = 0)
 {
     generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasDA,
                         precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,

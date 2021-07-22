@@ -10,7 +10,7 @@ init:
 install:
     - ps: Bootstrap
     - ps: mkdir -Force c:\deps
-    # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - ps: >-
         if (-Not (Test-Path C:\deps\biotransformer)) {
             #cinst maven

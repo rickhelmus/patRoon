@@ -13,7 +13,7 @@ install:
     - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - ps: >-
         if (-Not (Test-Path C:\deps\biotransformer)) {
-            #cinst maven
+            $ErrorActionPreference = "Continue"
             git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:\deps\biotransformer
             cd C:\deps\biotransformer
             bash .\install-via-maven.sh

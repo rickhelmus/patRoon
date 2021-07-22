@@ -222,6 +222,8 @@ setMethod("linkParentsToFGroups", "transformationProductsBT", function(TPs, fGro
 #'   Useful to simplify and clean-up the data.
 #'
 #' @param removeEqualFormulas If \code{TRUE} then the TPs that have an equal formula as their parent are removed.
+#' @param removeDuplicates If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
+#'   removed. Such duplicates may occur when different transformation pathways yield the same TPs.
 #' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
 #'   details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be
 #'   useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
@@ -231,13 +233,12 @@ setMethod("linkParentsToFGroups", "transformationProductsBT", function(TPs, fGro
 #' @return \code{filter} returns a filtered \code{transformationProductsBT} object.
 #'
 #' @export
-setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormulas = FALSE, minSimilarity = NULL,
-                                                         negate = FALSE)
+setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormulas = FALSE, removeDuplicates = FALSE,
+                                                         minSimilarity = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(removeEqualFormulas, add = ac)
+    aapply(checkmate::assertFlag, . ~ removeEqualFormulas + removeDuplicates + negate, fixed = list(add = ac))
     checkmate::assertNumber(minSimilarity, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -251,17 +252,19 @@ setMethod("filter", "transformationProductsBT", function(obj, removeEqualFormula
         obj <- cache
     else
     {
-        if (removeEqualFormulas)
+        if (removeEqualFormulas || removeDuplicates)
         {
             # NOTE: obj@products should be first arg to Map to keep names...
             obj@products <- Map(obj@products, parents(obj)$formula, f = function(prod, pform)
             {
-                if (negate)
-                    return(prod[formula == pform])
-                return(prod[formula != pform])
+                if (removeEqualFormulas)
+                    prod <- if (negate) prod[formula == pform] else prod[formula != pform]
+                if (removeDuplicates)
+                    prod <- if (negate) prod[duplicated(SMILES)] else prod[!duplicated(SMILES)]
+                return(prod)
             })
         }
-        
+
         if (!is.null(minSimilarity))
         {
             pred <- if (negate) function(x) x < minSimilarity else function(x) numGTE(x, minSimilarity)

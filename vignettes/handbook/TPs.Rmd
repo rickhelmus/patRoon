@@ -125,6 +125,10 @@ TPs2 <- TPs[1:10] # only keep results for first ten parents
 # may simplify data as these are often difficult to identify
 TPsF <- filter(TPs, removeEqualFormulas = TRUE)
 
+# remove duplicate transformation products from each parent
+# these can occur if different pathways yield the same TPs
+TPsF <- filter(TPs, removeDuplicates = TRUE)
+
 # only keep TPs that have a structural similarity to their parent of >= 0.5
 TPsF <- filter(TPs, minSimilarity = 0.5)
 

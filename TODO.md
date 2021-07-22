@@ -39,7 +39,6 @@
 - predictTPsBioTransformer()
     - Include BT in installation script
     - do we still need to check for non-calculated formulae?
-    - filter to remove duplicate SMILES/InChI TPs
 - log2fc
     - P values are calculated properly?
 - spectrumSimilarity

@@ -442,7 +442,8 @@ getScriptCode <- function(input, analyses)
                 list(name = "oc", value = FALSE, condition = input$formulaGen == "GenForm"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$formulaGen == "SIRIUS"),
                 list(name = "calculateFeatures", value = "TRUE", condition = input$formulaGen != "Bruker"),
-                list(name = "featThresholdAnn", value = 0.75)
+                list(name = "featThresholdAnn", value = 0.75),
+                list(name = "setThresholdAnn", value = 0, condition = input$ionization == "both")
             ))
         }
         
@@ -472,7 +473,8 @@ getScriptCode <- function(input, analyses)
                 list(name = "maxCandidatesToStop", value = 2500, condition = input$compIdent == "MetFrag"),
                 list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$compIdent == "SIRIUS"),
-                list(name = "profile", value = "qtof", quote = TRUE, condition = input$compIdent == "SIRIUS")
+                list(name = "profile", value = "qtof", quote = TRUE, condition = input$compIdent == "SIRIUS"),
+                list(name = "setThresholdAnn", value = 0, condition = input$ionization == "both")
             ))
             if (input$compIdent == "MetFrag")
             {

@@ -5,6 +5,8 @@
 - newProject
     - sets: add specific options for annotation and others?
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
+- remove mz column from patRoonData suspects?
+    - and/or ignore/warn when used with sets?
 
 
 ## Features
@@ -34,11 +36,10 @@
 
 ## TPs
 
-- componentsTP
-    - precursor_rt etc are from suspect list, not really clear --> also for reporting
 - predictTPsBioTransformer()
     - Include BT in installation script
     - do we still need to check for non-calculated formulae?
+    - filter to remove duplicate SMILES/InChI TPs
 - log2fc
     - P values are calculated properly?
 - spectrumSimilarity
@@ -46,9 +47,6 @@
         - precursor FALSE?
         - thresholds not really handy for formulas/compounds
             - at least doc that annotation results may disappear
-- reporting
-    - padding between two tables?
-    - default TP columns OK?
 
 
 ## tests

@@ -199,7 +199,7 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
 #' @templateVar class transformationProductsBT
 #' @template convertToMFDB
 #' @export
-setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includeParents = TRUE)
+setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includeParents = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...

@@ -30,12 +30,12 @@ install:
         }
         C:\deps\openbabel.exe /S
     - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-    - ps: >-
-        if (-Not (Test-Path C:\deps\biotransformer)) {
-            cinst maven
-            git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && ./install-via-maven.sh && cd ~ &&
-        }
-        C:\deps\openbabel.exe /S
+    # - ps: >-
+    #     if (-Not (Test-Path C:\deps\biotransformer)) {
+    #         cinst maven
+    #         git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && ./install-via-maven.sh && cd ~ &&
+    #     }
+    #     C:\deps\openbabel.exe /S
 
 
 

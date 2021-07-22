@@ -427,7 +427,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                                                  ..., setThreshold = 0, setThresholdAnn = 0.75)
+                                                                  ..., setThreshold = 0, setThresholdAnn = 0)
 {
     generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasGenForm, relMzDev = relMzDev, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)

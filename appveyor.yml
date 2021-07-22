@@ -14,7 +14,7 @@ install:
     - ps: >-
         if (-Not (Test-Path C:\deps\biotransformer)) {
             $ErrorActionPreference = "Continue"
-            git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:/deps/biotransformer
+            git -q clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:/deps/biotransformer
             cd C:\deps\biotransformer
             bash .\install-via-maven.sh > $null
             cd ~
@@ -41,9 +41,9 @@ install:
         C:\deps\openbabel.exe /S
 
 cache:
-  - C:\RLibrary
+  #- C:\RLibrary
   - C:\Program Files\Pandoc\
-  - C:\deps
+  #- C:\deps
 
 # Adapt as necessary starting from here
 

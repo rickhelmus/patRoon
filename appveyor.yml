@@ -41,9 +41,9 @@ install:
         C:\deps\openbabel.exe /S
 
 cache:
-  #- C:\RLibrary
+  - C:\RLibrary
   - C:\Program Files\Pandoc\
-  #- C:\deps
+  - C:\deps
 
 # Adapt as necessary starting from here
 

@@ -12,6 +12,14 @@ install:
     - ps: mkdir -Force c:\deps
     # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - ps: >-
+        if (-Not (Test-Path C:\deps\biotransformer)) {
+            #cinst maven
+            git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:\deps\biotransformer
+            cd C:\deps\biotransformer
+            bash .\install-via-maven.sh
+            cd ~
+        }
+    - ps: >-
         if (-Not (Test-Path C:\deps\openms26.exe)) {
             Invoke-WebRequest https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.6.0/OpenMS-2.6.0-Win64.exe -OutFile "C:\deps\openms26.exe"
         }
@@ -30,14 +38,6 @@ install:
             Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0.exe -OutFile "C:\deps\openbabel.exe"
         }
         C:\deps\openbabel.exe /S
-    - ps: >-
-        if (-Not (Test-Path C:\deps\biotransformer)) {
-            cinst maven
-            git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:\deps\biotransformer
-            cd C:\deps\biotransformer
-            bash .\install-via-maven.sh
-            cd ~
-        }
 
 cache:
   - C:\RLibrary

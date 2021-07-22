@@ -157,7 +157,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
 #' @templateVar class transformationProductsLibrary
 #' @template convertToMFDB
 #' @export
-setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, includeParents = TRUE)
+setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, includeParents = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...

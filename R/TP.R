@@ -107,7 +107,7 @@ setMethod("as.data.table", "transformationProducts", function(x) rbindlist(produ
 #'   \code{\link{screenSuspects}}.
 #' @param includeParents If \code{TRUE} then parents are also included in the returned suspect list.
 #' @export
-setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents = TRUE)
+setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includeParents, add = ac)

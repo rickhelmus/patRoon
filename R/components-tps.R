@@ -253,15 +253,17 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         if (!is.null(TPs))
         {
             pars <- parents(TPs)
-            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "rt", "mz") # more/less?
+            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass")
             cols <- intersect(names(pars), cols)
             cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
             targetCols <- paste0("parent_", cols)
             compInfo[, (targetCols) := pars[match(parent_name, pars$name), cols, with = FALSE]]
+            compInfo[, c("parent_rt", "parent_mz") := gInfoParents[parent_group, c("rts", "mzs")]]
+            setcolorder(compInfo, c("name", "parent_name", "parent_group", "parent_rt", "parent_mz"))
         }
         
         compInfo[, size := sapply(compList, nrow)]
-        compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overal links
+        compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overall links
         setcolorder(compInfo, "name")
         
         names(compList) <- compInfo$name

@@ -45,3 +45,45 @@ bool HeuerdingClercFilter(const ElementMultMap& EMM)
 	return true;
 }
 
+bool KindFiehnElementRatios(const ElementMultMap& EMM, bool bExtended)
+{
+	// ranges for element ratios corresponding to Table 2 of
+	// Kind, Tobias, and Oliver Fiehn. Seven Golden Rules for heuristic filtering of molecular formulas
+	// obtained by accurate mass spectrometry. BMC bioinformatics 8.1 (2007): 105.
+	// https://link.springer.com/article/10.1186/1471-2105-8-105/tables/2
+
+	double dC=EMM.GetMult(e_C);
+	double dRatio=EMM.GetMult(e_H)/dC;
+
+	if(!bExtended)
+	{
+		if(dRatio<0.2 || dRatio>3.1) return false;
+	}
+	else
+	{
+		if(dRatio<0.1 || dRatio>6.0) return false;
+	}
+
+	const int nEl=8;
+	const int pEl[nEl]={e_F,e_Cl,e_Br,e_N,e_O,e_P,e_S,e_Si};
+	const double pMaxCommon[nEl]={1.5,0.8,0.8,1.3,1.2,0.3,0.8,0.5};
+	const double pMaxExtended[nEl]={6.0,2.0,2.0,4.0,3.0,2.0,3.0,1.0};
+
+	for(int iEl=0;iEl<nEl;iEl++)
+	{
+		dRatio=EMM.GetMult(pEl[iEl])/dC;
+
+		if(!bExtended)
+		{
+			if(dRatio>pMaxCommon[iEl]) return false;
+		}
+		else
+		{
+			if(dRatio>pMaxExtended[iEl]) return false;
+		}
+	}
+
+	return true;
+}
+
+

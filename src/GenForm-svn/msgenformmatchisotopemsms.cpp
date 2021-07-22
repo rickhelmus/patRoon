@@ -54,7 +54,7 @@ void GenFormMatchIsotopeMsMsUsage(const string& strProgName)
 	cerr << "\t[ppm=<number>] [msmv=ndp|nsse|nsae] [acc=<number>] [rej=<number>]\n";
 	cerr << "\t[thms=<number>] [thmsms=<number>] [thcomb=<number>]\n";
 	cerr << "\t[sort[=ppm|msmv|msmsmv|combmv]] [el=<elements> [oc]] [ff=<fuzzy formula>]\n";
-	cerr << "\t[vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf]\n";
+	cerr << "\t[vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf] [kfer[=ex]]\n";
 	cerr << "\t[wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=<number>] [oei]\n";
 	cerr << "\t[dbeexc=<number>] [ivsm2mv=<number>] [vsm2ap2=<number>]\n";
 	cerr << "\t[oms[=<filename>]] [omsms[=<filename>]] [oclean[=<filename>]]\n";
@@ -87,6 +87,7 @@ void GenFormMatchIsotopeMsMsUsage(const string& strProgName)
 	cerr << "\tvsm2ap2\t: lower bound for valency sum - 2 * number of atoms + 2\n\t\t  (>=0 for graphical connected formulas)\n";
 //6.3
 	cerr << "\thcf\t: apply Heuerding-Clerc filter\n";
+	cerr << "\tkfer\t: apply Kind-Fiehn element ratio (extended) ranges\n";
 //6.4
 	cerr << "\twm\t: m/z weighting for MS/MS match value\n";
 	cerr << "\twi\t: intensity weighting for MS/MS match value\n";
@@ -122,6 +123,7 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 	int iFragMinDiffMaxVal=0;
 	int iFragMinDiffAtomCount=0;
 	bool bHCFilter=false,bAnalyze=false,bLoss=false;
+	bool bKFElementRatios=false, bKFElementRatiosExtendedRange=false;
 	bool bAllowRadicalIons=false,bTex=false;
 	bool bHighMass=true,bStripCalc=false;
 	bool bPercent=false,bWriteCalcMass=false,bWriteDBE=false;
@@ -205,6 +207,10 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 
 	if((it=mapArgValue.find("hcf"))!=mapArgValue.end())
 	{ bHCFilter=true; mapArgValue.erase(it); }
+
+	if((it=mapArgValue.find("kfer"))!=mapArgValue.end())
+	{ bKFElementRatios=true;
+	  bKFElementRatiosExtendedRange=(it->second=="ex")?true:false; mapArgValue.erase(it); }
 
 	if((it=mapArgValue.find("oei"))!=mapArgValue.end())
 	{ bAllowRadicalIons=true; mapArgValue.erase(it); }
@@ -357,7 +363,8 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 	dMass=AI.CalcMolMass(dMass);
 
 	double dMinMass=dMass*(1.0-dPPM/1000000.0),dMaxMass=dMass*(1.0+dPPM/1000000.0);
-	unsigned long iTotalCount=0,iValidCount=0,iHCFCount=0,iIsotopeCount=0,iMsMsCount=0,iCombCount=0;
+	unsigned long iTotalCount=0,iValidCount=0,iValidElementRatioCount=0;
+	unsigned long iIsotopeCount=0,iMsMsCount=0,iCombCount=0;
 	ElementIntervalMap EIM;
 
 	if(!strEIM.empty())
@@ -433,7 +440,11 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 
 			if(bHCFilter)
 			{ if(HeuerdingClercFilter(emmMol)==false) continue; }
-			iHCFCount++;
+
+			if(bKFElementRatios)
+			{ if(KindFiehnElementRatios(emmMol,bKFElementRatiosExtendedRange)==false) continue; }
+
+			iValidElementRatioCount++;
 
 			AI.CalcEMM(emmMol,emmIon);
 			Init(lrmCalc,emmIon);
@@ -567,12 +578,12 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 
 	if(pOutCleanMsMs) *pOutCleanMsMs << hrmMsMsClean;
 
-	if(bHCFilter)
-		cout << iCombCount << "/" << iMsMsCount << "/" << iIsotopeCount << "/" << iHCFCount << "/" << iValidCount << "/" << iTotalCount 
-		      << " (final/MSMS/MS-/HC-filter/valid/total) formula(s)\n";// in " << setprecision(1) << time.GetSecs() << "s\n";
+	if(bHCFilter||bKFElementRatios)
+		cout << iCombCount << "/" << iMsMsCount << "/" << iIsotopeCount << "/" << iValidElementRatioCount << "/" << iValidCount << "/" << iTotalCount
+		      << " (final/MSMS-/MS-/element-ratio-filter/valid/total) formula(s)\n";// in " << setprecision(1) << time.GetSecs() << "s\n";
 	else
 		cout << iCombCount << "/" << iMsMsCount << "/" << iIsotopeCount << "/" <<  iValidCount << "/" << iTotalCount 
-		      << " (final/MSMS/MS-filter/valid/total) formula(s)\n";// in " << setiosflags(ios::fixed) << setprecision(1) << time.GetSecs() << "s\n";
+		      << " (final/MSMS-/MS-filter/valid/total) formula(s)\n";// in " << setiosflags(ios::fixed) << setprecision(1) << time.GetSecs() << "s\n";
 
 	if(iSortMethod!=SortUndefined)
 		for(multimap<double,string>::reverse_iterator itSort=mapSort.rbegin();itSort!=mapSort.rend();itSort++)

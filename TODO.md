@@ -7,6 +7,7 @@
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 - remove mz column from patRoonData suspects?
     - and/or ignore/warn when used with sets?
+- update installPatRoon with new deps
 
 
 ## Features
@@ -22,7 +23,6 @@
 ## Annotation
 
 - default setThresholdAnn=0?
-- update GenForm
 
 
 ## Components
@@ -37,7 +37,6 @@
 ## TPs
 
 - predictTPsBioTransformer()
-    - Include BT in installation script
     - do we still need to check for non-calculated formulae?
 - log2fc
     - P values are calculated properly?

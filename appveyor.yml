@@ -10,7 +10,7 @@ init:
 install:
     - ps: Bootstrap
     - ps: mkdir -Force c:\deps
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - ps: >-
         if (-Not (Test-Path C:\deps\openms26.exe)) {
             Invoke-WebRequest https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.6.0/OpenMS-2.6.0-Win64.exe -OutFile "C:\deps\openms26.exe"
@@ -30,14 +30,14 @@ install:
             Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0.exe -OutFile "C:\deps\openbabel.exe"
         }
         C:\deps\openbabel.exe /S
-    # - ps: >-
-    #     if (-Not (Test-Path C:\deps\biotransformer)) {
-    #         cinst maven
-    #         git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && ./install-via-maven.sh && cd ~ &&
-    #     }
-    #     C:\deps\openbabel.exe /S
-
-
+    - ps: >-
+        if (-Not (Test-Path C:\deps\biotransformer)) {
+            cinst maven
+            git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git C:\deps\biotransformer
+            cd C:\deps\biotransformer
+            bash .\install-via-maven.sh
+            cd ~
+        }
 
 cache:
   - C:\RLibrary
@@ -72,10 +72,14 @@ environment:
 
 build_script:
     - travis-tool.sh install_r tibble # workaround for MSnbase
-    - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop
-    - travis-tool.sh install_github rickhelmus/patRoonData
+    - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop ropls BiocStyle Rgraphviz
+    - travis-tool.sh install_github rickhelmus/patRoonData@version20
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github cbroeckl/RAMClustR
+    - travis-tool.sh install_github rickhelmus/KPIC2
+    - travis-tool.sh install_github rickhelmus/cliqueMS
+    - travis-tool.sh install_github KelseyChetnik/MetaClean
+    - travis-tool.sh install_github KelseyChetnik/MetaCleanData
     - travis-tool.sh install_r vdiffr
     - travis-tool.sh install_r covr
     - travis-tool.sh install_deps
@@ -87,6 +91,7 @@ test_script:
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.5-CL.jar
     - set PATROON_SIRIUS=C:\deps\sirius
     - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml
+    - set PATROON_BIOTRANSFORMER=C:\deps\biotransformer\biotransformer-3.0.0.jar
     # HACK for SIRIUS
     - del C:\tools\Coverity\bin\jnidispatch.dll
     - travis-tool.sh run_tests

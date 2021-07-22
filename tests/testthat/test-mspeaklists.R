@@ -251,7 +251,8 @@ makeTestPL <- function()
 {
     spec <- data.table(mz = seq(50, 300, 50),
                        intensity = seq(50E4, 300E4, length.out = 6),
-                       precursor = c(rep(FALSE, 5), TRUE))
+                       precursor = c(rep(FALSE, 5), TRUE),
+                       ID = seq_len(3))
     
     ret <- MSPeakLists(algorithm = "test")
     ret@peakLists[["ana"]][["spec1"]] <- list(MS = copy(spec))

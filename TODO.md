@@ -31,8 +31,6 @@
 
 - predictTPsBioTransformer()
     - do we still need to check for non-calculated formulae?
-- log2fc
-    - P values are calculated properly?
 - spectrumSimilarity
     - defaults OK for sim params?
         - precursor FALSE?

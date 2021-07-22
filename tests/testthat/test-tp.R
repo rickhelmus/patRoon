@@ -122,8 +122,8 @@ test_that("basic usage", {
     expect_equal(nrow(as.data.table(TPsLogic)), length(TPsLogic))
     
     expect_error(assertSusp(convertToSuspects(TPsLogic)), NA)
-    expect_error(assertSusp(convertToSuspects(TPsLibScr)), NA)
-    expect_error(assertSusp(convertToSuspects(TPsBTSusp)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsLibScr, includeParents = TRUE)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsBTSusp, includeParents = TRUE)), NA)
     expect_error(convertToSuspects(TPsLogicEmpty), "create")
     
     testMFDB(TPsLibScr)
@@ -137,8 +137,8 @@ test_that("basic usage", {
     
     skip_if_not(doMetFrag)
     
-    expect_error(assertSusp(convertToSuspects(TPsLibComp)), NA)
-    expect_error(assertSusp(convertToSuspects(TPsBTComp)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsLibComp, includeParents = TRUE)), NA)
+    expect_error(assertSusp(convertToSuspects(TPsBTComp, includeParents = TRUE)), NA)
     testMFDB(TPsLibComp)
     testMFDB(TPsBTComp)
 })
@@ -147,21 +147,24 @@ fGroupsMore <- getTestFGroups(getTestAnaInfoAnn())
 componTPsNone <- generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL)
 componTPsNoneTPDiff <- generateComponents(fGroupsMore[, 1:25], "tp", fGroupsMore[, 26:50], TPs = NULL)
 
-componTPsLib <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibSusp)), "tp", TPs = TPsLibSusp)
+componTPsLib <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibSusp, includeParents = TRUE)), "tp",
+                                   TPs = TPsLibSusp)
 
 TPsLogicMore <- doGenLogicTPs(fGroupsMore[, 1:50])
 fGroupsTPsLogic <- doScreen(fGroupsMore, convertToSuspects(TPsLogicMore), onlyHits = TRUE)
 componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 
-fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp), onlyHits = TRUE)
+fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp, includeParents = TRUE), onlyHits = TRUE)
 componTPsBT <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsBTSusp)
 
 if (doMetFrag)
 {
-    fGroupsAnn <- doScreen(fGroupsMore, convertToSuspects(TPsLibSusp), onlyHits = TRUE)
+    fGroupsAnn <- doScreen(fGroupsMore, convertToSuspects(TPsLibSusp, includeParents = TRUE), onlyHits = TRUE)
     plistsAnn <- generateMSPeakLists(fGroupsAnn, "mzr")
     formsAnn <- doGenForms(fGroupsAnn, plistsAnn, "genform", elements = "CHNOPSClF", calculateFeatures = FALSE)
-    compsAnn <- doGenComps(fGroupsAnn, plistsAnn, "metfrag", database = "pubchemlite")
+    TPDB <- tempfile(fileext = ".csv")
+    convertToMFDB(TPsLibSusp, TPDB, includeParents = TRUE)
+    compsAnn <- doGenComps(fGroupsAnn, plistsAnn, "metfrag", database = "csv", extraOpts = list(LocalDatabasePath = TPDB))
     componTPsAnn <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn, formulas = formsAnn,
                                        compounds = compsAnn)
     componTPsAnnPL <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn)
@@ -188,8 +191,9 @@ test_that("TP componentization", {
                                                   TPs = NULL)), names(fGroupsMore)[26:30])
     
     expect_setequal(as.data.table(componTPsLogic)$retDir, c(-1, 0, 1))
-    expect_true(all(as.data.table(generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLogicMore)), "tp",
-                                                     TPs = TPsLogicMore, minRTDiff = 1E5))$retDir == 0))
+    expect_true(all(as.data.table(generateComponents(doScreen(fGroupsMore,
+                                                              convertToSuspects(TPsLogicMore, includeParents = TRUE)),
+                                                     "tp", TPs = TPsLogicMore, minRTDiff = 1E5))$retDir == 0))
     
     expect_length(generateComponents(fGroups, "tp", TPs = TPsLogicEmpty), 0)
     expect_length(generateComponents(fGroupsScrEmpty, "tp", TPs = TPsLogicEmpty), 0)

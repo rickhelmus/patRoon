@@ -17,5 +17,6 @@
 #include "mselementmultmap.h"
 
 bool HeuerdingClercFilter(const ElementMultMap& EMM);
+bool KindFiehnElementRatios(const ElementMultMap& EMM, bool bExtended=true);
 
 #endif

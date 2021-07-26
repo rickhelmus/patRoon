@@ -357,6 +357,7 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 #'   blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
 #'   \code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
 #'   set, blank subtraction is performed prior to removing any analyses.
+#' @param groupQualityRange Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.
 #' @param checkFeaturesSession If set then features and/or feature groups are removed that were selected for removal
 #'   (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
 #'   \code{\link{predictCheckFeaturesSession}} functions. The value of \code{checkFeaturesSession} should either by a
@@ -381,8 +382,8 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 #'
 #'   \item Pre-Intensity filters (\emph{i.e.} \code{preAbsMinIntensity} and \code{preRelMinIntensity}).
 #'
-#'   \item Chromatography and mass filters (\emph{i.e} \code{retentionRange}, \code{mzRange}, \code{mzDefectRange} and
-#'   \code{chromWidthRange}).
+#'   \item Chromatography and mass filters (\emph{i.e} \code{retentionRange}, \code{mzRange}, \code{mzDefectRange},
+#'   \code{chromWidthRange}, \code{featQualityRange} and \code{groupQualityRange}).
 #'
 #'   \item Replicate abundance filters (\emph{i.e.} \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
 #'   \code{maxReplicateIntRSD}).

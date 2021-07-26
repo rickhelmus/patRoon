@@ -62,13 +62,9 @@
 ## docs
 
 - ref docs
-    - quality/score filters
     - delete()
         - mention j=DT for fGroups method?
-    - parallelize args
-        - feat opt: update that it doesn't support parallelization atm --> now it does, but via futures
     - order of sets sections
-    - TP linking: amend instead of need for includeParents=TRUE
     - references
         - FC calculation?
         - PC transformations

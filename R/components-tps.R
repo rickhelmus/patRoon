@@ -519,11 +519,12 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #'   If transformation product data is given, \emph{i.e.} the \code{TPs} argument is set, then a suspect screening of
 #'   the TPs must be performed in advance (see \code{\link{screenSuspects}} and \code{\link{convertToSuspects}} to
 #'   create the suspect list). Furthermore, if TPs were generated with \code{\link{generateTPsBioTransformer}} or
-#'   \code{\link{generateTPsLibrary}} then the suspect screening must also include the parents (\emph{i.e.} by setting
-#'   \code{includeParents=TRUE} when calling \code{convertToSuspects}). The suspect screening is necessary for the
-#'   componentization algorithm to map the feature groups of the parent or TP. If the the suspect screening yields
-#'   multiple TP hits, all will be reported. Similarly, if the suspect screening contains multiple hits for a parent, a
-#'   component is made for each of the parent hits.
+#'   \code{\link{generateTPsLibrary}} then the suspect screening must also include the parents (\emph{e.g.} by setting
+#'   \code{includeParents=TRUE} when calling \code{convertToSuspects} or by amending results by setting
+#'   \code{amend=TRUE} to \code{screenSuspects}). The suspect screening is necessary for the componentization algorithm
+#'   to map the feature groups of the parent or TP. If the the suspect screening yields multiple TP hits, all will be
+#'   reported. Similarly, if the suspect screening contains multiple hits for a parent, a component is made for each of
+#'   the parent hits.
 #'
 #'   In case no transformation product data is provided (\code{TPs=NULL}), the componentization algorithm simply assumes
 #'   that each feature group from \code{fGroupsTPs} is a potential TP for every parent feature group in \code{fGroups}.

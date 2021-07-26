@@ -7,7 +7,7 @@
 \alias{convertToMFDB,transformationProductsLibrary-method}
 \title{Class to store transformation products (TPs) obtained from a library}
 \usage{
-\S4method{convertToMFDB}{transformationProductsLibrary}(TPs, out, includeParents = TRUE)
+\S4method{convertToMFDB}{transformationProductsLibrary}(TPs, out, includeParents = FALSE)
 }
 \arguments{
 \item{TPs}{\code{transformationProductsLibrary} object to be accessed}

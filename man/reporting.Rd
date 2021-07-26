@@ -47,8 +47,8 @@
   EICGrid = c(2, 1),
   EICRtWindow = 20,
   EICMzExpWindow = 0.001,
-  EICTopMost = NULL,
-  EICTopMostByRGroup = FALSE,
+  EICTopMost = 1,
+  EICTopMostByRGroup = TRUE,
   EICOnlyPresent = TRUE,
   clearPath = FALSE
 )
@@ -75,8 +75,8 @@
   retMin = TRUE,
   EICRtWindow = 20,
   EICMzExpWindow = 0.001,
-  EICTopMost = NULL,
-  EICTopMostByRGroup = FALSE,
+  EICTopMost = 1,
+  EICTopMostByRGroup = TRUE,
   EICOnlyPresent = TRUE,
   selfContained = TRUE,
   optimizePng = FALSE,

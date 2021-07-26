@@ -6,6 +6,7 @@
 \alias{suspect-screening}
 \alias{screenSuspects,featureGroups-method}
 \alias{screenSuspects}
+\alias{screenSuspects,featureGroupsScreening-method}
 \alias{numericIDLevel}
 \alias{genIDLevelRulesFile}
 \alias{screenSuspects,featureGroupsSet-method}
@@ -24,6 +25,17 @@
   adduct,
   skipInvalid,
   onlyHits
+)
+
+\S4method{screenSuspects}{featureGroupsScreening}(
+  fGroups,
+  suspects,
+  rtWindow,
+  mzWindow,
+  adduct,
+  skipInvalid,
+  onlyHits,
+  amend = FALSE
 )
 
 numericIDLevel(level)
@@ -63,6 +75,8 @@ data) will be ignored with a warning. Similarly, any suspects for which mass cal
 column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.}
 
 \item{onlyHits}{If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.}
+
+\item{amend}{If \code{TRUE} then screening results will be \emph{amended} to the original object.}
 
 \item{level}{The identification level to be converted.}
 

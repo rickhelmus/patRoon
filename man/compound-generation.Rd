@@ -62,7 +62,7 @@ compoundScorings(
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 
 \S4method{generateCompoundsSIRIUS}{featureGroups}(
@@ -92,7 +92,7 @@ compoundScorings(
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 }
 \arguments{

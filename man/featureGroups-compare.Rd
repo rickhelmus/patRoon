@@ -108,8 +108,8 @@ The order for the \code{areas} and \code{intersectionCounts} fields is the same 
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
 
-\code{consensus} returns a \code{\link{featureGroups}} object with a
-  consensus from the compared feature groups.
+\code{consensus} returns a \code{\link{featureGroups}} object with a consensus from the compared feature
+  groups.
 }
 \description{
 Functionality to compare feature groups and make a consensus.
@@ -141,6 +141,6 @@ The \code{comparison} method generates a
 \code{plotChord} plots a chord diagram to visualize the distribution
   of feature groups.
 
-\code{consensus} combines all compared feature groups and averages
-  their retention, \emph{m/z} and intensity data.
+\code{consensus} combines all compared feature groups and averages their retention, \emph{m/z} and intensity
+  data. Not yet supported for \link[=sets-workflow]{sets workflows}.
 }

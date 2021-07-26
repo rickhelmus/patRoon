@@ -40,7 +40,7 @@
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 
 \S4method{generateFormulasGenForm}{featureGroups}(
@@ -70,7 +70,7 @@
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 
 \S4method{generateFormulasSIRIUS}{featureGroups}(
@@ -101,7 +101,7 @@
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 
 formulaScorings()

@@ -98,15 +98,26 @@ methodology, which uses design of experiments (DoE), is based on the excellent
 package is directly integrated in patRoon. Some functionality was added or changed, however, the principle algorithm
 workings are nearly identical.
 
-Compared to IPO, the following functionality was added or changed: \itemize{ \item The code was made more generic in
-order to include support for other feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3). \item
-The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used to find isotopes. \item The
-\code{maxModelDeviation} parameter was added to potentially avoid suboptimal results
-(\href{https://github.com/rietho/IPO/issues/61}{issue discussed here}). \item The use of multiple 'parameter sets'
-(discussed below) which, for instance, allow optimizing qualitative paremeters more easily (see \verb{examples}).
-\item More consistent optimization code for feature finding/grouping. \item More consistent output using S4 classes
-(\emph{i.e.} \code{\link{optimizationResult}} class). \item Experiments are not (yet) executed in parallel (although
-feature finding or grouping may be if the algorithm supports it). }
+Compared to IPO, the following functionality was added or changed: \itemize{
+
+\item The code was made more generic in order to include support for other feature finding/grouping algorithms
+(\emph{e.g.} OpenMS, enviPick, XCMS3). \item The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used to
+find isotopes.
+
+\item The \code{maxModelDeviation} parameter was added to potentially avoid suboptimal results
+(\href{https://github.com/rietho/IPO/issues/61}{issue discussed here}).
+
+\item The use of multiple 'parameter sets' (discussed below) which, for instance, allow optimizing qualitative
+paremeters more easily (see \verb{examples}).
+
+\item More consistent optimization code for feature finding/grouping.
+
+\item More consistent output using S4 classes (\emph{i.e.} \code{\link{optimizationResult}} class).
+
+\item Parallelization is performed via the \CRANpkg{future} package instead of \pkg{BiocParallel}. If this is enabled
+(\code{parallel=TRUE}) then any parallelization supported by the feature finding or grouping algorithm is disabled.
+
+}
 }
 \section{Parameter sets}{
  Which parameters should be optimized is determined by a \emph{parameter set}. A set is

@@ -35,7 +35,7 @@
 
 \S4method{as.data.table}{transformationProducts}(x)
 
-\S4method{convertToSuspects}{transformationProducts}(TPs, includeParents = TRUE)
+\S4method{convertToSuspects}{transformationProducts}(TPs, includeParents = FALSE)
 }
 \arguments{
 \item{TPs, x, object}{\code{transformationProducts} object to be accessed}

@@ -505,8 +505,7 @@ Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
   For \code{plotVenn}, \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its
   meaning and is used to specify the names of the sets to be compared.}
 
-\item{negate}{If set to \code{TRUE} then filtering operations are performed
-in opposite manner.}
+\item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
 \item{absMinSets, relMinSets}{\setsWF Feature groups are only kept when they contain data for at least this (absolute
 or relative) amount of sets. Set to \code{NULL} to ignore.}

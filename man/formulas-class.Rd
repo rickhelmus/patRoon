@@ -138,7 +138,7 @@
   labels = NULL,
   filterSets = FALSE,
   setThreshold = 0,
-  setThresholdAnn = 0.75
+  setThresholdAnn = 0
 )
 
 \S4method{unset}{formulasSet}(obj, set)

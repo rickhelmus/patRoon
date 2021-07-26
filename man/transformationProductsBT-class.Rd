@@ -8,9 +8,15 @@
 \alias{filter,transformationProductsBT-method}
 \title{Class to store transformation products (TPs) predicted by BioTransformer}
 \usage{
-\S4method{convertToMFDB}{transformationProductsBT}(TPs, out, includeParents = TRUE)
+\S4method{convertToMFDB}{transformationProductsBT}(TPs, out, includeParents = FALSE)
 
-\S4method{filter}{transformationProductsBT}(obj, removeEqualFormulas = FALSE, minSimilarity = NULL, negate = FALSE)
+\S4method{filter}{transformationProductsBT}(
+  obj,
+  removeEqualFormulas = FALSE,
+  removeDuplicates = FALSE,
+  minSimilarity = NULL,
+  negate = FALSE
+)
 }
 \arguments{
 \item{out}{The file name of the the output \command{MetFrag} database.}
@@ -20,6 +26,9 @@
 \item{obj, TPs}{\code{transformationProductsBTs} object to be accessed}
 
 \item{removeEqualFormulas}{If \code{TRUE} then the TPs that have an equal formula as their parent are removed.}
+
+\item{removeDuplicates}{If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
+removed. Such duplicates may occur when different transformation pathways yield the same TPs.}
 
 \item{minSimilarity}{Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
 details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be

@@ -39,11 +39,9 @@
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups, threshold = 0)
 }
 \arguments{
-\item{absMinIntensity, relMinIntensity}{Minimum absolute/relative intensity
-for features to be kept. The relative intensity is determined from the
-feature with highest intensity (of all features from all groups).
-Set to \samp{0} or \code{NULL}
-to skip this step.}
+\item{absMinIntensity, relMinIntensity}{Minimum absolute/relative intensity for features to be kept. The relative
+intensity is determined from the feature with highest intensity (of
+all features from all groups). Set to \samp{0} or \code{NULL} to skip this step.}
 
 \item{preAbsMinIntensity, preRelMinIntensity}{As \code{absMinIntensity}/\code{relMinIntensity}, but applied
 \emph{before} any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
@@ -73,13 +71,18 @@ threshold. For instance, a value of \samp{5} means that only features with an in
 of the blank are kept. The relative intensity values between blanks and non-blanks are determined from the mean of
 all non-zero blank intensities. Set to \code{NULL} to skip this step.}
 
-\item{retentionRange, mzRange, mzDefectRange, chromWidthRange}{Range of
-retention time (in seconds), \emph{m/z}, mass defect (defined as the
-decimal part of \emph{m/z} values) or chromatographic peak width (in
-seconds), respectively. Features outside this range will be removed. Should
-be a numeric vector with length of two containing the min/max values. The
-maximum can be \code{Inf} to specify no maximum range. Set to \code{NULL}
-to skip this step.}
+\item{retentionRange, mzRange, mzDefectRange, chromWidthRange}{Range of retention time (in seconds), \emph{m/z}, mass
+defect (defined as the decimal part of \emph{m/z} values) or chromatographic peak width (in seconds), respectively.
+Features outside this range will be removed. Should be a numeric vector with length of two containing the min/max
+values. The maximum can be \code{Inf} to specify no maximum range. Set to \code{NULL} to skip this step.}
+
+\item{featQualityRange}{Used to filter features by their peak qualities/scores
+(see \code{\link{calculatePeakQualities}}). Should be a named \code{list} with min/max ranges for each
+quality/score to be filtered (the \code{\link{featureQualityNames}} function can be used to obtain valid names).
+Example: \code{featQualityRange=list(ModalityScore=c(0.3, Inf),
+SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
+
+\item{groupQualityRange}{Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.}
 
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
@@ -100,8 +103,7 @@ set, blank subtraction is performed prior to removing any analyses.}
 path to the session file or \code{TRUE}, in which case the default session file name is used. If \code{negate=TRUE}
 then all non-selected features/feature groups are removed instead.}
 
-\item{negate}{If set to \code{TRUE} then filtering operations are performed
-in opposite manner.}
+\item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
 \item{fGroups, obj}{\code{\link{featureGroups}} object to which the filter is
 applied.}
@@ -146,8 +148,8 @@ Basic rule based filtering of feature groups.
 
   \item Pre-Intensity filters (\emph{i.e.} \code{preAbsMinIntensity} and \code{preRelMinIntensity}).
 
-  \item Chromatography and mass filters (\emph{i.e} \code{retentionRange}, \code{mzRange}, \code{mzDefectRange} and
-  \code{chromWidthRange}).
+  \item Chromatography and mass filters (\emph{i.e} \code{retentionRange}, \code{mzRange}, \code{mzDefectRange},
+  \code{chromWidthRange}, \code{featQualityRange} and \code{groupQualityRange}).
 
   \item Replicate abundance filters (\emph{i.e.} \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
   \code{maxReplicateIntRSD}).

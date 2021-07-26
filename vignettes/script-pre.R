@@ -1,84 +1,63 @@
-## Script automatically generated on Mon Mar 25 08:24:32 2019
+# Script automatically generated on Mon Jul 26 14:32:58 2021
 
 library(patRoon)
-
 
 # -------------------------
 # initialization
 # -------------------------
 
-
 workPath <- "C:/myproject"
 setwd(workPath)
 
-# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
-anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                groups = c(rep("solvent", 3), rep("standard", 3)),
-                                blanks = "solvent")
-
+# Example data from patRoonData package (triplicate solvent blank + triplicate standard)
+anaInfo <- patRoonData::exampleAnalysisInfo("positive")
 
 # -------------------------
 # features
 # -------------------------
 
+# Find all features
+# NOTE: see the reference manual for many more options
+fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
 
-# Find all features.
-# NOTE: see manual for many more options
-fList <- findFeatures(anaInfo, "openms")
-
-# Group and align features between analysis
-fGroups <- groupFeatures(fList, "openms")
+# Group and align features between analyses
+fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
 
 # Basic rule based filtering
-fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
-                  relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
-                  blankThreshold = 5, removeBlanks = TRUE,
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE,
                   retentionRange = NULL, mzRange = NULL)
-
 
 # -------------------------
 # annotation
 # -------------------------
 
-
 # Retrieve MS peak lists
-avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
-                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
-# uncomment and configure for extra filtering of MS peak lists
-# mslists <- filter(mslists, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
-#                   relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
-#                   deIsotopeMS = FALSE, deIsotopeMSMS = FALSE)
+                               avgFeatParams = avgMSListParams,
+                               avgFGroupParams = avgMSListParams)
+# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
+mslists <- filter(mslists, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = 0.05,
+                  topMSPeaks = NULL, topMSMSPeaks = 25)
 
 # Calculate formula candidates
-formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
-                             adduct = "[M+H]+", elements = "CHNOP",
-                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
+formulas <- generateFormulas(fGroups, mslists, "genform", relMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
+                             oc = FALSE, calculateFeatures = TRUE,
+                             featThresholdAnn = 0.75)
 
-# Find compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL", dbRelMzDev = 5,
-                               fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 2500)
-compounds <- addFormulaScoring(compounds, formulas, TRUE)
-
-# Perform automatic generation of components
-components <- generateComponents(fGroups, "ramclustr", ionization = "positive")
-
+# Calculate compound structure candidates
+compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                               adduct = "[M+H]+", database = "pubchem",
+                               maxCandidatesToStop = 2500)
+compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 
 # -------------------------
 # reporting
 # -------------------------
 
-
-reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = formulas,
-          compounds = compounds, compoundsNormalizeScores = "max",
-          components = components)
-
-reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = formulas, reportFormulaSpectra = TRUE,
-          compounds = compounds, compoundsNormalizeScores = "max",
-          components = components, MSPeakLists = mslists)
-
-reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = formulas,
-           compounds = compounds, compoundsNormalizeScores = "max",
-           components = components, MSPeakLists = mslists,
+reportCSV(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+          components = NULL)
+reportHTML(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+           components = NULL, reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
            selfContained = FALSE, openReport = TRUE)

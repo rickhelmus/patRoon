@@ -81,9 +81,8 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-- annotation
-    - generateFormulas: MSPeakLists argument
-        - update tutorial
+- tutorial
+    - check if all is OK
 - TPs
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?

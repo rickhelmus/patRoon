@@ -594,7 +594,7 @@ setMethod("screenSuspects", "featureGroupsScreening", function(fGroups, suspects
     fGroups@screenInfo <- unique(fGroups@screenInfo, by = c("name", "group"))
     
     if (onlyHits)
-        fGroups <- fGroups[, scr$group]
+        fGroups <- fGroups[, fGroups@screenInfo$group]
     
     return(fGroups)
 })

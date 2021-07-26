@@ -87,8 +87,7 @@
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?
     - mention how sets filter work for componentsTPs?
-- fGroupsComparison doesn't work with sets yet
-    
+
 
 ## NEWS
 
@@ -181,6 +180,7 @@
     - logPath for annotateSuspects()
     - mass matching has changed
     - suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows
+    - amending
 - components
     - RC components: ensure that columns are the right type if all values are NA
     - changed "rt" to "ret" for component columns for consistency

@@ -61,7 +61,6 @@
 
 ## docs
 
-- MC: mention that latest XCMS is needed for Gauss?
 - ref docs
     - quality/score filters
     - delete()
@@ -88,7 +87,6 @@
             - mention changes of patRoon 2.0?
         - installation
             - update RDCOMClient installation?
-    - describe amending screening results
 - annotation
     - generateFormulas: MSPeakLists argument
         - update tutorial

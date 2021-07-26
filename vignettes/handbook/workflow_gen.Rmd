@@ -222,7 +222,9 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
 fGroupsSusp <- screenSuspects(fGroups, suspects)
 ```
 
-This example has a very simple suspect list with just three compounds. The format of the suspect list is quite flexible, and can contain the following columns:
+#### Suspect list format
+
+The example above has a very simple suspect list with just three compounds. The format of the suspect list is quite flexible, and can contain the following columns:
 
 - `name`: The name of the suspect. Mandatory and should be unique and file-name compatible (if not, the name will be automatically re-named to make it compatible).
 - `rt`: The retention time in seconds. Optional. If specified any feature groups with a different retention time will not be considered to match suspects.
@@ -245,7 +247,7 @@ Since suspect matching now occurs by the neutral mass it is required that the ad
 Finally, when the adduct is known for a suspect it can be specified in the suspect list:
 
 ```{r susp,eval=FALSE}
-# TBA is measured as positive molecular ion.
+# Aldicarb is measured with a sodium adduct.
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "Aldicarb"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "CC(C)(C=NOC(=O)NC)SC"),
                        adduct = c("[M+H]+", "[M+H]+", "[M+Na]+"))
@@ -258,14 +260,6 @@ To summarize:
 * Otherwise, if the suspect has data in the `adduct` column, the `m/z` value for the suspect is calculated from its neutral mass and the adduct and then matched with the `m/z` of a feature group.
 * Otherwise, suspects and feature groups are matched by their the neutral mass.
 
-Note that any feature groups that were not matched to a suspect are _not_ removed by default. If you want to remove these, you can use the `onlyHits` parameter:
-
-```{r suspOH,eval=FALSE}
-fGroupsSusp <- screenSuspects(fGroups, suspects, onlyHits = TRUE) # remove any non-hits immediately
-```
-
-The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The `filter()` function (discussed [here](#filtering)) can also be used to remove feature groups without a hit at a later stage.
-
 The `fragments_mz` and `fragments_formula` columns in the suspect list can be used to specify known fragments for a suspect, which can help [suspect annotation](#suspAnn). The former specifies the ionized _m/z_ of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:
 
 ```{r suspFrags,eval=FALSE}
@@ -274,6 +268,28 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
                        fragments_formula = c("C6H6N", "C6H8N;C7H6NO", ""),
                        fragments_mz = c("", "", "118.0652"))
 ```
+
+#### Removing feature groups without hits
+
+Note that any feature groups that were not matched to a suspect are _not_ removed by default. If you want to remove these, you can use the `onlyHits` parameter:
+
+```{r suspOH,eval=FALSE}
+fGroupsSusp <- screenSuspects(fGroups, suspects, onlyHits = TRUE) # remove any non-hits immediately
+```
+
+The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The `filter()` function (discussed [here](#filtering)) can also be used to remove feature groups without a hit at a later stage.
+
+#### Combining screening results
+
+The `amend` function argument to `screenSuspects` can be used to combine screening results from different suspect lists. 
+
+```{r suspAmend,eval=FALSE}
+fGroupsSusp <- screenSuspects(fGroups, suspects)
+fGroupsSusp <- screenSuspects(fGroupsSusp, suspects2, onlyHits = TRUE, amend = TRUE)
+```
+
+In this example the suspect lists defined in `suspects` and `suspects2` are both used for screening. By setting `amend=TRUE` the original screening results (i.e. from `suspects`) are preserved. Note that `onlyHits` should only be set in the final call to `screenSuspects` to ensure that all feature groups are screened.
+
 
 ## Componentization {#componentization}
 

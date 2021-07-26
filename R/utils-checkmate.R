@@ -170,6 +170,16 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 
     needsAdduct <- needsAdduct && (is.null(x[["mz"]]) || any(is.na(x$mz)))
+    if (needsAdduct)
+    {
+        msg <- "Adduct information is required to calculate ionized suspect masses. "
+        
+        if (is.null(x[["adduct"]]))
+            stop(msg, "Please either set the adduct argument or add an adduct column in the suspect list.")
+        if (any(is.na(x[["adduct"]]) & (is.null(x[["mz"]]) | is.na(x[["mz"]]))))
+            stop(msg, "Please either set the adduct argument or make sure that suspects without mz information have data in the adduct column.")
+    }
+    
     for (col in c("name", "SMILES", "InChI", "formula", "InChIKey", "adduct", "fragments_mz", "fragments_formula"))
     {
         emptyOK <- col != "name" && (col != "adduct" || !needsAdduct)

@@ -316,12 +316,12 @@ TPs <- generateTPs("biotransformer", parents = patRoonData::suspectsPos)
 
 # screen for the TPs
 suspectsTPs <- convertToSuspects(TPs, includeParents = FALSE)
-fGroupsTPs <- screenSuspects(fGroups, suspectsTPs, onlyHits = TRUE)
+fGroupsTPs <- screenSuspects(fGroups, suspectsTPs, adduct = "[M+H]+", onlyHits = TRUE)
 
 # perform annotation of TPs
 mslistsTPs <- generateMSPeakLists(fGroupsTPs, "mzr")
 convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE) # generate MetFrag database
-compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", database = "csv",
+compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", adduct = "[M+H]+", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 ```
 
@@ -341,18 +341,18 @@ In this example TPs of interest are obtained for the parents that surfaced from 
 
 ```{r eval=FALSE}
 # step 1
-fGroupsScr <- screenSuspects(fGroups, patRoonData::suspectsPos)
+fGroupsScr <- screenSuspects(fGroups, patRoonData::suspectsPos, adduct = "[M+H]+")
 # step 2
 TPs <- generateTPs("library", parents = fGroupsScr)
 
 # step 3
 suspects <- convertToSuspects(TPs)
-fGroupsScr <- screenSuspects(fGroupsScr, suspects, onlyHits = TRUE, amend = TRUE)
+fGroupsScr <- screenSuspects(fGroupsScr, suspects, adduct = "[M+H]+", onlyHits = TRUE, amend = TRUE)
 
 # step 4
 mslistsScr <- generateMSPeakLists(fGroupsScr, "mzr")
 convertToMFDB(TPs, "TP-database.csv", includeParents = TRUE)
-compoundsScr <- generateCompounds(fGroupsScr, mslistsScr, "metfrag", database = "csv",
+compoundsScr <- generateCompounds(fGroupsScr, mslistsScr, "metfrag", adduct = "[M+H]+", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 
 # step 5a
@@ -364,8 +364,8 @@ fGroupsScrAnn <- annotateSuspects(fGroupsScr, MSPeakLists = mslistsScr,
 fGroupsScrAnn <- filter(fGroupsScrAnn, maxLevel = 3, onlyHits = TRUE)
 
 # step 6
-componTP <- generateComponents(fGroupsScrAnn, "tp", MSPeakLists = mslistsScr,
-                               compunds = compoundsScr)
+componTP <- generateComponents(fGroupsScrAnn, "tp", TPs = TPs, MSPeakLists = mslistsScr,
+                               compounds = compoundsScr)
 fGroupsScrAnn <- fGroupsScrAnn[results = componTP]
 
 # step 7
@@ -390,7 +390,7 @@ This example uses metabolic logic to calculate possible TPs for all feature grou
 ```{r eval=FALSE}
 # steps 1-2
 mslists <- generateMSPeakLists(fGroups, "mzr")
-formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
 fGroups <- fGroups[results = formulas]
 
@@ -399,10 +399,10 @@ TPs <- generateTPs("logic", fGroups = fGroups, adduct = "[M+H]+")
 
 # step 4
 suspects <- convertToSuspects(TPs)
-fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
+fGroupsScr <- screenSuspects(fGroups, suspects, adduct = "[M+H]+", onlyHits = FALSE)
 
 # step 5
-componTP <- generateComponents(fGroupsScr, "tp", MSPeakLists = mslists, formulas = formulas)
+componTP <- generateComponents(fGroupsScr, "tp", TPs = TPs, MSPeakLists = mslists, formulas = formulas)
 
 # step 6
 componTP <- filter(componTP, retDirMatch = TRUE, formulas = formulas)
@@ -434,7 +434,7 @@ fGroups <- fGroups[, union(groupsParents, groupsTPs)]
 
 # step 3
 mslists <- generateMSPeakLists(fGroups, "mzr")
-formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+")
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
 fGroups <- fGroups[results = formulas]
 

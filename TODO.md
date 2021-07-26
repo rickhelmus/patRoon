@@ -80,7 +80,6 @@
 - handbook
     - TPs
         - add PC links (see UNDONEs)
-        - verify examples
     - update
         - introduction
             - mention changes of patRoon 2.0?

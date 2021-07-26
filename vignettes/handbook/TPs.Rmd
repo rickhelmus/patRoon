@@ -232,7 +232,7 @@ More sophisticates ways are of course possible to provide an upfront distinction
 
 > **_NOTE_** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
 
-For the `library` and `biotransformer` algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the `convertToSuspects` function should be used to prepare the suspect list:
+For the `library` and `biotransformer` algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the `convertToSuspects` function is used to prepare the suspect list:
 
 ```{r eval=FALSE}
 # set includeParents to TRUE since both the parents and TPs are needed
@@ -243,6 +243,8 @@ fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 # a similar distinction between fGroups/fGroupsScr as discussed above can of course also be done
 componTP <- generateComponents(fGroups = fGroupsScr, ...)
 ```
+
+If a parent screening was already performed in advance, for instance when the input parents to `generateTPs` are screening results, the screening results for parents and TPs can also be combined. The [second example](#TPsEx2) demonstrates this.
 
 Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to a TP suspect, all of them will be incorporated in the component.
 
@@ -329,7 +331,7 @@ In this example TPs of interest are obtained for the parents that surfaced from 
 
 1. Suspect screening parents.
 2. Obtain TPs for the suspect hits from a library.
-3. A second suspect screening is performed with both parents and TPs. Note that the parent data is needed for componentization.
+3. A second suspect screening is performed for TPs and the original parent screening results are amended. Note that the parent data is needed for componentization.
 4. Both parents and TPs are annotated using a database generated from their chemical structures.
 5. Some prioritization is performed by
     a. Only keeping candidate structures for which _in-silico_ fragmentation resulted in at least one annotated MS/MS peak.
@@ -339,13 +341,13 @@ In this example TPs of interest are obtained for the parents that surfaced from 
 
 ```{r eval=FALSE}
 # step 1
-fGroupsParents <- screenSuspects(fGroups, patRoonData::suspectsPos, onlyHits = TRUE)
+fGroupsScr <- screenSuspects(fGroups, patRoonData::suspectsPos)
 # step 2
-TPs <- generateTPs("library", parents = fGroupsParents)
+TPs <- generateTPs("library", parents = fGroupsScr)
 
 # step 3
-suspects <- convertToSuspects(TPs, includeParents = TRUE)
-fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
+suspects <- convertToSuspects(TPs)
+fGroupsScr <- screenSuspects(fGroupsScr, suspects, onlyHits = TRUE, amend = TRUE)
 
 # step 4
 mslistsScr <- generateMSPeakLists(fGroupsScr, "mzr")
@@ -371,14 +373,14 @@ reportHTML(fGroupsScrAnn, MSPeakLists = mslistsScr, compounds = compoundsScr,
            components = componTP)
 ```
 
-### Non-targeted screening of predicted TPs {#TPsEx3}
+### Non-target screening of predicted TPs {#TPsEx3}
 
 This example uses metabolic logic to calculate possible TPs for all feature groups from a complete non-target screening. This example demonstrates how a workflow can be performed when little is known about the identity of the parents. The steps of this workflow are:
 
 1. Formula annotations are performed for all feature groups.
 2. These results are then limited to the top 5 candidates, and only feature groups with annotations are kept.
 3. The TPs are calculated for all remaining feature groups.
-4. A suspect screening is performed to find the TPs. Unlike the previous example the parents are not screened, and feature groups without hits are kept ([discussed here](#TPsFGroups)).
+4. A suspect screening is performed to find the TPs. Unlike the previous example feature groups without hits are kept ([discussed here](#TPsFGroups)).
 5. The components are generated
 6. The components are filtered:
     a. The TPs must follow an expected [retention time direction](#TPsProc)
@@ -396,21 +398,21 @@ fGroups <- fGroups[results = formulas]
 TPs <- generateTPs("logic", fGroups = fGroups, adduct = "[M+H]+")
 
 # step 4
-suspects <- convertToSuspects(TPs, includeParents = FALSE)
+suspects <- convertToSuspects(TPs)
 fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
 
 # step 5
-componTP <- generateComponents(fGroups, "tp", MSPeakLists = mslists, formulas = formulas)
+componTP <- generateComponents(fGroupsScr, "tp", MSPeakLists = mslists, formulas = formulas)
 
 # step 6
 componTP <- filter(componTP, retDirMatch = TRUE, formulas = formulas)
 
 # step 7
-fGroups <- fGroups[results = componTP]
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
+fGroupsScr <- fGroupsScr[results = componTP]
+reportHTML(fGroupsScr, MSPeakLists = mslists, formulas = formulas, components = componTP)
 ```
 
-### Non-targeted screening of TPs by annotation similarities {#TPsEx4}
+### Non-target screening of TPs by annotation similarities {#TPsEx4}
 
 This example shows a workflow where no TP data from a prediction or library is used. Instead, this workflow relies on statistics and MS/MS data to find feature groups which may potentially have a parent - TP relationship. The workflow is similar to that of the previous example. The steps of this workflow are:
 

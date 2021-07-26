@@ -80,7 +80,6 @@
 - handbook
     - TPs
         - add PC links (see UNDONEs)
-        - update examples with amending suspect screening results
         - verify examples
     - update
         - introduction

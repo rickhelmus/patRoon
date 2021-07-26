@@ -277,7 +277,8 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("formula", "retDir", "TP_retDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID"),
+    trCols <- intersect(c("formula", "retDir", "TP_retDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID",
+                          "SMILES"),
                         names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {

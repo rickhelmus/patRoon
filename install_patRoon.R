@@ -307,9 +307,9 @@ utils <- setRefClass("utilsInst", methods = list(
         return(NULL)
     },
     
-    downloadFile = function(instPath, what, url, doUnzip)
+    downloadFile = function(instPath, what, url, doUnzip, destF = basename(url))
     {
-        dest <- file.path(instPath, basename(url))
+        dest <- file.path(instPath, destF)
         if (download.file(url, dest, mode = "wb") != 0)
         {
             warning(sprintf("Failed to download %s from '%s'", what, url))
@@ -339,14 +339,20 @@ utils <- setRefClass("utilsInst", methods = list(
         
         packagesCRAN <- packagesNotInstalled(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"))
         packagesBioC <- packagesNotInstalled(c("mzR", "xcms", "CAMERA"))
-        optPackages <- packagesNotInstalled(c("RAMClustR", "RDCOMClient"))
+        optPackages <- packagesNotInstalled(c("KPIC2", "RAMClustR", "cliqueMS", "MetaClean", "RDCOMClient"))
         mandatoryPackages <- c(packagesCRAN, packagesBioC)
         
         choices <- character()
         if (length(mandatoryPackages) > 0)
             choices <- c(choices, mandatory = "Only mandatory packages")
+        if ("KPIC" %in% optPackages)
+            choices <- c(choices, KPIC2 = "KPIC2 (algorithm to find/group features)")
         if ("RAMClustR" %in% optPackages)
-            choices <- c(choices, RAMClustR = "RAMClustR (required componentization with RAMClustR)")
+            choices <- c(choices, RAMClustR = "RAMClustR (algorithm for componentization)")
+        if ("cliqueMS" %in% optPackages)
+            choices <- c(choices, cliqueMS = "cliqueMS (algorithm for componentization)")
+        if ("MetaClean" %in% optPackages)
+            choices <- c(choices, MetaClean = "MetaClean (to calculate chromatographic peak qualities)")
         if ("RDCOMClient" %in% optPackages)
             choices <- c(choices, RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)")
         if (length(choices) > 1)
@@ -377,8 +383,20 @@ utils <- setRefClass("utilsInst", methods = list(
             
         if (!is.null(instWhat))
         {
+            if (any(c("all", "KPIC2") %in% instWhat))
+            {
+                checkPackages("ropls", pkgWhere, ask = FALSE, type = "bioc")
+                checkPackages("KPIC", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus")
+            }
             if (any(c("all", "RAMClustR") %in% instWhat))
                 checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl")
+            if (any(c("all", "cliqueMS") %in% instWhat))
+                checkPackages("cliqueMS", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus")
+            if (any(c("all", "MetaClean") %in% instWhat))
+            {
+                checkPackages(c("BiocStyle", "Rgraphviz"), pkgWhere, ask = FALSE, type = "bioc")
+                checkPackages("MetaClean", pkgWhere, ask = FALSE, type = "gh", repos = "KelseyChetnik")
+            }
             if (any(c("all", "RDCOMClient") %in% instWhat))
                 checkPackages("RDCOMClient", pkgWhere, ask = FALSE, repos = "http://www.omegahat.net/R")
         }
@@ -445,6 +463,8 @@ utils <- setRefClass("utilsInst", methods = list(
                                        path = getOption("patRoon.path.MetFragCompTox", "")))
         extDeps <- rbind(extDeps, list(name = "MetFrag PubChemLite DB", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragPubChemLite", "")))
+        extDeps <- rbind(extDeps, list(name = "BioTransformer", command = "", copt = "",
+                                       path = getOption("patRoon.path.BioTransformer", "")))
         
         present <- nzchar(extDeps$path) & file.exists(extDeps$path)
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
@@ -476,7 +496,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("MetFrag CL" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag CL", "http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar", FALSE)
+                down <- downloadFile(instPath, "MetFrag CL", "https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar", FALSE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.MetFragCL = down))
             }
@@ -514,9 +534,28 @@ utils <- setRefClass("utilsInst", methods = list(
                                       message = FALSE)
             }
             
+            if ("BioTransformer" %in% instWhat)
+            {
+                down <- downloadFile(instPath, "BioTransformer", "https://bitbucket.org/djoumbou/biotransformer/get/master.zip",
+                                     TRUE, "biotransformer.zip")
+                if (!is.null(down))
+                {
+                    # rename subdirectory with auto generated name...
+                    subDir <- list.files(down, pattern = "^djoumbou\\-biotransformer\\-[[:digit:]]+$", full.names = TRUE)
+                    file.rename(subDir, "biotransformer")
+                    
+                    # place in jar from patRoonDeps
+                    jar <- downloadFile(file.path(down, "biotransformer"),
+                                        "https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar",
+                                        FALSE)
+                    if (!is.null(jar))
+                        setOpts <- c(setOpts, list(patRoon.path.BioTransformer = jar))
+                }
+            }
+            
             if ("pngquant" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://pngquant.org/pngquant-windows.zip", TRUE)
+                down <- downloadFile(instPath, "pngquant", "https://pngquant.org/pngquant-windows.zip", TRUE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.pngquant = fixPath(file.path(down, "pngquant"))))
             }

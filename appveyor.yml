@@ -15,9 +15,7 @@ install:
         if (-Not (Test-Path C:\deps\biotransformer)) {
             git clone --depth 1 -q https://bitbucket.org/djoumbou/biotransformer.git C:/deps/biotransformer
             pushd C:\deps\biotransformer
-            $ErrorActionPreference = "Continue"
-            bash .\install-via-maven.sh > $null
-            $ErrorActionPreference = "Stop"
+            Invoke-WebRequest https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar -OutFile "biotransformer-3.0.0.jar"
             popd
         }
     - ps: >-
@@ -27,7 +25,7 @@ install:
         C:\deps\openms26.exe /S
     - ps: >-
         if (-Not (Test-Path C:\deps\MetFrag2.4.5-CL.jar)) {
-            Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
+            Invoke-WebRequest https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\sirius.zip)) {

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-06-17" />
+<meta name="date" content="2021-08-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="processing-workflow-data.html"/>
 <link rel="next" href="filtering.html"/>
-<script src="libs/header-attrs-2.8/header-attrs.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="libs/jquery-3.5.1/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -62,7 +62,7 @@
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.9.3/plotly.js"></script>
+<script src="libs/plotly-binding-4.9.4.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
@@ -356,17 +356,17 @@ div.csl-indent {
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="inspecting-results.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Feature table (only first columns for readability)</span></span>
 <span id="cb29-2"><a href="inspecting-results.html#cb29-2" aria-hidden="true" tabindex="-1"></a>fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_5353720722167290945  19.00698  78.99684  65793.390  13.01202  29.99700
-#&gt;   2:  f_9288265209130689681  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3: f_14674165221581410275   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4: f_11913187302629567876 112.34220  79.02103  71168.990 106.55400 147.51600
-#&gt;   5:  f_2906399819125315774 111.64380  84.95950  54875.130 105.15180 599.87400
+#&gt;   1:  f_5230818759398381441  19.00698  78.99684  65793.390  13.01202  29.99700
+#&gt;   2:  f_6292589452553214504  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3:  f_4505475326157190318   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_1183550900101892010 112.34220  79.02103  71168.990 106.55400 147.51600
+#&gt;   5:  f_2406541877084577538 111.64380  84.95950  54875.130 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:  f_6265519523057018763  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434: f_13681528777018315272  13.01202 296.92038  37753.420  10.01502  15.01098
-#&gt; 435: f_12877978417438190121  12.01302 297.16751  17366.130   9.01602  15.01098
-#&gt; 436:  f_3195978045411850725  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437:  f_3797173630217435155  12.01302 299.12581  13630.380   9.01602  15.01098</code></pre>
+#&gt; 433:  f_2966733606978924614  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_10260127263168162187  13.01202 296.92038  37753.420  10.01502  15.01098
+#&gt; 435: f_12455690583538118734  12.01302 297.16751  17366.130   9.01602  15.01098
+#&gt; 436: f_10417569266620635069  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437:  f_7841342382701938672  12.01302 299.12581  13630.380   9.01602  15.01098</code></pre>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="inspecting-results.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
 <span id="cb31-2"><a href="inspecting-results.html#cb31-2" aria-hidden="true" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R328_81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -414,17 +414,17 @@ div.csl-indent {
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="inspecting-results.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb43-2"><a href="inspecting-results.html#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_15116900772025145894  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1 f_11073732196774214406  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_16683436592039947759 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1  f_5740824575526154069  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1 f_16002235825278367686   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1  f_1287894285606616416  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1  f_7071751080362088187  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1  f_7716582823300324670 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_17652332481739463748  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1 f_11819118800412563192   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3 f_14917422449563659644  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3  f_7652998063157966526  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3   f_532993082927394489  13.14798 296.92039  42195.85  10.150980
-#&gt; 2443: standard-3  f_6134763394912631651  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_17160768747403822779  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3 f_12860039645771310340  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3 f_11743638368667594640  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3 f_13018862694249992240  13.14798 296.92039  42195.85  10.150980
+#&gt; 2443: standard-3  f_5230950622971293767  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_1190672718278473038  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="inspecting-results.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb45-2"><a href="inspecting-results.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
@@ -446,7 +446,7 @@ div.csl-indent {
 <pre><code>#&gt;            group             name suspCompRank annSimBoth estIDLevel
 #&gt; 1:  M120_R328_81 1H-benzotriazole            1  0.9194948         2a
 #&gt; 2: M137_R303_127      phenyl urea            1  0.9959918         3c
-#&gt; 3: M146_R185_153       2-quinolol           18  0.7827895         3c</code></pre>
+#&gt; 3: M146_R185_153       2-quinolol            3  0.7827895         3c</code></pre>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="inspecting-results.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
 <span id="cb49-2"><a href="inspecting-results.html#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists)</span></code></pre></div>
 <pre><code>#&gt;              group type        mz intensity precursor
@@ -485,11 +485,11 @@ div.csl-indent {
 #&gt;   4:  M120_R328_81              1 1.522632    119.0483
 #&gt;   5:  M120_R328_81              1 1.490700    119.0483
 #&gt;  ---                                                  
-#&gt; 496: M146_R185_153              2 1.557032    145.0528
-#&gt; 497: M146_R185_153              3 1.554850    145.0528
-#&gt; 498: M146_R185_153              3 1.554681    145.0528
-#&gt; 499: M146_R185_153              3 1.551151    145.0528
-#&gt; 500: M146_R185_153              3 1.549153    145.0528</code></pre>
+#&gt; 496: M146_R185_153              3 1.533662    145.0528
+#&gt; 497: M146_R185_153              3 1.532748    145.0528
+#&gt; 498: M146_R185_153              3 1.531070    145.0528
+#&gt; 499: M146_R185_153              3 1.524293    145.0528
+#&gt; 500: M146_R185_153              3 1.524285    145.0528</code></pre>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="inspecting-results.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
 <span id="cb55-2"><a href="inspecting-results.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size

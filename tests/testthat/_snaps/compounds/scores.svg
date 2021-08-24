@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<rect x='61.33' y='59.04' width='287.88' height='429.83' style='stroke-width: 0.75; stroke: #A6CEE3; fill: #A6CEE3;' />
+<rect x='406.79' y='59.04' width='287.88' height='429.83' style='stroke-width: 0.75; stroke: #1F78B4; fill: #1F78B4;' />
+<text transform='translate(209.40,507.57) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: sans;' textLength='29.35px' lengthAdjust='spacingAndGlyphs'>score</text>
+<text transform='translate(554.86,507.57) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: sans;' textLength='52.03px' lengthAdjust='spacingAndGlyphs'>fragScore</text>
+<line x1='36.00' y1='488.87' x2='36.00' y2='59.04' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='488.87' x2='28.80' y2='488.87' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='402.90' x2='28.80' y2='402.90' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='316.94' x2='28.80' y2='316.94' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='230.97' x2='28.80' y2='230.97' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='145.01' x2='28.80' y2='145.01' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='59.04' x2='28.80' y2='59.04' style='stroke-width: 0.75;' />
+<text x='21.60' y='492.59' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='21.60' y='406.62' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='21.60' y='320.65' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='21.60' y='234.69' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text x='21.60' y='148.72' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.8</text>
+<text x='21.60' y='62.76' text-anchor='end' style='font-size: 10.80px; font-family: sans;' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='205.27' y='51.84' text-anchor='middle' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='550.73' y='51.84' text-anchor='middle' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>1</text>
+</g>
+<defs>
+  <clipPath id='cpNTkuMDR8Njg5Ljc2fDU5LjA0fDUwMi41Ng=='>
+    <rect x='59.04' y='59.04' width='630.72' height='443.52' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuMDR8Njg5Ljc2fDU5LjA0fDUwMi41Ng==)'>
+</g>
+</svg>

@@ -61,6 +61,8 @@ environment:
     R_CHECK_ARGS: --no-build-vignettes --no-manual --no-multiarch
     av_token:
       secure: JJT6ZdxNWo6wf+xPRwfOXAXW1M65jtdzRXCKFGarzzQ=
+    GITHUB_PAT:
+      secure: VNNpZ/vmYAXvbXKtPfD/JNj4PPJOgbyUGMowVtH0Q//HULJrlOo62MWSuhksQ2MR
 
 build_script:
     - travis-tool.sh install_r tibble # workaround for MSnbase

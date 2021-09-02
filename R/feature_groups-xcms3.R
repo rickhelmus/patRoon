@@ -139,8 +139,13 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     setnames(groups, gNames)
     groups[is.na(groups)] <- 0
 
-    return(featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
-                              ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames)))
+    ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
+                              ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames))
+    
+    # synchronize features: any that were without group have been removed
+    ret@xdata <- xcms::filterChromPeaks(ret@xdata, getKeptXCMSPeakInds(feat, ret@features))
+    
+    return(ret)
 }
 
 #' @details \code{importFeatureGroupsXCMS3} converts grouped features from an
@@ -176,9 +181,12 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
     if (length(old) > length(obj))
         obj@xdata <- xcms::filterFeatureDefinitions(obj@xdata, names(old) %chin% names(obj))
     
-    # UNDONE: enable when we can update features (or mark dirty so that getXCMSnExp knows when to update)
-    # if (length(analyses(old)) > length(analyses(obj)))
-    #     obj@xdata <- xcms::filterFile(obj@xdata, analyses(obj), keepFeatures = TRUE)
+    # simple ana subset
+    if (!setequal(analyses(old), analyses(obj)))
+        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
     
+    if (nrow(chromPeaks(obj@xdata)) != length(obj@features)) # sync features
+        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj@features))
+
     return(obj)
 })

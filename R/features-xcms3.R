@@ -19,10 +19,7 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
     if (is.null(j) && !setequal(analyses(old), analyses(obj)))
         obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
     else if (!is.null(j)) # sync features
-    {
-        # UNDONE: ask for exported method...
-        obj@xdata@msFeatureData <- xcms:::.filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj))
-    }
+        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj))
     return(obj)
 })
 

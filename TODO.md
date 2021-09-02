@@ -11,7 +11,6 @@
 ## Features
 
 - misc
-    - XCMS3/delete: also update groups data? --> use new function once it hits BC
     - OpenMS: alignment may yield negative RTs...
     - OpenMS MapAligner exception
         - seems to be related when little overlap between sets --> add note in doc?

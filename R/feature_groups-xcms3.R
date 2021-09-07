@@ -183,7 +183,7 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
     
     # simple ana subset
     if (!setequal(analyses(old), analyses(obj)))
-        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
+        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)), keepFeatures = TRUE)
     
     if (nrow(chromPeaks(obj@xdata)) != length(obj@features)) # sync features
         obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj@features))

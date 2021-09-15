@@ -382,8 +382,10 @@ getKeptXCMSPeakInds <- function(old, new)
     newft <- featureTable(new)
     oldXCMSInds <- rbindlist(Map(featureTable(old), analyses(old), f = function(ft, ana)
     {
+        if (nrow(ft) == 0)
+            return(NULL)
         ret <- data.table(row = seq_len(nrow(ft)), analysis = ana)
-        set(ret, j = "keep", value = if (!is.null(newft[[ana]])) ft$ID %in% newft[[ana]]$ID else FALSE)
+        set(ret, j = "keep", value = if (!is.null(newft[[ana]]) && nrow(newft[[ana]]) > 0) ft$ID %in% newft[[ana]]$ID else FALSE)
         return(ret)
     }))
     oldXCMSInds[, inds := seq_len(nrow(oldXCMSInds))]

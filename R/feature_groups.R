@@ -1485,7 +1485,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 
-#' @describeIn featureGroups Plots Fold change data in a 'Volcona plot'.
+#' @describeIn featureGroups Plots Fold change data in a 'Volcano plot'.
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean, col = NULL,
                                                    pch = 19, ...)

@@ -1356,6 +1356,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
                 EICFill <- EIC[numGTE(EIC$time, fts[anai, retmin]) & numLTE(EIC$time, fts[anai, retmax]), ]
                 if (retMin)
                     EICFill$time <- EICFill$time / 60
+                EICFill <- EICFill[EICFill$time %inrange% xlim, ]
                 polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
                         col = fillColors[colInd], border = NA)
             }

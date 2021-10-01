@@ -15,6 +15,9 @@
     - OpenMS MapAligner exception
         - seems to be related when little overlap between sets --> add note in doc?
     - Somehow integrate XCMS::fillChromPeaks
+    - Check/Update for new OpenMS
+        - intensity loading?
+        - installDeps, CI
 
 
 ## Components
@@ -75,6 +78,7 @@
 - handbook
     - TPs
         - add PC links (see UNDONEs)
+        - add MSPL filtering of annotated peaks (in examples)?
     - update
         - introduction
             - mention changes of patRoon 2.0?
@@ -118,6 +122,7 @@
     - featInfo in HTML reports
     - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
     - results filter/subsetting
+    - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

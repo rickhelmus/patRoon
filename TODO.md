@@ -123,6 +123,7 @@
     - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
     - results filter/subsetting
     - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
+    - OpenMS: optionally load peak intensities directly from feature output (`useFFMIntensities` argument)
 - Annotation
     - MSPL
         - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE

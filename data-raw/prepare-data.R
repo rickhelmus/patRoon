@@ -10,24 +10,15 @@ TPsLogicTransformations <- data.table::fread(system.file("data-raw", "TP-logic.c
 
 # obtain PubChem transformations and prepare data
 transFile <- tempfile(fileext = ".tsv")
-utils::download.file("https://git-r3lab.uni.lu/eci/pubchem/-/raw/master/annotations/tps/norman_transformations_tsv.txt",
+utils::download.file("https://git-r3lab.uni.lu/eci/pubchem/-/raw/master/annotations/tps/PubChem_all_transformations_wExtraInfo.csv",
                      destfile = transFile)
 
-PubChemTransformations <- data.table::fread(transFile, skip = 2)
-
-# first row contains DB var types, no need for those
-PubChemTransformations <- PubChemTransformations[-1]
-
-# for now, only keep predecessor --> successor rows
-PubChemTransformations <- PubChemTransformations[`#cid` == predecessorcid]
-
-# no need for first CID column anymore
-PubChemTransformations <- PubChemTransformations[, -"#cid"]
+PubChemTransformations <- data.table::fread(transFile)
 
 # convert column names to generic patRoon format
 setnames(PubChemTransformations,
-         c("predecessor", "predecessorcid", "successor", "successorcid"),
-         c("parent_name", "parent_CID", "TP_name", "TP_CID"))
+         c("predecessor", "predecessorcid", "successor", "successorcid", "predecessorEM", "successorEM", "XlogPDiff"),
+         c("parent_name", "parent_CID", "TP_name", "TP_CID", "parent_neutralMass", "TP_neutralMass", "LogPDiff"))
 
 # merge duplicates rows: these may occur eg when different sources exist
 # NOTE: this doesn't take into account different CIDs, hence, only the first will remain
@@ -38,27 +29,27 @@ PubChemTransformations[, (otherCols) := lapply(.SD, function(x) paste0(unique(x)
                        by = nameCols, .SDcols = otherCols]
 PubChemTransformations <- unique(PubChemTransformations, by = nameCols)
 
-# use CIDs to get SMILES with webchem
-allCIDs <- union(PubChemTransformations$parent_CID, PubChemTransformations$TP_CID)
-PCInfos <- as.data.table(webchem::pc_prop(allCIDs, c("CanonicalSMILES", "XLogP")))
+splitIn2Lists <- function(vals) rbindlist(lapply(vals, function(x) as.list(strsplit(x, ">>")[[1]])))
 
-# and add SMILES/XLogPs to parents/TPs...
-PubChemTransformations[, c("parent_SMILES", "parent_LogP") :=
-                           PCInfos[match(parent_CID, CID), .(CanonicalSMILES, XLogP)]]
-PubChemTransformations[, c("TP_SMILES", "TP_LogP") := PCInfos[match(TP_CID, CID), .(CanonicalSMILES, XLogP)]]
+# get SMILES/IKs
+PubChemTransformations[, c("parent_SMILES", "TP_SMILES") := splitIn2Lists(ReactionSMILES)]
+PubChemTransformations[, c("parent_InChIKey", "TP_InChIKey") := splitIn2Lists(IK_to_IK)]
 
 # add other chem properties
-PubChemTransformations[, c("parent_formula", "TP_formula", "parent_InChI", "TP_InChI",
-                           "parent_InChIKey", "TP_InChIKey") :=
-                           .(patRoon:::convertToFormulaBabel(parent_SMILES, "smi", mustWork = TRUE),
-                             patRoon:::convertToFormulaBabel(TP_SMILES, "smi", mustWork = TRUE),
-                             patRoon:::babelConvert(parent_SMILES, "smi", "inchi", mustWork = TRUE),
-                             patRoon:::babelConvert(TP_SMILES, "smi", "inchi", mustWork = TRUE),
-                             patRoon:::babelConvert(parent_SMILES, "smi", "inchikey", mustWork = TRUE),
-                             patRoon:::babelConvert(TP_SMILES, "smi", "inchikey", mustWork = TRUE))]
-PubChemTransformations[, c("parent_neutralMass", "TP_neutralMass") :=
-                           .(sapply(parent_formula, patRoon:::getFormulaMass),
-                             sapply(TP_formula, patRoon:::getFormulaMass))]
+PubChemTransformations[, c("parent_formula", "TP_formula", "parent_InChI", "TP_InChI") :=
+                              .(patRoon:::convertToFormulaBabel(parent_SMILES, "smi", mustWork = TRUE),
+                                patRoon:::convertToFormulaBabel(TP_SMILES, "smi", mustWork = TRUE),
+                                patRoon:::babelConvert(parent_SMILES, "smi", "inchi", mustWork = TRUE),
+                                patRoon:::babelConvert(TP_SMILES, "smi", "inchi", mustWork = TRUE))]
+
+PubChemTransformations[is.na(LogPDiff), LogPDiff := 0]
+
+# clear unneeded columns
+PubChemTransformations <- PubChemTransformations[, -c("CID_to_CID", "IK_to_IK", "IKFB_to_IKFB",
+                                                      "ReactionSMILES", "DescReactionSMILES", "MassDiff")]
+
+# UNDONE: for now remove some TPs w/out names
+PubChemTransformations <- PubChemTransformations[!is.na(TP_name)]
 
 usethis::use_data(compScorings, adductsGF, adductsMF, TPsLogicTransformations, PubChemTransformations, internal = TRUE,
                   overwrite = TRUE)

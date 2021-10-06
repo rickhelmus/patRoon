@@ -146,6 +146,12 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
         results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
                        f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
     }
+    else if (!is.null(TPLibrary[["LogPDiff"]]))
+    {
+        results <- lapply(results, function(x) set(x, j = "retDir", value = fcase(x$LogPDiff < 0, -1,
+                                                                                  x$LogPDiff > 0, 1,
+                                                                                  default = 0)))
+    }
     
     results <- pruneList(results, checkZeroRows = TRUE)
     parents <- parents[name %in% names(results)]

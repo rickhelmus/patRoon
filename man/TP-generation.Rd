@@ -137,7 +137,10 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
 
   \item \code{parent_SMILES} and \code{TP_SMILES} The \acronym{SMILES} of the parent structure.
 
-  \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP (\strong{optional}).
+  \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
+
+  \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
+  \code{parent_LogP} and \code{TP_LogP} are specified. (\strong{optional})
 
   }
 

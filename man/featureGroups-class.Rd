@@ -620,7 +620,7 @@ between up to five replicate groups.
 \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
 groups between given replicate groups.
 
-\item \code{plotVolcano}: Plots Fold change data in a 'Volcona plot'.
+\item \code{plotVolcano}: Plots Fold change data in a 'Volcano plot'.
 
 \item \code{unique}: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).

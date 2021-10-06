@@ -79,6 +79,7 @@ findFeaturesOpenMS(
   useSmoothedInts = TRUE,
   extraOpts = NULL,
   intSearchRTWindow = 3,
+  useFFMIntensities = FALSE,
   verbose = TRUE
 )
 
@@ -172,56 +173,81 @@ obtain PICs, otherwise it is \code{\link[KPIC]{getPIC}}.}
 \item{picsList}{A \code{list} with a \code{pics} objects obtained with
 \code{\link[KPIC]{getPIC}} or \code{\link[KPIC]{getPIC.kmeans}} for each analysis.}
 
-\item{noiseThrInt}{Noise intensity threshold. Sets \code{algorithm:common:noise_threshold_int} option.}
+\item{noiseThrInt}{Noise intensity threshold. Sets
+\code{algorithm:common:noise_threshold_int} option.}
 
-\item{chromSNR}{Minimum S/N of a mass trace. Sets \code{algorithm:common:chrom_peak_snr} option.}
+\item{chromSNR}{Minimum S/N of a mass trace. Sets
+\code{algorithm:common:chrom_peak_snr} option.}
 
-\item{chromFWHM}{Expected chromatographic peak width (in seconds). Sets \code{algorithm:common:chrom_fwhm} option.}
+\item{chromFWHM}{Expected chromatographic peak width (in seconds). Sets
+\code{algorithm:common:chrom_fwhm} option.}
 
-\item{mzPPM}{Allowed mass deviation (ppm) for trace detection. Sets \code{algorithm:mtd:mass_error_ppm}.}
+\item{mzPPM}{Allowed mass deviation (ppm) for trace detection. Sets
+\code{algorithm:mtd:mass_error_ppm}.}
 
-\item{reEstimateMTSD}{If \code{TRUE} then enables dynamic re-estimation of m/z variance during mass trace collection
-stage. Sets \code{algorithm:mtd:reestimate_mt_sd}.}
+\item{reEstimateMTSD}{If \code{TRUE} then enables dynamic re-estimation of
+m/z variance during mass trace collection stage. Sets
+\code{algorithm:mtd:reestimate_mt_sd}.}
 
-\item{traceTermCriterion, traceTermOutliers, minSampleRate}{Termination criterion for the extension of mass traces. See
+\item{traceTermCriterion, traceTermOutliers, minSampleRate}{Termination
+criterion for the extension of mass traces. See
 \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
- Sets the \code{algorithm:mtd:trace_termination_criterion}, \code{algorithm:mtd:trace_termination_outliers} and
+ Sets the \code{algorithm:mtd:trace_termination_criterion},
+\code{algorithm:mtd:trace_termination_outliers} and
 \code{algorithm:mtd:min_sample_rate} options, respectively.}
 
-\item{minTraceLength, maxTraceLength}{Minimum/Maximum length of mass trace (seconds). Set negative value for maxlength
-to disable maximum. Sets \code{algorithm:mtd:min_trace_length} and \code{algorithm:mtd:min_trace_length},
-respectively.}
+\item{minTraceLength, maxTraceLength}{Minimum/Maximum length of mass trace
+(seconds). Set negative value for maxlength to disable maximum. Sets
+\code{algorithm:mtd:min_trace_length} and
+\code{algorithm:mtd:min_trace_length}, respectively.}
 
-\item{widthFiltering, minFWHM, maxFWHM}{Enable filtering of unlikely peak widths. See
+\item{widthFiltering, minFWHM, maxFWHM}{Enable filtering of unlikely peak
+widths. See
 \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
- Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm} and \code{algorithm:epd:max_fwhm},
-respectively.}
+ Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm}
+and \code{algorithm:epd:max_fwhm}, respectively.}
 
-\item{traceSNRFiltering}{If \code{TRUE} then apply post-filtering by signal-to-noise ratio after smoothing. Sets the
+\item{traceSNRFiltering}{If \code{TRUE} then apply post-filtering by
+signal-to-noise ratio after smoothing. Sets the
 \code{algorithm:epd:masstrace_snr_filtering} option.}
 
-\item{localRTRange, localMZRange}{Retention/MZ range where to look for coeluting/isotopic mass traces. Sets the
-\code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range} options, respectively.}
+\item{localRTRange, localMZRange}{Retention/MZ range where to look for
+coeluting/isotopic mass traces. Sets the
+\code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range}
+options, respectively.}
 
-\item{isotopeFilteringModel}{Remove/score candidate assemblies based on isotope intensities. See
+\item{isotopeFilteringModel}{Remove/score candidate assemblies based on
+isotope intensities. See
 \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets the \code{algorithm:ffm:isotope_filtering_model} option.}
 
-\item{MZScoring13C}{Use the 13C isotope as the expected shift for isotope mass traces. See
+\item{MZScoring13C}{Use the 13C isotope as the expected shift for isotope
+mass traces. See
 \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets \code{algorithm:ffm:mz_scoring_13C}.}
 
-\item{useSmoothedInts}{If \code{TRUE} then use LOWESS intensities instead of raw intensities. Sets the
-\code{algorithm:ffm:use_smoothed_intensities} option.}
+\item{useSmoothedInts}{If \code{TRUE} then use LOWESS intensities instead of
+raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
+option.}
 
-\item{extraOpts}{Named \code{list} containing extra options that will be passed to \command{FeatureFinderMetabo}. Any
-options specified here will override any of the above. Example:
-\code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)} (corresponds to setting
-\code{noiseThrInt=1000}). Set to \code{NULL} to ignore.}
+\item{extraOpts}{Named \code{list} containing extra options that will be
+passed to \command{FeatureFinderMetabo}. Any options specified here will
+override any of the above. Example:
+\code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)}
+(corresponds to setting \code{noiseThrInt=1000}). Set to \code{NULL} to
+ignore.}
 
-\item{intSearchRTWindow}{Retention time window (in seconds, +/- feature retention time) that is used to find the
-closest data point to the retention time to obtain the intensity of a feature (this is needed since OpenMS does not
-provide this data).}
+\item{intSearchRTWindow}{Retention time window (in seconds, +/- feature
+retention time) that is used to find the closest data point to the
+retention time to obtain the intensity of a feature (this is needed since
+OpenMS does not provide this data).}
+
+\item{useFFMIntensities}{If \code{TRUE} then peak intensities are directly
+loaded from \command{FeatureFinderMetabo} output. Otherwise, intensities
+are loaded afterwards from the input \file{mzML} files, which is
+potentially much slower, especially with many analyses files. However,
+\code{useFFMIntensities=TRUE} is still somewhat experimental, may be less
+accurate and requires a recent version of \command{OpenMS} (>=2.7).}
 
 \item{profPath}{A \code{character} vector with paths to the profile MS data for each analysis (will be re-cycled if
 necessary). See the \verb{Using SAFD} section for more details.}
@@ -335,8 +361,9 @@ If any errors related to \command{DCOM} appear it might be necessary to
 \code{findFeaturesEnviPick} Requires analysis files to be in the
   \code{mzXML} format.
 
-The file format of analyses for \code{findFeaturesOpenMS} must be \file{mzML}. This functionality has been
-  tested with OpenMS version >= 2.0. Please make sure it is installed and its binaries are added to the PATH
+The file format of analyses for \code{findFeaturesOpenMS} must be
+  \file{mzML}. This functionality has been tested with OpenMS version >= 2.0.
+  Please make sure it is installed and its binaries are added to the PATH
   environment variable or the \code{patRoon.path.OpenMS} option is set.
 }
 \section{Parallelization}{
@@ -345,8 +372,9 @@ The file format of analyses for \code{findFeaturesOpenMS} must be \file{mzML}. T
   more details and \link[=patRoon-package]{patRoon options} for configuration
   options.
 
- Note that for caching purposes, the analyses files must always exist on the local host
-  computer, even if it is not participating in computations.
+ Note that for caching purposes, the analyses files
+  must always exist on the local host computer, even if it is not
+  participating in computations.
 }
 
 \section{Sets workflows}{

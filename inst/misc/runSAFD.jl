@@ -15,6 +15,8 @@ end
 inPath = popArg()
 filename = popArg()
 
+doCent = popArg() == "TRUE"
+
 mz_thresh = [parse(Float64, popArg()), parse(Float64, popArg())]
 
 max_numb_iter = parse(Int64, popArg())
@@ -35,5 +37,7 @@ mz_vals, mz_int, t0, t_end, m, pathin, msModel, msIonisation, msManufacturer, po
 
 GC.gc()
 
-rep_table, final_table = safd_s3D(mz_vals, mz_int, Rt, filename, outPath, max_numb_iter,
+func = doCent ? safd_s3d_cent : safd_s3D
+
+rep_table, final_table = func(mz_vals, mz_int, Rt, filename, outPath, max_numb_iter,
     max_t_peak_w, res, min_ms_w, r_thresh, min_int, sig_inc_thresh, S2N, min_peak_w_s)

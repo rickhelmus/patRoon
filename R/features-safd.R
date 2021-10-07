@@ -30,12 +30,12 @@ featuresSAFD <- setClass("featuresSAFD", contains = "features")
 setMethod("initialize", "featuresSAFD",
           function(.Object, ...) callNextMethod(.Object, algorithm = "safd", ...))
 
-makeSAFDCommand <- function(inPath, fileName, mzRange, maxNumbIter, maxTPeakW, resolution,
+makeSAFDCommand <- function(cent, inPath, fileName, mzRange, maxNumbIter, maxTPeakW, resolution,
                             minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS)
 {
     # UNDONE: check if julia exists? allow to configure path?
     return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
-                                            inPath, fileName, mzRange[1], mzRange[2],
+                                            cent, inPath, fileName, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
                                             minPeakWS),
@@ -57,26 +57,28 @@ makeSAFDCommand <- function(inPath, fileName, mzRange, maxNumbIter, maxTPeakW, r
 #'   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
 #'   everything works, \emph{e.g.} by running the test data.
 #'
-#'   This algorithm only supports profile (\emph{i.e.} not centroided) MS data. Since other \code{patRoon} functionality
-#'   typically relies on the centroided data, MS data must be available in \emph{both} forms. The centroided data is
-#'   specified through the 'regular' \link[=analysis-information]{analysis info} mechanism, whereas the location of the
-#'   profile data is specified through the \code{profPath} argument. The base file names (\emph{i.e.} the file name
-#'   without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+#'   This algorithm only supports profile and centroided MS data. If the use of profile data is desired, centroided data
+#'   must still be available for other functionality of \code{patRoon}. The centroided data is specified through the
+#'   'regular' \link[=analysis-information]{analysis info} mechanism. The location to any profile data is specified
+#'   through the \code{profPath} argument (\code{NULL} for no profile data). The base file names (\emph{i.e.} the file
+#'   name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
 #'   profile data must be \code{mzXML}.
 #'
 #' @references \insertRef{Samanipour2019}{patRoon}
 #' @rdname feature-finding
 #' @export
-findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400), 
+findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,
                              minMSW = 0.02, RThreshold = 0.75, minInt = 2000,
                              sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
 {
-    # UNDONE: docs
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    checkmate::assertCharacter(profPath, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
-    assertCanCreateDirs(profPath, add = ac)
+    if (!is.null(profPath))
+    {
+        checkmate::assertCharacter(profPath, min.chars = 1, min.len = 1, add = ac)
+        assertCanCreateDirs(profPath, add = ac)
+    }
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertCount, . ~ maxNumbIter + maxTPeakW + resolution + sigIncThreshold +
                S2N, positive = TRUE, fixed = list(add = ac))
@@ -89,16 +91,18 @@ findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400),
         stop("First element of mzRange should be smaller than second.")
     
     anaCount <- nrow(analysisInfo)
-    profPath <- rep(profPath, length.out = anaCount)
+    if (!is.null(profPath))
+        profPath <- rep(profPath, length.out = anaCount)
     
-    params <- list(mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
+    params <- list(is.null(profPath), mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
                    sigIncThreshold, S2N, minPeakWS)
     baseHash <- makeHash(params)
     
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)
 
-    cmdQueue <- Map(analysisInfo$analysis, profPath, f = function(ana, path)
+    anaPaths <- if (is.null(profPath)) analysisInfo$path else profPath
+    cmdQueue <- Map(analysisInfo$analysis, anaPaths, f = function(ana, path)
     {
         fpMZXML <- getMzXMLAnalysisPath(ana, path)
         fpNCDF <- getAnalysisPath(ana, path, "cdf")

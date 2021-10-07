@@ -18,6 +18,7 @@
     - Check/Update for new OpenMS
         - intensity loading?
         - installDeps, CI
+    - SAFD: verify with latest version
 
 
 ## Components
@@ -326,7 +327,12 @@
 - DBE calculation for SIRIUS?
 - OM reporting
 - as.data.table: option to average per replicate group?
-
+- ID levels for non-suspects
+    - function to calculate ID levels from suspect list (to take RTs/MSMS if available), formulas, compounds
+    - store in compounds?
+    - does it make sense for formula candidates?
+    - add into reporting
+        - also mark if in suspect list
 
 ## Suspects
 

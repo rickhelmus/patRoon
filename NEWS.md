@@ -1,27 +1,66 @@
-# patRoon next major
+# patRoon 2.0
 
-* **New functionality**
-    - The `as.data.table()` method for `featureGroups` now supports normalization of intensities through the `normFunc` argument.
-    - The `as.data.table()` method for `featureGroups` now supports specifying a different averaging function through the `averageFunc` argument.
+* **Major new functionality**
+    - TPs
+    - Sets
+    - Peak qualities
+    - ...
+
+* **Other new functionality**
+    - `newProject`
+        - Updated for new functionality such as sets and TP workflows and adduct annotation
+        - completely re-designed code generation. The generated code will have a slightly different layout and some parameter defaults were changed. 
+    - Features
+        - `as.data.table()`
+            - intensity normalization (`normFunc` argument)
+            - customized averaging (`averageFunc` argument)
+            - calculation of Fold-changes (`FCParams` argument)
+            - report peak qualities/scores (`qualities` argument)
+        - `topMostByRGroup/EICTopMostByRGroup` arguments for plotting/reporting EIC data of only the top most intense replicate(s).
+
 * **Major changes**:
+    - ggplot2 support (i.e. `useGGPlot2` argument) for several plotting functions is removed (not oftend used and maintenance burden)
     - the `precursor` argument to the `plotSpec()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was necessary to select precursors for sets with different polarities. This is also in general more consistent with compound annotations.
     - The behavior of the `filter()` method for `MSPeakLists` was slightly changed. Prior to this change, the analysis specific peak lists were first filtered, these lists were then averaged to regenerate feature group peak lists and finally the updated group peak lists were also filtered. The latter filter step was removed, since this may result in subtle bugs after e.g. subsetting.
-    - The methodology of `plotSpec()` to automatically calculate the space necessary for formula annotation texts and candidate structures was improved. Annotation texts are now automatically resized if there is insufficient space, and the maximum size and resolution for candidate structures can be controlled with the `maxMolSize`/`molRes` parameters.
-* Minor changes
+    - The methodology of `plotSpectrum()` to automatically calculate the space necessary for formula annotation texts and candidate structures was improved. Annotation texts are now automatically resized if there is insufficient space, and the maximum size and resolution for candidate structures can be controlled with the `maxMolSize`/`molRes` parameters.
+    
+    - Features
+        - XMCS(3): Renamed argument `exportedData` to `loadRawData`
+
+* **Minor changes**
     - `show()` methods now print class inheritance tree
     - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
     - Intensity clusters now use `fastcluster` for hierarchical clustering
     - Components for homologous series new report links as character string indices instead of numeric indices.
+    - `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
+    - The `progressr` package is not used anymore, thus, it is not necessary to set up progress bars with future based multiprocessing.
+    - `newProject`: Moved order of componentization step (now before annotation & suspect screening).
+    - Features
+        - Improved performance for some feature group filters.
+        - `reportHTML()`: EICs are shared between tabs to avoid duplicated plotting
+        - `...` argument for `findFeaturesXCMS3`
+        - XCMS3 grouping/import with exportedData and comparison() supports xcms3
+        - don't subtract blanks from each other
+        - syncing XCMS objects
+        - print feature counts in show(fGroups) and filter()
+        - noDataPlot() for empty plots, eg by plot(), plotChroms()...
+        - mzWindow --> mzExpWindow
+        - groupFeatures: feat arg --> obj
+        
+        - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
+        - clarify reportCSV() now only reports remaining features?
+        - OpenMS: load intensities from FFM data (needs pre-release)
+        - featInfo in HTML reports
+        - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
+        - results filter/subsetting
+        - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
+        - OpenMS: optionally load peak intensities directly from feature output (`useFFMIntensities` argument)
 
-
-
-
-# patRoon 1.3.0
-
-* Future multiprocessing: make sure that logs are created even when an error occurs.
-* Classic multiprocessing: intermediate results are cached again
-* Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
-* `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
+* **Fixes**
+    - Future multiprocessing: make sure that logs are created even when an error occurs.
+    - Classic multiprocessing: intermediate results are cached again
+    - Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
+    - `newProject`: correctly handle DIA with Bruker MS peak lists
 
 
 # patRoon 1.2.1

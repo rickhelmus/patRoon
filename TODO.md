@@ -95,18 +95,7 @@
 
 ## NEWS
 
-- ggplot2 support removed
-- progressr
-- newProject
-    - DA mslists: MSMSType now correctly bbCID if DIA is requested
-        - added DIA checkbox because of this
-    - added some default findFeatureOpenMS args
-    - componentization moved to before annotation & suspect screening
 - Features
-    - as.data.table(fGroups): normalization, FC, averageFunc
-    - topMostByRGroup/EICTopMostByRGroup
-    - as.data.table: qualities argument (and potentially faster now with features=T?)
-    - optimized feature group filters
     - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
     - ... for findFeaturesXCMS3
     - XCMS3 grouping/import with exportedData and comparison() supports xcms3

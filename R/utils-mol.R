@@ -21,7 +21,7 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
         {
             if (doTyping)
             {
-                rcdk::do.typing(ret)
+                rcdk::set.atom.types(ret)
                 rcdk::do.aromaticity(ret)
             }
             if (doIsotopes)

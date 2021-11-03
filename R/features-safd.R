@@ -3,14 +3,15 @@ NULL
 
 SAFDMPFinishHandler <- function(cmd)
 {
-    results <- fread(file.path(cmd$outPath, paste0(cmd$fileName, "_report.csv")))
+    fExt <- if (cmd$cent) "_Cent_report.csv" else "_report.csv"
+    results <- fread(file.path(cmd$outPath, paste0(cmd$fileName, fExt)))
     setnames(results,
              c("Nr", "Rt", "MeasMass", "RtStart", "RtEnd", "MinMass", "MaxMass", "Area", "Int",
                "FeatPurity", "MediRes"),
              c("ID", "ret", "mz", "retmin", "retmax", "mzmin", "mzmax", "area", "intensity",
                "purity", "mediRes"))
     results[, c("ret", "retmin", "retmax") := .(ret * 60, retmin * 60, retmax * 60)] # min --> sec
-    results[, c("SecInPeak", "ScanNum", "ScanInPeak") := NULL]
+    results[, c("MinInPeak", "ScanNum", "ScanInPeak") := NULL]
     
     return(results[])
 }
@@ -30,16 +31,16 @@ featuresSAFD <- setClass("featuresSAFD", contains = "features")
 setMethod("initialize", "featuresSAFD",
           function(.Object, ...) callNextMethod(.Object, algorithm = "safd", ...))
 
-makeSAFDCommand <- function(cent, inPath, fileName, mzRange, maxNumbIter, maxTPeakW, resolution,
+makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPeakW, resolution,
                             minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS)
 {
     # UNDONE: check if julia exists? allow to configure path?
     return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
-                                            cent, inPath, fileName, mzRange[1], mzRange[2],
+                                            inPath, fileName, cent, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
                                             minPeakWS),
-                fileName = fileName))
+                cent = cent, fileName = fileName))
 }
 
 #' @details \code{findFeaturesSAFD} uses \href{https://bitbucket.org/SSamanipour/safd.jl/src/master/}{SAFD} to obtain

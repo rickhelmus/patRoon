@@ -6,6 +6,7 @@
 - remove mz column from patRoonData suspects?
     - and/or ignore/warn when used with sets?
 - update installPatRoon with new deps
+- clean old Dockerfiles/structure
 
 
 ## Features
@@ -95,67 +96,15 @@
 
 ## NEWS
 
-- Features
-    - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
-    - ... for findFeaturesXCMS3
-    - XCMS3 grouping/import with exportedData and comparison() supports xcms3
-    - don't subtract blanks from each other
-    - syncing XCMS objects
-    - print feature counts in show(fGroups) and filter()
-    - noDataPlot() for empty plots, eg by plot(), plotChroms()...
-    - mzWindow --> mzExpWindow
-    - groupFeatures: feat arg --> obj
-    - XMCS(3): `exportedData` --> `loadRawData`
-    - OpenMS: minFWHM/maxFWHM defaults lowered for findFeatures and feat opt
-    - clarify reportCSV() now only reports remaining features?
-    - OpenMS: load intensities from FFM data (needs pre-release)
-    - featInfo in HTML reports
-    - XCMS3: add preGroupParam used when grouping prior to alignment (suggested by Ricardo Cunha)
-    - results filter/subsetting
-    - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
-    - OpenMS: optionally load peak intensities directly from feature output (`useFFMIntensities` argument)
 - Annotation
     - MSPL
-        - reAverage = FALSE for subset/filter and implications of filtering when setting it to TRUE
         - PLIndex -- > PLID and different meaning
-    - Fixed Hill ordering: H wasn't alphabetical if no C is present
-    - minMSMSPeaks and annotatedBy MSPeakLists filters
-    - fixed: withMSMS now applied after all other filters
-    - fixed: topX peaks for MSPeakLists filter would re-order peaklists
     - MetFrag
-        - formula_MF in MF FragInfo
         - useSmiles=true
-    - SIRIUS
-        - Fixed: as.data.table() and possibly others didn't handle empty fragInfos from SIRIUS
-        - More fixes to correctly handle 'adduct fragments'
-    - Fixed: as.data.table(compounds, fragments=TRUE) not outputting anything with missing fragInfo
-    - changed formula feature consensus
-        - featThreshold and featThresholdAnn
-        - former follows original definition but is now actually working properly, as pruning before could lead too high abundances
-        - latter only takes annotated features into account
-        - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
-        - renamed analysis column from feature consensus formulae results to analysis_from
-        - added analyses column in feature consensus formulae results
-        - formulas as.data.table(average=TRUE): remove analysis_from column
-        - if multiple annotations are availale for a single MS/MS peak (ie due to calculateFeatures=T) then only the annotation with lowest m/z deviation is kept (and warning is emitted)
-    - annotatedPeakList(): also add annotation columns for missing results (for consistency)
-    - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown
-    - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown
-    - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peaklists
-    - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
-    - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
-    - formula/compound annotation consensus: ranking is properly scaled
-    - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data
-    - Bruker formulas: MSPeakLists argument now required
     - frag mSigma/score now also averaged
-    - formula --> ion_formula/neutral_formula (formulas/compounds)
-    - intensity removed from fragInfo
-    - generateFormulas now includes mandatory MSPeakLists argument
     - as.data.table(): maxFormulas/maxFragFormulas removed
     - elements filter: neutral_formula used for formulas (but not fragments)
-    - Fixed: MF was using wrong/inconsistent cache name
     - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
-    - formula_mz --> ion_formula_mz
     - MF now uses peaklist precursor mz instead of fGroup mz
     - scoreLimits filter: if consensus results are filtered, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all)
     - plotSpectrum: plotStruct default changed to FALSE
@@ -164,7 +113,6 @@
         - now report generic format
         - load from cached R data --> faster as.adduct()
     - adduct as.character: err argument
-    - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
     - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
     - OpenMS and cliqueMS formats
 - suspects

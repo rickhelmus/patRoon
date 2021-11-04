@@ -12,7 +12,7 @@
 !src/GenForm-svn/*.cpp
 !src/GenForm-svn/*.h
 !tests/testthat.R
-!tests/figs/*
+!tests/testthat/_snaps/*
 !tests/testthat/*.R
 !tests/testthat/test_data/*
 !tests/testthat/test_data_sets/*

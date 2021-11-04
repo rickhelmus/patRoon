@@ -1,34 +1,46 @@
 # patRoon 2.0
 
 ## Important changes
+
 - Features
     - XMCS(3): Renamed argument `exportedData` to `loadRawData`
     - The `mzWindow` and `EICMzWindow` arguments were renamed to `mzExpWindow` / `EICMzExpWindow` and are now with slightly different meaning (please see the reference manual).
     - `groupFeatures`: renamed the `feat` argument to `obj`.
     - OpenMS: `minFWHM`/`maxFWHM` defaults lowered for `findFeatures` and feature optimization
 - Annotation
-    - ggplot2 support (i.e. `useGGPlot2` argument) for several plotting functions is removed (not often used and a maintenance burden).
+    - ggplot2 support for several plotting functions (i.e. `useGGPlot2` argument) is removed (not often used and a maintenance burden).
     - the `precursor` argument to the `plotSpectrum()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was done for consistency with compound annotations and sets workflows.
-    - The way of obtaining candidate formulae from different analyses (i.e. _feature formula_ consensus) was changed.
+    - The way of obtaining candidate formulae from different features in the same group (i.e. _feature formula_ consensus) was changed.
         - Fixes were applied to improve thresholding with `featThreshold`.
         - A second and new threshold, `featThresholdAnn`, only takes annotated features into account.
         - The default of `featThreshold` is now `0`, for `featThresholdAnn` it is the same as the previous default for `featThreshold`.
         - Candidate results: renamed `analysis` column to `analysis_from` and added `analyses` column that lists all analyses from which the consensus was made.
         - if multiple annotations are available for a single MS/MS peak (ie due to differences between feature annotations) then only the annotation with lowest m/z deviation is kept (and a warning is emitted).
+        - Scores of annotated fragments from different features are now averaged.
+    - The storage classes and interface for formula and compound annotation was harmonized
+        - The `formulas` and `compounds` classes now derive from the new `featureAnnotations` class. Most of the functionality common to formulas/compounds are defined for this class.
+        - Storage of formula annotation results mostly follow the format that was already used for compound annotations.
+        - The `maxFormulas`/`maxFragFormulas` argument for `as.data.table()` were removed, as these don't make much sense with the new format.
+        - The `elements` filter now applies to neutral formulae for both formula and compound annotations (`fragElements` still applies to the ionized fragment formula).
     - Formula annotation with Bruker now require `MSPeakLists`. Since all algorithms now require peak lists, `generateFormulas` now has a mandatory `MSPeakLists` argument (similar to `generateCompounds`).
-    - Formula candidates (formula and compound annotations) are now reported in the `ion_formula` (ionized) and `neutral_formula` (neutral) columns. Similarly, the `formula_mz` was renamed to `ion_formula_mz`.
+    - Formula candidates (formula and compound annotations) are now reported in the `ion_formula` (ionized) and `neutral_formula` (neutral) columns. Similarly, the `formula_mz` column was renamed to `ion_formula_mz`.
+- Suspect screening
+    - The methodology to match m/z values of suspects and features was changed. This was mainly for consistency and compatibility with sets workflows. Please see the updated section on suspect screening in the Handbook.
+
 
 
 ## Major new functionality
+
 - TPs
 - Sets
 - Peak qualities
 - ...
 
 ## Other new functionality
+
 - `newProject`
-    - Updated for new functionality such as sets and TP workflows and adduct annotation
-    - completely re-designed code generation. The generated code will have a slightly different layout and some parameter defaults were changed.
+    - Updated for new functionality such as sets and TP workflows and adduct annotation.
+    - Completely re-designed code generation to improve extensibility. The generated code will have a slightly different layout and some parameter defaults were changed.
 - Features
     - `as.data.table()`
         - intensity normalization (`normFunc` argument)
@@ -36,6 +48,7 @@
         - calculation of Fold-changes (`FCParams` argument)
         - report peak qualities/scores (`qualities` argument)
     - `topMostByRGroup/EICTopMostByRGroup` arguments for plotting/reporting EIC data of only the top most intense replicate(s).
+    - `reportHTML()` now only plots the EIC of the most intense feature of each replicate group (i.e. `EICTopMostByRGroup=TRUE` and `EICTopMost=1`).
     - `XCMS3`
         - `loadRawData` argument for feature grouping and `comparison()`
         - `...` argument for `findFeaturesXCMS3`
@@ -49,34 +62,60 @@
     - The methodology of `plotSpectrum()` to automatically calculate the space necessary for formula annotation texts and candidate structures was improved. Annotation texts are now automatically resized if there is insufficient space, and the maximum size and resolution for candidate structures can be controlled with the `maxMolSize`/`molRes` parameters.
     - `filter()` method for `MSPeakLists`: `minMSMSPeaks` filter to only retain MSMS peak lists with a minimum number of peaks.
     - `filter()` method for `MSPeakLists`: `annotatedBy` filter to only keep peaks with formula/compound annotations.
+- Suspect screening
+    - The `screenSuspects()` method now supports the `amend` argument, which allows combining results of different `screenSuspects()` calls (see the Handbook for details).
 
 
 ## Minor changes
-- `show()` methods now print class inheritance tree
-- `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
-- Intensity clusters now use `fastcluster` for hierarchical clustering
-- Components for homologous series new report links as character string indices instead of numeric indices.
-- `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
-- The `progressr` package is not used anymore, thus, it is not necessary to set up progress bars with future based multiprocessing.
-- `newProject`: Moved order of componentization step (now before annotation & suspect screening).
-- Plots of chromatograms, spectra etc that are without data now reflect this in the generated plot.
+
 - Features
     - Improved performance for some feature group filters.
     - `reportHTML()`: EICs are shared between tabs to avoid duplicated plotting
-    - The `features` object embedded in `featureGroups` objects is now synchronized, and any features not present in any group are removed accordingly. This reduces memory usage and indirectly causes `reportCSV()` to only report features still present. 
+    - The `features` object embedded in `featureGroups` objects is now synchronized, and any features not present in any group are removed accordingly. This reduces memory usage and indirectly causes `reportCSV()` to only report features still present.
+    - `plotInt()`: now has `xnames` and `showLegend` arguments to adjust plotting.
 - Annotation
-    - The `[` (subset) and `filter()` methods for `MSPeakLists` now only re-average peak lists if the new `reAverage` argument is set to `TRUE` (default `FALSE`). This change was mainly done as (1) the effects are usually minor and (2) re-averaging invalidates any formula/compound annotations done with the un-filtered peak lists.
+    - The `[` (subset) and `filter()` methods for `MSPeakLists` now only re-average peak lists if the new `reAverage` argument is set to `TRUE` (default `FALSE`). This change was mainly done as (1) the effects are usually minor and (2) re-averaging invalidates any formula/compound annotations done prior to filtering.
     - `filter()` method for `MSPeakLists`: the `withMSMS` filter is now applied after all other filters.
     - `MetFrag`: the raw unprocessed annotation formulas are now additionally stored in the `fragInfo` tables (`formula_MF` column).
-    - `formulas` method for `as.data.table()`: if `average=TRUE` then the `analysis_from` column (previously `analysis`) is removed.
+    - `MetFrag`: the precursor ion m/z is now taken from peak list data instead of the feature group to improve annotation.
+    - `MetFrag`: the `useSmiles` parameter is now set to `true` as this seems to improve results sometimes.
+    - `as.data.table()` method for `formulas`: if `average=TRUE` then all column data that cannot be reasonably averaged are excluded.
     - `annotatedPeakList()`: also add annotation columns for missing results (for consistency).
     - Compound MS/MS annotations do not include peak intensities anymore (already stored in MS peak lists).
+    - The `minMaxNormalization` argument to the `consensus()` method for `compounds` was removed (unused).
+    - `filter()` for `formulas`/`compounds`: if algorithm consensus results are filtered with `scoreLimits`, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all).
+    - `plotSpectrum()` for `compounds`: `plotStruct` is now defaulted to `FALSE`.
+    - `MSPeakLists` data now store an unique identifier for each mass peak in the `ID` column. These IDs are used by e.g. formula/compound annotations, and stored in the `PLID` column in their `fragInfo` data. This replaces the `PLIndex` column in `fragInfo` data, which was only row based, and therefore invalidated in case peak lists were filtered afterwards.
+- Adducts
+    - `GenFormAdducts()` and `MetFragAdducts()` now additionally return adducts in generic format and use cached data for efficiency. 
+    - `err` argument to `as.character()` to control if an error or `NA` should returned if conversion fails.
+    - Standardized GenForm/MetFrag element addition/subtraction data to improve consistency for conversions (eg NH4 --> H4N).
+    - Conversion from/to adduct formats of OpenMS (`MetaboliteAdductDecharger`) and `cliqueMS`.
+    - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
+- Suspect screening
+    - `as.data.table()`: Suspect screening specific columns are now prefixed with `susp_`.
+    - The `suspFormRank` and `suspCompRank` suspect annotation data columns were renamed to `formRank`/`suspCompRank` (the previous change made prefixing unnecessary).
+    - Several updates for Bruker TASQ import.
+    - `logPath` argument for `annotateSuspects()` to specify the file path for log files are disable logging completely.
+    - suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows
+- Components
+    - Intensity clusters now use `fastcluster` for hierarchical clustering.
+    - Changed column `rt` to `ret` for consistency.
+    - `show()`: show unique feature group counts.
+    - `filter()`: allow negative `rtIncrement` values.
+    - `nontarget`: replaced `extraOpts` argument with `...`.
+    - `nontarget`: store links as character string indices instead of numeric indices.
+    - `RAMClustR`: moved position of `ionization` argument to improve consistency.
+    - The 'reduced components' mechanism, where a components object was returned without any algorithm specific data (using the `componentsReduced` class) when filtering/subsetting components, was removed. This system was quite unintuitive and imposed unnecessary limitations. Instead, functions that cannot work after component data is changed (e.g. those specific to intensity clustering) will throw an error if needed.
+- Misc
+    - `show()` methods now print class inheritance tree
+    - The `progressr` package is not used anymore, thus, it is not necessary to set up progress bars with `future` based multiprocessing.
+    - `newProject`: Moved order of componentization step (now before annotation & suspect screening).
+    - Plots of chromatograms, spectra etc that are without data now reflect this in the generated plot.
+
 
 ## Fixes
-- Future multiprocessing: make sure that logs are created even when an error occurs.
-- Classic multiprocessing: intermediate results are cached again
-- Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
-- `newProject`: correctly handle DIA with Bruker MS peak lists
+
 - Features
     - Blank filter: don't subtract blanks from each other
     - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
@@ -94,6 +133,20 @@
     - fixed: Hill ordering: H wasn't sorted alphabetically if no C is present.
     - Several fixes were applied to improve handling of `SIRIUS` 'adduct fragments'.
     - formula/compound annotation consensus ranking is now properly scaled.
+    - Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
+- Suspect screening
+    - Fixed: `numericIDLevel()` now handles `NA` values.
+    - `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
+- Components
+    - `RAMClustR`: ensure that columns are the right type if all values are NA
+    - `CAMERA`: correctly handle cases when `minSize` filter results in zero components.
+    - `plotGraph()`: improve error handling with empty objects
+- Misc
+    - Future multiprocessing: make sure that logs are created even when an error occurs.
+    - Classic multiprocessing: intermediate results are cached again
+    - Fixed: parallelization issues with cached data (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
+    - `newProject()`: correctly handle DIA with Bruker MS peak lists
+
 
 # patRoon 1.2.1
 

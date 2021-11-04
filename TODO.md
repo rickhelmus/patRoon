@@ -96,52 +96,15 @@
 
 ## NEWS
 
-- Annotation
-    - MSPL
-        - PLIndex -- > PLID and different meaning
-    - MetFrag
-        - useSmiles=true
-    - frag mSigma/score now also averaged
-    - as.data.table(): maxFormulas/maxFragFormulas removed
-    - elements filter: neutral_formula used for formulas (but not fragments)
-    - compounds consensus: removed minMaxNormalization param (wasn't used anyway, old left-over?)
-    - MF now uses peaklist precursor mz instead of fGroup mz
-    - scoreLimits filter: if consensus results are filtered, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all)
-    - plotSpectrum: plotStruct default changed to FALSE
-- adducts
-    - GenForm/MetFragAdducts()
-        - now report generic format
-        - load from cached R data --> faster as.adduct()
-    - adduct as.character: err argument
-    - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
-    - OpenMS and cliqueMS formats
-- suspects
-    - susp_ prefix in as.data.table
-    - suspFormRank/suspCompRank --> formRank/compRank
-    - Updated TASQ support
-    - numericIDLevel: handle NAs
-    - logPath for annotateSuspects()
-    - mass matching has changed
-    - suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows
-    - amending
-- components
-    - RC components: ensure that columns are the right type if all values are NA
-    - changed "rt" to "ret" for component columns for consistency
-    - show(): show unique fGroup counts
-    - CAMERA components: handle cases when `minSize` filter results in zero components
-    - CAMERA components: ensure consistent component names
-    - filter(): allow negative rtIncrement values
-    - componentsReduced removed, intclust checks instead
-    - extraOpts --> `...` for nontarget
-    - generateComponentsRAMClustR: moved ionization arg (consistency with other functions)
-- plotGraph: better error if object is empty
-- Fixed: cache parallelization issues (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
-- xnames/showLegend args for plotInt
-- newProject: switch to new system and tweaks
-- as.data.table(formulas, average=T): now removes most cols
-- adduct/ionization args optional if fGroups is adduct annotated
-- reportHTML/reportPDF: EICTopMostByRGroup=T && EICTopMost=1 by default
-
+- Other major things to discuss
+    - delete()
+    - TPs
+    - sets
+    - feature scoring
+    - check UIs
+    - adduct annotations & selection
+        - adduct/ionization args optional if fGroups is adduct annotated
+    - ...
 
 # Lower priority
 

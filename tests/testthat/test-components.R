@@ -40,8 +40,6 @@ test_that("components generation works", {
     expect_known_value(compsInt, testFile("components-int"))
     expect_known_value(compsSpec, testFile("components-spec"))
     expect_known_value(compsOpenMS, testFile("components-om"))
-    # can't compare cliqueMS data as it has environments in them that change
-    expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
 
     expect_length(compsEmpty, 0)
     expect_length(doGenComponents(fGroupsEmpty, "ramclustr"), 0)
@@ -58,6 +56,13 @@ test_that("components generation works", {
     expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)
     expect_gt(length(unique(as.data.table(compsClMSNoAB)$adduct_ion)),
               length(unique(as.data.table(compsClMS)$adduct_ion)))
+    
+    skip_on_os("windows")
+    
+    # BUG: cliqueMS gives different results on Windows/Linux, skip former for ref checking for now.
+    # NOTE: can't compare cliqueMS data as it has environments in them that change
+    expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
+    
 })
 
 test_that("verify components show", {
@@ -66,6 +71,10 @@ test_that("verify components show", {
     expect_known_show(compsInt, testFile("components-int", text = TRUE))
     expect_known_show(compsSpec, testFile("components-spec", text = TRUE))
     expect_known_show(compsOpenMS, testFile("components-om", text = TRUE))
+    
+    skip_on_os("windows")
+    
+    # BUG: cliqueMS gives different results on Windows/Linux, skip former for ref checking for now.
     expect_known_show(compsClMS, testFile("components-cm", text = TRUE))
 })
 

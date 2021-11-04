@@ -96,15 +96,8 @@
 
 ## NEWS
 
-- Other major things to discuss
-    - delete()
-    - TPs
-    - sets
-    - feature scoring
-    - check UIs
-    - adduct annotations & selection
-        - adduct/ionization args optional if fGroups is adduct annotated
-    - ...
+- add paper ref, re-read
+
 
 # Lower priority
 

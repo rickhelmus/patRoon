@@ -1,5 +1,10 @@
 # patRoon 2.0
 
+This release adds a significant amount of new functionality and changes. Please see the [publication], updated Handbook and sections below for more information.
+
+Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+
+
 ## Important changes
 
 - Features
@@ -28,13 +33,29 @@
     - The methodology to match m/z values of suspects and features was changed. This was mainly for consistency and compatibility with sets workflows. Please see the updated section on suspect screening in the Handbook.
 
 
-
 ## Major new functionality
 
-- TPs
-- Sets
-- Peak qualities
-- ...
+### Transformation product screening
+
+The most important new functionality in `patRoon 2.0` are transformation product (TP) screening workflows. This release adds functionality to predict TPs (with `BioTransformer` or metabolic logic) or search TPs in `PubChem` or custom databases. Furthermore,  other data such as MS/MS similarity or feature classification data can be used to relate parent/TP features. Other TP screening functionality includes TP prioritization and automatic generation of TP compound database for `MetFrag` annotation. The workflows follow the classical design of `patRoon`, where flexible workflows can be executed with a combination of established algorithms and new functionality. For more information, please see the dedicated chapter about TP screening in the Handbook.
+
+### Sets workflows
+
+Another major change in this release is the addition of sets workflows. These workflows are typically used to simultaneously process positive and negative ionization data. Advantages of sets workflows include simplification of data processing, combining positive and negative data to improve e.g. feature annotations and easily comparing features across polarities. A sets workflow requires minimal changes to a 'classical workflow', and most of the additional work needed to process both polarities is done automatically behind the scenes. For more information, please see the dedicated chapter about sets workflows in the Handbook.
+
+### Features
+
+The following new feature detection/grouping algorithms were integrated: `SIRIUS`, `KPIC2` and `SAFD`. Furthermore, integration with `MetaClean` was implemented for the calculation of peak qualities and machine learning based classification of pass/fail peaks. In addition, the peak qualities are used to calculate peak scores, which can be used for quick assessment and prioritization.
+
+### Data curation
+
+Interactive curation of feature data with `checkChromatograms()` was replaced with `checkFeatures()`, which is much faster, is better suitable for larger datasets, customizable and has an improved user interface. Furthermore, this tool can be used for training/assessing `MetaClean` models. Similarly, `checkComponents()` is a function that allows interactive curation of component data.
+
+The `delete()` generic function allows straightforward deletion of workflow data, such as features, components and annotations. Furthermore, this function makes it easy to implement customized filters.
+
+### Adduct annotation
+
+The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were integrated for additional ways to detect adducts/isotopes through componentization. Furthermore, the `selectIons()` method uses these annotations to prioritize features (e.g. by only retaining those with preferable adducts). In addition, this function stores the adduct annotations for the remaining feature groups, which can then be automatically used for e.g. formula and compound annotation.
 
 ## Other new functionality
 
@@ -64,6 +85,8 @@
     - `filter()` method for `MSPeakLists`: `annotatedBy` filter to only keep peaks with formula/compound annotations.
 - Suspect screening
     - The `screenSuspects()` method now supports the `amend` argument, which allows combining results of different `screenSuspects()` calls (see the Handbook for details).
+- Components
+    - A new algorithm, `specclust`, which generates components based on hierarchically clustering feature groups with high MS/MS similarities.
 
 
 ## Minor changes
@@ -107,6 +130,7 @@
     - `nontarget`: store links as character string indices instead of numeric indices.
     - `RAMClustR`: moved position of `ionization` argument to improve consistency.
     - The 'reduced components' mechanism, where a components object was returned without any algorithm specific data (using the `componentsReduced` class) when filtering/subsetting components, was removed. This system was quite unintuitive and imposed unnecessary limitations. Instead, functions that cannot work after component data is changed (e.g. those specific to intensity clustering) will throw an error if needed.
+    - The objects returned from `intclust` components are now derived from a general `componentsClust` class, which is shared with `specclust` components. The common functionality for both algorithms is implemented for this class.
 - Misc
     - `show()` methods now print class inheritance tree
     - The `progressr` package is not used anymore, thus, it is not necessary to set up progress bars with `future` based multiprocessing.

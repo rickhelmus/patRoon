@@ -17,7 +17,6 @@ file.copy(patRoon:::getMzMLAnalysisPath(anaInfoOne$analysis[1], anaInfoOne$path[
 # group optimizing happens with the features object from the first iteration, as these inconsistencies make the others
 # are slightly different.
 
-
 ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), mzPPM = c(5, 15),
                                                               noiseThrInt = 3E4),
                                       maxIterations = 2)
@@ -30,11 +29,14 @@ ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(dmzgap = c(1
 
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
-fgOptOpenMS <- optimizeFeatureGrouping(experimentInfo(ffOptOpenMS, 1, 1)$finalResult$object, "openms",
+ffOpenMS <- findFeatures(anaInfo, "openms", noiseThrInt = 3E4)
+ffXCMS3 <- findFeatures(anaInfo, "xcms3", xcms::CentWaveParam(noise = 3E4))
+
+fgOptOpenMS <- optimizeFeatureGrouping(ffOpenMS, "openms",
                                        list(maxGroupMZ = c(0.002, 0.007)), maxIterations = 2)
 # fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
 #                                                                               retcorArgs = list(method = "obiwarp")))
-fgOptXCMS3 <- optimizeFeatureGrouping(experimentInfo(ffOptXCMS3, 1, 1)$finalResult$object, "xcms3",
+fgOptXCMS3 <- optimizeFeatureGrouping(ffXCMS3, "xcms3",
                                       list(groupParams = list(bw = c(22, 28))), maxIterations = 2)
 
 expInfoPrepForComp <- function(...)

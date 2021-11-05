@@ -12,7 +12,8 @@ remotes::install_github("rickhelmus/patRoonData@version20", upgrade = "never")
 remotes::install_github("thomasp85/farver", upgrade = "never")
 remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
 install.packages("vdiffr")
-install.packages("circlize", repos="http://cran.r-project.org") # get most recent version (rpm is too old)
+install.packages(c("circlize", "VennDiagram"),
+                 repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
 BiocManager::install("ropls") # for KPIC2
 remotes::install_github("rickhelmus/KPIC2")

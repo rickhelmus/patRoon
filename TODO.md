@@ -66,6 +66,7 @@
 ## docs
 
 - ref docs
+    - add TPs Zenodo link
     - delete()
         - mention j=DT for fGroups method?
     - order of sets sections

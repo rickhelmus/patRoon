@@ -58,3 +58,4 @@
 [SAFD]: https://bitbucket.org/SSamanipour/safd.jl/src/master/
 [YAML]: https://en.wikipedia.org/wiki/YAML
 [MetaClean]: https://github.com/KelseyChetnik/MetaClean/
+[PubChemLiteTR]: https://doi.org/10.5281/zenodo.5644560

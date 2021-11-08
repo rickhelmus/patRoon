@@ -31,14 +31,12 @@ The next sections will outline more details on these steps are performed and con
 
 ## Obtaining transformation product data {#genTPs}
 
-UNDONE: cite PC
-
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
 Algorithm        | Usage                                            | Remarks
 ---------------- | ------------------------------------------------ | ---------------------------------
 [BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
-Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem] or custom)
+Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem transformations][PubChemLiteTR] or custom)
 Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
 
 The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic only requires the feature mass, and this simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
@@ -146,9 +144,7 @@ The `convertToSuspects` function is always part of a workflow with `biotransform
 
 ### Custom libraries and transformations {#TPsCustom}
 
-UNDONE: DB refs
-
-By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on X and @Scholle2015, respectively). However, it is also possible to use custom data.
+By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on [PubChem transformations][PubChemLiteTR] and @Scholle2015, respectively). However, it is also possible to use custom data.
 
 To use a custom TP library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
 

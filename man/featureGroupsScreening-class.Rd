@@ -6,6 +6,7 @@
 \alias{featureGroupsScreening-class}
 \alias{featureGroupsScreening}
 \alias{screenInfo,featureGroupsScreening-method}
+\alias{screenInfo}
 \alias{show,featureGroupsScreening-method}
 \alias{[,featureGroupsScreening,ANY,ANY,missing-method}
 \alias{delete,featureGroupsScreening-method}
@@ -378,8 +379,8 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
 }
 
 \section{Source}{
- Cosine spectral similarity calculation was based on the code from
-  \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
+ Cosine spectral similarity calculation was based on the code from \code{SpectrumSimilarity()}
+  function of \pkg{OrgMassSpecR}.
 }
 
 \section{Sets workflows}{

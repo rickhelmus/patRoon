@@ -309,6 +309,8 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @param flatnessFactor Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 #'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
 #'
+#' @template parallel-arg
+#' 
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.

@@ -518,7 +518,7 @@ RUserDir <- function(...)
 {
     if (getRversion() >= "4.0.0")
         return(tools::R_user_dir(...))
-    return(backports:::R_user_dir(...))
+    return(getFromNamespace("R_user_dir", "backports")(...))
 }
 
 ReduceWithArgs <- function(f, x, ..., fixedArgs = list())

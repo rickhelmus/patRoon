@@ -240,6 +240,9 @@ components} section for more details.}
 \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}}, \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}}
 and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.}
 
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+see the parallelization section in the handbook for more details.}
+
 \item{method}{Clustering method that should be applied (passed to
 \code{\link[fastcluster:hclust]{fastcluster::hclust}}).}
 

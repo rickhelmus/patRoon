@@ -14,7 +14,7 @@
 \alias{[,compoundsCluster,ANY,missing,missing-method}
 \alias{treeCut,compoundsCluster-method}
 \alias{treeCutDynamic,compoundsCluster-method}
-\alias{plot,compoundsCluster,ANY-method}
+\alias{plot,compoundsCluster,missing-method}
 \alias{getMCS,compoundsCluster-method}
 \alias{plotStructure,compoundsCluster-method}
 \alias{plotSilhouettes,compoundsCluster-method}
@@ -40,13 +40,13 @@
 
 \S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit, minModuleSize, groupName)
 
-\S4method{plot}{compoundsCluster,ANY}(
+\S4method{plot}{compoundsCluster,missing}(
   x,
+  ...,
   groupName,
   pal = "Paired",
   colourBranches = lengths(x)[groupName] < 50,
-  showLegend = lengths(x)[groupName] < 20,
-  ...
+  showLegend = lengths(x)[groupName] < 20
 )
 
 \S4method{getMCS}{compoundsCluster}(obj, groupName, cluster)

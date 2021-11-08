@@ -20,6 +20,7 @@
 \alias{filter,MSPeakLists-method}
 \alias{plotSpectrum,MSPeakLists-method}
 \alias{spectrumSimilarity,MSPeakLists-method}
+\alias{spectrumSimilarity}
 \alias{MSPeakListsSet-class}
 \alias{MSPeakListsSet}
 \alias{analysisInfo,MSPeakListsSet-method}

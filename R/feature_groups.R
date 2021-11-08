@@ -832,10 +832,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 #' @param onlyUnique If \code{TRUE} and \code{colourBy="rGroups"} then only
 #'   feature groups that are unique to a replicate group are plotted.
 #' @export
-setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "fGroups"),
-                                            onlyUnique = FALSE, retMin = FALSE,
-                                            showLegend = TRUE, col = NULL,
-                                            pch = NULL, ...)
+setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = c("none", "rGroups", "fGroups"),
+                                                                  onlyUnique = FALSE, retMin = FALSE,
+                                                                  showLegend = TRUE, col = NULL,
+                                                                  pch = NULL, ...)
 {
     rGroups <- replicateGroups(x)
     if (is.null(which))
@@ -1636,6 +1636,8 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 #' @inheritParams calculatePeakQualities,features-method
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
 #'
+#' @template parallel-arg
+#' 
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
@@ -1764,6 +1766,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 #' @return \code{selectIons} returns a \code{featureGroups} object with only the selected feature groups and amended
 #'   with adduct annotations.
 #'
+#' @aliases selectIons
 #' @export
 setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE,
                                                   chargeMismatch = "adduct")

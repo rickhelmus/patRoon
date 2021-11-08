@@ -1,11 +1,12 @@
 #### Dependencies
 
-#' @importFrom utils head tail modifyList setTxtProgressBar txtProgressBar write.csv write.table read.csv
+#' @importFrom utils head tail modifyList setTxtProgressBar txtProgressBar write.csv write.table read.csv data
 #' @importFrom graphics axis barplot close.screen grconvertX grconvertY grid layout legend lines par plot.new points polygon rasterImage rect screen segments split.screen strwidth text title xinch yinch abline contour persp
-#' @importFrom grDevices adjustcolor colorRampPalette
-#' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames as.dendrogram order.dendrogram as.dist as.formula
+#' @importFrom grDevices adjustcolor colorRampPalette dev.off png
+#' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames as.dendrogram order.dendrogram as.dist as.formula weighted.mean cor p.adjust t.test
 #' @importFrom Rdpack reprompt
 #' @importFrom magrittr %>%
+#' @import methods
 #' @import data.table
 #' @import shiny
 #' @import cluster
@@ -179,6 +180,8 @@ NULL
 #'   workflow}.
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
+#' @template parallel-arg
+#' 
 #' @templateVar what \code{findFeaturesOpenMS}, \code{findFeaturesSIRIUS} and \code{findFeaturesSAFD}
 #' @template uses-multiProc
 #'
@@ -320,6 +323,8 @@ NULL
 #' @param maxIterations Maximum number of iterations that may be performed to find optimimum values. Used to restrict
 #'   neededless long optimization procedures. In IPO this was fixed to \samp{50}.
 #' @param maxModelDeviation See the \verb{Potential suboptimal results by optimization model} section below.
+#'
+#' @template parallel-arg
 #'
 #' @section Parameter sets: Which parameters should be optimized is determined by a \emph{parameter set}. A set is
 #'   defined by a named \code{list} containing the minimum and maximum starting range for each parameter that should be
@@ -725,6 +730,8 @@ NULL
 #' @template specSimParams-arg
 #'
 #' @template dynamictreecut
+#' 
+#' @template parallel-arg
 #'
 #' @section Feature components: Components resulting from \code{generateComponentsCliqueMS} and
 #'   \code{generateComponentsOpenMS} are based on so called \emph{feature components}. Unlike other algorithms,

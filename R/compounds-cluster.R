@@ -181,9 +181,9 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
 #' @templateVar withoutDots TRUE
 #' @template plot_clust
 #' @export
-setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
-                                               colourBranches = lengths(x)[groupName] < 50,
-                                               showLegend = lengths(x)[groupName] < 20, ...)
+setMethod("plot", c(x = "compoundsCluster", y = "missing"), function(x, ..., groupName, pal = "Paired",
+                                                                     colourBranches = lengths(x)[groupName] < 50,
+                                                                     showLegend = lengths(x)[groupName] < 20)
 {
     assertChoiceSilent(groupName, names(x@clusters))
     checkmate::assertString(pal, min.chars = 1)

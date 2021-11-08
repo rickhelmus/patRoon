@@ -8,7 +8,7 @@
 \alias{length,optimizationResult-method}
 \alias{lengths,optimizationResult-method}
 \alias{show,optimizationResult-method}
-\alias{plot,optimizationResult,ANY-method}
+\alias{plot,optimizationResult,missing-method}
 \alias{optimizedParameters,optimizationResult-method}
 \alias{optimizedParameters}
 \alias{optimizedObject,optimizationResult-method}
@@ -27,7 +27,7 @@
 
 \S4method{show}{optimizationResult}(object)
 
-\S4method{plot}{optimizationResult,ANY}(
+\S4method{plot}{optimizationResult,missing}(
   x,
   paramSet,
   DoEIteration,

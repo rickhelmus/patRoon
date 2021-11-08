@@ -36,7 +36,7 @@
 \alias{export,featureGroups-method}
 \alias{getFCParams}
 \alias{as.data.table,featureGroups-method}
-\alias{plot,featureGroups,ANY-method}
+\alias{plot,featureGroups,missing-method}
 \alias{plotInt,featureGroups-method}
 \alias{plotChord,featureGroups-method}
 \alias{plotChroms,featureGroups-method}
@@ -48,6 +48,7 @@
 \alias{overlap}
 \alias{calculatePeakQualities,featureGroups-method}
 \alias{selectIons,featureGroups-method}
+\alias{selectIons}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
@@ -142,7 +143,7 @@ getFCParams(rGroups, ...)
   FCParams = NULL
 )
 
-\S4method{plot}{featureGroups,ANY}(
+\S4method{plot}{featureGroups,missing}(
   x,
   colourBy = c("none", "rGroups", "fGroups"),
   onlyUnique = FALSE,
@@ -475,6 +476,9 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
 
 \item{avgFunc}{The function used to average the peak qualities and scores for each feature group.}
+
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+see the parallelization section in the handbook for more details.}
 
 \item{components}{The \code{components} object that was generated for the given \code{featureGroups} object.
 Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those

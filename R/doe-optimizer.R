@@ -421,8 +421,9 @@ setMethod("show", "optimizationResult", function(object)
 #' }
 #'
 #' @export
-setMethod("plot", "optimizationResult", function(x, paramSet, DoEIteration, paramsToPlot = NULL, maxCols = NULL, type = "contour",
-                                                 image = TRUE, contours = "colors", ...)
+setMethod("plot", c(x = "optimizationResult", y = "missing"), function(x, paramSet, DoEIteration, paramsToPlot = NULL,
+                                                                       maxCols = NULL, type = "contour",
+                                                                       image = TRUE, contours = "colors", ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertInt(paramSet, lower = 1, upper = length(x@paramSets)) # don't add, this should fail before the next line

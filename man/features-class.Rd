@@ -147,6 +147,9 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
 
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+see the parallelization section in the handbook for more details.}
+
 \item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
 \code{negate=TRUE}).}
 

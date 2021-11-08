@@ -629,6 +629,7 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 #' @author For \code{spectrumSimilarity}: major contributions by Bas van de Velde for spectral binning and similarity
 #'   calculation.
 #'
+#' @aliases spectrumSimilarity
 #' @export
 setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2 = NULL, analysis1 = NULL,
                                                         analysis2 = NULL, MSLevel = 1,

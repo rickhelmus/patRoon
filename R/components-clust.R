@@ -171,9 +171,9 @@ setMethod("treeCutDynamic", "componentsClust", function(obj, maxTreeHeight, deep
 #' @templateVar withoutDots TRUE
 #' @template plot_clust
 #' @export
-setMethod("plot", "componentsClust", function(x, pal = "Paired", numericLabels = TRUE,
-                                              colourBranches = length(x) < 50,
-                                              showLegend = length(x) < 20, ...)
+setMethod("plot", c(x = "componentsClust", y = "missing"), function(x, pal = "Paired", numericLabels = TRUE,
+                                                                    colourBranches = length(x) < 50,
+                                                                    showLegend = length(x) < 20, ...)
 {
     verifyCompNotAltered(x)
     

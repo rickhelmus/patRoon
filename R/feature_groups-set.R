@@ -94,6 +94,10 @@ setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 #' @export
 setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
 {
+    # UNDONE: this function definition gives a warning with R checking as value must be the last argument, however,
+    # putting it as last will not work with the other arguments as their names must then be specified explicitly and
+    # defaults don't work.
+    
     assertSets(obj, set, FALSE)
     checkmate::assertFlag(reGroup)
     

@@ -10,7 +10,7 @@
 \alias{clusterProperties,componentsClust-method}
 \alias{treeCut,componentsClust-method}
 \alias{treeCutDynamic,componentsClust-method}
-\alias{plot,componentsClust,ANY-method}
+\alias{plot,componentsClust,missing-method}
 \alias{plotSilhouettes,componentsClust-method}
 \title{Base class for components that are based on hierarchical clustered data.}
 \usage{
@@ -26,7 +26,7 @@
 
 \S4method{treeCutDynamic}{componentsClust}(obj, maxTreeHeight, deepSplit, minModuleSize)
 
-\S4method{plot}{componentsClust,ANY}(
+\S4method{plot}{componentsClust,missing}(
   x,
   pal = "Paired",
   numericLabels = TRUE,

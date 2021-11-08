@@ -85,7 +85,7 @@ findFeaturesOpenMS(
 
 findFeaturesSAFD(
   analysisInfo,
-  profPath,
+  profPath = NULL,
   mzRange = c(0, 400),
   maxNumbIter = 1000,
   maxTPeakW = 300,
@@ -162,6 +162,9 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 \code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
 likely what you want as otherwise any processed data is lost.}
+
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+see the parallelization section in the handbook for more details.}
 
 \item{enviProjPath}{The path of the enviMass project.}
 
@@ -394,11 +397,11 @@ The file format of analyses for \code{findFeaturesOpenMS} must be
   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
   everything works, \emph{e.g.} by running the test data.
 
-  This algorithm only supports profile (\emph{i.e.} not centroided) MS data. Since other \code{patRoon} functionality
-  typically relies on the centroided data, MS data must be available in \emph{both} forms. The centroided data is
-  specified through the 'regular' \link[=analysis-information]{analysis info} mechanism, whereas the location of the
-  profile data is specified through the \code{profPath} argument. The base file names (\emph{i.e.} the file name
-  without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+  This algorithm only supports profile and centroided MS data. If the use of profile data is desired, centroided data
+  must still be available for other functionality of \code{patRoon}. The centroided data is specified through the
+  'regular' \link[=analysis-information]{analysis info} mechanism. The location to any profile data is specified
+  through the \code{profPath} argument (\code{NULL} for no profile data). The base file names (\emph{i.e.} the file
+  name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
   profile data must be \code{mzXML}.
 }
 

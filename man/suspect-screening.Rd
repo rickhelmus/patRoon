@@ -10,6 +10,7 @@
 \alias{numericIDLevel}
 \alias{genIDLevelRulesFile}
 \alias{screenSuspects,featureGroupsSet-method}
+\alias{screenSuspects,featureGroupsScreeningSet-method}
 \alias{featureGroupsBrukerTASQ-class}
 \alias{featureGroupsBrukerTASQ}
 \alias{importFeatureGroupsBrukerTASQ}
@@ -50,6 +51,17 @@ genIDLevelRulesFile(out, inLevels = NULL, exLevels = NULL)
   adduct,
   skipInvalid,
   onlyHits
+)
+
+\S4method{screenSuspects}{featureGroupsScreeningSet}(
+  fGroups,
+  suspects,
+  rtWindow,
+  mzWindow,
+  adduct,
+  skipInvalid,
+  onlyHits,
+  amend = FALSE
 )
 
 importFeatureGroupsBrukerTASQ(path, analysisInfo, clusterRTWindow = 12)

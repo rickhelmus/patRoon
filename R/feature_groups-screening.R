@@ -112,6 +112,7 @@ setMethod("initialize", "featureGroupsScreening",
 
 #' @describeIn featureGroupsScreening Returns a table with screening information
 #'   (see \code{screenInfo} slot).
+#' @aliases screenInfo
 #' @export
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
@@ -221,8 +222,8 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
 #'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
 #'
-#' @section Source: Cosine spectral similarity calculation was based on the code from
-#'   \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
+#' @section Source: Cosine spectral similarity calculation was based on the code from \code{SpectrumSimilarity()}
+#'   function of \pkg{OrgMassSpecR}.
 #'
 #' @aliases annotateSuspects
 #' @export

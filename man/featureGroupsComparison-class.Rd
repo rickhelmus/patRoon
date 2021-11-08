@@ -9,6 +9,8 @@
 \alias{[,featureGroupsComparison,ANY,missing,missing-method}
 \alias{[[,featureGroupsComparison,ANY,missing-method}
 \alias{$,featureGroupsComparison-method}
+\alias{featureGroupsComparisonSet-class}
+\alias{featureGroupsComparisonSet}
 \title{Feature groups comparison class}
 \usage{
 \S4method{names}{featureGroupsComparison}(x)

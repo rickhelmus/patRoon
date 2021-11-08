@@ -65,6 +65,7 @@ setMethod("$", "featureGroupsComparison", function(x, name)
 })
 
 # dummy class to differentiate between (non-)sets objects
+#' @rdname featureGroupsComparison-class
 #' @export
 featureGroupsComparisonSet <- setClass("featureGroupsComparisonSet", contains = "featureGroupsComparison")
 
@@ -213,7 +214,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
 #' @param retMin If \code{TRUE} retention times are plotted as minutes (seconds otherwise).
 #' @rdname featureGroups-compare
 #' @export
-setMethod("plot", "featureGroupsComparison", function(x, retMin = TRUE, ...) plot(x@comparedFGroups, retMin, ...))
+setMethod("plot", c(x = "featureGroupsComparison", y = "missing"), function(x, retMin = TRUE, ...) plot(x@comparedFGroups, retMin, ...))
 
 #' @details \code{plotVenn} plots a Venn diagram outlining unique and shared
 #'   feature groups between up to five compared feature groups.
@@ -400,6 +401,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
                                   ftindex = consFeatInds, algorithm = allAlgos))
 })
 
+#' @rdname featureGroups-compare
 #' @export
 setMethod("comparison", "featureGroupsSet", function(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 {

@@ -408,6 +408,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                      annotations = copy(annotations(fGroups))))
 })
 
+#' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                                   adduct, skipInvalid, onlyHits, amend = FALSE)

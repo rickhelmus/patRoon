@@ -11,17 +11,18 @@
 \alias{featureGroupsConsensus}
 \alias{comparison,featureGroups-method}
 \alias{comparison}
-\alias{plot,featureGroupsComparison,ANY-method}
+\alias{plot,featureGroupsComparison,missing-method}
 \alias{plotVenn,featureGroupsComparison-method}
 \alias{plotUpSet,featureGroupsComparison-method}
 \alias{plotChord,featureGroupsComparison-method}
 \alias{consensus,featureGroupsComparison-method}
+\alias{comparison,featureGroupsSet-method}
 \alias{consensus,featureGroupsComparisonSet-method}
 \title{Comparing feature groups}
 \usage{
 \S4method{comparison}{featureGroups}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 
-\S4method{plot}{featureGroupsComparison,ANY}(x, retMin = TRUE, ...)
+\S4method{plot}{featureGroupsComparison,missing}(x, retMin = TRUE, ...)
 
 \S4method{plotVenn}{featureGroupsComparison}(obj, which = NULL, ...)
 
@@ -36,6 +37,8 @@
   uniqueFrom = NULL,
   uniqueOuter = FALSE
 )
+
+\S4method{comparison}{featureGroupsSet}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 
 \S4method{consensus}{featureGroupsComparisonSet}(obj, ...)
 }

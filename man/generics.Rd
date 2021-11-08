@@ -477,7 +477,7 @@ please refer to the linked method documentation for each generic.
  \code{plot} Generates a plot for an object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plot,componentsClust,ANY-method]{componentsClust,ANY}}; \code{\link[=plot,compoundsCluster,ANY-method]{compoundsCluster,ANY}}; \code{\link[=plot,featureGroups,ANY-method]{featureGroups,ANY}}; \code{\link[=plot,featureGroupsComparison,ANY-method]{featureGroupsComparison,ANY}}; \code{\link[=plot,optimizationResult,ANY-method]{optimizationResult,ANY}}.
+    \item Methods are defined for: \code{\link[=plot,componentsClust,missing-method]{componentsClust,missing}}; \code{\link[=plot,compoundsCluster,missing-method]{compoundsCluster,missing}}; \code{\link[=plot,featureGroups,missing-method]{featureGroups,missing}}; \code{\link[=plot,featureGroupsComparison,missing-method]{featureGroupsComparison,missing}}; \code{\link[=plot,optimizationResult,missing-method]{optimizationResult,missing}}.
 }
 
  \code{show} Prints information about this object.

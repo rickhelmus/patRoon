@@ -22,7 +22,7 @@
 \usage{
 \S4method{comparison}{featureGroups}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 
-\S4method{plot}{featureGroupsComparison,missing}(x, retMin = TRUE, ...)
+\S4method{plot}{featureGroupsComparison,missing}(x, retMin = FALSE, ...)
 
 \S4method{plotVenn}{featureGroupsComparison}(obj, which = NULL, ...)
 

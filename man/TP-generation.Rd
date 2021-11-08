@@ -68,8 +68,8 @@ of the \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package
 parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
 Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.}
 
-\item{TPLibrary}{If \code{NULL}, a default \href{https://pubchem.ncbi.nlm.nih.gov}{PubChem} based library is used.
-Otherwise, \code{TPLibrary} should be a \code{data.frame}. See section below.}
+\item{TPLibrary}{If \code{NULL}, a default \href{https://doi.org/10.5281/zenodo.5644560}{PubChem} based library is
+used. Otherwise, \code{TPLibrary} should be a \code{data.frame}. See section below.}
 
 \item{matchParentsBy}{A \code{character} that specifies how the input parents are matched with the data from the TP
 library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.}
@@ -115,7 +115,7 @@ database (\code{\link{convertToMFDB}}) or further processed to generate parent t
 \code{generateTPsLibrary} obtains transformation products from a library. Similar to
   \code{generateTPsBioTransformer}, this algorithm relies and provides structural information for parents/TPs
   (\acronym{SMILES}). By default, a library is used that is based on data from
-  \href{https://pubchem.ncbi.nlm.nih.gov}{PubChem}. However, it also possible to use your own library.
+  \href{https://doi.org/10.5281/zenodo.5644560}{PubChem}. However, it also possible to use your own library.
 
 \code{generateTPsLogic} applies \emph{metabolic logic} to predict transformation products. With this
   algorithm, TPs are predicted from common (environmental) chemical reactions, such as hydroxylation, demethylation

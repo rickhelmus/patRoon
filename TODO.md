@@ -59,12 +59,9 @@
 ## docs
 
 - ref docs
-    - add TPs Zenodo link
     - delete()
         - mention j=DT for fGroups method?
     - order of sets sections
-    - references
-        - PC transformations
 - handbook
     - TPs
         - add MSPL filtering of annotated peaks (in examples)?

@@ -19,6 +19,7 @@ getDefAvgPListParams <- function(...)
 }
 
 # For docs
+# nocov start
 getDefAvgPListParamsRD <- function()
 {
     def <- getDefAvgPListParams()
@@ -26,6 +27,7 @@ getDefAvgPListParamsRD <- function()
     def$avgFun <- "mean" # UNDONE?
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
+# nocov end
 
 #' @details The \code{getDefIsolatePrecParams} is used to create a parameter
 #'   list for isolating the precursor and its isotopes (see \verb{Isolating precursor data}).
@@ -42,12 +44,14 @@ getDefIsolatePrecParams <- function(...)
 }
 
 # For docs
+# nocov start
 getDefIsolatePrecParamsRD <- function()
 {
     def <- getDefIsolatePrecParams()
     def <- sapply(def, function(v) if (length(v) == 2) sprintf("c(%s, %s)", v[1], v[2]) else as.character(v))
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
+# nocov end
 
 #' MS spectral similarity calculation parameters
 #'
@@ -325,6 +329,7 @@ getMSPeakListPlotTitle <- function(MSLevel, analysis, groupName)
 }
 
 # NOTE: This function is mainly for debugging the C++ version
+# nocov start
 binPeakLists <- function(pl1, pl2, shift, absMzDev)
 {
     prep <- function(pl)
@@ -412,6 +417,7 @@ specSimilarityR <- function(pl1, pl2, method, shift = "none", removePrecursor = 
                   spearman = cor(u, v, method = "spearman"),
                   jaccard = binnedPL[intensity_1 != 0 & intensity_2 != 0, .N] / nrow(binnedPL)))
 }
+# nocov end
 
 getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams, nr)
 {

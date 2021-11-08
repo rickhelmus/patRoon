@@ -3,6 +3,8 @@
 # optimizeXcmsSetParameters.R. All functions are placed inside a separate
 # environment to keep the package namespace clean.
 
+# no coverage: no intention to test IPO code
+# nocov start
 
 # utilsIPO <- list2env(hash = TRUE, envir = env, parent =  x = list(
 utilsIPO <- setRefClass("utilsIPO", methods = list(
@@ -615,3 +617,4 @@ getRGTVValues = function(xset, exp_index=1, retcor_penalty=1) {
 
 ))()
 
+# nocov end

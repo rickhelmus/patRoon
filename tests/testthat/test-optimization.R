@@ -26,11 +26,14 @@ ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 1
 ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006), noise = 3E4), maxIterations = 2)
 ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(dmzgap = c(10, 20), minpeak = 25),
                                         maxIterations = 2)
+ffOptKPIC2 <- suppressWarnings(optimizeFeatureFinding(anaInfo, "kpic2", list(mztol = c(0.002, 0.01), level = 2E5, kmeans = TRUE),
+                                                      maxIterations = 2))
 
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
 ffOpenMS <- findFeatures(anaInfo, "openms", noiseThrInt = 3E4)
 ffXCMS3 <- findFeatures(anaInfo, "xcms3", xcms::CentWaveParam(noise = 3E4))
+ffKPIC2 <- suppressWarnings(findFeatures(anaInfo, "kpic2", level = 2E5))
 
 fgOptOpenMS <- optimizeFeatureGrouping(ffOpenMS, "openms",
                                        list(maxGroupMZ = c(0.002, 0.007)), maxIterations = 2)
@@ -38,6 +41,9 @@ fgOptOpenMS <- optimizeFeatureGrouping(ffOpenMS, "openms",
 #                                                                               retcorArgs = list(method = "obiwarp")))
 fgOptXCMS3 <- optimizeFeatureGrouping(ffXCMS3, "xcms3",
                                       list(groupParams = list(bw = c(22, 28))), maxIterations = 2)
+
+fgOptKPIC2 <- optimizeFeatureGrouping(ffKPIC2, "kpic2",
+                                      list(groupArgs = list(mz_tolerance = c(0.002, 0.01))), maxIterations = 2)
 
 expInfoPrepForComp <- function(...)
 {
@@ -56,6 +62,8 @@ test_that("verify feature optimization output", {
 
     expect_known_value(expInfoPrepForComp(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
     # expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
+    
+    expect_known_value(expInfoPrepForComp(ffOptKPIC2, 1, 1), testFile("ff-opt-kpic2"))
 
     expect_length(ffOptEmpty, 1)
 
@@ -73,6 +81,8 @@ test_that("verify feature group optimization output", {
     
     expect_known_value(expInfoPrepForComp(fgOptXCMS3, 1, 1), testFile("fg-opt-xcms3"))
     # expect_known_show(fgOptXCMS3, testFile("fg-opt-xcms3-show", text = TRUE))
+    
+    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
 })
 
 test_that("default param generators", {
@@ -84,6 +94,7 @@ test_that("default param generators", {
                            min.len = 1, names = "unique")
     checkmate::expect_list(generateFeatureOptPSet("openms"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFeatureOptPSet("envipick"), min.len = 1, names = "unique")
+    checkmate::expect_list(generateFeatureOptPSet("kpic2"), min.len = 1, names = "unique")
 
     checkmate::expect_list(generateFGroupsOptPSet("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("xcms", groupArgs = list(method = "nearest"),
@@ -94,6 +105,7 @@ test_that("default param generators", {
                                                   retAlignMethod = "peakgroups"),
                            min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("openms"), min.len = 1, names = "unique")
+    checkmate::expect_list(generateFGroupsOptPSet("kpic2"), min.len = 1, names = "unique")
 
     checkmate::expect_list(getDefFeaturesOptParamRanges("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("xcms", "matchedFilter"), min.len = 1, names = "unique")
@@ -101,10 +113,12 @@ test_that("default param generators", {
     checkmate::expect_list(getDefFeaturesOptParamRanges("xcms3", "matchedFilter"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("openms"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("envipick"))
+    checkmate::expect_list(getDefFeaturesOptParamRanges("kpic2"), min.len = 1, names = "unique")
 
     checkmate::expect_list(getDefFGroupsOptParamRanges("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFGroupsOptParamRanges("xcms3"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFGroupsOptParamRanges("openms"), min.len = 1, names = "unique")
+    checkmate::expect_list(getDefFGroupsOptParamRanges("kpic2"), min.len = 1, names = "unique")
 })
 
 test_that("plotting works", {

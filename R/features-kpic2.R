@@ -58,7 +58,7 @@ setMethod("initialize", "featuresKPIC2",
 #' @export
 setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 {
-    i <- assertDeleteArgAndToChr(i, analyses(obj), add = ac)
+    i <- assertDeleteArgAndToChr(i, analyses(obj))
     
     old <- obj
     obj <- callNextMethod()
@@ -98,7 +98,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
 
     anas <- analysisInfo$analysis
     filePaths <- mapply(getMzMLOrMzXMLAnalysisPath, anas, analysisInfo$path)
-    baseHash <- makeHash(list(...))
+    baseHash <- makeHash(kmeans, level, list(...))
     hashes <- setNames(sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp))), anas)
     cachedData <- lapply(hashes, loadCacheData, category = "featuresKPIC2")
     cachedData <- pruneList(setNames(cachedData, anas))

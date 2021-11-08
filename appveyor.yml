@@ -22,7 +22,7 @@ install:
         if (-Not (Test-Path C:\deps\openms27.exe)) {
             Invoke-WebRequest https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.7.0/OpenMS-2.7.0-Win64.exe -OutFile "C:\deps\openms27.exe"
         }
-        C:\deps\openms26.exe /S
+        C:\deps\openms27.exe /S
     - ps: >-
         if (-Not (Test-Path C:\deps\MetFrag2.4.5-CL.jar)) {
             Invoke-WebRequest https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"

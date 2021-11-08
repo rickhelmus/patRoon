@@ -78,8 +78,6 @@
     - update
         - introduction
             - mention changes of patRoon 2.0?
-        - installation
-            - update RDCOMClient installation?
 - tutorial
     - check if all is OK
 - TPs

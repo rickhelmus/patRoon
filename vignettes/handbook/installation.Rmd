@@ -69,7 +69,8 @@ remotes::install_github("cbroeckl/RAMClustR")
 remotes::install_github("rickhelmus/cliqueMS") # note: repository is a fork with minor bug fixes
 
 # only needed for Bruker DataAnalysis integration
-install.packages("RDCOMClient", repos = "http://www.omegahat.net/R")
+# NOTE: a fork is installed that fixes some issues with the latest R versions
+remotes::install_github("BSchamberger/RDCOMClient")
 
 # only when using the R interface (not recommended by default)
 remotes::install_github("c-ruttkies/MetFragR/metfRag")

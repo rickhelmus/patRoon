@@ -398,7 +398,7 @@ utils <- setRefClass("utilsInst", methods = list(
                 checkPackages("MetaClean", pkgWhere, ask = FALSE, type = "gh", repos = "KelseyChetnik")
             }
             if (any(c("all", "RDCOMClient") %in% instWhat))
-                checkPackages("RDCOMClient", pkgWhere, ask = FALSE, repos = "http://www.omegahat.net/R")
+                checkPackages("RDCOMClient", pkgWhere, ask = FALSE, type = "gh", repos = "BSchamberger")
         }
     },
     

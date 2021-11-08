@@ -366,6 +366,11 @@ for access.}
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}     \itemize{       \item{\code{\link{MSPeakListsSet}}}       \item{\code{\link{MSPeakListsUnset}}}     }   } }
 }
 
+\section{Source}{
+ \code{spectrumSimilarity}: The principles of spectral binning and cosine similarity calculations
+  were loosely was based on the code from \code{SpectrumSimilarity()} function of \pkg{OrgMassSpecR}.
+}
+
 \section{Sets workflows}{
  \setsWFClass{MSPeakListsSet}{MSPeakLists}
 

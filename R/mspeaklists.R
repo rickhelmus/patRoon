@@ -628,6 +628,9 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 #'
 #' @author For \code{spectrumSimilarity}: major contributions by Bas van de Velde for spectral binning and similarity
 #'   calculation.
+#'   
+#' @section Source: \code{spectrumSimilarity}: The principles of spectral binning and cosine similarity calculations
+#'   were loosely was based on the code from \code{SpectrumSimilarity()} function of \pkg{OrgMassSpecR}.
 #'
 #' @aliases spectrumSimilarity
 #' @export

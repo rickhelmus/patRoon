@@ -5,7 +5,6 @@
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 - remove mz column from patRoonData suspects?
     - and/or ignore/warn when used with sets?
-- update installPatRoon with new deps
 
 
 ## Features
@@ -14,12 +13,7 @@
     - OpenMS: alignment may yield negative RTs...
     - OpenMS MapAligner exception
         - seems to be related when little overlap between sets --> add note in doc?
-    - Somehow integrate XCMS::fillChromPeaks
-    - Check/Update for new OpenMS
-        - intensity loading?
-        - installDeps, CI
-    - SAFD: verify with latest version
-
+    
 
 ## Components
 
@@ -125,7 +119,7 @@
 - XCMS: multiple features grouped in same analysis?
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
-
+- Somehow integrate XCMS::fillChromPeaks
 
 
 ## Annotation

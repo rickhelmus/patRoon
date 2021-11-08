@@ -27,7 +27,7 @@ ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar && \
     wget --progress=dot:mega https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.9.8/sirius-4.9.8-linux64-headless.zip && \
-    wget --progress=dot:mega https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget --progress=dot:mega https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv && \
     wget --progress=dot:mega ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
     unzip sirius-4.9.8-linux64-headless.zip && rm sirius-4.9.8-linux64-headless.zip && \
     git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && \

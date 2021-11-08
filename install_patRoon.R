@@ -490,7 +490,7 @@ utils <- setRefClass("utilsInst", methods = list(
             if ("OpenMS" %in% instWhat)
             {
                 # NOTE: set keep_install_file to avoid long delays after installation
-                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.6.0/OpenMS-2.6.0-Win64.exe",
+                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.7.0/OpenMS-2.7.0-Win64.exe",
                                       message = FALSE, keep_install_file = TRUE)
             }
             
@@ -514,7 +514,7 @@ utils <- setRefClass("utilsInst", methods = list(
 
             if ("MetFrag PubChemLite DB" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag PubChemLite database", "https://zenodo.org/record/4183801/files/PubChemLite_31Oct2020_exposomics.csv",
+                down <- downloadFile(instPath, "MetFrag PubChemLite database", "https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv",
                                      FALSE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.MetFragPubChemLite = down))
@@ -522,7 +522,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.9.3/sirius-4.9.3-win64.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.9.8/sirius-4.9.8-win64.zip",
                                      TRUE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-gui"))))

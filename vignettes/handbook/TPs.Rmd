@@ -100,7 +100,7 @@ TPs <- generateTPs("library")
 ```{r TPsProcInsp,eval=TRUE}
 # just show a few columns in this example, there are many more!
 # note: the double dot syntax (..cols) is necessary since the data is stored as data.tables
-cols <- c("name", "formula", "LogP")
+cols <- c("name", "formula", "InChIKey")
 parents(TPs)[1:5, ..cols]
 TPs[["DEET"]][, ..cols]
 TPs[[2]][, ..cols]

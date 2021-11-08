@@ -1,6 +1,6 @@
 #### Dependencies
 
-#' @importFrom utils head tail modifyList setTxtProgressBar txtProgressBar write.csv write.table read.csv data
+#' @importFrom utils head tail modifyList setTxtProgressBar txtProgressBar write.csv write.table read.csv data getFromNamespace
 #' @importFrom graphics axis barplot close.screen grconvertX grconvertY grid layout legend lines par plot.new points polygon rasterImage rect screen segments split.screen strwidth text title xinch yinch abline contour persp
 #' @importFrom grDevices adjustcolor colorRampPalette dev.off png
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames as.dendrogram order.dendrogram as.dist as.formula weighted.mean cor p.adjust t.test

@@ -141,8 +141,7 @@ for (obji in seq_along(objToShow))
 ### Retention vs m/z
 ```{r fig.height=4}
 par(mai = c(0.9, 0.8, 0.1, 0.1))
-selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups, colourBy = "fGroups", showLegend = FALSE,
-                                             retMin = rmdVars$retMin)
+plot(rmdVars$fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = rmdVars$retMin)
 ```
 
 

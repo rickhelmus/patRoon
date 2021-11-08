@@ -143,6 +143,7 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
 - Features
     - Blank filter: don't subtract blanks from each other
     - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
+    - `retMin` argument to `plot()` method for `featureGroupsComparison` wasn't properly used/defaulted.
 - Annotations
     - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown
     - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown

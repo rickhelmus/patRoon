@@ -214,7 +214,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
 #' @param retMin If \code{TRUE} retention times are plotted as minutes (seconds otherwise).
 #' @rdname featureGroups-compare
 #' @export
-setMethod("plot", c(x = "featureGroupsComparison", y = "missing"), function(x, retMin = TRUE, ...) plot(x@comparedFGroups, retMin, ...))
+setMethod("plot", c(x = "featureGroupsComparison", y = "missing"), function(x, retMin = FALSE, ...) plot(x@comparedFGroups, retMin = retMin, ...))
 
 #' @details \code{plotVenn} plots a Venn diagram outlining unique and shared
 #'   feature groups between up to five compared feature groups.

@@ -6,7 +6,6 @@
 - remove mz column from patRoonData suspects?
     - and/or ignore/warn when used with sets?
 - update installPatRoon with new deps
-- clean old Dockerfiles/structure
 
 
 ## Features

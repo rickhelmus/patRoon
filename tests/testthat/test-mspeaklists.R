@@ -9,15 +9,15 @@ if (doDATests())
     # NOTE: use different analyses than first: this call will clearout all DA
     # compounds, forcing other calls (from features/formulas tests) to re-run
     # FMF
-    fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[2, ], "bruker"), "openms")
+    fgDA <- getTestFGroupsDA(getDAAnaInfo("std2"))
 
     # NOTE: set bgsubtr to FALSE: subtraction might remove pecursor peaks of
     # (often wrong) low intensity features and result in warnings during
     # averaging
     plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE, bgsubtr = FALSE)
-    plistsDAEmpty <- generateMSPeakLists(fgDA["nope"], "bruker", save = FALSE, bgsubtr = FALSE)
+    plistsDAEmpty <- generateMSPeakLists(fgDA[, "nope"], "bruker", save = FALSE, bgsubtr = FALSE)
 
-    fgDA2 <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
+    fgDA2 <- getTestFGroupsDA(getDAAnaInfo("std1"))
     plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")
 }
 

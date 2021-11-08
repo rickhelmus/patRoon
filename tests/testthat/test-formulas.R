@@ -31,8 +31,9 @@ if (doSIRIUS)
 if (doDATests())
 {
     # HACK: use first standard as its compounds are not touched by MS peak lists
-    fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
-    formsDA <- doGenForms(fgDA, "bruker")
+    fgDA <- getTestFGroupsDA(getDAAnaInfo("std1"))
+    plistsDA <- generateMSPeakLists(fgDA, "brukerfmf")
+    formsDA <- doGenForms(fgDA, plistsDA, "bruker")
 }
 
 test_that("verify formula generation", {

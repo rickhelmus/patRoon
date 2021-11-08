@@ -1,0 +1,1 @@
+A MSPeakListsSet objectHierarchy:MSPeakLists,workflowStepSet    |-- MSPeakListsSet---Algorithm: Bruker_DataAnalysis_FMF-setTotal peak count: 79011 (MS: 4210 - MS/MS: 74801)Average peak count/analysis: 39506 (MS: 2105 - MS/MS: 37401)Total peak lists: 2754 (MS: 2143 - MS/MS: 611)Average peak lists/analysis: 1377 (MS: 1072 - MS/MS: 306)Sets: positive, negative

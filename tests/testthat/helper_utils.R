@@ -19,6 +19,20 @@ callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPa
                extraOpts = list(LocalDatabasePath = db), ...)
 }
 
+getDAAnaInfoAll <- function(pat = NULL)
+{
+    path <- getOption("patRoon.test.DAAnalyses")
+    if (is.null(path))
+        return(NULL)
+    ret <- generateAnalysisInfo(c(file.path(path, "neg"), file.path(path, "pos")),
+                                groups = c(rep("solvent-neg", 3), rep("standard-neg", 3),
+                                           rep("solvent-pos", 3), rep("standard-pos", 3)),
+                                blanks = "solvent", formats = "bruker")
+    if (!is.null(pat))
+        ret <- ret[grepl(pat, ret$analysis), ]
+    return(ret)
+}
+
 if (testWithSets())
 {
     isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)
@@ -30,6 +44,7 @@ if (testWithSets())
         return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
     }
     getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
+    getDAAnaInfo <- function(...) getDAAnaInfoAll(...)
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
     {
         an <- isAnaInfoNeg(anaInfo)
@@ -41,6 +56,17 @@ if (testWithSets())
             ret <- makeSet(findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...), adducts = "[M+H]+")
         return(ret)
         
+    }
+    getTestFGroupsDA <- function(anaInfo)
+    {
+        an <- isAnaInfoNeg(anaInfo)
+        if (any(isAnaInfoNeg(anaInfo)))
+            feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"),
+                             findFeatures(anaInfo[an, ], "bruker"),
+                             adducts = c("[M+H]+", "[M-H]-"))
+        else
+            feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"), adducts = c("[M+H]+", "[M-H]-"))
+        return(groupFeatures(feats, "openms"))
     }
     makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
 
@@ -88,6 +114,11 @@ if (testWithSets())
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
     getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
+    getDAAnaInfo <- function(...)
+    {
+        ret <- getDAAnaInfoAll(pat)
+        return(ret[grepl("-pos", ret$group, fixed = TRUE), ])
+    }
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
     {
         ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
@@ -169,15 +200,6 @@ removeMSPlists <- function(plists, type)
         plists@setObjects <- lapply(plists@setObjects, doRemove)
     
     return(plists)
-}
-
-getDAAnaInfo <- function()
-{
-    path <- getOption("patRoon.test.DAAnalyses")
-    if (is.null(path))
-        return(NULL)
-    return(generateAnalysisInfo(path, groups = c(rep("standard", 3), rep("solvent", 3)),
-                                blanks = "solvent"))
 }
 
 doDATests <- function() !is.null(getOption("patRoon.test.DAAnalyses"))

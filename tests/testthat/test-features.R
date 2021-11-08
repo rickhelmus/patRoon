@@ -29,11 +29,10 @@ ffEmptyQ <- calculatePeakQualities(ffEmpty)
 
 if (doDATests())
 {
-    anaInfoDA <- getDAAnaInfo()[1, ]
-    ffDA <- findFeatures(getDAAnaInfo()[1, ], "bruker")
+    ffDA <- findFeatures(getDAAnaInfo("std1")[1, ], "bruker")
 
     # NOTE: use 2nd analysis here so first can be re-used for MS peaklists/formulas...
-    ffDAEmpty <- findFeatures(getDAAnaInfo()[2, ], "bruker", endRange = 0.01, doFMF = "force")
+    ffDAEmpty <- findFeatures(getDAAnaInfo("std2")[1, ], "bruker", endRange = 0.01, doFMF = "force")
 }
 
 # Remove ID column: not reproducible

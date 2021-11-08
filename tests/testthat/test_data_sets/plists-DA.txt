@@ -1,0 +1,1 @@
+A MSPeakListsSet objectHierarchy:MSPeakLists,workflowStepSet    |-- MSPeakListsSet---Algorithm: bruker-setTotal peak count: 3977999 (MS: 3951967 - MS/MS: 26032)Average peak count/analysis: 1989000 (MS: 1975984 - MS/MS: 13016)Total peak lists: 2520 (MS: 2276 - MS/MS: 244)Average peak lists/analysis: 1260 (MS: 1138 - MS/MS: 122)Sets: positive, negative

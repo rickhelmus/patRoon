@@ -141,9 +141,9 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                     ion_formula_mz = SMFResultItem[["m_over_z"]],
                                     error = SMFResultItem[["Error"]],
                                     mSigma = SMFResultItem[["Sigma"]] * 1000,
-                                    RingsAndDoubleBonds = SMFResultItem[["RingsAndDoubleBonds"]],
+                                    dbe = SMFResultItem[["RingsAndDoubleBonds"]],
                                     score = SMFResultItem[["Score"]],
-                                    fragInfo = getEmptyDAFragInfo()
+                                    fragInfo = list(getEmptyDAFragInfo())
                                 ))
                             }))
 
@@ -182,7 +182,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                 next
                             
                             form <- simplifyDAFormula(parent[["SumFormula"]])
-                            nform <- calculateNeutralFormula(form, fgAdd$grpAdducts[grp])
+                            nform <- calculateNeutralFormula(form, fgAdd$grpAdducts[[grp]])
 
                             dt <- data.table(neutral_formula = nform,
                                              ion_formula = form,
@@ -191,8 +191,8 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                              mSigma = parent[["Sigma"]] * 1000,
                                              dbe = parent[["RingsAndDoubleBonds"]],
                                              score = parent[["Score"]])
-
-                            dt[, fragInfo := lapply(seq_len(SMF3DResultCount), function(resi)
+                            
+                            fi <- rbindlist(lapply(seq_len(SMF3DResultCount), function(resi)
                             {
                                 frag <- SMF3DResult[[resi]]
                                 fform <- simplifyDAFormula(frag[["SumFormula"]])
@@ -202,9 +202,9 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                                     error = frag[["Error"]],
                                     mSigma = frag[["Sigma"]] * 1000,
                                     dbe = frag[["RingsAndDoubleBonds"]],
-                                    score = frag[["Score"]],
-                                ))
-                            })]
+                                    score = frag[["Score"]]))
+                            }))
+                            dt[, fragInfo := list(fi)]
 
                             dt <- addMiscFormulaInfo(dt, adduct)
                             dt <- setFormColOrder(dt)
@@ -230,7 +230,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
                 {
                     MSMSFlist <- rbindlist(ftable3D[1:ftable3DCount])
                     if (ftableCount > 0)
-                        flist <- flist[!neutralformula %in% MSMSFlist[["neutral_formula"]]]
+                        flist <- flist[!neutral_formula %in% MSMSFlist[["neutral_formula"]]]
                     flist <- rbind(flist, MSMSFlist, fill = TRUE)
                 }
 
@@ -273,7 +273,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
     else
         groupFormulas <- list()
 
-    return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
+    return(formulas(groupAnnotations = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
 })
 
 #' @rdname formula-generation

@@ -107,7 +107,7 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close
 
         if (verbose && ccount > 0)
         {
-            printf("Loading %d features from DataAnalysis...\n", ccount, analysis)
+            printf("Loading %d features from DataAnalysis...\n", ccount)
             prog <- openProgBar(0, ccount)
         }
 

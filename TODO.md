@@ -78,7 +78,7 @@
 
 ## NEWS
 
-- add paper ref, re-read
+- re-read
 
 
 # Lower priority

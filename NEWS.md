@@ -1,6 +1,6 @@
 # patRoon 2.0
 
-This release adds a significant amount of new functionality and changes. Please see the [publication], updated Handbook and sections below for more information.
+This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections below for more information.
 
 Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
 
@@ -8,10 +8,9 @@ Users of previous `patRoon` versions should inform themselves with the important
 ## Important changes
 
 - Features
-    - XMCS(3): Renamed argument `exportedData` to `loadRawData`
+    - XMCS(3): Renamed argument `exportedData` to `loadRawData`.
     - The `mzWindow` and `EICMzWindow` arguments were renamed to `mzExpWindow` / `EICMzExpWindow` and are now with slightly different meaning (please see the reference manual).
-    - `groupFeatures`: renamed the `feat` argument to `obj`.
-    - OpenMS: `minFWHM`/`maxFWHM` defaults lowered for `findFeatures` and feature optimization
+    - OpenMS: `minFWHM`/`maxFWHM` defaults lowered for `findFeatures` and feature optimization.
 - Annotation
     - ggplot2 support for several plotting functions (i.e. `useGGPlot2` argument) is removed (not often used and a maintenance burden).
     - the `precursor` argument to the `plotSpectrum()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was done for consistency with compound annotations and sets workflows.
@@ -20,7 +19,7 @@ Users of previous `patRoon` versions should inform themselves with the important
         - A second and new threshold, `featThresholdAnn`, only takes annotated features into account.
         - The default of `featThreshold` is now `0`, for `featThresholdAnn` it is the same as the previous default for `featThreshold`.
         - Candidate results: renamed `analysis` column to `analysis_from` and added `analyses` column that lists all analyses from which the consensus was made.
-        - if multiple annotations are available for a single MS/MS peak (ie due to differences between feature annotations) then only the annotation with lowest m/z deviation is kept (and a warning is emitted).
+        - if multiple annotations are available for a single MS/MS peak (eg due to differences between feature annotations) then only the annotation with lowest m/z deviation is kept (and a warning is emitted).
         - Scores of annotated fragments from different features are now averaged.
     - The storage classes and interface for formula and compound annotation was harmonized
         - The `formulas` and `compounds` classes now derive from the new `featureAnnotations` class. Most of the functionality common to formulas/compounds are defined for this class.
@@ -51,11 +50,11 @@ The following new feature detection/grouping algorithms were integrated: `SIRIUS
 
 Interactive curation of feature data with `checkChromatograms()` was replaced with `checkFeatures()`, which is much faster, is better suitable for larger datasets, customizable and has an improved user interface. Furthermore, this tool can be used for training/assessing `MetaClean` models. Similarly, `checkComponents()` is a function that allows interactive curation of component data.
 
-The `delete()` generic function allows straightforward deletion of workflow data, such as features, components and annotations. Furthermore, this function makes it easy to implement customized filters.
+The `delete()` generic function allows straightforward deletion of parts of the workflow data, such as features, components and annotations. Furthermore, this function makes it easy to implement customized filters.
 
 ### Adduct annotation
 
-The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were integrated for additional ways to detect adducts/isotopes through componentization. Furthermore, the `selectIons()` method uses these annotations to prioritize features (e.g. by only retaining those with preferable adducts). In addition, this function stores the adduct annotations for the remaining feature groups, which can then be automatically used for e.g. formula and compound annotation.
+The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were integrated for additional ways to detect adducts/isotopes through componentization. Furthermore, the new `selectIons()` method uses these annotations to prioritize features (e.g. by only retaining those with preferable adducts). In addition, this function stores the adduct annotations for the remaining feature groups, which can then be automatically used for e.g. formula and compound annotation.
 
 ## Other new functionality
 
@@ -68,6 +67,7 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
         - customized averaging (`averageFunc` argument)
         - calculation of Fold-changes (`FCParams` argument)
         - report peak qualities/scores (`qualities` argument)
+    - New `plotVolcano()` method function to plot fold changes.
     - `topMostByRGroup/EICTopMostByRGroup` arguments for plotting/reporting EIC data of only the top most intense replicate(s).
     - `reportHTML()` now only plots the EIC of the most intense feature of each replicate group (i.e. `EICTopMostByRGroup=TRUE` and `EICTopMost=1`).
     - `XCMS3`
@@ -75,8 +75,8 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
         - `...` argument for `findFeaturesXCMS3`
         - `preGroupParam` to specify grouping parameters used prior to RT alignment (suggested by Ricardo Cunha)
     - The internal `XCMS` feature (group) objects are synchronized as much as possible when feature data is changed.
-    - Feature groups: print feature counts with `show()` and `filter()` methods
-    - OpenMS: `useFFMIntensities` to speed up intensity loading (experimental)
+    - Feature groups: print feature counts with `show()` and `filter()` methods.
+    - `OpenMS` feature finding: `useFFMIntensities` argument to speed up intensity loading (experimental).
     - `reportHTML()` now reports general feature information in a separate tab.
     - Feature groups: `results` argument to `[` (subset) and `filter()` to quickly synchronize feature groups between objects (e.g. to quickly remove feature groups without annotation results).
 - Annotation
@@ -92,6 +92,7 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
 ## Minor changes
 
 - Features
+    - `groupFeatures`: renamed the `feat` argument to `obj`.
     - Improved performance for some feature group filters.
     - `reportHTML()`: EICs are shared between tabs to avoid duplicated plotting
     - The `features` object embedded in `featureGroups` objects is now synchronized, and any features not present in any group are removed accordingly. This reduces memory usage and indirectly causes `reportCSV()` to only report features still present.
@@ -145,32 +146,32 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
     - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were not always correctly filled
     - `retMin` argument to `plot()` method for `featureGroupsComparison` wasn't properly used/defaulted.
 - Annotations
-    - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown
-    - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown
-    - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peaklists
-    - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists
-    - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms
-    - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data
-    - Fixed: MetFrag was using wrong/inconsistent cache name
-    - Fixed: `as.data.table(compounds, fragments=TRUE)` returned empty results for candidates without fragment annotations
-    - fixed: `topX` arguments for `MSPeakLists` filter would re-order peak lists, thereby invaliding any annotations.
-    - fixed: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
-    - fixed: Hill ordering: H wasn't sorted alphabetically if no C is present.
+    - Fixed: `plotSpectrum()` if `xlim` is set and this yields no data then an empty plot is shown.
+    - Fixed: `plotSpectrum()` automatic `ylim` determination was incorrect if only one peak is shown.
+    - Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peak lists.
+    - Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists.
+    - Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms.
+    - Fixed: the `scoreLimits` filter for formulas could ignore results not obtained with MS/MS data.
+    - Fixed: MetFrag was using a wrong/inconsistent cache name.
+    - Fixed: `as.data.table(compounds, fragments=TRUE)` returned empty results for candidates without fragment annotations.
+    - Fixed: `topX` arguments for the `MSPeakLists` method for `filter()` would re-order peak lists, thereby invaliding any annotations.
+    - Fixed: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed.
+    - Fixed: Hill ordering: H wasn't sorted alphabetically if no C is present.
     - Several fixes were applied to improve handling of `SIRIUS` 'adduct fragments'.
     - formula/compound annotation consensus ranking is now properly scaled.
-    - Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
+    - Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered.
 - Suspect screening
-    - Fixed: `numericIDLevel()` now handles `NA` values.
-    - `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
+    - Fixed: `numericIDLevel()` now properly handles `NA` values.
+    - `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files.
 - Components
-    - `RAMClustR`: ensure that columns are the right type if all values are NA
+    - `RAMClustR`: ensure that columns are the right type if all values are NA.
     - `CAMERA`: correctly handle cases when `minSize` filter results in zero components.
-    - `plotGraph()`: improve error handling with empty objects
+    - `plotGraph()`: improve error handling with empty objects.
 - Misc
     - Future multiprocessing: make sure that logs are created even when an error occurs.
-    - Classic multiprocessing: intermediate results are cached again
+    - Classic multiprocessing: intermediate results are cached again.
     - Fixed: parallelization issues with cached data (thanks to https://blog.r-hub.io/2021/03/13/rsqlite-parallel/)
-    - `newProject()`: correctly handle DIA with Bruker MS peak lists
+    - `newProject()`: correctly handle DIA with Bruker MS peak lists.
 
 
 # patRoon 1.2.1

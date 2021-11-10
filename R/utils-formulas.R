@@ -433,6 +433,8 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
     # sync fragInfos with group averaged peak lists: the fragments may either have a slightly different m/z than
     # what was used to get the feature formula, or it may simply be removed.
     
+    warnAlign <- warnDiffAnn <- FALSE
+    
     formList <- Map(formList, lapply(averagedPeakLists(MSPeakLists)[names(formList)], "[[", "MSMS"), f = function(fc, spec)
     {
         fc <- copy(fc)
@@ -443,8 +445,7 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
             {
                 wh <- which(numLTE(abs(fimz - spec$mz), absAlignMzDev))
                 if (length(wh) > 1)
-                    warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
-                            "Consider lowering absAlignMzDev.", call. = FALSE)
+                    warnAlign <<- TRUE
                 return(length(wh) > 0)
             })]
             
@@ -455,9 +456,7 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
                 fi[, mz := spec[match(PLID, ID)]$mz]
                 if (anyDuplicated(fi$PLID))
                 {
-                    warning("Matched different formula fragment annotations to single MS/MS peak. ",
-                            "Taking annotation with lowest m/z deviation. ",
-                            "Consider lowering absAlignMzDev and/or mass tolerances.", call. = FALSE)
+                    warnDiffAnn <<- TRUE
                     fi[, mzD := abs(mz - ion_formula_mz)]
                     setorderv(fi, c("PLID", "mzD"))
                     fi <- unique(fi, by = "PLID")[, -"mzD"]
@@ -472,6 +471,14 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
         return(fc)
     })
     formList <- pruneList(formList, checkZeroRows = TRUE)
+    
+    if (warnAlign)
+        warning("Found multiple MS/MS peak list m/z values that may correspond to formula fragment m/z. ",
+                "Consider lowering absAlignMzDev.", call. = FALSE)
+    if (warnDiffAnn)
+        warning("Matched different formula fragment annotations to single MS/MS peak. ",
+                "Taking annotation with lowest m/z deviation. ",
+                "Consider lowering absAlignMzDev and/or mass tolerances.", call. = FALSE)
     
     return(formList)
 }

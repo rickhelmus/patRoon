@@ -8,7 +8,7 @@
 #'   should be present, respectively. When \code{length(elements)>1} formulas
 #'   are tested to follow at least one of the given elemental restrictions. For
 #'   instance, \code{elements=c("P", "S")} specifies that either one phosphorus
-#'   or one sulphur atom should be present. Set to \code{NULL} to ignore this
+#'   or one sulfur atom should be present. Set to \code{NULL} to ignore this
 #'   filter.
 #' @param fragElements,lossElements Specifies elemental restrictions for
 #'   fragment or neutral loss formulae (charged form). Candidates are retained

@@ -119,9 +119,9 @@ Generic             | Classes                    | Remarks
 ```{r TPsProcMod,eval=FALSE}
 TPs2 <- TPs[1:10] # only keep results for first ten parents
 
-# remove transformation products that have equal formulas as parents (ie isomers)
+# remove transformation products that are isomers to their parent or sibling TPs
 # may simplify data as these are often difficult to identify
-TPsF <- filter(TPs, removeEqualFormulas = TRUE)
+TPsF <- filter(TPs, removeParentIsomers = TRUE, removeTPIsomers = TRUE)
 
 # remove duplicate transformation products from each parent
 # these can occur if different pathways yield the same TPs

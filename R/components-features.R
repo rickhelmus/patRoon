@@ -143,10 +143,8 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # collapse features: only retain one row per feature group
     linkedFGs <- unique(linkedFGs, by = c("parentGroup", "group"))
     
-    dups <- function(v) names(which(table(v) > 1))
-    
     # remove feature groups that occur in multiple to be components
-    linkedFGs <- linkedFGs[!group %chin% dups(group)]
+    linkedFGs <- linkedFGs[!group %chin% getDuplicatedStrings(group)]
     
     # prepare for components
     cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct_ion"),
@@ -159,9 +157,9 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     
     # Remove any fGroups from components with equal adducts (unless assigned to different isotope)
     if (!is.null(linkedFGs[["isonr"]]))
-        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !paste0(adduct_ion, isonr) %chin% dups(paste0(adduct_ion, isonr))])
+        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !paste0(adduct_ion, isonr) %chin% getDuplicatedStrings(paste0(adduct_ion, isonr))])
     else
-        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !adduct_ion %chin% dups(adduct_ion)])
+        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !adduct_ion %chin% getDuplicatedStrings(adduct_ion)])
     
     # NOTE: minSize should be >= 1 to filter out empty components
     comps <- comps[sapply(comps, nrow) >= minSize]

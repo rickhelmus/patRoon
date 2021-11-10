@@ -104,8 +104,8 @@ testMFDB <- function(...)
 getMFDB <- function(...) { outf <- tempfile(fileext = ".csv"); convertToMFDB(..., out = outf); fread(outf) }
 MFDBNP <- getMFDB(TPsLibScr, includeParents = FALSE)
 MFDBP <- getMFDB(TPsLibScr, includeParents = TRUE)
-TPsBTSuspFEF <- filter(TPsBTSuspMore, removeEqualFormulas = TRUE)
-TPsBTSuspFEFN <- filter(TPsBTSuspMore, removeEqualFormulas = TRUE, negate = TRUE)
+TPsBTSuspFPI <- filter(TPsBTSuspMore, removeParentIsomers = TRUE)
+TPsBTSuspFPIN <- filter(TPsBTSuspMore, removeParentIsomers = TRUE, negate = TRUE)
 pnames <- parents(TPsLogic)$name
 test_that("basic usage", {
     expect_length(TPsLogic["nope"], 0)
@@ -130,8 +130,14 @@ test_that("basic usage", {
     testMFDB(TPsBTSusp)
     expect_error(convertToMFDB(TPsBTEmpty, tempfile(fileext = ".csv")), "create")
     
-    expect_false(any(mapply(parents(TPsBTSuspFEF)$formula, products(TPsBTSuspFEF), FUN = function(f, p) any(f %in% p$formula))))
-    expect_true(all(mapply(parents(TPsBTSuspFEFN)$formula, products(TPsBTSuspFEFN), FUN = function(f, p) all(f %in% p$formula))))
+    expect_equal(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeDuplicates = TRUE)), by = c("SMILES", "parent")), 0)
+    expect_gt(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeDuplicates = TRUE, negate = TRUE)),
+                              by = c("SMILES", "parent")), 0)
+    expect_false(any(mapply(parents(TPsBTSuspFPI)$formula, products(TPsBTSuspFPI), FUN = function(f, p) any(f %in% p$formula))))
+    expect_true(all(mapply(parents(TPsBTSuspFPIN)$formula, products(TPsBTSuspFPIN), FUN = function(f, p) all(f %in% p$formula))))
+    expect_equal(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeTPIsomers = TRUE)), by = c("formula", "parent")), 0)
+    expect_gt(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeTPIsomers = TRUE, negate = TRUE)),
+                              by = c("formula", "parent")), 0)
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
     

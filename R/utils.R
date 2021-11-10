@@ -567,3 +567,5 @@ getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
     targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames), USE.NAMES = FALSE))
     return(intersect(targetCols, allCols))
 }
+
+getDuplicatedStrings <- function(x) names(which(table(x) > 1))

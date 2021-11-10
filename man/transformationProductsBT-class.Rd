@@ -12,7 +12,8 @@
 
 \S4method{filter}{transformationProductsBT}(
   obj,
-  removeEqualFormulas = FALSE,
+  removeParentIsomers = FALSE,
+  removeTPIsomers = FALSE,
   removeDuplicates = FALSE,
   minSimilarity = NULL,
   negate = FALSE
@@ -25,10 +26,15 @@
 
 \item{obj, TPs}{\code{transformationProductsBTs} object to be accessed}
 
-\item{removeEqualFormulas}{If \code{TRUE} then the TPs that have an equal formula as their parent are removed.}
+\item{removeParentIsomers}{If \code{TRUE} then TPs with an equal formula as their parent (isomers) are removed.}
+
+\item{removeTPIsomers}{If \code{TRUE} then all TPs with equal formula as any sibling TPs (isomers) are removed.
+Unlike \code{removeDuplicates}, \emph{all} TP candidates are removed (including the first match). This filter
+automatically sets \code{removeDuplicates=TRUE} to avoid complete removal of TPs with equal structure.}
 
 \item{removeDuplicates}{If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
-removed. Such duplicates may occur when different transformation pathways yield the same TPs.}
+removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP
+candidate with duplicate structure will be kept.}
 
 \item{minSimilarity}{Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
 details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be

@@ -26,8 +26,6 @@ doCompounds <- TRUE # curl::has_internet()
 
 # Introduction
 
-<!-- UNDONE: link to advanced vignette -->
-
 In this tutorial you will learn how to perform a simple non-target analysis with `patRoon`. This tutorial is not meant to give a detailed overview of `patRoon`. Instead, it serves as a quick introduction on how to use `patRoon` to setup and perform a full non-target analysis workflow.
 
 The workflow in this tutorial consists of the following steps:
@@ -51,11 +49,9 @@ node [ shape = box,
 
 # Data
 
-In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
+In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [Handbook] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate and measured with positive and negative ionization. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionality of `patRoon`.
 
-<!-- UNDONE: Move/Refer below to other vignette -->
-
-The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first  export your data to _mzXML_ or _mzML_ and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from [ProteoWizard] or software from your mass spectrometer vendor. Alternatively, `patRoon` can do this automatically for your analyses with the `convertMSFiles()` function. Please see the handbook and reference manual for its usage.
+The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first export your data to _mzXML_ or _mzML_ and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from [ProteoWizard] or software from your mass spectrometer vendor. Alternatively, `patRoon` can do this automatically for your analyses with the `convertMSFiles()` function. Please see the handbook and reference manual for its usage.
 
 # New project
 
@@ -140,8 +136,6 @@ anaInfo <- patRoonData::exampleAnalysisInfo("positive")
 # https://github.com/yihui/knitr/issues/558
 
 library(patRoon)
-
-# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
 anaInfo <- patRoonData::exampleAnalysisInfo("positive")
 ```
 
@@ -194,10 +188,10 @@ fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
 
 ## Data clean-up {#data-cleanup}
 
-The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several ways to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object that was made in the previous section (stored in the the `fGroups` variable).
+The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several ways to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object that was made in the previous section (stored in the the `fGroups` variable). Note that in this tutorial the `absMinIntensity` was increased to `1E5` to simplify the results.
 
 ```{r filtering}
-fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5,
                   relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                   blankThreshold = 5, removeBlanks = TRUE,
                   retentionRange = NULL, mzRange = NULL)
@@ -218,6 +212,12 @@ As you may have noticed quite a large part of the features are removed as a resu
 <!-- UNDONE: add link below to other vignette when it contains prioritization -->
 
 The next logical step in a non-target workflow is often to perform further prioritization of data. However, this will not be necessary in this tutorial as our samples are just known standard mixtures.
+
+To simplify processing, we only continue with the first 25 feature groups:
+
+```{r subSetFG}
+fGroups <- fGroups[, 1:25]
+```
 
 ## Inspecting results
 
@@ -288,28 +288,21 @@ Note that you need to change the elements parameter to this function to make sur
 
 <!-- UNDONE Move MF installation to front? -->
 
-Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag can be found by `patRoon`. Download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
-
-```{r MF_opt,eval=FALSE}
-# change to the full path of the MetFrag CL jar file
-options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar")
-```
+Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag and the PubChemLite library can be found by `patRoon`. Please see the [Handbook] for installation instructions. 
 
 Then `generateCompounds()` is used to execute MetFrag and generate the `compounds`.
 
 ```{r compounds,eval=doCompounds}
 compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL",
                                dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
+                               adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 2500)
 ```
 
 While `generateCompounds()` is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.
 
-In this case we are using the [PubChem] database to retrieve candidates. Other commonly databases are [ChemSpider] and EPA's [CompTox]. See `?generateCompounds()` for more information on possible databases and many other parameters that can be set.
+See `?generateCompounds()` for more information on possible databases and many other parameters that can be set.
 
-> **_NOTE_** You may get several warnings for feature groups for which no compounds could be searched. Usually this is because we set a hard limit with the `maxCandidatesToStop` argument. Increasing this value is tempting, however, the compounds are searched through an online database and processing thousands of candidates takes too much time (and is not nice towards the servers running MetFrag!). An obvious drawback is that you will not get any results for feature groups with many candidates (however, these are generally difficult to sort out anyway!).
-
-> **_NOTE_** This is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the servers used by MetFrag, you should always take care to prioritize your data before running this function!
+> **_NOTE_** This is often one of the most time consuming steps during the workflow. For this reason you should always take care to prioritize your data before running this function!
 
 Finally we use the `addFormulaScoring()` function to improve ranking of candidates by incorporating the formula calculation data from the previous step.
 

@@ -24,9 +24,11 @@ fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chrom
 fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
 
 # Basic rule based filtering
-fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5, relMinReplicateAbundance = 1,
                   maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE,
                   retentionRange = NULL, mzRange = NULL)
+
+fGroups <- fGroups[, 1:25]
 
 # -------------------------
 # annotation
@@ -47,8 +49,8 @@ formulas <- generateFormulas(fGroups, mslists, "genform", relMzDev = 5, adduct =
 
 # Calculate compound structure candidates
 compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchem",
-                               maxCandidatesToStop = 5000)
+                               adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
 compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 
 # -------------------------

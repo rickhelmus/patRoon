@@ -33,10 +33,10 @@ install:
             7z x -aoa -oC:\deps\ C:\deps\sirius.zip
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\openbabel.exe)) {
-            Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe -OutFile "C:\deps\openbabel.exe"
+        if (-Not (Test-Path C:\deps\openbabel311.exe)) {
+            Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe -OutFile "C:\deps\openbabel311.exe"
         }
-        C:\deps\openbabel.exe /S
+        C:\deps\openbabel311.exe /S
 
 cache:
   - C:\RLibrary

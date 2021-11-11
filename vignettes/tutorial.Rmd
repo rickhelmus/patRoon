@@ -363,7 +363,7 @@ reportHTML(fGroups, path = "report", formulas = formulas, MSPeakLists = mslists)
 
 # ugly work around for nested rmarkdown call made by reportHTML; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
-save(fGroups, formulas, compounds, components, mslists, file = tempF)
+save(fGroups, formulas, compounds, mslists, file = tempF)
 writeLines(sprintf('
 library(patRoon)
 setwd("%s")

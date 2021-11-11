@@ -198,21 +198,31 @@ if (!is.null(rmdVars$components))
     }, USE.NAMES = FALSE)]
 }
 
-DT::datatable(fGroupsSpecDT,
-              extensions = "Buttons",
-              options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "200px",
-                             dom = "Bfrtip",
-                             initComplete = DT::JS("function(settings, json)",
-                                                   "{ setTimeout(initAnnotation, 25); }"),
-                             order = list(list(1, "asc")),
-                             columnDefs = list(list(visible = FALSE, targets = 0),
-                                               list(className = "dt-nowrap", targets = 4),
-                                               list(className = "dt-center",
-                                                    targets = (seq_len(ncol(fGroupsSpecDT))[-5])-1)),
-                             buttons = list(list(extend = "colvis", background = FALSE,
+dtOpts <- list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "200px",
+               dom = "frtip",
+               initComplete = DT::JS("function(settings, json)",
+                                     "{ setTimeout(initAnnotation, 25); }"),
+               order = list(list(1, "asc")),
+               columnDefs = list(list(visible = FALSE, targets = 0),
+                                 list(className = "dt-nowrap", targets = 4),
+                                 list(className = "dt-center",
+                                      targets = (seq_len(ncol(fGroupsSpecDT))[-5])-1)))
+
+selCols <- ncol(fGroupsSpecDT) > 5 # selectable columns if >5 columns
+if (selCols)
+{
+    dtOpts <- c(dtOpts, list(buttons = list(list(extend = "colvis", background = FALSE,
                                                  columns = seq(5, ncol(fGroupsSpecDT)-1),
-                                                 collectionLayout = "three-column"))),
-              escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
+                                                 collectionLayout = "three-column"))))
+    dtOpts$dom <- paste0("B", dtOpts$dom)
+}
+
+dtArgs <- list(fGroupsSpecDT, escape = FALSE, rownames = FALSE, elementId = "fGroupsTable",
+               options = dtOpts)
+if (selCols)
+    dtArgs <- c(dtArgs, list(extensions = "Buttons"))
+
+do.call(DT::datatable, dtArgs)
 ```
 
 ### EIC { data-width=100 }

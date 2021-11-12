@@ -104,7 +104,7 @@ cols <- c("name", "formula", "InChIKey")
 parents(TPs)[1:5, ..cols]
 TPs[["DEET"]][, ..cols]
 TPs[[2]][, ..cols]
-as.data.frame(TPs)[1:5, 1:3]
+as.data.table(TPs)[1:5, 1:3]
 ```
 
 In addition, the following generic functions are available to modify or convert the object data:

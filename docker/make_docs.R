@@ -27,17 +27,11 @@ file.rename(disabledRmds, origRmds)
 # make book after pkgdown, otherwise it complains
 # NOTE: set clean_envir to FALSE so that 'out' variable below is recognized
 out <- file.path(normalizePath("docs", mustWork = FALSE), "handbook_bd")
-withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd",
-                                                             output_dir = out,
-                                                             clean_envir = FALSE))
+withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", output_dir = out))
 
 # PDF versions
-withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd",
-                                                             "bookdown::pdf_book",
-                                                             output_dir = out,
-                                                             clean_envir = FALSE))
-rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document",
-                  output_dir = file.path("docs", "articles"))
+withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", "bookdown::pdf_book", output_dir = out))
+rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document", output_dir = file.path("docs", "articles"))
 
 tinytex::tlmgr_install("makeindex")
 refp <- file.path("docs/reference")

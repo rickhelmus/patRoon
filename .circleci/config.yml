@@ -10,6 +10,7 @@ jobs:
     build:
         machine:
             image: ubuntu-2004:202010-01
+        resource_class: medium
         <<: *set_dock_env
         steps:
             - checkout
@@ -28,6 +29,7 @@ jobs:
     test:
         machine:
             image: ubuntu-2004:202010-01
+        resource_class: medium
         <<: *set_dock_env
         steps:
             - run:
@@ -59,6 +61,7 @@ jobs:
     docs:
         machine:
             image: ubuntu-2004:202010-01
+        resource_class: medium
         <<: *set_dock_env
         steps:
             - checkout
@@ -85,6 +88,7 @@ jobs:
     deps:
         machine:
             image: ubuntu-2004:202010-01
+        resource_class: medium
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain

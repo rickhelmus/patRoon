@@ -70,7 +70,8 @@ utils <- setRefClass("utilsInst", methods = list(
         cat(hd, txt, hd, sep = "\n")
     },
     
-    checkPackages = function(pkgs, pkgWhere, ask = TRUE, type = "installp", repos = NULL, force = FALSE, ...)
+    checkPackages = function(pkgs, pkgWhere, ask = TRUE, type = "installp", repos = NULL, force = FALSE,
+                             pkgReposNames = pkgs, ...)
     {
         if (force)
             notInstalled <- pkgs
@@ -84,22 +85,25 @@ utils <- setRefClass("utilsInst", methods = list(
                                          paste0(notInstalled, collapse = ", "))))
             stop("Aborted. Please install the package(s) manually.")
         
+        # HACK: in some cases the package repos name differs from the installed package name (ie KPIC<-->KPIC2)
+        pkgToInstall <- pkgReposNames[notInstalled %in% pkgs]
+        
         if (pkgWhere == "normal")
         {
             if (type == "bioc")
             {
                 cmd <- "BiocManager::install"
-                args <- list(notInstalled, ask = TRUE)
+                args <- list(pkgToInstall, update = FALSE)
             }
             else if (type == "gh")
             {
                 cmd <- "remotes::install_github"
-                args <- c(list(paste(repos, notInstalled, sep = "/")), list(upgrade_dependencies = FALSE, force = force))
+                args <- c(list(paste(repos, pkgToInstall, sep = "/")), list(upgrade = FALSE, force = force))
             }
             else
             {
                 cmd <- "install.packages"
-                args <- list(notInstalled)
+                args <- list(pkgToInstall)
                 if (!is.null(repos))
                     args <- c(args, list(repos = repos))
             }
@@ -108,7 +112,7 @@ utils <- setRefClass("utilsInst", methods = list(
         {
             cmd <- "install.packages"
             args <- c(list(repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary"),
-                      list(notInstalled))
+                      list(pkgToInstall))
             
             # shouldn't be necessary as .libPaths was already set
             # if (pkgWhere == "pDepsIso")
@@ -119,7 +123,7 @@ utils <- setRefClass("utilsInst", methods = list(
         argNames <- names(args)
         argVals <- quoteVariables(args)
         argsTxt <- paste0(ifelse(nzchar(argNames), paste0(argNames, " = "), ""), argVals, collapse = ", ")
-        cat(sprintf("Installing packages: %s\n\nEXECUTE: %s(%s)\n\n", paste0(notInstalled, collapse = ", "), cmd, argsTxt))
+        cat(sprintf("Installing packages: %s\n\nEXECUTE: %s(%s)\n\n", paste0(pkgToInstall, collapse = ", "), cmd, argsTxt))
 
         # hopefully to avoid stupid DLL problems etc
         unloadAllPackages()
@@ -330,21 +334,46 @@ utils <- setRefClass("utilsInst", methods = list(
         return(dest)
     },
     
-    installRDeps = function(instPath, pkgWhere)
+    installMandatoryRDeps = function(instPath, pkgWhere)
     {
-        printHeader("Pre-Installing R dependencies...")
+        printHeader("Pre-Installing mandatory R dependencies...")
         
         curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
         .libPaths(getLibPaths(instPath, pkgWhere))
         
         packagesCRAN <- packagesNotInstalled(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"))
         packagesBioC <- packagesNotInstalled(c("mzR", "xcms", "CAMERA"))
-        optPackages <- packagesNotInstalled(c("KPIC2", "RAMClustR", "cliqueMS", "MetaClean", "RDCOMClient"))
         mandatoryPackages <- c(packagesCRAN, packagesBioC)
         
         choices <- character()
-        if (length(mandatoryPackages) > 0)
-            choices <- c(choices, mandatory = "Only mandatory packages")
+        if (length(mandatoryPackages) == 0)
+        {
+            cat("All mandatory R pre-dependencies already installed\n")
+            return(NULL)
+        }
+
+        cat("The following mandatory packages will be installed:",
+            paste0(mandatoryPackages, collapse = ", "),
+            sep = "\n")
+        
+        instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,
+                                title = "Which of the following R packages do you want to install?")
+        instWhat <- names(instWhat)
+        
+        checkPackages(packagesCRAN, pkgWhere, ask = FALSE)
+        checkPackages(packagesBioC, pkgWhere, ask = FALSE, type = "bioc")
+    },
+    
+    installOptionalRDeps = function(instPath, pkgWhere)
+    {
+        printHeader("Pre-Installing optional R dependencies...")
+        
+        curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
+        .libPaths(getLibPaths(instPath, pkgWhere))
+        
+        optPackages <- packagesNotInstalled(c("KPIC", "RAMClustR", "cliqueMS", "MetaClean", "RDCOMClient"))
+        
+        choices <- character()
         if ("KPIC" %in% optPackages)
             choices <- c(choices, KPIC2 = "KPIC2 (algorithm to find/group features)")
         if ("RAMClustR" %in% optPackages)
@@ -359,34 +388,20 @@ utils <- setRefClass("utilsInst", methods = list(
             choices <- c(choices, all = "All")
         else if (length(choices) == 0)
         {
-            cat("All R pre-dependencies already installed\n")
+            cat("All optional R pre-dependencies already installed\n")
             return(NULL)
         }
 
-        if (length(mandatoryPackages) > 0)
-            cat("The following mandatory packages will be installed:",
-                paste0(mandatoryPackages, collapse = ", "),
-                sep = "\n")
-        
         instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,
                                 title = "Which of the following R packages do you want to install?")
         instWhat <- names(instWhat)
 
-        if (length(mandatoryPackages) > 0)
-        {
-            if (is.null(instWhat))
-                stop("Please install the mandatory packages manually.")
-            
-            checkPackages(packagesCRAN, pkgWhere, ask = FALSE)
-            checkPackages(packagesBioC, pkgWhere, ask = FALSE, type = "bioc")
-        }
-            
         if (!is.null(instWhat))
         {
             if (any(c("all", "KPIC2") %in% instWhat))
             {
                 checkPackages("ropls", pkgWhere, ask = FALSE, type = "bioc")
-                checkPackages("KPIC", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus")
+                checkPackages("KPIC", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", pkgReposNames = "KPIC2")
             }
             if (any(c("all", "RAMClustR") %in% instWhat))
                 checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl")
@@ -422,7 +437,7 @@ utils <- setRefClass("utilsInst", methods = list(
                 url <- "https://download.java.net/java/GA/jdk13/5b8a42f3905b406298b72d750b6919f6/33/GPL/openjdk-13_windows-x64_bin.zip"
                 down <- downloadFile(instPath, "Open JDK 13", url, TRUE)
                 if (!is.null(down))
-                    return(paste0(down, "/jdk-13"))
+                    ret <- paste0(down, "/jdk-13")
                 
             }
             else
@@ -459,7 +474,7 @@ utils <- setRefClass("utilsInst", methods = list(
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCL", "")))
-        extDeps <- rbind(extDeps, list(name = "MetFrag CompTox DB", command = "", copt = "",
+        extDeps <- rbind(extDeps, list(name = "MetFrag CompTox WasteWater DB", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCompTox", "")))
         extDeps <- rbind(extDeps, list(name = "MetFrag PubChemLite DB", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragPubChemLite", "")))
@@ -503,7 +518,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("MetFrag CompTox DB" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag CompTox database", "ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv",
+                down <- downloadFile(instPath, "MetFrag CompTox database", "https://zenodo.org/record/3472781/files/CompTox_07March19_WWMetaData.csv",
                                      FALSE)
                 if (!is.null(down))
                 {
@@ -522,7 +537,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.9.8/sirius-4.9.8-win64.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://github.com/boecker-lab/sirius/releases/download/v4.9.9/sirius-4.9.9-win64.zip",
                                      TRUE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-gui"))))
@@ -541,11 +556,11 @@ utils <- setRefClass("utilsInst", methods = list(
                 if (!is.null(down))
                 {
                     # rename subdirectory with auto generated name...
-                    subDir <- list.files(down, pattern = "^djoumbou\\-biotransformer\\-[[:digit:]]+$", full.names = TRUE)
+                    subDir <- list.files(down, pattern = "^djoumbou\\-biotransformer\\-[[:alnum:]]+$", full.names = TRUE)
                     file.rename(subDir, "biotransformer")
                     
                     # place in jar from patRoonDeps
-                    jar <- downloadFile(file.path(down, "biotransformer"),
+                    jar <- downloadFile(file.path(down, "biotransformer"), "BioTransformer jar",
                                         "https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar",
                                         FALSE)
                     if (!is.null(jar))
@@ -601,14 +616,14 @@ utils <- setRefClass("utilsInst", methods = list(
 ))()
 
 
-installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
+installPatRoon <- function(what = c("mandatory_packages", "optional_packages", "tools", "deps", "patRoon"),
                            instPath = "~/patRoon-install", exampleData = TRUE,
                            force = FALSE)
 {
     if (Sys.info()[["sysname"]] != "Windows" || Sys.info()[["machine"]] != "x86-64")
         stop("Sorry, this script only works on a 64 bit Windows system at the moment.")
     
-    validWhat <- c("packages", "tools", "deps", "patRoon")
+    validWhat <- c("mandatory_packages", "optional_packages", "tools", "deps", "patRoon")
     if (!is.character(what) || any(!what %in% validWhat))
         stop(sprintf("what must be a subset of (%s)", paste0(validWhat, collapse = ", ")))
     
@@ -632,7 +647,7 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
     instPath <- utils$fixPath(instPath)
     
     pkgWhere <- "normal"
-    if (any(c("packages", "patRoon") %in% what))
+    if (any(c("mandatory_packages", "optional_packages", "patRoon") %in% what))
     {
         # UNDONE: add option to always install patRoon from GH?
         
@@ -655,14 +670,16 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
     }
     
     jPath <- NULL; setOpts <- list()
-    if ("packages" %in% what)
-        utils$installRDeps(instPath, pkgWhere)
+
+    if ("mandatory_packages" %in% what)
+        utils$installMandatoryRDeps(instPath, pkgWhere)    
     if ("deps" %in% what)
     {
         # UNDONE: enable Rtools if we allow github installation of patRoon regardless of repos
         jPath <- utils$installExtDeps(instPath, "patRoon" %in% what && pkgWhere == "normal")
     }
-    
+    if ("optional_packages" %in% what)
+        utils$installOptionalRDeps(instPath, pkgWhere)
     if ("tools" %in% what)
         setOpts <- utils$installTools(instPath)
     

@@ -397,18 +397,17 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
 
         printf("%s%s\\item{%s}\n", if (level == 0) "\\itemize{\n" else "", indent, cl$name)
 
-        more <- any(sapply(cl, is.list))
-        if (more)
-            cat(paste0(indent, "\\itemize{\n"))
-
-        for (clsub in cl)
+        # NOTE: don't go over four levels (0-3) since TeX cannot handle more 
+        if (level < 3 && any(sapply(cl, is.list)))
         {
-            if (is.list(clsub))
-                doPrintRD(clsub, level + 1)
-        }
-
-        if (more)
+            cat(paste0(indent, "\\itemize{\n"))
+            for (clsub in cl)
+            {
+                if (is.list(clsub))
+                    doPrintRD(clsub, level + 1)
+            }
             cat(paste0(indent, "}\n"))
+        }
         if (level == 0)
             cat("}\n")
     }

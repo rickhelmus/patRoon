@@ -247,7 +247,7 @@ normalization.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureAnnotations}}}}     \itemize{       \item{\code{\link{formulas}}}       \itemize{         \item{\code{\link{formulasConsensus}}}         \item{\code{\link{formulasSet}}}         \itemize{           \item{\code{\link{formulasConsensusSet}}}         }         \item{\code{\link{formulasUnset}}}       }       \item{\code{\link{compounds}}}       \itemize{         \item{\code{\link{compoundsConsensus}}}         \item{\code{\link{compoundsMF}}}         \item{\code{\link{compoundsSet}}}         \itemize{           \item{\code{\link{compoundsConsensusSet}}}         }         \item{\code{\link{compoundsUnset}}}       }     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureAnnotations}}}}     \itemize{       \item{\code{\link{formulas}}}       \itemize{         \item{\code{\link{formulasConsensus}}}         \item{\code{\link{formulasSet}}}         \item{\code{\link{formulasUnset}}}       }       \item{\code{\link{compounds}}}       \itemize{         \item{\code{\link{compoundsConsensus}}}         \item{\code{\link{compoundsMF}}}         \item{\code{\link{compoundsSet}}}         \item{\code{\link{compoundsUnset}}}       }     }   } }
 }
 
 \references{

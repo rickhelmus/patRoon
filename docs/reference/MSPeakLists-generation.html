@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -168,6 +168,7 @@
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakLists</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakListsDA</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   bgsubtr <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -181,6 +182,10 @@
   avgFGroupParams <span class='op'>=</span> <span class='fu'>getDefAvgPListParams</span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateMSPeakListsDA</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakListsDAFMF</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   minMSIntensity <span class='op'>=</span> <span class='fl'>500</span>,
@@ -190,6 +195,10 @@
   avgFGroupParams <span class='op'>=</span> <span class='fu'>getDefAvgPListParams</span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateMSPeakListsDAFMF</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakListsMzR</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   maxMSRtWindow <span class='op'>=</span> <span class='fl'>5</span>,
@@ -199,6 +208,9 @@
   avgFGroupParams <span class='op'>=</span> <span class='fu'>getDefAvgPListParams</span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateMSPeakListsMzR</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>...</span><span class='op'>)</span>
+
 <span class='fu'>getDefAvgPListParams</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -206,8 +218,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fGroups</th>
-      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object from which MS peak
-lists should be extracted.</p></td>
+      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object from which MS peak lists should be extracted.</p></td>
     </tr>
     <tr>
       <th>algorithm</th>
@@ -216,10 +227,10 @@ used: <code>"bruker"</code>, <code>"brukerfmf"</code>, <code>"mzr"</code></p></t
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For <code>generateMSPeakLists</code>: Any parameters to be passed to
-  the selected MS peak lists generation algorithm.</p>
-<p>For <code>getDefAvgPListParams</code>: Optional named arguments that override
-  defaults.</p></td>
+      <td><p>For <code>generateMSPeakLists</code>: Any parameters to be passed to the selected MS peak lists generation
+  algorithm.</p>
+<p>For <code>getDefAvgPListParams</code>: Optional named arguments that override defaults.</p>  
+<p>For sets workflows: further arguments passed to the non-sets workflow method.</p></td>
     </tr>
     <tr>
       <th>bgsubtr</th>
@@ -228,15 +239,13 @@ used: <code>"bruker"</code>, <code>"brukerfmf"</code>, <code>"mzr"</code></p></t
     </tr>
     <tr>
       <th>maxMSRtWindow</th>
-      <td><p>Maximum chromatographic peak window used for spectrum
-averaging (in seconds, +/- retention time). If <code>NULL</code> all spectra from
-a feature will be taken into account. Lower to decrease processing time.</p></td>
+      <td><p>Maximum chromatographic peak window used for spectrum averaging (in seconds, +/- retention
+time). If <code>NULL</code> all spectra from a feature will be taken into account. Lower to decrease processing time.</p></td>
     </tr>
     <tr>
       <th>minMSIntensity, minMSMSIntensity</th>
-      <td><p>Minimum intensity for peak lists
-obtained with DataAnalysis. Highly recommended to set <samp>&gt;0</samp> as DA tends
-to report many very low intensity peaks.</p></td>
+      <td><p>Minimum intensity for peak lists obtained with DataAnalysis. Highly
+recommended to set <samp>&gt;0</samp> as DA tends to report many very low intensity peaks.</p></td>
     </tr>
     <tr>
       <th>clear</th>
@@ -269,45 +278,35 @@ should be <code>NULL</code>.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
-      <td><p>Only extract MS peak lists from a maximum of <code>topMost</code>
-analyses with highest intensity. If <code>NULL</code> all analyses will be used.</p></td>
+      <td><p>Only extract MS peak lists from a maximum of <code>topMost</code> analyses with highest intensity. If
+<code>NULL</code> all analyses will be used.</p></td>
     </tr>
     <tr>
       <th>avgFeatParams, avgFGroupParams</th>
-      <td><p>A <code>list</code> with parameters used for
-averaging of peak lists for individual features and feature groups,
-respectively (see below).</p></td>
+      <td><p>A <code>list</code> with parameters used for averaging of peak lists for individual
+features and feature groups, respectively (see below).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that can be used for formulae
-  calculation and compound identification.</p>
+    <p>A <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that can be used for formulae calculation and compound identification.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Formula calculation and identification tools rely on mass spectra that belong
-to features of interest. For processing, MS (and MS/MS) spectra are typically
-reduced to a table with a column containing measured <em>m/z</em> values and a
-column containing their intensities. These 'MS peak lists' can then be used
-for <a href='formula-generation.html'>formula generation</a> and
-<a href='compound-generation.html'>compound generation</a>.</p>
-<p>MS and MS/MS peak lists are first generated for all features (or a subset, if
-the <code>topMost</code> argument is set). During this step multiple spectra over
-the feature elution profile are averaged. Subsequently, peak lists will be
-generated for each feature group by averaging peak lists of the features
-within the group. Functionality that uses peak lists will either use data
-from individual features or from group averaged peak lists. For instance, the
-former may be used by formulae calculation, while compound identification and
-plotting functionality typically uses group averaged peak lists.</p>
-<p>Several functions exist to automatically extract MS peak lists for feature
-groups.</p>
-<p><code>generateMSPeakLists</code> is a generic function that will generate MS peak lists
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>generateMSPeakListsMzR</code> and
-  <code>generateMSPeakListsDA</code>. While these functions may be called directly,
-  <code>generateMSPeakLists</code> provides a generic interface and is therefore usually
-  preferred.</p>
+    <p>Formula calculation and identification tools rely on mass spectra that belong to features of interest. For
+processing, MS (and MS/MS) spectra are typically reduced to a table with a column containing measured <em>m/z</em>
+values and a column containing their intensities. These 'MS peak lists' can then be used for
+<a href='formula-generation.html'>formula generation</a> and <a href='compound-generation.html'>compound generation</a>.</p>
+<p>MS and MS/MS peak lists are first generated for all features (or a subset, if the <code>topMost</code> argument is set).
+During this step multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be
+generated for each feature group by averaging peak lists of the features within the group. Functionality that uses
+peak lists will either use data from individual features or from group averaged peak lists. For instance, the former
+may be used by formulae calculation, while compound identification and plotting functionality typically uses group
+averaged peak lists.</p>
+<p>Several functions exist to automatically extract MS peak lists for feature groups.</p>
+<p><code>generateMSPeakLists</code> is a generic function that will generate MS peak lists using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as <code>generateMSPeakListsMzR</code> and <code>generateMSPeakListsDA</code>. While these
+  functions may be called directly, <code>generateMSPeakLists</code> provides a generic interface and is therefore usually preferred.</p>
 <p><code>generateMSPeakListsDA</code> uses Bruker DataAnalysis to generate MS
   peak lists. Naturally, this only works with analyses in the Bruker data
   format (<code class="file">.d</code>). This function leverages DataAnalysis functionality to
@@ -338,59 +337,50 @@ groups.</p>
   with DataAnalayis can be used for this.</p>
     <h2 class="hasAnchor" id="peak-list-averaging-parameters"><a class="anchor" href="#peak-list-averaging-parameters"></a>Peak list averaging parameters</h2>
 
-    <p>The parameters set used for
-  averaging peak lists are set by the <code>avgFeatParams</code> and
-  <code>avgFGroupParams</code> arguments. This should be a named <code>list</code> with
-  the following values:</p><ul>
-<li><p><code>clusterMzWindow</code> <em>m/z</em> window (in Da) used for clustering
-  <em>m/z</em> values when spectra are averaged. For <code>method="hclust"</code>
-  this corresponds to the cluster height, while for <code>method="distance"</code>
-  this value is used to find nearby masses (+/- window).  Too small windows
-  will prevent clustering <em>m/z</em> values (thus erroneously treating equal
-  masses along spectra as different), whereas too big windows may cluster
-  unrelated <em>m/z</em> values from different or even the same spectrum
-  together.</p></li>
-<li><p><code>topMost</code> Only retain this maximum number of MS peaks when
-  generating averaged spectra. Lowering this number may exclude more
-  irrelevant (noisy) MS peaks and decrease processing time, whereas higher
-  values may avoid excluding lower intense MS peaks that may still be of
-  interest.</p></li>
-<li><p><code>minIntensityPre</code> MS peaks with intensities below this value
-  will be removed (applied prior to selection by <code>topMost</code>) before
-  averaging.</p></li>
-<li><p><code>minIntensityPost</code> MS peaks with intensities below this value
-  will be removed after averaging.</p></li>
-<li><p><code>avgFun</code> Function that is used to calculate average <em>m/z</em>
-  values.</p></li>
-<li><p><code>method</code> Method used for producing averaged MS spectra. Valid
-  values are <code>"hclust"</code>, used for hierarchical clustering (using the
-  <span class="pkg">fastcluster</span> package), and <code>"distance"</code>, to use the
-  between peak distance. The latter method may reduces processing time and
-  memory requirements, at the potential cost of reduced accuracy.</p></li>
-<li><p><code>pruneMissingPrecursorMS</code> For MS data only: if <code>TRUE</code> then
-  peak lists without a precursor peak are removed. Note that even when this
-  is set to <code>FALSE</code>, functionality that relies on MS (not MS/MS) peak
-  lists (<em>e.g.</em> formulae calulcation) will still skip calculation if a
-  precursor is not found.</p></li>
-<li><p><code>retainPrecursorMSMS</code> For MS/MS data only: if <code>TRUE</code> then
-  always retain the precursor mass peak even if is not amongst the
-  <code>topMost</code> peaks. Note that MS precursor mass peaks are always kept.
-  Furthermore, note that precursor peaks in both MS and MS/MS data may still
-  be removed by intensity thresholds (this is unlike the
-  <code><a href='MSPeakLists-class.html'>filter</a></code> method function).</p></li>
+    <p>The parameters set used for averaging peak lists are set by the
+  <code>avgFeatParams</code> and <code>avgFGroupParams</code> arguments. This should be a named <code>list</code> with the following
+  values:</p><ul>
+<li><p><code>clusterMzWindow</code> <em>m/z</em> window (in Da) used for clustering <em>m/z</em> values when spectra are
+  averaged. For <code>method="hclust"</code> this corresponds to the cluster height, while for <code>method="distance"</code>
+  this value is used to find nearby masses (+/- window).  Too small windows will prevent clustering <em>m/z</em> values
+  (thus erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
+  <em>m/z</em> values from different or even the same spectrum together.</p></li>
+<li><p><code>topMost</code> Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
+  number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
+  excluding lower intense MS peaks that may still be of interest.</p></li>
+<li><p><code>minIntensityPre</code> MS peaks with intensities below this value will be removed (applied prior to selection
+  by <code>topMost</code>) before averaging.</p></li>
+<li><p><code>minIntensityPost</code> MS peaks with intensities below this value will be removed after averaging.</p></li>
+<li><p><code>avgFun</code> Function that is used to calculate average <em>m/z</em> values.</p></li>
+<li><p><code>method</code> Method used for producing averaged MS spectra. Valid values are <code>"hclust"</code>, used for
+  hierarchical clustering (using the <span class="pkg">fastcluster</span> package), and <code>"distance"</code>, to use the between
+  peak distance. The latter method may reduces processing time and memory requirements, at the potential cost of
+  reduced accuracy.</p></li>
+<li><p><code>pruneMissingPrecursorMS</code> For MS data only: if <code>TRUE</code> then peak lists without a precursor peak are
+  removed. Note that even when this is set to <code>FALSE</code>, functionality that relies on MS (not MS/MS) peak lists
+  (<em>e.g.</em> formulae calulcation) will still skip calculation if a precursor is not found.</p></li>
+<li><p><code>retainPrecursorMSMS</code> For MS/MS data only: if <code>TRUE</code> then always retain the precursor mass peak
+  even if is not amongst the <code>topMost</code> peaks. Note that MS precursor mass peaks are always kept. Furthermore,
+  note that precursor peaks in both MS and MS/MS data may still be removed by intensity thresholds (this is unlike
+  the <code><a href='MSPeakLists-class.html'>filter</a></code> method function).</p></li>
 </ul>
 
-<p>Note that when Bruker algorithms are used these parameters only control
-  generation of feature groups averaged peak lists: how peak lists for
-  features are generated is controlled by DataAnalysis.</p>
-<p>The <code>getDefAvgPListParams</code> function can be used to generate a default
-  parameter list. The current defaults are:</p>
+<p>Note that when Bruker algorithms are used these parameters only control generation of feature groups averaged peak
+  lists: how peak lists for features are generated is controlled by DataAnalysis.</p>
+<p>The <code>getDefAvgPListParams</code> function can be used to generate a default parameter list. The current defaults
+  are:</p>
 <p><code>clusterMzWindow=0.005</code>; <code>topMost=50</code>; <code>minIntensityPre=500</code>; <code>minIntensityPost=500</code>; <code>avgFun=mean</code>; <code>method="hclust"</code>; <code>pruneMissingPrecursorMS=TRUE</code>; <code>retainPrecursorMSMS=TRUE</code></p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>With a <a href='sets-workflow.html'>sets workflow</a>, the feature group averaged peak lists are made
+  per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
+  ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled
+  in the final peak lists. However, please note that annotation and other functionality typically uses only the set
+  specific peak lists, as this functionality cannot work with mixed peak lists.</p>
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <p>Averaging of mass spectra algorithms used by are based on
-  the <a href='https://github.com/zeehio/msProcess'>msProcess</a> R package (now
-  archived on CRAN).</p>
+    <p>Averaging of mass spectra algorithms used by are based on the
+  <a href='https://github.com/zeehio/msProcess'>msProcess</a> R package (now archived on CRAN).</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>A cross-platform toolkit for mass spectrometry and proteomics Chambers, Matthew C. and Maclean, Brendan and Burke, Robert and Amodei, 

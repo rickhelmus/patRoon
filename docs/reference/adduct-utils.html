@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -169,7 +169,7 @@
 
 <span class='fu'>MetFragAdducts</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>as.adduct</span><span class='op'>(</span><span class='va'>x</span>, format <span class='op'>=</span> <span class='st'>"generic"</span>, isPositive <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+<span class='fu'>as.adduct</span><span class='op'>(</span><span class='va'>x</span>, format <span class='op'>=</span> <span class='st'>"generic"</span>, isPositive <span class='op'>=</span> <span class='cn'>NULL</span>, charge <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
 <span class='fu'>calculateIonFormula</span><span class='op'>(</span><span class='va'>formula</span>, <span class='va'>adduct</span><span class='op'>)</span>
 
@@ -196,7 +196,9 @@ string, a <code>numeric</code> <code class='command'>MetFrag</code> adduct ident
   SIRIUS manual for more details.</p>
 <p><code>"genform"</code> and <code>"metfrag"</code> support fixed types of adducts
   which can be obtained with the <code>GenFormAdducts</code> and
-  <code>MetFragAdducts</code> functions, respectively.</p></td>
+  <code>MetFragAdducts</code> functions, respectively.</p>  
+<p><code>"openms"</code> is the format used by the <code class='command'>MetaboliteAdductDecharger</code> tool.</p>  
+<p><code>"cliquems"</code> is the format used by <span class="pkg">cliqueMS</span>.</p></td>
     </tr>
     <tr>
       <th>isPositive</th>
@@ -205,14 +207,17 @@ positive. Should only be set when <code>format="metfrag"</code> and <code>x</cod
 <code>numeric</code> identifier.</p></td>
     </tr>
     <tr>
+      <th>charge</th>
+      <td><p>The final charge. Only needs to be set when <code>format="openms"</code>.</p></td>
+    </tr>
+    <tr>
       <th>formula</th>
       <td><p>A <code>character</code> vector with formulae to convert.</p></td>
     </tr>
     <tr>
       <th>adduct</th>
-      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
-converted to it with <code>as.adduct</code>). Examples: <code>"[M-H]-"</code>,
-<code>"[M+Na]+"</code>.</p></td>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be converted to it with <code>as.adduct</code>).
+Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>.</p></td>
     </tr>
     </table>
 

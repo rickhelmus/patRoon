@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Component class — components-class • patRoon</title>
+<title>Component class — length,transformationProducts-method • patRoon</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Component class — components-class" />
+<meta property="og:title" content="Component class — length,transformationProducts-method" />
 <meta property="og:description" content="Contains data for feature groups that are related in some way. These
 components commonly include adducts, isotopes and homologues." />
 
@@ -73,7 +73,7 @@ components commonly include adducts, isotopes and homologues." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -158,7 +158,7 @@ components commonly include adducts, isotopes and homologues." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Component class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-camera.R'><code>R/components-camera.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-ramclustr.R'><code>R/components-ramclustr.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/TP.R'><code>R/TP.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-camera.R'><code>R/components-camera.R</code></a>, and 5 more</small>
     <div class="hidden name"><code>components-class.Rd</code></div>
     </div>
 
@@ -167,7 +167,10 @@ components commonly include adducts, isotopes and homologues." />
 <em>components</em> commonly include adducts, isotopes and homologues.</p>
     </div>
 
-    <pre class="usage"># S4 method for components
+    <pre class="usage"># S4 method for transformationProducts
+length(x)
+
+# S4 method for components
 componentTable(obj)
 
 # S4 method for components
@@ -195,6 +198,9 @@ show(object)
 $(x, name)
 
 # S4 method for components
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for components
 as.data.table(x)
 
 # S4 method for components
@@ -205,28 +211,43 @@ filter(
   isotopes = NULL,
   rtIncrement = NULL,
   mzIncrement = NULL,
-  negate = FALSE
+  checkComponentsSession = NULL,
+  negate = FALSE,
+  verbose = TRUE
 )
 
 # S4 method for components
 findFGroup(obj, fGroup)
 
 # S4 method for components
-plotSpectrum(
-  obj,
-  index,
-  markFGroup = NULL,
-  useGGPlot2 = FALSE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
+plotSpectrum(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
 
 # S4 method for components
 plotChroms(obj, index, fGroups, rtWindow = 5, ...)
 
 # S4 method for components
-consensus(obj, ...)</pre>
+consensus(obj, ...)
+
+# S4 method for componentsFeatures
+show(object)
+
+# S4 method for componentsSet
+show(object)
+
+# S4 method for componentsSet,ANY,ANY,missing
+[(x, i, j, ..., sets = NULL, drop = TRUE)
+
+# S4 method for componentsSet
+filter(obj, ..., negate = FALSE, sets = NULL)
+
+# S4 method for componentsSet
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for componentsSet
+consensus(obj, ...)
+
+# S4 method for componentsSet
+unset(obj, set)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -237,20 +258,26 @@ consensus(obj, ...)</pre>
     </tr>
     <tr>
       <th>i, j</th>
-      <td><p>A numeric or character value which is used to select components/feature groups by
+      <td><p>For <code><a href='generics.html'>[</a></code>/<code><a href='generics.html'>[[</a></code>: A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. <code>j</code> is optional.</p></td>
+(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. <code>j</code> is optional.<br /><br /> For <code>delete</code>: The data to remove from. <code>i</code> are the
+components as numeric index, logical or character, <code>j</code> the feature groups as numeric index/logical (relative to component) or character. If either is
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
+component, with the component (a <code>data.table</code>) as first argument, the component name as second argument, and any other arguments passed as
+<code>...</code> to <code>delete</code>. The return value of this function specifies the feature groups to be removed (same format as <code>j</code>).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For <code>plotChroms</code>: Further (optional) arguments passed to the
+      <td><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
+<p>For <code>plotChroms</code>: Further (optional) arguments passed to the
   <code>plotChroms</code> method for the <code><a href='featureGroups-class.html'>featureGroups</a></code> class. Note that
   the <code>colourBy</code>, <code>showPeakArea</code>, <code>showFGroupRect</code> and
   <code>topMost</code> arguments cannot be set as these are set by this method.</p>
 <p>For <code>plotSpectrum</code>: Further arguments passed to
   <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p>
 <p>For <code>consensus</code>: <code>components</code> objects that should be used to
-  generate the consensus.</p></td>
+  generate the consensus.</p>  
+<p>For <a href='sets-workflow.html'>sets workflow</a> methods: further arguments passed to the base <code>components</code> method.</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -262,38 +289,42 @@ their index or name, respectively (for the order/names see <code>names()/groupNa
     </tr>
     <tr>
       <th>size</th>
-      <td><p>Should be a two sized vector with the minimum/maximum size of a
-component. Set to <code>NULL</code> to ignore.</p></td>
+      <td><p>Should be a two sized vector with the minimum/maximum size of a component. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>adducts</th>
-      <td><p>Remove any feature groups within components that do not match
-given adduct rules. If <code>adducts</code> is a logical then only results are
-kept when an adduct is assigned (<code>adducts=TRUE</code>) or not assigned
-(<code>adducts=FALSE</code>). Otherwise, if <code>adducts</code> contains one or more
-<code><a href='adduct-class.html'>adduct</a></code> objects (or something that can be converted to it with
-<code><a href='adduct-utils.html'>as.adduct</a></code>) then only results are kept that match the given
+      <td><p>Remove any feature groups within components that do not match given adduct rules. If <code>adducts</code> is
+a logical then only results are kept when an adduct is assigned (<code>adducts=TRUE</code>) or not assigned
+(<code>adducts=FALSE</code>). Otherwise, if <code>adducts</code> contains one or more <code><a href='adduct-class.html'>adduct</a></code> objects (or
+something that can be converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>) then only results are kept that match the given
 adducts. Set to <code>NULL</code> to ignore this filter.</p></td>
     </tr>
     <tr>
       <th>isotopes</th>
-      <td><p>Only keep results that match a given isotope rule. If
-<code>isotopes</code> is a logical then only results are kept with
-(<code>isotopes=TRUE</code>) or without (<code>isotopes=FALSE</code>) isotope
-assignment. Otherwise <code>isotopes</code> should be a numeric vector with
-isotope identifiers to keep (<em>e.g.</em> <samp>0</samp> for monoisotopic results,
-<samp>1</samp> for <samp>M+1</samp> results etc.). Set to <code>NULL</code> to ignore this
-filter.</p></td>
+      <td><p>Only keep results that match a given isotope rule. If <code>isotopes</code> is a logical then only results
+are kept with (<code>isotopes=TRUE</code>) or without (<code>isotopes=FALSE</code>) isotope assignment. Otherwise
+<code>isotopes</code> should be a numeric vector with isotope identifiers to keep (<em>e.g.</em> <samp>0</samp> for monoisotopic
+results, <samp>1</samp> for <samp>M+1</samp> results etc.). Set to <code>NULL</code> to ignore this filter.</p></td>
     </tr>
     <tr>
       <th>rtIncrement, mzIncrement</th>
-      <td><p>Should be a two sized vector with the
-minimum/maximum retention or mz increment of a homologous series. Set to
-<code>NULL</code> to ignore.</p></td>
+      <td><p>Should be a two sized vector with the minimum/maximum retention or mz increment of a
+homologous series. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>checkComponentsSession</th>
+      <td><p>If set then components and/or feature groups are removed that were selected for removal
+(see <a href='check-GUI.html'>check-GUI</a> and the <code><a href='check-GUI.html'>checkComponents</a></code> function). The value of <code>checkComponentsSession</code>
+should either by a path to the session file or <code>TRUE</code>, in which case the default session file name is used. If
+<code>negate=TRUE</code> then all non-selected data is removed instead.</p></td>
     </tr>
     <tr>
       <th>negate</th>
       <td><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>If set to <code>FALSE</code> then no text output is shown.</p></td>
     </tr>
     <tr>
       <th>fGroup</th>
@@ -313,13 +344,6 @@ should be a character with the name of the feature group. Setting this to
 <code>NULL</code> will not mark any peak.</p></td>
     </tr>
     <tr>
-      <th>useGGPlot2</th>
-      <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
-plotting, otherwise base plot used. For <code>plotSpectrum</code>, <code>ggplot2</code>
-allows nicely repelled text for annotation. However, base plot is generally
-faster.</p></td>
-    </tr>
-    <tr>
       <th>xlim, ylim</th>
       <td><p>Sets the plot size limits used by
 <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
@@ -334,16 +358,19 @@ generate the components.</p></td>
       <td><p>Retention window: see the <code>plotChroms</code> method for the
 <code><a href='featureGroups-class.html'>featureGroups</a></code> class.</p></td>
     </tr>
+    <tr>
+      <th>sets</th>
+      <td><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The subset operator (<code>"["</code>) and <code>filter</code> method return the
-  data subset in an object from the <code>componentsReduced</code> class. This
-  object does not contain any algorithm specific data and as such, algorithm
-  specific methods (<em>e.g.</em> <code>treeCut</code>) will not work on this object.
-  The reason for this is that it is often very difficult or impossible to
-  subset the algorithmic data.</p>
+    <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>consensus</code> returns a <code>components</code> object that is produced
   by merging multiple specified <code>components</code> objects.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -354,6 +381,7 @@ generate the components.</p></td>
 
     
 <ul>
+<li><p><code>length</code>: Obtain total number of transformation products.</p></li>
 <li><p><code>componentTable</code>: Accessor method for the <code>components</code> slot of a
 <code>components</code> class. Each component is stored as a
 <code>data.table</code>.</p></li>
@@ -367,6 +395,7 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code><a href='generics.html'>[</a></code>: Subset on components/feature groups.</p></li>
 <li><p><code><a href='generics.html'>[[</a></code>: Extracts a component table, optionally filtered by a feature group.</p></li>
 <li><p><code><a href='generics.html'>$</a></code>: Extracts a component table by component name.</p></li>
+<li><p><code>delete</code>: Completely deletes specified (parts of) components.</p></li>
 <li><p><code>as.data.table</code>: Returns all component data in a table.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for components.</p></li>
 <li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
@@ -393,21 +422,45 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
 </dl>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p><code>filter</code> Applies only those filters for which a component has data
-  available. For instance, filtering by adduct will only filter any results
-  within a component if that component contains adduct information.</p>
+    <p><code>filter</code> Applies only those filters for which a component has data available. For instance, filtering by
+  adduct will only filter any results within a component if that component contains adduct information.</p>
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
 <li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
 <li><p><strong><code>components</code></strong></p><ul>
-<li><p><code>componentsReduced</code></p></li>
 <li><p><code>componentsCamera</code></p></li>
+<li><p><code>componentsFeatures</code></p><ul>
+<li><p><code>componentsCliqueMS</code></p></li>
+<li><p><code>componentsOpenMS</code></p></li>
+</ul></li>
+<li><p><code><a href='componentsClust-class.html'>componentsClust</a></code></p><ul>
 <li><p><code><a href='componentsIntClust-class.html'>componentsIntClust</a></code></p></li>
-<li><p><code><a href='componentsNT-class.html'>componentsNT</a></code></p></li>
+<li><p><code><a href='componentsSpecClust-class.html'>componentsSpecClust</a></code></p></li>
+</ul></li>
+<li><p><code>componentsSet</code></p><ul>
+<li><p><code><a href='componentsNT-class.html'>componentsNTSet</a></code></p></li>
+</ul></li>
+<li><p><code>componentsUnset</code></p></li>
+<li><p><code><a href='componentsNT-class.html'>componentsNT</a></code></p><ul>
+<li><p><code><a href='componentsNT-class.html'>componentsNTUnset</a></code></p></li>
+</ul></li>
 <li><p><code>componentsRC</code></p></li>
+<li><p><code><a href='componentsTPs-class.html'>componentsTPs</a></code></p></li>
 </ul></li>
 </ul></li>
+</ul>
+
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>componentsSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>components</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>componentsUnset</code>), which allows it to be used in 'regular' workflows. Only the components in the specified set are kept.</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>filter</code> and the subset operator (<code><a href='generics.html'>[</a></code>) Can be used to select components that are only present for
+  selected sets.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

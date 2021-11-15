@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Class for suspect screened feature groups. — featureGroupsScreening-class" />
-<meta property="og:description" content="This class derives from featureGroups and adds suspect
-screening information." />
+<meta property="og:description" content="This class derives from featureGroups and adds suspect screening information." />
 
 
 
@@ -73,7 +72,7 @@ screening information." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -158,13 +157,12 @@ screening information." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Class for suspect screened feature groups.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-screening.R'><code>R/feature_groups-screening.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-screening.R'><code>R/feature_groups-screening.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-screening-set.R'><code>R/feature_groups-screening-set.R</code></a></small>
     <div class="hidden name"><code>featureGroupsScreening-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This class derives from <code><a href='featureGroups-class.html'>featureGroups</a></code> and adds suspect
-screening information.</p>
+    <p>This class derives from <code><a href='featureGroups-class.html'>featureGroups</a></code> and adds suspect screening information.</p>
     </div>
 
     <pre class="usage"># S4 method for featureGroupsScreening
@@ -175,6 +173,9 @@ show(object)
 
 # S4 method for featureGroupsScreening,ANY,ANY,missing
 [(x, i, j, ..., rGroups, suspects = NULL, drop = TRUE)
+
+# S4 method for featureGroupsScreening
+delete(obj, i = NULL, j = NULL, ...)
 
 # S4 method for featureGroupsScreening
 as.data.table(x, ..., collapseSuspects = ",", onlyHits = FALSE)
@@ -191,7 +192,8 @@ annotateSuspects(
   checkFragments = c("mz", "formula", "compound"),
   formulasNormalizeScores = "max",
   compoundsNormalizeScores = "max",
-  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon")
+  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+  logPath = file.path("log", "ident")
 )
 
 # S4 method for featureGroupsScreening
@@ -210,7 +212,52 @@ filter(
   absMinFragMatches = NULL,
   relMinFragMatches = NULL,
   negate = FALSE
-)</pre>
+)
+
+# S4 method for featureGroupsScreeningSet
+screenInfo(obj)
+
+# S4 method for featureGroupsScreeningSet
+show(object)
+
+# S4 method for featureGroupsScreeningSet,ANY,ANY,missing
+[(x, i, j, ..., rGroups, suspects = NULL, sets = NULL, drop = TRUE)
+
+# S4 method for featureGroupsScreeningSet
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for featureGroupsScreeningSet
+as.data.table(x, ..., collapseSuspects = ",", onlyHits = FALSE)
+
+# S4 method for featureGroupsScreeningSet
+annotateSuspects(
+  fGroups,
+  MSPeakLists = NULL,
+  formulas = NULL,
+  compounds = NULL,
+  ...
+)
+
+# S4 method for featureGroupsScreeningSet
+filter(
+  obj,
+  ...,
+  onlyHits = NULL,
+  selectHitsBy = NULL,
+  selectBestFGroups = FALSE,
+  maxLevel = NULL,
+  maxFormRank = NULL,
+  maxCompRank = NULL,
+  minAnnSimForm = NULL,
+  minAnnSimComp = NULL,
+  minAnnSimBoth = NULL,
+  absMinFragMatches = NULL,
+  relMinFragMatches = NULL,
+  negate = FALSE
+)
+
+# S4 method for featureGroupsScreeningSet
+unset(obj, set)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -226,13 +273,17 @@ replicate groups, see <code><a href='featureGroups-class.html'>featureGroups</a>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Passed to the base <code><a href='featureGroups-class.html'>featureGroups</a></code> method.</p></td>
+      <td><p>Further arguments passed to the base method.</p></td>
     </tr>
     <tr>
       <th>suspects</th>
       <td><p>An optional <code>character</code> vector with suspect names. If
 specified, only <code>featureGroups</code> will be kept that are assigned to
 these suspects.</p></td>
+    </tr>
+    <tr>
+      <th>drop</th>
+      <td><p>Ignored.</p></td>
     </tr>
     <tr>
       <th>collapseSuspects</th>
@@ -245,24 +296,20 @@ enabled.</p></td>
     </tr>
     <tr>
       <th>onlyHits</th>
-      <td><p>For <code>as.data.table</code>: if <code>TRUE</code> then only feature
-  groups with suspect hits are reported.</p>
+      <td><p>For <code>as.data.table</code>: if <code>TRUE</code> then only feature groups with suspect hits are reported.</p>
 <p>For <code>filter</code></p><ul>
-<li><p>if <code>negate=FALSE</code> and <code>onlyHits=TRUE</code> then all feature
-  groups without suspect hits will be removed. Otherwise nothing will be
-  done.</p></li>
-<li><p>if <code>negate=TRUE</code> then <code>onlyHits=TRUE</code> will select feature
-  groups without suspect hits, <code>onlyHits=FALSE</code> will only retain feature
-  groups with suspect matches and this filter is ignored if
+<li><p>if <code>negate=FALSE</code> and <code>onlyHits=TRUE</code> then all feature groups without suspect hits will be removed.
+  Otherwise nothing will be done.</p></li>
+<li><p>if <code>negate=TRUE</code> then <code>onlyHits=TRUE</code> will select feature groups without suspect hits,
+  <code>onlyHits=FALSE</code> will only retain feature groups with suspect matches and this filter is ignored if
   <code>onlyHits=NULL</code>.</p></li>
 </ul></td>
     </tr>
     <tr>
       <th>MSPeakLists, formulas, compounds</th>
-      <td><p>Annotation data
-(<code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>, <code><a href='formulas-class.html'>formulas</a></code> and
-<code><code>compounds</code></code>) obtained for this <code>featureGroupsScreening</code>
-object. All arguments can be <code>NULL</code> to exclude it from the annotation.</p></td>
+      <td><p>Annotation data (<code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>, <code><a href='formulas-class.html'>formulas</a></code> and
+<code><a href='compounds-class.html'>compounds</a></code>) obtained for this <code>featureGroupsScreening</code> object. All arguments can be <code>NULL</code>
+to exclude it from the annotation.</p></td>
     </tr>
     <tr>
       <th>absMzDev</th>
@@ -270,25 +317,22 @@ object. All arguments can be <code>NULL</code> to exclude it from the annotation
     </tr>
     <tr>
       <th>relMinMSMSIntensity</th>
-      <td><p>Minimum relative intensity (<samp>0-1</samp>) threshold
-applied when calculating annotation similarities.</p></td>
+      <td><p>Minimum relative intensity (<samp>0-1</samp>) threshold applied when calculating annotation
+similarities.</p></td>
     </tr>
     <tr>
       <th>simMSMSMethod</th>
-      <td><p>Either <code>"cosine"</code> or <code>"jaccard"</code>: used to
-compare MS/MS peak lists for annotation similarity calculation.</p></td>
+      <td><p>Either <code>"cosine"</code> or <code>"jaccard"</code>: used to compare MS/MS peak lists for annotation
+similarity calculation.</p></td>
     </tr>
     <tr>
       <th>checkFragments</th>
-      <td><p>Which type(s) of MS/MS fragments from workflow data
-should be checked to evaluate the number of suspect fragment matches
-(<em>i.e.</em> from the <code>fragments_mz</code>/<code>fragments_formula</code> columns
-in the suspect list). Valid values are: <code>"mz"</code>, <code>"formula"</code>,
-<code>"compounds"</code>. The former uses <em>m/z</em> values in the specified
-<code>MSPeakLists</code> object, whereas the others use the formulae that were
-annotated to MS/MS peaks in the given <code>formulas</code> or <code>compounds</code>
-objects. Multiple values are possible: in this case the maximum number of
-fragment matches will be reported.</p></td>
+      <td><p>Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
+suspect fragment matches (<em>i.e.</em> from the <code>fragments_mz</code>/<code>fragments_formula</code> columns in the suspect
+list). Valid values are: <code>"mz"</code>, <code>"formula"</code>, <code>"compounds"</code>. The former uses <em>m/z</em> values in
+the specified <code>MSPeakLists</code> object, whereas the others use the formulae that were annotated to MS/MS peaks in
+the given <code>formulas</code> or <code>compounds</code> objects. Multiple values are possible: in this case the maximum
+number of fragment matches will be reported.</p></td>
     </tr>
     <tr>
       <th>compoundsNormalizeScores, formulasNormalizeScores</th>
@@ -305,9 +349,12 @@ results were removed after they were generated (<em>e.g.</em> by use of
     </tr>
     <tr>
       <th>IDFile</th>
-      <td><p>A file path to a YAML file with rules used for estimation of
-identification levels. See the <code>Suspect annotation</code> section for more
-details. If not specified then a default rules file will be used.</p></td>
+      <td><p>A file path to a YAML file with rules used for estimation of identification levels. See the
+<code>Suspect annotation</code> section for more details. If not specified then a default rules file will be used.</p></td>
+    </tr>
+    <tr>
+      <th>logPath</th>
+      <td><p>A directory path to store logging information. If <code>NULL</code> then logging is disabled.</p></td>
     </tr>
     <tr>
       <th>selectHitsBy</th>
@@ -347,13 +394,20 @@ columns of the suspect list. Set to <code>NULL</code> to ignore.</p></td>
       <td><p>If set to <code>TRUE</code> then filtering operations are performed
 in opposite manner.</p></td>
     </tr>
+    <tr>
+      <th>sets</th>
+      <td><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code>
-  object, which is a <code><a href='featureGroups-class.html'>featureGroups</a></code> object amended with
-  annotation data.</p>
+    <p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code> object, which is a
+  <code><a href='featureGroups-class.html'>featureGroups</a></code> object amended with annotation data.</p>
 <p><code>filter</code> returns a filtered <code>featureGroupsScreening</code>
   object.</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
@@ -370,12 +424,10 @@ suspects.</p></li>
 optionally other feature data. Furthermore, the output table will be merged
 with information from <code>screenInfo</code>, such as suspect names and other
 properties and annotation data.</p></li>
-<li><p><code>annotateSuspects</code>: Incorporates annotation data obtained
-during the workflow to annotate suspects with matched known MS/MS
-fragments, formula/candidate ranks and automatic estimation of
-identification levels. See the <code>Suspect annotation</code> section for more
-details. The estimation of identification levels for each suspect is logged
-in the <code>log/ident</code> directory.</p></li>
+<li><p><code>annotateSuspects</code>: Incorporates annotation data obtained during the workflow to annotate suspects
+with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
+the <code>Suspect annotation</code> section for more details. The estimation of identification levels for each suspect is
+logged in the <code>log/ident</code> directory.</p></li>
 <li><p><code>filter</code>: Performs rule based filtering. This method
 builds on the comprehensive filter functionality from the base
 <code><a href='feature-filtering.html'>filter,featureGroups-method</a></code>. It adds several filters to
@@ -390,68 +442,51 @@ other filter steps.</p></li>
     
 
 <dl>
-<dt><code>screenInfo</code></dt><dd><p>A (<code>data.table</code>) with results from suspect
-screening. This table will be amended with annotation data when
-<code>annotateSuspects</code> is run.</p></dd>
+<dt><code>screenInfo</code></dt><dd><p>A (<code>data.table</code>) with results from suspect screening. This table will be amended with
+annotation data when <code>annotateSuspects</code> is run.</p></dd>
 
 </dl>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The <code>relMinMSMSIntensity</code> filter argument to
-  <code>annotateSuspects</code> is applied <em>after</em> removing the precursor ion
-  from the peak lists (if present). Thus, intensity scales may be different
-  when this filter is applied when the most abundant peak resulted from the
-  precursor ion.</p>
+    <p>The <code>relMinMSMSIntensity</code> filter argument to <code>annotateSuspects</code> is applied <em>after</em> removing the
+  precursor ion from the peak lists (if present). Thus, intensity scales may be different when this filter is applied
+  when the most abundant peak resulted from the precursor ion.</p>
 <p><code>filter</code> removes suspect hits with <code>NA</code> values when any of
   the filters related to minimum or maximum values are applied (unless
   <code>negate=TRUE</code>).</p>
     <h2 class="hasAnchor" id="suspect-annotation"><a class="anchor" href="#suspect-annotation"></a>Suspect annotation</h2>
 
-    <p>The <code>annotateSuspects</code> method is used to
-  annotate suspects after <code><a href='suspect-screening.html'>screenSuspects</a></code> was used to collect
-  suspect screening results and other workflow steps such as formula and
-  compound annotation steps have been completed. The annotation results,
-  which can be acquired with the <code>as.data.table</code> and <code>screenInfo</code>
-  methods, amends the current screening data with the following columns:</p>
+    <p>The <code>annotateSuspects</code> method is used to annotate suspects after
+  <code><a href='suspect-screening.html'>screenSuspects</a></code> was used to collect suspect screening results and other workflow steps such as formula
+  and compound annotation steps have been completed. The annotation results, which can be acquired with the
+  <code>as.data.table</code> and <code>screenInfo</code> methods, amends the current screening data with the following columns:</p>
 <p></p><ul>
-<li><p><code>suspFormRank</code>,<code>suspCompRank</code> The rank of the suspect
-  within the formula/compound annotation results.</p></li>
-<li><p><code>annSimForm</code>,<code>annSimComp</code>,<code>annSimBoth</code> A similarity
-  measure between measured and annotated MS/MS peaks from annotation of
-  formulae, compounds or both. The similarity is calculated as the spectral
-  similarity between a peaklist with (a) all MS/MS peaks and (b) only
-  annotated peaks. Thus, a value of one means that all MS/MS peaks were
-  annotated. If both formula and compound annotations are available then
-  <code>annSimBoth</code> is calculated after combining all the annotated peaks,
-  otherwise <code>annSimBoth</code> equals the available value for
-  <code>annSimForm</code> or <code>annSimComp</code>. The similarity calculation can be
-  configured with the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code>
-  arguments to <code>annotateSuspects</code>.</p></li>
-<li><p><code>maxFrags</code> The maximum number of MS/MS fragments that can be
-  matched for this suspect (based on the <code>fragments_*</code> columns from the
-  suspect list).</p></li>
-<li><p><code>maxFragMatches</code>,<code>maxFragMatchesRel</code> The absolute and
-  relative amount of experimental MS/MS peaks that were matched from the
-  fragments specified in the suspect list. The value for
-  <code>maxFragMatchesRel</code> is relative to the value for <code>maxFrags</code>. The
-  calculation of this column is influenced by the <code>checkFragments</code>
-  argument to <code>annotateSuspects</code>.</p></li>
-<li><p><code>estIDLevel</code> Provides an <em>estimation</em> of the identification
-  level, roughly following that of (Schymanski et al. 2014)
-.
-  However, please note that this value is only an estimation, and manual
-  interpretation is still necessary to assign final identification levels.
-  The estimation is done through a set of rules, see the <code>Identification
-  level rules</code> section below.</p></li>
+<li><p><code>formRank</code>,<code>compRank</code> The rank of the suspect within the formula/compound annotation results.</p></li>
+<li><p><code>annSimForm</code>,<code>annSimComp</code>,<code>annSimBoth</code> A similarity measure between measured and annotated
+  MS/MS peaks from annotation of formulae, compounds or both. The similarity is calculated as the spectral similarity
+  between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
+  peaks were annotated. If both formula and compound annotations are available then <code>annSimBoth</code> is calculated
+  after combining all the annotated peaks, otherwise <code>annSimBoth</code> equals the available value for
+  <code>annSimForm</code> or <code>annSimComp</code>. The similarity calculation can be configured with the
+  <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments to <code>annotateSuspects</code>.</p></li>
+<li><p><code>maxFrags</code> The maximum number of MS/MS fragments that can be matched for this suspect (based on the
+  <code>fragments_*</code> columns from the suspect list).</p></li>
+<li><p><code>maxFragMatches</code>,<code>maxFragMatchesRel</code> The absolute and relative amount of experimental MS/MS peaks
+  that were matched from the fragments specified in the suspect list. The value for <code>maxFragMatchesRel</code> is
+  relative to the value for <code>maxFrags</code>. The calculation of this column is influenced by the
+  <code>checkFragments</code> argument to <code>annotateSuspects</code>.</p></li>
+<li><p><code>estIDLevel</code> Provides an <em>estimation</em> of the identification level, roughly following that of
+  (Schymanski et al. 2014)
+. However, please note that this value is only an estimation, and manual
+  interpretation is still necessary to assign final identification levels. The estimation is done through a set of
+  rules, see the <code>Identification level rules</code> section below.</p></li>
 </ul>
 
-<p>Note that only columns are present is sufficient data is available for
-  their calculation.</p>
+<p>Note that only columns are present is sufficient data is available for their calculation.</p>
     <h2 class="hasAnchor" id="identification-level-rules"><a class="anchor" href="#identification-level-rules"></a>Identification level rules</h2>
 
-    <p>The estimation of identification levels
-  is configured through a YAML file which specifies the rules for each level.
-  The default file is shown below.</p>
+    <p>The estimation of identification levels is configured through a YAML file which
+  specifies the rules for each level. The default file is shown below.</p>
 <p></p><pre>1:
     suspectFragments: 3
     retention: 12
@@ -492,45 +527,62 @@ screening. This table will be amended with annotation data when
     all: yes
 </pre>
 
-<p>Most of the file should be
-  self-explanatory. Some notes:</p>
+<p>Most of the file should be self-explanatory. Some notes:</p>
 <p></p><ul>
-<li><p>Each rule is either a field of <code>suspectFragments</code> (minimum
-  number of MS/MS fragments matched from suspect list), <code>retention</code>
-  (maximum retention deviation from suspect list), <code>rank</code> (the maximum
-  annotation rank from formula or compound annotations), <code>all</code> (this
-  level is always matched) or any of the scorings available from the formula
-  or compound annotations.</p></li>
-<li><p>In case any of the rules could be applied to either formula or
-  compound annotations, the annotation type must be specified with the
-  <code>type</code> field (<code>formula</code> or <code>compound</code>).</p></li>
-<li><p>Identification levels should start with a number and may optionally
-  be followed by a alphabetic character. The lowest levels are checked first.</p></li>
-<li><p>If <code>relative=yes</code> then the relative scoring will be used for
-  testing.</p></li>
-<li><p>For <code>suspectFragments</code>: if the number of fragments from the
-  suspect list (<code>maxFrags</code> column) is less then the minimum rule value,
-  the minimum is adjusted to the number of available fragments.</p></li>
+<li><p>Each rule is either a field of <code>suspectFragments</code> (minimum number of MS/MS fragments matched from
+  suspect list), <code>retention</code> (maximum retention deviation from suspect list), <code>rank</code> (the maximum
+  annotation rank from formula or compound annotations), <code>all</code> (this level is always matched) or any of the
+  scorings available from the formula or compound annotations.</p></li>
+<li><p>In case any of the rules could be applied to either formula or compound annotations, the annotation type must
+  be specified with the <code>type</code> field (<code>formula</code> or <code>compound</code>).</p></li>
+<li><p>Identification levels should start with a number and may optionally be followed by a alphabetic character.
+  The lowest levels are checked first.</p></li>
+<li><p>If <code>relative=yes</code> then the relative scoring will be used for testing.</p></li>
+<li><p>For <code>suspectFragments</code>: if the number of fragments from the suspect list (<code>maxFrags</code> column) is
+  less then the minimum rule value, the minimum is adjusted to the number of available fragments.</p></li>
 </ul>
 
-<p>A template rules file can be generated with the
-  <code><a href='suspect-screening.html'>genIDLevelRulesFile</a></code> function, and this file can subsequently
-  passed to <code>annotateSuspects</code>. The file format is highly flexible and
-  (sub)levels can be added or removed if desired. Note that the default file
-  is currently only suitable when annotation is performed with GenForm and
-  MetFrag, for other algorithms it is crucial to modify the rules.</p>
+<p>A template rules file can be generated with the <code><a href='suspect-screening.html'>genIDLevelRulesFile</a></code> function, and this file can
+  subsequently passed to <code>annotateSuspects</code>. The file format is highly flexible and (sub)levels can be added or
+  removed if desired. Note that the default file is currently only suitable when annotation is performed with GenForm
+  and MetFrag, for other algorithms it is crucial to modify the rules.</p>
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
 <li><p><code><a href='featureGroups-class.html'>featureGroups</a></code></p><ul>
-<li><p><strong><code>featureGroupsScreening</code></strong></p></li>
+<li><p><strong><code>featureGroupsScreening</code></strong></p><ul>
+<li><p><code>featureGroupsSetScreeningUnset</code></p></li>
+</ul></li>
 </ul></li>
 </ul>
 
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <p>Cosine spectral similarity calculation was based on the code
-  from <code>OrgMassSpecR::SpectrumSimilarity()</code>.</p>
+    <p>Cosine spectral similarity calculation was based on the code from <code>SpectrumSimilarity()</code>
+  function of <span class="pkg">OrgMassSpecR</span>.</p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>featureGroupsScreeningSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>featureGroupsScreening</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>featureGroupsScreeningUnset</code>), which allows it to be used in 'regular' workflows. Only the screening results present in the specified set are kept.</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>annotateSuspects</code> Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
+  identification levels etc are calculated for each set. Subsequently, these results are merged in the final
+  <code>screenInfo</code>. In addition, an overall <code>formRank</code> and <code>compRank</code> column is created based on the
+  rankings of the suspect candidate in the set consensus data. Furthermore, an overall <code>estIDLevel</code> is generated
+  that is based on the 'best' estimated identification level among the sets data (<em>i.e.</em> the lowest). In case
+  there is a tie between sub-levels (<em>e.g.</em> <samp>3a</samp> and <samp>3b</samp>), then the sub-level is stripped
+  (<em>e.g.</em> <samp>3</samp>).</p></li>
+<li><p><code>filter</code> All filters releated to estimated identification levels and formula/compound rankings  are
+  applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
+  are only removed if none of the set data confirms to the filter.</p></li>
+</ul>
+
+<p>This class derives also from <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>. Please see its documentation for more relevant details
+  with sets workflows.</p>
+<p>Note that the <code>formRank</code> and <code>compRank</code> columns are <em>not</em> updated when the data is subset.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Schymanski EL, Jeon J, Gulde R, Fenner K, Ruff M, Singer HP, Hollender J (2014).
@@ -548,10 +600,8 @@ doi: <a href='https://doi.org/10.1016/1044-0305(94)87009-8'>10.1016/1044-0305(94
     <div class='dont-index'><p><code><a href='featureGroups-class.html'>featureGroups</a></code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p>Rick Helmus &lt;<a href='mailto:r.helmus@uva.nl'>r.helmus@uva.nl</a>&gt;, Emma Schymanski
-  &lt;<a href='mailto:emma.schymanski@uni.lu'>emma.schymanski@uni.lu</a>&gt; (contributions to identification level
-  rules), Bas van de Velde (contributions to spectral similarity
-  calculation).</p>
+    <p>Rick Helmus &lt;<a href='mailto:r.helmus@uva.nl'>r.helmus@uva.nl</a>&gt;, Emma Schymanski &lt;<a href='mailto:emma.schymanski@uni.lu'>emma.schymanski@uni.lu</a>&gt; (contributions to
+  identification level rules), Bas van de Velde (contributions to spectral similarity calculation).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

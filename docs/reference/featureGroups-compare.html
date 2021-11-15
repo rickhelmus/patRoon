@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -168,8 +168,8 @@
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>comparison</span><span class='op'>(</span><span class='va'>...</span>, <span class='va'>groupAlgo</span>, groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>rtalign <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='co'># S4 method for featureGroupsComparison,ANY</span>
-<span class='fu'><a href='generics.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, retMin <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='co'># S4 method for featureGroupsComparison,missing</span>
+<span class='fu'><a href='generics.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, retMin <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroupsComparison</span>
 <span class='fu'><a href='generics.html'>plotVenn</a></span><span class='op'>(</span><span class='va'>obj</span>, which <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -187,7 +187,13 @@
   relMinAbundance <span class='op'>=</span> <span class='cn'>NULL</span>,
   uniqueFrom <span class='op'>=</span> <span class='cn'>NULL</span>,
   uniqueOuter <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>comparison</span><span class='op'>(</span><span class='va'>...</span>, <span class='va'>groupAlgo</span>, groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>rtalign <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsComparisonSet</span>
+<span class='fu'><a href='generics.html'>consensus</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,8 +215,7 @@
       <th>groupAlgo</th>
       <td><p>The <code><a href='feature-grouping.html'>feature grouping
 algorithm</a></code> that should be used for grouping <em>pseudo</em> features (see
-details). Valid values are: <code>"xcms"</code> or <code>"openms"</code>. Note:
-<code>xcms3</code> is not (yet) supported.</p></td>
+details). Valid values are: <code>"xcms"</code>, <code>xcms3</code>, <code>kpic2</code> or <code>"openms"</code>.</p></td>
     </tr>
     <tr>
       <th>groupArgs</th>
@@ -282,8 +287,8 @@ objects specified in <code>uniqueFrom</code>.</p></td>
 <p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
 from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
-<p><code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code> object with a
-  consensus from the compared feature groups.</p>
+<p><code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code> object with a consensus from the compared feature
+  groups.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Feature groups objects originating from differing feature finding and/or
@@ -306,8 +311,8 @@ output and generate a consensus.</p>
   feature groups.</p>
 <p><code>plotChord</code> plots a chord diagram to visualize the distribution
   of feature groups.</p>
-<p><code>consensus</code> combines all compared feature groups and averages
-  their retention, <em>m/z</em> and intensity data.</p>
+<p><code>consensus</code> combines all compared feature groups and averages their retention, <em>m/z</em> and intensity
+  data. Not yet supported for <a href='sets-workflow.html'>sets workflows</a>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

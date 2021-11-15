@@ -7,13 +7,13 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
-  </url>
-  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/TP-generation.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc>
@@ -28,6 +28,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/bruker-utils.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/check-GUI.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/clearCache.html</loc>
   </url>
   <url>
@@ -37,10 +40,19 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/components-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/componentsClust-class.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/componentsNT-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/componentsTPs-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/compound-generation.html</loc>
@@ -79,6 +91,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/feature-optimization.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/featureAnnotations-class.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-class.html</loc>
   </url>
   <url>
@@ -91,6 +106,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/featureQualityNames.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/features-class.html</loc>
   </url>
   <url>
@@ -101,6 +119,12 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/generics.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/kpic2-conv.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/newProject.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
@@ -121,7 +145,22 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/sets-workflow.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/specSimParams.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/suspect-screening.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProducts-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsBT-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsLibrary-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc>
@@ -131,6 +170,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/workflowStepSet-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/xcms-conv.html</loc>

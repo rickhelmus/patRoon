@@ -40,8 +40,8 @@
 
 
 <meta property="og:title" content="Conversion to XCMS objects — getXCMSSet" />
-<meta property="og:description" content="Converts a features or featureGroups object to an
-xcmsSet or XCMSnExp object." />
+<meta property="og:description" content="Converts a features or featureGroups object to an xcmsSet or
+XCMSnExp object." />
 
 
 
@@ -73,7 +73,7 @@ xcmsSet or XCMSnExp object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -163,40 +163,49 @@ xcmsSet or XCMSnExp object." />
     </div>
 
     <div class="ref-description">
-    <p>Converts a <code><a href='features-class.html'>features</a></code> or <code><a href='featureGroups-class.html'>featureGroups</a></code> object to an
-<code>xcmsSet</code> or <code>XCMSnExp</code> object.</p>
+    <p>Converts a <code><a href='features-class.html'>features</a></code> or <code><a href='featureGroups-class.html'>featureGroups</a></code> object to an <code>xcmsSet</code> or
+<code>XCMSnExp</code> object.</p>
     </div>
 
     <pre class="usage"><span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for features</span>
-<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>exportedData</span><span class='op'>)</span>
-
-<span class='co'># S4 method for featuresOpenMS</span>
-<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featuresXCMS</span>
 <span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>exportedData</span><span class='op'>)</span>
+<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroupsXCMS</span>
-<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>exportedData</span><span class='op'>)</span>
+<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span>, <span class='va'>set</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>getXCMSSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span>, <span class='va'>set</span><span class='op'>)</span>
 
 <span class='co'># S4 method for features</span>
-<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featuresXCMS3</span>
-<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroupsXCMS3</span>
-<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>verbose</span>, <span class='va'>loadRawData</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span>, <span class='va'>set</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>getXCMSnExp</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span>, <span class='va'>set</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,13 +219,25 @@ xcmsSet or XCMSnExp object." />
       <td><p>If <code>FALSE</code> then no text output is shown.</p></td>
     </tr>
     <tr>
-      <th>exportedData, ...</th>
-      <td><p>Set to <code>TRUE</code> if analyses were exported as
-<code>mzXML</code> or <code>mzML</code> files (ignored for <code>featuresOpenMS</code> and
-<code>featuresXCMS</code> methods).</p></td>
+      <th>...</th>
+      <td><p>(<strong>sets workflow</strong>) Further arguments passed to non-sets method.</p>
+<p>Otherwise ignored.</p></td>
+    </tr>
+    <tr>
+      <th>loadRawData</th>
+      <td><p>Set to <code>TRUE</code> if analyses are available as <code>mzXML</code> or <code>mzML</code> files. Otherwise MS
+data is not loaded, and some dummy data (<em>e.g.</em> file paths) is used in the returned object.</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set to be exported.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>In a <a href='sets-workflow.html'>sets workflow</a>, <code><a href='generics.html'>unset</a></code> is used to convert the
+  feature (group) data before the object is exported.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

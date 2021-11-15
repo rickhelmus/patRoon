@@ -40,9 +40,8 @@
 
 
 <meta property="og:title" content="Components based on clustered intensity profiles. — componentsIntClust-class" />
-<meta property="og:description" content="This class is derived from components and is used to store
-hierarchical clustering information from intensity profiles of feature
-groups." />
+<meta property="og:description" content="This class is derived from componentsClust and is used to store hierarchical clustering information
+from intensity profiles of feature groups." />
 
 
 
@@ -74,7 +73,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -164,27 +163,11 @@ groups." />
     </div>
 
     <div class="ref-description">
-    <p>This class is derived from <code><a href='components-class.html'>components</a></code> and is used to store
-hierarchical clustering information from intensity profiles of feature
-groups.</p>
+    <p>This class is derived from <code><a href='componentsClust-class.html'>componentsClust</a></code> and is used to store hierarchical clustering information
+from intensity profiles of feature groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>clusters</a></span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>cutClusters</a></span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>clusterProperties</a></span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>treeCut</a></span><span class='op'>(</span><span class='va'>obj</span>, k <span class='op'>=</span> <span class='cn'>NULL</span>, h <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>treeCutDynamic</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>maxTreeHeight</span>, <span class='va'>deepSplit</span>, <span class='va'>minModuleSize</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
 <span class='fu'>plotHeatMap</span><span class='op'>(</span>
   <span class='va'>obj</span>,
   interactive <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -195,34 +178,14 @@ groups.</p>
 <span class='op'>)</span>
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>plotInt</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>index</span>, pch <span class='op'>=</span> <span class='fl'>20</span>, type <span class='op'>=</span> <span class='st'>"b"</span>, lty <span class='op'>=</span> <span class='fl'>3</span>, col <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust,ANY</span>
-<span class='fu'><a href='generics.html'>plot</a></span><span class='op'>(</span>
-  <span class='va'>x</span>,
-  pal <span class='op'>=</span> <span class='st'>"Paired"</span>,
-  numericLabels <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  colourBranches <span class='op'>=</span> <span class='fu'><a href='generics.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='fl'>50</span>,
-  showLegend <span class='op'>=</span> <span class='fu'><a href='generics.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='fl'>20</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
-
-<span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>plotSilhouettes</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>kSeq</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, type <span class='op'>=</span> <span class='st'>"b"</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='generics.html'>plotInt</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>index</span>, pch <span class='op'>=</span> <span class='fl'>20</span>, type <span class='op'>=</span> <span class='st'>"b"</span>, lty <span class='op'>=</span> <span class='fl'>3</span>, col <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>k, h</th>
-      <td><p>Desired number of clusters or tree height to be used for cutting
-the dendrogram, respectively. One or the other must be specified.
-Analogous to <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>maxTreeHeight, deepSplit, minModuleSize</th>
-      <td><p>Arguments used by
-<code>cutreeDynamicTree</code>.</p></td>
+      <th>obj</th>
+      <td><p>A <code>componentsIntClust</code> object.</p></td>
     </tr>
     <tr>
       <th>interactive</th>
@@ -231,8 +194,7 @@ Analogous to <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></cod
     </tr>
     <tr>
       <th>col</th>
-      <td><p>The colour used for plotting. Set to <code>NULL</code> for automatic
-colours.</p></td>
+      <td><p>The colour used for plotting. Set to <code>NULL</code> for automatic colours.</p></td>
     </tr>
     <tr>
       <th>margins, cexCol</th>
@@ -240,52 +202,16 @@ colours.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Further options passed to <code>heatmap.2</code> /
-<code>heatmaply</code> (<code>plotHeatMap</code>), <code><a href='https://rdrr.io/r/stats/dendrogram.html'>plot.dendrogram</a></code>
-(<code>plot</code>) or <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plotInt</code>).</p></td>
+      <td><p>Further options passed to <code>heatmap.2</code> / <code>heatmaply</code> (<code>plotHeatMap</code>),
+<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plotInt</code>).</p></td>
     </tr>
     <tr>
       <th>index</th>
       <td><p>Numeric component/cluster index.</p></td>
     </tr>
     <tr>
-      <th>pch, type</th>
-      <td><p>Passed to <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>lty</th>
+      <th>pch, type, lty</th>
       <td><p>Passed to <code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>x, obj</th>
-      <td><p>A <code>componentsIntClust</code> object.</p></td>
-    </tr>
-    <tr>
-      <th>pal</th>
-      <td><p>Colour palette to be used from <span class="pkg">RColorBrewer</span>.</p></td>
-    </tr>
-    <tr>
-      <th>numericLabels</th>
-      <td><p>Set to <code>TRUE</code> to label with numeric indices instead
-of (long) feature group names.</p></td>
-    </tr>
-    <tr>
-      <th>colourBranches</th>
-      <td><p>Whether branches from cut clusters (and their labels)
-should be coloured. Might be slow with large numbers of clusters, hence,
-the default is only <code>TRUE</code> when this is not the case.</p></td>
-    </tr>
-    <tr>
-      <th>showLegend</th>
-      <td><p>If <code>TRUE</code> and <code>colourBranches</code> is also
-<code>TRUE</code> then a legend will be shown which outlines cluster numbers and
-their colours. By default <code>TRUE</code> for small amount of clusters to avoid
-overflowing the plot.</p></td>
-    </tr>
-    <tr>
-      <th>kSeq</th>
-      <td><p>An integer vector containing the sequence that should be used for
-average silhouette width calculation.</p></td>
     </tr>
     </table>
 
@@ -295,73 +221,39 @@ average silhouette width calculation.</p></td>
   <code>heatmaply</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Objects from this class are generated by
-<code><a href='component-generation.html'>generateComponentsIntClust</a></code></p>
+    <p>Objects from this class are generated by <code><a href='component-generation.html'>generateComponentsIntClust</a></code></p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
 <ul>
-<li><p><code>clusters</code>: Accessor method to the <code>clust</code> slot,
-which was generated by <code><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></code>.</p></li>
-<li><p><code>cutClusters</code>: Accessor method to the <code>cutClusters</code>
-slot. Returns a vector with cluster membership for each candidate (format
-as <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></code>).</p></li>
-<li><p><code>clusterProperties</code>: Returns a list with properties on how the
-clustering was performed.</p></li>
-<li><p><code>treeCut</code>: Manually (re-)cut the dendrogram.</p></li>
-<li><p><code>treeCutDynamic</code>: Automatically (re-)cut the dendrogram using
-the <code>cutreeDynamicTree</code> function from
-<span class="pkg">dynamicTreeCut</span>.</p></li>
 <li><p><code>plotHeatMap</code>: draws a heatmap using the
 <code>heatmap.2</code> or <code>heatmaply</code> function.</p></li>
 <li><p><code>plotInt</code>: makes a plot for all (normalized) intensity
 profiles of the feature groups within a given cluster.</p></li>
-<li><p><code>plot</code>: generates a dendrogram from a given cluster
-object and optionally highlights resulting branches when the cluster is
-cut.</p></li>
-<li><p><code>plotSilhouettes</code>: Plots the average silhouette width when the
-clusters are cut by a sequence of k numbers. The k value with the highest
-value (marked in the plot) may be considered as the optimal number of
-clusters.</p></li>
 </ul>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
 
 <dl>
-<dt><code>clusterm</code></dt><dd><p>Numeric matrix with normalized feature group intensities that
-was used for clustering.</p></dd>
-
-<dt><code>distm</code></dt><dd><p>Distance matrix that was used for clustering (obtained with
-<code>daisy</code>).</p></dd>
-
-<dt><code>clust</code></dt><dd><p>Object returned by <code><a href='https://rdrr.io/r/stats/hclust.html'>hclust</a></code>.</p></dd>
-
-<dt><code>cutClusters</code></dt><dd><p>A <code>list</code> with assigned clusters (same format as what
-<code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></code> returns).</p></dd>
-
-<dt><code>gInfo</code></dt><dd><p>The <code><a href='featureGroups-class.html'>groupInfo</a></code> of the feature groups object that was
-used.</p></dd>
-
-<dt><code>properties</code></dt><dd><p>A list containing general properties and parameters used for
-clustering.</p></dd>
+<dt><code>clusterm</code></dt><dd><p>Numeric matrix with normalized feature group intensities that was used for clustering.</p></dd>
 
 </dl>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The intensity values for components (used by <code>plotSpectrum</code>) are set
-  to a dummy value (1) as no single intensity value exists for this kind of
-  components.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    <p>When the object is altered (<em>e.g.</em> by filtering or subsetting it), methods that need the original
+  clustered data such as plotting methods do not work anymore and stop with an error.</p>
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
-    <p>Schollee JE, Bourgin M, von Gunten U, McArdell CS, Hollender J (2018).
-&#8220;Non-target screening to trace ozonation transformation products in a wastewater treatment train including different post-treatments.&#8221;
-<em>Water Research</em>, <b>142</b>, 267--278.
-doi: <a href='https://doi.org/10.1016/j.watres.2018.05.045'>10.1016/j.watres.2018.05.045</a>
-.</p>
+    <p></p><ul>
+<li><p><code><a href='componentsClust-class.html'>componentsClust</a></code></p><ul>
+<li><p><strong><code>componentsIntClust</code></strong></p></li>
+</ul></li>
+</ul>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='components-class.html'>components</a></code> and <a href='component-generation.html'>component-generation</a></p></div>
+    <div class='dont-index'><p><code><a href='componentsClust-class.html'>componentsClust</a></code> for other relevant methods and <a href='component-generation.html'>component-generation</a></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

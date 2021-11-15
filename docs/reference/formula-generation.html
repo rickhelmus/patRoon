@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Automatic chemical formula generation — formula-generation" />
-<meta property="og:description" content="Functionality to automatically calculate chemical formulae for all feature
-groups." />
+<meta property="og:description" content="Functionality to automatically calculate chemical formulae for all feature groups." />
 
 
 
@@ -73,7 +72,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -163,34 +162,52 @@ groups." />
     </div>
 
     <div class="ref-description">
-    <p>Functionality to automatically calculate chemical formulae for all feature
-groups.</p>
+    <p>Functionality to automatically calculate chemical formulae for all feature groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>generateFormulas</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>generateFormulas</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateFormulasDA</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
   precursorMzSearchWindow <span class='op'>=</span> <span class='fl'>0.002</span>,
   MSMode <span class='op'>=</span> <span class='st'>"both"</span>,
-  <span class='va'>adduct</span>,
-  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  featThresholdAnn <span class='op'>=</span> <span class='fl'>0.75</span>,
+  absAlignMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
   save <span class='op'>=</span> <span class='cn'>TRUE</span>,
   close <span class='op'>=</span> <span class='va'>save</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateFormulasDA</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  precursorMzSearchWindow <span class='op'>=</span> <span class='fl'>0.002</span>,
+  MSMode <span class='op'>=</span> <span class='st'>"both"</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>,
+  setThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  setThresholdAnn <span class='op'>=</span> <span class='fl'>0</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateFormulasGenForm</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   <span class='va'>MSPeakLists</span>,
   relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
   elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
   hetero <span class='op'>=</span> <span class='cn'>TRUE</span>,
   oc <span class='op'>=</span> <span class='cn'>FALSE</span>,
   extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>,
   calculateFeatures <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  featThresholdAnn <span class='op'>=</span> <span class='fl'>0.75</span>,
+  absAlignMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
   MSMode <span class='op'>=</span> <span class='st'>"both"</span>,
   isolatePrec <span class='op'>=</span> <span class='cn'>TRUE</span>,
   timeout <span class='op'>=</span> <span class='fl'>120</span>,
@@ -198,11 +215,23 @@ groups.</p>
   batchSize <span class='op'>=</span> <span class='fl'>8</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateFormulasGenForm</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>,
+  setThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  setThresholdAnn <span class='op'>=</span> <span class='fl'>0</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateFormulasSIRIUS</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   <span class='va'>MSPeakLists</span>,
   relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
   elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
   profile <span class='op'>=</span> <span class='st'>"qtof"</span>,
   database <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -212,9 +241,22 @@ groups.</p>
   extraOptsGeneral <span class='op'>=</span> <span class='cn'>NULL</span>,
   extraOptsFormula <span class='op'>=</span> <span class='cn'>NULL</span>,
   calculateFeatures <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  featThresholdAnn <span class='op'>=</span> <span class='fl'>0.75</span>,
+  absAlignMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
   splitBatches <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateFormulasSIRIUS</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>,
+  setThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  setThresholdAnn <span class='op'>=</span> <span class='fl'>0</span>
 <span class='op'>)</span>
 
 <span class='fu'>formulaScorings</span><span class='op'>(</span><span class='op'>)</span></pre>
@@ -224,11 +266,13 @@ groups.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fGroups</th>
-      <td><p><code><a href='featureGroups-class.html'>featureGroups</a></code> object for which formulae should
-be generated. This should be the same or a subset of the object that was
-used to create the specified <code>MSPeakLists</code> (only relevant for
-algorithms using <code>MSPeakLists</code>). In the case of a subset only the
-remaining feature groups in the subset are considered.</p></td>
+      <td><p><code><a href='featureGroups-class.html'>featureGroups</a></code> object for which formulae should be generated. This should be the same or
+a subset of the object that was used to create the specified <code>MSPeakLists</code> (only relevant for algorithms using
+<code>MSPeakLists</code>). In the case of a subset only the remaining feature groups in the subset are considered.</p></td>
+    </tr>
+    <tr>
+      <th>MSPeakLists</th>
+      <td><p>An <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></td>
     </tr>
     <tr>
       <th>algorithm</th>
@@ -237,40 +281,50 @@ used: <code>"bruker"</code>, <code>"genform"</code>, <code>"sirius"</code></p></
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Any parameters to be passed to the selected formula generation
-algorithm.</p></td>
+      <td><p>Any parameters to be passed to the selected formula generation algorithm.</p>
+<p>For sets workflows: further arguments directly passed to the non-sets method.</p></td>
     </tr>
     <tr>
       <th>precursorMzSearchWindow</th>
-      <td><p>Search window for <em>m/z</em> values (+/- the
-feature <em>m/z</em>) used to find back feature data of precursor/parent ions
-from MS/MS spectra (this data is not readily available from
+      <td><p>Search window for <em>m/z</em> values (+/- the feature <em>m/z</em>) used to find back
+feature data of precursor/parent ions from MS/MS spectra (this data is not readily available from
 <code class='command'>SmartFormula3D</code> results).</p></td>
     </tr>
     <tr>
       <th>MSMode</th>
-      <td><p>Whether formulae should be generated only from MS data
-  (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>).</p>
-<p>For <code class='command'>GenForm</code> selecting <code>"both"</code> will fall back to formula
-  calculation with only MS data in case no MS/MS data is available.</p>
-<p>For calulation with Bruker DataAnalysis selecting <code>"both"</code> will
-  calculate formulae from MS data <em>and</em> MS/MS data and combines the
-  results (duplicated formulae are removed). This is useful when poor MS/MS
-  data would exclude proper candidates.</p></td>
+      <td><p>Whether formulae should be generated only from MS data (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or
+  both (<code>"both"</code>).</p>
+<p>For <code class='command'>GenForm</code> selecting <code>"both"</code> will fall back to formula calculation with only MS data in case no
+  MS/MS data is available.</p>
+<p>For calulation with Bruker DataAnalysis selecting <code>"both"</code> will calculate formulae from MS data <em>and</em>
+  MS/MS data and combines the results (duplicated formulae are removed). This is useful when poor MS/MS data would
+  exclude proper candidates.</p></td>
     </tr>
     <tr>
       <th>adduct</th>
-      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
-converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
-<code>"[M+Na]+"</code>.</p></td>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>).
+  Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
+  adduct annotations then these are used if <code>adducts=NULL</code>.</p>
+<p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.</p></td>
     </tr>
     <tr>
       <th>featThreshold</th>
-      <td><p>If <code>calculateFeatures=TRUE</code>: minimum presence
-(<samp>0-1</samp>) of a formula in all features before it is considered as a
-candidate for a feature group. For instance, <code>featThreshold</code> dictates
-that a formula should be present in at least 75<!-- % of the features inside a -->
-feature group.</p></td>
+      <td><p>If <code>calculateFeatures=TRUE</code>: minimum presence (<samp>0-1</samp>) of a formula in all features
+before it is considered as a candidate for a feature group. For instance, <code>featThreshold=0.75</code> dictates that a
+formula should be present in at least 75% of the features inside a feature group.</p></td>
+    </tr>
+    <tr>
+      <th>featThresholdAnn</th>
+      <td><p>As <code>featThreshold</code>, but only considers features with annotations. For instance,
+<code>featThresholdAnn=0.75</code> dictates that a formula should be present in at least 75% of the features with
+annotations inside a feature group.</p></td>
+    </tr>
+    <tr>
+      <th>absAlignMzDev</th>
+      <td><p>When the group formula annotation consensus is made from feature annotations, the <em>m/z</em>
+values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
+<code>absAlignMzDev</code> argument specifies the maximum <em>m/z</em> window used to re-align the mass peaks.</p></td>
     </tr>
     <tr>
       <th>close, save</th>
@@ -282,9 +336,14 @@ which otherwise may use excessive memory or become slow. By default
 likely what you want as otherwise any processed data is lost.</p></td>
     </tr>
     <tr>
-      <th>MSPeakLists</th>
-      <td><p>An <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that was generated for
-the supplied <code>fGroups</code>.</p></td>
+      <th>setThreshold</th>
+      <td><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
+<samp>1</samp> means that the candidate needs to be present in all the set data.</p></td>
+    </tr>
+    <tr>
+      <th>setThresholdAnn</th>
+      <td><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
+annotations for the feature group of the candidate.</p></td>
     </tr>
     <tr>
       <th>relMzDev</th>
@@ -318,15 +377,14 @@ carbon atom). Sets the <span class="option">oc</span> commandline option.</p></t
     </tr>
     <tr>
       <th>extraOpts</th>
-      <td><p>An optional character vector with any other commandline
-options that will be passed to <code class='command'>GenForm</code> or <code class='command'>SIRIUS</code>. See
-the <code>GenForm options</code> section/SIRIUS manual for all available
+      <td><p>An optional character vector with any other commandline options that will be passed to
+<code class='command'>GenForm</code> or <code class='command'>SIRIUS</code>. See the <code>GenForm options</code> section/SIRIUS manual for all available
 commandline options.</p></td>
     </tr>
     <tr>
       <th>calculateFeatures</th>
-      <td><p>If <code>TRUE</code> fomulae are first calculated for all
-features prior to feature group assignment (see details).</p></td>
+      <td><p>If <code>TRUE</code> fomulae are first calculated for all features prior to feature group
+assignment (see details).</p></td>
     </tr>
     <tr>
       <th>isolatePrec</th>
@@ -336,10 +394,11 @@ scoring of candidates, as non-relevant mass peaks will dramatically
 decrease the score. The value of <code>isolatePrec</code> should either be a
 <code>list</code> with parameters (see the
 <code><a href='MSPeakLists-class.html'>filter method</a></code> for
-<code>MSPeakLists</code> for more details), <code>TRUE</code> for default parameters
-(the <code>z</code> parameter is automatically deduced from the <code>adduct</code>
-argument) or <code>FALSE</code> for no isolation (<em>e.g.</em> when you already
-performed isolation with the <code>filter</code> method).</p></td>
+<code>MSPeakLists</code> for more details), <code>TRUE</code> for default parameters or
+<code>FALSE</code> for no isolation (<em>e.g.</em> when you already performed
+isolation with the <code>filter</code> method). The <code>z</code> parameter (charge)
+is automatically deduced from the adduct used for annotation (unless
+<code>isolatePrec=FALSE</code>), hence any custom <code>z</code> setting is ignored.</p></td>
     </tr>
     <tr>
       <th>timeout</th>
@@ -350,9 +409,8 @@ need of timeouts.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
-      <td><p>Only keep this number of candidates (per feature group) with
-highest score. For <code class='command'>SIRIUS</code>: Sets the <span class="option">--candidates</span>
-commandline option.</p></td>
+      <td><p>Only keep this number of candidates (per feature group) with highest score. For <code class='command'>SIRIUS</code>: Sets
+the <span class="option">--candidates</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>batchSize</th>
@@ -364,35 +422,31 @@ Note that this is ignored if <span class="option">patRoon.MP.method="future"</sp
     </tr>
     <tr>
       <th>profile</th>
-      <td><p>Name of the configuration profile, for example:
-<span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>, <span class="option">"fticr"</span>. Sets the
-<span class="option">--profile</span> commandline option.</p></td>
+      <td><p>Name of the configuration profile, for example: <span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>,
+<span class="option">"fticr"</span>. Sets the <span class="option">--profile</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>database</th>
-      <td><p>If not <code>NULL</code>,
-use a database for retrieval of formula candidates. Possible values are:
-<span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets
-the <span class="option">--database</span> commandline option.</p></td>
+      <td><p>If not <code>NULL</code>, use a database for retrieval of formula
+candidates. Possible values are: <span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets the
+<span class="option">--database</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>noise</th>
-      <td><p>Median intensity of the noise (<code>NULL</code> ignores this
-parameter). Sets the <span class="option">--noise</span> commandline option.</p></td>
+      <td><p>Median intensity of the noise (<code>NULL</code> ignores this parameter). Sets the <span class="option">--noise</span>
+commandline option.</p></td>
     </tr>
     <tr>
       <th>cores</th>
-      <td><p>The number of cores <code class='command'>SIRIUS</code> will use. If <code>NULL</code>
-then the default of all cores will be used.</p></td>
+      <td><p>The number of cores <code class='command'>SIRIUS</code> will use. If <code>NULL</code> then the default of all cores will be
+used.</p></td>
     </tr>
     <tr>
       <th>extraOptsGeneral, extraOptsFormula</th>
-      <td><p>a <code>character</code> vector with any
-extra commandline parameters for <code class='command'>SIRIUS</code>. For <code class='command'>SIRIUS</code>
-versions <code>&lt;4.4</code> there is no distinction between general and formula
-options. Otherwise commandline options specified in <code>extraOptsGeneral</code>
-are added prior to the <code>formula</code> command, while options specified in
-<code>extraOptsFormula</code> are added in afterwards. See the <code class='command'>SIRIUS</code>
+      <td><p>a <code>character</code> vector with any extra commandline parameters for
+<code class='command'>SIRIUS</code>. For <code class='command'>SIRIUS</code> versions <code>&lt;4.4</code> there is no distinction between general and formula
+options. Otherwise commandline options specified in <code>extraOptsGeneral</code> are added prior to the <code>formula</code>
+command, while options specified in <code>extraOptsFormula</code> are added in afterwards. See the <code class='command'>SIRIUS</code>
 manual for more details. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
@@ -401,12 +455,10 @@ manual for more details. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>splitBatches</th>
-      <td><p>If <code>TRUE</code> then the calculations done by
-<code class='command'>SIRIUS</code> will be evenly split over multiple <code class='command'>SIRIUS</code> calls
-(which may be run in parallel depending on the <a href='patRoon-package.html'>set
-package options</a>). If <code>splitBatches=FALSE</code> then all feature
-calculations are performed from a single <code class='command'>SIRIUS</code> execution, which
-is often the fastest if calculations are performed on a single computer.</p></td>
+      <td><p>If <code>TRUE</code> then the calculations done by <code class='command'>SIRIUS</code> will be evenly split over multiple
+<code class='command'>SIRIUS</code> calls (which may be run in parallel depending on the <a href='patRoon-package.html'>set package
+options</a>). If <code>splitBatches=FALSE</code> then all feature calculations are performed from a single <code class='command'>SIRIUS</code>
+execution, which is often the fastest if calculations are performed on a single computer.</p></td>
     </tr>
     </table>
 
@@ -415,46 +467,32 @@ is often the fastest if calculations are performed on a single computer.</p></td
     <p>A <code><a href='formulas-class.html'>formulas</a></code> object containing all generated formulae.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Several algorithms are provided to automatically generate formulae for given
-feature groups. All tools use the accurate mass of a feature to
-back-calculate candidate formulae. Depending on the algorithm and data
-availability, other data such as isotopic pattern and MS/MS fragments may be
-used to further improve formula assignment and ranking.</p>
-<p>When DataAnalysis is used for formula generation or
-<code>calculateFeatures=TRUE</code> formulae are first calculated for each feature.
-The results are then combined for final assignment of candidate formulae for
-each feature group. If a formula was found in multiple features within the
-group, the reported scorings and mass errors are averaged and other numeric
-values are those from the feature in the analysis of the <code>"analysis"</code>
-column. The calculation of formulae on 'feature level' might result in a
-more thorough formula search and better removal of outliers (controlled by
-<code>featThreshold</code> argument). In contrast, when calculations occur on
-'feature group level' (<em>i.e.</em> <code>calculateFeatures=FALSE</code>), formulae
-are directly assigned to each feature group (by using group averaged peak MS
-lists), which significantly reduces processing time is, especially with many
-analyses. Note that in both situations subsequent algorithms that use formula
-data (<em>e.g.</em> <code><a href='compounds-class.html'>addFormulaScoring</a></code> and <a href='reporting.html'>reporting</a>
-functions) only use formula data that was eventually assigned to feature
-groups. Furthermore, please note that calculation of formulae with
-DataAnalysis always occurs on 'feature level'.</p>
-<p><code>generateFormulas</code> is a generic function that will generate formulae
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>generateFormulasDA</code> and
-  <code>generateFormulasGenForm</code>. While these functions may be called directly,
-  <code>generateFormulas</code> provides a generic interface and is therefore usually
-  preferred.</p>
-<p><code>generateFormulasDA</code> uses Bruker DataAnalysis to generate
-  chemical formulae. This method supports scoring based on overlap between
-  measured and theoretical isotopic patterns (both MS and MS/MS data) and the
-  presence of 'fitting' MS/MS fragments. The method will iterate through all
-  features (or "Compounds" in DataAnalysis terms) and call
-  <code class='command'>SmartFormula</code> (and <code class='command'>SmartFormula3D</code> if MS/MS data is
-  available) to generate all formulae. Parameters affecting formula
-  calculation have to be set in advance within the DataAnalysis method for
-  each analysis (<em>e.g.</em> by <code><a href='bruker-utils.html'>setDAMethod</a></code>). This method
-  requires that features were obtained with
-  <code><a href='feature-finding.html'>findFeaturesBruker</a></code>. Unlike other algorithms, there is no
-  prior need to generate <code><a href='MSPeakLists-class.html'>MS peak lists</a></code>.</p>
+    <p>Several algorithms are provided to automatically generate formulae for given feature groups. All tools use the
+accurate mass of a feature to back-calculate candidate formulae. Depending on the algorithm and data availability,
+other data such as isotopic pattern and MS/MS fragments may be used to further improve formula assignment and
+ranking.</p>
+<p>When DataAnalysis is used for formula generation or <code>calculateFeatures=TRUE</code> formulae are first calculated for
+each feature. The results are then combined for final assignment of candidate formulae for each feature group. If a
+formula was found in multiple features within the group, the reported scorings and mass errors are averaged and other
+numeric values are those from the feature in the analysis of the <code>"analysis"</code> column. The calculation of
+formulae on 'feature level' might result in a more thorough formula search and better removal of outliers (controlled
+by <code>featThreshold</code> and <code>featThresholdAnn</code> arguments). In contrast, when calculations occur on 'feature
+group level' (<em>i.e.</em> <code>calculateFeatures=FALSE</code>), formulae are directly assigned to each feature group (by
+using group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses.
+Note that in both situations subsequent algorithms that use formula data (<em>e.g.</em> <code><a href='compounds-class.html'>addFormulaScoring</a></code>
+and <a href='reporting.html'>reporting</a> functions) only use formula data that was eventually assigned to feature groups. Furthermore,
+please note that calculation of formulae with DataAnalysis always occurs on 'feature level'.</p>
+<p><code>generateFormulas</code> is a generic function that will generate formulae using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as <code>generateFormulasDA</code> and <code>generateFormulasGenForm</code>. While these
+  functions may be called directly, <code>generateFormulas</code> provides a generic interface and is therefore usually preferred.</p>
+<p><code>generateFormulasDA</code> uses Bruker DataAnalysis to generate chemical formulae. This method supports
+  scoring based on overlap between measured and theoretical isotopic patterns (both MS and MS/MS data) and the
+  presence of 'fitting' MS/MS fragments. The method will iterate through all features (or "Compounds" in DataAnalysis
+  terms) and call <code class='command'>SmartFormula</code> (and <code class='command'>SmartFormula3D</code> if MS/MS data is available) to generate all
+  formulae. Parameters affecting formula calculation have to be set in advance within the DataAnalysis method for
+  each analysis (<em>e.g.</em> by <code><a href='bruker-utils.html'>setDAMethod</a></code>). This method requires that features were obtained with
+  <code><a href='feature-finding.html'>findFeaturesBruker</a></code>. It is recommended, but not mandatory, that the <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> are also
+  generated by DataAnalysis.</p>
 <p><code>generateFormulasGenForm</code> uses
   <a href='https://sourceforge.net/projects/genform/'>GenForm</a> to generate
   chemical formulae. When MS/MS data is available it will be used to score
@@ -480,35 +518,49 @@ DataAnalysis always occurs on 'feature level'.</p>
   formula calculation may need a very long time. Timeouts are used to avoid
   excessive computational times by terminating long running commands (set by
   the <code>timeout</code> argument).</p>
-<p>For annotations performed with <code class='command'>SIRIUS</code> it is often the fastest
-  to keep the default <code>splitBatches=FALSE</code>. In this case, all
-  <code class='command'>SIRIUS</code> output will be printed to the terminal (unless
-  <code>verbose=FALSE</code> or <span class="option">patRoon.MP.method="future"</span>).</p>
+<p>For annotations performed with <code class='command'>SIRIUS</code> it is often the fastest to keep the default
+  <code>splitBatches=FALSE</code>. In this case, all <code class='command'>SIRIUS</code> output will be printed to the terminal (unless
+  <code>verbose=FALSE</code> or <span class="option">patRoon.MP.method="future"</span>). Furthermore, please note that only annotations to be
+  performed for the same adduct are grouped in a single batch execution.</p>
     <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
 
-    <p>Each algorithm implements their own scoring system. Their
-  names have been harmonized where possible. An overview is obtained with the
-  <code>formulaScorings</code> function:
+    <p>Each algorithm implements their own scoring system. Their names have been harmonized where
+  possible. An overview is obtained with the <code>formulaScorings</code> function:
   <table class='table'>
 <tr><td><strong>name</strong></td><td><strong>genform</strong></td><td><strong>sirius</strong></td><td><strong>bruker</strong></td><td><strong>description</strong></td></tr>
 <tr><td>combMatch</td><td>comb_match</td><td>-</td><td>-</td><td>MS and MS/MS combined match value</td></tr>
-<tr><td>frag_mSigma</td><td>-</td><td>-</td><td>mSigma (SmartFormula3D)</td><td>Deviation of isotopic pattern of fragment</td></tr>
-<tr><td>frag_score</td><td>-</td><td>-</td><td>Score (SmartFormula3D)</td><td>MS/MS fragment score</td></tr>
 <tr><td>isoScore</td><td>MS_match</td><td>isoScore</td><td>-</td><td>How well the isotopic pattern matches</td></tr>
 <tr><td>mSigma</td><td>-</td><td>-</td><td>mSigma</td><td>Deviation of the isotopic pattern</td></tr>
 <tr><td>MSMSScore</td><td>MSMS_match</td><td>treeScore</td><td>-</td><td>How well MS/MS data matches</td></tr>
 <tr><td>score</td><td>-</td><td>score</td><td>Score</td><td>Overall MS formula score</td></tr>
 </table></p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>With a <a href='sets-workflow.html'>sets workflow</a>, annotation is first performed for each set.
+  This is important, since the annotation algorithms typically cannot work with data from mixed ionization modes. The
+  annotation results are then combined to generate a <em>sets consensus</em>:</p><ul>
+<li><p>The annotation tables for each feature group from the set specific data are combined. Rows with overlapping
+  candidates (determined by the neutral formula) are merged.</p></li>
+<li><p>Set specific data (<em>e.g.</em> the ionic formula) is retained by renaming their columns with set specific
+  names.</p></li>
+<li><p>The MS/MS fragment annotations (<code>fragInfo</code> column) from each set are combined.</p></li>
+<li><p>The scorings for each set are averaged to calculate overall scores.</p></li>
+<li><p>The candidates are re-ranked based on their average ranking among the set data (if a candidate is absent in a
+  set it is assigned the poorest rank in that set).</p></li>
+<li><p>The coverage of each candidate among sets is calculated. Depending on the <code>setThreshold</code> and
+  <code>setThresholdAnn</code> arguments, candidates with low abundance are removed.</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="parallelization"><a class="anchor" href="#parallelization"></a>Parallelization</h2>
 
     <p><code>generateFormulasGenForm</code> and <code>generateFormulasSIRIUS</code> uses multiprocessing to parallelize
   computations. Please see the parallelization section in the handbook for
   more details and <a href='patRoon-package.html'>patRoon options</a> for configuration
   options.</p>
-<p>When <code>futures</code> are used for parallel processing
-  (<code>patRoon.MP.method="future"</code>), calculations with <code class='command'>GenForm</code>
-  are done with batch mode is disabled (see <code>batchSize</code> argument), which
-  generally limit overall performance.</p>
+<p>When <code>futures</code> are used for parallel
+  processing (<code>patRoon.MP.method="future"</code>), calculations with
+  <code class='command'>GenForm</code> are done with batch mode is disabled (see
+  <code>batchSize</code> argument), which generally limit overall performance.</p>
     <h2 class="hasAnchor" id="genform-options"><a class="anchor" href="#genform-options"></a>GenForm options</h2>
 
     <p>Below is a list of options (generated by running
@@ -590,18 +642,17 @@ Explanation:
 <em>Nature Methods</em>, <b>16</b>(4), 299--302.
 doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
 .
- <br /><br />
-  Duhrkop K, Bocker S (2015).
+ <br /><br /> Duhrkop K, Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
 In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
 ISBN 978-3-319-16706-0.
- <br /><br /> Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
+ <br /><br />
+  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
 &#8220;Searching molecular structure databases with tandem mass spectra using CSI:FingerID.&#8221;
 <em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
 doi: <a href='https://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 .
-
-  <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+ <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
 <em>Bioinformatics</em>, <b>25</b>(2), 218--224.
 doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
@@ -609,8 +660,8 @@ doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformat
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='formulas-class.html'>formulas-class</a></code>. The
-  <a href='https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual'>GenForm
-   manual</a> (also known as MOLGEN-MSMS).</p></div>
+  <a href='https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual'>GenForm manual</a> (also
+  known as MOLGEN-MSMS).</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

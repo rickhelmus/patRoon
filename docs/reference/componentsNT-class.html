@@ -74,7 +74,7 @@ package." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -159,29 +159,39 @@ package." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Components class for homologous series.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-nontarget.R'><code>R/components-nontarget.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-nontarget.R'><code>R/components-nontarget.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-nontarget-set.R'><code>R/components-nontarget-set.R</code></a></small>
     <div class="hidden name"><code>componentsNT-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This class is derived from <code><a href='components-class.html'>components</a></code> and is used to store
+    <p>This class is derived from <code><a href='length,transformationProducts-method.html'>components</a></code> and is used to store
 results from unsupervised homolog detection with the <span class="pkg">nontarget</span>
 package.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for componentsNT</span>
-<span class='fu'>plotGraph</span><span class='op'>(</span><span class='va'>obj</span>, onlyLinked <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+<span class='fu'><a href='generics.html'>plotGraph</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>onlyLinked</span><span class='op'>)</span>
+
+<span class='co'># S4 method for componentsNTSet</span>
+<span class='fu'><a href='generics.html'>plotGraph</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>onlyLinked</span>, <span class='va'>set</span><span class='op'>)</span>
+
+<span class='co'># S4 method for componentsNTSet</span>
+<span class='fu'><a href='generics.html'>unset</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>set</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>The <code>componentsRC</code> object to plot.</p></td>
+      <td><p>The <code>componentsNT</code> object to plot.</p></td>
     </tr>
     <tr>
       <th>onlyLinked</th>
-      <td><p>If <code>TRUE</code> then only series with links are plotted.</p></td>
+      <td><p>If <code>TRUE</code> then only components with links are plotted.</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
     </tr>
     </table>
 
@@ -212,15 +222,30 @@ with the <span class="pkg">igraph</span> package and rendered with
 as returned by <code>homol.search</code></p></dd>
 
 </dl>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>componentsNTSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>componentsNT</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>componentsNTUnset</code>), which allows it to be used in 'regular' workflows. Only the components in the specified set are kept. Furthermore, the
+  component names are restored to non-set specific names (see <code><a href='component-generation.html'>generateComponents</a></code> for more details).</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>plotGraph</code> Currently can only create graph networks from one set (specified by the <code>set</code>
+  argument).</p></li>
+</ul>
+
+<p>Note that the <code>componentsNTSet</code> class does not have a <code>homol</code> slot. Instead, the <code><a href='generics.html'>setObjects</a></code>
+  method can be used to access this data for a specific set.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9.  <br /><br /> Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
 			Accelerated isotope fine structure calculation using pruned transition trees, 
 			Analytical Chemistry 87(11), 5738-5744.</p>
-<p>Csardi G, Nepusz T: The igraph software package for complex network research, InterJournal, Complex Systems 1695. 2006. https://igraph.org <br /> <br /> Almende B.V., Benoit Thieurmel and Titouan Robert (2019). visNetwork: Network Visualization using 'vis.js' Library. R package version 2.0.9. http://datastorm-open.github.io/visNetwork/</p>
+<p>Csardi G, Nepusz T: The igraph software package for complex network research, InterJournal, Complex Systems 1695. 2006. https://igraph.org <br /> <br /> Almende B.V. and Contributors, Benoit Thieurmel and Titouan Robert (2021). visNetwork: Network Visualization using 'vis.js' Library. R package version 2.1.0. http://datastorm-open.github.io/visNetwork/</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='components-class.html'>components</a></code> and <a href='component-generation.html'>component-generation</a></p></div>
+    <div class='dont-index'><p><code><a href='length,transformationProducts-method.html'>components</a></code> and <a href='component-generation.html'>component-generation</a></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

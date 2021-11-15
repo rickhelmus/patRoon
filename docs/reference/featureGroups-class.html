@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base class for grouped features.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-bruker.R'><code>R/feature_groups-bruker.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-envimass.R'><code>R/feature_groups-envimass.R</code></a>, and 3 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-set.R'><code>R/feature_groups-set.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-bruker.R'><code>R/feature_groups-bruker.R</code></a>, and 6 more</small>
     <div class="hidden name"><code>featureGroups-class.Rd</code></div>
     </div>
 
@@ -201,8 +201,23 @@ getFeatures(obj)
 # S4 method for featureGroups
 groupFeatIndex(fGroups)
 
+# S4 method for featureGroups
+groupQualities(fGroups)
+
+# S4 method for featureGroups
+groupScores(fGroups)
+
+# S4 method for featureGroups
+annotations(obj)
+
+# S4 method for featureGroups
+adducts(obj)
+
+# S4 method for featureGroups
+adducts(obj) &lt;- value
+
 # S4 method for featureGroups,ANY,ANY,missing
-[(x, i, j, ..., rGroups, drop = TRUE)
+[(x, i, j, ..., rGroups, results, drop = TRUE)
 
 # S4 method for featureGroups,ANY,ANY
 [[(x, i, j)
@@ -211,7 +226,12 @@ groupFeatIndex(fGroups)
 $(x, name)
 
 # S4 method for featureGroups
-export(fGroups, type, out)
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for featureGroups
+export(obj, type, out)
+
+getFCParams(rGroups, ...)
 
 # S4 method for featureGroups
 as.data.table(
@@ -219,10 +239,14 @@ as.data.table(
   average = FALSE,
   areas = FALSE,
   features = FALSE,
-  regression = FALSE
+  qualities = FALSE,
+  regression = FALSE,
+  averageFunc = mean,
+  normFunc = NULL,
+  FCParams = NULL
 )
 
-# S4 method for featureGroups,ANY
+# S4 method for featureGroups,missing
 plot(
   x,
   colourBy = c("none", "rGroups", "fGroups"),
@@ -235,7 +259,18 @@ plot(
 )
 
 # S4 method for featureGroups
-plotInt(obj, average = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
+plotInt(
+  obj,
+  average = FALSE,
+  normFunc = NULL,
+  xnames = TRUE,
+  showLegend = FALSE,
+  pch = 20,
+  type = "b",
+  lty = 3,
+  col = NULL,
+  ...
+)
 
 # S4 method for featureGroups
 plotChord(
@@ -252,9 +287,10 @@ plotChord(
 plotChroms(
   obj,
   rtWindow = 30,
-  mzWindow = 0.005,
+  mzExpWindow = 0.001,
   retMin = FALSE,
   topMost = NULL,
+  topMostByRGroup = FALSE,
   EICs = NULL,
   showPeakArea = FALSE,
   showFGroupRect = TRUE,
@@ -276,42 +312,167 @@ plotVenn(obj, which = NULL, ...)
 plotUpSet(obj, which = NULL, nsets = length(which), nintersects = NA, ...)
 
 # S4 method for featureGroups
+plotVolcano(
+  obj,
+  FCParams,
+  showLegend = TRUE,
+  averageFunc = mean,
+  col = NULL,
+  pch = 19,
+  ...
+)
+
+# S4 method for featureGroups
 unique(x, which, relativeTo = NULL, outer = FALSE)
 
 # S4 method for featureGroups
-overlap(fGroups, which, exclusive = FALSE)</pre>
+overlap(fGroups, which, exclusive)
+
+# S4 method for featureGroups
+calculatePeakQualities(
+  obj,
+  weights,
+  flatnessFactor,
+  avgFunc = mean,
+  parallel = TRUE
+)
+
+# S4 method for featureGroups
+selectIons(
+  fGroups,
+  components,
+  prefAdduct,
+  onlyMonoIso = TRUE,
+  chargeMismatch = "adduct"
+)
+
+# S4 method for featureGroupsSet
+sets(obj)
+
+# S4 method for featureGroupsSet
+adducts(obj, set, ...)
+
+# S4 method for featureGroupsSet
+adducts(obj, set, reGroup = TRUE) &lt;- value
+
+# S4 method for featureGroupsSet
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for featureGroupsSet
+show(object)
+
+# S4 method for featureGroupsSet
+featureTable(obj)
+
+# S4 method for featureGroupsSet,ANY,ANY,missing
+[(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
+
+# S4 method for featureGroupsSet
+export(obj, type, out, set)
+
+# S4 method for featureGroupsSet
+as.data.table(
+  x,
+  average = FALSE,
+  areas = FALSE,
+  features = FALSE,
+  qualities = FALSE,
+  regression = FALSE,
+  averageFunc = mean,
+  normFunc = NULL,
+  FCParams = NULL
+)
+
+# S4 method for featureGroupsSet
+filter(
+  obj,
+  ...,
+  negate = FALSE,
+  sets = NULL,
+  absMinSets = NULL,
+  relMinSets = NULL
+)
+
+# S4 method for featureGroupsSet
+plotInt(
+  obj,
+  average = FALSE,
+  normFunc = NULL,
+  xnames = !sets,
+  showLegend = sets,
+  pch = 20,
+  type = "b",
+  lty = 3,
+  col = NULL,
+  ...,
+  sets = FALSE
+)
+
+# S4 method for featureGroupsSet
+plotVenn(obj, which = NULL, ..., sets = FALSE)
+
+# S4 method for featureGroupsSet
+unique(x, which, ..., sets = FALSE)
+
+# S4 method for featureGroupsSet
+overlap(fGroups, which, exclusive, sets = FALSE)
+
+# S4 method for featureGroupsSet
+selectIons(fGroups, components, prefAdduct, ...)
+
+# S4 method for featureGroupsSet
+unset(obj, set)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>areas</th>
-      <td><p>If set to <code>TRUE</code> then areas are considered instead of peak
-intensities.</p></td>
+      <td><p>If set to <code>TRUE</code> then areas are considered instead of peak intensities.</p>
+<p>For <code>as.data.table</code>: ignored if <code>features=TRUE</code>, as areas of features are always reported.</p></td>
     </tr>
     <tr>
       <th>fGroups, obj, x, object</th>
       <td><p><code>featureGroups</code> object to be accessed.</p></td>
     </tr>
     <tr>
+      <th>value</th>
+      <td><p>For <code>adducts&lt;-</code>: A <code>character</code> with adduct annotations assigned to each feature group. The
+length should equal the number of feature groups. Can be named with feature group names to customize the assignment
+order.</p></td>
+    </tr>
+    <tr>
       <th>i, j</th>
-      <td><p>A numeric or character value which is used to select analyses/feature groups by
+      <td><p>For <code><a href='generics.html'>[</a></code>/<code><a href='generics.html'>[[</a></code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br /><br /> For <code>delete</code>: The data to remove from. <code>i</code> are the
+analyses as numeric index, logical or character, <code>j</code> the feature groups as numeric index, logical or character. If either is
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
+feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
+<code>...</code> to <code>delete</code>. The return value of this function specifies the analyses of the features in the group to be removed (same format as <code>i</code>).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Ignored for <code>"["</code> operator or passed to
-<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plot</code> and <code>plotChroms</code>),
-<code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code> (<code>plotInt</code>), <span class="pkg">VennDiagram</span>
-plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
-(<code>plotChord</code>) or <code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code> (<code>plotUpSet</code>).</p></td>
+      <td><p>For the <code>"["</code> operator: ignored.</p>
+<p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
+<p>For <code>getFCParams</code>: optional named arguments that override defaults.</p>  
+<p>For <a href='sets-workflow.html'>sets workflow</a> methods: further arguments passed to the base <code>featureGroups</code> method.</p>
+<p>Otherwise passed to <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plot</code> and <code>plotChroms</code>), <code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code>
+  (<code>plotInt</code>), <span class="pkg">VennDiagram</span> plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
+  (<code>plotChord</code>) or <code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code> (<code>plotUpSet</code>).</p></td>
     </tr>
     <tr>
       <th>rGroups</th>
-      <td><p>An optional <code>character</code> vector: if specified only keep
-results for the given replicate groups (equivalent to the <code>rGroups</code>
-argument to <code><a href='feature-filtering.html'>filter</a></code>).</p></td>
+      <td><p>For <code><a href='generics.html'>[</a></code>: An optional <code>character</code> vector: if specified only keep results for the given
+  replicate groups (equivalent to the <code>rGroups</code> argument to <code><a href='feature-filtering.html'>filter</a></code>).</p>
+<p>For <code>getFCParams</code>: a <code>character</code> vector with the names of the two replicate groups to be compared.</p></td>
+    </tr>
+    <tr>
+      <th>results</th>
+      <td><p>Optional argument. If specified only feature groups with results in the specified object are kept. The
+class of <code>results</code> should be <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> or <code><a href='length,transformationProducts-method.html'>components</a></code>. Multiple objects
+can be specified in a <code>list</code>: in this case a feature group is kept if it has a result in <em>any</em> of the
+objects (equivalent to the <code>results</code> argument to <code><a href='feature-filtering.html'>filter</a></code>).</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -327,31 +488,52 @@ argument to <code><a href='feature-filtering.html'>filter</a></code>).</p></td>
     </tr>
     <tr>
       <th>average</th>
-      <td><p>Average data within replicate groups.</p></td>
+      <td><p>If <code>TRUE</code> then data within replicate groups are averaged.</p>
+<p>For <code>as.data.table</code>: if <code>features=TRUE</code> other feature properties are also averaged.</p></td>
     </tr>
     <tr>
       <th>features</th>
-      <td><p>If <code>TRUE</code> then feature specific data will be added. If
-<code>average=TRUE</code> this data will be averaged for each feature group.</p></td>
+      <td><p>If <code>TRUE</code> then feature specific data will be added. If <code>average=TRUE</code> this data will be
+averaged for each feature group.</p></td>
+    </tr>
+    <tr>
+      <th>qualities</th>
+      <td><p>Adds feature (group) qualities (<code>qualities="quality"</code>), scores (<code>qualities="score"</code>) or
+both (<code>qualities="both"</code>), if this data is available (<em>i.e.</em> from <code>calculatePeakQualities</code>). If
+<code>qualities=FALSE</code> then nothing is reported.</p></td>
     </tr>
     <tr>
       <th>regression</th>
-      <td><p>Set to <code>TRUE</code> to add regression data for each feature
-group. For this a linear model is created (intensity/area [depending on
-<code>areas</code> argument] <em>vs</em> concentration). The model concentrations
-(e.g. of a set of standards) is derived from the <code>conc</code> column of the
-<a href='analysis-information.html'>analysis information</a>. From this model the
-intercept, slope and R2 is added to the output. In addition, when
-<code>features=TRUE</code>, concentrations for each feature are added. Note that
-no regression information is added when no <code>conc</code> column is present in
-the analysis information or when less than two concentrations are specified
+      <td><p>Set to <code>TRUE</code> to add regression data for each feature group. For this a linear model is
+created (intensity/area [depending on <code>areas</code> argument] <em>vs</em> concentration). The model concentrations
+(e.g. of a set of standards) is derived from the <code>conc</code> column of the <a href='analysis-information.html'>analysis
+information</a>. From this model the intercept, slope and R2 is added to the output. In addition, when
+<code>features=TRUE</code>, concentrations for each feature are added. Note that no regression information is added when
+no <code>conc</code> column is present in the analysis information or when less than two concentrations are specified
 (<em>i.e.</em> the minimum amount).</p></td>
     </tr>
     <tr>
+      <th>averageFunc</th>
+      <td><p>Function used for averaging.</p>
+<p>for <code>as.data.table</code>: only used when <code>average=TRUE</code> or <code>FCParams != NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>normFunc</th>
+      <td><p>Function that should be used for normalization of data. The function is called for all
+intensities/areas of a feature group and these quantities are divided by the result of the function call. For
+example, when <code><a href='https://rdrr.io/r/base/Extremes.html'>max</a></code> is used normalized intensities will be between zero and one. If all quantities are
+zero then the function will not be called. Set to <code>NULL</code> to perform no normalization.</p></td>
+    </tr>
+    <tr>
+      <th>FCParams</th>
+      <td><p>A parameter list to calculate Fold change data (see <code>getFCParams</code> and the
+<code>Fold change calculation</code> section).</p>
+<p>For <code>as.data.table</code>: set to <code>NULL</code> to not perform FC calculations.</p></td>
+    </tr>
+    <tr>
       <th>colourBy</th>
-      <td><p>Sets the automatic colour selection: <code>"none"</code> for a
-single colour or <code>"rGroups"</code>/<code>"fGroups"</code> for a distinct colour
-per replicate/feature group.</p></td>
+      <td><p>Sets the automatic colour selection: <code>"none"</code> for a single colour or
+<code>"rGroups"</code>/<code>"fGroups"</code> for a distinct colour per replicate/feature group.</p></td>
     </tr>
     <tr>
       <th>onlyUnique</th>
@@ -364,21 +546,20 @@ feature groups that are unique to a replicate group are plotted.</p></td>
     </tr>
     <tr>
       <th>showLegend</th>
-      <td><p>If <code>TRUE</code> a legend will be shown with either replicate
-groups (<code>colourBy == "rGroups"</code>) or feature groups (<code>colourBy ==
-"fGroups"</code>, only for <code>plotChroms</code>). If <code>colourBy</code> is <code>"none"</code>
-no legend will be shown.</p></td>
+      <td><p>Plot a legend if <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>col</th>
-      <td><p>Colour(s) used. If <code>col=NULL</code> then colours are automatically
-generated.</p></td>
+      <td><p>Colour(s) used. If <code>col=NULL</code> then colours are automatically generated.</p></td>
     </tr>
     <tr>
       <th>pch, type, lty</th>
-      <td><p>Common plotting parameters passed to <em>e.g.</em>
-<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>. For <code>plot</code>: if <code>pch=NULL</code> then
-values are automatically assigned.</p></td>
+      <td><p>Common plotting parameters passed to <em>e.g.</em> <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>. For <code>plot</code>:
+if <code>pch=NULL</code> then values are automatically assigned.</p></td>
+    </tr>
+    <tr>
+      <th>xnames</th>
+      <td><p>Plot analysis (or replicate group if <code>average=TRUE</code>) names on the x axis.</p></td>
     </tr>
     <tr>
       <th>addSelfLinks</th>
@@ -406,58 +587,60 @@ outer groups.</p></td>
     </tr>
     <tr>
       <th>rtWindow</th>
-      <td><p>Retention time (in seconds) that will be subtracted/added to
-respectively the minimum and maximum retention time of the plotted feature
-groups. Thus, setting this value to a positive value will 'zoom out' on the
+      <td><p>Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
+retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
 retention time axis.</p></td>
     </tr>
     <tr>
-      <th>mzWindow</th>
-      <td><p>The <em>m/z</em> value (in Da) which will be subtracted/added
-to a feature group <em>m/z</em> value to determine the width of its EIC.</p></td>
+      <th>mzExpWindow</th>
+      <td><p>In case the <em>m/z</em> window to plot an EIC for a particular analysis is not known (<em>i.e.</em>
+no feature was detected of the feature group to be plot and <code>onlyPresent=FALSE</code>) then the EIC <em>m/z</em> range
+is estimated from the range for the complete feature group and expanded by the offset defined by
+<code>mzExpWindow</code>.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
-      <td><p>Only plot EICs from features within this number of top most
-intense analyses. If <code>NULL</code> then all analyses are used for plotted.</p></td>
+      <td><p>Only plot EICs from features within this number of top most intense analyses. If <code>NULL</code> then all
+analyses are used for plotted.</p></td>
+    </tr>
+    <tr>
+      <th>topMostByRGroup</th>
+      <td><p>If set to <code>TRUE</code> and <code>topMost</code> is set: only plot EICs for the top most features in
+each replicate group. For instance, when <code>topMost=1</code> and <code>topMostByRGroup=TRUE</code>, then EICs will be
+plotted for the most intense feature of each replicate group.</p></td>
     </tr>
     <tr>
       <th>EICs</th>
-      <td><p>Internal parameter for now and should be kept at <code>NULL</code>
-(default).</p></td>
+      <td><p>Internal parameter for now and should be kept at <code>NULL</code> (default).</p></td>
     </tr>
     <tr>
       <th>showPeakArea</th>
-      <td><p>Set to <code>TRUE</code> to display integrated chromatographic
-peak ranges by filling (shading) their areas.</p></td>
+      <td><p>Set to <code>TRUE</code> to display integrated chromatographic peak ranges by filling (shading) their
+areas.</p></td>
     </tr>
     <tr>
       <th>showFGroupRect</th>
-      <td><p>Set to <code>TRUE</code> to mark the full retention/intensity
-range of all features within a feature group by drawing a rectangle around
-it.</p></td>
+      <td><p>Set to <code>TRUE</code> to mark the full retention/intensity range of all features within a feature
+group by drawing a rectangle around it.</p></td>
     </tr>
     <tr>
       <th>title</th>
-      <td><p>Character string used for title of the plot. If <code>NULL</code> a
-title will be automatically generated.</p></td>
+      <td><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></td>
     </tr>
     <tr>
       <th>onlyPresent</th>
-      <td><p>If <code>TRUE</code> then EICs will only be generated for
-analyses in which a particular feature group was detected. Disabling this
-option might be useful to see if any features were 'missed'.</p></td>
+      <td><p>If <code>TRUE</code> then EICs will only be generated for analyses in which a particular feature group
+was detected. Disabling this option might be useful to see if any features were 'missed'.</p></td>
     </tr>
     <tr>
       <th>annotate</th>
-      <td><p>If set to <code>"ret"</code> and/or <code>"mz"</code> then retention
-and/or <em>m/z</em> values will be drawn for each plotted feature group.</p></td>
+      <td><p>If set to <code>"ret"</code> and/or <code>"mz"</code> then retention and/or <em>m/z</em> values will be drawn for
+each plotted feature group.</p></td>
     </tr>
     <tr>
       <th>showProgress</th>
-      <td><p>if set to <code>TRUE</code> then a text progressbar will be
-displayed when all EICs are being plot. Set to <code>"none"</code> to disable any
-annotation.</p></td>
+      <td><p>if set to <code>TRUE</code> then a text progressbar will be displayed when all EICs are being plot. Set
+to <code>"none"</code> to disable any annotation.</p></td>
     </tr>
     <tr>
       <th>xlim, ylim</th>
@@ -468,13 +651,11 @@ annotation.</p></td>
       <th>which</th>
       <td><p>A character vector with replicate groups used for comparison.</p>
 <p>For plotting functions: set to <code>NULL</code> for all replicate groups.</p>
-<p>For <code>plotVenn</code>: alternatively a named <code>list</code> containing elements
-of <code>character</code> vectors with replicate groups to compare. For instance,
-<code>which=list(infl = c("influent-A", "influent-B"), effl =
-c("effluent-A", "effluent-B"))</code>, will compare the features in replicate
-groups <samp>"influent-A/B"</samp> against those in <samp>"effluent-A/B"</samp>.
-The names of the list are used for labelling in the plot, and will be made
-automatically if not specified.</p></td>
+<p>For <code>plotVenn</code>: alternatively a named <code>list</code> containing elements of <code>character</code> vectors with
+  replicate groups to compare. For instance, <code>which=list(infl = c("influent-A", "influent-B"), effl =
+  c("effluent-A", "effluent-B"))</code>, will compare the features in replicate groups <samp>"influent-A/B"</samp> against those
+  in <samp>"effluent-A/B"</samp>. The names of the list are used for labelling in the plot, and will be made automatically
+  if not specified.</p></td>
     </tr>
     <tr>
       <th>nsets, nintersects</th>
@@ -498,11 +679,82 @@ parameter.</p></td>
       <td><p>If <code>TRUE</code> then all feature groups are removed that are
 not unique to the given replicate groups.</p></td>
     </tr>
+    <tr>
+      <th>weights</th>
+      <td><p>A named <code>numeric</code> vector that defines the weight for each score to calculate the
+<code>totalScore</code>. The names of the vector follow the score names. Unspecified weights are defaulted to <samp>1</samp>.
+Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)</code>.</p></td>
+    </tr>
+    <tr>
+      <th>flatnessFactor</th>
+      <td><p>Passed to <span class="pkg">MetaClean</span> as the <code>flatness.factor</code> argument to
+<code><a href='https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html'>calculateJaggedness</a></code> and <code><a href='https://rdrr.io/pkg/MetaClean/man/calculateModality.html'>calculateModality</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>avgFunc</th>
+      <td><p>The function used to average the peak qualities and scores for each feature group.</p></td>
+    </tr>
+    <tr>
+      <th>parallel</th>
+      <td><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href='https://CRAN.R-project.org/package=futures'><span class="pkg">futures</span></a> package. Please
+see the parallelization section in the handbook for more details.</p></td>
+    </tr>
+    <tr>
+      <th>components</th>
+      <td><p>The <code>components</code> object that was generated for the given <code>featureGroups</code> object.
+Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
+from <span class="pkg">RAMClustR</span> and <span class="pkg">cliqueMS</span>.</p></td>
+    </tr>
+    <tr>
+      <th>prefAdduct</th>
+      <td><p>The 'preferred adduct' (see method description). This is often <code>"[M+H]+"</code> or <code>"[M-H]-"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>onlyMonoIso</th>
+      <td><p>Set to <code>TRUE</code> to only keep feature groups that were annotated as monoisotopic. Feature groups
+are never removed by this setting if no isotope annotations are available.</p></td>
+    </tr>
+    <tr>
+      <th>chargeMismatch</th>
+      <td><p>Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
+values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</code> (ignore adduct annotation), <code>"none"</code>
+(ignore both annotations) and <code>"ignore"</code> (don't check for charge mismatches). <em>Important</em>: when
+<code class='command'>OpenMS</code> is used to find features, it already removes any detected non-monoisotopic features by default.
+Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropriate.</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
+    </tr>
+    <tr>
+      <th>reGroup</th>
+      <td><p>Set to <code>TRUE</code> to re-group the features after the adduct annotations are changed. See the
+<code>Sets workflow</code> section for more details.</p></td>
+    </tr>
+    <tr>
+      <th>sets</th>
+      <td><p>(<strong>sets workflow</strong>) For <code><a href='generics.html'>[</a></code> and <code>filter</code>: a <code>character</code> with name(s) of the sets to keep (or remove if
+  <code>negate=TRUE</code>).</p>
+<p>For <code>plotInt</code>: if <code>TRUE</code> then feature intensities are plot per set (order follows the
+  <a href='analysis-information.html'>analysis information</a>).</p>
+<p>For <code>plotVenn</code>, <code>overlap</code> and <code>unique</code>: If <code>TRUE</code> then the <code>which</code> argument changes its
+  meaning and is used to specify the names of the sets to be compared.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></td>
+    </tr>
+    <tr>
+      <th>absMinSets, relMinSets</th>
+      <td><p>(<strong>sets workflow</strong>) Feature groups are only kept when they contain data for at least this (absolute
+or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
+    <p><code>delete</code> returns the object for which the specified data was removed.</p>
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
 <li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
@@ -512,15 +764,18 @@ not unique to the given replicate groups.</p></td>
 <p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
 from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
+<p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
+<p><code>selectIons</code> returns a <code>featureGroups</code> object with only the selected feature groups and amended
+  with adduct annotations.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The <code>featureGroup</code> class is the workhorse of <span class="pkg">patRoon</span>: almost all
-functionality operate on its instantiated objects. The class holds all
-information from grouped features (obtained from <code><a href='features-class.html'>features</a></code>).
-This class itself is <code>virtual</code>, hence, objects are not created directly
-from it. Instead, 'feature groupers' such as <code><a href='feature-grouping.html'>groupFeaturesXCMS</a></code>
-return a <code>featureGroups</code> derived object after performing the actual
-grouping of features across analyses.</p>
+    <p>The <code>featureGroup</code> class is the workhorse of <span class="pkg">patRoon</span>: almost all functionality operate on its instantiated
+objects. The class holds all information from grouped features (obtained from <code><a href='features-class.html'>features</a></code>). This class
+itself is <code>virtual</code>, hence, objects are not created directly from it. Instead, 'feature groupers' such as
+<code><a href='feature-grouping.html'>groupFeaturesXCMS</a></code> return a <code>featureGroups</code> derived object after performing the actual grouping of
+features across analyses.</p>
+<p><code>getFCParams</code> creates a parameter <code>list</code> to calculate Fold changes (see the
+  <code>Fold change calculation</code> section).</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
@@ -539,15 +794,22 @@ replicate groups for which data is present in this object.</p></li>
 <li><p><code>featureTable</code>: Obtain feature information (see <code><a href='features-class.html'>features</a></code>).</p></li>
 <li><p><code>getFeatures</code>: Accessor for <code>features</code> slot.</p></li>
 <li><p><code>groupFeatIndex</code>: Accessor for <code>ftindex</code> slot.</p></li>
+<li><p><code>groupQualities</code>: Accessor for <code>groupQualities</code> slot.</p></li>
+<li><p><code>groupScores</code>: Accessor for <code>groupScores</code> slot.</p></li>
+<li><p><code>annotations</code>: Accessor for <code>annotations</code> slot.</p></li>
+<li><p><code>adducts</code>: Returns a named <code>character</code> with adduct annotations assigned to each feature group (if
+available).</p></li>
+<li><p><code>adducts&lt;-</code>: Sets adduct annotations for feature groups.</p></li>
 <li><p><code><a href='generics.html'>[</a></code>: Subset on analyses/feature groups.</p></li>
 <li><p><code><a href='generics.html'>[[</a></code>: Extract intensity values.</p></li>
 <li><p><code><a href='generics.html'>$</a></code>: Extract intensity values for a feature group.</p></li>
+<li><p><code>delete</code>: Completely deletes specified feature groups.</p></li>
 <li><p><code>export</code>: Exports feature groups to a <code class="file">.csv</code> file that
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 analyte database) or that is suitable as input for the <code>Targeted peak
 detection</code> functionality of <a href='http://mzmine.github.io/'>MZmine</a>.</p></li>
-<li><p><code>as.data.table</code>: Obtain a summary table (a <code>data.table</code>)
-with retention, <em>m/z</em>, intensity and optionally other feature data.</p></li>
+<li><p><code>as.data.table</code>: Obtain a summary table (a <code>data.table</code>) with retention, <em>m/z</em>, intensity
+and optionally other feature data.</p></li>
 <li><p><code>plot</code>: Generates an <em>m/z</em> <em>vs</em> retention time
 plot for all featue groups. Optionally highlights unique/overlapping
 presence amongst replicate groups.</p></li>
@@ -558,52 +820,106 @@ visualize shared presence of feature groups between analyses or replicate
 groups. In addition, analyses/replicates sharing similar properties
 (<em>e.g.</em> location, age, type) may be grouped to enhance visualization
 between these 'outer groups'.</p></li>
-<li><p><code>plotChroms</code>: Plots extracted ion chromatograms (EICs) of feature
-groups.</p></li>
+<li><p><code>plotChroms</code>: Plots extracted ion chromatograms (EICs) of feature groups.</p></li>
 <li><p><code>plotVenn</code>: plots a Venn diagram (using
 <span class="pkg">VennDiagram</span>) outlining unique and shared feature groups
 between up to five replicate groups.</p></li>
 <li><p><code>plotUpSet</code>: plots an UpSet diagram (using the
 <code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code> function) outlining unique and shared feature
 groups between given replicate groups.</p></li>
+<li><p><code>plotVolcano</code>: Plots Fold change data in a 'Volcano plot'.</p></li>
 <li><p><code>unique</code>: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).</p></li>
 <li><p><code>overlap</code>: Obtain a subset with feature groups that overlap
 between a set of specified replicate group(s).</p></li>
+<li><p><code>calculatePeakQualities</code>: Calculates peak and group qualities for all features and feature groups. The peak qualities
+(and scores) are calculated with the <a href='features-class.html'>features method of this
+function</a>, and subsequently averaged per feature group. Then, <span class="pkg">MetaClean</span> is used to calculate the
+<code>Elution Shift</code> and <code>Retention Time Consistency</code> group quality metrics (see the <span class="pkg">MetaClean</span>
+publication cited below for more details). Similarly to the <code><a href='features-class.html'>features</a></code> method, these metrics are scored
+by normalizing qualities among all groups and scaling them from <samp>0</samp> (worst) to <samp>1</samp> (best). The
+<code>totalScore</code> for each group is then calculated as the weighted sum from all feature (group) scores. The
+<code><a href='check-GUI.html'>getMCTrainData</a></code> and <code><a href='check-GUI.html'>predictCheckFeaturesSession</a></code> functions can be used to train and apply
+Pass/Fail ML models from <span class="pkg">MetaClean</span>.</p></li>
+<li><p><code>selectIons</code>: uses <a href='component-generation.html'>componentization</a> results to select feature groups with
+preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
+(de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
+copied from the components to the <code>annotations</code> slot. If the adduct for a feature group is unknown, its
+annotation is defaulted to the 'preferred' adduct, and hence, the feature group will never be removed. Furthermore,
+if a component does not contain an annotation with the preferred adduct, the most intense feature group is selected
+instead. Similarly, if no isotope annotation is available, the feature group is assumed to be monoisotopic and thus
+not removed. An important advantage of <code>selectIons</code> is that it may considerably simplify your dataset.
+Furthermore, the adduct assignments allow formula/compound annotation steps later in the workflow to improve their
+annotation accuracy. On the other hand, it is important the componentization results are reliable. Hence, it is
+highly recommended that, prior to calling <code>selectIons</code>, the settings to <code><a href='component-generation.html'>generateComponents</a></code> are
+optimized and its results are reviewed with <code><a href='check-GUI.html'>checkComponents</a></code>. Finally, the <code>adducts&lt;-</code> method can
+be used to manually correct adduct assignments afterwards if necessary.</p></li>
 </ul>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
 
 <dl>
-<dt><code>groups</code></dt><dd><p>Matrix (<code>data.table</code>) with intensities for each
-feature group (columns) per analysis (rows). Access with <code>groups</code>
-method.</p></dd>
+<dt><code>groups</code></dt><dd><p>Matrix (<code>data.table</code>) with intensities for each feature group (columns) per analysis (rows).
+Access with <code>groups</code> method.</p></dd>
 
-<dt><code>analysisInfo,features</code></dt><dd><p><a href='analysis-information.html'>Analysis info</a> and
-<code><a href='features-class.html'>features</a></code> class associated with this object. Access with
-<code>analysisInfo</code> and <code>featureTable</code> methods, respectively.</p></dd>
+<dt><code>analysisInfo,features</code></dt><dd><p><a href='analysis-information.html'>Analysis info</a> and <code><a href='features-class.html'>features</a></code> class associated
+with this object. Access with <code>analysisInfo</code> and <code>featureTable</code> methods, respectively.</p></dd>
 
-<dt><code>groupInfo</code></dt><dd><p><code>data.frame</code> with retention time (<code>rts</code> column, in
-seconds) and <em>m/z</em> (<code>mzs</code> column) for each feature group. Access
-with <code>groupInfo</code> method.</p></dd>
+<dt><code>groupInfo</code></dt><dd><p><code>data.frame</code> with retention time (<code>rts</code> column, in seconds) and <em>m/z</em> (<code>mzs</code>
+column) for each feature group. Access with <code>groupInfo</code> method.</p></dd>
 
-<dt><code>ftindex</code></dt><dd><p>Matrix (<code>data.table</code>) with feature indices for each
-feature group (columns) per analysis (rows). Each index corresponds to the
-row within the feature table of the analysis (see
+<dt><code>ftindex</code></dt><dd><p>Matrix (<code>data.table</code>) with feature indices for each feature group (columns) per analysis
+(rows). Each index corresponds to the row within the feature table of the analysis (see
 <code><a href='generics.html'>featureTable</a></code>).</p></dd>
 
+<dt><code>groupQualities,groupScores</code></dt><dd><p>A <code>data.table</code> with qualities/scores for each feature group (see the
+<code>calculatePeakQualities</code> method).</p></dd>
+
+<dt><code>annotations</code></dt><dd><p>A <code>data.table</code> with adduct annotations for each group (see the <code>selectIons</code>
+method).</p></dd>
+
+<dt><code>groupAlgo,groupArgs,groupVerbose</code></dt><dd><p>(<strong>sets workflow</strong>) Grouping parameters that were used when this object was created. Used
+by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perform a re-grouping of features.</p></dd>
+
+<dt><code>annotations</code></dt><dd><p>(<strong>sets workflow</strong>) As the <code>featureGroups</code> slot, but contains the annotation data per set.</p></dd>
+
 </dl>
+    <h2 class="hasAnchor" id="fold-change-calculation"><a class="anchor" href="#fold-change-calculation"></a>Fold change calculation</h2>
+
+    <p>the <code>as.data.table</code> and <code>plotVolcano</code> methods can be used to
+  calculate/plot (log2) Fold changes (FC) between two replicate groups to easily identify significant changes. The
+  calculation process is configured through a pramater list, which can be constructed with the <code>getFCParams</code>
+  function. The parameter list has the following entries:</p><ul>
+<li><p><code>rGroups</code> the name of the two replicate groups to compare (taken from the <code>rGroups</code> argument to
+  <code>getFCParams</code>).</p></li>
+<li><p><code>thresholdFC</code>: the threshold log FC for a feature group to be classified as increasing/decreasing.</p></li>
+<li><p><code>thresholdPV</code>: the threshold log P for a feature group to be significantly different.</p></li>
+<li><p><code>zeroMethod</code>,<code>zeroValue</code>: how to handle zero values when calculating the FC: <code>add</code> adds an
+  offset to zero values, <code>"fixed"</code> sets zero values to a fixed number and <code>"omit"</code> removes zero data. The
+  number that is added/set by the former two options is defined by <code>zeroValue</code>.</p></li>
+<li><p><code>PVTestFunc</code>: a function that is used to calculate P values (usually using <code><a href='https://rdrr.io/r/stats/t.test.html'>t.test</a></code>).</p></li>
+<li><p><code>PVAdjFunc</code>: a function that is used to adjust P values (usually using <code><a href='https://rdrr.io/r/stats/p.adjust.html'>p.adjust</a></code>)</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
 <li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
 <li><p><strong><code>featureGroups</code></strong></p><ul>
+<li><p><code>featureGroupsSet</code></p><ul>
+<li><p><code><a href='featureGroupsScreening-class.html'>featureGroupsScreeningSet</a></code></p></li>
+</ul></li>
+<li><p><code>featureGroupsUnset</code></p></li>
+<li><p><code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code></p><ul>
+<li><p><code><a href='featureGroupsScreening-class.html'>featureGroupsSetScreeningUnset</a></code></p></li>
+</ul></li>
 <li><p><code>featureGroupsBruker</code></p></li>
 <li><p><code><a href='featureGroups-compare.html'>featureGroupsConsensus</a></code></p></li>
 <li><p><code>featureGroupsEnviMass</code></p></li>
+<li><p><code>featureGroupsKPIC2</code></p></li>
 <li><p><code>featureGroupsOpenMS</code></p></li>
-<li><p><code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code></p></li>
+<li><p><code>featureGroupsSIRIUS</code></p></li>
 <li><p><code><a href='suspect-screening.html'>featureGroupsBrukerTASQ</a></code></p></li>
 <li><p><code>featureGroupsXCMS</code></p></li>
 <li><p><code>featureGroupsXCMS3</code></p></li>
@@ -611,6 +927,34 @@ row within the feature table of the analysis (see
 </ul></li>
 </ul>
 
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>featureGroupsSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>featureGroups</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>sets</code> Returns the set names for this object.</p></li>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>featureGroupsUnset</code>), which allows it to be used in 'regular' workflows. The adduct annotations for the selected set are used to convert all
+  feature (group) masses to ionic <em>m/z</em> values. The annotations persist in the converted object.</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>adducts</code>, <code>adducts&lt;-</code> require the <code>set</code> argument. The order of the data that is
+  returned/changed follows that of the <code>annotations</code> slot. Furthermore, <code>adducts&lt;-</code> will perform a
+  re-grouping of features when its <code>reGroup</code> parameter is set to <code>TRUE</code>. The implications for this are
+  discussed below.</p></li>
+<li><p><code>filter</code> and the subset operator (<code><a href='generics.html'>[</a></code>) have specific arguments to choose/filter by (feature
+  presence in) sets. See the argument descriptions.</p></li>
+<li><p><code>as.data.table</code>: normalization of intensities is performed per set.</p></li>
+<li><p><code>export</code> Only allows to export data from one set. The <code>unset</code> method is used prior to exporting the
+  data.</p></li>
+<li><p><code>overlap</code>, <code>unique</code>, <code>plotVenn</code>, <code>plotInt</code> allow to handle data per set. See the
+  <code>sets</code> argument description.</p></li>
+<li><p><code>selectIons</code> Will perform a re-grouping of features. The implications of this are discussed below.</p></li>
+</ul>
+
+<p>A re-grouping of features occurs if <code>selectIons</code> is called or <code>adducts&lt;-</code> is used with
+  <code>reGroup=TRUE</code>. Afterwards, it is very likely that feature group names are changed. Since data generated later
+  in the workflow (<em>e.g.</em> annotation steps) rely on feature group names, these objects are <strong>not valid</strong>
+  anymore, and <strong>must</strong> be re-generated.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.</p>
@@ -625,6 +969,14 @@ doi: <a href='https://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformat
 <em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
 doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
 .</p>
+<p>Chetnik K, Petrick L, Pandey G (2020).
+&#8220;MetaClean: a machine learning-based classifier for reduced false positive peak detection in untargeted LC-MS metabolomics data.&#8221;
+<em>Metabolomics</em>, <b>16</b>(11).
+doi: <a href='https://doi.org/10.1007/s11306-020-01738-3'>10.1007/s11306-020-01738-3</a>
+.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>The code to calculate and plot Fold change data was created by Bas van de Velde.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

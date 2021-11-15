@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4.4 Componentization | patRoon handbook</title>
-  <meta name="description" content="4.4 Componentization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <title>4.3 Componentization | patRoon handbook</title>
+  <meta name="description" content="4.3 Componentization | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4.4 Componentization | patRoon handbook" />
+  <meta property="og:title" content="4.3 Componentization | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4.4 Componentization | patRoon handbook" />
+  <meta name="twitter:title" content="4.3 Componentization | patRoon handbook" />
   
   
   
@@ -24,17 +24,18 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-09-07" />
+<meta name="date" content="2021-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="annotation.html"/>
-<link rel="next" href="processing-workflow-data.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="libs/jquery-3.5.1/jquery.min.js"></script>
+<link rel="prev" href="features.html"/>
+<link rel="next" href="incorpAdductIso.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,24 +51,23 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
-<script src="libs/vis-4.20.1/vis.min.js"></script>
-<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.9.4.1/plotly.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.0/visNetwork.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -174,7 +174,7 @@ div.csl-indent {
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image-experimental.html"><a href="docker-image-experimental.html"><i class="fa fa-check"></i><b>2.2</b> Docker image (experimental)</a></li>
+<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
 <li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
 <ul>
 <li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
@@ -189,28 +189,34 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="4.1.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.1.1</b> Data pre-treatment</a></li>
 <li class="chapter" data-level="4.1.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.1.2</b> Analysis information</a></li>
-<li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#automatic-project-generation-with-newproject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
+<li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#newProject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a>
 <ul>
 <li class="chapter" data-level="4.2.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.2.1</b> Finding and grouping features</a></li>
 <li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a>
+<li class="chapter" data-level="4.3" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.3</b> Componentization</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.3.1</b> MS peak lists</a></li>
-<li class="chapter" data-level="4.3.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.3.2</b> Formulae</a></li>
-<li class="chapter" data-level="4.3.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.3.3</b> Compounds</a></li>
-<li class="chapter" data-level="4.3.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.3.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.3.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.3.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.3.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.3.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.3.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.3.3</b> Intensity and MS/MS similarity</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<li class="chapter" data-level="4.4" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.4</b> Incorporating adduct and isotopic data</a>
 <ul>
-<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#features-with-similar-chromatographic-behaviour"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
-<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
-<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#intclust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity clustering</a></li>
+<li class="chapter" data-level="4.4.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.4.1</b> Selecting features with preferential adducts/isotopes</a></li>
+<li class="chapter" data-level="4.4.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.4.2</b> Setting adduct annotations for feature groups</a></li>
+<li class="chapter" data-level="4.4.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.4.3</b> Using adduct annotations in the workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.5</b> Annotation</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.5.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.5.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.5.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.5.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.5.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.5.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.5.4</b> Suspect annotation</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
+<li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
 <ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
@@ -225,37 +231,85 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
 </ul></li>
-<li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
-<li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a>
+<li class="chapter" data-level="5.4" data-path="deleting-data.html"><a href="deleting-data.html"><i class="fa fa-check"></i><b>5.4</b> Deleting data</a></li>
+<li class="chapter" data-level="5.5" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.5</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.6" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.6</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.7</b> Visualization</a>
 <ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
-<li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
-<li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
-<li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
-<li class="chapter" data-level="5.5.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.5.5</b> Generating EICs in DataAnalysis</a></li>
+<li class="chapter" data-level="5.7.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.7.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.7.2</b> Overlapping and unique data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.7.3</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.7.4</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
-<li class="chapter" data-level="5.6" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.6</b> Reporting</a></li>
+<li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
+<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>6</b> Advanced usage</a>
+<li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>6.1</b> Adducts</a></li>
-<li class="chapter" data-level="6.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>6.2</b> Feature parameter optimization</a>
+<li class="chapter" data-level="6.1" data-path="initiating-a-sets-workflow.html"><a href="initiating-a-sets-workflow.html"><i class="fa fa-check"></i><b>6.1</b> Initiating a sets workflow</a></li>
+<li class="chapter" data-level="6.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html"><i class="fa fa-check"></i><b>6.2</b> Generating sets workflow data</a>
 <ul>
-<li class="chapter" data-level="6.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>6.2.1</b> Parameter sets</a></li>
-<li class="chapter" data-level="6.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>6.2.2</b> Processing optmization results</a></li>
+<li class="chapter" data-level="6.2.1" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#componentization-1"><i class="fa fa-check"></i><b>6.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="6.2.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#formula-and-compound-annotation"><i class="fa fa-check"></i><b>6.2.2</b> Formula and compound annotation</a></li>
 </ul></li>
-<li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
-<li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
-<li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
-<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a>
+<li class="chapter" data-level="6.3" data-path="setsAdducts.html"><a href="setsAdducts.html"><i class="fa fa-check"></i><b>6.3</b> Selecting adducts to improve grouping</a></li>
+<li class="chapter" data-level="6.4" data-path="processing-data.html"><a href="processing-data.html"><i class="fa fa-check"></i><b>6.4</b> Processing data</a></li>
+<li class="chapter" data-level="6.5" data-path="advanced.html"><a href="advanced.html"><i class="fa fa-check"></i><b>6.5</b> Advanced</a>
 <ul>
-<li class="chapter" data-level="6.8.1" data-path="parallelization.html"><a href="parallelization.html#classic-parallelization-method"><i class="fa fa-check"></i><b>6.8.1</b> Classic parallelization method</a></li>
-<li class="chapter" data-level="6.8.2" data-path="parallelization.html"><a href="parallelization.html#future-parallelization-method"><i class="fa fa-check"></i><b>6.8.2</b> Future parallelization method</a></li>
-<li class="chapter" data-level="6.8.3" data-path="parallelization.html"><a href="parallelization.html#logging"><i class="fa fa-check"></i><b>6.8.3</b> Logging</a></li>
+<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#initiating-a-sets-workflow-from-feature-groups"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
+<li class="chapter" data-level="6.5.2" data-path="advanced.html"><a href="advanced.html#inspecting-and-converting-set-objects"><i class="fa fa-check"></i><b>6.5.2</b> Inspecting and converting set objects</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="7" data-path="TPs.html"><a href="TPs.html"><i class="fa fa-check"></i><b>7</b> Transformation product screening</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="genTPs.html"><a href="genTPs.html"><i class="fa fa-check"></i><b>7.1</b> Obtaining transformation product data</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
+<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#componentization-2"><i class="fa fa-check"></i><b>7.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#omitting-transformation-product-input"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
+<li class="chapter" data-level="7.2.4" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#reporting-tp-components"><i class="fa fa-check"></i><b>7.2.4</b> Reporting TP components</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="TPsExamples.html"><a href="TPsExamples.html"><i class="fa fa-check"></i><b>7.3</b> Example workflows</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx1"><i class="fa fa-check"></i><b>7.3.1</b> Screen predicted TPs for targets</a></li>
+<li class="chapter" data-level="7.3.2" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx2"><i class="fa fa-check"></i><b>7.3.2</b> Screening TPs from a library for suspects</a></li>
+<li class="chapter" data-level="7.3.3" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx3"><i class="fa fa-check"></i><b>7.3.3</b> Non-target screening of predicted TPs</a></li>
+<li class="chapter" data-level="7.3.4" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx4"><i class="fa fa-check"></i><b>7.3.4</b> Non-target screening of TPs by annotation similarities</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>8</b> Advanced usage</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>8.1</b> Adducts</a></li>
+<li class="chapter" data-level="8.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>8.2</b> Feature parameter optimization</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>8.2.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="8.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>8.2.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>8.3</b> Chromatographic peak qualities</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>8.3.1</b> Applying machine learning with MetaClean</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>8.4</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="8.5" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.5</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="8.6" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.6</b> Compound clustering</a></li>
+<li class="chapter" data-level="8.7" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.7</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="8.8" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.8</b> Fold changes</a></li>
+<li class="chapter" data-level="8.9" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.9</b> Caching</a></li>
+<li class="chapter" data-level="8.10" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.10</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.10.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.10.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.10.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.10.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.10.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.10.3</b> Notes when using parallelization with futures</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
 </ul>
 
       </nav>
@@ -273,20 +327,22 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="componentization" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> Componentization</h2>
-<p>In <code>patRoon</code> <em>componentization</em> refers to grouping related feature groups together in components. Currently there are three different methodologies to generate components:</p>
+<div id="componentization" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Componentization</h2>
+<p>In <code>patRoon</code> <em>componentization</em> refers to grouping related feature groups together in components. There are different methodologies to generate components:</p>
 <ul>
 <li>Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).</li>
 <li>Homologous series: features with increasing <em>m/z</em> and retention time.</li>
 <li>Intensity profiles: features that follow a similar intensity profile in the analyses.</li>
+<li>MS/MS similarity: feature groups with similar MS/MS spectra are clustered.</li>
+<li>Transformation products: Components are formed by grouping feature groups that have a parent/transformation product relationship. This is further discussed in <a href="TPs.html#TPs">its own chapter</a>.</li>
 </ul>
 <p>The following algorithms are currently supported:</p>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="17%" />
-<col width="43%" />
-<col width="38%" />
+<col width="19%" />
+<col width="42%" />
+<col width="37%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -307,6 +363,16 @@ div.csl-indent {
 <td>As above.</td>
 </tr>
 <tr class="odd">
+<td><a href="https://github.com/osenan/cliqueMS">cliqueMS</a></td>
+<td><code>generateComponents(algorithm = "cliquems", ...)</code></td>
+<td>As above, but using <em>feature components</em>.</td>
+</tr>
+<tr class="even">
+<td><a href="http://openms.de/">OpenMS</a></td>
+<td><code>generateComponents(algorithm = "openms", ...)</code></td>
+<td>As above. Uses <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html">MetaboliteAdductDecharger</a>.</td>
+</tr>
+<tr class="odd">
 <td><a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a></td>
 <td><code>generateComponents(algorithm = "nontarget", ...)</code></td>
 <td>Uses the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package to perform unsupervised homologous series detection.</td>
@@ -316,81 +382,87 @@ div.csl-indent {
 <td><code>generateComponents(algorithm = "intclust", ...)</code></td>
 <td>Groups features with similar intensity profiles across analyses by hierarchical clustering.</td>
 </tr>
+<tr class="odd">
+<td>MS/MS clustering</td>
+<td><code>generateComponents(algorithm = "specclust", ...)</code></td>
+<td>Clusters feature groups with similar MS/MS spectra.</td>
+</tr>
+<tr class="even">
+<td>Transformation products</td>
+<td><code>generateComponents(algorithm = "tp", ...)</code></td>
+<td>Discussed in <a href="TPs.html#TPs">its own chapter</a>.</td>
+</tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong><em>NOTE</em></strong> Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the <a href="report.html#report">reporting functions</a>.</p>
-</blockquote>
-<div id="features-with-similar-chromatographic-behaviour" class="section level3" number="4.4.1">
-<h3><span class="header-section-number">4.4.1</span> Features with similar chromatographic behaviour</h3>
-<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a> and <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a> can be used to group features that undergo highly similar chromatographic behaviour but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.</p>
-<p>Some common function arguments to <code>generateComponents()</code> are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly ‘over-cluster’ features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>).</p>
+<div id="componentsChrom" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Features with similar chromatographic behaviour</h3>
+<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.</p>
+<p>Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:</p>
 <table>
-<colgroup>
-<col width="23%" />
-<col width="20%" />
-<col width="56%" />
-</colgroup>
 <thead>
 <tr class="header">
-<th>Argument</th>
-<th>Algorithm</th>
-<th>Remarks</th>
+<th>Feature group</th>
+<th><em>m/z</em></th>
+<th>analysis 1</th>
+<th>analysis 2</th>
+<th>analysis 3</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>ionization</code></td>
-<td><code>"camera"</code>, <code>"ramclustr"</code></td>
-<td>Ionization mode: <code>"positive"</code> or <code>"negative"</code></td>
+<td>#1</td>
+<td>100.08827</td>
+<td>Present</td>
+<td>Present</td>
+<td>Absent</td>
 </tr>
 <tr class="even">
-<td><code>minSize</code></td>
-<td><code>"camera"</code>, <code>"ramclustr"</code></td>
-<td>Minimum component size. Smaller components will be removed.</td>
+<td>#2</td>
+<td>122.07021</td>
+<td>Present</td>
+<td>Present</td>
+<td>Absent</td>
 </tr>
 <tr class="odd">
-<td><code>relMinReplicates</code></td>
-<td><code>"camera"</code>, <code>"ramclustr"</code></td>
-<td>See below.</td>
-</tr>
-<tr class="even">
-<td><code>st</code>, <code>sr</code>, <code>maxt</code>, <code>hmax</code></td>
-<td><code>"ramclustr"</code></td>
-<td>Common parameters to influence clustering of <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>. See <code>?ramclustR</code> for details.</td>
-</tr>
-<tr class="odd">
-<td><code>extraOpts</code></td>
-<td><code>"camera"</code></td>
-<td>A list with extra argument passed to the <code>annotate()</code> function from <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a>.</td>
-</tr>
-<tr class="even">
-<td><code>extraOptsRC</code>, <code>extraOptsFM</code></td>
-<td><code>"ramclustr"</code></td>
-<td>A list with extra arguments passed to the <code>ramclustR()</code> and <code>do.findmain()</code> functions from <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>.</td>
+<td>#3</td>
+<td>138.04415</td>
+<td>Absent</td>
+<td>Absent</td>
+<td>Present</td>
 </tr>
 </tbody>
 </table>
-<p>Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the <code>relMinReplicates</code> argument of <code>generateComponents()</code>, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is <em>0.5</em> (the default), a feature must be present in at least half of all replicate groups present in the component.</p>
+<p>Based on the mass differences from this example a cluster of <code>[M+H]+</code>, <code>[M+Na]+</code> and <code>[M+K]+</code> could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn’t detected in the first two sample analysis. Based on this it seems unlikely that feature group <em>#3</em> should be part of the component.</p>
+<p>For the algorithms that operate on a ‘feature group level’ (<a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a> and <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>), the <code>relMinReplicates</code> argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is <em>0.5</em> (the default), and all the features of a component were detected in four different replicate groups in total, then only those feature groups are kept for which its features were detected in at least two different replicate groups (<em>i.e.</em> half of four).</p>
+<p>Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a ‘feature level’ (<a href="https://github.com/osenan/cliqueMS">cliqueMS</a> and <a href="http://openms.de/">OpenMS</a>). These algorithms generate components for each sample analysis individually. The ‘feature components’ are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, <code>?generateComponents</code>).</p>
+<p>Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid ‘over-clustering’ of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The <code>checkComponents</code> function (discussed <a href="intReview.html#intReview">here</a>) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>).</p>
+<p>Once the components with adduct and isotopes annotations are generated this data can be <a href="incorpAdductIso.html#incorpAdductIso">used to prioritize and improve the workflow</a>.</p>
 <p>Some example usage is shown below.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="componentization.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use CAMERA with defaults</span></span>
-<span id="cb26-2"><a href="componentization.html#cb26-2" aria-hidden="true" tabindex="-1"></a>componCAM <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb26-3"><a href="componentization.html#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="componentization.html#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># CAMERA with customized settings</span></span>
-<span id="cb26-5"><a href="componentization.html#cb26-5" aria-hidden="true" tabindex="-1"></a>componCAM2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb26-6"><a href="componentization.html#cb26-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">mzabs =</span> <span class="fl">0.001</span>, <span class="at">sigma =</span> <span class="dv">5</span>))</span>
-<span id="cb26-7"><a href="componentization.html#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="componentization.html#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use RAMClustR with customized parameters</span></span>
-<span id="cb26-9"><a href="componentization.html#cb26-9" aria-hidden="true" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">hmax =</span> <span class="fl">0.4</span>,</span>
-<span id="cb26-10"><a href="componentization.html#cb26-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extraOptsRC =</span> <span class="fu">list</span>(<span class="at">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),</span>
-<span id="cb26-11"><a href="componentization.html#cb26-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extraOptsFM =</span> <span class="fu">list</span>(<span class="at">ppm.error =</span> <span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="componentization.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use CAMERA with defaults</span></span>
+<span id="cb20-2"><a href="componentization.html#cb20-2" aria-hidden="true" tabindex="-1"></a>componCAM <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb20-3"><a href="componentization.html#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="componentization.html#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># CAMERA with customized settings</span></span>
+<span id="cb20-5"><a href="componentization.html#cb20-5" aria-hidden="true" tabindex="-1"></a>componCAM2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
+<span id="cb20-6"><a href="componentization.html#cb20-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">mzabs =</span> <span class="fl">0.001</span>, <span class="at">sigma =</span> <span class="dv">5</span>))</span>
+<span id="cb20-7"><a href="componentization.html#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="componentization.html#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use RAMClustR with customized parameters</span></span>
+<span id="cb20-9"><a href="componentization.html#cb20-9" aria-hidden="true" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">hmax =</span> <span class="fl">0.4</span>,</span>
+<span id="cb20-10"><a href="componentization.html#cb20-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extraOptsRC =</span> <span class="fu">list</span>(<span class="at">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),</span>
+<span id="cb20-11"><a href="componentization.html#cb20-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extraOptsFM =</span> <span class="fu">list</span>(<span class="at">ppm.error =</span> <span class="dv">5</span>))</span>
+<span id="cb20-12"><a href="componentization.html#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="componentization.html#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># OpenMS with customized parameters</span></span>
+<span id="cb20-14"><a href="componentization.html#cb20-14" aria-hidden="true" tabindex="-1"></a>componOpenMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">chargeMax =</span> <span class="dv">2</span>,</span>
+<span id="cb20-15"><a href="componentization.html#cb20-15" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">absMzDev =</span> <span class="fl">0.002</span>)</span>
+<span id="cb20-16"><a href="componentization.html#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="componentization.html#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co"># cliqueMS with default parameters</span></span>
+<span id="cb20-18"><a href="componentization.html#cb20-18" aria-hidden="true" tabindex="-1"></a>componCliqueMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;cliquems&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;negative&quot;</span>)</span></code></pre></div>
 </div>
-<div id="homologues-series" class="section level3" number="4.4.2">
-<h3><span class="header-section-number">4.4.2</span> Homologues series</h3>
+<div id="homologues-series" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Homologues series</h3>
 <p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
-<div class="figure"><span id="fig:HS"></span>
-<div id="htmlwidget-b81851bd073e57790a34" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b81851bd073e57790a34">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="figure"><span style="display:block;" id="fig:HS"></span>
+<div id="htmlwidget-0ad6e68be4bd5dbc6875" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0ad6e68be4bd5dbc6875">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>
@@ -411,7 +483,7 @@ Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap a
 <tbody>
 <tr class="odd">
 <td><code>ionization</code></td>
-<td>Ionization mode: <code>"positive"</code> or <code>"negative"</code></td>
+<td>Ionization mode: <code>"positive"</code> or <code>"negative"</code>. Not needed if <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> are available.</td>
 </tr>
 <tr class="even">
 <td><code>rtRange</code>, <code>mzRange</code></td>
@@ -426,32 +498,34 @@ Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap a
 <td>Maximum retention time and <em>m/z</em> deviation.</td>
 </tr>
 <tr class="odd">
-<td><code>extraOpts</code></td>
-<td>List with extra arguments passed to the <code>homol.search()</code> function.</td>
+<td><code>...</code></td>
+<td>Further arguments passed to the <code>homol.search()</code> function.</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="componentization.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># default settings</span></span>
-<span id="cb27-2"><a href="componentization.html#cb27-2" aria-hidden="true" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb27-3"><a href="componentization.html#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="componentization.html#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># customized settings</span></span>
-<span id="cb27-5"><a href="componentization.html#cb27-5" aria-hidden="true" tabindex="-1"></a>componNT2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb27-6"><a href="componentization.html#cb27-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="at">rtRange =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="dv">60</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="componentization.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># default settings</span></span>
+<span id="cb21-2"><a href="componentization.html#cb21-2" aria-hidden="true" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb21-3"><a href="componentization.html#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="componentization.html#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># customized settings</span></span>
+<span id="cb21-5"><a href="componentization.html#cb21-5" aria-hidden="true" tabindex="-1"></a>componNT2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
+<span id="cb21-6"><a href="componentization.html#cb21-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="at">rtRange =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="dv">60</span>))</span></code></pre></div>
 </div>
-<div id="intclust" class="section level3" number="4.4.3">
-<h3><span class="header-section-number">4.4.3</span> Intensity clustering</h3>
+<div id="compClust" class="section level3" number="4.3.3">
+<h3><span class="header-section-number">4.3.3</span> Intensity and MS/MS similarity</h3>
 <!-- UNDONE: refs? -->
-<p>Whereas previous componentization methods utilized chemical properties to relate features, intensity clustering uses a statistical approach. This methodology is especially useful to find features that show similar trends in the analysed samples. Intensities for all features are first normalized and thereafter hierarchical clustering is performed to find features that show similar intensity profiles across analyses. Components are then formed from automatically assigned clusters (using the <a href="https://cran.r-project.org/package=dynamicTreeCut">dynamicTreeCut</a> R package, however, assignment can be changed afterwards).</p>
+<p>The previous componentization methods utilized chemical properties to relate features. The two componentization algorithms described in this section use a statistical approach based on hierarchical clustering. The first algorithm normalizes all feature intensities and then clusters features with similar intensity profiles across sample analyses together. The second algorithm compares all MS/MS spectra from all feature groups, and then uses hierarchical clustering to generate components from feature groups that have a high MS/MS spectrum similarity.</p>
 <p>Some common arguments to <code>generateComponents()</code> are listed below. It is recommended to test various settings (especially for <code>method</code>) to optimize the clustering results.</p>
 <table>
 <colgroup>
-<col width="36%" />
-<col width="12%" />
-<col width="50%" />
+<col width="38%" />
+<col width="9%" />
+<col width="13%" />
+<col width="38%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Argument</th>
+<th>Algorithm</th>
 <th>Default</th>
 <th>Remarks</th>
 </tr>
@@ -459,55 +533,73 @@ Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap a
 <tbody>
 <tr class="odd">
 <td><code>method</code></td>
+<td>All</td>
 <td><code>"complete"</code></td>
 <td>Clustering method. See <code>?hclust</code></td>
 </tr>
 <tr class="even">
 <td><code>metric</code></td>
+<td><code>intclust</code></td>
 <td><code>"euclidean"</code></td>
 <td>Metric used to calculate the distance matrix. See <code>?daisy</code>.</td>
 </tr>
 <tr class="odd">
 <td><code>normFunc</code></td>
+<td><code>intclust</code></td>
 <td><code>max</code></td>
 <td>Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.</td>
 </tr>
 <tr class="even">
 <td><code>average</code></td>
+<td><code>intclust</code></td>
 <td><code>TRUE</code></td>
 <td>Whether intensities of replicates should first be averaged.</td>
 </tr>
 <tr class="odd">
+<td><code>MSPeakLists</code></td>
+<td><code>specclust</code></td>
+<td>-</td>
+<td>The <a href="annotation.html#ms-peak-lists">MS peak lists</a> object used for spectral similarity calculations</td>
+</tr>
+<tr class="even">
+<td><code>specSimParams</code></td>
+<td><code>specclust</code></td>
+<td><code>getDefSpecSimParams()</code></td>
+<td>Parameters used for <a href="specSim.html#specSim">spectral similarity calculation</a>.</td>
+</tr>
+<tr class="odd">
 <td><code>maxTreeHeight</code>, <code>deepSplit</code>, <code>minModuleSize</code></td>
+<td>All</td>
 <td><code>1</code>, <code>TRUE</code>, <code>1</code></td>
 <td>Used for dynamic cluster assignment. See <code>?cutreeDynamicTree</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>The resulting components are stored in an object from the <code>componentsIntClust</code> S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant <a href="visualization.html#plotClust">visualization section</a>. More info can be found in the reference manual (e.g. <code>?componentsIntClust</code>).</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="componentization.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate components with default settings</span></span>
-<span id="cb28-2"><a href="componentization.html#cb28-2" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)</span>
-<span id="cb28-3"><a href="componentization.html#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="componentization.html#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># manually re-assign clusters</span></span>
-<span id="cb28-5"><a href="componentization.html#cb28-5" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(componInt, <span class="at">k =</span> <span class="dv">10</span>)</span>
-<span id="cb28-6"><a href="componentization.html#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-7"><a href="componentization.html#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span></span>
-<span id="cb28-8"><a href="componentization.html#cb28-8" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(componInt, <span class="at">maxTreeHeight =</span> <span class="fl">0.7</span>)</span></code></pre></div>
-
+<p>The components are generated by automatically assigning clusters using the <a href="https://cran.r-project.org/package=dynamicTreeCut">dynamicTreeCut</a> <code>R</code> package. However, the cluster assignment can be performed manually or with different parameters, as is demonstrated below.</p>
+<p>The resulting components are stored in an object from the <code>componentsIntClust</code> or <code>componentsSpecClust</code> S4 class, which are both derived from the <code>componentsClust</code> class (which in turn is derived from the <code>components</code> class). Several methods are defined that can be used on these objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant <a href="visualization.html#plotClust">visualization section</a>. More info can be found in the reference manual (e.g. <code>?componentsIntClust</code>, <code>?componentsSpecClust</code> and <code>?componentsClust</code>).</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="componentization.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate intensity profile components with default settings</span></span>
+<span id="cb22-2"><a href="componentization.html#cb22-2" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)</span>
+<span id="cb22-3"><a href="componentization.html#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="componentization.html#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># manually re-assign clusters</span></span>
+<span id="cb22-5"><a href="componentization.html#cb22-5" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(componInt, <span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb22-6"><a href="componentization.html#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="componentization.html#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span></span>
+<span id="cb22-8"><a href="componentization.html#cb22-8" aria-hidden="true" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(componInt, <span class="at">maxTreeHeight =</span> <span class="fl">0.7</span>)</span>
+<span id="cb22-9"><a href="componentization.html#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="componentization.html#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># MS/MS similarity components</span></span>
+<span id="cb22-11"><a href="componentization.html#cb22-11" aria-hidden="true" tabindex="-1"></a>componMSMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;specclust&quot;</span>, <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
 </div>
 </div>
-<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="annotation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="processing-workflow-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="features.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="incorpAdductIso.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -537,6 +629,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": false
 }

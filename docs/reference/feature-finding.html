@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Finding features</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-bruker.R'><code>R/features-bruker.R</code></a>, and 4 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-set.R'><code>R/features-set.R</code></a>, and 8 more</small>
     <div class="hidden name"><code>feature-finding.Rd</code></div>
     </div>
 
@@ -169,6 +169,12 @@
 
 <span class='fu'>importFeatures</span><span class='op'>(</span><span class='va'>analysisInfo</span>, <span class='va'>type</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='co'># S4 method for features</span>
+<span class='fu'><a href='generics.html'>makeSet</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span>, <span class='va'>adducts</span>, labels <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'><a href='generics.html'>makeSet</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
+
 <span class='fu'>findFeaturesBruker</span><span class='op'>(</span>
   <span class='va'>analysisInfo</span>,
   doFMF <span class='op'>=</span> <span class='st'>"auto"</span>,
@@ -179,9 +185,20 @@
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
-<span class='fu'>findFeaturesEnviPick</span><span class='op'>(</span><span class='va'>analysisInfo</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>findFeaturesEnviPick</span><span class='op'>(</span><span class='va'>analysisInfo</span>, <span class='va'>...</span>, parallel <span class='op'>=</span> <span class='cn'>TRUE</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='fu'>importFeaturesEnviMass</span><span class='op'>(</span><span class='va'>analysisInfo</span>, <span class='va'>enviProjPath</span><span class='op'>)</span>
+
+<span class='fu'>findfeaturesKPIC2</span><span class='op'>(</span>
+  <span class='va'>analysisInfo</span>,
+  kmeans <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  level <span class='op'>=</span> <span class='fl'>1000</span>,
+  <span class='va'>...</span>,
+  parallel <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>importfeaturesKPIC2</span><span class='op'>(</span><span class='va'>picsList</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
 
 <span class='fu'>findFeaturesOpenMS</span><span class='op'>(</span>
   <span class='va'>analysisInfo</span>,
@@ -196,8 +213,8 @@
   minTraceLength <span class='op'>=</span> <span class='fl'>3</span>,
   maxTraceLength <span class='op'>=</span> <span class='op'>-</span><span class='fl'>1</span>,
   widthFiltering <span class='op'>=</span> <span class='st'>"fixed"</span>,
-  minFWHM <span class='op'>=</span> <span class='fl'>3</span>,
-  maxFWHM <span class='op'>=</span> <span class='fl'>60</span>,
+  minFWHM <span class='op'>=</span> <span class='fl'>1</span>,
+  maxFWHM <span class='op'>=</span> <span class='fl'>30</span>,
   traceSNRFiltering <span class='op'>=</span> <span class='cn'>FALSE</span>,
   localRTRange <span class='op'>=</span> <span class='fl'>10</span>,
   localMZRange <span class='op'>=</span> <span class='fl'>6.5</span>,
@@ -206,14 +223,38 @@
   useSmoothedInts <span class='op'>=</span> <span class='cn'>TRUE</span>,
   extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>,
   intSearchRTWindow <span class='op'>=</span> <span class='fl'>3</span>,
+  useFFMIntensities <span class='op'>=</span> <span class='cn'>FALSE</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
+
+<span class='fu'>findFeaturesSAFD</span><span class='op'>(</span>
+  <span class='va'>analysisInfo</span>,
+  profPath <span class='op'>=</span> <span class='cn'>NULL</span>,
+  mzRange <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>400</span><span class='op'>)</span>,
+  maxNumbIter <span class='op'>=</span> <span class='fl'>1000</span>,
+  maxTPeakW <span class='op'>=</span> <span class='fl'>300</span>,
+  resolution <span class='op'>=</span> <span class='fl'>30000</span>,
+  minMSW <span class='op'>=</span> <span class='fl'>0.02</span>,
+  RThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  minInt <span class='op'>=</span> <span class='fl'>2000</span>,
+  sigIncThreshold <span class='op'>=</span> <span class='fl'>5</span>,
+  S2N <span class='op'>=</span> <span class='fl'>2</span>,
+  minPeakWS <span class='op'>=</span> <span class='fl'>3</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>findFeaturesSIRIUS</span><span class='op'>(</span><span class='va'>analysisInfo</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='fu'>findFeaturesXCMS</span><span class='op'>(</span><span class='va'>analysisInfo</span>, method <span class='op'>=</span> <span class='st'>"centWave"</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='fu'>importFeaturesXCMS</span><span class='op'>(</span><span class='va'>xs</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
 
-<span class='fu'>findFeaturesXCMS3</span><span class='op'>(</span><span class='va'>analysisInfo</span>, param <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/findChromPeaks-centWave.html'>CentWaveParam</a></span><span class='op'>(</span><span class='op'>)</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>findFeaturesXCMS3</span><span class='op'>(</span>
+  <span class='va'>analysisInfo</span>,
+  param <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/findChromPeaks-centWave.html'>CentWaveParam</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
 <span class='fu'>importFeaturesXCMS3</span><span class='op'>(</span><span class='va'>xdata</span>, <span class='va'>analysisInfo</span><span class='op'>)</span></pre>
 
@@ -227,14 +268,17 @@
     <tr>
       <th>algorithm</th>
       <td><p>A character string describing the algorithm that should be
-used: <code>"bruker"</code>, <code>"openms"</code>, <code>"xcms"</code>, <code>"xcms3"</code>, <code>"envipick"</code></p></td>
+used: <code>"bruker"</code>, <code>"openms"</code>, <code>"xcms"</code>, <code>"xcms3"</code>, <code>"envipick"</code>, <code>"sirius"</code>, <code>"kpic2"</code>, <code>"safd"</code></p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>further parameters passed to <code><a href='https://rdrr.io/pkg/xcms/man/xcmsSet.html'>xcmsSet</a></code>
-(<code>findFeaturesXCMS</code>), <code><a href='https://rdrr.io/pkg/enviPick/man/enviPickwrap.html'>enviPickwrap</a></code>
-(<code>featurefinderEnviPick</code>) or to selected feature finding or importing
-algorithms (<code>findFeatures</code> and <code>importFeatures</code>).</p></td>
+      <td><p>Further parameters passed to <code><a href='https://rdrr.io/pkg/xcms/man/xcmsSet.html'>xcmsSet</a></code> (<code>findFeaturesXCMS</code>),
+  <code><a href='https://rdrr.io/pkg/xcms/man/chromatographic-peak-detection.html'>xcms::findChromPeaks</a></code> (<code>findFeaturesXCMS3</code>),
+  <code><a href='https://rdrr.io/pkg/enviPick/man/enviPickwrap.html'>enviPickwrap</a></code> (<code>featurefinderEnviPick</code>),
+  <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.html'>getPIC</a></code>/<code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.kmeans.html'>getPIC.kmeans</a></code> (<code>findFeaturesKPIC2</code>) or to selected feature
+  finding or importing algorithms (<code>findFeatures</code> and <code>importFeatures</code>).</p>
+<p>For <code>makeSet</code>: further <code><a href='features-class.html'>features</a></code> objects that should be used for the <a href='sets-workflow.html'>sets
+  workflow</a>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -243,7 +287,24 @@ algorithms (<code>findFeatures</code> and <code>importFeatures</code>).</p></td>
     <tr>
       <th>type</th>
       <td><p>What type of data should be imported: <code>"xcms"</code>,
-<code>"xcms3"</code> or <code>"envimass"</code>.</p></td>
+<code>"xcms3"</code>, <code>"kpic2"</code> or <code>"envimass"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>obj</th>
+      <td><p>A <code>features</code> object that is used (together with other objects passed to <code>...</code>) to create a
+sets object with <code>makeSet</code>.</p></td>
+    </tr>
+    <tr>
+      <th>adducts</th>
+      <td><p>The adduct assignments to each set. Should either be a <code>list</code> with <code><a href='adduct-class.html'>adduct</a></code> objects
+or a <code>character</code> vector (<em>e.g.</em> <code>"[M+H]+"</code>). The order should follow that of the objects given to
+the <code>obj</code> and <code>...</code> arguments.</p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>The labels, or <em>set names</em>, for each set to be created. The order should follow that of the
+objects given to the <code>obj</code> and <code>...</code> arguments. If <code>NULL</code>, then labels are automatically generated
+from the polarity of the specified <code>adducts</code> argument (<em>e.g.</em> <code>"positive"</code>, <code>"negative"</code>).</p></td>
     </tr>
     <tr>
       <th>doFMF</th>
@@ -270,8 +331,27 @@ which otherwise may use excessive memory or become slow. By default
 likely what you want as otherwise any processed data is lost.</p></td>
     </tr>
     <tr>
+      <th>parallel</th>
+      <td><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href='https://CRAN.R-project.org/package=futures'><span class="pkg">futures</span></a> package. Please
+see the parallelization section in the handbook for more details.</p></td>
+    </tr>
+    <tr>
       <th>enviProjPath</th>
       <td><p>The path of the enviMass project.</p></td>
+    </tr>
+    <tr>
+      <th>kmeans</th>
+      <td><p>If <code>TRUE</code> then <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.kmeans.html'>getPIC.kmeans</a></code> is used to
+obtain PICs, otherwise it is <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.html'>getPIC</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>level</th>
+      <td><p>Passed to <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.html'>getPIC</a></code> or <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.kmeans.html'>getPIC.kmeans</a></code></p></td>
+    </tr>
+    <tr>
+      <th>picsList</th>
+      <td><p>A <code>list</code> with a <code>pics</code> objects obtained with
+<code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.html'>getPIC</a></code> or <code><a href='https://rdrr.io/pkg/KPIC/man/getPIC.kmeans.html'>getPIC.kmeans</a></code> for each analysis.</p></td>
     </tr>
     <tr>
       <th>noiseThrInt</th>
@@ -373,6 +453,29 @@ retention time to obtain the intensity of a feature (this is needed since
 OpenMS does not provide this data).</p></td>
     </tr>
     <tr>
+      <th>useFFMIntensities</th>
+      <td><p>If <code>TRUE</code> then peak intensities are directly
+loaded from <code class='command'>FeatureFinderMetabo</code> output. Otherwise, intensities
+are loaded afterwards from the input <code class="file">mzML</code> files, which is
+potentially much slower, especially with many analyses files. However,
+<code>useFFMIntensities=TRUE</code> is still somewhat experimental, may be less
+accurate and requires a recent version of <code class='command'>OpenMS</code> (&gt;=2.7).</p></td>
+    </tr>
+    <tr>
+      <th>profPath</th>
+      <td><p>A <code>character</code> vector with paths to the profile MS data for each analysis (will be re-cycled if
+necessary). See the <code>Using SAFD</code> section for more details.</p></td>
+    </tr>
+    <tr>
+      <th>mzRange</th>
+      <td><p>The <em>m/z</em> window to be imported (passed to the <code>import_files_MS1</code> function).</p></td>
+    </tr>
+    <tr>
+      <th>maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS</th>
+      <td><p>Parameters directly
+passed to the <code>safd_s3D</code> function.</p></td>
+    </tr>
+    <tr>
       <th>method</th>
       <td><p>The method setting used by XCMS peak finding, see
 <code><a href='https://rdrr.io/pkg/xcms/man/findPeaks-methods.html'>xcms::findPeaks</a></code></p></td>
@@ -395,27 +498,24 @@ OpenMS does not provide this data).</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of a class which is derived from <code><a href='features-class.html'>features</a></code>.</p>
+<p><code>makeSet</code> returns a <code><a href='features-class.html'>featuresSet</a></code> object.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Several functions exist to collect features (<em>i.e.</em> retention and MS
-information that represent potential compounds) from a set of analyses. All
-'feature finders' return an object derived from the <code><a href='features-class.html'>features</a></code>
-base class. The next step in a general workflow is to group and align these
-features across analyses by <a href='feature-grouping.html'>feature groupers</a>. Note
-that some feature finders have a plethora of options which sometimes may have
-a large effect on the quality of results. Fine-tuning parameters is therefore
-important, and the optimum is largely dependent upon applied analysis
-methodology and instrumentation.</p>
-<p><code>findFeatures</code> is a generic function that will find features
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>findFeaturesOpenMS</code> and
-  <code>findFeaturesBruker</code>. While these functions may be called directly,
-  <code>findFeatures</code> provides a generic interface and is therefore usually
-  preferred.</p>
+    <p>Several functions exist to collect features (<em>i.e.</em> retention and MS information that represent potential
+compounds) from a set of analyses. All 'feature finders' return an object derived from the <code><a href='features-class.html'>features</a></code>
+base class. The next step in a general workflow is to group and align these features across analyses by
+<a href='feature-grouping.html'>feature groupers</a>. Note that some feature finders have a plethora of options which sometimes
+may have a large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is
+largely dependent upon applied analysis methodology and instrumentation.</p>
+<p><code>findFeatures</code> is a generic function that will find features using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as <code>findFeaturesOpenMS</code> and <code>findFeaturesBruker</code>. While these
+  functions may be called directly, <code>findFeatures</code> provides a generic interface and is therefore usually preferred.</p>
 <p><code>importFeatures</code> is a generic function to import feature groups
   produced by other software. The actual functionality is provided by
   specific functions such as <code>importFeaturesXCMS</code> and
-  <code>importFeaturesEnviMass</code>.</p>
+  <code>importFeaturesKPIC2</code>.</p>
+<p><code>makeSet</code> is used to initiate a <a href='sets-workflow.html'>sets workflow</a>. See the <code>Sets workflows</code>
+  section for more details.</p>
 <p><code>findFeaturesBruker</code> uses the 'Find Molecular Features' (FMF)
   algorithm of Bruker DataAnalysis vendor software to find features. The
   resulting 'compounds' are then transferred from DataAnalysis and stored as
@@ -426,9 +526,18 @@ methodology and instrumentation.</p>
 <p><code>importFeaturesEnviMass</code> imports features from a project
   generated by the <span class="pkg">enviMass</span> package. NOTE: this functionality has only
   been tested with older versions of <span class="pkg">enviMass</span>.</p>
+<p><code>findFeaturesKPIC2</code> uses the
+  <a href='https://github.com/hcji/KPIC2'>KPIC2</a> <span style="R">R</span> package to extract features.</p>
+<p><code>importfeaturesKPIC2</code> converts features obtained with with the
+  <span class="pkg">KPIC2</span> package to a new <code><a href='features-class.html'>features</a></code> object.</p>
 <p><code>findFeaturesOpenMS</code> uses the
   <a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>
    TOPP tool (see <a href='http://www.openms.de'>http://www.openms.de</a>).</p>
+<p><code>findFeaturesSAFD</code> uses <a href='https://bitbucket.org/SSamanipour/safd.jl/src/master/'>SAFD</a> to obtain
+  features. This functionality is still experimental. Please see the <code>Using SAFD</code> section below for more
+  details.</p>
+<p><code>findFeaturesSIRIUS</code> uses <a href='https://bio.informatik.uni-jena.de/software/sirius/'>SIRIUS</a> to find
+  features. The features are collected by running the <code class='command'>lcms-align</code> command for every analysis.</p>
 <p><code>findFeaturesXCMS</code> uses the <code><a href='https://rdrr.io/pkg/xcms/man/xcmsSet.html'>xcmsSet</a></code>
   function from the <span class="pkg">xcms</span> package to find features.</p>
 <p><code>importFeaturesXCMS</code> converts features from an existing
@@ -441,8 +550,9 @@ methodology and instrumentation.</p>
   to a new <code><a href='features-class.html'>features</a></code> object.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The file format of analyses for <code>findFeaturesXCMS</code> and
-  <code>findFeaturesXCMS3</code> must be <code>mzML</code> or <code>mzXML</code>.</p>
+    <p>The file format of analyses for <code>findFeaturesXCMS</code> and <code>findFeaturesXCMS3</code> must be <code>mzML</code> or
+  <code>mzXML</code>.</p>
+<p><code>makeSet</code> Currently does not support making sets from <code><a href='features-class.html'>featuresSet</a></code> objects.</p>
 <p><code>findFeaturesBruker</code> only works with Bruker data files (<code>.d</code>
   extension) and requires Bruker DataAnalysis and the <span class="pkg">RDCOMClient</span>
   package to be installed. Furthermore, DataAnalysis combines multiple
@@ -462,13 +572,42 @@ methodology and instrumentation.</p>
   environment variable or the <code>patRoon.path.OpenMS</code> option is set.</p>
     <h2 class="hasAnchor" id="parallelization"><a class="anchor" href="#parallelization"></a>Parallelization</h2>
 
-    <p><code>generateFeaturesOpenMS</code> uses multiprocessing to parallelize
+    <p><code>findFeaturesOpenMS</code>, <code>findFeaturesSIRIUS</code> and <code>findFeaturesSAFD</code> uses multiprocessing to parallelize
   computations. Please see the parallelization section in the handbook for
   more details and <a href='patRoon-package.html'>patRoon options</a> for configuration
   options.</p>
+<p>Note that for caching purposes, the analyses files
+  must always exist on the local host computer, even if it is not
+  participating in computations.</p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>makeSet</code> method function is used to initiate a <a href='sets-workflow.html'>sets
+  workflow</a>. This method simply combines all the features from specified <code><a href='features-class.html'>features</a></code> objects in a new
+  <code><a href='features-class.html'>featuresSet</a></code> object. The <a href='analysis-information.html'>analysis information</a> for this object is updated
+  with all analyses, and a <code>set</code> column is added to designate the set of each analysis. Note that currently, all
+  analyses names <strong>must</strong> be unique across different sets. In the last step the features are <em>neutralized</em>:
+  the specified <code>adducts</code> to <code>makeSet</code> is used calculate the neutral monoisotopic mass for each feature per
+  set. This neutralization is important to group features afterwards (see the details on sets workflows in
+  <a href='feature-grouping.html'>feature grouping</a>).</p>
+    <h2 class="hasAnchor" id="using-safd"><a class="anchor" href="#using-safd"></a>Using SAFD</h2>
+
+    <p>The support for SAFD is still experimental, and its interface might change in the future.</p>
+<p>In order to use SAFD, please make sure that its <code>julia</code> packages are installed and you have verified that
+  everything works, <em>e.g.</em> by running the test data.</p>
+<p>This algorithm only supports profile and centroided MS data. If the use of profile data is desired, centroided data
+  must still be available for other functionality of <code>patRoon</code>. The centroided data is specified through the
+  'regular' <a href='analysis-information.html'>analysis info</a> mechanism. The location to any profile data is specified
+  through the <code>profPath</code> argument (<code>NULL</code> for no profile data). The base file names (<em>i.e.</em> the file
+  name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+  profile data must be <code>mzXML</code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
+    <p>Ji H, Zeng F, Xu Y, Lu H, Zhang Z (2017).
+&#8220;KPIC2: An Effective Framework for Mass Spectrometry-Based Metabolomics Using Pure Ion Chromatograms.&#8221;
+<em>Analytical Chemistry</em>, <b>89</b>(14), 7631--7640.
+doi: <a href='https://doi.org/10.1021/acs.analchem.7b01547'>10.1021/acs.analchem.7b01547</a>
+.</p>
+<p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
 &#8220;OpenMS: a flexible open-source software platform for mass spectrometry data analysis.&#8221;
 <em>Nature Methods</em>, <b>13</b>(9), 741--748.
 doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
@@ -478,6 +617,16 @@ doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
   Dirk Eddelbuettel and Romain Francois (2011). Rcpp: Seamless R and C++ Integration. Journal of Statistical Software, 40(8), 1-18. URL https://www.jstatsoft.org/v40/i08/. <br /><br />
   Eddelbuettel, Dirk (2013) Seamless R and C++ Integration with Rcpp. Springer, New York. ISBN 978-1-4614-6867-7. <br /><br />
   Dirk Eddelbuettel and James Joseph Balamuta (2018). Extending R with C++: A Brief Introduction to Rcpp. The American Statistician. 72(1). URL https://doi.org/10.1080/00031305.2017.1375990.</p>
+<p>Samanipour S, OBrien JW, Reid MJ, Thomas KV (2019).
+&#8220;Self Adjusting Algorithm for the Nontargeted Feature Detection of High Resolution Mass Spectrometry Coupled with Liquid Chromatography Profile Data.&#8221;
+<em>Analytical Chemistry</em>, <b>91</b>(16), 10800--10807.
+doi: <a href='https://doi.org/10.1021/acs.analchem.9b02422'>10.1021/acs.analchem.9b02422</a>
+.</p>
+<p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
+&#8220;SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information.&#8221;
+<em>Nature Methods</em>, <b>16</b>(4), 299--302.
+doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
+.</p>
 <p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br />
    Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br />
    H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -218,7 +218,9 @@ retries)</code> where <code>cmd</code> is the queue data for that command and
 command has failed. The signature should be <code>function(cmd, exitStatus,
 retries)</code>. The <code>exitStatus</code> argument is the exit code of the command
 (may be <code>NA</code> in rare cases this is unknown). Other arguments are as
-<code>timeoutHandler</code>.</p></td>
+<code>timeoutHandler</code>. The return value should be as <code>timeoutHandler</code>
+or a <code>character</code> with an error message which will be thrown with
+<code><a href='https://rdrr.io/r/base/stop.html'>stop</a></code>.</p></td>
     </tr>
     <tr>
       <th>prepareHandler</th>

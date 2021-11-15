@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Class containing MS Peak Lists — MSPeakLists-class" />
-<meta property="og:description" content="Contains all MS (and MS/MS where available) peak lists for a
-featureGroups object." />
+<meta property="og:description" content="Contains all MS (and MS/MS where available) peak lists for a featureGroups object." />
 
 
 
@@ -73,7 +72,7 @@ featureGroups object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -158,13 +157,12 @@ featureGroups object." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Class containing MS Peak Lists</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-mspeaklists.R'><code>R/utils-mspeaklists.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists-set.R'><code>R/mspeaklists-set.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-mspeaklists.R'><code>R/utils-mspeaklists.R</code></a></small>
     <div class="hidden name"><code>MSPeakLists-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Contains all MS (and MS/MS where available) peak lists for a
-<code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p>
+    <p>Contains all MS (and MS/MS where available) peak lists for a <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p>
     </div>
 
     <pre class="usage"># S4 method for MSPeakLists
@@ -186,7 +184,7 @@ length(x)
 show(object)
 
 # S4 method for MSPeakLists,ANY,ANY,missing
-[(x, i, j, ..., reAverage = TRUE, drop = TRUE)
+[(x, i, j, ..., reAverage = FALSE, drop = TRUE)
 
 # S4 method for MSPeakLists,ANY,ANY
 [[(x, i, j)
@@ -206,11 +204,14 @@ filter(
   relMSMSIntThr = NULL,
   topMSPeaks = NULL,
   topMSMSPeaks = NULL,
+  minMSMSPeaks = NULL,
   isolatePrec = NULL,
   deIsotopeMS = FALSE,
   deIsotopeMSMS = FALSE,
   withMSMS = FALSE,
+  annotatedBy = NULL,
   retainPrecursorMSMS = TRUE,
+  reAverage = FALSE,
   negate = FALSE
 )
 
@@ -221,11 +222,78 @@ plotSpectrum(
   analysis = NULL,
   MSLevel = 1,
   title = NULL,
-  useGGPlot2 = FALSE,
+  specSimParams = getDefSpecSimParams(),
   xlim = NULL,
   ylim = NULL,
   ...
 )
+
+# S4 method for MSPeakLists
+spectrumSimilarity(
+  obj,
+  groupName1,
+  groupName2 = NULL,
+  analysis1 = NULL,
+  analysis2 = NULL,
+  MSLevel = 1,
+  specSimParams = getDefSpecSimParams(),
+  NAToZero = FALSE,
+  drop = TRUE
+)
+
+# S4 method for MSPeakListsSet
+analysisInfo(obj)
+
+# S4 method for MSPeakListsSet
+show(object)
+
+# S4 method for MSPeakListsSet,ANY,ANY,missing
+[(x, i, j, ..., reAverage = FALSE, sets = NULL, drop = TRUE)
+
+# S4 method for MSPeakListsSet
+as.data.table(x, fGroups = NULL, averaged = TRUE)
+
+# S4 method for MSPeakListsSet
+filter(
+  obj,
+  ...,
+  annotatedBy = NULL,
+  retainPrecursorMSMS = TRUE,
+  reAverage = FALSE,
+  negate = FALSE,
+  sets = NULL
+)
+
+# S4 method for MSPeakListsSet
+plotSpectrum(
+  obj,
+  groupName,
+  analysis = NULL,
+  MSLevel = 1,
+  title = NULL,
+  specSimParams = getDefSpecSimParams(),
+  xlim = NULL,
+  ylim = NULL,
+  perSet = TRUE,
+  mirror = TRUE,
+  ...
+)
+
+# S4 method for MSPeakListsSet
+spectrumSimilarity(
+  obj,
+  groupName1,
+  groupName2 = NULL,
+  analysis1 = NULL,
+  analysis2 = NULL,
+  MSLevel = 1,
+  specSimParams = getDefSpecSimParams(),
+  NAToZero = FALSE,
+  drop = TRUE
+)
+
+# S4 method for MSPeakListsSet
+unset(obj, set)
 
 getDefIsolatePrecParams(...)</pre>
 
@@ -238,22 +306,25 @@ getDefIsolatePrecParams(...)</pre>
     </tr>
     <tr>
       <th>i, j</th>
-      <td><p>A numeric or character value which is used to select analyses/feature groups by
+      <td><p>For <code><a href='generics.html'>[</a></code>/<code><a href='generics.html'>[[</a></code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Further arguments passed to <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p></td>
+      <td><p>Further arguments passed to <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p>
+<p>For <a href='sets-workflow.html'>sets workflow</a> methods: further arguments passed to the base <code>MSPeakLists</code> method.</p></td>
     </tr>
     <tr>
       <th>reAverage</th>
-      <td><p>Set to <code>TRUE</code> to regenerate averaged MS peak lists
-after subsetting analyses.</p></td>
+      <td><p>Set to <code>TRUE</code> to regenerate group averaged MS peak lists. <strong>NOTE</strong> it is very important
+that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
+likely that <em>e.g.</em> plotting methods will use wrong MS/MS data.</p></td>
     </tr>
     <tr>
       <th>drop</th>
-      <td><p>ignored.</p></td>
+      <td><p>If set to <code>TRUE</code> and if the comparison is made between two spectra then <code><a href='https://rdrr.io/r/base/drop.html'>drop</a></code> is used
+to reduce the <code>matrix</code> return value to a <code>numeric</code> vector.</p></td>
     </tr>
     <tr>
       <th>name</th>
@@ -272,41 +343,45 @@ used.</p></td>
     </tr>
     <tr>
       <th>absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr</th>
-      <td><p>Absolute/relative
-intensity threshold for MS or MS/MS peak lists. <code>NULL</code> for none.</p></td>
+      <td><p>Absolute/relative intensity threshold for MS or MS/MS peak
+lists. <code>NULL</code> for none.</p></td>
     </tr>
     <tr>
       <th>topMSPeaks, topMSMSPeaks</th>
-      <td><p>Only consider this amount of MS or MS/MS peaks
-with highest intensity. <code>NULL</code> to consider all.</p></td>
+      <td><p>Only consider this amount of MS or MS/MS peaks with highest intensity. <code>NULL</code> to
+consider all.</p></td>
+    </tr>
+    <tr>
+      <th>minMSMSPeaks</th>
+      <td><p>If the number of peaks in an MS/MS peak list (<strong>excluding</strong> the precursor peak) is lower
+than this it will be completely removed. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>isolatePrec</th>
-      <td><p>If not <code>NULL</code> then value should be a <code>list</code> with
-parameters used for isolating the precursor and its isotopes in MS peak
-lists (see <code>Isolating precursor data</code>). Alternatively, <code>TRUE</code> to
-apply the filter with default settings (as given with
-<code>getDefIsolatePrecParams</code>).</p></td>
+      <td><p>If not <code>NULL</code> then value should be a <code>list</code> with parameters used for isolating the
+precursor and its isotopes in MS peak lists (see <code>Isolating precursor data</code>). Alternatively, <code>TRUE</code> to
+apply the filter with default settings (as given with <code>getDefIsolatePrecParams</code>).</p></td>
     </tr>
     <tr>
       <th>deIsotopeMS, deIsotopeMSMS</th>
-      <td><p>Remove any isotopic peaks in MS or MS/MS
-peak lists. This may improve data processing steps which do not assume the
-presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
+      <td><p>Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
+processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 <code>getMzRPeakLists</code> does not (yet) support flagging of isotopes.</p></td>
     </tr>
     <tr>
       <th>withMSMS</th>
-      <td><p>If set to <code>TRUE</code> then only results will be retained for
-which MS/MS data is available. if <code>negate=TRUE</code> then only results
-<em>without</em> MS/MS data will be retained.</p></td>
+      <td><p>If set to <code>TRUE</code> then only results will be retained for which MS/MS data is available. if
+<code>negate=TRUE</code> then only results <em>without</em> MS/MS data will be retained.</p></td>
+    </tr>
+    <tr>
+      <th>annotatedBy</th>
+      <td><p>Either a <code><a href='formulas-class.html'>formulas</a></code> or <code><a href='compounds-class.html'>compounds</a></code> object, or a <code>list</code> with both. Any
+MS/MS peaks that are <em>not</em> annotated by any of the candidates in the specified objects are removed.</p></td>
     </tr>
     <tr>
       <th>retainPrecursorMSMS</th>
-      <td><p>If <code>TRUE</code> then precursor peaks will never be
-filtered out from MS/MS peak lists (note that precursors are never removed
-from MS peak lists). The <code>negate</code> argument does not affect this
-setting.</p></td>
+      <td><p>If <code>TRUE</code> then precursor peaks will never be filtered out from MS/MS peak lists (note
+that precursors are never removed from MS peak lists). The <code>negate</code> argument does not affect this setting.</p></td>
     </tr>
     <tr>
       <th>negate</th>
@@ -314,13 +389,14 @@ setting.</p></td>
     </tr>
     <tr>
       <th>groupName</th>
-      <td><p>The name of the feature group for which a plot should be
-made.</p></td>
+      <td><p>The name of the feature group for which a plot should be made. To compare spectra, two group names
+can be specified.</p></td>
     </tr>
     <tr>
       <th>analysis</th>
-      <td><p>The name of the analysis for which a plot should be made. If
-<code>NULL</code> then data from the feature group averaged peak list is used.</p></td>
+      <td><p>The name of the analysis for which a plot should be made. If <code>NULL</code> then data from the feature
+group averaged peak list is used. When comparing spectra, either <code>NULL</code> or the analyses for both spectra
+should be specified.</p></td>
     </tr>
     <tr>
       <th>MSLevel</th>
@@ -328,20 +404,49 @@ made.</p></td>
     </tr>
     <tr>
       <th>title</th>
-      <td><p>The title of the plot. If <code>NULL</code> a title will be
-automatically made.</p></td>
+      <td><p>The title of the plot. If <code>NULL</code> a title will be automatically made.</p></td>
     </tr>
     <tr>
-      <th>useGGPlot2</th>
-      <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
-plotting, otherwise base plot used. For <code>plotSpectrum</code>, <code>ggplot2</code>
-allows nicely repelled text for annotation. However, base plot is generally
-faster.</p></td>
+      <th>specSimParams</th>
+      <td><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
+See the <a href='specSimParams.html'>spectral similarity parameters</a> documentation for more details.</p></td>
     </tr>
     <tr>
       <th>xlim, ylim</th>
       <td><p>Sets the plot size limits used by
 <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+    </tr>
+    <tr>
+      <th>groupName1, groupName2</th>
+      <td><p>The names of the feature groups for which the comparison should be made. If both
+arguments are specified then a comparison is made with the spectra specified by <code>groupName1</code> <em>vs</em> those
+specified by <code>groupName2</code>. The length of either can be <samp>&gt;1</samp> to generate a comparison matrix.
+Alternatively, if <code>groupName2</code> is <code>NULL</code> then all the spectra specified in <code>groupName1</code> will be
+compared with eachother, <em>i.e.</em> resulting in a square similarity matrix.</p></td>
+    </tr>
+    <tr>
+      <th>analysis1, analysis2</th>
+      <td><p>The name of the analysis (analyses) for the comparison. If <code>NULL</code> then data from the
+feature group averaged peak list is used. Otherwise, should be the same length as
+<code>groupName1</code>/<code>groupName2</code>.</p></td>
+    </tr>
+    <tr>
+      <th>NAToZero</th>
+      <td><p>Set to <code>TRUE</code> to convert <code>NA</code> similarities (<em>i.e.</em> when no similarity could be
+calculated) to zero values.</p></td>
+    </tr>
+    <tr>
+      <th>sets</th>
+      <td><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>perSet, mirror</th>
+      <td><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
+Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
     </tr>
     </table>
 
@@ -359,12 +464,9 @@ faster.</p></td>
   moment).</p>
 <p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
-<p><code>plotSpectrum</code> will return a <code>ggplot
-  object</code> if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak
-lists generators</a>.</p>
+    <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak lists generators</a>.</p>
 <p>The <code>getDefIsolatePrecParams</code> is used to create a parameter
   list for isolating the precursor and its isotopes (see <code>Isolating precursor data</code>).</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
@@ -387,85 +489,108 @@ lists for the group specified by the first argument (<code>i</code>) will be
 returned.</p></li>
 <li><p><code><a href='generics.html'>$</a></code>: Extract group averaged MS peaklists for a feature group.</p></li>
 <li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
-<li><p><code>filter</code>: provides post filtering of generated MS peak lists,
-which may further enhance quality of subsequent workflow steps (<em>e.g.</em>
-formulae calculation and compounds identification) and/or speed up these
-processes.</p></li>
-<li><p><code>plotSpectrum</code>: Plots a spectrum using MS or MS/MS peak lists for a
-given feature group.</p></li>
+<li><p><code>filter</code>: provides post filtering of generated MS peak lists, which may further enhance quality of
+subsequent workflow steps (<em>e.g.</em> formulae calculation and compounds identification) and/or speed up these
+processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged
+to update group averaged peak lists. However, since version <samp>1.1</samp>, the resulting feature group lists are
+<em>not</em> filtered afterwards.</p></li>
+<li><p><code>plotSpectrum</code>: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
+compared when two feature groups are specified.</p></li>
+<li><p><code>spectrumSimilarity</code>: Calculates the spectral similarity between two or more spectra.</p></li>
 </ul>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
 
 <dl>
-<dt><code>peakLists</code></dt><dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the
-<code>peakLists</code> method for access.</p></dd>
+<dt><code>peakLists</code></dt><dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the <code>peakLists</code> method for access.</p></dd>
 
-<dt><code>metadata</code></dt><dd><p>Metadata for all spectra used to generate peak lists. Follows
-the format of the <code>peakLists</code> slot.</p></dd>
+<dt><code>metadata</code></dt><dd><p>Metadata for all spectra used to generate peak lists. Follows the format of the <code>peakLists</code> slot.</p></dd>
 
-<dt><code>averagedPeakLists</code></dt><dd><p>A <code>list</code> with averaged MS (and MS/MS) peak lists
-for each feature group.</p></dd>
+<dt><code>averagedPeakLists</code></dt><dd><p>A <code>list</code> with averaged MS (and MS/MS) peak lists for each feature group.</p></dd>
 
-<dt><code>avgPeakListArgs</code></dt><dd><p>A <code>list</code> with arguments used to generate feature
-group averaged MS(/MS) peak lists.</p></dd>
+<dt><code>avgPeakListArgs</code></dt><dd><p>A <code>list</code> with arguments used to generate feature group averaged MS(/MS) peak lists.</p></dd>
 
-<dt><code>origFGNames</code></dt><dd><p>A <code>character</code> with the original input feature group
-names.</p></dd>
+<dt><code>origFGNames</code></dt><dd><p>A <code>character</code> with the original input feature group names.</p></dd>
+
+<dt><code>analysisInfo</code></dt><dd><p>(<strong>sets workflow</strong>)  <a href='analysis-information.html'>Analysis information</a>. Use the <code>analysisInfo</code> method
+for access.</p></dd>
 
 </dl>
     <h2 class="hasAnchor" id="isolating-precursor-data"><a class="anchor" href="#isolating-precursor-data"></a>Isolating precursor data</h2>
 
-    <p>Formula calculation typically relies on
-  evaluating the measured isotopic pattern from the precursor to score
-  candidates. Some algorithms (currently only <code class='command'>GenForm</code>) penalize
-  candidates if mass peaks are present in MS1 spectra that do not contribute
-  to the isotopic pattern. Since these spectra are typically very 'noisy' due
-  to background and co-eluting ions, an additional filtering step may be
-  recommended prior to formula calculation. During this precursor isolation
-  step all mass peaks are removed that are (1) not the precursor and (2) not
-  likely to be an isotopologue of the precursor. To determine potential
-  isotopic peaks the following parameters are used:</p>
+    <p>Formula calculation typically relies on evaluating the measured isotopic pattern
+  from the precursor to score candidates. Some algorithms (currently only <code class='command'>GenForm</code>) penalize candidates if
+  mass peaks are present in MS1 spectra that do not contribute to the isotopic pattern. Since these spectra are
+  typically very 'noisy' due to background and co-eluting ions, an additional filtering step may be recommended prior
+  to formula calculation. During this precursor isolation step all mass peaks are removed that are (1) not the
+  precursor and (2) not likely to be an isotopologue of the precursor. To determine potential isotopic peaks the
+  following parameters are used:</p>
 <p></p><ul>
-<li><p><code>maxIsotopes</code> The maximum number of isotopes to consider. For
-  instance, a value of <samp>5</samp> means that <code>M+0</code> (<em>i.e.</em> the
-  monoisotopic peak) till <code>M+5</code> is considered. All mass peaks outside
-  this range are removed.</p></li>
-<li><p><code>mzDefectRange</code> A two-sized <code>vector</code> specifying the minimum
-  (can be negative) and maximum <em>m/z</em> defect deviation compared to the
-  precursor <em>m/z</em> defect. When chlorinated, brominated or other
-  compounds with strong <em>m/z</em> defect in their isotopologues are to be
-  considered a higher range may be desired. On the other hand, for natural
-  compounds this range may be tightened. Note that the search range is
-  propegated with increasing distance from the precursor, <em>e.g.</em> the
-  search range is doubled for <code>M+2</code>, tripled for <code>M+3</code> etc.</p></li>
-<li><p><code>intRange</code> A two-sized <code>vector</code> specifying the minimum and
-  maximum relative intensity range compared to the precursor. For instance,
-  <code><a href='https://rdrr.io/r/base/c.html'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% or
+<li><p><code>maxIsotopes</code> The maximum number of isotopes to consider. For instance, a value of <samp>5</samp> means that
+  <code>M+0</code> (<em>i.e.</em> the monoisotopic peak) till <code>M+5</code> is considered. All mass peaks outside this range are
+  removed.</p></li>
+<li><p><code>mzDefectRange</code> A two-sized <code>vector</code> specifying the minimum (can be negative) and maximum
+  <em>m/z</em> defect deviation compared to the precursor <em>m/z</em> defect. When chlorinated, brominated or other
+  compounds with strong <em>m/z</em> defect in their isotopologues are to be considered a higher range may be desired.
+  On the other hand, for natural compounds this range may be tightened. Note that the search range is propegated with
+  increasing distance from the precursor, <em>e.g.</em> the search range is doubled for <code>M+2</code>, tripled for
+  <code>M+3</code> etc.</p></li>
+<li><p><code>intRange</code> A two-sized <code>vector</code> specifying the minimum and maximum relative intensity range
+  compared to the precursor. For instance, <code><a href='https://rdrr.io/r/base/c.html'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% or
   above 200% of that of the precursor.</p></li>
-<li><p><code>z</code> The <code>z</code> value (<em>i.e.</em> absolute charge) to be
-  considerd. For instance, a value of <code>2</code> would look for <code>M+0.5</code>,
-  <code>M+1</code> etc. Note that the <code>mzDefectRange</code> is adjusted accordingly
+<li><p><code>z</code> The <code>z</code> value (<em>i.e.</em> absolute charge) to be considerd. For instance, a value of <code>2</code>
+  would look for <code>M+0.5</code>, <code>M+1</code> etc. Note that the <code>mzDefectRange</code> is adjusted accordingly
   (<em>e.g.</em> halved if <code>z=2</code>).</p></li>
-<li><p><code>maxGap</code> The maximum number of missing adjacent isotopic peaks
-  ('gaps'). If the (rounded) <em>m/z</em> difference to the previous peak
-  exceeds this value then this and all next peaks will be removed. Similar to
+<li><p><code>maxGap</code> The maximum number of missing adjacent isotopic peaks ('gaps'). If the (rounded) <em>m/z</em>
+  difference to the previous peak exceeds this value then this and all next peaks will be removed. Similar to
   <code>z</code>, the maximum gap is automatically adjusted for <code>charge</code>.</p></li>
 </ul>
 
-<p>These parameters should be in a <code>list</code> that is passed to the
-  <code>isolatePrec</code> argument to <code>filter</code>. The default values can be
-  obtained with the <code>getDefIsolatePrecParams</code> function:</p>
+<p>These parameters should be in a <code>list</code> that is passed to the <code>isolatePrec</code> argument to <code>filter</code>. The
+  default values can be obtained with the <code>getDefIsolatePrecParams</code> function:</p>
 <p><code>maxIsotopes=5</code>; <code>mzDefectRange=c(-0.01, 0.01)</code>; <code>intRange=c(0.001, 2)</code>; <code>z=1</code>; <code>maxGap=2</code></p>
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
 <li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
-<li><p><strong><code>MSPeakLists</code></strong></p></li>
+<li><p><strong><code>MSPeakLists</code></strong></p><ul>
+<li><p><code>MSPeakListsSet</code></p></li>
+<li><p><code>MSPeakListsUnset</code></p></li>
+</ul></li>
 </ul></li>
 </ul>
 
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p><code>spectrumSimilarity</code>: The principles of spectral binning and cosine similarity calculations
+  were loosely was based on the code from <code>SpectrumSimilarity()</code> function of <span class="pkg">OrgMassSpecR</span>.</p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>MSPeakListsSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>MSPeakLists</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>MSPeakListsUnset</code>), which allows it to be used in 'regular' workflows. Only the MS peaks that are present in the specified set are kept.</p></li>
+<li><p><code>analysisInfo</code> Returns the  <a href='analysis-information.html'>analysis info</a> for this object.</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>filter</code> and the subset operator (<code><a href='generics.html'>[</a></code>) Can be used to select data that is only present for selected
+  sets. The <code>filter</code> method is applied for each set individually, and afterwards the results are combined again
+  (see <code><a href='MSPeakLists-generation.html'>generateMSPeakLists</a></code>). Note that this has important implications for <em>e.g.</em> relative
+  intensity filters (<code>relMSIntThr</code>/<code>relMSMSIntThr</code>), <code>topMSPeaks</code>/<code>topMSMSPeaks</code> and
+  <code>minMSMSPeaks</code>. Similarly, when the <code>annotatedBy</code> filter is applied, each set specific MS peak list is
+  filtered by the annotation results from only that set.</p></li>
+<li><p><code>plotSpectrum</code> Is able to highlight set specific mass peaks (<code>perSet</code> and <code>mirror</code> arguments).</p></li>
+<li><p><code>spectrumSimilarity</code> First calculates similarities for each spectral pair per set (<em>e.g.</em> all
+  positive mode spectra are compared and then all negative mode spectra are compared). This data is then combined
+  into an overall similarity value. How this combination is performed depends on the <code>setCombineMethod</code> field of
+  the <code><a href='specSimParams.html'>specSimParams</a></code> argument.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>For <code>spectrumSimilarity</code>: major contributions by Bas van de Velde for spectral binning and similarity
+  calculation.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

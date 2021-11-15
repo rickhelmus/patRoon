@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Grouping of features</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-bruker.R'><code>R/feature_groups-bruker.R</code></a>, and 4 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-set.R'><code>R/feature_groups-set.R</code></a>, and 7 more</small>
     <div class="hidden name"><code>feature-grouping.Rd</code></div>
     </div>
 
@@ -166,9 +166,29 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for features</span>
-<span class='fu'>groupFeatures</span><span class='op'>(</span><span class='va'>feat</span>, <span class='va'>algorithm</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>groupFeatures</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>algorithm</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='co'># S4 method for data.frame</span>
+<span class='fu'>groupFeatures</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>algorithm</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='fu'>importFeatureGroups</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>type</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>groupFeatures</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>algorithm</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
+<span class='fu'><a href='generics.html'>makeSet</a></span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  <span class='va'>...</span>,
+  <span class='va'>groupAlgo</span>,
+  groupArgs <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  adducts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  labels <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'><a href='generics.html'>makeSet</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>importFeatureGroupsBrukerPA</span><span class='op'>(</span>
   <span class='va'>path</span>,
@@ -181,6 +201,29 @@
 
 <span class='fu'>importFeatureGroupsEnviMass</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>feat</span>, <span class='va'>positive</span><span class='op'>)</span>
 
+<span class='co'># S4 method for features</span>
+<span class='fu'>groupFeaturesKPIC2</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  loadRawData <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>tolerance <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.005</span>, <span class='fl'>12</span><span class='op'>)</span><span class='op'>)</span>,
+  alignArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>groupFeaturesKPIC2</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>tolerance <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.005</span>, <span class='fl'>12</span><span class='op'>)</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>importFeatureGroupsKPIC2</span><span class='op'>(</span><span class='va'>picsSetGrouped</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsKPIC2</span>
+<span class='fu'><a href='generics.html'>delete</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for features</span>
 <span class='fu'>groupFeaturesOpenMS</span><span class='op'>(</span>
   <span class='va'>feat</span>,
   rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -194,46 +237,68 @@
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
+<span class='fu'>groupFeaturesSIRIUS</span><span class='op'>(</span><span class='va'>analysisInfo</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='co'># S4 method for features</span>
 <span class='fu'>groupFeaturesXCMS</span><span class='op'>(</span>
   <span class='va'>feat</span>,
   rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  exportedData <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  loadRawData <span class='op'>=</span> <span class='cn'>TRUE</span>,
   groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mzwid <span class='op'>=</span> <span class='fl'>0.015</span><span class='op'>)</span>,
   retcorArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"obiwarp"</span><span class='op'>)</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>groupFeaturesXCMS</span><span class='op'>(</span><span class='va'>feat</span>, groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mzwid <span class='op'>=</span> <span class='fl'>0.015</span><span class='op'>)</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
 <span class='fu'>importFeatureGroupsXCMS</span><span class='op'>(</span><span class='va'>xs</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsXCMS</span>
+<span class='fu'><a href='generics.html'>delete</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for features</span>
 <span class='fu'>groupFeaturesXCMS3</span><span class='op'>(</span>
   <span class='va'>feat</span>,
   rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  loadRawData <span class='op'>=</span> <span class='cn'>TRUE</span>,
   groupParam <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span><span class='op'>(</span>sampleGroups <span class='op'>=</span> <span class='fu'><a href='generics.html'>analysisInfo</a></span><span class='op'>(</span><span class='va'>feat</span><span class='op'>)</span><span class='op'>$</span><span class='va'>group</span><span class='op'>)</span>,
+  preGroupParam <span class='op'>=</span> <span class='va'>groupParam</span>,
   retAlignParam <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/adjustRtime-obiwarp.html'>ObiwarpParam</a></span><span class='op'>(</span><span class='op'>)</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsXCMS3</span><span class='op'>(</span><span class='va'>xdata</span>, <span class='va'>analysisInfo</span><span class='op'>)</span></pre>
+<span class='co'># S4 method for featuresSet</span>
+<span class='fu'>groupFeaturesXCMS3</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  groupParam <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span><span class='op'>(</span>sampleGroups <span class='op'>=</span> <span class='fu'><a href='generics.html'>analysisInfo</a></span><span class='op'>(</span><span class='va'>feat</span><span class='op'>)</span><span class='op'>$</span><span class='va'>group</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='fu'>importFeatureGroupsXCMS3</span><span class='op'>(</span><span class='va'>xdata</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroupsXCMS3</span>
+<span class='fu'><a href='generics.html'>delete</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>feat</th>
-      <td><p>The <code><a href='features-class.html'>features</a></code> to be grouped.
-<code>importFeatureGroupsBrukerPA</code> and <code>importFeatureGroupsEnviMass</code>
-only support features generated by <code><a href='feature-finding.html'>findFeaturesBruker</a></code> and
-<code><a href='feature-finding.html'>importFeaturesEnviMass</a></code>, respectively.</p></td>
+      <th>obj</th>
+      <td><p>Either a <code><a href='features-class.html'>features</a></code> object to be grouped, or a <code>data.frame</code> with
+<a href='analysis-information.html'>analysis info</a> to be passed to <code>groupFeaturesSIRIUS</code> or a <code>featureGroups</code>
+objects passed to <code>makeSet</code>.</p></td>
     </tr>
     <tr>
       <th>algorithm</th>
-      <td><p>A character string describing the algorithm that should be
-used: <code>"openms"</code>, <code>"xcms"</code>, <code>"xcms3"</code></p></td>
+      <td><p>A <code>character</code> that specifies the algorithm to be used: either <code>"openms"</code>, <code>"xcms"</code>,
+<code>"xcms3"</code> or <code>"kpic2"</code> (<code>features method</code>), or <code>"sirius"</code> (<code>data.frame</code> method).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Any parameters to be passed to the selected grouping/importing
-algorithm.</p></td>
+      <td><p>Any parameters to be passed to the selected grouping/importing algorithm.</p>
+<p>For <code>makeSet</code>: further <code><a href='featureGroups-class.html'>featureGroups</a></code> objects that should be used for the
+  <a href='sets-workflow.html'>sets workflow</a>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -249,10 +314,37 @@ an exported global result table (converted to <code class="file">.csv</code>) an
     </tr>
     <tr>
       <th>type</th>
-      <td><p>Which file type should be imported or exported: <code>"brukerpa"</code>
-(Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ),
-<code>envimass</code> (<span class="pkg">enviMass</span>, only import) or <code>"mzmine"</code> (MZMine,
-only export).</p></td>
+      <td><p>Which file type should be imported or exported: <code>"brukerpa"</code> (Bruker ProfileAnalysis),
+<code>"brukertasq"</code> (Bruker TASQ), <code>envimass</code> (<span class="pkg">enviMass</span>, only import) or <code>"mzmine"</code> (MZMine, only
+export).</p></td>
+    </tr>
+    <tr>
+      <th>groupAlgo</th>
+      <td><p>groupAlgo The name of the feature grouping algorithm. See the <code>algorithm</code> argument description.</p></td>
+    </tr>
+    <tr>
+      <th>groupArgs</th>
+      <td><p>A <code>list</code> with arguments directly passed to <code>groupFeatures</code> (can be named). Example:
+<code>groupArgs=list(maxAlignMZ=0.002)</code>.</p></td>
+    </tr>
+    <tr>
+      <th>adducts</th>
+      <td><p>The adduct assignments to each set. Should either be a <code>list</code> with <code><a href='adduct-class.html'>adduct</a></code> objects
+or a <code>character</code> vector (<em>e.g.</em> <code>"[M+H]+"</code>). The order should follow that of the objects given to
+the <code>obj</code> and <code>...</code> arguments. if <code>NULL</code> then adduct annotations
+are used.</p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>The labels, or <em>set names</em>, for each set to be created. The order should follow that of the
+objects given to the <code>obj</code> and <code>...</code> arguments. If <code>NULL</code>, then labels are automatically generated
+from the polarity of the specified <code>adducts</code> argument (<em>e.g.</em> <code>"positive"</code>, <code>"negative"</code>).</p></td>
+    </tr>
+    <tr>
+      <th>feat</th>
+      <td><p>The <code><a href='features-class.html'>features</a></code> to be grouped. <code>importFeatureGroupsBrukerPA</code> and
+<code>importFeatureGroupsEnviMass</code> only support features generated by <code><a href='feature-finding.html'>findFeaturesBruker</a></code> and
+<code><a href='feature-finding.html'>importFeaturesEnviMass</a></code>, respectively.</p></td>
     </tr>
     <tr>
       <th>rtWindow, mzWindow, intWindow</th>
@@ -274,6 +366,25 @@ from grouped features.</p></td>
     <tr>
       <th>rtalign</th>
       <td><p>Enable retention time alignment.</p></td>
+    </tr>
+    <tr>
+      <th>loadRawData</th>
+      <td><p>Set to <code>TRUE</code> if analyses are available as <code>mzXML</code> or <code>mzML</code> files. Otherwise MS
+data is not loaded, and some dummy data (<em>e.g.</em> file paths) is used in the returned object.</p></td>
+    </tr>
+    <tr>
+      <th>alignArgs</th>
+      <td><p>named <code>character vector</code> that may contain extra parameters to be used by
+<code><a href='https://rdrr.io/pkg/KPIC/man/PICset.align.html'>KPIC::PICset.align</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>picsSetGrouped</th>
+      <td><p>A grouped <code>PIC set</code> object (<em>e.g.</em> as returned by
+<code><a href='https://rdrr.io/pkg/KPIC/man/PICset.group.html'>KPIC::PICset.group</a></code>).</p></td>
+    </tr>
+    <tr>
+      <th>analysisInfo</th>
+      <td><p>A <code>data.frame</code> with <a href='analysis-information.html'>analysis info</a>.</p></td>
     </tr>
     <tr>
       <th>QT</th>
@@ -305,29 +416,24 @@ Any options specified here will override any of the above. Example:
 ignore.</p></td>
     </tr>
     <tr>
-      <th>exportedData</th>
-      <td><p>Set to <code>TRUE</code> if analyses were exported as
-<code>mzXML</code> or <code>mzML</code> files.</p></td>
-    </tr>
-    <tr>
-      <th>groupArgs, retcorArgs</th>
-      <td><p>named <code>character vector</code> that can contain
-extra parameters to be used by <code><a href='https://rdrr.io/pkg/xcms/man/group-methods.html'>xcms::group</a></code> and
-<code><a href='https://rdrr.io/pkg/xcms/man/retcor-methods.html'>xcms::retcor</a></code>, respectively.</p></td>
+      <th>retcorArgs</th>
+      <td><p>named <code>character vector</code> that may contain extra parameters to be used by
+<code><a href='https://rdrr.io/pkg/xcms/man/retcor-methods.html'>xcms::retcor</a></code>.</p></td>
     </tr>
     <tr>
       <th>xs</th>
       <td><p>An <code>xcmsSet</code> object.</p></td>
     </tr>
     <tr>
-      <th>analysisInfo</th>
-      <td><p>A <code>data.frame</code> with <a href='analysis-information.html'>analysis info</a>.</p></td>
-    </tr>
-    <tr>
       <th>groupParam, retAlignParam</th>
       <td><p>parameter object that is directly passed to
-<code><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks.html'>xcms::groupChromPeaks</a></code> and
-<code><a href='https://rdrr.io/pkg/xcms/man/adjustRtime.html'>xcms::adjustRtime</a></code>, respectively.</p></td>
+<code><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks.html'>xcms::groupChromPeaks</a></code> and <code><a href='https://rdrr.io/pkg/xcms/man/adjustRtime.html'>xcms::adjustRtime</a></code>,
+respectively.</p></td>
+    </tr>
+    <tr>
+      <th>preGroupParam</th>
+      <td><p>grouping parameters applied when features are grouped <em>prior</em> to alignment (only with peak
+groups alignment).</p></td>
     </tr>
     <tr>
       <th>xdata</th>
@@ -337,32 +443,30 @@ extra parameters to be used by <code><a href='https://rdrr.io/pkg/xcms/man/group
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of a class which is derived from
-  <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p>
+    <p>An object of a class which is derived from <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p>
+<p><code>makeSet</code> and the <code><a href='features-class.html'>featuresSet</a></code> method of <code>groupFeatures</code> return a
+  <code><a href='featureGroups-class.html'>featureGroupsSet</a></code> object.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>After <a href='feature-finding.html'>features have been found</a> the logical next step
-is to align and group them across analyses. This process is necessary to
-allow comparison of features between multiple analyses, which otherwise would
-be difficult due to small deviations in retention and mass data. Thus,
-algorithms of 'feature groupers' are used to collect features with similar
-retention and mass data. In addition, advanced retention time alignment
-algorithms exist to enhance grouping of features even with relative large
-retention time deviations (<em>e.g.</em> possibly observed from analyses
-collected over a long period). Like <a href='feature-finding.html'>finding of
-features</a>, various algorithms are supported which may have many parameters
-that can be fine-tuned. This fine-tuning is likely to be necessary, since
-optimal settings often depend on applied methodology and instrumentation.</p>
-<p><code>groupFeatures</code> is a generic function that will group features
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>groupFeaturesOpenMS</code> and
-  <code>groupFeaturesXCMS3</code>. While these functions may be called directly,
-  <code>groupFeatures</code> provides a generic interface and is therefore usually
-  preferred.</p>
+    <p>After <a href='feature-finding.html'>features have been found</a> the logical next step is to align and group them across
+analyses. This process is necessary to allow comparison of features between multiple analyses, which otherwise would
+be difficult due to small deviations in retention and mass data. Thus, algorithms of 'feature groupers' are used to
+collect features with similar retention and mass data. In addition, advanced retention time alignment algorithms
+exist to enhance grouping of features even with relative large retention time deviations (<em>e.g.</em> possibly
+observed from analyses collected over a long period). Like <a href='feature-finding.html'>finding of features</a>, various
+algorithms are supported which may have many parameters that can be fine-tuned. This fine-tuning is likely to be
+necessary, since optimal settings often depend on applied methodology and instrumentation.</p>
+<p><code>groupFeatures</code> is a generic function that will group features using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as <code>groupFeaturesOpenMS</code> and <code>groupFeaturesXCMS3</code>. While these
+  functions may be called directly, <code>groupFeatures</code> provides a generic interface and is therefore usually preferred.</p>
+<p>The <code>data.frame</code> method for <code>groupFeatures</code> is a special case that currently only supports the
+  <code>"sirius"</code> algorithm.</p>
 <p><code>importFeatureGroups</code> is a generic function to import feature
   groups produced by other software. The actual functionality is provided by
   specific functions such as <code>importFeatureGroupsBrukerPA</code> and
   <code>importFeatureGroupsEnviMass</code>.</p>
+<p><code>makeSet</code> is used to initiate a <a href='sets-workflow.html'>sets workflow</a>. See the <code>Sets workflows</code>
+  section for more details.</p>
 <p><code>importFeatureGroupsBrukerPA</code> imports grouped features
   generated with Bruker ProfileAnalysis (PA). To do so, a 'bucket table'
   should be generated using PA and exported as <code class="file">.txt</code> file. Please note
@@ -382,6 +486,12 @@ optimal settings often depend on applied methodology and instrumentation.</p>
   Finally, please note that this function only supports features imported by
   <code><a href='feature-finding.html'>importFeaturesEnviMass</a></code> (obviously, the same project should be
   used for both importing functions).</p>
+<p><code>groupFeaturesKPIC2</code> uses the the
+  <a href='https://github.com/hcji/KPIC2'>KPIC2</a> <span style="R">R</span> package for grouping of features. Grouping of features and alignment of
+  their retention times are performed with the
+  <code><a href='https://rdrr.io/pkg/KPIC/man/PICset.group.html'>KPIC::PICset.group</a></code> and
+  <code><a href='https://rdrr.io/pkg/KPIC/man/PICset.align.html'>KPIC::PICset.align</a></code> functions, respectively.</p>
+<p><code>importFeatureGroupsKPIC2</code> imports grouped features from an <span class="pkg">KPIC</span> object.</p>
 <p><code>groupFeaturesOpenMS</code> uses the OpenMS tools for grouping of
   features (see <a href='http://www.openms.de'>http://www.openms.de</a>). Retention times may be aligned
   by the
@@ -391,26 +501,61 @@ optimal settings often depend on applied methodology and instrumentation.</p>
    or
   <a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html'>FeatureLinkerUnlabeledQT</a>
    TOPP tools.</p>
-<p><code>groupFeaturesXCMS</code> uses the <span class="pkg">xcms</span> package for grouping of
-  features. Grouping of features and alignment of their retention times are
-  performed with the <code><a href='https://rdrr.io/pkg/xcms/man/group-methods.html'>xcms::group</a></code> and
-  <code><a href='https://rdrr.io/pkg/xcms/man/retcor-methods.html'>xcms::retcor</a></code> functions, respectively.
-  Both functions have an extensive list of parameters to modify their
-  behaviour and may therefore be used to potentially optimize results.</p>
+<p><code>groupFeaturesSIRIUS</code> uses <a href='https://bio.informatik.uni-jena.de/software/sirius/'>SIRIUS</a> to find
+  <em>and</em> group features. This is done by running the <code class='command'>lcms-align</code> command on every analyses at once. Note
+  that grouping feature data from other algorithms than <code class='command'>SIRIUS</code> are therefore not supported.</p>
+<p><code>groupFeaturesXCMS</code> uses the <span class="pkg">xcms</span> package for grouping of features. Grouping of features and
+  alignment of their retention times are performed with the <code><a href='https://rdrr.io/pkg/xcms/man/group-methods.html'>xcms::group</a></code> and
+  <code><a href='https://rdrr.io/pkg/xcms/man/retcor-methods.html'>xcms::retcor</a></code> functions, respectively. Both functions have an extensive list of
+  parameters to modify their behaviour and may therefore be used to potentially optimize results.</p>
 <p><code>importFeatureGroupsXCMS</code> converts grouped features from an
   <code>xcmsSet</code> object (from the <span class="pkg">xcms</span> package).</p>
-<p><code>groupFeaturesXCMS3</code> uses the new interface from the <span class="pkg">xcms</span>
-  package for grouping of features. Grouping of features and alignment of
-  their retention times are performed with the
-  <code><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks.html'>xcms::groupChromPeaks</a></code> and
-  <code><a href='https://rdrr.io/pkg/xcms/man/adjustRtime.html'>xcms::adjustRtime</a></code> functions, respectively.
-  Both of these functions support an extensive amount of parameters that
-  modify their behaviour and may therefore require optimization.</p>
+<p><code>groupFeaturesXCMS3</code> uses the new interface from the <span class="pkg">xcms</span> package for grouping of features.
+  Grouping of features and alignment of their retention times are performed with the
+  <code><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks.html'>xcms::groupChromPeaks</a></code> and <code><a href='https://rdrr.io/pkg/xcms/man/adjustRtime.html'>xcms::adjustRtime</a></code>
+  functions, respectively. Both of these functions support an extensive amount of parameters that modify their
+  behaviour and may therefore require optimization.</p>
 <p><code>importFeatureGroupsXCMS3</code> converts grouped features from an
   <code>XCMSnExp</code> object (from the <span class="pkg">xcms</span> package).</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p><code>makeSet</code> Currently does not support making sets from <code><a href='featureGroups-class.html'>featureGroupsSet</a></code> objects.</p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>With a <a href='sets-workflow.html'>sets workflow</a> the features are first neutralized, <em>i.e.</em>
+  their <em>m/z</em> values is replaced by their neutral monoisotopic mass. The latter is calculated from adduct
+  annotations, specified either directly, or already present in the input objects. The features are then grouped by
+  any of the <code>groupFeatures</code> algorithms. The neutralization step ensures that features measured with <em>e.g.</em>
+  different ionization polarities can be grouped since their neutral mass will be the same. The sets workflow is
+  initiated in either of the following two ways:</p><ol>
+<li><p>The <code>groupFeatures</code> method can be called with a <code><a href='features-class.html'>featuresSet</a></code> object (generated with the
+  <a href='feature-finding.html'>features method</a> of <code>makeSet</code>).</p></li>
+<li><p>By using the <code>makeSet</code> method for <code>featureGroups</code>. This uses the
+  <a href='feature-finding.html'>features method</a> internally to first create a <code><a href='features-class.html'>featuresSet</a></code> object from
+  all the feature data inside the input <code>featureGroups</code> objects. The (neutralized) features are then
+  (re-)grouped with <code>groupFeatures</code>.</p></li>
+</ol>
+
+<p>The advantage of the second method is that it preserves adduct annotations present in the input
+  <code>featureGroups</code> objects (<em>e.g.</em> as set by <code>selectIons</code> or <code>adducts&lt;-</code>). Furthermore, the second
+  approach allows more advanced workflows where the input <code>featureGroups</code> are first pre-treated with <em>e.g.</em>
+  filter before the sets object is made. On the other hand, the first approach is easier as it doesn't require
+  intermediate feature grouping steps, and is often sufficient as adduct annotations can be made afterwards with
+  <code>selectIons</code>/<code>adducts&lt;-</code>, and most <code>filter</code> operations do not need to be done per individual set.</p>
+<p>With both approaches the resulting <code><a href='featureGroups-class.html'>featureGroupsSet</a></code> object will contain adduct annotations, either
+  based on those already present from input <code>featureGroups</code> objects or as specified by the <code>adducts</code>
+  argument to <code>makeSet</code>.</p>
+<p><strong>NOTE</strong> the <code>loadRawData</code> and arguments related to retention time alignment (<em>e.g.</em> <code>rtalign</code>,
+  <code>retcorArgs</code>) are currently not supported for sets workflows when using algorithms from <span class="pkg">KPIC2</span> or
+  <span class="pkg">XCMS</span>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
+    <p>Ji H, Zeng F, Xu Y, Lu H, Zhang Z (2017).
+&#8220;KPIC2: An Effective Framework for Mass Spectrometry-Based Metabolomics Using Pure Ion Chromatograms.&#8221;
+<em>Analytical Chemistry</em>, <b>89</b>(14), 7631--7640.
+doi: <a href='https://doi.org/10.1021/acs.analchem.7b01547'>10.1021/acs.analchem.7b01547</a>
+.</p>
+<p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
 &#8220;OpenMS: a flexible open-source software platform for mass spectrometry data analysis.&#8221;
 <em>Nature Methods</em>, <b>13</b>(9), 741--748.
 doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
@@ -420,11 +565,13 @@ doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
   Dirk Eddelbuettel and Romain Francois (2011). Rcpp: Seamless R and C++ Integration. Journal of Statistical Software, 40(8), 1-18. URL https://www.jstatsoft.org/v40/i08/. <br /><br />
   Eddelbuettel, Dirk (2013) Seamless R and C++ Integration with Rcpp. Springer, New York. ISBN 978-1-4614-6867-7. <br /><br />
   Dirk Eddelbuettel and James Joseph Balamuta (2018). Extending R with C++: A Brief Introduction to Rcpp. The American Statistician. 72(1). URL https://doi.org/10.1080/00031305.2017.1375990.</p>
-<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br />
-  Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br />
-  H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>
-<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br /> Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br />
-  H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>
+<p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
+&#8220;SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information.&#8221;
+<em>Nature Methods</em>, <b>16</b>(4), 299--302.
+doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
+.</p>
+<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br /> Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br /> H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>
+<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br /> Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br /> H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='featureGroups-class.html'>featureGroups-class</a></code></p></div>

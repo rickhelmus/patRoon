@@ -74,7 +74,7 @@ common structure (MCS)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -193,15 +193,13 @@ common structure (MCS).</p>
     </tr>
     <tr>
       <th>fpType</th>
-      <td><p>The type of structural fingerprint that should be calculated.
-See the <code>type</code> argument of the <code>get.fingerprint</code> function
-of <a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a>.</p></td>
+      <td><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
+<code>get.fingerprint</code> function of <a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a>.</p></td>
     </tr>
     <tr>
       <th>fpSimMethod</th>
-      <td><p>The similarity method (i.e. not dissimilarity!) to be used
-for generating the distance matrix. See the <code>method</code> argument of the
-<code>fp.sim.matrix</code> function of the <a href='https://CRAN.R-project.org/package=fingerprint'><span class="pkg">fingerprint</span></a> package.</p></td>
+      <td><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
+of the <code>fp.sim.matrix</code> function of the <a href='https://CRAN.R-project.org/package=fingerprint'><span class="pkg">fingerprint</span></a> package.</p></td>
     </tr>
     <tr>
       <th>maxTreeHeight, deepSplit, minModuleSize</th>
@@ -235,6 +233,9 @@ resulting clusters can then be characterized by evaluating their
     <p>The methodology applied here has been largely derived from
   <code class="file">chemclust.R</code> from the <span class="pkg">metfRag</span> package and the package vignette
   of <a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a>.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Guha, R. (2007). 'Chemical Informatics Functionality in R'. Journal of Statistical Software 6(18)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>compoundsCluster</p></div>

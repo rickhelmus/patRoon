@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base features class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-bruker.R'><code>R/features-bruker.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-envipick.R'><code>R/features-envipick.R</code></a>, and 3 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-set.R'><code>R/features-set.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-bruker.R'><code>R/features-bruker.R</code></a>, and 7 more</small>
     <div class="hidden name"><code>features-class.Rd</code></div>
     </div>
 
@@ -195,6 +195,7 @@ filter(
   mzRange = NULL,
   mzDefectRange = NULL,
   chromWidthRange = NULL,
+  qualityRange = NULL,
   negate = FALSE
 )
 
@@ -207,17 +208,38 @@ filter(
 # S4 method for features
 $(x, name)
 
-# S4 method for featuresXCMS,ANY,missing,missing
-[(x, i, j, ..., drop = TRUE)
+# S4 method for features
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for features
+calculatePeakQualities(obj, weights, flatnessFactor, parallel = TRUE)
+
+# S4 method for featuresSet
+sets(obj)
+
+# S4 method for featuresSet
+show(object)
+
+# S4 method for featuresSet
+as.data.table(x)
+
+# S4 method for featuresSet,ANY,missing,missing
+[(x, i, ..., sets = NULL, drop = TRUE)
+
+# S4 method for featuresSet
+filter(obj, ..., negate = FALSE, sets = NULL)
+
+# S4 method for featuresSet
+unset(obj, set)
+
+# S4 method for featuresKPIC2
+delete(obj, i = NULL, j = NULL, ...)
 
 # S4 method for featuresXCMS
-filter(obj, ...)
-
-# S4 method for featuresXCMS3,ANY,missing,missing
-[(x, i, j, ..., drop = TRUE)
+delete(obj, i = NULL, j = NULL, ...)
 
 # S4 method for featuresXCMS3
-filter(obj, ...)</pre>
+delete(obj, i = NULL, j = NULL, ...)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -228,44 +250,75 @@ filter(obj, ...)</pre>
     </tr>
     <tr>
       <th>absMinIntensity, relMinIntensity</th>
-      <td><p>Minimum absolute/relative intensity
-for features to be kept. The relative intensity is determined from the
-feature with highest intensity (within the same analysis).
-Set to <samp>0</samp> or <code>NULL</code>
-to skip this step.</p></td>
+      <td><p>Minimum absolute/relative intensity for features to be kept. The relative
+intensity is determined from the feature with highest intensity (within the same analysis). Set to <samp>0</samp> or <code>NULL</code> to skip this step.</p></td>
     </tr>
     <tr>
       <th>retentionRange, mzRange, mzDefectRange, chromWidthRange</th>
-      <td><p>Range of
-retention time (in seconds), <em>m/z</em>, mass defect (defined as the
-decimal part of <em>m/z</em> values) or chromatographic peak width (in
-seconds), respectively. Features outside this range will be removed. Should
-be a numeric vector with length of two containing the min/max values. The
-maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code>
-to skip this step.</p></td>
+      <td><p>Range of retention time (in seconds), <em>m/z</em>, mass
+defect (defined as the decimal part of <em>m/z</em> values) or chromatographic peak width (in seconds), respectively.
+Features outside this range will be removed. Should be a numeric vector with length of two containing the min/max
+values. The maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code> to skip this step.</p></td>
+    </tr>
+    <tr>
+      <th>qualityRange</th>
+      <td><p>Used to filter features by their peak qualities/scores
+(see <code><a href='generics.html'>calculatePeakQualities</a></code>). Should be a named <code>list</code> with min/max ranges for each
+quality/score to be filtered (the <code><a href='featureQualityNames.html'>featureQualityNames</a></code> function can be used to obtain valid names).
+Example: <code>qualityRange=list(ModalityScore=c(0.3, Inf),
+SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>negate</th>
-      <td><p>If set to <code>TRUE</code> then filtering operations are performed
-in opposite manner.</p></td>
+      <td><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></td>
     </tr>
     <tr>
-      <th>i</th>
-      <td><p>A numeric or character value which is used to select analyses by
+      <th>i, j</th>
+      <td><p>For <code><a href='generics.html'>[</a></code>/<code><a href='generics.html'>[[</a></code>: A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see <code><a href='generics.html'>analyses()</a></code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value.</p></td>
+(similar to regular vectors). If missing all analyses are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value.<br /><br /> For <code>delete</code>: The data to remove from. <code>i</code> are the
+analyses as numeric index, logical or character, <code>j</code> the features as numeric index (row) of the feature. If either is
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
+analysis, with the feature table (a <code>data.table</code>) as first argument, the analysis name as second argument, and any other arguments passed as
+<code>...</code> to <code>delete</code>. The return value of this function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Ignored.</p></td>
+      <td><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
+<p>For <a href='sets-workflow.html'>sets workflow</a> methods: further arguments passed to the base <code>features</code> method.</p></td>
     </tr>
     <tr>
-      <th>drop, j</th>
+      <th>drop</th>
       <td><p>ignored.</p></td>
     </tr>
     <tr>
       <th>name</th>
       <td><p>The analysis name (partially matched).</p></td>
+    </tr>
+    <tr>
+      <th>weights</th>
+      <td><p>A named <code>numeric</code> vector that defines the weight for each score to calculate the
+<code>totalScore</code>. The names of the vector follow the score names. Unspecified weights are defaulted to <samp>1</samp>.
+Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)</code>.</p></td>
+    </tr>
+    <tr>
+      <th>flatnessFactor</th>
+      <td><p>Passed to <span class="pkg">MetaClean</span> as the <code>flatness.factor</code> argument to
+<code><a href='https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html'>calculateJaggedness</a></code> and <code><a href='https://rdrr.io/pkg/MetaClean/man/calculateModality.html'>calculateModality</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>parallel</th>
+      <td><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href='https://CRAN.R-project.org/package=futures'><span class="pkg">futures</span></a> package. Please
+see the parallelization section in the handbook for more details.</p></td>
+    </tr>
+    <tr>
+      <th>sets</th>
+      <td><p>(<strong>sets workflow</strong>) For <code><a href='generics.html'>[</a></code> and <code>filter</code>: a <code>character</code> with name(s) of the sets to keep (or remove if
+<code>negate=TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>set</th>
+      <td><p>(<strong>sets workflow</strong>) The name of the set.</p></td>
     </tr>
     </table>
 
@@ -277,6 +330,8 @@ their index or name, respectively (for the order/names see <code><a href='generi
   analysis name (<code>analysis</code>), its path (<code>path</code>), and other columns
   such as replicate group name (<code>group</code>) and blank reference
   (<code>blank</code>).</p>
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+<p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This class provides a way to store intensity, retention times, <em>m/z</em> and
@@ -305,6 +360,15 @@ amounts of features.</p></li>
 <li><p><code><a href='generics.html'>[</a></code>: Subset on analyses.</p></li>
 <li><p><code><a href='generics.html'>[[</a></code>: Extract a feature table for an analysis.</p></li>
 <li><p><code><a href='generics.html'>$</a></code>: Extract a feature table for an analysis.</p></li>
+<li><p><code>delete</code>: Completely deletes specified features.</p></li>
+<li><p><code>calculatePeakQualities</code>: Calculates peak qualities for each feature. This uses
+<a href='https://github.com/KelseyChetnik/MetaClean/'>MetaClean</a> <span style="R">R</span> package to calculate the following metrics:
+<code>Apex-Boundary Ratio</code>, <code>FWHM2Base</code>, <code>Jaggedness</code>, <code>Modality</code>, <code>Symmetry</code>, <code>Gaussian
+Similarity</code>, <code>Sharpness</code>, <code>Triangle Peak Area Similarity Ratio</code> and <code>Zig-Zag index</code>. Please see the
+<span class="pkg">MetaClean</span> publication (referenced below) for more details. For each metric, an additional score is calculated
+by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from <samp>0</samp>
+(worst) to <samp>1</samp> (best). Then, a <code>totalScore</code> for each feature is calculated by the (weighted) sum of all
+score values.</p></li>
 </ul>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
@@ -318,16 +382,25 @@ amounts of features.</p></li>
 for access.</p></dd>
 
 </dl>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>For <code>calculatePeakQualities</code>: sometimes <span class="pkg">MetaClean</span> may return <code>NA</code> for the <code>Gaussian
+  Similarity</code> metric, in which case it will be set to <samp>0</samp>.</p>
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
 <li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
 <li><p><strong><code>features</code></strong></p><ul>
+<li><p><code>featuresSet</code></p></li>
+<li><p><code>featuresUnset</code></p></li>
 <li><p><code><a href='featureGroups-compare.html'>featuresFromFeatGroups</a></code></p></li>
 <li><p><code><a href='featureGroups-compare.html'>featuresConsensus</a></code></p></li>
 <li><p><code>featuresBruker</code></p></li>
 <li><p><code>featuresEnviPick</code></p></li>
+<li><p><code>featuresKPIC2</code></p></li>
 <li><p><code>featuresOpenMS</code></p></li>
+<li><p><code>featuresSAFD</code></p></li>
+<li><p><code>featuresSIRIUS</code></p></li>
 <li><p><code><a href='suspect-screening.html'>featuresBrukerTASQ</a></code></p></li>
 <li><p><code>featuresXCMS</code></p></li>
 <li><p><code>featuresXCMS3</code></p></li>
@@ -335,6 +408,27 @@ for access.</p></dd>
 </ul></li>
 </ul>
 
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>The <code>featuresSet</code> class is applicable for <a href='sets-workflow.html'>sets workflows</a>. This class is derived from <code>features</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul>
+<li><p><code>sets</code> Returns the set names for this object.</p></li>
+<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>featuresUnset</code>), which allows it to be used in 'regular' workflows. The adduct annotations for the selected set (<em>e.g.</em> as passed to
+  <code>makeSet</code>) are used to convert all feature masses to ionic <em>m/z</em> values.</p></li>
+</ul>
+
+<p>The following methods are changed or with new functionality:</p><ul>
+<li><p><code>filter</code> and the subset operator (<code><a href='generics.html'>[</a></code>) have specific arguments to choose/filter by (feature
+  presence in) sets. See the <code>sets</code> argument description.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Chetnik K, Petrick L, Pandey G (2020).
+&#8220;MetaClean: a machine learning-based classifier for reduced false positive peak detection in untargeted LC-MS metabolomics data.&#8221;
+<em>Metabolomics</em>, <b>16</b>(11).
+doi: <a href='https://doi.org/10.1007/s11306-020-01738-3'>10.1007/s11306-020-01738-3</a>
+.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='feature-finding.html'>feature-finding</a></code></p></div>

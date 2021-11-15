@@ -74,7 +74,7 @@ identified compounds." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -207,8 +207,9 @@ identified compounds.</p>
   retMin <span class='op'>=</span> <span class='cn'>TRUE</span>,
   EICGrid <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>1</span><span class='op'>)</span>,
   EICRtWindow <span class='op'>=</span> <span class='fl'>20</span>,
-  EICMzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
-  EICTopMost <span class='op'>=</span> <span class='cn'>NULL</span>,
+  EICMzExpWindow <span class='op'>=</span> <span class='fl'>0.001</span>,
+  EICTopMost <span class='op'>=</span> <span class='fl'>1</span>,
+  EICTopMostByRGroup <span class='op'>=</span> <span class='cn'>TRUE</span>,
   EICOnlyPresent <span class='op'>=</span> <span class='cn'>TRUE</span>,
   clearPath <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
@@ -232,10 +233,12 @@ identified compounds.</p>
   components <span class='op'>=</span> <span class='cn'>NULL</span>,
   interactiveHeat <span class='op'>=</span> <span class='cn'>FALSE</span>,
   MSPeakLists <span class='op'>=</span> <span class='cn'>NULL</span>,
+  specSimParams <span class='op'>=</span> <span class='fu'><a href='specSimParams.html'>getDefSpecSimParams</a></span><span class='op'>(</span><span class='op'>)</span>,
   retMin <span class='op'>=</span> <span class='cn'>TRUE</span>,
   EICRtWindow <span class='op'>=</span> <span class='fl'>20</span>,
-  EICMzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
-  EICTopMost <span class='op'>=</span> <span class='cn'>NULL</span>,
+  EICMzExpWindow <span class='op'>=</span> <span class='fl'>0.001</span>,
+  EICTopMost <span class='op'>=</span> <span class='fl'>1</span>,
+  EICTopMostByRGroup <span class='op'>=</span> <span class='cn'>TRUE</span>,
   EICOnlyPresent <span class='op'>=</span> <span class='cn'>TRUE</span>,
   selfContained <span class='op'>=</span> <span class='cn'>TRUE</span>,
   optimizePng <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -267,7 +270,7 @@ features.</p></td>
       <th>formulas, compounds, compsCluster, components</th>
       <td><p>Further objects
 (<code><a href='formulas-class.html'>formulas</a></code>, <code><a href='compounds-class.html'>compounds</a></code>,
-<code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>, <code><a href='components-class.html'>components</a></code>) that should be
+<code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>, <code><a href='length,transformationProducts-method.html'>components</a></code>) that should be
 reported. Specify <code>NULL</code> to skip reporting a particular object.</p></td>
     </tr>
     <tr>
@@ -340,10 +343,10 @@ reported.</p></td>
 used to determine the plotting grid when reporting EICs in PDF files.</p></td>
     </tr>
     <tr>
-      <th>EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent</th>
-      <td><p>Plotting parameters
-passed to <code><a href='generics.html'>plotChroms</a></code> (<em>i.e.</em> <code>rtWindow</code>,
-<code>mzWindow</code>, <code>topMost</code> and <code>onlyPresent</code> arguments).</p></td>
+      <th>EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent</th>
+      <td><p>Plotting parameters passed to <code><a href='generics.html'>plotChroms</a></code> (<em>i.e.</em>
+<code>rtWindow</code>, <code>mzExpWindow</code>, <code>topMost</code>, <code>topMostByRGroup</code>
+and <code>onlyPresent</code> arguments).</p></td>
     </tr>
     <tr>
       <th>reportPlots</th>
@@ -366,6 +369,11 @@ Options are: <code>"compounds"</code> (only to those with compounds results),
       <td><p>If <code>TRUE</code> an interactive heatmap HTML widget will
 be generated to display hierarchical clustering results. Set to
 <code>FALSE</code> for a 'regular' static plot.</p></td>
+    </tr>
+    <tr>
+      <th>specSimParams</th>
+      <td><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
+See the <a href='specSimParams.html'>spectral similarity parameters</a> documentation for more details.</p></td>
     </tr>
     <tr>
       <th>selfContained</th>

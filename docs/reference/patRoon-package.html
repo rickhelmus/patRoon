@@ -78,7 +78,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -186,68 +186,49 @@
 
 <p>The following package options (see <code><a href='https://rdrr.io/r/base/options.html'>options</a></code>) can be set:</p>
 <p></p><ul>
-<li><p><code>patRoon.cache.mode</code>: A <code>character</code> setting the current
-  caching mode: <code>"save"</code> and <code>"load"</code> will only save/load results
-  to/from the cache, <code>"both"</code> (default) will do both and <code>"none"</code>
-  to completely disable caching. This option can be changed anytime, which
-  might be useful, for instance, to temporarily disable cached results before
-  running a function.</p></li>
-<li><p><code>patRoon.cache.fileName</code>: a <code>character</code> specifying the name
-  of the cache file (default is <code class="file">cache.sqlite</code>).</p></li>
-<li><p><code>patRoon.MP.maxProcs</code>: The maximum number of processes that
-  should be initiated in parallel. A good starting point is the number of
-  physical cores, which is the default as detected by
-  <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>. This option is only used when
-  <span class="option">patRoon.MP.method="classic"</span>.</p></li>
-<li><p><code>patRoon.MP.method</code>: Either <code>"classic"</code> or <code>"future"</code>.
-  The former is the default and uses <code>processx</code> to execute
-  multiple commands in parallel. When <code>"future"</code> the
-  <code>future.apply</code> package is used for parallelization, which is
-  especially useful for <em>e.g.</em> cluster computing.</p></li>
-<li><p><code>patRoon.MP.futureSched</code>: Sets the <code>future.scheduling</code> function
-  argument for <code>future_lapply</code>. Only used if
-  <span class="option">patRoon.MP.method="future"</span>.</p></li>
-<li><p><code>patRoon.MP.logPath</code>: The path used for logging of output from
-  commands executed by multiprocess. Set to <code>FALSE</code> to disable logging.</p></li>
-<li><p><code>patRoon.path.pwiz</code>: The path in which the
-  <code class='command'>ProteoWizard</code> binaries are installed. If unset an attempt is made
-  to find this directory from the Windows registry and <span class="option">PATH</span>
-  environment variable.</p></li>
-<li><p><code>patRoon.path.GenForm</code>: The path to the <code class='command'>GenForm</code>
-  executable. If not set (the default) the internal <code>GenForm</code> binary is
-  used. Only set if you want to override the executable.</p></li>
-<li><p><code>patRoon.path.MetFragCL</code>: The complete file path to the MetFrag
-  CL <code class="file">jar</code> file that <em>must</em> be set when using
-  <code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code>. Example:
-  <code>"C:/MetFrag2.4.2-CL.jar"</code>.</p></li>
-<li><p><code>patRoon.path.MetFragCompTox</code>: The complete file path to the
-  CompTox database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for
-  more details.</p></li>
-<li><p><code>patRoon.path.MetFragPubChemLite</code>: The complete file path to the
-  PubChem database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for
-  more details.</p></li>
-<li><p><code>patRoon.path.SIRIUS</code>: The directory in which SIRIUS is
-  installed. Unless the binaries can be located via the <span class="option">PATH</span>
-  environment variable, this <em>must</em> be set when using
-  <code><a href='formula-generation.html'>generateFormulasSIRIUS</a></code> or
-  <code><a href='compound-generation.html'>generateCompoundsSIRIUS</a></code>. Example:
-  <code>"C:/sirius-win64-3.5.1"</code>.</p></li>
-<li><p><code>patRoon.path.OpenMS</code>: The path in which the <code class='command'>OpenMS</code>
-  binaries are installed. Usually the location is added to the <span class="option">PATH</span>
-  environment variable when OpenMS is installed, in which case this option
+<li><p><code>patRoon.cache.mode</code>: A <code>character</code> setting the current caching mode: <code>"save"</code> and
+  <code>"load"</code> will only save/load results to/from the cache, <code>"both"</code> (default) will do both and <code>"none"</code>
+  to completely disable caching. This option can be changed anytime, which might be useful, for instance, to
+  temporarily disable cached results before running a function.</p></li>
+<li><p><code>patRoon.cache.fileName</code>: a <code>character</code> specifying the name of the cache file (default is
+  <code class="file">cache.sqlite</code>).</p></li>
+<li><p><code>patRoon.MP.maxProcs</code>: The maximum number of processes that should be initiated in parallel. A good
+  starting point is the number of physical cores, which is the default as detected by
+  <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>. This option is only used when <span class="option">patRoon.MP.method="classic"</span>.</p></li>
+<li><p><code>patRoon.MP.method</code>: Either <code>"classic"</code> or <code>"future"</code>. The former is the default and uses
+  <a href='https://CRAN.R-project.org/package=processx'><span class="pkg">processx</span></a> to execute multiple commands in parallel. When <code>"future"</code> the <code>future.apply</code>
+  package is used for parallelization, which is especially useful for <em>e.g.</em> cluster computing.</p></li>
+<li><p><code>patRoon.MP.futureSched</code>: Sets the <code>future.scheduling</code> function argument for
+  <code>future_lapply</code>. Only used if <span class="option">patRoon.MP.method="future"</span>.</p></li>
+<li><p><code>patRoon.MP.logPath</code>: The path used for logging of output from commands executed by multiprocess. Set to
+  <code>FALSE</code> to disable logging.</p></li>
+<li><p><code>patRoon.path.pwiz</code>: The path in which the <code class='command'>ProteoWizard</code> binaries are installed. If unset an
+  attempt is made to find this directory from the Windows registry and <span class="option">PATH</span> environment variable.</p></li>
+<li><p><code>patRoon.path.GenForm</code>: The path to the <code class='command'>GenForm</code> executable. If not set (the default) the
+  internal <code>GenForm</code> binary is used. Only set if you want to override the executable.</p></li>
+<li><p><code>patRoon.path.MetFragCL</code>: The complete file path to the MetFrag CL <code class="file">jar</code> file that <em>must</em> be
+  set when using <code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code>. Example: <code>"C:/MetFrag2.4.2-CL.jar"</code>.</p></li>
+<li><p><code>patRoon.path.MetFragCompTox</code>: The complete file path to the CompTox database <code class="file">csv</code> file. See
+  <code><a href='compound-generation.html'>generateCompounds</a></code> for more details.</p></li>
+<li><p><code>patRoon.path.MetFragPubChemLite</code>: The complete file path to the PubChem database <code class="file">csv</code> file. See
+  <code><a href='compound-generation.html'>generateCompounds</a></code> for more details.</p></li>
+<li><p><code>patRoon.path.SIRIUS</code>: The directory in which SIRIUS is installed. Unless the binaries can be located
+  via the <span class="option">PATH</span> environment variable, this <em>must</em> be set when using <code><a href='formula-generation.html'>generateFormulasSIRIUS</a></code>
+  or <code><a href='compound-generation.html'>generateCompoundsSIRIUS</a></code>. Example: <code>"C:/sirius-win64-3.5.1"</code>.</p></li>
+<li><p><code>patRoon.path.OpenMS</code>: The path in which the <code class='command'>OpenMS</code> binaries are installed. Usually the
+  location is added to the <span class="option">PATH</span> environment variable when OpenMS is installed, in which case this option can
+  be left empty.</p></li>
+<li><p><code>patRoon.path.pngquant</code>: The path of the <code class='command'>pngquant</code> binary that is used when optimizing
+  <code class="file">.png</code> plots generated by <code><a href='reporting.html'>reportHTML</a></code> (with <code>optimizePng</code> set to <code>TRUE</code>). If the binary
+  can be located through the <span class="option">PATH</span> environment variable this option can remain empty. Note that some of the
+  functionality of <code>reportHTML</code> only locates the binary through the <span class="option">PATH</span> environment variable, hence,
+  it is recommended to set up <span class="option">PATH</span> instead.</p></li>
+<li><p><code>patRoon.path.obabel</code>: The path in which the <code class='command'>OpenBabel</code> binaries are installed. Usually the
+  location is added to the <span class="option">PATH</span> environment variable when OpenBabel is installed, in which case this option
   can be left empty.</p></li>
-<li><p><code>patRoon.path.pngquant</code>: The path of the <code class='command'>pngquant</code>
-  binary that is used when optimizing <code class="file">.png</code> plots generated by
-  <code><a href='reporting.html'>reportHTML</a></code> (with <code>optimizePng</code> set to <code>TRUE</code>). If the
-  binary can be located through the <span class="option">PATH</span> environment variable this
-  option can remain empty. Note that some of the functionality of
-  <code>reportHTML</code> only locates the binary through the <span class="option">PATH</span>
-  environment variable, hence, it is recommended to set up <span class="option">PATH</span>
-  instead.</p></li>
-<li><p><code>patRoon.path.obabel</code>: The path in which the <code class='command'>OpenBabel</code>
-  binaries are installed. Usually the location is added to the <span class="option">PATH</span>
-  environment variable when OpenBabel is installed, in which case this option
-  can be left empty.</p></li>
+<li><p><code>patRoon.path.BiotransFormer</code> The full file path to the <code class='command'>biotransformer</code> <code class="file">.jar</code> command
+  line utility. This needs to be set when <code><a href='TP-generation.html'>generateTPsBioTransformer</a></code> is used. For more details see
+  <a href='https://bitbucket.org/djoumbou/biotransformer/src/master'>https://bitbucket.org/djoumbou/biotransformer/src/master</a>.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -266,6 +247,7 @@
 <li><p>Vittorio Albergamo (<a href='https://orcid.org/0000-0002-5347-1362'>ORCID</a>) [contributor]</p></li>
 <li><p>Andrea Brunner (<a href='https://orcid.org/0000-0002-2801-1751'>ORCID</a>) [contributor]</p></li>
 <li><p>Emma Schymanski (<a href='https://orcid.org/0000-0001-6868-8145'>ORCID</a>) [contributor]</p></li>
+<li><p>Bas van de Velde (<a href='https://orcid.org/0000-0001-6868-8145'>ORCID</a>) [contributor]</p></li>
 </ul>
 
 

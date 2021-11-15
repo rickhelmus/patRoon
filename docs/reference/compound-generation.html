@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Automatic compound identification — compound-generation" />
-<meta property="og:description" content="Functionality to automatically identify chemical compounds from feature
-groups." />
+<meta property="og:description" content="Functionality to automatically identify chemical compounds from feature groups." />
 
 
 
@@ -73,7 +72,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -158,18 +157,26 @@ groups." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Automatic compound identification</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds-metfrag.R'><code>R/compounds-metfrag.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-compounds.R'><code>R/utils-compounds.R</code></a>, and 2 more</small>
     <div class="hidden name"><code>compound-generation.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Functionality to automatically identify chemical compounds from feature
-groups.</p>
+    <p>Functionality to automatically identify chemical compounds from feature groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateCompounds</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='fu'>compoundScorings</span><span class='op'>(</span>
+  algorithm <span class='op'>=</span> <span class='cn'>NULL</span>,
+  database <span class='op'>=</span> <span class='cn'>NULL</span>,
+  includeSuspectLists <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  onlyDefault <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  includeNoDB <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateCompoundsMetFrag</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   <span class='va'>MSPeakLists</span>,
@@ -181,7 +188,7 @@ groups.</p>
   dbRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
   fragRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
   fragAbsMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
-  <span class='va'>adduct</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
   database <span class='op'>=</span> <span class='st'>"pubchem"</span>,
   extendedPubChem <span class='op'>=</span> <span class='st'>"auto"</span>,
   chemSpiderToken <span class='op'>=</span> <span class='st'>""</span>,
@@ -194,11 +201,30 @@ groups.</p>
   extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span>
 
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateCompoundsMetFrag</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  method <span class='op'>=</span> <span class='st'>"CL"</span>,
+  timeout <span class='op'>=</span> <span class='fl'>300</span>,
+  timeoutRetries <span class='op'>=</span> <span class='fl'>2</span>,
+  errorRetries <span class='op'>=</span> <span class='fl'>2</span>,
+  topMost <span class='op'>=</span> <span class='fl'>100</span>,
+  dbRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  fragRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  fragAbsMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>,
+  setThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  setThresholdAnn <span class='op'>=</span> <span class='fl'>0</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateCompoundsSIRIUS</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   <span class='va'>MSPeakLists</span>,
   relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
   elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
   profile <span class='op'>=</span> <span class='st'>"qtof"</span>,
   formulaDatabase <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -214,12 +240,15 @@ groups.</p>
   splitBatches <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
-<span class='fu'>compoundScorings</span><span class='op'>(</span>
-  algorithm <span class='op'>=</span> <span class='cn'>NULL</span>,
-  database <span class='op'>=</span> <span class='cn'>NULL</span>,
-  includeSuspectLists <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  onlyDefault <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  includeNoDB <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='co'># S4 method for featureGroupsSet</span>
+<span class='fu'>generateCompoundsSIRIUS</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>,
+  setThreshold <span class='op'>=</span> <span class='fl'>0</span>,
+  setThresholdAnn <span class='op'>=</span> <span class='fl'>0</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -227,15 +256,13 @@ groups.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fGroups</th>
-      <td><p><code><a href='featureGroups-class.html'>featureGroups</a></code> object for which compounds should
-be identified. This should be the same or a subset of the object that was
-used to create the specified <code>MSPeakLists</code>. In the case of a subset
-only the remaining feature groups in the subset are considered.</p></td>
+      <td><p><code><a href='featureGroups-class.html'>featureGroups</a></code> object for which compounds should be identified. This should be the same
+or a subset of the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only
+the remaining feature groups in the subset are considered.</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
-      <td><p>A <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that was generated for
-the supplied <code>fGroups</code>.</p></td>
+      <td><p>A <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></td>
     </tr>
     <tr>
       <th>algorithm</th>
@@ -244,8 +271,23 @@ used: <code>"metfrag"</code>, <code>"sirius"</code></p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Any parameters to be passed to the selected compound generation
-algorithm.</p></td>
+      <td><p>Any parameters to be passed to the selected compound generation algorithm.</p>
+<p>For sets workflows: further arguments directly passed to the non-sets method.</p></td>
+    </tr>
+    <tr>
+      <th>database</th>
+      <td><p>Compound database to use. Valid values are: <code>"pubchem"</code>,
+<code>"chemspider"</code>, <code>"for-ident"</code>, <code>"comptox"</code>,
+<code>"pubchemlite"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
+<code>"csv"</code>. See section below for more information. Sets the
+<code>MetFragDatabaseType</code> option.</p></td>
+    </tr>
+    <tr>
+      <th>includeSuspectLists, onlyDefault, includeNoDB</th>
+      <td><p>A logical specifying
+whether scoring terms related to suspect lists, default scoring terms and
+non-database specific scoring terms should be included in the output,
+respectively.</p></td>
     </tr>
     <tr>
       <th>method</th>
@@ -266,15 +308,14 @@ before completely skipping the metFrag query for a feature group. Also see
     </tr>
     <tr>
       <th>errorRetries</th>
-      <td><p>Maximum number of retries after an error occurred. This
-may be useful to handle e.g. connection errors.</p></td>
+      <td><p>Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
+errors.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
-      <td><p>Only keep this number of candidates (per feature group) with
-highest score. Set to <code>NULL</code> to always keep all candidates,
-however, please note that this may result in significant usage of CPU/RAM
-resources for large numbers of candidates.</p></td>
+      <td><p>Only keep this number of candidates (per feature group) with highest score. Set to <code>NULL</code> to
+always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
+large numbers of candidates.</p></td>
     </tr>
     <tr>
       <th>dbRelMzDev</th>
@@ -293,17 +334,11 @@ Sets the <span class="option">FragmentPeakMatchAbsoluteMassDeviation</span> opti
     </tr>
     <tr>
       <th>adduct</th>
-      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
-converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
-<code>"[M+Na]+"</code>.</p></td>
-    </tr>
-    <tr>
-      <th>database</th>
-      <td><p>Compound database to use. Valid values are: <code>"pubchem"</code>,
-<code>"chemspider"</code>, <code>"for-ident"</code>, <code>"comptox"</code>,
-<code>"pubchemlite"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
-<code>"csv"</code>. See section below for more information. Sets the
-<code>MetFragDatabaseType</code> option.</p></td>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>).
+  Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
+  adduct annotations then these are used if <code>adducts=NULL</code>.</p>
+<p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
+  adduct annotations will then always be used.</p></td>
     </tr>
     <tr>
       <th>extendedPubChem</th>
@@ -373,14 +408,22 @@ were generated by SIRIUS+CSI:FingerID. Sets the
     </tr>
     <tr>
       <th>extraOpts</th>
-      <td><p>For <code class='command'>MetFrag</code>: A named <code>list</code> containing
-  further settings to be passed to <code>run.metfrag</code>. See
-  the <a href='http://ipb-halle.github.io/MetFrag/projects/metfragr/'>MetFragR</a>
-  and <a href='http://ipb-halle.github.io/MetFrag/projects/metfragcl/'>MetFrag
-  CL</a> homepages for all available options.</p>
-<p>For <code class='command'>SIRIUS</code>: a <code>character</code> vector with any extra commandline
-  parameters for formula prediction. See the SIRIUS manual for more details.</p>
+      <td><p>For <code class='command'>MetFrag</code>: A named <code>list</code> containing further settings to be passed to
+  <code>run.metfrag</code>. See the <a href='http://ipb-halle.github.io/MetFrag/projects/metfragr/'>MetFragR</a>
+  and <a href='http://ipb-halle.github.io/MetFrag/projects/metfragcl/'>MetFrag CL</a> homepages for all available options.</p>
+<p>For <code class='command'>SIRIUS</code>: a <code>character</code> vector with any extra commandline parameters for formula prediction. See
+  the SIRIUS manual for more details.</p>
 <p>Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>setThreshold</th>
+      <td><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
+<samp>1</samp> means that the candidate needs to be present in all the set data.</p></td>
+    </tr>
+    <tr>
+      <th>setThresholdAnn</th>
+      <td><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
+annotations for the feature group of the candidate.</p></td>
     </tr>
     <tr>
       <th>relMzDev</th>
@@ -400,16 +443,14 @@ atoms. Sets the <span class="option">--elements</span> commandline option.</p></
     </tr>
     <tr>
       <th>profile</th>
-      <td><p>Name of the configuration profile, for example:
-<span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>, <span class="option">"fticr"</span>. Sets the
-<span class="option">--profile</span> commandline option.</p></td>
+      <td><p>Name of the configuration profile, for example: <span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>,
+<span class="option">"fticr"</span>. Sets the <span class="option">--profile</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>formulaDatabase</th>
-      <td><p>If not <code>NULL</code>,
-use a database for retrieval of formula candidates. Possible values are:
-<span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets
-the <span class="option">--database</span> commandline option.</p></td>
+      <td><p>If not <code>NULL</code>, use a database for retrieval of formula
+candidates. Possible values are: <span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets the
+<span class="option">--database</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>fingerIDDatabase</th>
@@ -420,13 +461,13 @@ is also <code>NULL</code>. Sets the <span class="option">--fingerid-db</span> op
     </tr>
     <tr>
       <th>noise</th>
-      <td><p>Median intensity of the noise (<code>NULL</code> ignores this
-parameter). Sets the <span class="option">--noise</span> commandline option.</p></td>
+      <td><p>Median intensity of the noise (<code>NULL</code> ignores this parameter). Sets the <span class="option">--noise</span>
+commandline option.</p></td>
     </tr>
     <tr>
       <th>cores</th>
-      <td><p>The number of cores <code class='command'>SIRIUS</code> will use. If <code>NULL</code>
-then the default of all cores will be used.</p></td>
+      <td><p>The number of cores <code class='command'>SIRIUS</code> will use. If <code>NULL</code> then the default of all cores will be
+used.</p></td>
     </tr>
     <tr>
       <th>topMostFormulas</th>
@@ -436,12 +477,10 @@ Sets the <span class="option">--candidates</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>extraOptsGeneral, extraOptsFormula</th>
-      <td><p>a <code>character</code> vector with any
-extra commandline parameters for <code class='command'>SIRIUS</code>. For <code class='command'>SIRIUS</code>
-versions <code>&lt;4.4</code> there is no distinction between general and formula
-options. Otherwise commandline options specified in <code>extraOptsGeneral</code>
-are added prior to the <code>formula</code> command, while options specified in
-<code>extraOptsFormula</code> are added in afterwards. See the <code class='command'>SIRIUS</code>
+      <td><p>a <code>character</code> vector with any extra commandline parameters for
+<code class='command'>SIRIUS</code>. For <code class='command'>SIRIUS</code> versions <code>&lt;4.4</code> there is no distinction between general and formula
+options. Otherwise commandline options specified in <code>extraOptsGeneral</code> are added prior to the <code>formula</code>
+command, while options specified in <code>extraOptsFormula</code> are added in afterwards. See the <code class='command'>SIRIUS</code>
 manual for more details. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
@@ -450,51 +489,37 @@ manual for more details. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>splitBatches</th>
-      <td><p>If <code>TRUE</code> then the calculations done by
-<code class='command'>SIRIUS</code> will be evenly split over multiple <code class='command'>SIRIUS</code> calls
-(which may be run in parallel depending on the <a href='patRoon-package.html'>set
-package options</a>). If <code>splitBatches=FALSE</code> then all feature
-calculations are performed from a single <code class='command'>SIRIUS</code> execution, which
-is often the fastest if calculations are performed on a single computer.</p></td>
-    </tr>
-    <tr>
-      <th>includeSuspectLists, onlyDefault, includeNoDB</th>
-      <td><p>A logical specifying
-whether scoring terms related to suspect lists, default scoring terms and
-non-database specific scoring terms should be included in the output,
-respectively.</p></td>
+      <td><p>If <code>TRUE</code> then the calculations done by <code class='command'>SIRIUS</code> will be evenly split over multiple
+<code class='command'>SIRIUS</code> calls (which may be run in parallel depending on the <a href='patRoon-package.html'>set package
+options</a>). If <code>splitBatches=FALSE</code> then all feature calculations are performed from a single <code class='command'>SIRIUS</code>
+execution, which is often the fastest if calculations are performed on a single computer.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>generateCompoundsMetFrag</code> returns a <code><a href='compoundsMF-class.html'>compoundsMF</a></code>
+    <p><code>compoundScorings</code> returns a <code>data.frame</code> with information
+  on which scoring terms are used, what their algorithm specific name is and
+  other information such as to which database they apply and short remarks.</p>
+<p><code>generateCompoundsMetFrag</code> returns a <code><a href='compoundsMF-class.html'>compoundsMF</a></code>
   object.</p>
 <p><code>generateCompoundsSIRIUS</code> returns a <code><a href='compounds-class.html'>compounds</a></code>
   object.</p>
-<p><code>compoundScorings</code> returns a <code>data.frame</code> with information
-  on which scoring terms are used, what their algorithm specific name is and
-  other information such as to which database they apply and short remarks.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Several algorithms are provided to automatically identify compounds for given
-feature groups. To this end, each measured masses for all feature groups are
-searched within online database(s) (<em>e.g.</em>
-<a href='https://pubchem.ncbi.nlm.nih.gov/'>PubChem</a>) to retrieve a list of
-potential candidate chemical compounds. Depending on the algorithm and its
-parameters, further scoring of candidates is then performed using, for
-instance, matching of measured and theoretical isotopic patterns, presence
-within other data sources such as patent databases and similarity of measured
-and in-silico predicted MS/MS fragments. Note that this process is often
-quite time consuming, especially for large feature group sets. Therefore,
-this is often one of the last steps within the workflow and not performed
-before feature groups have been prioritized.</p>
-<p><code>generateCompounds</code> is a generic function that will generate compounds
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>generateCompoundsMetFrag</code> and
-  <code>generateCompoundsSIRIUS</code>. While these functions may be called directly,
-  <code>generateCompounds</code> provides a generic interface and is therefore usually
-  preferred.</p>
+    <p>Several algorithms are provided to automatically identify compounds for given feature groups. To this end, each
+measured masses for all feature groups are searched within online database(s) (<em>e.g.</em>
+<a href='https://pubchem.ncbi.nlm.nih.gov/'>PubChem</a>) to retrieve a list of potential candidate chemical compounds.
+Depending on the algorithm and its parameters, further scoring of candidates is then performed using, for instance,
+matching of measured and theoretical isotopic patterns, presence within other data sources such as patent databases
+and similarity of measured and in-silico predicted MS/MS fragments. Note that this process is often quite time
+consuming, especially for large feature group sets. Therefore, this is often one of the last steps within the
+workflow and not performed before feature groups have been prioritized.</p>
+<p><code>generateCompounds</code> is a generic function that will generate compounds using one of the supported algorithms. The actual
+  functionality is provided by algorithm specific functions such as <code>generateCompoundsMetFrag</code> and <code>generateCompoundsSIRIUS</code>. While these
+  functions may be called directly, <code>generateCompounds</code> provides a generic interface and is therefore usually preferred.</p>
+<p><code>compoundScorings</code> displays an overview of scorings may be
+  applied to rank candidate compounds (see <code>Scorings</code> section below).</p>
 <p><code>generateCompoundsMetFrag</code> uses the <span class="pkg">metfRag</span> package or
   <code class='command'>MetFrag CL</code> for compound identification (see
   <a href='http://ipb-halle.github.io/MetFrag/'>http://ipb-halle.github.io/MetFrag/</a>). Several online compound
@@ -514,23 +539,19 @@ before feature groups have been prioritized.</p>
   SIRIUS. These results are then feed to CSI:FingerID to acquire candidate
   structures. This method requires the availability
   of MS/MS data, and feature groups without it will be ignored.</p>
-<p><code>compoundScorings</code> displays an overview of scorings may be
-  applied to rank candidate compounds (see <code>Scorings</code> section below).</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>For annotations performed with <code class='command'>SIRIUS</code> it is often the fastest
-  to keep the default <code>splitBatches=FALSE</code>. In this case, all
-  <code class='command'>SIRIUS</code> output will be printed to the terminal (unless
-  <code>verbose=FALSE</code> or <span class="option">patRoon.MP.method="future"</span>).</p>
+    <p>For annotations performed with <code class='command'>SIRIUS</code> it is often the fastest to keep the default
+  <code>splitBatches=FALSE</code>. In this case, all <code class='command'>SIRIUS</code> output will be printed to the terminal (unless
+  <code>verbose=FALSE</code> or <span class="option">patRoon.MP.method="future"</span>). Furthermore, please note that only annotations to be
+  performed for the same adduct are grouped in a single batch execution.</p>
     <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
 
-    <p>Each algorithm implements their own scoring system. Their
-  names have been simplified and harmonized where possible and are used for
-  reporting and in the case <code class='command'>MetFrag</code> is used to specify how
-  compounds should be scored (<code>scoreTypes</code> argument). The
-  <code>compoundScorings</code> function can be used to get an overview of both the
-  algorithm specific and generic scoring names. For instance, the table below
-  shows all scorings for <code class='command'>MetFrag</code>: (some columns are omitted)</p>
+    <p>Each algorithm implements their own scoring system. Their names have been simplified and
+  harmonized where possible and are used for reporting and in the case <code class='command'>MetFrag</code> is used to specify how
+  compounds should be scored (<code>scoreTypes</code> argument). The <code>compoundScorings</code> function can be used to get an
+  overview of both the algorithm specific and generic scoring names. For instance, the table below shows all scorings
+  for <code class='command'>MetFrag</code>: (some columns are omitted)</p>
 <p></p><table class='table'>
 <tr><td><strong>name</strong></td><td><strong>metfrag</strong></td><td><strong>database</strong></td></tr>
 <tr><td>score</td><td>Score</td><td></td></tr>
@@ -596,15 +617,29 @@ before feature groups have been prioritized.</p>
 </table>
 
 
-<p>In addition, the <code>compoundScorings</code> function is also
-  useful to programatically generate  a set of scorings to be used by
-  <code class='command'>MetFrag</code>. For instance, the following can be given to the
-  <code>scoreTypes</code> argument to use all default scorings for PubChem:
-  <code>compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name</code>.</p>
-<p>For all <code class='command'>MetFrag</code> scoring types refer to the <code>Candidate
-  Scores</code> section on the
-  <a href='http://ipb-halle.github.io/MetFrag/projects/metfragr/'>MetFragR
-  homepage</a>.</p>
+<p>In addition, the <code>compoundScorings</code> function is also useful to programatically generate  a
+  set of scorings to be used by <code class='command'>MetFrag</code>. For instance, the following can be given to the <code>scoreTypes</code>
+  argument to use all default scorings for PubChem: <code>compoundScorings("metfrag", "pubchem",
+  onlyDefault=TRUE)$name</code>.</p>
+<p>For all <code class='command'>MetFrag</code> scoring types refer to the <code>Candidate Scores</code> section on the
+  <a href='http://ipb-halle.github.io/MetFrag/projects/metfragr/'>MetFragR homepage</a>.</p>
+    <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
+
+    <p>With a <a href='sets-workflow.html'>sets workflow</a>, annotation is first performed for each set.
+  This is important, since the annotation algorithms typically cannot work with data from mixed ionization modes. The
+  annotation results are then combined to generate a <em>sets consensus</em>:</p><ul>
+<li><p>The annotation tables for each feature group from the set specific data are combined. Rows with overlapping
+  candidates (determined by the first-block <acronym>InChIKey</acronym>) are merged.</p></li>
+<li><p>Set specific data (<em>e.g.</em> the ionic formula) is retained by renaming their columns with set specific
+  names.</p></li>
+<li><p>The MS/MS fragment annotations (<code>fragInfo</code> column) from each set are combined.</p></li>
+<li><p>The scorings for each set are averaged to calculate overall scores.</p></li>
+<li><p>The candidates are re-ranked based on their average ranking among the set data (if a candidate is absent in a
+  set it is assigned the poorest rank in that set).</p></li>
+<li><p>The coverage of each candidate among sets is calculated. Depending on the <code>setThreshold</code> and
+  <code>setThresholdAnn</code> arguments, candidates with low abundance are removed.</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="parallelization"><a class="anchor" href="#parallelization"></a>Parallelization</h2>
 
     <p><code>generateCompoundsMetFrag</code> and <code>generateCompoundsSIRIUS</code> uses multiprocessing to parallelize
@@ -654,18 +689,17 @@ doi: <a href='https://doi.org/10.1186/s13321-016-0115-9'>10.1186/s13321-016-0115
 <em>Nature Methods</em>, <b>16</b>(4), 299--302.
 doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
 .
- <br /><br />
-  Duhrkop K, Bocker S (2015).
+ <br /><br /> Duhrkop K, Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
 In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
 ISBN 978-3-319-16706-0.
- <br /><br /> Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
+ <br /><br />
+  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
 &#8220;Searching molecular structure databases with tandem mass spectra using CSI:FingerID.&#8221;
 <em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
 doi: <a href='https://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 .
-
-  <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+ <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
 <em>Bioinformatics</em>, <b>25</b>(2), 218--224.
 doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>

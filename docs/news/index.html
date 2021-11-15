@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
       </span>
     </div>
 
@@ -159,22 +159,324 @@
       <small>Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="patroon-20" class="section level1">
+<h1 class="page-header" data-toc-text="2.0">
+<a href="#patroon-20" class="anchor"></a>patRoon 2.0</h1>
+<p>This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections below for more information.</p>
+<p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running <code><a href="../reference/clearCache.html">clearCache("all")</a></code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
+<div id="important-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#important-changes" class="anchor"></a>Important changes</h2>
+<ul>
+<li>Features
+<ul>
+<li>XMCS(3): Renamed argument <code>exportedData</code> to <code>loadRawData</code>.</li>
+<li>The <code>mzWindow</code> and <code>EICMzWindow</code> arguments were renamed to <code>mzExpWindow</code> / <code>EICMzExpWindow</code> and are now with slightly different meaning (please see the reference manual).</li>
+<li>OpenMS: <code>minFWHM</code>/<code>maxFWHM</code> defaults lowered for <code>findFeatures</code> and feature optimization.</li>
+</ul>
+</li>
+<li>Annotation
+<ul>
+<li>ggplot2 support for several plotting functions (i.e. <code>useGGPlot2</code> argument) is removed (not often used and a maintenance burden).</li>
+<li>the <code>precursor</code> argument to the <code><a href="../reference/generics.html">plotSpectrum()</a></code>, <code>annotatedSpectrum()</code> and <code><a href="../reference/generics.html">plotScores()</a></code> methods for <code>formulas</code> now expects the neutral formula instead of the ionized formula. This change was done for consistency with compound annotations and sets workflows.</li>
+<li>The way of obtaining candidate formulae from different features in the same group (i.e. <em>feature formula</em> consensus) was changed.
+<ul>
+<li>Fixes were applied to improve thresholding with <code>featThreshold</code>.</li>
+<li>A second and new threshold, <code>featThresholdAnn</code>, only takes annotated features into account.</li>
+<li>The default of <code>featThreshold</code> is now <code>0</code>, for <code>featThresholdAnn</code> it is the same as the previous default for <code>featThreshold</code>.</li>
+<li>Candidate results: renamed <code>analysis</code> column to <code>analysis_from</code> and added <code>analyses</code> column that lists all analyses from which the consensus was made.</li>
+<li>if multiple annotations are available for a single MS/MS peak (eg due to differences between feature annotations) then only the annotation with lowest m/z deviation is kept (and a warning is emitted).</li>
+<li>Scores of annotated fragments from different features are now averaged.</li>
+</ul>
+</li>
+<li>The storage classes and interface for formula and compound annotation was harmonized
+<ul>
+<li>The <code>formulas</code> and <code>compounds</code> classes now derive from the new <code>featureAnnotations</code> class. Most of the functionality common to formulas/compounds are defined for this class.</li>
+<li>Storage of formula annotation results mostly follow the format that was already used for compound annotations.</li>
+<li>The <code>maxFormulas</code>/<code>maxFragFormulas</code> argument for <code><a href="../reference/generics.html">as.data.table()</a></code> were removed, as these don’t make much sense with the new format.</li>
+<li>The <code>elements</code> filter now applies to neutral formulae for both formula and compound annotations (<code>fragElements</code> still applies to the ionized fragment formula).</li>
+</ul>
+</li>
+<li>Formula annotation with Bruker now require <code>MSPeakLists</code>. Since all algorithms now require peak lists, <code>generateFormulas</code> now has a mandatory <code>MSPeakLists</code> argument (similar to <code>generateCompounds</code>).</li>
+<li>Formula candidates (formula and compound annotations) are now reported in the <code>ion_formula</code> (ionized) and <code>neutral_formula</code> (neutral) columns. Similarly, the <code>formula_mz</code> column was renamed to <code>ion_formula_mz</code>.</li>
+</ul>
+</li>
+<li>Suspect screening
+<ul>
+<li>The methodology to match m/z values of suspects and features was changed. This was mainly for consistency and compatibility with sets workflows. Please see the updated section on suspect screening in the Handbook.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="major-new-functionality" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-new-functionality" class="anchor"></a>Major new functionality</h2>
+<div id="transformation-product-screening" class="section level3">
+<h3 class="hasAnchor">
+<a href="#transformation-product-screening" class="anchor"></a>Transformation product screening</h3>
+<p>The most important new functionality in <code>patRoon 2.0</code> are transformation product (TP) screening workflows. This release adds functionality to predict TPs (with <code>BioTransformer</code> or metabolic logic) or search TPs in <code>PubChem</code> or custom databases. Furthermore, other data such as MS/MS similarity or feature classification data can be used to relate parent/TP features. Other TP screening functionality includes TP prioritization and automatic generation of TP compound database for <code>MetFrag</code> annotation. The workflows follow the classical design of <code>patRoon</code>, where flexible workflows can be executed with a combination of established algorithms and new functionality. For more information, please see the dedicated chapter about TP screening in the Handbook.</p>
+</div>
+<div id="sets-workflows" class="section level3">
+<h3 class="hasAnchor">
+<a href="#sets-workflows" class="anchor"></a>Sets workflows</h3>
+<p>Another major change in this release is the addition of sets workflows. These workflows are typically used to simultaneously process positive and negative ionization data. Advantages of sets workflows include simplification of data processing, combining positive and negative data to improve e.g. feature annotations and easily comparing features across polarities. A sets workflow requires minimal changes to a ‘classical workflow’, and most of the additional work needed to process both polarities is done automatically behind the scenes. For more information, please see the dedicated chapter about sets workflows in the Handbook.</p>
+</div>
+<div id="features" class="section level3">
+<h3 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h3>
+<p>The following new feature detection/grouping algorithms were integrated: <code>SIRIUS</code>, <code>KPIC2</code> and <code>SAFD</code>. Furthermore, integration with <code>MetaClean</code> was implemented for the calculation of peak qualities and machine learning based classification of pass/fail peaks. In addition, the peak qualities are used to calculate peak scores, which can be used for quick assessment and prioritization.</p>
+</div>
+<div id="data-curation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#data-curation" class="anchor"></a>Data curation</h3>
+<p>Interactive curation of feature data with <code><a href="../reference/patRoon-defunct.html">checkChromatograms()</a></code> was replaced with <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>, which is much faster, is better suitable for larger datasets, customizable and has an improved user interface. Furthermore, this tool can be used for training/assessing <code>MetaClean</code> models. Similarly, <code><a href="../reference/check-GUI.html">checkComponents()</a></code> is a function that allows interactive curation of component data.</p>
+<p>The <code><a href="../reference/generics.html">delete()</a></code> generic function allows straightforward deletion of parts of the workflow data, such as features, components and annotations. Furthermore, this function makes it easy to implement customized filters.</p>
+</div>
+<div id="adduct-annotation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#adduct-annotation" class="anchor"></a>Adduct annotation</h3>
+<p>The algorithms of <code>OpenMS</code> (<code>MetaboliteAdductDecharger</code>) and <code>cliqueMS</code> were integrated for additional ways to detect adducts/isotopes through componentization. Furthermore, the new <code><a href="../reference/featureGroups-class.html">selectIons()</a></code> method uses these annotations to prioritize features (e.g. by only retaining those with preferable adducts). In addition, this function stores the adduct annotations for the remaining feature groups, which can then be automatically used for e.g. formula and compound annotation.</p>
+</div>
+</div>
+<div id="other-new-functionality" class="section level2">
+<h2 class="hasAnchor">
+<a href="#other-new-functionality" class="anchor"></a>Other new functionality</h2>
+<ul>
+<li>
+<code>newProject</code>
+<ul>
+<li>Updated for new functionality such as sets and TP workflows and adduct annotation.</li>
+<li>Completely re-designed code generation to improve extensibility. The generated code will have a slightly different layout and some parameter defaults were changed.</li>
+</ul>
+</li>
+<li>Features
+<ul>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code>
+<ul>
+<li>intensity normalization (<code>normFunc</code> argument)</li>
+<li>customized averaging (<code>averageFunc</code> argument)</li>
+<li>calculation of Fold-changes (<code>FCParams</code> argument)</li>
+<li>report peak qualities/scores (<code>qualities</code> argument)</li>
+</ul>
+</li>
+<li>New <code><a href="../reference/generics.html">plotVolcano()</a></code> method function to plot fold changes.</li>
+<li>
+<code>topMostByRGroup/EICTopMostByRGroup</code> arguments for plotting/reporting EIC data of only the top most intense replicate(s).</li>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code> now only plots the EIC of the most intense feature of each replicate group (i.e. <code>EICTopMostByRGroup=TRUE</code> and <code>EICTopMost=1</code>).</li>
+<li>
+<code>XCMS3</code>
+<ul>
+<li>
+<code>loadRawData</code> argument for feature grouping and <code><a href="../reference/featureGroups-compare.html">comparison()</a></code>
+</li>
+<li>
+<code>...</code> argument for <code>findFeaturesXCMS3</code>
+</li>
+<li>
+<code>preGroupParam</code> to specify grouping parameters used prior to RT alignment (suggested by Ricardo Cunha)</li>
+</ul>
+</li>
+<li>The internal <code>XCMS</code> feature (group) objects are synchronized as much as possible when feature data is changed.</li>
+<li>Feature groups: print feature counts with <code><a href="../reference/generics.html">show()</a></code> and <code><a href="../reference/generics.html">filter()</a></code> methods.</li>
+<li>
+<code>OpenMS</code> feature finding: <code>useFFMIntensities</code> argument to speed up intensity loading (experimental).</li>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code> now reports general feature information in a separate tab.</li>
+<li>Feature groups: <code>results</code> argument to <code><a href="../reference/generics.html">[</a></code> (subset) and <code><a href="../reference/generics.html">filter()</a></code> to quickly synchronize feature groups between objects (e.g. to quickly remove feature groups without annotation results).</li>
+</ul>
+</li>
+<li>Annotation
+<ul>
+<li>The methodology of <code><a href="../reference/generics.html">plotSpectrum()</a></code> to automatically calculate the space necessary for formula annotation texts and candidate structures was improved. Annotation texts are now automatically resized if there is insufficient space, and the maximum size and resolution for candidate structures can be controlled with the <code>maxMolSize</code>/<code>molRes</code> parameters.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code>: <code>minMSMSPeaks</code> filter to only retain MSMS peak lists with a minimum number of peaks.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code>: <code>annotatedBy</code> filter to only keep peaks with formula/compound annotations.</li>
+</ul>
+</li>
+<li>Suspect screening
+<ul>
+<li>The <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> method now supports the <code>amend</code> argument, which allows combining results of different <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> calls (see the Handbook for details).</li>
+</ul>
+</li>
+<li>Components
+<ul>
+<li>A new algorithm, <code>specclust</code>, which generates components based on hierarchically clustering feature groups with high MS/MS similarities.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>Features
+<ul>
+<li>
+<code>groupFeatures</code>: renamed the <code>feat</code> argument to <code>obj</code>.</li>
+<li>Improved performance for some feature group filters.</li>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code>: EICs are shared between tabs to avoid duplicated plotting</li>
+<li>The <code>features</code> object embedded in <code>featureGroups</code> objects is now synchronized, and any features not present in any group are removed accordingly. This reduces memory usage and indirectly causes <code><a href="../reference/reporting.html">reportCSV()</a></code> to only report features still present.</li>
+<li>
+<code><a href="../reference/generics.html">plotInt()</a></code>: now has <code>xnames</code> and <code>showLegend</code> arguments to adjust plotting.</li>
+</ul>
+</li>
+<li>Annotation
+<ul>
+<li>The <code><a href="../reference/generics.html">[</a></code> (subset) and <code><a href="../reference/generics.html">filter()</a></code> methods for <code>MSPeakLists</code> now only re-average peak lists if the new <code>reAverage</code> argument is set to <code>TRUE</code> (default <code>FALSE</code>). This change was mainly done as (1) the effects are usually minor and (2) re-averaging invalidates any formula/compound annotations done prior to filtering.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code>: the <code>withMSMS</code> filter is now applied after all other filters.</li>
+<li>
+<code>MetFrag</code>: the raw unprocessed annotation formulas are now additionally stored in the <code>fragInfo</code> tables (<code>formula_MF</code> column).</li>
+<li>
+<code>MetFrag</code>: the precursor ion m/z is now taken from peak list data instead of the feature group to improve annotation.</li>
+<li>
+<code>MetFrag</code>: the <code>useSmiles</code> parameter is now set to <code>true</code> as this seems to improve results sometimes.</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>formulas</code>: if <code>average=TRUE</code> then all column data that cannot be reasonably averaged are excluded.</li>
+<li>
+<code><a href="../reference/generics.html">annotatedPeakList()</a></code>: also add annotation columns for missing results (for consistency).</li>
+<li>Compound MS/MS annotations do not include peak intensities anymore (already stored in MS peak lists).</li>
+<li>The <code>minMaxNormalization</code> argument to the <code><a href="../reference/generics.html">consensus()</a></code> method for <code>compounds</code> was removed (unused).</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> for <code>formulas</code>/<code>compounds</code>: if algorithm consensus results are filtered with <code>scoreLimits</code>, and a score term exists multiple times for a candidate, only one of the terms needs to fall within the specified limits for the candidate to be kept (was all).</li>
+<li>
+<code><a href="../reference/generics.html">plotSpectrum()</a></code> for <code>compounds</code>: <code>plotStruct</code> is now defaulted to <code>FALSE</code>.</li>
+<li>
+<code>MSPeakLists</code> data now store an unique identifier for each mass peak in the <code>ID</code> column. These IDs are used by e.g. formula/compound annotations, and stored in the <code>PLID</code> column in their <code>fragInfo</code> data. This replaces the <code>PLIndex</code> column in <code>fragInfo</code> data, which was only row based, and therefore invalidated in case peak lists were filtered afterwards.</li>
+</ul>
+</li>
+<li>Adducts
+<ul>
+<li>
+<code><a href="../reference/adduct-utils.html">GenFormAdducts()</a></code> and <code><a href="../reference/adduct-utils.html">MetFragAdducts()</a></code> now additionally return adducts in generic format and use cached data for efficiency.</li>
+<li>
+<code>err</code> argument to <code><a href="https://rdrr.io/r/base/character.html">as.character()</a></code> to control if an error or <code>NA</code> should returned if conversion fails.</li>
+<li>Standardized GenForm/MetFrag element addition/subtraction data to improve consistency for conversions (eg NH4 –&gt; H4N).</li>
+<li>Conversion from/to adduct formats of OpenMS (<code>MetaboliteAdductDecharger</code>) and <code>cliqueMS</code>.</li>
+<li>
+<code><a href="../reference/adduct-utils.html">calculateIonFormula()</a></code> and <code><a href="../reference/adduct-utils.html">calculateNeutralFormula()</a></code> now Hill sort their result</li>
+</ul>
+</li>
+<li>Suspect screening
+<ul>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code>: Suspect screening specific columns are now prefixed with <code>susp_</code>.</li>
+<li>The <code>suspFormRank</code> and <code>suspCompRank</code> suspect annotation data columns were renamed to <code>formRank</code>/<code>suspCompRank</code> (the previous change made prefixing unnecessary).</li>
+<li>Several updates for Bruker TASQ import.</li>
+<li>
+<code>logPath</code> argument for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> to specify the file path for log files are disable logging completely.</li>
+<li>suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows</li>
+</ul>
+</li>
+<li>Components
+<ul>
+<li>Intensity clusters now use <code>fastcluster</code> for hierarchical clustering.</li>
+<li>Changed column <code>rt</code> to <code>ret</code> for consistency.</li>
+<li>
+<code><a href="../reference/generics.html">show()</a></code>: show unique feature group counts.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code>: allow negative <code>rtIncrement</code> values.</li>
+<li>
+<code>nontarget</code>: replaced <code>extraOpts</code> argument with <code>...</code>.</li>
+<li>
+<code>nontarget</code>: store links as character string indices instead of numeric indices.</li>
+<li>
+<code>RAMClustR</code>: moved position of <code>ionization</code> argument to improve consistency.</li>
+<li>The ‘reduced components’ mechanism, where a components object was returned without any algorithm specific data (using the <code>componentsReduced</code> class) when filtering/subsetting components, was removed. This system was quite unintuitive and imposed unnecessary limitations. Instead, functions that cannot work after component data is changed (e.g. those specific to intensity clustering) will throw an error if needed.</li>
+<li>The objects returned from <code>intclust</code> components are now derived from a general <code>componentsClust</code> class, which is shared with <code>specclust</code> components. The common functionality for both algorithms is implemented for this class.</li>
+</ul>
+</li>
+<li>Misc
+<ul>
+<li>
+<code><a href="../reference/generics.html">show()</a></code> methods now print class inheritance tree</li>
+<li>The <code>progressr</code> package is not used anymore, thus, it is not necessary to set up progress bars with <code>future</code> based multiprocessing.</li>
+<li>
+<code>newProject</code>: Moved order of componentization step (now before annotation &amp; suspect screening).</li>
+<li>Plots of chromatograms, spectra etc that are without data now reflect this in the generated plot.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#fixes" class="anchor"></a>Fixes</h2>
+<ul>
+<li>Features
+<ul>
+<li>Blank filter: don’t subtract blanks from each other</li>
+<li>Fixed: when <code>xlim</code>/<code>ylim</code> was used with <code>plotChroms</code> then peaks were not always correctly filled</li>
+<li>
+<code>retMin</code> argument to <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroupsComparison</code> wasn’t properly used/defaulted.</li>
+</ul>
+</li>
+<li>Annotations
+<ul>
+<li>Fixed: <code><a href="../reference/generics.html">plotSpectrum()</a></code> if <code>xlim</code> is set and this yields no data then an empty plot is shown.</li>
+<li>Fixed: <code><a href="../reference/generics.html">plotSpectrum()</a></code> automatic <code>ylim</code> determination was incorrect if only one peak is shown.</li>
+<li>Fixed: consensus from feature formulas possibly could have fragment m/zs not in group MS/MS peak lists.</li>
+<li>Fixed: consensus from feature formulas possibly could have fragment m/zs that deviated from those in in group MS/MS peaklists.</li>
+<li>Fixed: formula algorithm consensus wrongly ranked candidates not ubiquitously present in all algorithms.</li>
+<li>Fixed: the <code>scoreLimits</code> filter for formulas could ignore results not obtained with MS/MS data.</li>
+<li>Fixed: MetFrag was using a wrong/inconsistent cache name.</li>
+<li>Fixed: <code><a href="../reference/generics.html">as.data.table(compounds, fragments=TRUE)</a></code> returned empty results for candidates without fragment annotations.</li>
+<li>Fixed: <code>topX</code> arguments for the <code>MSPeakLists</code> method for <code><a href="../reference/generics.html">filter()</a></code> would re-order peak lists, thereby invaliding any annotations.</li>
+<li>Fixed: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed.</li>
+<li>Fixed: Hill ordering: H wasn’t sorted alphabetically if no C is present.</li>
+<li>Several fixes were applied to improve handling of <code>SIRIUS</code> ‘adduct fragments’.</li>
+<li>formula/compound annotation consensus ranking is now properly scaled.</li>
+<li>Fixed: <code><a href="../reference/MSPeakLists-generation.html">generateMSPeakListsDAFMF()</a></code> potentially used wrong DA compound data in case features were filtered.</li>
+</ul>
+</li>
+<li>Suspect screening
+<ul>
+<li>Fixed: <code><a href="../reference/suspect-screening.html">numericIDLevel()</a></code> now properly handles <code>NA</code> values.</li>
+<li>
+<code><a href="../reference/suspect-screening.html">importFeatureGroupsBrukerTASQ()</a></code>: Improved handling of absent analyses in imported results files.</li>
+</ul>
+</li>
+<li>Components
+<ul>
+<li>
+<code>RAMClustR</code>: ensure that columns are the right type if all values are NA.</li>
+<li>
+<code>CAMERA</code>: correctly handle cases when <code>minSize</code> filter results in zero components.</li>
+<li>
+<code><a href="../reference/generics.html">plotGraph()</a></code>: improve error handling with empty objects.</li>
+</ul>
+</li>
+<li>Misc
+<ul>
+<li>Future multiprocessing: make sure that logs are created even when an error occurs.</li>
+<li>Classic multiprocessing: intermediate results are cached again.</li>
+<li>Fixed: parallelization issues with cached data (thanks to <a href="https://blog.r-hub.io/2021/03/13/rsqlite-parallel/" class="uri">https://blog.r-hub.io/2021/03/13/rsqlite-parallel/</a>)</li>
+<li>
+<code><a href="../reference/newProject.html">newProject()</a></code>: correctly handle DIA with Bruker MS peak lists.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
     <div id="patroon-121" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.1">
 <a href="#patroon-121" class="anchor"></a>patRoon 1.2.1</h1>
 <ul>
 <li>Fixed: XCMS feature grouping didn’t work when the <code>peakgroups</code> alignment method was used (fixes issue <a href='https://github.com/rickhelmus/patRoon/issues/22'>#22</a>)</li>
-<li>Fixed: (harmless) <code>mapply</code> warning was shown with <code><a href="../reference/GUI-utils.html">newProject()</a></code>
+<li>Fixed: (harmless) <code>mapply</code> warning was shown with <code><a href="../reference/newProject.html">newProject()</a></code>
 </li>
 <li>
-<code><a href="../reference/GUI-utils.html">newProject()</a></code>: don’t show <em>Remove</em> button in analyses select screen when the script option is selected, as this will not work properly.</li>
+<code><a href="../reference/newProject.html">newProject()</a></code>: don’t show <em>Remove</em> button in analyses select screen when the script option is selected, as this will not work properly.</li>
 <li>
 <code>IPO</code>: add default limits for OpenMS <code>traceTermOutliers</code>
 </li>
 <li>
 <code>IPO</code> optimization fix: integer parameters are properly rounded</li>
 <li>Fixed: <code><a href="../reference/feature-optimization.html">generateFeatureOptPSet("xcms3", method="matchedFilter")</a></code> would return a parameter set with <code>step</code> instead of <code>binSize</code> (issue <a href='https://github.com/rickhelmus/patRoon/issues/23'>#23</a>)</li>
-<li>Fixed: <code><a href="../reference/GUI-utils.html">newProject()</a></code> would generate an ID levels configuration file even when no suspect list was selected.</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> would generate an ID levels configuration file even when no suspect list was selected.</li>
 <li>MCS calculation: handle <code>NULL</code> values that may occasionally be returned by <code><a href="https://rdrr.io/pkg/rcdk/man/get.mcs.html">rcdk::get.mcs</a></code>
 </li>
 <li>Fixed: intensity filter failed if previous filters lead to zero feature groups.</li>
@@ -210,7 +512,7 @@
 <li>New suspect screening interface
 <ul>
 <li>By default, feature groups without suspect hit are <em>not</em> removed (unless <code>onlyHits=TRUE</code>). This allows straightforward mixing of suspect and full non-target workflows.</li>
-<li>The feature groups are <em>not</em> renamed tot the suspect name anymore. If you quickly want to assess which suspects were found, use the <code>screenInfo()</code> or <code><a href="../reference/generics.html">as.data.table()</a></code> methods.</li>
+<li>The feature groups are <em>not</em> renamed tot the suspect name anymore. If you quickly want to assess which suspects were found, use the <code><a href="../reference/featureGroupsScreening-class.html">screenInfo()</a></code> or <code><a href="../reference/generics.html">as.data.table()</a></code> methods.</li>
 <li>Subsetting of suspsect screening results can be done with the <code>suspects</code> argument to <code><a href="../reference/generics.html">[</a></code>, e.g. <code>fGroupsScr[, suspects = "carbamazepine"]</code>
 </li>
 <li>A new method, <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>, allows combining the annotation workflow data (peak lists, formulas, compounds) to perform a detailed annotation for the suspects found during the workflow. This method calculates properties such as
@@ -227,7 +529,7 @@
 </li>
 <li>Changes to suspect lists
 <ul>
-<li>Whenever possible, suspect information such as formulae, neutral masses, InChIKeys etc will be calculated for the input suspect list (obtainable afterwards with <code>screenInfo()</code>).</li>
+<li>Whenever possible, suspect information such as formulae, neutral masses, InChIKeys etc will be calculated for the input suspect list (obtainable afterwards with <code><a href="../reference/featureGroupsScreening-class.html">screenInfo()</a></code>).</li>
 <li>The suspect names will be checked to be file compatible, and automatically adjusted if necessary.</li>
 <li>If MS/MS fragments are known for a suspect (formula or <code>m/z</code>), these can be included in the suspect list to improve suspect annotation.</li>
 <li>The old suspect screening support for <code>features</code> objects was removed. The same and much more functionality can be obtained by the workflow for feature groups.</li>
@@ -291,7 +593,7 @@
 <li>
 <code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
 <li>
-<code><a href="../reference/GUI-utils.html">checkChromatograms()</a></code>: fix error when <code>fGroups</code> has only one replicate group</li>
+<code><a href="../reference/patRoon-defunct.html">checkChromatograms()</a></code>: fix error when <code>fGroups</code> has only one replicate group</li>
 <li>
 <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>: If <code>algorithm="pwiz"</code> and vendor centroiding is used then any extra filters are now correctly put after the <code>peakPicking</code> filter.</li>
 <li>
@@ -340,7 +642,7 @@
 <a href="#patroon-102" class="anchor"></a>patRoon 1.0.2</h1>
 <ul>
 <li>Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)</li>
-<li>Fixed: <code><a href="../reference/componentsNT-class.html">plotGraph()</a></code> didn’t properly handle components without linked series (reported by Vittorio Albergamo)</li>
+<li>Fixed: <code><a href="../reference/generics.html">plotGraph()</a></code> didn’t properly handle components without linked series (reported by Vittorio Albergamo)</li>
 <li>Keep signal to noise data when importing/exporting XCMS data (<code>sn</code> column) (suggested by Ricardo Cunha)</li>
 <li>Reversed argument order of <code>exportedData</code>/<code>verbose</code> to <code><a href="../reference/getXCMSSet.html">getXCMSSet()</a></code> functions to avoid ambiguities</li>
 <li>Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs</li>
@@ -350,7 +652,7 @@
 <li>Improved handling of empty feature groups objects when reporting</li>
 <li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
 </li>
-<li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://rdrr.io/pkg/data.table/man/truelength.html">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://rdrr.io/pkg/data.table/man/assign.html">data.table::set()</a></code> is called on cached data.</li>
+<li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/truelength.html">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://Rdatatable.gitlab.io/data.table/reference/assign.html">data.table::set()</a></code> is called on cached data.</li>
 <li>Fixed: plotSpec() for <code>compounds</code> with <code>useGGPlot2=TRUE</code> would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)<br>
 </li>
 <li>Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.</li>
@@ -380,7 +682,7 @@
 <h2 class="hasAnchor">
 <a href="#june-2020" class="anchor"></a>June 2020</h2>
 <ul>
-<li>Fixed: <code><a href="../reference/GUI-utils.html">newProject()</a></code> didn’t show polarity selection if only a compound identification algorithm was selected.</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> didn’t show polarity selection if only a compound identification algorithm was selected.</li>
 <li>Updated external dependency versions in installer script.</li>
 <li>Fixed: <code><a href="../reference/feature-grouping.html">groupFeaturesXCMS3()</a></code> didn’t properly cache results.</li>
 <li>
@@ -432,7 +734,7 @@
 <li>The <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroups</code> now allows drawing legends when <code>colourBy="fGroups"</code> and sets <code>colourBy="none"</code> by default, both for consistency with <code><a href="../reference/patRoon-deprecated.html">plotEIC()</a></code>.</li>
 <li>All documentation is now available as PDF files on the website (<a href="https://rickhelmus.github.io/patRoon/" class="uri">https://rickhelmus.github.io/patRoon/</a>)</li>
 <li>
-<code><a href="../reference/GUI-utils.html">newProject()</a></code> now uses XCMS3 algorithms instead of the older XCMS interface.</li>
+<code><a href="../reference/newProject.html">newProject()</a></code> now uses XCMS3 algorithms instead of the older XCMS interface.</li>
 <li>Fixed: features in objects generated by <code>xcms</code> (not <code>xcms3</code>) could not be subset with zero analyses (which resulted in errors by e.g. <code><a href="https://rdrr.io/r/base/unique.html">unique()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code>). Reported by Corey Griffith.</li>
 </ul>
 </div>
@@ -446,7 +748,7 @@
 <li>Fixed: Errors/Warnings of missing data in suspect list were not shown if using cached data</li>
 <li>If a value is missing in any of the columns from the suspect list used for automatic ion mass calculation (e.g. SMILES, formula, …) then data from another suitable column is tried.</li>
 <li>Fixed: invalid neutral mass calculation for suspects with charged SMILES/InChIs</li>
-<li>Default adduct can be specified in <code><a href="../reference/GUI-utils.html">newProject()</a></code> dialog</li>
+<li>Default adduct can be specified in <code><a href="../reference/newProject.html">newProject()</a></code> dialog</li>
 </ul>
 </li>
 <li>Small compatibility fix for feature finding with OpenMS 2.5 (reported by Thanh Wang)</li>
@@ -490,7 +792,7 @@
 <li>labels parameter for formulas/compounds methods of <code><a href="../reference/generics.html">consensus()</a></code>
 </li>
 <li>Fixed: colour assignment for scores plotting of merged formulae/compound results might be incorrect (reported by Emma Schymanski)</li>
-<li>Fixed: analysis table in <code><a href="../reference/GUI-utils.html">newProject()</a></code> UI only showed partial amount of rows.</li>
+<li>Fixed: analysis table in <code><a href="../reference/newProject.html">newProject()</a></code> UI only showed partial amount of rows.</li>
 <li>Fixed: don’t print normalized instead of absolute design parameters when only one parameter is optimized in DoEs (fixes issue <a href='https://github.com/rickhelmus/patRoon/issues/10'>#10</a>)</li>
 </ul>
 </div>
@@ -526,7 +828,7 @@
 <code><a href="../reference/generics.html">plot()</a></code> for <code>featureGroups</code> can now highlight unique/shared features across replicates (suggested by V Albergamo)</li>
 <li>Linking of homologous series:
 <ul>
-<li>Improved info descriptions for <code><a href="../reference/componentsNT-class.html">plotGraph()</a></code>
+<li>Improved info descriptions for <code><a href="../reference/generics.html">plotGraph()</a></code>
 </li>
 <li>Series are now properly unlinked when merging (was too greedy)</li>
 <li>Better algorithm to detect conflicting series</li>
@@ -535,7 +837,6 @@
 </li>
 <li>
 <code>concs</code> option for <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> to set concentration data</li>
-<li>Components for homologous series new report links as character string indices instead of numeric indices.</li>
 </ul>
 </div>
 <div id="september-2019" class="section level2">
@@ -608,14 +909,14 @@
 <li>
 <code><a href="../reference/generics.html">as.data.table()</a></code> / <code><a href="../reference/generics.html">as.data.frame()</a></code> for <code>featureGroups</code> now optionally reports regression information, which may be useful for quantitative purposes. This replaces the (defunct) <code>regression()</code> method and limited support from <code>screenTargets()</code>.</li>
 <li>
-<code><a href="../reference/componentsNT-class.html">plotGraph()</a></code> method to visually inspect linked homologous series.</li>
+<code><a href="../reference/generics.html">plotGraph()</a></code> method to visually inspect linked homologous series.</li>
 </ul>
 </div>
 <div id="april-2019" class="section level2">
 <h2 class="hasAnchor">
 <a href="#april-2019" class="anchor"></a>April 2019</h2>
 <ul>
-<li>Misc small tweaks and fixes for <code><a href="../reference/GUI-utils.html">newProject()</a></code> (e.g. loading of example data).</li>
+<li>Misc small tweaks and fixes for <code><a href="../reference/newProject.html">newProject()</a></code> (e.g. loading of example data).</li>
 <li>Improved graphical output of various common plotting functions.</li>
 <li>Updated tutorial vignette and added handbook</li>
 </ul>
@@ -640,7 +941,7 @@
 <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now has the <code>centroid</code> argument to more easily perform centroiding.</li>
 </ul>
 </li>
-<li>Updates to <code><a href="../reference/GUI-utils.html">newProject()</a></code>:
+<li>Updates to <code><a href="../reference/newProject.html">newProject()</a></code>:
 <ul>
 <li>The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.</li>
 <li>Data pre-treatment options now include more sophisticated file conversion options (<em>e.g.</em> using ProteoWizard). This and the new analysis selector functionality ensures that data files in all major vendor formats do not have to be converted prior to generating a script.</li>

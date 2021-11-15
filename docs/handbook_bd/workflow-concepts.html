@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>3 Workflow concepts | patRoon handbook</title>
   <meta name="description" content="3 Workflow concepts | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="3 Workflow concepts | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-09-07" />
+<meta name="date" content="2021-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="manual-installation.html"/>
 <link rel="next" href="generating-workflow-data.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="libs/jquery-3.5.1/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,24 +51,23 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
-<script src="libs/vis-4.20.1/vis.min.js"></script>
-<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.9.4.1/plotly.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.0/visNetwork.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -174,7 +174,7 @@ div.csl-indent {
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
 <li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image-experimental.html"><a href="docker-image-experimental.html"><i class="fa fa-check"></i><b>2.2</b> Docker image (experimental)</a></li>
+<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
 <li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
 <ul>
 <li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
@@ -189,28 +189,34 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="4.1.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.1.1</b> Data pre-treatment</a></li>
 <li class="chapter" data-level="4.1.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.1.2</b> Analysis information</a></li>
-<li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#automatic-project-generation-with-newproject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
+<li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#newProject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a>
 <ul>
 <li class="chapter" data-level="4.2.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.2.1</b> Finding and grouping features</a></li>
 <li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a>
+<li class="chapter" data-level="4.3" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.3</b> Componentization</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.3.1</b> MS peak lists</a></li>
-<li class="chapter" data-level="4.3.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.3.2</b> Formulae</a></li>
-<li class="chapter" data-level="4.3.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.3.3</b> Compounds</a></li>
-<li class="chapter" data-level="4.3.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.3.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.3.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.3.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.3.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.3.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.3.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.3.3</b> Intensity and MS/MS similarity</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<li class="chapter" data-level="4.4" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.4</b> Incorporating adduct and isotopic data</a>
 <ul>
-<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#features-with-similar-chromatographic-behaviour"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
-<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
-<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#intclust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity clustering</a></li>
+<li class="chapter" data-level="4.4.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.4.1</b> Selecting features with preferential adducts/isotopes</a></li>
+<li class="chapter" data-level="4.4.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.4.2</b> Setting adduct annotations for feature groups</a></li>
+<li class="chapter" data-level="4.4.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.4.3</b> Using adduct annotations in the workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.5</b> Annotation</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.5.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.5.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.5.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.5.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.5.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.5.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.5.4</b> Suspect annotation</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
+<li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
 <ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
@@ -225,37 +231,85 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
 </ul></li>
-<li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
-<li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a>
+<li class="chapter" data-level="5.4" data-path="deleting-data.html"><a href="deleting-data.html"><i class="fa fa-check"></i><b>5.4</b> Deleting data</a></li>
+<li class="chapter" data-level="5.5" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.5</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.6" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.6</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.7</b> Visualization</a>
 <ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
-<li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
-<li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
-<li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
-<li class="chapter" data-level="5.5.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.5.5</b> Generating EICs in DataAnalysis</a></li>
+<li class="chapter" data-level="5.7.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.7.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.7.2</b> Overlapping and unique data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.7.3</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.7.4</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
-<li class="chapter" data-level="5.6" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.6</b> Reporting</a></li>
+<li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
+<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>6</b> Advanced usage</a>
+<li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>6.1</b> Adducts</a></li>
-<li class="chapter" data-level="6.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>6.2</b> Feature parameter optimization</a>
+<li class="chapter" data-level="6.1" data-path="initiating-a-sets-workflow.html"><a href="initiating-a-sets-workflow.html"><i class="fa fa-check"></i><b>6.1</b> Initiating a sets workflow</a></li>
+<li class="chapter" data-level="6.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html"><i class="fa fa-check"></i><b>6.2</b> Generating sets workflow data</a>
 <ul>
-<li class="chapter" data-level="6.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>6.2.1</b> Parameter sets</a></li>
-<li class="chapter" data-level="6.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>6.2.2</b> Processing optmization results</a></li>
+<li class="chapter" data-level="6.2.1" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#componentization-1"><i class="fa fa-check"></i><b>6.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="6.2.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#formula-and-compound-annotation"><i class="fa fa-check"></i><b>6.2.2</b> Formula and compound annotation</a></li>
 </ul></li>
-<li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
-<li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
-<li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
-<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a>
+<li class="chapter" data-level="6.3" data-path="setsAdducts.html"><a href="setsAdducts.html"><i class="fa fa-check"></i><b>6.3</b> Selecting adducts to improve grouping</a></li>
+<li class="chapter" data-level="6.4" data-path="processing-data.html"><a href="processing-data.html"><i class="fa fa-check"></i><b>6.4</b> Processing data</a></li>
+<li class="chapter" data-level="6.5" data-path="advanced.html"><a href="advanced.html"><i class="fa fa-check"></i><b>6.5</b> Advanced</a>
 <ul>
-<li class="chapter" data-level="6.8.1" data-path="parallelization.html"><a href="parallelization.html#classic-parallelization-method"><i class="fa fa-check"></i><b>6.8.1</b> Classic parallelization method</a></li>
-<li class="chapter" data-level="6.8.2" data-path="parallelization.html"><a href="parallelization.html#future-parallelization-method"><i class="fa fa-check"></i><b>6.8.2</b> Future parallelization method</a></li>
-<li class="chapter" data-level="6.8.3" data-path="parallelization.html"><a href="parallelization.html#logging"><i class="fa fa-check"></i><b>6.8.3</b> Logging</a></li>
+<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#initiating-a-sets-workflow-from-feature-groups"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
+<li class="chapter" data-level="6.5.2" data-path="advanced.html"><a href="advanced.html#inspecting-and-converting-set-objects"><i class="fa fa-check"></i><b>6.5.2</b> Inspecting and converting set objects</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="7" data-path="TPs.html"><a href="TPs.html"><i class="fa fa-check"></i><b>7</b> Transformation product screening</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="genTPs.html"><a href="genTPs.html"><i class="fa fa-check"></i><b>7.1</b> Obtaining transformation product data</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
+<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#componentization-2"><i class="fa fa-check"></i><b>7.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#omitting-transformation-product-input"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
+<li class="chapter" data-level="7.2.4" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#reporting-tp-components"><i class="fa fa-check"></i><b>7.2.4</b> Reporting TP components</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="TPsExamples.html"><a href="TPsExamples.html"><i class="fa fa-check"></i><b>7.3</b> Example workflows</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx1"><i class="fa fa-check"></i><b>7.3.1</b> Screen predicted TPs for targets</a></li>
+<li class="chapter" data-level="7.3.2" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx2"><i class="fa fa-check"></i><b>7.3.2</b> Screening TPs from a library for suspects</a></li>
+<li class="chapter" data-level="7.3.3" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx3"><i class="fa fa-check"></i><b>7.3.3</b> Non-target screening of predicted TPs</a></li>
+<li class="chapter" data-level="7.3.4" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx4"><i class="fa fa-check"></i><b>7.3.4</b> Non-target screening of TPs by annotation similarities</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>8</b> Advanced usage</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>8.1</b> Adducts</a></li>
+<li class="chapter" data-level="8.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>8.2</b> Feature parameter optimization</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>8.2.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="8.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>8.2.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>8.3</b> Chromatographic peak qualities</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>8.3.1</b> Applying machine learning with MetaClean</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>8.4</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="8.5" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.5</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="8.6" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.6</b> Compound clustering</a></li>
+<li class="chapter" data-level="8.7" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.7</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="8.8" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.8</b> Fold changes</a></li>
+<li class="chapter" data-level="8.9" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.9</b> Caching</a></li>
+<li class="chapter" data-level="8.10" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.10</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.10.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.10.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.10.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.10.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.10.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.10.3</b> Notes when using parallelization with futures</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
 </ul>
 
       </nav>
@@ -281,26 +335,26 @@ div.csl-indent {
 <!-- - show images of feature definition etc? -->
 <p>In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:</p>
 <!-- UNDONE: include other data processing steps here? -->
-<div id="htmlwidget-0c11be2c7e363d230b44" style="width:750px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0c11be2c7e363d230b44">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n  \n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n  \n  subgraph cluster3 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  subgraph cluster4 {\n    Componentization\n  }\n  \n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster3, style=dashed]\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster4, style=dashed]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<p>Note that <code>patRoon</code> supports flexible composition of workflows. In the scheme above you can recognize optional steps by a <em>dashed line</em>. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief descripton of all steps is given below.</p>
+<div id="htmlwidget-4f0e659ac98c32e302b7" style="width:750px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4f0e659ac98c32e302b7">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n\n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n\n  subgraph cluster3 {\n    Componentization\n  }\n  \n  subgraph cluster4 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster3, style=dashed, dir=both, minlen=3]\n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster4, style=dashed, minlen=3]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>Note that <code>patRoon</code> supports flexible composition of workflows. In the scheme above you can recognize optional steps by a <em>dashed line</em>. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief description of all steps is given below.</p>
 <p>During <strong>data pre-treatment</strong> raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of <em>m/z</em> data or performing advanced filtering operations.</p>
 <p>The next step is to extract <strong>features</strong> from the data. While different terminologies are used, a feature in <code>patRoon</code> refers to a single chromatographic peak in an extracted ion chromatogram for a single <em>m/z</em> value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate <em>m/z</em>). Note that with mass spectrometry multiple <em>m/z</em> values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in <code>patRoon</code> we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as ‘peaks.’</p>
 <p>Features are found per analysis. Hence, in order to compare a feature across analyses, the next step is to group them. This step is essential as it finds equal features even if their retention time or <em>m/z</em> values slightly differ due to analytical variability. The resulting <strong>feature groups</strong> are crucial input for subsequent workflow steps. Prior to grouping, <em>retention time alignment</em> between analyses may be performed to improve grouping of features, especially when processing multiple analysis batches at once. Outside <code>patRoon</code> feature groups may also be defined as <em>profiles</em>, <em>aligned</em> or <em>grouped features</em> or <em>buckets</em>.</p>
 <p>Depending on the study type, <strong>suspect screening</strong> is then performed to limit the features that should be considered for further processing. As its name suggests, with suspect screening only those features which are suspected to be present are considered for further processing. These suspects are retrieved from a suspect list which contains the <em>m/z</em> and (optionally) retention times for each suspect. Typical suspect lists may be composed from databases with known pollutants or from predicted transformation products. Note that for a ‘full’ non-target analysis no suspect screening is performed, hence, this step is simply omitted and all features are to be considered.</p>
-<p>After features have been collected the next step typically involves <strong>annotation</strong>. During this step MS and MS/MS data are collected in so called <strong>MS peak lists</strong>, which are then used as input for formula and compound annotation. Formula annotation involves automatic calculation of possible formulae for each feature based on its <em>m/z</em>, isotopic pattern and MS/MS fragments, whereas compound annotation (or identification) involves the assignment of actual chemical structures to each feature. Note that during formula and compound annotation typically multiple candidates are assigned to a single feature. To assist interpretation of this data each candidate is therefore ranked on characteristics such as isotopic fit, number of explained MS/MS fragments and metadata from an online database such as number of scientific references or presence in common suspect lists.</p>
-<p>Besides annotation, another step to perform after extraction of features is <strong>componentization</strong>. A <strong>component</strong> is defined as a collection of multiple feature groups that are somehow related to each other. Typical exmples are features that belong to the same chemical compound (i.e. with different <em>m/z</em> values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologues series and features that display a similar intensity trend across samples.</p>
+<p>The feature group data may then be subjected to <strong>componentization</strong>. A <strong>component</strong> is defined as a collection of multiple feature groups that are somehow related to each other. Typical examples are features that belong to the same chemical compound (i.e. with different <em>m/z</em> values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologous series and features that display a similar intensity trend across samples. If adducts or isotopes were annotated during componentization then this data may be used to prioritize the feature groups.</p>
+<p>The last step in the workflow commonly involves <strong>annotation</strong>. During this step MS and MS/MS data are collected in so called <strong>MS peak lists</strong>, which are then used as input for formula and compound annotation. Formula annotation involves automatic calculation of possible formulae for each feature based on its <em>m/z</em>, isotopic pattern and MS/MS fragments, whereas compound annotation (or identification) involves the assignment of actual chemical structures to each feature. Note that during formula and compound annotation typically multiple candidates are assigned to a single feature. To assist interpretation of this data each candidate is therefore ranked on characteristics such as isotopic fit, number of explained MS/MS fragments and metadata from an online database such as number of scientific references or presence in common suspect lists.</p>
 <p>To summarize:</p>
 <ul>
 <li><strong>Data-pretreatment</strong> involves preparing raw MS data for further processing (e.g. conversion to an open format)</li>
 <li><strong>Features</strong> describe chromatographic and <em>m/z</em> information (or ‘peaks’) in all analyses.</li>
 <li>A <strong>feature group</strong> consists of equal features across analyses.</li>
 <li>With <strong>suspect screening</strong> only features that are considered to be on a suspect list are considered further in the workflow.</li>
+<li><strong>Componentization</strong> involves consolidating different feature groups that have a relationship to each other in to a single component.</li>
 <li><strong>MS peak lists</strong> Summarizes all MS and MS/MS data that will be used for subsequent annotation.</li>
 <li>During <strong>formula</strong> and <strong>compound annotation</strong> candidate formulae/structures will be assigned and ranked for each feature.</li>
-<li><strong>Componentization</strong> involves consolidating different feature groups that have a relationship to each other in to a single component.</li>
 </ul>
-<p>The next chapters will discuss how to generate this data and process it.</p>
+<p>The next chapters will discuss how to generate this data and process it. Afterwards, several advanced topics are discussed such as <a href="setsWorkflow.html#setsWorkflow">combining positive and negative ionization data</a>, <a href="TPs.html#TPs">screening for transformation products</a> and <a href="advanced_usage.html#advanced_usage">other advanced functionality</a>.</p>
 
 </div>
             </section>
@@ -313,7 +367,6 @@ div.csl-indent {
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -343,6 +396,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": false
 }

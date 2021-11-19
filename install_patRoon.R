@@ -516,7 +516,7 @@ utils <- setRefClass("utilsInst", methods = list(
                     setOpts <- c(setOpts, list(patRoon.path.MetFragCL = down))
             }
             
-            if ("MetFrag CompTox DB" %in% instWhat)
+            if ("MetFrag CompTox WasteWater DB" %in% instWhat)
             {
                 down <- downloadFile(instPath, "MetFrag CompTox database", "https://zenodo.org/record/3472781/files/CompTox_07March19_WWMetaData.csv",
                                      FALSE)
@@ -557,10 +557,10 @@ utils <- setRefClass("utilsInst", methods = list(
                 {
                     # rename subdirectory with auto generated name...
                     subDir <- list.files(down, pattern = "^djoumbou\\-biotransformer\\-[[:alnum:]]+$", full.names = TRUE)
-                    file.rename(subDir, "biotransformer")
+                    file.rename(subDir, file.path(down, "biotransformer"))
                     
                     # place in jar from patRoonDeps
-                    jar <- downloadFile(file.path(down, "biotransformer"), "BioTransformer jar",
+                    jar <- downloadFile(file.path(dow, "biotransformer"), "BioTransformer jar",
                                         "https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar",
                                         FALSE)
                     if (!is.null(jar))

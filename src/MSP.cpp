@@ -54,10 +54,14 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
                 }
                 else
                 {
+                    if (key == "DB#")
+                        key = "DB_ID"; // rename for R name compat
+                    
                     keys.insert(key);
                     
-                    // UNDONE: merge duplicate fields (eg Synom)
-                    curRec.values[key] = val;
+                    auto p = curRec.values.insert({key, val});
+                    if (!p.second) // NOT inserted, i.e. already present?
+                        curRec.values[key] = p.first->second + ";" + val;
                 }
             }
         }
@@ -68,13 +72,20 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
     for (std::string k : keys)
     {
         std::vector<std::string> vals;
-        for (auto r : records)
+        for (const auto r : records)
         {
             const auto it = r.values.find(k);
             vals.push_back((it == r.values.end()) ? "NA" : it->second);
         }
         recordsList[k] = vals;
     }
+
+    Rcpp::List specList(records.size());
+    specList.names() = recordsList["Name"];
+    for (size_t i=0; i<specList.size(); ++i)
+        specList[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = records[i].spectrum.mzs,
+                                              Rcpp::Named("intensity") = records[i].spectrum.intensities);
     
-    return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList));
+    return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
+                              Rcpp::Named("spectra") = specList);
 }

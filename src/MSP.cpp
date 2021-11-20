@@ -31,6 +31,8 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
         std::string line;
         MSPRecord curRec;
         
+        Rcpp::Rcout << "Parsing file...";
+        
         while (std::getline(fs, line))
         {
             auto cPos = line.find(":");
@@ -66,13 +68,14 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
             }
         }
     }
+    Rcpp::Rcout << " Done!" << std::endl << "Converting to R data...";
     
     Rcpp::List recordsList(keys.size());
     recordsList.names() = Rcpp::wrap(std::vector<std::string>(keys.begin(), keys.end()));
-    for (std::string k : keys)
+    for (const std::string &k : keys)
     {
         std::vector<std::string> vals;
-        for (const auto r : records)
+        for (const auto &r : records)
         {
             const auto it = r.values.find(k);
             vals.push_back((it == r.values.end()) ? "NA" : it->second);
@@ -83,8 +86,16 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
     Rcpp::List specList(records.size());
     specList.names() = recordsList["Name"];
     for (size_t i=0; i<specList.size(); ++i)
-        specList[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = records[i].spectrum.mzs,
-                                              Rcpp::Named("intensity") = records[i].spectrum.intensities);
+    {
+        Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);
+        nm(Rcpp::_, 0) = Rcpp::NumericVector(records[i].spectrum.mzs.begin(), records[i].spectrum.mzs.end());
+        nm(Rcpp::_, 1) = Rcpp::NumericVector(records[i].spectrum.intensities.begin(),
+                                             records[i].spectrum.intensities.end());
+        Rcpp::colnames(nm) = Rcpp::CharacterVector({"mz", "intensity"});
+        specList[i] = nm;
+    }
+    
+    Rcpp::Rcout << " Done!" << std::endl;
     
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
                               Rcpp::Named("spectra") = specList);

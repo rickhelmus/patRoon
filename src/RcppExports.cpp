@@ -5,11 +5,17 @@
 
 using namespace Rcpp;
 
-#ifdef RCPP_USE_GLOBAL_ROSTREAM
-Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
-Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
-#endif
-
+// readMSP
+Rcpp::List readMSP(Rcpp::CharacterVector file);
+RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type file(fileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readMSP(file));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parseAdductConsXMLFile
 Rcpp::List parseAdductConsXMLFile(Rcpp::CharacterVector file);
 RcppExport SEXP _patRoon_parseAdductConsXMLFile(SEXP fileSEXP) {
@@ -167,6 +173,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 1},
     {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},

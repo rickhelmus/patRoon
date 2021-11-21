@@ -66,13 +66,22 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
     
-    # UNDONE
-    # prodAll <- rbindlist(products(TPs))
-    # keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
-    # prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
-    # prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE)
+    ret <- copy(records(obj))
     
-    return(prodAll)
+    mapCols <- c(Name = "name",
+                 SMILES = "SMILES",
+                 InChI = "InChI",
+                 InChIKey = "InChIKey",
+                 Formula = "formula",
+                 Precursor_Type = "adduct",
+                 ExactMass = "neutralMass")
+    mapCols <- mapCols[names(mapCols) %in% names(ret)]
+    setnames(ret, names(mapCols), mapCols)
+    ret <- unique(ret, by = "InChIKey")
+    ret <- ret[, mapCols, with = FALSE]
+    ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
+    
+    return(ret)
 })
 
 

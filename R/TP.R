@@ -107,16 +107,16 @@ setMethod("as.data.table", "transformationProducts", function(x) rbindlist(produ
 #'   \code{\link{screenSuspects}}.
 #' @param includeParents If \code{TRUE} then parents are also included in the returned suspect list.
 #' @export
-setMethod("convertToSuspects", "transformationProducts", function(TPs, includeParents = FALSE)
+setMethod("convertToSuspects", "transformationProducts", function(obj, includeParents = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(TPs) == 0)
+    if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
 
-    prodAll <- rbindlist(products(TPs))
+    prodAll <- rbindlist(products(obj))
     
     # remove TPs that are equal for a parent that were predicted through different routes
     prodAll <- unique(prodAll, by = "name")
@@ -126,7 +126,7 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
     prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE)
     
     if (includeParents)
-        prodAll <- rbind(parents(TPs), prodAll, fill = TRUE)
+        prodAll <- rbind(parents(obj), prodAll, fill = TRUE)
 
     return(prodAll)
 })

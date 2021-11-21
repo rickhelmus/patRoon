@@ -46,6 +46,8 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
                 {
                     for (int n = std::stoi(val); n; --n)
                     {
+                        // UNDONE: MSP also allows other formats than one space separated pair per line
+                        
                         double m, i;
                         fs >> m >> i;
                         curRec.spectrum.mzs.push_back(m);
@@ -84,7 +86,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
     }
 
     Rcpp::List specList(records.size());
-    specList.names() = recordsList["Name"];
+    specList.names() = recordsList["DB_ID"];
     for (size_t i=0; i<specList.size(); ++i)
     {
         Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);

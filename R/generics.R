@@ -146,6 +146,12 @@ setGeneric("scores", function(object, paramSet = NULL, DoEIteration = NULL) stan
 setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGeneric("experimentInfo"))
 
 
+### MS library
+
+setGeneric("records", function(obj) standardGeneric("records"))
+setGeneric("spectra", function(obj) standardGeneric("spectra"))
+
+
 ### Misc.
 
 #' Miscellaneous generics
@@ -234,7 +240,7 @@ setGeneric("convertToMFDB", function(TPs, out, ...) standardGeneric("convertToMF
 #' @templateVar func convertToSuspects
 #' @templateVar desc Converts an object to a suspect list.
 #' @template generics
-setGeneric("convertToSuspects", function(TPs, ...) standardGeneric("convertToSuspects"))
+setGeneric("convertToSuspects", function(obj, ...) standardGeneric("convertToSuspects"))
 
 #' @templateVar func cutClusters
 #' @templateVar desc Returns assigned cluster indices of a cut cluster.

@@ -8,7 +8,7 @@ install.packages("dplyr") # missing dep(?)
 BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
-remotes::install_github("rickhelmus/patRoonData@version20", upgrade = "never")
+remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
 remotes::install_github("thomasp85/farver", upgrade = "never")
 remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
 install.packages("vdiffr")

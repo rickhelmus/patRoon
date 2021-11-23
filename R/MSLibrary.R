@@ -85,11 +85,14 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
 })
 
 
-loadMSPLibrary <- function(file)
+loadMSPLibrary <- function(file, parseComments = TRUE)
 {
-    checkmate::assertFileExists(file, "r")
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(file, "r", add = ac)
+    checkmate::assertFlag(parseComments, add = ac)
+    checkmate::reportAssertions(ac)
     
-    lib <- readMSP(file)
+    lib <- readMSP(file, parseComments)
     lib$records <- as.data.table(lib$records)
     lib$spectra <- lapply(lib$spectra, as.data.table)
     

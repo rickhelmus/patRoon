@@ -1,4 +1,5 @@
 #include <fstream>
+#include <regex>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -18,9 +19,27 @@ struct MSPRecord
     MSPSpectrum spectrum;
 };
 
-// [[Rcpp::export]]
-Rcpp::List readMSP(Rcpp::CharacterVector file)
+bool parseComments(const std::string &comments, const std::string &field, std::string &out)
 {
+    std::regex r("\"" + field + "=([^\"]+)");
+    std::smatch sm;
+    
+    if (std::regex_search(comments, sm, r))
+    {
+        if (sm.size() == 2)
+        {
+            out = sm[1].str(); // [0] is complete match
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// [[Rcpp::export]]
+Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
+{
+    const bool pComments = Rcpp::as<bool>(pc);
     std::ifstream fs;
     std::vector<MSPRecord> records;
     std::set<std::string> keys;
@@ -53,6 +72,26 @@ Rcpp::List readMSP(Rcpp::CharacterVector file)
                         curRec.spectrum.mzs.push_back(m);
                         curRec.spectrum.intensities.push_back(i);
                     }
+                    
+                    // NOTE: Num Peaks is always the last entry, finish up record
+                    
+                    // Parse comments?
+                    if (pComments && curRec.values.find("Comments") != curRec.values.end())
+                    {
+                        const std::string com = curRec.values["Comments"];
+                        std::string cv;
+                        if (curRec.values.find("SMILES") == curRec.values.end() && parseComments(com, "SMILES", cv))
+                        {
+                            keys.insert("SMILES");
+                            curRec.values["SMILES"] = cv;
+                        }
+                        if (curRec.values.find("InChI") == curRec.values.end() && parseComments(com, "InChI", cv))
+                        {
+                            keys.insert("InChI");
+                            curRec.values["InChI"] = cv;
+                        }
+                    }
+                    
                     records.push_back(curRec);
                     curRec = MSPRecord();
                 }

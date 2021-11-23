@@ -6,13 +6,14 @@
 using namespace Rcpp;
 
 // readMSP
-Rcpp::List readMSP(Rcpp::CharacterVector file);
-RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP) {
+Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
+RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type file(fileSEXP);
-    rcpp_result_gen = Rcpp::wrap(readMSP(file));
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type pc(pcSEXP);
+    rcpp_result_gen = Rcpp::wrap(readMSP(file, pc));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -173,7 +174,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 1},
+    {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},

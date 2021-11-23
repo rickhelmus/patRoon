@@ -1,9 +1,18 @@
 # Priority
 
+# Lower priority
+
+
 ## General
 
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 - remove mz column from patRoonData suspects?
+- convertMSFiles()
+    - Agilent .d is also a directory?
+    - Remove necessity to have different input/output formats? (at least OK for pwiz)
+- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
+- delete() for other classes
+- generalize makeLegend() to new plot util
 
 
 ## Features
@@ -12,6 +21,31 @@
     - OpenMS: alignment may yield negative RTs...
     - OpenMS MapAligner exception
         - seems to be related when little overlap between sets --> add note in doc?
+- adduct annotations
+    - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
+    - what to do with unsupported adducts for annotation?
+	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
+	    - check better for what is supported by SIRIUS?
+- import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
+- getEICsForFeatures method for kpic2?
+- optimize hashing? Or further avoid hashing big objects/objects with lists?
+- load OpenMS intensities in parallel
+    - either with futures or with MP and cache intensities afterwards
+- XCMS: multiple features grouped in same analysis?
+    - can be, but now handled by default method="medret" param. Make this configurable?
+- updatePICSet(): also sync peaks list? otherwise doc
+- Somehow integrate XCMS::fillChromPeaks
+
+
+## Annotation
+
+- SusDat MF support
+- parallel MSPeakLists generation?
+- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
+- DA formulas: also rank formula results like GF/SIRIUS?
+- plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons
+- Support multiple MS/MS formula annotation candidates (ie same MS/MS peak annotated with different formulas)
+    - mainly relevant for GenForm
     
 
 ## Components
@@ -21,7 +55,17 @@
         - change checkPackage GH link once PRs are merged
         - maxCharge --> chargeMax (same as OpenMS)? update docs
         - apply sort fix? https://github.com/osenan/cliqueMS/issues/8
-
+- RC: check spearmans correlation
+- NT: minimum size argument, combine rows for multiple rGroups?
+- int and others: also use calculateComponentIntensities() for intensities?
+- plot doesnt work for componentsReduced that originates from cluster components
+    - maybe drop reduced mechanism?
+- intclust
+    - optionally take areas instead of intensities
+    - cache results
+- import check sessions?
+    - needs way to match component names
+    
 
 ## TPs
 
@@ -39,11 +83,7 @@
 - checkComponents() / checkFeatures()
     - server tests?
     - import
-- test DA algorithms
-    - formulas: check if fragInfo etc is correct
 - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
-- new ranking for formulas/compounds consensus (and sets)
-    - filterSets?
 - ensure peaklists are sorted
 - features
     - new multiple blank filtering
@@ -73,68 +113,6 @@
     - doc that merging TPs (same fGroup/TP) could be done with suspect screening
     - logic: mention results can be filtered with TP components?
     - mention how sets filter work for componentsTPs?
-
-
-## NEWS
-
-- re-read
-
-
-# Lower priority
-
-## General
-
-- convertMSFiles()
-    - Agilent .d is also a directory?
-    - Remove necessity to have different input/output formats? (at least OK for pwiz)
-- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
-- delete() for other classes
-- generalize makeLegend() to new plot util
-
-## Features
-
-- adduct annotations
-    - selectIons(): prefer adducts based on MS/MS? eg handy for Na/K adducts
-    - what to do with unsupported adducts for annotation?
-	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
-	    - check better for what is supported by SIRIUS?
-- import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
-- getEICsForFeatures method for kpic2?
-- optimize hashing? Or further avoid hashing big objects/objects with lists?
-- load OpenMS intensities in parallel
-    - either with futures or with MP and cache intensities afterwards
-- XCMS: multiple features grouped in same analysis?
-    - can be, but now handled by default method="medret" param. Make this configurable?
-- updatePICSet(): also sync peaks list? otherwise doc
-- Somehow integrate XCMS::fillChromPeaks
-
-
-## Annotation
-
-- SusDat MF support
-- parallel MSPeakLists generation?
-- somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
-- DA formulas: also rank formula results like GF/SIRIUS?
-- plotSpectrum/spectrumSimilarity: allow separate MSLevel for comparisons
-- Support multiple MS/MS formula annotation candidates (ie same MS/MS peak annotated with different formulas)
-    - mainly relevant for GenForm
-
-
-## Components
-
-- RC: check spearmans correlation
-- NT: minimum size argument, combine rows for multiple rGroups?
-- int and others: also use calculateComponentIntensities() for intensities?
-- plot doesnt work for componentsReduced that originates from cluster components
-    - maybe drop reduced mechanism?
-- intclust
-    - optionally take areas instead of intensities
-    - cache results
-- import check sessions?
-    - needs way to match component names
-
-## Sets
-
 
 
 # Future

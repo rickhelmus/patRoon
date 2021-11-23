@@ -50,7 +50,7 @@ setMethod("parents", "transformationProducts", function(TPs) TPs@parents)
 #' @export
 setMethod("products", "transformationProducts", function(TPs) TPs@products)
 
-#' @describeIn components Obtain total number of transformation products.
+#' @describeIn transformationProducts Obtain total number of transformation products.
 #' @export
 setMethod("length", "transformationProducts", function(x) if (length(products(x)) == 0) 0 else sum(sapply(products(x), nrow)))
 

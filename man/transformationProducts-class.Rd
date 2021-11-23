@@ -8,6 +8,7 @@
 \alias{parents}
 \alias{products,transformationProducts-method}
 \alias{products}
+\alias{length,transformationProducts-method}
 \alias{names,transformationProducts-method}
 \alias{show,transformationProducts-method}
 \alias{[,transformationProducts,ANY,missing,missing-method}
@@ -22,6 +23,8 @@
 \S4method{parents}{transformationProducts}(TPs)
 
 \S4method{products}{transformationProducts}(TPs)
+
+\S4method{length}{transformationProducts}(x)
 
 \S4method{names}{transformationProducts}(x)
 
@@ -72,6 +75,8 @@ or \code{\link{generateTPsLibrary}} was used to generate the data, the \code{ret
 \code{transformationProducts} class.
 
 \item \code{products}: Accessor method for the \code{products} slot.
+
+\item \code{length}: Obtain total number of transformation products.
 
 \item \code{names}: Obtain the names of all parents in this object.
 

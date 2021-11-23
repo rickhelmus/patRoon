@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Component class — length,transformationProducts-method • patRoon</title>
+<title>Component class — components-class • patRoon</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Component class — length,transformationProducts-method" />
+<meta property="og:title" content="Component class — components-class" />
 <meta property="og:description" content="Contains data for feature groups that are related in some way. These
 components commonly include adducts, isotopes and homologues." />
 
@@ -73,7 +73,7 @@ components commonly include adducts, isotopes and homologues." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -158,7 +158,7 @@ components commonly include adducts, isotopes and homologues." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Component class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/TP.R'><code>R/TP.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-camera.R'><code>R/components-camera.R</code></a>, and 5 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-camera.R'><code>R/components-camera.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-features.R'><code>R/components-features.R</code></a>, and 4 more</small>
     <div class="hidden name"><code>components-class.Rd</code></div>
     </div>
 
@@ -167,10 +167,7 @@ components commonly include adducts, isotopes and homologues." />
 <em>components</em> commonly include adducts, isotopes and homologues.</p>
     </div>
 
-    <pre class="usage"># S4 method for transformationProducts
-length(x)
-
-# S4 method for components
+    <pre class="usage"># S4 method for components
 componentTable(obj)
 
 # S4 method for components
@@ -381,7 +378,6 @@ generate the components.</p></td>
 
     
 <ul>
-<li><p><code>length</code>: Obtain total number of transformation products.</p></li>
 <li><p><code>componentTable</code>: Accessor method for the <code>components</code> slot of a
 <code>components</code> class. Each component is stored as a
 <code>data.table</code>.</p></li>

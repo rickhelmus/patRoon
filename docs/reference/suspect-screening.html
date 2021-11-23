@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -356,9 +356,9 @@ possible, as it can significantly reduce the load on data interpretation.</p>
   <code>mz</code> column is available for a suspect)</p></li>
 <li><p><code>mz</code> The ionized <em>m/z</em> of the suspect. (<strong>mandatory</strong> unless it can be calculated from one of
   the aforementioned columns)</p></li>
-<li><p><code>adduct</code> A <code>character</code> that can be converted with <code><a href='adduct-utils.html'>as.adduct</a></code>. (<strong>mandatory</strong>
-  unless data from the <code>mz</code> column is available, the <code>adduct</code> argument is set or <code>fGroups</code> has adduct
-  annotations)</p></li>
+<li><p><code>adduct</code> A <code>character</code> that can be converted with <code><a href='adduct-utils.html'>as.adduct</a></code>. Can be used to
+  automatically calculate values for the <code>mz</code> column. (<strong>mandatory</strong> unless data from the <code>mz</code> column
+  is available, the <code>adduct</code> argument is set or <code>fGroups</code> has adduct annotations)</p></li>
 <li><p><code>fragments_mz</code>,<code>fragments_formula</code> One or more MS/MS fragments (specified as <em>m/z</em> or
   formulae, respectively). Multiple values can be specified by separating them with a semicolon (<code>;</code>). This data
   is used by <code><a href='featureGroupsScreening-class.html'>annotateSuspects</a></code> to report detected MS/MS fragments and calculate identification levels.
@@ -369,7 +369,7 @@ possible, as it can significantly reduce the load on data interpretation.</p>
 
     <p>How the mass of a suspect is matched with the mass of a feature depends on the
   available data:</p><ul>
-<li><p>If the suspect has data from the <code>mz</code> column of the suspect list, then the this data is matched with the
+<li><p>If the suspect has data from the <code>mz</code> column of the suspect list, then this data is matched with the
   detected feature <em>m/z</em>.</p></li>
 <li><p>Otherwise, if the suspect has data in the <code>adduct</code> column of the suspect list, this data is used to
   calculate its <code>mz</code> value, which is then used like above.</p></li>

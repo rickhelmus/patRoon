@@ -73,7 +73,7 @@ and simplify compound annotation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0.9999</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -586,8 +586,8 @@ elutes prior/after the parent (to calculate <code>retDir</code> values, see Deta
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='length,transformationProducts-method.html'>components</a></code> (derived) object containing all generated components.</p>
-<p>The algorithms based on 'feature components' return a <code><a href='length,transformationProducts-method.html'>componentsFeatures</a></code> derived object.</p>
+    <p>A <code><a href='components-class.html'>components</a></code> (derived) object containing all generated components.</p>
+<p>The algorithms based on 'feature components' return a <code><a href='components-class.html'>componentsFeatures</a></code> derived object.</p>
 <p><code>generateComponentsIntClust</code> and <code>generateComponentsSpecClust</code> return objects derived from
   <code><a href='componentsSpecClust-class.html'>componentsSpecClust</a></code>.</p>
 <p><code>generateComponentsTPs</code> returns objects derived from <code><a href='componentsTPs-class.html'>componentsTPs</a></code>.</p>
@@ -687,7 +687,7 @@ generally useful to provide more information for compound annotation and reduce 
 <li><p>The componentization algorithms that support annotation of adducts/isotopes, <em>e.g.</em> <span class="pkg">RAMClustR</span>,
   <span class="pkg">CAMERA</span> and <code class='command'>OpenMS</code>, first perform componentization for each set independently. This is necessary,
   because <em>e.g.</em> adducts are specific to the MS ionization mode that was used. The resulting components are then
-  all combined in a <code><a href='length,transformationProducts-method.html'>componentsSet</a></code> object. Note that the components themselves are never merged. The
+  all combined in a <code><a href='components-class.html'>componentsSet</a></code> object. Note that the components themselves are never merged. The
   components are renamed to include the set name for which they were generated (<em>e.g.</em> <code>"CMP1"</code> becomes
   <code>"CMP1-positive"</code>).</p></li>
 <li><p>For componentization with <span class="pkg">nontarget</span> a similar strategy is applied as above. However, the output is
@@ -715,7 +715,7 @@ generally useful to provide more information for compound annotation and reduce 
 
     <p>With <code>generateComponentsTPs</code>, each component consists of
   feature groups that are considered to be transformation products for one parent (the parent that 'belongs' to the
-  component can be retrieved with the <code><a href='length,transformationProducts-method.html'>componentInfo</a></code> method). The parent feature groups are taken from
+  component can be retrieved with the <code><a href='components-class.html'>componentInfo</a></code> method). The parent feature groups are taken from
   the <code>fGroups</code> parameter, while the feature groups for TPs are taken from <code>fGroupsTPs</code>. If a feature group
   occurs in both variables, it may therefore be considered as both a parent or TP.</p>
 <p>If transformation product data is given, <em>i.e.</em> the <code>TPs</code> argument is set, then a suspect screening of

@@ -4,7 +4,6 @@
 
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
 - remove mz column from patRoonData suspects?
-    - and/or ignore/warn when used with sets?
 
 
 ## Features

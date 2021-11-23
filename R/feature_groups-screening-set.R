@@ -373,7 +373,12 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     if (checkmate::testDataFrame(suspects))
     {
         assertSuspectList(suspects, FALSE, skipInvalid)
-        suspects <- sapply(sets(fGroups), function(s) suspects, simplify = FALSE) # same for all set
+        if (any(c("mz", "adduct", "fragments_mz") %in% names(suspects)) && length(sets(fGroups)) > 1)
+            warning("The suspect list seems to contain an mz, adduct or fragments_mz column, ",
+                    "which are generally specific to the ionization mode used. ",
+                    "These columns most likely need to removed since the same suspect list will be used for all sets.",
+                    call. = FALSE)
+        suspects <- sapply(sets(fGroups), function(s) suspects, simplify = FALSE) # same for all sets
     }
     else
     {

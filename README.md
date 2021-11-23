@@ -5,41 +5,73 @@
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
 [![Docker image](https://img.shields.io/docker/image-size/patroonorg/patroonrs/latest)][DockerImg]
 
-`patRoon` aims to provide a solution for comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss specTROmetry nOn-target aNalysis_.
+`patRoon` aims to provide comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental
+analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss
+specTROmetry nOn-target aNalysis_.
 
-Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or _hyphenated_) with chromatography (_e.g._ LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical. Many dedicated software tools were developed and are still being developed to facilitate a more automated approach. However, these tools are generally not optimized for environmental workflows and/or only implement parts of the functionality required for a complete NTA workflow. An important aim of `patRoon` is to harmonize the many tools available in a consistent user interface, which removes the need to know all the details of each individual software tool and performing tedious conversion of data when combining tools in a workflow. In addition, key functionality is implemented in `patRoon` to provide complete NTA workflows, such as fully automated annotation, evaluating and combining of results from different algorithms, automatic reporting, several user friendly graphical tools, extensive documentation, several important optimization strategies and more. Many of the available tools nowadays were developed using the [R language][R] or are otherwise easily interface with `R`, hence, it was a straightforward decision to develop `patRoon` as an `R` package.
+## Project news
 
-The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, `patRoon` does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.
+**November 2021** `patRoon 2.0` is now available. This major new release adds functionality to automatically screen and
+identify transformation products, process positive and negative ionization MS data simultaneously and combine the
+results, new algorithms for feature and adduct detection, interactive data curation and more. Please see the [Project
+NEWS][NEWS] for details.
 
-Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:
+## Introduction
 
-* **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([ProteoWizard], [OpenMS], [DataAnalysis]).
-* **Extraction and grouping of features** (e.g. [XCMS], [OpenMS], [enviPick], [ProfileAnalysis]).
-* **Data cleanup**: post filtering of data to improve its quality and several tools to aid prioritization.
-* **Automatic extraction of MS and MS/MS** data ([mzR], [DataAnalysis]).
-* **Formula calculation**: automatic calculation of candidate formulae for detected features ([GenForm], [SIRIUS], [DataAnalysis]).
-* **Compound identification**: automatic annotation of MS/MS spectra and retrieval of candidate structures ([MetFrag], [SIRIUS with CSI:FingerID][SIRIUS]).
-* **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]) and with related intensity profiles.
-* **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
+Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this
+purpose, high resolution mass spectrometry instruments are used which are typically coupled (or _hyphenated_) with
+chromatography (_e.g._ LC or GC). The size and complexity of resulting data makes manual processing impractical. Many
+software tools were/are developed to facilitate a more automated approach. However, these tools are generally not
+optimized for environmental workflows and/or only implement parts of the functionality required.
 
-An example HTML report which gives an overview of what data can be produced can viewed [here][example].
+`patRoon` combines established software tools with novel functionality in order to provide comprehensive NTA workflows.
+The different algorithms are provided through a consistent interface, which removes the need to know all the details of
+each individual software tool and performing tedious data conversions during the workflow. The table below outlines the
+major functionality of `patRoon`.
 
-## Implementation notes
+Functionality | Description | Algorithms
+---------------------- | ------------------------------------------------------------------------ | -----------------------
+Raw data pre-treatment | MS format conversion (e.g. vendor to `mzML`) and calibration.            | [ProteoWizard], [OpenMS], [DataAnalysis]
+Feature extraction     | Finding features and grouping them across analyses.                      | [XCMS], [OpenMS], [enviPick], [DataAnalysis], [KPIC2], [SIRIUS], [SAFD]
+Suspect screening      | Finding features with suspected presence by MS and chromatographic data. Estimation of identification confidence levels. | Native
+MS data extraction     | Automatic extraction and averaging of feature MS(/MS) peak lists.        | Native, [mzR], [DataAnalysis]
+Formula annotation     | Automatic calculation of formula candidates for features.                | [GenForm], [SIRIUS], [DataAnalysis]
+Compound annotation    | Automatic (_in silico_) compound annotation for features.                | [MetFrag], [SIRIUS], Native
+Componentization & adduct annotation | Grouping of (chemically) related features such as isotopes, adducts and homologs into components. Annotating and prioritizing features. Use of adduct annotations for formula/compound annotations.            | [RAMClustR], [CAMERA], [nontarget R package][nontarget], [OpenMS], [cliqueMS], Native
+Combining algorithms   | Combine data from different algorithms (e.g. features, annotations) and generate a consensus. | Native
+_Sets workflows_       | Simultaneous processing and combining +/- MS ionization data             | Native
+Transformation product (TP) screening | Automatic screening of TPs using library/_in-silico_ data, MS similarities and classifications. Tools to improve compound TP annotation. | [BioTransformer], [PubChemLite][PubChemLiteTR], Native
+Reporting              | Automatic reporting in _CSV_, _PDF_ and (interactive) _HTML_ formats. An example HTML report can be viewed [here][example]. | Native
+Data clean-up & prioritization | Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and much more. | Native
+Data curation          | Several graphical interactive tools and functions to inspect and remove unwanted data. | Native
 
-* Developed on both Windows and Linux
-* `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
-* The [processx] R package is used to execute command line processes in parallel to reduce computation times.
-* Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
-* The [RDCOMClient] is used to provide functionality from DataAnalysis (Bruker).
-* Supports all major instrument vendor input formats (through usage of [ProteoWizard] and [DataAnalysis]).
-* The [Shiny] R package was used to implement several GUI tools.
-* S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.
+The workflow of non-target analysis typically depends on the aims and requirements of the study and the instrumentation
+and methodology used for sample analysis. For this reason, `patRoon` does not enforce a certain workflow. Instead, most
+workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.
+
+## Implementation details
+
+* `patRoon` is implemented as an [R] package, which allows easy interfacing with the many other `R` based MS tools and other data processing functionality from `R`.
+* Fully open-source (GPLv3).
+* Developed on Windows, Linux and macOS
+* S4 classes and generics are used to implement a consistent interface to all supported algorithms.
 * Continuous integration is used for automated unit testing, automatically updating the [Website][ghweb] and documentation and maintaining a [miniCRAN] [repository][patRoonDeps] and [Docker image][DockerImg] to simplify installation (see [the handbook][handbook-inst] for more details).
+* Supports all major instrument vendor input formats (through usage of [ProteoWizard] and [DataAnalysis]).
+* Optimizations
+    * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
+    * The [processx] and [future] `R` packages are used for parallelization.
+    * Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
+    * Code for loading MS and EIC data, MS similarity calculations and others were implemented in `C++` to reduce computational times.
+* The [RDCOMClient] is used to interface with Bruker DataAnalysis algorithms.
+* The [Shiny] R package was used to implement several GUI tools.
 
 
 ## Installation
 
-`patRoon` itself can be installed as any other R package, however, depending on which algorithms you want to use in your workflow, some extra steps may be required to install all the necessary tools. Please see the [installation section in the handbook][handbook-inst] for more information.
+`patRoon` itself can be installed as any other R package, however, some additional installation steps are needed to
+install its dependencies. Alternatively, [R Studio][RStudio] based Docker images are available to easily deploy a
+complete `patRoon` environment. Please see the [installation section in the handbook][handbook-inst] for more
+information.
 
 
 ## Getting started
@@ -51,15 +83,37 @@ library(patRoon)
 newProject()
 ```
 
-The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template `R` processing script.
+The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly
+select the analyses and common workflow options to subsequently generate a template `R` processing script.
 
-However, for a better guide to get started it is recommended to read the [tutorial]. Afterwards the [handbook] is a recommended read if you want to know more about advanced usage of `patRoon`. Finally, the [reference] outlines all the details of the `patRoon` package.
+However, for a better guide to get started it is recommended to read the [tutorial]. Afterwards the [handbook] is a
+recommended read if you want to know more about advanced usage of `patRoon`. Finally, the [reference] outlines all the
+details of the `patRoon` package.
+
+
+## Citing
+
+When you use `patRoon` please cite its publication:
+
+Rick Helmus, Thomas L. ter Laak, Annemarie P. van Wezel, Pim de Voogt and Emma L. Schymanski. [patRoon: open source
+software platform for environmental mass spectrometry based non-target screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformatics_ **13**, 1 (2021)
+
+(a manuscript for `patRoon 2.0` is in preparation)
+
+`patRoon` builds on many open-source software tools and open data sources. Therefore, please take care to also cite their work when using these algorithms via `patRoon`.
+
+## Contributing
+
+You are very welcome to send bug reports, code contributions (pull requests) and general feedback via the [GitHub page](https://github.com/rickhelmus/patRoon).
 
 
 [R]: https://www.r-project.org/
+[NEWS]: https://github.com/rickhelmus/patRoon/blob/master/NEWS.md
 [XCMS]: https://github.com/sneumann/xcms
 [OpenMS]: http://openms.de/
 [enviPick]: https://cran.r-project.org/web/packages/enviPick/index.html
+[KPIC2]: https://github.com/hcji/KPIC2
+[SAFD]: https://bitbucket.org/SSamanipour/safd.jl/src/master/
 [DataAnalysis]: https://www.bruker.com/
 [ProfileAnalysis]: https://www.bruker.com/
 [mzR]: https://github.com/sneumann/mzR/
@@ -69,16 +123,15 @@ However, for a better guide to get started it is recommended to read the [tutori
 [RAMClustR]: https://github.com/sneumann/RAMClustR
 [CAMERA]: http://msbi.ipb-halle.de/msbi/CAMERA/
 [nontarget]: https://cran.r-project.org/web/packages/nontarget/index.html
-[MetFrag-CL]: http://c-ruttkies.github.io/MetFrag/projects/metfragcl/
+[cliqueMS]: https://github.com/osenan/cliqueMS
+[BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/
+[PubChemLiteTR]: https://doi.org/10.5281/zenodo.5644560
+[future]: https://github.com/HenrikBengtsson/future
 [pngquant]: https://pngquant.org/
-[Bioconductor]: https://www.bioconductor.org
-[rJava]: http://www.rforge.net/rJava/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
 [handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
 [handbook-inst]: https://rickhelmus.github.io/patRoon/articles/handbook.html#installation
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
-[remotes]: https://github.com/r-lib/remotes#readme
-[Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [RStudio]: https://www.rstudio.com/
 [processx]: https://github.com/r-lib/processx
 [SQLite]: https://www.sqlite.org/index.html

@@ -193,9 +193,9 @@ For \code{screenSuspects} in some cases you may need to install
   \item \code{mz} The ionized \emph{m/z} of the suspect. (\strong{mandatory} unless it can be calculated from one of
   the aforementioned columns)
 
-  \item \code{adduct} A \code{character} that can be converted with \code{\link{as.adduct}}. (\strong{mandatory}
-  unless data from the \code{mz} column is available, the \code{adduct} argument is set or \code{fGroups} has adduct
-  annotations)
+  \item \code{adduct} A \code{character} that can be converted with \code{\link{as.adduct}}. Can be used to
+  automatically calculate values for the \code{mz} column. (\strong{mandatory} unless data from the \code{mz} column
+  is available, the \code{adduct} argument is set or \code{fGroups} has adduct annotations)
 
   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS fragments (specified as \emph{m/z} or
   formulae, respectively). Multiple values can be specified by separating them with a semicolon (\verb{;}). This data
@@ -209,7 +209,7 @@ For \code{screenSuspects} in some cases you may need to install
  How the mass of a suspect is matched with the mass of a feature depends on the
   available data: \itemize{
 
-  \item If the suspect has data from the \code{mz} column of the suspect list, then the this data is matched with the
+  \item If the suspect has data from the \code{mz} column of the suspect list, then this data is matched with the
   detected feature \emph{m/z}.
 
   \item Otherwise, if the suspect has data in the \code{adduct} column of the suspect list, this data is used to

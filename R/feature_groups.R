@@ -620,8 +620,6 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
     
-    # UNDONE: document FC and put in assertions
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
     checkmate::assertFlag(areas, add = ac)

@@ -96,5 +96,14 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     lib$records <- as.data.table(lib$records)
     lib$spectra <- lapply(lib$spectra, as.data.table)
     
+    # C++ code sets "NA" as string, convert to NA
+    for (j in seq_along(lib$records))
+        set(lib$records, which(lib$records[[j]] == "NA"), j, NA_character_)
+    
+    # Ensure case of column names used by patRoon are consistent
+    cols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_Type", "ExactMass")
+    change <- match(tolower(cols), tolower(names(lib$records)), nomatch = integer())
+    setnames(lib$records, change, cols)
+    
     return(MSLibrary(records = lib$records, spectra = lib$spectra, algorithm = "msp"))
 }

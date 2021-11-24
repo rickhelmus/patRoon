@@ -85,25 +85,24 @@ utils <- setRefClass("utilsInst", methods = list(
                                          paste0(notInstalled, collapse = ", "))))
             stop("Aborted. Please install the package(s) manually.")
         
-        # HACK: in some cases the package repos name differs from the installed package name (ie KPIC<-->KPIC2)
-        pkgToInstall <- pkgReposNames[notInstalled %in% pkgs]
-        
         if (pkgWhere == "normal")
         {
             if (type == "bioc")
             {
                 cmd <- "BiocManager::install"
-                args <- list(pkgToInstall, update = FALSE)
+                args <- list(notInstalled, update = FALSE)
             }
             else if (type == "gh")
             {
+                # HACK: in some cases the package repos name differs from the installed package name (ie KPIC<-->KPIC2)
+                pkgToInstall <- pkgReposNames[notInstalled %in% pkgs]
                 cmd <- "remotes::install_github"
                 args <- c(list(paste(repos, pkgToInstall, sep = "/")), list(upgrade = FALSE, force = force))
             }
             else
             {
                 cmd <- "install.packages"
-                args <- list(pkgToInstall)
+                args <- list(notInstalled)
                 if (!is.null(repos))
                     args <- c(args, list(repos = repos))
             }
@@ -112,7 +111,7 @@ utils <- setRefClass("utilsInst", methods = list(
         {
             cmd <- "install.packages"
             args <- c(list(repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary"),
-                      list(pkgToInstall))
+                      list(notInstalled))
             
             # shouldn't be necessary as .libPaths was already set
             # if (pkgWhere == "pDepsIso")
@@ -123,7 +122,7 @@ utils <- setRefClass("utilsInst", methods = list(
         argNames <- names(args)
         argVals <- quoteVariables(args)
         argsTxt <- paste0(ifelse(nzchar(argNames), paste0(argNames, " = "), ""), argVals, collapse = ", ")
-        cat(sprintf("Installing packages: %s\n\nEXECUTE: %s(%s)\n\n", paste0(pkgToInstall, collapse = ", "), cmd, argsTxt))
+        cat(sprintf("Installing packages: %s\n\nEXECUTE: %s(%s)\n\n", paste0(notInstalled, collapse = ", "), cmd, argsTxt))
 
         # hopefully to avoid stupid DLL problems etc
         unloadAllPackages()
@@ -355,10 +354,6 @@ utils <- setRefClass("utilsInst", methods = list(
         cat("The following mandatory packages will be installed:",
             paste0(mandatoryPackages, collapse = ", "),
             sep = "\n")
-        
-        instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,
-                                title = "Which of the following R packages do you want to install?")
-        instWhat <- names(instWhat)
         
         checkPackages(packagesCRAN, pkgWhere, ask = FALSE)
         checkPackages(packagesBioC, pkgWhere, ask = FALSE, type = "bioc")

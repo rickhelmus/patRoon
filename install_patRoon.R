@@ -609,8 +609,8 @@ utils <- setRefClass("utilsInst", methods = list(
         .libPaths(getLibPaths(instPath, pkgWhere))
         
         checkPackages("patRoon", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", force = force)
-        if (exampleData)
-            checkPackages("patRoonData", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", force = force)
+        if (exampleData) # NOTE: patRoonData is always installed from GitHub, as it's too big for patRoonDeps
+            checkPackages("patRoonData", "normal", ask = FALSE, type = "gh", repos = "rickhelmus", force = force)
         invisible(NULL)
     }
 ))()

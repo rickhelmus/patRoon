@@ -131,11 +131,12 @@ LinkingTo:
 RdMacros:
     Rdpack
 Collate: 
-    'RcppExports.R'
     'generics.R'
     'cache.R'
     'main.R'
     'workflow-step.R'
+    'MSLibrary.R'
+    'RcppExports.R'
     'TP.R'
     'TP-structure.R'
     'TP-CTS.R'

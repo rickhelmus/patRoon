@@ -85,14 +85,14 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
 })
 
 
-loadMSPLibrary <- function(file, parseComments = TRUE)
+loadMSPLibrary <- function(file, parseComments = TRUE, numericMasses = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
-    checkmate::assertFlag(parseComments, add = ac)
+    aapply(checkmate::assertFlag, . ~ parseComments + numericMasses, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    lib <- readMSP(file, parseComments)
+    lib <- readMSP(normalizePath(file), parseComments)
     lib$records <- as.data.table(lib$records)
     lib$spectra <- lapply(lib$spectra, as.data.table)
     
@@ -104,6 +104,13 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     cols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_Type", "ExactMass")
     change <- match(tolower(cols), tolower(names(lib$records)), nomatch = integer())
     setnames(lib$records, change, cols)
+    
+    if (numericMasses)
+    {
+        cols <- intersect(c("ExactMass", "MW", "PrecursorMZ"), names(lib$records))
+        if (length(cols) > 0)
+            suppressWarnings(lib$records[, (cols) := lapply(.SD, as.numeric), .SDcols = cols]) # suppress NA conversion warnings
+    }
     
     return(MSLibrary(records = lib$records, spectra = lib$spectra, algorithm = "msp"))
 }

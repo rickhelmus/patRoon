@@ -1,3 +1,7 @@
+# UNDONE: this should probably be deleted someday...
+
+# nocov start
+
 #' @include features.R
 #' @include feature_groups.R
 NULL
@@ -93,4 +97,4 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
     return(ret)
 }
 
-
+# nocov end

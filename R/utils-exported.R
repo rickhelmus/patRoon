@@ -84,6 +84,9 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
     return(ret)
 }
 
+# nocov start
+
+# UNDONE: delete some day...
 #' @details \code{generateAnalysisInfoFromEnviMass} loads analysis information
 #'   from an \pkg{enviMass} project. Note: this funtionality has only been
 #'   tested with older versions of \pkg{enviMass}.
@@ -126,6 +129,8 @@ generateAnalysisInfoFromEnviMass <- function(path)
     
     return(ret)
 }
+# nocov end
+
 
 #' Temporarily changes package options
 #'

@@ -144,7 +144,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
         }
         else
         {
-            if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
+            if (!grepl("^\\[[[:alnum:]\\+\\-]+\\][[:digit:]]*[\\+\\-]{1}$", x))
                 stop("Wrong format! (forgot brackets or charge?)")
             
             if (format == "cliquems")

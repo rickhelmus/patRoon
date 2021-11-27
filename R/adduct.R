@@ -72,8 +72,6 @@ setMethod("show", "adduct", function(object)
 #' @describeIn adduct Converts an \code{adduct} object to a specified
 #'   \code{character} format.
 #' @inheritParams as.adduct
-#' @param err If \code{TRUE} then an error will be thrown if conversion fails,
-#'   otherwise returns \code{NA}.
 #' @export
 setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
 {

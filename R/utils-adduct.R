@@ -132,7 +132,7 @@ getFGroupAdducts <- function(gNames, annTable, adduct, format)
 }
 
 # NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
-doAsAdduct <- memoise(function(x, format, isPositive, charge)
+doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
 {
     if (is(x, "adduct"))
         return(x)
@@ -155,6 +155,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
     }
     else
         checkmate::assertString(x, min.chars = 1, add = ac)
+    checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
     
     if (format == "generic" || format == "sirius" || format == "cliquems")
@@ -168,7 +169,11 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
             x <- gsub(" ", "", x, fixed = TRUE) # e.g. RAMClustR includes an accidental adduct with space
             
             if (!grepl("^\\[[[:alnum:]\\+\\-]+\\][[:digit:]]*[\\+\\-]{1}$", x))
-                stop("Wrong format! (forgot brackets or charge?)")
+            {
+                if (err)
+                    stop("Wrong format! (forgot brackets or charge?)")
+                return(NULL)
+            }
             
             if (format == "cliquems")
                 x <- sub("Cat", "M", x, fixed = TRUE)
@@ -200,7 +205,11 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
     {
         gfadds <- GenFormAdducts()[adduct == x]
         if (nrow(gfadds) == 0)
-            stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
+        {
+            if (err)
+                stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
+            return(NULL)
+        }
         
         gfadds <- gfadds[1] # in case there are multiple hits
         adds <- gfadds$add; subs <- gfadds$sub; charge <- gfadds$charge; mult <- gfadds$molMult
@@ -223,7 +232,11 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
             mfadds <- MetFragAdducts()[adduct_type == x]
         
         if (nrow(mfadds) == 0)
-            stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+        {
+            if (err)
+                stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+            return(NULL)
+        }
         
         mfadds <- mfadds[1] # in case there are multiple hits
         adds <- mfadds$add; subs <- mfadds$sub; charge <- mfadds$charge
@@ -318,10 +331,13 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 #'   \code{numeric} identifier.
 #' @param charge The final charge. Only needs to be set when \code{format="openms"}.
-#' 
+#' @param err If \code{TRUE} then an error will be thrown if conversion fails,
+#'   otherwise returns without data.
+#'   
 #' @rdname adduct-utils
 #' @export
-as.adduct <- function(x, format = "generic", isPositive = NULL, charge = NULL) doAsAdduct(x, format, isPositive, charge)
+as.adduct <- function(x, format = "generic", isPositive = NULL, charge = NULL,
+                      err = TRUE) doAsAdduct(x, format, isPositive, charge, err = err)
 
 #' @details \code{calculateIonFormula} Converts one or more neutral formulae to
 #'   adduct ions.

@@ -50,8 +50,6 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
         std::string line;
         MSPRecord curRec;
         
-        Rcpp::Rcout << "Parsing file...";
-        
         while (std::getline(fs, line))
         {
             auto cPos = line.find(":");
@@ -109,7 +107,6 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
             }
         }
     }
-    Rcpp::Rcout << " Done!" << std::endl << "Converting to R data...";
     
     Rcpp::List recordsList(keys.size());
     recordsList.names() = Rcpp::wrap(std::vector<std::string>(keys.begin(), keys.end()));
@@ -135,8 +132,6 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
         Rcpp::colnames(nm) = Rcpp::CharacterVector({"mz", "intensity"});
         specList[i] = nm;
     }
-    
-    Rcpp::Rcout << " Done!" << std::endl;
     
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
                               Rcpp::Named("spectra") = specList);

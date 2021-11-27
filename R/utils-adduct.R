@@ -131,6 +131,21 @@ getFGroupAdducts <- function(gNames, annTable, adduct, format)
     return(list(grpAdducts = grpAdducts, grpAdductsChr = grpAdductsChr))
 }
 
+asAdductVec <- function(v, ...)
+{
+    uv <- unique(v)
+    adds <- setNames(lapply(uv, as.adduct, ...), uv)
+    return(adds[v])
+}
+
+normalizeAdducts <- function(adds, err = TRUE)
+{
+    unAdds <- unique(adds)
+    nAddsObj <- setNames(lapply(unAdds, as.adduct, err = err), unAdds)
+    nAdds <- sapply(nAddsObj, function(x) if (is.null(x)) NA_character_ else as.character(x))
+    return(nAdds[adds])
+}
+    
 # NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
 doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
 {

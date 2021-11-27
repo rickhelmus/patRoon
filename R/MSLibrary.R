@@ -152,16 +152,6 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
         return(ret)
     }))]
 
-    printf("Calculating missing precursor m/z values\n")
-    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_Type),
-                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_Type, FUN = function(em, pt)
-    {
-        add <- tryCatch(as.adduct(pt), error = function(...) NULL)
-        ret <- if (is.null(add)) NA_real_ else em + adductMZDelta(add)
-        doProgress()
-        return(ret)
-    }))]
-    
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
     lib$records[, Ion_mode := toupper("POSITIVE")]
     lib$records[Ion_mode == "P", Ion_mode := "POSITIVE"]
@@ -192,12 +182,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
         lib$records[, Precursor_Type := sub(names(adductMapping)[i], adductMapping[i], Precursor_Type)]
 
     printf("Verify/Standardize adducts\n")
-    lib$records[!is.na(Precursor_Type), Precursor_Type := withProg(.N, FALSE, sapply(Precursor_Type, function(pt)
-    {
-        ret <- tryCatch(as.character(as.adduct(pt)), error = function(...) NA_character_)
-        doProgress()
-        return(ret)
-    }))]
+    lib$records[!is.na(Precursor_Type), Precursor_Type := normalizeAdducts(Precursor_Type, err = FALSE)]
     
     printf("Guessing missing adducts\n")
     potAdducts <- copy(GenFormAdducts()) # UNDONE: make optional?
@@ -214,5 +199,15 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
         return(if (length(pa) == 1) pa else NA_character_)
     })]
 
+    printf("Calculating missing precursor m/z values\n")
+    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_Type),
+                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_Type, FUN = function(em, pt)
+    {
+        add <- tryCatch(as.adduct(pt), error = function(...) NULL)
+        ret <- if (is.null(add)) NA_real_ else em + adductMZDelta(add)
+        doProgress()
+        return(ret)
+    }))]
+    
     return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
 }

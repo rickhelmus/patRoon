@@ -107,9 +107,17 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         if (format == "sirius")
         {
             if (abs(x@charge) != 1)
-                stop("SIRIUS only supports a charge of +/- 1")
+            {
+                if (err)
+                    stop("SIRIUS only supports a charge of +/- 1")
+                return(NA_character_)
+            }
             if (x@molMult > 1)
-                stop("SIRIUS only supports a molecular multiplier of 1")
+            {
+                if (err)
+                    stop("SIRIUS only supports a molecular multiplier of 1")
+                return(NA_character_)
+            }
         }
 
         adds <- if (length(x@add)) paste0("+", x@add, collapse = "") else ""
@@ -137,7 +145,7 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         {
             if (err)
                 stop("MetFrag only supports a molecular multiplier of 1")
-            return(character())
+            return(NA_character_)
         }
 
         return(getGFMFAdduct())

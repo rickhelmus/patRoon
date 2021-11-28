@@ -98,12 +98,13 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     
     printf("Converting to tables\n")
     lib$records <- as.data.table(lib$records)
-    lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
-    {
-        ret <- as.data.table(s)
-        doProgress()
-        return(ret)
-    }))
+    # UNDONE: not for now, takes a lot of time for large amounts
+    # lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
+    # {
+    #     ret <- as.data.table(s)
+    #     doProgress()
+    #     return(ret)
+    # }))
     
     # C++ code sets "NA" as string, convert to NA
     for (j in seq_along(lib$records))

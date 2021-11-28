@@ -21,18 +21,18 @@ struct MSPRecord
 
 bool parseComments(const std::string &comments, const std::string &field, std::string &out)
 {
-    std::regex r("\"" + field + "=([^\"]+)");
-    std::smatch sm;
-    
-    if (std::regex_search(comments, sm, r))
+    const std::string toMatch = '"' + field + '=';
+    auto start = comments.find(toMatch);
+    if (start != std::string::npos)
     {
-        if (sm.size() == 2)
+        start += toMatch.length();
+        const auto end = comments.find('"', start);
+        if (end != std::string::npos)
         {
-            out = sm[1].str(); // [0] is complete match
+            out = comments.substr(start, end-start);
             return true;
         }
     }
-    
     return false;
 }
 
@@ -64,11 +64,11 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     for (int n = std::stoi(val); n; --n)
                     {
                         // UNDONE: MSP also allows other formats than one space separated pair per line
-                        
-                        double m, i;
+                        std::string m, i;
                         fs >> m >> i;
-                        curRec.spectrum.mzs.push_back(m);
-                        curRec.spectrum.intensities.push_back(i);
+                        
+                        curRec.spectrum.mzs.push_back(stod(m));
+                        curRec.spectrum.intensities.push_back(stod(i));
                     }
                     
                     // NOTE: Num Peaks is always the last entry, finish up record
@@ -123,7 +123,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
 
     Rcpp::List specList(records.size());
     specList.names() = recordsList["DB_ID"];
-    for (size_t i=0; i<specList.size(); ++i)
+    for (int i=0; i<specList.size(); ++i)
     {
         Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);
         nm(Rcpp::_, 0) = Rcpp::NumericVector(records[i].spectrum.mzs.begin(), records[i].spectrum.mzs.end());

@@ -17,6 +17,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// writeMSPLibrary
+void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcpp::CharacterVector outCV);
+RcppExport SEXP _patRoon_writeMSPLibrary(SEXP recordsMSEXP, SEXP spectraListSEXP, SEXP outCVSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterMatrix >::type recordsM(recordsMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type spectraList(spectraListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type outCV(outCVSEXP);
+    writeMSPLibrary(recordsM, spectraList, outCV);
+    return R_NilValue;
+END_RCPP
+}
 // parseAdductConsXMLFile
 Rcpp::List parseAdductConsXMLFile(Rcpp::CharacterVector file);
 RcppExport SEXP _patRoon_parseAdductConsXMLFile(SEXP fileSEXP) {
@@ -175,6 +187,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
+    {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},

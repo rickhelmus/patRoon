@@ -84,6 +84,21 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
     return(ret)
 })
 
+setMethod("export", "MSLibrary", function(obj, type, out)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(type, "msp", add = ac)
+    checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    # convert records to character matrix to simplfy Rcpp processing
+    recs <- copy(records(obj))
+    recs[, (names(recs)) := lapply(.SD, as.character)]
+    recs <- as.matrix(recs)
+    writeMSPLibrary(recs, spectra(obj), normalizePath(out))
+})
+
+
 
 loadMSPLibrary <- function(file, parseComments = TRUE)
 {

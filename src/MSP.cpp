@@ -141,3 +141,32 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
                               Rcpp::Named("spectra") = specList);
 }
+
+// [[Rcpp::export]]
+void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcpp::CharacterVector outCV)
+{
+    // UNDONE: numeric precision seems to reduce
+    const char *out = Rcpp::as<const char *>(outCV);
+    std::ofstream outf(out);
+    const Rcpp::CharacterVector fields = Rcpp::colnames(recordsM);
+    if (outf.is_open())
+    {
+        for (int row=0; row<recordsM.nrow(); ++row)
+        {
+            for (int col=0; col<recordsM.ncol(); ++col)
+            {
+                const char *f = fields[col], *v = recordsM(row, col);
+                outf << ((!strcmp(f, "DB_ID")) ? "DB#" : f) << ": " << v << "\n";
+            }
+            const Rcpp::NumericMatrix spec = spectraList[row];
+            outf << "Num Peaks: " << spec.nrow() << "\n";
+            for (int srow=0; srow<spec.nrow(); ++srow)
+                outf << spec(srow, 0) << " " << spec(srow, 1) << "\n";
+            outf << "\n";
+            
+            if (row > 0 && (row == (recordsM.nrow()-1) || (row % 25000) == 0))
+                Rcpp::Rcout << "Wrote " << row << " records\n";
+        }
+        outf.close();
+    }
+}

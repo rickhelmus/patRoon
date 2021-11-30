@@ -92,6 +92,9 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     
                     records.push_back(curRec);
                     curRec = MSPRecord();
+                    
+                    if ((records.size() % 25000) == 0)
+                        Rcpp::Rcout << "Read " << records.size() << " records\n";
                 }
                 else
                 {
@@ -106,6 +109,8 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                 }
             }
         }
+        fs.close();
+        Rcpp::Rcout << "Read " << records.size() << " records\n";
     }
     
     Rcpp::List recordsList(keys.size());

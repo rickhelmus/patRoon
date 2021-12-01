@@ -113,6 +113,7 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
 - Adducts
     - `GenFormAdducts()` and `MetFragAdducts()` now additionally return adducts in generic format and use cached data for efficiency. 
     - `err` argument to `as.character()` to control if an error or `NA` should returned if conversion fails.
+    - `as.adduct()` now removes any whitespace and performs stricter format checks to make conversion more robust.
     - Standardized GenForm/MetFrag element addition/subtraction data to improve consistency for conversions (eg NH4 --> H4N).
     - Conversion from/to adduct formats of OpenMS (`MetaboliteAdductDecharger`) and `cliqueMS`.
     - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
@@ -163,6 +164,9 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
 - Suspect screening
     - Fixed: `numericIDLevel()` now properly handles `NA` values.
     - `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files.
+    - Fixed: Automatic _m/z_ calculation for suspects
+        - Improperly handled electron masses for adducts involving element subtract (e.g. `[M-H]-`), resulting in ~1.5 mDa deviations
+        - Adduct conversion didn't handle multiple molecules (e.g. `[2M+H]+`) and multiple charges (e.g. `[M+2H]2+`)
 - Components
     - `RAMClustR`: ensure that columns are the right type if all values are NA.
     - `CAMERA`: correctly handle cases when `minSize` filter results in zero components.

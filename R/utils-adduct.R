@@ -165,6 +165,8 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
         }
         else
         {
+            x <- gsub(" ", "", x, fixed = TRUE) # e.g. RAMClustR includes an accidental adduct with space
+            
             if (!grepl("^\\[[[:alnum:]\\+\\-]+\\][[:digit:]]*[\\+\\-]{1}$", x))
                 stop("Wrong format! (forgot brackets or charge?)")
             

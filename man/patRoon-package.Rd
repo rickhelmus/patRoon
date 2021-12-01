@@ -94,7 +94,7 @@ Other contributors:
   \item Vittorio Albergamo (\href{https://orcid.org/0000-0002-5347-1362}{ORCID}) [contributor]
   \item Andrea Brunner (\href{https://orcid.org/0000-0002-2801-1751}{ORCID}) [contributor]
   \item Emma Schymanski (\href{https://orcid.org/0000-0001-6868-8145}{ORCID}) [contributor]
-  \item Bas van de Velde (\href{https://orcid.org/0000-0001-6868-8145}{ORCID}) [contributor]
+  \item Bas van de Velde (\href{https://orcid.org/0000-0003-1292-3251}{ORCID}) [contributor]
 }
 
 }

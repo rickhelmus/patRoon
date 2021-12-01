@@ -6,14 +6,11 @@ NULL
 neutralizeFeatures <- function(feat, adduct)
 {
     if (!is.null(adduct))
-    {
         adductChar <- as.character(adduct)
-        adductMZ <- adductMZDelta(adduct)
-    }
     else
     {
-        allAdducts <- unique(unlist(lapply(feat@features, "[[", "adduct")))
-        adductMZ <- sapply(allAdducts, function(a) adductMZDelta(as.adduct(a)))
+        allAdductsChar <- unique(unlist(lapply(feat@features, "[[", "adduct")))
+        allAdducts <- sapply(allAdductsChar, as.adduct)
     }
     
     feat@features <- lapply(feat@features, function(fTab)
@@ -25,19 +22,16 @@ neutralizeFeatures <- function(feat, adduct)
         else
         {
             if (!is.null(adduct))
-            {
-                mzd <- adductMZ
                 fTab[, adduct := adductChar]
-            }
             else
-            {
-                mzd <- adductMZ[fTab$adduct]
                 fTab[, adduct := fTab$adduct]
-            }
             
-            fTab[, mz := mz - mzd]
-            fTab[, mzmin := mzmin - mzd]
-            fTab[, mzmax := mzmax - mzd]
+            nm <- calculateMasses(fTab$mz, if (!is.null(adduct)) adduct else allAdducts[fTab$adduct], type = "neutral")
+            nmd <- fTab$mz - nm
+            
+            fTab[, mz := nm]
+            fTab[, mzmin := mzmin - nmd]
+            fTab[, mzmax := mzmax - nmd]
         }
         
         return(fTab)
@@ -190,18 +184,19 @@ setMethod("unset", "featuresSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     
+    allAdductsChar <- unique(unlist(lapply(obj@features, "[[", "adduct")))
+    allAdducts <- sapply(allAdductsChar, as.adduct)
+    
     ionizedFTable <- lapply(featureTable(obj), function(ft)
     {
         ft <- copy(ft)
         
         if (nrow(ft) > 0)
         {
-            adducts <- sapply(unique(ft$adduct), as.adduct)
-            addMZs <- sapply(adducts, adductMZDelta)
-            addMZs <- addMZs[ft$adduct]
-            
+            mzs <- calculateMasses(ft$mz, allAdducts[ft$adduct], type = "mz")
+            nmd <- mzs - ft$mz
             set(ft, j = c("mz", "mzmin", "mzmax"),
-                value = list(ft$mz + addMZs, ft$mzmin + addMZs, ft$mzmax + addMZs))
+                value = list(mzs, ft$mzmin + nmd, ft$mzmax + nmd))
         }
         
         ft[, adduct := NULL] # UNDONE: keep?

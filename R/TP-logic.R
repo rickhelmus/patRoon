@@ -98,9 +98,8 @@ setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, a
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
-    neutralMasses <- if (length(fGroups) == 0) numeric () else groupInfo(fGroups)[, "mzs"] - sapply(fgAdd$grpAdducts,
-                                                                                                    adductMZDelta)
-    
+    neutralMasses <- if (length(fGroups) == 0) numeric() else calculateMasses(groupInfo(fGroups)[, "mzs"],
+                                                                              fgAdd$grpAdducts, type = "neutral")
     res <- doGenerateTPsLogic(fGroups, minMass, neutralMasses, transformations)
     
     return(transformationProductsLogic(parents = res$parents, products = res$products))

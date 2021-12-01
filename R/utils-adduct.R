@@ -56,21 +56,42 @@ checkAndGetIonization <- function(ionization, fGroups, .var.name = "ionization",
     return(ionization)    
 }
 
-adductMZDelta <- function(adduct)
+calculateMasses <- function(masses, adducts, type)
 {
-    # NOTE: rcdk::get.formula (getFormulaMass()) makes elemental counts absolute
-    ret <- 0
-    if (length(adduct@add) > 0 && length(adduct@sub) > 0) # NOTE: add charge once
-        ret <- sum(sapply(adduct@add, getFormulaMass, c = adduct@charge)) -
-            sum(sapply(adduct@sub, getFormulaMass, c = 0))
-    else if (length(adduct@add) > 0)
-        ret <- sum(sapply(adduct@add, getFormulaMass, c = adduct@charge))
-    else if (length(adduct@sub) > 0)
-        ret <- -(sum(sapply(adduct@sub, getFormulaMass, c = adduct@charge)))
-    else # [M]
-        ret <- getFormulaMass("H", adduct@charge) - getFormulaMass("H", 0) # electron mass
+    stopifnot(type %in% c("neutral", "mz"))
     
-    return(ret)
+    if (!is.list(adducts))
+        adducts <- list(adducts)
+    
+    if (length(masses) > length(adducts))
+        adducts <- rep(adducts, length.out = length(masses))
+    else if (length(masses) < length(adducts))
+        masses <- rep(masses, length.out = length(adducts))
+    
+    electronMass <- getFormulaMass("H", -1) - getFormulaMass("H", 0)
+    
+    return(mapply(masses, adducts, FUN = function(m, add)
+    {
+        # calculation is split by elemental M multiplier, addition/subtractions, and final charge (z)
+        
+        em <- if (length(add@add) > 0 && length(add@sub) > 0)
+            sum(sapply(add@add, getFormulaMass)) - sum(sapply(add@sub, getFormulaMass))
+        else if (length(add@add) > 0)
+            sum(sapply(add@add, getFormulaMass))
+        else if (length(add@sub) > 0)
+            -(sum(sapply(add@sub, getFormulaMass)))
+        else # [M]
+            0
+        
+        # NOTE: invert charge (electron is lost in pos and gained in neg)
+        em <- em + (electronMass * -add@charge)
+        
+        if (type == "mz")
+            return(((m * add@molMult) + em) / abs(add@charge))
+        
+        # else neutralize
+        return(((m * abs(add@charge)) - em) / add@molMult)
+    }))
 }
 
 makeAlgoAdducts <- function(adducts, gNames, format)

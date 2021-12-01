@@ -83,7 +83,7 @@ test_that("adducts setting", {
     expect_true(all(sapply(seq_len(nrow(annotations(fgOpenMSAnn2))), function(i)
     {
         ann <- annotations(fgOpenMSAnn2)[i]
-        return(isTRUE(all.equal(ann$neutralMass + adductMZDelta(as.adduct(ann$adduct)),
+        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
                                 groupInfo(fgOpenMSAnn2)[ann$group, "mzs"])))
     })))
 })
@@ -526,8 +526,8 @@ test_that("sets functionality", {
     skip_if_not(testWithSets())
     
     # proper (de)neutralization
-    expect_equal(mean(groupInfo(unset(fgOpenMS, "positive"))$mzs) - mean(groupInfo(fgOpenMS[, sets = "positive"])$mzs),
-                 patRoon:::adductMZDelta(as.adduct("[M+H]+")))
+    expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mzs, as.adduct("[M+H]+"), "neutral"),
+                 mean(groupInfo(fgOpenMS[, sets = "positive"])$mzs))
     expect_equal(analysisInfo(unset(fgOpenMS, "positive")), getTestAnaInfoPos())
     expect_equal(analysisInfo(fgOpenMS[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))

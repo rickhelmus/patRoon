@@ -117,27 +117,28 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
             close(prog)
         }
 
+        suspects[, neutralMass := neutralMasses]
+        
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
             (!is.null(adduct) || !is.null(suspects[["adduct"]])))
         {
-            if (!is.null(adduct))
-                addMZs <- adductMZDelta(adduct)
-            else
-                addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
+            if (is.null(suspects[["mz"]]))
+                suspects[, mz := NA_real_] # make it present to simplify code below
             
-            if (!is.null(suspects[["mz"]]))
-                suspects[, mz := ifelse(!is.na(suspects$mz), suspects$mz, neutralMasses + addMZs)]
+            if (!is.null(adduct))
+                suspects[is.na(mz), mz := calculateMasses(neutralMass, adduct, type = "mz")]
             else
-                suspects[, mz := neutralMasses + addMZs]
+            {
+                unAdducts <- sapply(unique(suspects[is.na(mz)]$adduct), as.adduct)
+                suspects[is.na(mz), mz := calculateMasses(neutralMass, adductList[adduct], type = "mz")]
+            }
         }
         else if (is.null(suspects[["mz"]]))
         {
             # NOTE: if mz column is already available it either contains user values or already NAs
             suspects[, mz := NA_real_]
         }
-        
-        suspects[, neutralMass := neutralMasses]
         
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        

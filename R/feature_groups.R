@@ -1850,8 +1850,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         else
             fGroups@annotations[, adduct := prefAdduct]
 
-        fGroups@annotations[, neutralMass := groupInfo(fGroups)[group, "mzs"] -
-                                sapply(lapply(adduct, as.adduct), adductMZDelta)]
+        fGroups@annotations[, neutralMass := calculateMasses(groupInfo(fGroups)[group, "mzs"],
+                                                             lapply(adduct, as.adduct),
+                                                             type = "neutral")]
                 
         # retain correct order
         fGroups@annotations <- fGroups@annotations[match(names(fGroups), group)]

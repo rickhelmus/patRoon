@@ -518,8 +518,7 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     if (nrow(gInfo) > 0)
     {
         adducts <- sapply(unique(ann$adduct), as.adduct)
-        addMZs <- sapply(adducts, adductMZDelta)
-        gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
+        gInfo$mzs <- calculateMasses(gInfo$mzs, adducts[ann$adduct], type = "mz")
         ann <- ann[, -"set"]
     }
     

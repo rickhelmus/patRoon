@@ -254,7 +254,7 @@ test_that("selectIons works", {
     expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSI))), function(i)
     {
         ann <- annotations(fGroupsSI)[i]
-        return(isTRUE(all.equal(ann$neutralMass + adductMZDelta(as.adduct(ann$adduct)),
+        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
                                 groupInfo(fGroupsSI)[ann$group, "mzs"])))
     })))
     

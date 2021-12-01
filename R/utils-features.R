@@ -102,7 +102,7 @@ updateAnnAdducts <- function(annTable, gInfo, adducts)
     
     adducts <- sapply(adducts, checkAndToAdduct, .var.name = "value", simplify = FALSE)
     adductsChr <- sapply(adducts, as.character) # re-make characters: standardize format
-    nm <- gInfo[names(adducts), "mzs"] - sapply(adducts, adductMZDelta)
+    nm <- calculateMasses(gInfo[names(adducts), "mzs"], adducts, type = "neutral")
     
     if (nrow(annTable) > 0)
     {

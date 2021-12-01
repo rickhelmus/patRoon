@@ -42,7 +42,13 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
     const bool pComments = Rcpp::as<bool>(pc);
     std::ifstream fs;
     std::vector<MSPRecord> records;
-    std::set<std::string> keys;
+    std::vector<std::string> keys;
+    
+    auto addKey = [&keys](const std::string &k)
+    {
+        if (std::find(keys.begin(), keys.end(), k) == keys.end())
+            keys.push_back(k);
+    };
     
     fs.open(Rcpp::as<const char *>(file));
     if (fs.is_open())
@@ -80,12 +86,12 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                         std::string cv;
                         if (curRec.values.find("SMILES") == curRec.values.end() && parseComments(com, "SMILES", cv))
                         {
-                            keys.insert("SMILES");
+                            addKey("SMILES");
                             curRec.values["SMILES"] = cv;
                         }
                         if (curRec.values.find("InChI") == curRec.values.end() && parseComments(com, "InChI", cv))
                         {
-                            keys.insert("InChI");
+                            addKey("InChI");
                             curRec.values["InChI"] = cv;
                         }
                     }
@@ -101,7 +107,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     if (key == "DB#")
                         key = "DB_ID"; // rename for R name compat
                     
-                    keys.insert(key);
+                    addKey(key);
                     
                     auto p = curRec.values.insert({key, val});
                     if (!p.second) // NOT inserted, i.e. already present?

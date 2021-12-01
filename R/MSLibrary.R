@@ -107,9 +107,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     aapply(checkmate::assertFlag, . ~ parseComments, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    printf("Parsing file... ")
     lib <- readMSP(normalizePath(file), parseComments)
-    printf("Done!\n")
     
     printf("Converting to tables\n")
     lib$records <- as.data.table(lib$records)
@@ -201,9 +199,10 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     lib$records[!is.na(Precursor_Type), Precursor_Type := normalizeAdducts(Precursor_Type, err = FALSE)]
     
     printf("Guessing missing adducts\n")
+    if (FALSE) # UNDONE: update adduct m/z calc
+    {
     potAdducts <- copy(GenFormAdducts()) # UNDONE: make optional?
     potAdducts <- unique(potAdducts, by = "adduct_generic")
-    potAdducts <- potAdducts[molMult == 1] # UNDONE
     potAdducts[, delta := sapply(adduct_generic, function(a) adductMZDelta(as.adduct(a)))]
     lib$records[is.na(Precursor_Type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
                 Precursor_Type := mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
@@ -214,13 +213,14 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
         # NOTE: multiple hits are ignored (=NA)
         return(if (length(pa) == 1) pa else NA_character_)
     })]
-
+    }
+    
     printf("Calculating missing precursor m/z values\n")
     lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_Type),
                 PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_Type, FUN = function(em, pt)
     {
         add <- tryCatch(as.adduct(pt), error = function(...) NULL)
-        ret <- if (is.null(add)) NA_real_ else em + adductMZDelta(add)
+        ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")
         doProgress()
         return(ret)
     }))]

@@ -1,5 +1,5 @@
 #include <fstream>
-#include <regex>
+#include <iomanip>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -148,6 +148,7 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
     // UNDONE: numeric precision seems to reduce
     const char *out = Rcpp::as<const char *>(outCV);
     std::ofstream outf(out);
+    outf << std::fixed << std::setprecision(6);
     const Rcpp::CharacterVector fields = Rcpp::colnames(recordsM);
     if (outf.is_open())
     {

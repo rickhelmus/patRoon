@@ -355,6 +355,8 @@
 <code><a href="../reference/adduct-utils.html">GenFormAdducts()</a></code> and <code><a href="../reference/adduct-utils.html">MetFragAdducts()</a></code> now additionally return adducts in generic format and use cached data for efficiency.</li>
 <li>
 <code>err</code> argument to <code><a href="https://rdrr.io/r/base/character.html">as.character()</a></code> to control if an error or <code>NA</code> should returned if conversion fails.</li>
+<li>
+<code><a href="../reference/adduct-utils.html">as.adduct()</a></code> now removes any whitespace and performs stricter format checks to make conversion more robust.</li>
 <li>Standardized GenForm/MetFrag element addition/subtraction data to improve consistency for conversions (eg NH4 –&gt; H4N).</li>
 <li>Conversion from/to adduct formats of OpenMS (<code>MetaboliteAdductDecharger</code>) and <code>cliqueMS</code>.</li>
 <li>
@@ -437,6 +439,12 @@
 <li>Fixed: <code><a href="../reference/suspect-screening.html">numericIDLevel()</a></code> now properly handles <code>NA</code> values.</li>
 <li>
 <code><a href="../reference/suspect-screening.html">importFeatureGroupsBrukerTASQ()</a></code>: Improved handling of absent analyses in imported results files.</li>
+<li>Fixed: Automatic <em>m/z</em> calculation for suspects
+<ul>
+<li>Improperly handled electron masses for adducts involving element subtract (e.g. <code>[M-H]-</code>), resulting in ~1.5 mDa deviations</li>
+<li>Adduct conversion didn’t handle multiple molecules (e.g. <code>[2M+H]+</code>) and multiple charges (e.g. <code>[M+2H]2+</code>)</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>Components

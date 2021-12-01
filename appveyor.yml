@@ -29,7 +29,7 @@ install:
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\sirius-4.9.9.zip)) {
-            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.9.9/sirius-4.9.9-win64-headless.zip -OutFile "C:\deps\sirius-4.9.9.zip"
+            Invoke-WebRequest https://github.com/boecker-lab/sirius/releases/download/v4.9.9/sirius-4.9.9-win64-headless.zip"
             7z x -aoa -oC:\deps\ C:\deps\sirius-4.9.9.zip
         }
     - ps: >-

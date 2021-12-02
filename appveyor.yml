@@ -10,7 +10,6 @@ init:
 install:
     - ps: Bootstrap
     - ps: mkdir -Force c:\deps
-    # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - ps: >-
         if (-Not (Test-Path C:\deps\biotransformer)) {
             git clone --depth 1 -q https://bitbucket.org/djoumbou/biotransformer.git C:/deps/biotransformer
@@ -37,6 +36,7 @@ install:
             Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe -OutFile "C:\deps\openbabel311.exe"
         }
         C:\deps\openbabel311.exe /S
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - C:\RLibrary

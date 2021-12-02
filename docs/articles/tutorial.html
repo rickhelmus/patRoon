@@ -119,7 +119,7 @@
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2021-12-01</h4>
+            <h4 class="date">2021-12-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -150,8 +150,8 @@ p.caption {
 <a href="#introduction" class="anchor"></a>Introduction</h1>
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-5b791d912ac965c34656" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5b791d912ac965c34656">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ee9e472ed200963943b2" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ee9e472ed200963943b2">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -523,7 +523,7 @@ p.caption {
 <pre><code>#&gt; Identifying 25 feature groups with MetFrag...
 #&gt; Converting to algorithm specific adducts... Done!
 #&gt; ================================================================================
-#&gt; Loaded 562 compounds from 18 features (72.00%).</code></pre>
+#&gt; Loaded 654 compounds from 18 features (72.00%).</code></pre>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.</p>
 <p>See <code>?generateCompounds()</code> for more information on possible databases and many other parameters that can be set.</p>
 <blockquote>
@@ -581,10 +581,10 @@ p.caption {
 #&gt; compounds
 #&gt;     |-- compoundsMF
 #&gt; ---
-#&gt; Object size (indication): 2.2 MB
+#&gt; Object size (indication): 2.5 MB
 #&gt; Algorithm: metfrag
 #&gt; Number of feature groups with compounds in this object: 18
-#&gt; Number of compounds: 562 (total), 31.2 (mean), 2 - 99 (min - max)</code></pre>
+#&gt; Number of compounds: 654 (total), 36.3 (mean), 2 - 100 (min - max)</code></pre>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">mslists</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt;                group type ID        mz intensity precursor
@@ -616,17 +616,17 @@ p.caption {
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></code></pre></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass                  SMILES
-#&gt;   1:  M109_R192_158              1 4.176110    108.0687       C1=CC=C(C(=C1)N)N
-#&gt;   2:  M109_R192_158              1 4.052444    108.0687         C1=CC(=CC=C1N)N
-#&gt;   3:  M109_R192_158              1 3.679805    108.0687         C1=CC=C(C=C1)NN
-#&gt;   4:  M109_R192_158              1 3.601013    108.0687       C1=CC(=CC(=C1)N)N
-#&gt;   5:  M109_R192_158              1 3.035824    108.0687           CNC1=CC=CC=N1
+#&gt;   1:  M109_R192_158              1 4.190025    108.0687         C1=CC(=CC=C1N)N
+#&gt;   2:  M109_R192_158              1 4.184934    108.0687       C1=CC=C(C(=C1)N)N
+#&gt;   3:  M109_R192_158              1 4.019062    108.0687         C1=CC=C(C=C1)NN
+#&gt;   4:  M109_R192_158              1 3.690572    108.0687       C1=CC(=CC(=C1)N)N
+#&gt;   5:  M109_R192_158              1 3.099843    108.0687         CC1=CC(=NC=C1)N
 #&gt;  ---                                                                           
-#&gt; 558: M186_R293_1559              3 2.885388    185.2143     CCCC(CCC)(CC(C)C)NC
-#&gt; 559: M186_R293_1559              3 2.884940    185.2143       CCCC(CCC)(CCC)NCC
-#&gt; 560: M186_R293_1559              3 2.875359    185.2143   CC(C)CC(C)NC(C)CC(C)C
-#&gt; 561: M186_R293_1559              3 2.875040    185.2143     CCCC(CCC)(CCC)N(C)C
-#&gt; 562: M186_R293_1559              3 2.855583    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</code></pre>
+#&gt; 650: M186_R293_1559              3 2.885477    185.2143     CCCC(CCC)(CC(C)C)NC
+#&gt; 651: M186_R293_1559              3 2.884977    185.2143       CCCC(CCC)(CCC)NCC
+#&gt; 652: M186_R293_1559              3 2.875313    185.2143   CC(C)CC(C)NC(C)CC(C)C
+#&gt; 653: M186_R293_1559              3 2.875147    185.2143     CCCC(CCC)(CCC)N(C)C
+#&gt; 654: M186_R293_1559              3 2.855758    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M215_R333_2275"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; NULL</code></pre>

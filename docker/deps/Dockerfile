@@ -35,7 +35,7 @@ RUN  mkdir deps && cd deps && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_07March19_WWMetaData.csv")' >> .Rprofile && \
-    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_01Jan2021_exposomics.csv")' >> .Rprofile && \
     echo 'options(patRoon.path.BioTransformer = "/home/rstudio/deps/biotransformer/biotransformer-3.0.0.jar")' >> .Rprofile && \
     echo 'options(java.parameters = "-Djava.awt.headless=true")' >> .Rprofile
 

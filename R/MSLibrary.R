@@ -199,21 +199,20 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     lib$records[!is.na(Precursor_Type), Precursor_Type := normalizeAdducts(Precursor_Type, err = FALSE)]
     
     printf("Guessing missing adducts\n")
-    if (FALSE) # UNDONE: update adduct m/z calc
-    {
-    potAdducts <- copy(GenFormAdducts()) # UNDONE: make optional?
-    potAdducts <- unique(potAdducts, by = "adduct_generic")
-    potAdducts[, delta := sapply(adduct_generic, function(a) adductMZDelta(as.adduct(a)))]
+    # UNDONE: make optional, additionally check adducts specified in lib?
+    potAdducts <- lapply(unique(GenFormAdducts()$adduct_generic), as.adduct)
+    potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
+    potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
     lib$records[is.na(Precursor_Type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
-                Precursor_Type := mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+                Precursor_Type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
     {
-        d <- pmz - em
-        pa <- potAdducts[((im == "POSITIVE" & charge > 0) |
-                              (im == "NEGATIVE" & charge < 0)) & (abs(delta - d) <= 0.002)]$adduct_generic
+        pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
+        calcMZs <- calculateMasses(em, pa, "mz")
+        wh <- which(numLTE(abs(calcMZs - pmz), 0.002)) # UNDONE: tolerance configurable
+        doProgress()
         # NOTE: multiple hits are ignored (=NA)
-        return(if (length(pa) == 1) pa else NA_character_)
-    })]
-    }
+        return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)
+    }))]
     
     printf("Calculating missing precursor m/z values\n")
     lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_Type),

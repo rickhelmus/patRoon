@@ -212,19 +212,20 @@ testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expe
                                  row.names = "unique", col.names = "unique")
 }
 
+simFG1 <- groupNames(plists)[2]; simFG2 <- groupNames(plists)[3]
 test_that("spectral similarity", {
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = analyses(plists)[1],
+    testSpecSim(plists, simFG1, simFG2, analysis1 = analyses(plists)[1],
                 analysis2 = analyses(plists)[2], MSLevel = 1)
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = analyses(plists)[1],
+    testSpecSim(plists, simFG1, simFG2, analysis1 = analyses(plists)[1],
                 analysis2 = NULL, MSLevel = 1)
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], analysis1 = NULL,
+    testSpecSim(plists, simFG1, simFG2, analysis1 = NULL,
                 analysis2 = analyses(plists)[1], MSLevel = 1)
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[2], MSLevel = 1)
+    testSpecSim(plists, simFG1, simFG2, MSLevel = 1)
 
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], analysis1 = analyses(plists)[1],
+    testSpecSim(plists, simFG1, simFG1, analysis1 = analyses(plists)[1],
                 analysis2 = analyses(plists)[1], MSLevel = 1, expectOne = TRUE)
-    testSpecSim(plists, groupNames(plists)[1], groupNames(plists)[1], MSLevel = 1, expectOne = TRUE)
-    testSpecSim(plists, groupNames(plists)[1], NULL, MSLevel = 1, expectOne = TRUE)
+    testSpecSim(plists, simFG1, simFG1, MSLevel = 1, expectOne = TRUE)
+    testSpecSim(plists, simFG1, NULL, MSLevel = 1, expectOne = TRUE)
     
     testSpecSim(plists, groupNames(plists), groupNames(plists),
                 analysis1 = rep(analyses(plists)[1], length(groupNames(plists))),

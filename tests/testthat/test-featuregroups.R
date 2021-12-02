@@ -527,7 +527,7 @@ test_that("sets functionality", {
     
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mzs, as.adduct("[M+H]+"), "neutral"),
-                 mean(groupInfo(fgOpenMS[, sets = "positive"])$mzs))
+                 groupInfo(fgOpenMS[, sets = "positive"])$mzs)
     expect_equal(analysisInfo(unset(fgOpenMS, "positive")), getTestAnaInfoPos())
     expect_equal(analysisInfo(fgOpenMS[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))

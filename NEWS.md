@@ -117,6 +117,7 @@ The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS` were int
     - Standardized GenForm/MetFrag element addition/subtraction data to improve consistency for conversions (eg NH4 --> H4N).
     - Conversion from/to adduct formats of OpenMS (`MetaboliteAdductDecharger`) and `cliqueMS`.
     - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
+    - The embedded GenForm code was updated to the latest version.
 - Suspect screening
     - `as.data.table()`: Suspect screening specific columns are now prefixed with `susp_`.
     - The `suspFormRank` and `suspCompRank` suspect annotation data columns were renamed to `formRank`/`suspCompRank` (the previous change made prefixing unnecessary).

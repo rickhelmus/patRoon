@@ -11,7 +11,7 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
-**November 2021** `patRoon 2.0` is now available. This major new release adds functionality to automatically screen and
+**December 2021** `patRoon 2.0` is now available. This major new release adds functionality to automatically screen and
 identify transformation products, process positive and negative ionization MS data simultaneously and combine the
 results, new algorithms for feature and adduct detection, interactive data curation and more. Please see the [Project
 NEWS][NEWS] for details.
@@ -36,18 +36,18 @@ Feature extraction     | Finding features and grouping them across analyses.    
 Suspect screening      | Finding features with suspected presence by MS and chromatographic data. Estimation of identification confidence levels. | Native
 MS data extraction     | Automatic extraction and averaging of feature MS(/MS) peak lists.        | Native, [mzR], [DataAnalysis]
 Formula annotation     | Automatic calculation of formula candidates for features.                | [GenForm], [SIRIUS], [DataAnalysis]
-Compound annotation    | Automatic (_in silico_) compound annotation for features.                | [MetFrag], [SIRIUS], Native
-Componentization & adduct annotation | Grouping of (chemically) related features such as isotopes, adducts and homologs into components. Annotating and prioritizing features. Use of adduct annotations for formula/compound annotations.            | [RAMClustR], [CAMERA], [nontarget R package][nontarget], [OpenMS], [cliqueMS], Native
+Compound annotation    | Automatic (_in silico_) compound annotation of features.                 | [MetFrag], [SIRIUS], Native
+Componentization & adduct annotation | Grouping of related features based on chemistry (e.g. isotopes, adducts and homologs), hierarchical clustering or MS/MS similarity into components. Using adduct and isotope annotations for prioritizing features and improving formula/compound annotations. | [RAMClustR], [CAMERA], [nontarget R package][nontarget], [OpenMS], [cliqueMS], Native
 Combining algorithms   | Combine data from different algorithms (e.g. features, annotations) and generate a consensus. | Native
 _Sets workflows_       | Simultaneous processing and combining +/- MS ionization data             | Native
 Transformation product (TP) screening | Automatic screening of TPs using library/_in-silico_ data, MS similarities and classifications. Tools to improve compound TP annotation. | [BioTransformer], [PubChemLite][PubChemLiteTR], Native
 Reporting              | Automatic reporting in _CSV_, _PDF_ and (interactive) _HTML_ formats. An example HTML report can be viewed [here][example]. | Native
-Data clean-up & prioritization | Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and much more. | Native
+Data clean-up & prioritization | Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and many more. | Native
 Data curation          | Several graphical interactive tools and functions to inspect and remove unwanted data. | Native
 
 The workflow of non-target analysis typically depends on the aims and requirements of the study and the instrumentation
 and methodology used for sample analysis. For this reason, `patRoon` does not enforce a certain workflow. Instead, most
-workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.
+workflow steps are optional, fully configurable and algorithms can easily be mixed or even combined.
 
 ## Implementation details
 
@@ -62,13 +62,13 @@ workflow steps are optional, are highly configurable and algorithms can easily b
     * The [processx] and [future] `R` packages are used for parallelization.
     * Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
     * Code for loading MS and EIC data, MS similarity calculations and others were implemented in `C++` to reduce computational times.
-* The [RDCOMClient] is used to interface with Bruker DataAnalysis algorithms.
-* The [Shiny] R package was used to implement several GUI tools.
+* The [RDCOMClient] `R` package is used to interface with Bruker DataAnalysis algorithms.
+* The [Shiny] `R` package was used to implement several GUI tools.
 
 
 ## Installation
 
-`patRoon` itself can be installed as any other R package, however, some additional installation steps are needed to
+`patRoon` itself can be installed as any other `R` package, however, some additional installation steps are needed to
 install its dependencies. Alternatively, [R Studio][RStudio] based Docker images are available to easily deploy a
 complete `patRoon` environment. Please see the [installation section in the handbook][handbook-inst] for more
 information.
@@ -83,7 +83,7 @@ library(patRoon)
 newProject()
 ```
 
-The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly
+The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]), which will allow you to quickly
 select the analyses and common workflow options to subsequently generate a template `R` processing script.
 
 However, for a better guide to get started it is recommended to read the [tutorial]. Afterwards the [handbook] is a
@@ -93,18 +93,22 @@ details of the `patRoon` package.
 
 ## Citing
 
-When you use `patRoon` please cite its publication:
+When you use `patRoon` please cite its publications:
 
 Rick Helmus, Thomas L. ter Laak, Annemarie P. van Wezel, Pim de Voogt and Emma L. Schymanski. [patRoon: open source
-software platform for environmental mass spectrometry based non-target screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformatics_ **13**, 1 (2021)
+software platform for environmental mass spectrometry based non-target
+screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformatics_ **13**, 1 (2021)
 
-(a manuscript for `patRoon 2.0` is in preparation)
+Rick Helmus, Bas van de Velde, Andrea M. Brunner, Thomas L. ter Laak, Annemarie P. van Wezel and Emma L. Schymanski.
+**patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening**. _In
+preparation_
 
-`patRoon` builds on many open-source software tools and open data sources. Therefore, please take care to also cite their work when using these algorithms via `patRoon`.
+`patRoon` builds on many open-source software tools and open data sources. Therefore, it is important to also cite their
+work when using these algorithms via `patRoon`.
 
 ## Contributing
 
-You are very welcome to send bug reports, code contributions (pull requests) and general feedback via the [GitHub page](https://github.com/rickhelmus/patRoon).
+For bug reports, code contributions (pull requests), questions, suggestions and general feedback please use the [GitHub page](https://github.com/rickhelmus/patRoon).
 
 
 [R]: https://www.r-project.org/

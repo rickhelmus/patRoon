@@ -35,7 +35,7 @@ affiliations:
       index: 4
     - name: Luxembourg Centre for Systems Biomedicine (LCSB), University of Luxembourg, L-4367 Belvaux, Luxembourg.
       index: 5
-date: 1 December 2021
+date: 3 December 2021
 bibliography: paper.bib
 ---
 
@@ -51,7 +51,7 @@ workflows.
 
 This article describes improvements introduced in `patRoon 2.0`, including extensive TP screening and simultaneous
 processing of positive and negative HRMS data. The updated documentation and code are available via
-<https://rickhelmus.github.io/patRoon> and archived in [@patRoon20Zen].
+<https://rickhelmus.github.io/patRoon> and archived in @patRoon20Zen.
 
 # Statement of need
 
@@ -195,7 +195,7 @@ Other new functionality of `patRoon 2.0` includes:
 [@Bengtsson2020].
 * Bug fixes and improvements from user feedback.
 
-A complete listing of all changes is outlined [the Project News file][NEWS].
+A complete listing of all changes is outlined [the project news file][NEWS].
 
 # Example workflows
 

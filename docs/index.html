@@ -128,7 +128,7 @@
 <div id="project-news" class="section level2">
 <h2 class="hasAnchor">
 <a href="#project-news" class="anchor"></a>Project news</h2>
-<p><strong>November 2021</strong> <code>patRoon 2.0</code> is now available. This major new release adds functionality to automatically screen and identify transformation products, process positive and negative ionization MS data simultaneously and combine the results, new algorithms for feature and adduct detection, interactive data curation and more. Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md">Project NEWS</a> for details.</p>
+<p><strong>December 2021</strong> <code>patRoon 2.0</code> is now available. This major new release adds functionality to automatically screen and identify transformation products, process positive and negative ionization MS data simultaneously and combine the results, new algorithms for feature and adduct detection, interactive data curation and more. Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md">Project NEWS</a> for details.</p>
 </div>
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
@@ -181,13 +181,13 @@
 </tr>
 <tr class="even">
 <td>Compound annotation</td>
-<td>Automatic (<em>in silico</em>) compound annotation for features.</td>
+<td>Automatic (<em>in silico</em>) compound annotation of features.</td>
 <td>
 <a href="http://c-ruttkies.github.io/MetFrag/">MetFrag</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>, Native</td>
 </tr>
 <tr class="odd">
 <td>Componentization &amp; adduct annotation</td>
-<td>Grouping of (chemically) related features such as isotopes, adducts and homologs into components. Annotating and prioritizing features. Use of adduct annotations for formula/compound annotations.</td>
+<td>Grouping of related features based on chemistry (e.g. isotopes, adducts and homologs), hierarchical clustering or MS/MS similarity into components. Using adduct and isotope annotations for prioritizing features and improving formula/compound annotations.</td>
 <td>
 <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>, <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a>, <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget R package</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://github.com/osenan/cliqueMS">cliqueMS</a>, Native</td>
 </tr>
@@ -214,7 +214,7 @@
 </tr>
 <tr class="even">
 <td>Data clean-up &amp; prioritization</td>
-<td>Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and much more.</td>
+<td>Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and many more.</td>
 <td>Native</td>
 </tr>
 <tr class="odd">
@@ -224,7 +224,7 @@
 </tr>
 </tbody>
 </table>
-<p>The workflow of non-target analysis typically depends on the aims and requirements of the study and the instrumentation and methodology used for sample analysis. For this reason, <code>patRoon</code> does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.</p>
+<p>The workflow of non-target analysis typically depends on the aims and requirements of the study and the instrumentation and methodology used for sample analysis. For this reason, <code>patRoon</code> does not enforce a certain workflow. Instead, most workflow steps are optional, fully configurable and algorithms can easily be mixed or even combined.</p>
 </div>
 <div id="implementation-details" class="section level2">
 <h2 class="hasAnchor">
@@ -246,14 +246,14 @@
 <li>Code for loading MS and EIC data, MS similarity calculations and others were implemented in <code>C++</code> to reduce computational times.</li>
 </ul>
 </li>
-<li>The <a href="http://www.omegahat.net/RDCOMClient/">RDCOMClient</a> is used to interface with Bruker DataAnalysis algorithms.</li>
-<li>The <a href="https://shiny.rstudio.com/">Shiny</a> R package was used to implement several GUI tools.</li>
+<li>The <a href="http://www.omegahat.net/RDCOMClient/">RDCOMClient</a> <code>R</code> package is used to interface with Bruker DataAnalysis algorithms.</li>
+<li>The <a href="https://shiny.rstudio.com/">Shiny</a> <code>R</code> package was used to implement several GUI tools.</li>
 </ul>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p><code>patRoon</code> itself can be installed as any other R package, however, some additional installation steps are needed to install its dependencies. Alternatively, <a href="https://www.rstudio.com/">R Studio</a> based Docker images are available to easily deploy a complete <code>patRoon</code> environment. Please see the <a href="https://rickhelmus.github.io/patRoon/articles/handbook.html#installation">installation section in the handbook</a> for more information.</p>
+<p><code>patRoon</code> itself can be installed as any other <code>R</code> package, however, some additional installation steps are needed to install its dependencies. Alternatively, <a href="https://www.rstudio.com/">R Studio</a> based Docker images are available to easily deploy a complete <code>patRoon</code> environment. Please see the <a href="https://rickhelmus.github.io/patRoon/articles/handbook.html#installation">installation section in the handbook</a> for more information.</p>
 </div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
@@ -262,21 +262,21 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon">patRoon</a></span><span class="op">)</span>
 <span class="fu"><a href="reference/newProject.html">newProject</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>The <code><a href="reference/newProject.html">newProject()</a></code> function will pop-up a dialog screen (requires <a href="https://www.rstudio.com/">R Studio</a>!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template <code>R</code> processing script.</p>
+<p>The <code><a href="reference/newProject.html">newProject()</a></code> function will pop-up a dialog screen (requires <a href="https://www.rstudio.com/">R Studio</a>), which will allow you to quickly select the analyses and common workflow options to subsequently generate a template <code>R</code> processing script.</p>
 <p>However, for a better guide to get started it is recommended to read the <a href="https://rickhelmus.github.io/patRoon/articles/tutorial.html">tutorial</a>. Afterwards the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html">handbook</a> is a recommended read if you want to know more about advanced usage of <code>patRoon</code>. Finally, the <a href="https://rickhelmus.github.io/patRoon/reference/index.html">reference</a> outlines all the details of the <code>patRoon</code> package.</p>
 </div>
 <div id="citing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#citing" class="anchor"></a>Citing</h2>
-<p>When you use <code>patRoon</code> please cite its publication:</p>
+<p>When you use <code>patRoon</code> please cite its publications:</p>
 <p>Rick Helmus, Thomas L. ter Laak, Annemarie P. van Wezel, Pim de Voogt and Emma L. Schymanski. <a href="https://doi.org/10.1186/s13321-020-00477-w">patRoon: open source software platform for environmental mass spectrometry based non-target screening</a>. <em>Journal of Cheminformatics</em> <strong>13</strong>, 1 (2021)</p>
-<p>(a manuscript for <code>patRoon 2.0</code> is in preparation)</p>
-<p><code>patRoon</code> builds on many open-source software tools and open data sources. Therefore, please take care to also cite their work when using these algorithms via <code>patRoon</code>.</p>
+<p>Rick Helmus, Bas van de Velde, Andrea M. Brunner, Thomas L. ter Laak, Annemarie P. van Wezel and Emma L. Schymanski. <strong>patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening</strong>. <em>In preparation</em></p>
+<p><code>patRoon</code> builds on many open-source software tools and open data sources. Therefore, it is important to also cite their work when using these algorithms via <code>patRoon</code>.</p>
 </div>
 <div id="contributing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#contributing" class="anchor"></a>Contributing</h2>
-<p>You are very welcome to send bug reports, code contributions (pull requests) and general feedback via the <a href="https://github.com/rickhelmus/patRoon">GitHub page</a>.</p>
+<p>For bug reports, code contributions (pull requests), questions, suggestions and general feedback please use the <a href="https://github.com/rickhelmus/patRoon">GitHub page</a>.</p>
 </div>
 </div>
   </div>

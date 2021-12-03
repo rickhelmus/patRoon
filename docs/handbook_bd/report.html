@@ -385,17 +385,17 @@ div.csl-indent {
 <p>Which data will be reported is fully configurable. The only workflow object that must be specified are the feature groups (i.e. with the <code>fGroups</code> argument), all other data (e.g. <code>compounds</code>, <code>components</code>) are optional. This means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data.</p>
 <p>When formula or compound results are reported with <code>reportPDF()</code> or <code>reportHTML()</code> then only the top ranked candidates are considered. This limtation is often necessary as reporting many candidates will take considerable time. By default the top 5 for each feature group are reported, however, this number can be changed with the <code>formulasTopMost</code> and <code>compoundsTopMost</code> arguments.</p>
 <p>Some typical examples:</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="report.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups) <span class="co"># simple interactive report with feature data</span></span>
-<span id="cb136-2"><a href="report.html#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="co"># generate PDFs with feature and compound annotation data</span></span>
-<span id="cb136-3"><a href="report.html#cb136-3" aria-hidden="true" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">compounds =</span> compounds, <span class="at">MSPeakLists =</span> mslists)</span>
-<span id="cb136-4"><a href="report.html#cb136-4" aria-hidden="true" tabindex="-1"></a><span class="fu">reportCSV</span>(fGroups, <span class="at">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span></span>
-<span id="cb136-5"><a href="report.html#cb136-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb136-6"><a href="report.html#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="co"># generate report with all workflow types and increase maximum number of</span></span>
-<span id="cb136-7"><a href="report.html#cb136-7" aria-hidden="true" tabindex="-1"></a><span class="co"># compound candidates to top 10</span></span>
-<span id="cb136-8"><a href="report.html#cb136-8" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
-<span id="cb136-9"><a href="report.html#cb136-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">components =</span> components, <span class="at">MSPeakLists =</span> mslists,</span>
-<span id="cb136-10"><a href="report.html#cb136-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">compsCluster =</span> compsClust,</span>
-<span id="cb136-11"><a href="report.html#cb136-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">compoundsTopMost =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="report.html#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups) <span class="co"># simple interactive report with feature data</span></span>
+<span id="cb137-2"><a href="report.html#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="co"># generate PDFs with feature and compound annotation data</span></span>
+<span id="cb137-3"><a href="report.html#cb137-3" aria-hidden="true" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">compounds =</span> compounds, <span class="at">MSPeakLists =</span> mslists)</span>
+<span id="cb137-4"><a href="report.html#cb137-4" aria-hidden="true" tabindex="-1"></a><span class="fu">reportCSV</span>(fGroups, <span class="at">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span></span>
+<span id="cb137-5"><a href="report.html#cb137-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-6"><a href="report.html#cb137-6" aria-hidden="true" tabindex="-1"></a><span class="co"># generate report with all workflow types and increase maximum number of</span></span>
+<span id="cb137-7"><a href="report.html#cb137-7" aria-hidden="true" tabindex="-1"></a><span class="co"># compound candidates to top 10</span></span>
+<span id="cb137-8"><a href="report.html#cb137-8" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
+<span id="cb137-9"><a href="report.html#cb137-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">components =</span> components, <span class="at">MSPeakLists =</span> mslists,</span>
+<span id="cb137-10"><a href="report.html#cb137-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">compsCluster =</span> compsClust,</span>
+<span id="cb137-11"><a href="report.html#cb137-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">compoundsTopMost =</span> <span class="dv">10</span>)</span></code></pre></div>
 
 </div>
 <!-- </div> -->

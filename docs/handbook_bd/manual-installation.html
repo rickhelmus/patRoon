@@ -404,8 +404,8 @@ div.csl-indent {
 <td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking metadata</a> and <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater metadata</a> are also supported.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://zenodo.org/record/4183801">MetFrag PubChemLite DB</a></td>
-<td>Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).</td>
+<td><a href="https://zenodo.org/record/4432124/">MetFrag PubChemLite DB</a></td>
+<td>Database file needed to use <a href="https://doi.org/10.1186/s13321-021-00489-0">PubChemLite</a> with MetFrag.</td>
 </tr>
 <tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
@@ -413,7 +413,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td><a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a></td>
-<td>For prediction of transformation products. See the <a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a> page for installation details.</td>
+<td>For prediction of transformation products. See the <a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a> page for installation details. If you have trouble compiling the jar file you can download it from <a href="https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar">here</a>.</td>
 </tr>
 <tr class="even">
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
@@ -446,17 +446,14 @@ div.csl-indent {
 <h3><span class="header-section-number">2.3.3</span> patRoon installation</h3>
 <p>Finally, it is time to install <code>patRoon</code> itself. As mentioned before, Windows users (who have the latest <code>R</code> version) can install <code>patRoon</code> and all its package dependencies from the <code>patRoonDeps</code> repository:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="manual-installation.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install from patRoonDeps (only Windows with latest R version)</span></span>
-<span id="cb5-2"><a href="manual-installation.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="at">type =</span> <span class="st">&quot;binary&quot;</span>)</span>
-<span id="cb5-3"><a href="manual-installation.html#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="manual-installation.html#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># optional example data</span></span>
-<span id="cb5-5"><a href="manual-installation.html#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoonData&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="at">type =</span> <span class="st">&quot;binary&quot;</span>)</span></code></pre></div>
+<span id="cb5-2"><a href="manual-installation.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="at">type =</span> <span class="st">&quot;binary&quot;</span>)</span></code></pre></div>
 <p><strong>Otherwise</strong>, installation occurs directly from GitHub:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="manual-installation.html#cb6-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</span>
-<span id="cb6-2"><a href="manual-installation.html#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="manual-installation.html#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># optional example data</span></span>
-<span id="cb6-4"><a href="manual-installation.html#cb6-4" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>)</span></code></pre></div>
-<p>Afterwards, you can run the <code>verifyDependencies()</code> function to see if <code>patRoon</code> can find all its dependencies (you may need to restart R beforehand)</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="manual-installation.html#cb7-1" aria-hidden="true" tabindex="-1"></a>patRoon<span class="sc">::</span><span class="fu">verifyDependencies</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="manual-installation.html#cb6-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</span></code></pre></div>
+<p>Optional example data is installed via GitHub:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="manual-installation.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optional example data</span></span>
+<span id="cb7-2"><a href="manual-installation.html#cb7-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>)</span></code></pre></div>
+<p>Afterwards, you can run the <code>verifyDependencies()</code> function to see if <code>patRoon</code> can find all its dependencies (you may need to restart R beforehand):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="manual-installation.html#cb8-1" aria-hidden="true" tabindex="-1"></a>patRoon<span class="sc">::</span><span class="fu">verifyDependencies</span>()</span></code></pre></div>
 
 </div>
 </div>

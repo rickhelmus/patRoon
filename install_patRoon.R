@@ -555,7 +555,7 @@ utils <- setRefClass("utilsInst", methods = list(
                     file.rename(subDir, file.path(down, "biotransformer"))
                     
                     # place in jar from patRoonDeps
-                    jar <- downloadFile(file.path(dow, "biotransformer"), "BioTransformer jar",
+                    jar <- downloadFile(file.path(down, "biotransformer"), "BioTransformer jar",
                                         "https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar",
                                         FALSE)
                     if (!is.null(jar))

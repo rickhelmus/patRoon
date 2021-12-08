@@ -46,8 +46,11 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     gCount <- length(fGroups)
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
-    recTab <- records(MSLibrary)
-    recTab <- recTab[!is.na(PrecursorMZ) & !is.na(Precursor_Type) & !is.na(Ion_mode)]
+    libRecs <- records(MSLibrary)
+    libSpecs <- spectra(MSLibrary)
+    
+    # UNDONE: configurable, ms level and more?
+    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(Precursor_Type) & !is.na(Ion_mode)]
     
     getRecsForAdduct <- function(recs, add, addChr)
     {
@@ -56,7 +59,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     }
     
     if (!is.null(adduct))
-        recTab <- getRecsForAdduct(recTab, adduct, as.character(adduct))
+        libRecs <- getRecsForAdduct(libRecs, adduct, as.character(adduct))
     else
         allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
     
@@ -75,12 +78,12 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         precMZ <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
         
-        cTab <- recTab[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
+        cTab <- libRecs[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
         
         if (is.null(adduct))
         {
             addChr <- annTbl[group == grp]$adduct
-            recTab <- getRecsForAdduct(recTab, allAdducts[addChr], addChr)
+            libRecs <- getRecsForAdduct(libRecs, allAdducts[addChr], addChr)
         }
         
         if (nrow(cTab) == 0)
@@ -89,7 +92,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         cTab <- unifyLibNames(cTab)
         cTab[, InChIKey1 := getIKBlock1(InChIKey)]
         
-        libSpecs <- lapply(spectra(MSLibrary)[cTab$identifier], function(sp)
+        lspecs <- lapply(libSpecs[cTab$identifier], function(sp)
         {
             # convert to MSPeakLists format
             ret <- as.data.table(sp)
@@ -98,7 +101,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         })
         
         # UNDONE: ensure that no shift is applied in specSimParams
-        sims <- specDistRect(list(spec), libSpecs, specSimParams$method, specSimParams$shift, 0,
+        sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
                              0, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
         
         cTab[, score := sims[1, ]]
@@ -109,6 +112,21 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         # UNDONE: make optional and specify on which column to collapse
         cTab <- unique(cTab, by = "InChIKey") # NOTE: prior sorting ensure top ranked stays
+
+        # fill in fragInfos
+        # UNDONE: support libraries with annotations
+        cTab[, fragInfo := list(lapply(lspecs[identifier], function(ls)
+        {
+            bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
+            bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
+            
+            # NOTE: the mz values from the binned spectra could be slightly different --> take the original values
+            fi <- data.table(mz = spec[match(bsp$ID_1, ID)]$mz, PLID = bsp$ID_1)
+            
+            # UNDONE: assign "unknown" or some identifier that differentiates with unassigned
+            fi[, c("ion_formula", "neutral_loss") := NA_character_]
+            return(fi)
+        }))]
         
         return(cTab)
     }, simplify = FALSE))

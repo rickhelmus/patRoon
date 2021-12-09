@@ -105,7 +105,8 @@ Imports:
     fs,
     yaml,
     keys,
-    backports
+    backports,
+    httr
 Suggests: 
     RDCOMClient,
     metfRag,
@@ -136,6 +137,7 @@ Collate:
     'main.R'
     'workflow-step.R'
     'TP.R'
+    'TP-CTS.R'
     'TP-biotransformer.R'
     'TP-library.R'
     'features.R'

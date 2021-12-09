@@ -2,6 +2,7 @@
 
 # Lower priority
 
+
 ## General
 
 - add 'keep.rownames = FALSE' to all as.data.table methods (or see if there is a work-around)
@@ -34,6 +35,7 @@
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
 - Somehow integrate XCMS::fillChromPeaks
+- Export generic EIC generation, i.e. without the need of feature data
 
 
 ## Annotation

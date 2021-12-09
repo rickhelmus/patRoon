@@ -118,7 +118,6 @@ setGeneric("updateSetConsensus", function(obj) standardGeneric("updateSetConsens
 ### TP generation
 
 setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("generateTPsLogic"))
-setGeneric("generateTPsComponents", function(components, fGroupsPrecursors, fGroupsTPs) standardGeneric("generateTPsComponents"))
 setGeneric("parents", function(TPs) standardGeneric("parents"))
 setGeneric("products", function(TPs) standardGeneric("products"))
 setGeneric("needsScreening", function(TPs) standardGeneric("needsScreening"))

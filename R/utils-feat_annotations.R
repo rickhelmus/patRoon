@@ -69,17 +69,20 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
         fragInfo <- compr$fragInfo[[1]]
         
         if (!is.null(fragInfo))
-            spec <- merge(spec, fragInfo[, -"mz"], all.x = TRUE, by.x = "ID", by.y = "PLID")
+        {
+            fi <- fragInfo[, -"mz"]
+            fi[, annotated := TRUE]
+            spec <- merge(spec, fi, all.x = TRUE, by.x = "ID", by.y = "PLID")
+            spec[is.na(annotated), annotated := FALSE]
+        }
     }
+    
+    if (is.null(spec[["annotated"]]))
+        spec[, annotated := FALSE]
     
     if (onlyAnnotated)
-    {
-        if (is.null(spec[["ion_formula"]]))
-            spec <- spec[0]
-        else
-            spec <- spec[!is.na(ion_formula)]
-    }
-    
+        spec <- spec[annotated == TRUE]
+
     return(spec[])
 }
 

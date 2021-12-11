@@ -96,7 +96,7 @@ getMSPlotData <- function(spec, marklwd, markWhich = NULL)
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
     
     if (is.null(markWhich))
-        markWhich <- if (hasFragInfo) plotData[!is.na(ion_formula), which = TRUE] else seq_len(nrow(plotData))
+        markWhich <- if (hasFragInfo) which(plotData$annotated) else seq_len(nrow(plotData))
     else
         markWhich <- plotData[mergedBy %in% markWhich, which = TRUE]
     

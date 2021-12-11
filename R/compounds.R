@@ -409,34 +409,27 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
                 if (is.null(ret[["ion_formula"]]))
                 {
                     # only formula annotations
-                    ret[, ion_formula := annPLForms$ion_formula]
-                    ret[!is.na(ion_formula), mergedBy := algorithm(formulas)]
+                    ret[, c("ion_formula", "annotated") := .(annPLForms$ion_formula, annPLForms$annotated)]
+                    ret[annotated == TRUE, mergedBy := algorithm(formulas)]
                 }
                 else
                 {
-                    inMe <- !is.na(ret$ion_formula)
-                    inForms <- !is.na(annPLForms$ion_formula)
+                    inMe <- ret$annotated
+                    inForms <- annPLForms$annotated
                     
                     # UNDONE: handle different formula assignments?
-                    ret[, c("ion_formula", "mergedBy") := .(
-                        fcase(inMe, ion_formula,
-                              inForms, annPLForms$ion_formula),
-                        fcase(inMe & inForms, paste0(algorithm(obj), ",", algorithm(formulas)),
-                              inMe, algorithm(obj),
-                              inForms, algorithm(formulas))
-                    )]
+                    ret[is.na(ion_formula), ion_formula := annPLForms$ion_formula]
+                    ret[, mergedBy := fcase(inMe & inForms, paste0(algorithm(obj), ",", algorithm(formulas)),
+                                            inMe, algorithm(obj),
+                                            inForms, algorithm(formulas))]
+                    ret[, annotated := inMe | inForms]
                 }
             }
         }
     }
     
     if (onlyAnnotated)
-    {
-        if (is.null(ret[["ion_formula"]]))
-            ret <- ret[0]
-        else
-            ret <- ret[!is.na(ion_formula)]
-    }
+        ret <- ret[annotated == TRUE]
 
     return(ret[])
 })

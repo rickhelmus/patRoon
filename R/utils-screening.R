@@ -392,7 +392,7 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
     
     if (method == "cosine")
     {
-        annPL[, intensityAnn := ifelse(is.na(ion_formula), 0, intensity)]
+        annPL[, intensityAnn := ifelse(!annotated, 0, intensity)]
         return(as.vector((annPL$intensityAnn %*% annPL$intensity) /
                              (sqrt(sum(annPL$intensityAnn^2)) * sqrt(sum(annPL$intensity^2)))))
     }

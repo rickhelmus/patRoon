@@ -104,8 +104,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         # UNDONE: this will overwrite consensus algo if present, OK?
         specs <- lapply(specs, function(x)
         {
-            if (!is.null(x[["ion_formula"]]))
-                x[!is.na(ion_formula), mergedBy := set]
+            x[annotated == TRUE, mergedBy := set]
             return(x)
         })
         

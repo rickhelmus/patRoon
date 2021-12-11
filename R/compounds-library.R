@@ -12,7 +12,7 @@ unifyLibNames <- function(cTab)
                  SMILES = "SMILES",
                  InChI = "InChI",
                  InChIKey = "InChIKey",
-                 Formula = "formula",
+                 Formula = "neutral_formula",
                  ExactMass = "neutralMass",
                  Precursor_Type = "precursorType",
                  Spectrum_Type = "spectrumType",
@@ -31,6 +31,8 @@ unifyLibNames <- function(cTab)
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, absMzDev = 0.002,
                                                                 adduct = NULL, specSimParams = getDefSpecSimParams())
 {
+    # UNDONE: cache
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)

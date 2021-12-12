@@ -84,12 +84,14 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     {
                         const std::string com = curRec.values["Comments"];
                         std::string cv;
-                        if (curRec.values.find("SMILES") == curRec.values.end() && parseComments(com, "SMILES", cv))
+                        if (curRec.values.find("SMILES") == curRec.values.end() &&
+                            (parseComments(com, "SMILES", cv) || parseComments(com, "computed SMILES", cv)))
                         {
                             addKey("SMILES");
                             curRec.values["SMILES"] = cv;
                         }
-                        if (curRec.values.find("InChI") == curRec.values.end() && parseComments(com, "InChI", cv))
+                        if (curRec.values.find("InChI") == curRec.values.end() &&
+                            (parseComments(com, "InChI", cv) || parseComments(com, "computed InChI", cv)))
                         {
                             addKey("InChI");
                             curRec.values["InChI"] = cv;

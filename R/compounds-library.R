@@ -32,6 +32,10 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                                                                 adduct = NULL, specSimParams = getDefSpecSimParams())
 {
     # UNDONE: cache
+    # UNDONE: show mirror spectrum in report? Would need library data somehow
+    # UNDONE: don't normalize scores (or already not done?)
+    # UNDONE: separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
+    # UNDONE: report # of peaks matched (before/after filtering?)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
@@ -80,6 +84,11 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         precMZ <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
         
+        spec <- prepSpecSimilarityPL(spec, removePrecursor = specSimParams$removePrecursor,
+                                     relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
+        if (nrow(spec) == 0)
+            return(NULL)
+        
         cTab <- libRecs[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
         
         if (is.null(adduct))
@@ -93,14 +102,20 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 
         cTab <- unifyLibNames(cTab)
         cTab[, InChIKey1 := getIKBlock1(InChIKey)]
-        
-        lspecs <- lapply(libSpecs[cTab$identifier], function(sp)
+        lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, f = function(sp, pmz)
         {
             # convert to MSPeakLists format
             ret <- as.data.table(sp)
             ret[, ID := seq_len(.N)]
+            ret <- assignPrecursorToMSPeakList(ret, pmz)
+            ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParams$removePrecursor,
+                                        relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
             return(ret)
         })
+        lspecs <- pruneList(lspecs, checkZeroRows = TRUE)
+        cTab <- cTab[identifier %in% names(lspecs)]
+        if (nrow(cTab) == 0) # UNDONE: allow results without annotations (i.e. like MF)? Would interfere with min sim score though
+            return(NULL)
         
         # UNDONE: ensure that no shift is applied in specSimParams
         sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,

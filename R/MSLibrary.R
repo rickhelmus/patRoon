@@ -73,7 +73,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
                  InChI = "InChI",
                  InChIKey = "InChIKey",
                  Formula = "formula",
-                 Precursor_Type = "adduct",
+                 Precursor_type = "adduct",
                  ExactMass = "neutralMass")
     mapCols <- mapCols[names(mapCols) %in% names(ret)]
     setnames(ret, names(mapCols), mapCols)
@@ -102,8 +102,6 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 loadMSPLibrary <- function(file, parseComments = TRUE)
 {
-    # UNDONE calculate missing SMILES/InChI(Keys)
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     aapply(checkmate::assertFlag, . ~ parseComments, fixed = list(add = ac))
@@ -121,9 +119,9 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     #     return(ret)
     # }))
     
-    # C++ code sets "NA" as string, convert to NA
+    # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
     for (j in seq_along(lib$records))
-        set(lib$records, which(lib$records[[j]] == "NA"), j, NA_character_)
+        set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
     chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode")
@@ -152,22 +150,21 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     # ensure mass data is numeric, but ignore conversion warnings
     suppressWarnings(lib$records[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols])
     
-    printf("Calculating missing formulas\n")
-    lib$records[is.na(Formula) & !is.na(SMILES), Formula := withProg(.N, FALSE, sapply(SMILES, function(smi)
-    {
-        ret <- convertToFormulaBabel(smi, "smi", FALSE)
-        doProgress()
-        return(fifelse(nzchar(ret), ret, NA_character_))
-    }))]
-
-    printf("Calculating missing exact masses\n")
-    lib$records[is.na(ExactMass) & !is.na(Formula), ExactMass := withProg(.N, FALSE, sapply(Formula, function(form)
-    {
-        ret <- tryCatch(getFormulaMass(form), error = function(...) NA_real_)
-        doProgress()
-        return(ret)
-    }))]
-
+    # UNDONE: this is quite slow, skip for now?
+    # printf("Sanitizing SMILES/InChI values... ")
+    # lib$records[!is.na(SMILES), SMILES := babelConvert(SMILES, "smi", "smi", FALSE)]
+    # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
+    # printf("Done!\n")
+    
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
+                                           fromFormats = "inchi", fromCols = "InChI")
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchi", destCol = "InChI",
+                                           fromFormats = "smi", fromCols = "SMILES")
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchikey", destCol = "InChIKey",
+                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "Formula",
+                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+    
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
     lib$records[, Ion_mode := toupper("POSITIVE")]
     lib$records[Ion_mode == "P", Ion_mode := "POSITIVE"]
@@ -195,18 +192,18 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
                        "[\\-\\+]{1}Hac" = "C2H4O2" # acetic acid
     )
     for (i in seq_along(adductMapping))
-        lib$records[, Precursor_Type := sub(names(adductMapping)[i], adductMapping[i], Precursor_Type)]
+        lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
 
     printf("Verify/Standardize adducts\n")
-    lib$records[!is.na(Precursor_Type), Precursor_Type := normalizeAdducts(Precursor_Type, err = FALSE)]
+    lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
     
     printf("Guessing missing adducts\n")
     # UNDONE: make optional, additionally check adducts specified in lib?
     potAdducts <- lapply(unique(GenFormAdducts()$adduct_generic), as.adduct)
     potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
     potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
-    lib$records[is.na(Precursor_Type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
-                Precursor_Type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+    lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
+                Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
     {
         pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
         calcMZs <- calculateMasses(em, pa, "mz")
@@ -217,8 +214,8 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     }))]
     
     printf("Calculating missing precursor m/z values\n")
-    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_Type),
-                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_Type, FUN = function(em, pt)
+    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_type),
+                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_type, FUN = function(em, pt)
     {
         add <- tryCatch(as.adduct(pt), error = function(...) NULL)
         ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")

@@ -18,35 +18,6 @@ doScreeningShow <- function(obj)
     printf("Suspects annotated: %s\n", if (!is.null(screenInfo(obj)[["estIDLevel"]])) "yes" else "no")
 }
 
-convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromCols)
-{
-    hasData <- function(x) !is.na(x) & nzchar(x)
-    missingInScr <- function(x) if (is.null(scr[[x]])) rep(TRUE, nrow(scr)) else !hasData(scr[[x]])
-
-    countEntries <- function() if (is.null(scr[[destCol]])) 0 else sum(hasData(scr[[destCol]]))
-    curEntryCount <- countEntries()
-    if (curEntryCount < nrow(scr))
-    {
-        printf("Trying to calculate missing %s data in suspect list... ", destCol)
-        
-        if (destFormat == "formula")
-            doConv <- function(inp, f) convertToFormulaBabel(inp, f, mustWork = FALSE)
-        else
-            doConv <- function(inp, f) babelConvert(inp, f, destFormat, mustWork = FALSE)
-        
-        for (i in seq_along(fromFormats))
-        {
-            if (!is.null(scr[[fromCols[i]]]))
-                scr[missingInScr(destCol) & !missingInScr(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
-        }
-     
-        newEntryCount <- countEntries() - curEntryCount
-        printf("Done! Filled in %d (%.1f%%) entries.\n", newEntryCount,
-               if (newEntryCount > 0) newEntryCount * 100 / nrow(scr) else 0)
-    }
-    return(scr)
-}
-
 prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
 {
     hash <- makeHash(suspects, adduct, skipInvalid, calcMZs)
@@ -88,13 +59,13 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
         }
         
         # get missing identifiers & formulae if necessary and possible
-        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "smi", destCol = "SMILES",
+        suspects <- convertChemDataIfNeeded(suspects, destFormat = "smi", destCol = "SMILES",
                                             fromFormats = "inchi", fromCols = "InChI")
-        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "inchi", destCol = "InChI",
+        suspects <- convertChemDataIfNeeded(suspects, destFormat = "inchi", destCol = "InChI",
                                             fromFormats = "smi", fromCols = "SMILES")
-        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "inchikey", destCol = "InChIKey",
+        suspects <- convertChemDataIfNeeded(suspects, destFormat = "inchikey", destCol = "InChIKey",
                                             fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
+        suspects <- convertChemDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
                                             fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
         
         # neutral masses given for all?

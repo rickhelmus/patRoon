@@ -14,7 +14,7 @@ unifyLibNames <- function(cTab)
                  InChIKey = "InChIKey",
                  Formula = "neutral_formula",
                  ExactMass = "neutralMass",
-                 Precursor_Type = "precursorType",
+                 Precursor_type = "precursorType",
                  Spectrum_Type = "spectrumType",
                  PrecursorMZ = "ion_formula_mz",
                  Instrument_Type = "instrumentType"
@@ -60,10 +60,10 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     libSpecs <- spectra(MSLibrary)
     
     # UNDONE: ms level? or just a filter?
-    # UNDONE: support entries without SMILES/InChI(keys)?
-    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey)]
+    # UNDONE: support entries without SMILES/InChI(keys)/Formulas?
+    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !.is.na(Formula)]
     if (checkIons == "adduct")
-        libRecs <- libRecs[!is.na(Precursor_Type)]
+        libRecs <- libRecs[!is.na(Precursor_type)]
     if (checkIons != "none")
         libRecs <- libRecs[!is.na(Ion_mode)]
     
@@ -74,7 +74,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         pos <- add@charge > 0
         recs <- recs[((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
         if (checkIons == "adduct")
-            recs <- recs[Precursor_Type == addChr]
+            recs <- recs[Precursor_type == addChr]
         return(recs)
     }
     

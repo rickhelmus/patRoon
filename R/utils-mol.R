@@ -59,6 +59,9 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts 
     # error occurs the batch conversion is simply restarted with the subsequent
     # entry.
     
+    if (length(input) == 0)
+        return(character())
+    
     inputFile <- tempfile("obabel_inp", fileext = ".txt")
     outputFile <- tempfile("obabel_out", fileext = ".txt")
     doConversion <- function(inp)
@@ -77,31 +80,40 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts 
         return(trimws(ret, which = "right", whitespace = "\t"))
     }
     
-    inputLen <- length(input)
-    ret <- character(inputLen)
+    stopOrWarn <- function(msg)
+    {
+        do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
+    }
+
+    inpNA <- is.na(input)
+    doInputs <- input[!inpNA]
+    inputLen <- length(doInputs)
+    conv <- character(inputLen)
     curIndex <- 1
     while(TRUE)
     {
         curRange <- seq(curIndex, inputLen)
-        out <- doConversion(input[curRange])
+        out <- doConversion(doInputs[curRange])
         outl <- length(out)
         
         if (outl > 0)
-            ret[seq(curIndex, curIndex + outl - 1)] <- out
+            conv[seq(curIndex, curIndex + outl - 1)] <- out
+        else # silent fail
+            conv[curIndex] <- NA_character_
         
         curIndex <- curIndex + outl + 1
         
         if (curIndex <= inputLen)
-        {
-            msg <- sprintf("Failed to convert %d ('%s')", curIndex - 1, input[curIndex - 1])
-            if (mustWork)
-                stop(msg)
-            else
-                warning(msg)
-        }
+            stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", curIndex - 1, doInputs[curIndex - 1],
+                               inFormat, outFormat))
         else
             break
     }
+    
+    # merge back in NA inputs
+    ret <- character(length(input))
+    ret[inpNA] <- NA_character_
+    ret[!inpNA] <- conv
     
     return(ret)
 }
@@ -110,7 +122,37 @@ convertToFormulaBabel <- function(input, inFormat, mustWork)
 {
     ret <- babelConvert(input = input, inFormat = inFormat, outFormat = "txt", mustWork = mustWork,
                         extraOpts = c("--append", "formula"))
-    ret <- sub("[\\+\\-]+$", "", ret) # remove trailing positive/negative charge is present
+    ret <- sub("[\\+\\-]+$", "", ret) # remove trailing positive/negative charge if present
+    return(ret)
+}
+
+convertChemDataIfNeeded <- function(tab, destFormat, destCol, fromFormats, fromCols)
+{
+    hasData <- function(x) !is.na(x) & nzchar(x)
+    missingInTab <- function(x) if (is.null(tab[[x]])) rep(TRUE, nrow(tab)) else !hasData(tab[[x]])
+    
+    countEntries <- function() if (is.null(tab[[destCol]])) 0 else sum(hasData(tab[[destCol]]))
+    curEntryCount <- countEntries()
+    if (curEntryCount < nrow(tab))
+    {
+        printf("Trying to calculate missing %s data... ", destCol)
+        
+        if (destFormat == "formula")
+            doConv <- function(inp, f) convertToFormulaBabel(inp, f, mustWork = FALSE)
+        else
+            doConv <- function(inp, f) babelConvert(inp, f, destFormat, mustWork = FALSE)
+        
+        for (i in seq_along(fromFormats))
+        {
+            if (!is.null(tab[[fromCols[i]]]))
+                tab[missingInTab(destCol) & !missingInTab(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
+        }
+        
+        newEntryCount <- countEntries() - curEntryCount
+        printf("Done! Filled in %d (%.1f%%) entries.\n", newEntryCount,
+               if (newEntryCount > 0) newEntryCount * 100 / nrow(tab) else 0)
+    }
+    return(tab)
 }
 
 calculateXLogP <- function(SMILES, mustWork)

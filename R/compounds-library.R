@@ -36,8 +36,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     # UNDONE: show mirror spectrum in report? Would need library data somehow
     # UNDONE: don't normalize scores (or already not done?)
     # UNDONE: separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
-    # UNDONE: report # of peaks matched (before/after filtering?)
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
@@ -45,6 +44,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (specSimParams$shift != "none")
+        stop("Spectral shifting not supported", call. = FALSE)
     
     if (length(fGroups) == 0)
         return(compounds(algorithm = "library"))
@@ -129,7 +131,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         if (nrow(cTab) == 0) # UNDONE: allow results without annotations (i.e. like MF)? Would interfere with min sim score though
             return(NULL)
         
-        # UNDONE: ensure that no shift is applied in specSimParams
         sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
                              0, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
         
@@ -153,16 +154,23 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             fi <- data.table(mz = spec[match(bsp$ID_1, ID)]$mz, PLID = bsp$ID_1)
             
             fi[, c("ion_formula", "neutral_loss") := NA_character_]
+            setorderv(fi, "PLID")
             return(fi)
         }))]
         
         cTab[, explainedPeaks := sapply(fragInfo, nrow)]
+        cTab[, libPeaksCompared := sapply(lspecs[identifier], nrow)]
+        cTab[, libPeaksTotal := sapply(libSpecs[identifier], nrow)]
         cTab[, database := "library"]
         
         return(cTab)
     }, simplify = FALSE))
     
     compList <- pruneList(compList, checkZeroRows = TRUE)
+    
+    ngrp <- length(compList)
+    printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(compList, nrow))),
+           ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     
     return(compounds(groupAnnotations = compList, scoreTypes = "score",
                      scoreRanges = sapply(compList, function(ct) list(score = range(ct$score)), simplify = FALSE),

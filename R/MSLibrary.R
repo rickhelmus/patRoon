@@ -102,6 +102,8 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 loadMSPLibrary <- function(file, parseComments = TRUE)
 {
+    # UNDONE calculate missing SMILES/InChI(Keys)
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     aapply(checkmate::assertFlag, . ~ parseComments, fixed = list(add = ac))
@@ -124,7 +126,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
         set(lib$records, which(lib$records[[j]] == "NA"), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_Type", "Ion_mode")
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode")
     numCols <- c("ExactMass", "PrecursorMZ", "MW")
     allCols <- c(chCols, numCols)
     change <- match(tolower(allCols), tolower(names(lib$records)), nomatch = integer())

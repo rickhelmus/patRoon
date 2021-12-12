@@ -61,7 +61,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     
     # UNDONE: ms level? or just a filter?
     # UNDONE: support entries without SMILES/InChI(keys)/Formulas?
-    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !.is.na(Formula)]
+    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(Formula)]
     if (checkIons == "adduct")
         libRecs <- libRecs[!is.na(Precursor_type)]
     if (checkIons != "none")

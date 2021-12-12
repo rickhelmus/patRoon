@@ -28,8 +28,9 @@ unifyLibNames <- function(cTab)
 
 
 #' @export
-setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, absMzDev = 0.002,
-                                                                adduct = NULL, specSimParams = getDefSpecSimParams())
+setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
+                                                                absMzDev = 0.002, adduct = NULL, checkIons = "adduct",
+                                                                specSimParams = getDefSpecSimParams())
 {
     # UNDONE: cache
     # UNDONE: show mirror spectrum in report? Would need library data somehow
@@ -40,7 +41,8 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
-    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ minSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -55,13 +57,23 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     libRecs <- records(MSLibrary)
     libSpecs <- spectra(MSLibrary)
     
-    # UNDONE: configurable, ms level and more?
-    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(Precursor_Type) & !is.na(Ion_mode)]
+    # UNDONE: ms level? or just a filter?
+    # UNDONE: support entries without SMILES/InChI(keys)?
+    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey)]
+    if (checkIons == "adduct")
+        libRecs <- libRecs[!is.na(Precursor_Type)]
+    if (checkIons != "none")
+        libRecs <- libRecs[!is.na(Ion_mode)]
     
     getRecsForAdduct <- function(recs, add, addChr)
     {
+        if (checkIons == "none")
+            return(recs)
         pos <- add@charge > 0
-        recs[Precursor_Type == addChr & ((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
+        recs <- recs[((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
+        if (checkIons == "adduct")
+            recs <- recs[Precursor_Type == addChr]
+        return(recs)
     }
     
     if (!is.null(adduct))
@@ -123,7 +135,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         cTab[, score := sims[1, ]]
         
-        cTab <- cTab[score >= 0.75] # UNDONE
+        cTab <- cTab[numGTE(score, minSim)]
         
         setorderv(cTab, "score", -1)
         

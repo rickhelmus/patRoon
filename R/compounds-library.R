@@ -16,7 +16,7 @@ unifyLibNames <- function(cTab)
                  ExactMass = "neutralMass",
                  Precursor_Type = "precursorType",
                  Spectrum_Type = "spectrumType",
-                 PrecursorMZ = "precursorMZ",
+                 PrecursorMZ = "ion_formula_mz",
                  Instrument_Type = "instrumentType"
     )
     

@@ -557,7 +557,7 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
     if (specSimParams$shift != "none")
     {
         if (is.na(PLP1$precs) || is.na(PLP2$precs))
-            stop("One or both pecursor ions are unknown, can't calculate shift")
+            stop("One or both precursor ions are unknown, can't calculate shift")
         precDiff <- PLP2$precs - PLP1$precs
     }
     

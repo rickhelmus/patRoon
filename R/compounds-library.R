@@ -125,10 +125,12 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             # NOTE: the mz values from the binned spectra could be slightly different --> take the original values
             fi <- data.table(mz = spec[match(bsp$ID_1, ID)]$mz, PLID = bsp$ID_1)
             
-            # UNDONE: assign "unknown" or some identifier that differentiates with unassigned
             fi[, c("ion_formula", "neutral_loss") := NA_character_]
             return(fi)
         }))]
+        
+        cTab[, explainedPeaks := sapply(fragInfo, nrow)]
+        cTab[, database := "library"]
         
         return(cTab)
     }, simplify = FALSE))

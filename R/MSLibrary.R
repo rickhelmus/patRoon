@@ -100,11 +100,16 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 
 
-loadMSPLibrary <- function(file, parseComments = TRUE)
+loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     aapply(checkmate::assertFlag, . ~ parseComments, fixed = list(add = ac))
+    checkmate::assert(checkmate::checkNull(potAdducts),
+                      checkmate::checkFALSE(potAdducts),
+                      checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
+                      checkmate::checkList(potAdducts, types = c("adduct", "character"), any.missing = FALSE),
+                      .var.name = "potAdducts")
     checkmate::reportAssertions(ac)
     
     lib <- readMSP(normalizePath(file), parseComments)
@@ -189,7 +194,8 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
                        "\\]\\-\\*$" = "\\]\\-", # -* (radical) --> -
                        "[\\-\\+]{1}ACN" = "C2H3N", # ACN
                        "[\\-\\+]{1}FA" = "CH2O2", # formic acid
-                       "[\\-\\+]{1}Hac" = "C2H4O2" # acetic acid
+                       "[\\-\\+]{1}Hac" = "C2H4O2", # acetic acid
+                       "[\\-\\+]{1}DMSO" = "C2H6OS" # DMSO
     )
     for (i in seq_along(adductMapping))
         lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
@@ -197,22 +203,31 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     printf("Verify/Standardize adducts\n")
     lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
     
-    printf("Guessing missing adducts\n")
-    # UNDONE: make optional
-    potAdductsChr <- union(GenFormAdducts()$adduct_generic, lib$records$Precursor_type)
-    potAdducts <- lapply(potAdductsChr, as.adduct)
-    potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
-    potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
-    lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
-                Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+    if (!isFALSE(potAdducts))
     {
-        pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
-        calcMZs <- calculateMasses(em, pa, "mz")
-        wh <- which(numLTE(abs(calcMZs - pmz), 0.002)) # UNDONE: tolerance configurable
-        doProgress()
-        # NOTE: multiple hits are ignored (=NA)
-        return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)
-    }))]
+        printf("Guessing missing adducts\n")
+        # UNDONE: include lib adducts optionally --> default to FALSE as invalid adducts will throw errors (see UNDONE below)
+        if (is.null(potAdducts))
+        {
+            potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,
+                                   lib$records$Precursor_type))
+            potAdducts <- potAdducts[!is.na(potAdducts)]
+        }
+        
+        potAdducts <- lapply(potAdducts, checkAndToAdduct, .var.name = "potAdducts")
+        potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
+        potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
+        lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
+                    Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+        {
+            pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
+            calcMZs <- calculateMasses(em, pa, "mz") # UNDONE: catch errors?
+            wh <- which(numLTE(abs(calcMZs - pmz), 0.002)) # UNDONE: tolerance configurable
+            doProgress()
+            # NOTE: multiple hits are ignored (=NA)
+            return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)
+        }))]
+    }
     
     printf("Calculating missing precursor m/z values\n")
     lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_type),

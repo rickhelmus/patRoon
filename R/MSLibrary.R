@@ -198,8 +198,9 @@ loadMSPLibrary <- function(file, parseComments = TRUE)
     lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
     
     printf("Guessing missing adducts\n")
-    # UNDONE: make optional, additionally check adducts specified in lib?
-    potAdducts <- lapply(unique(GenFormAdducts()$adduct_generic), as.adduct)
+    # UNDONE: make optional
+    potAdductsChr <- union(GenFormAdducts()$adduct_generic, lib$records$Precursor_type)
+    potAdducts <- lapply(potAdductsChr, as.adduct)
     potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
     potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
     lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),

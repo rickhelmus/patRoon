@@ -56,7 +56,7 @@ checkAndGetIonization <- function(ionization, fGroups, .var.name = "ionization",
     return(ionization)    
 }
 
-calculateMasses <- function(masses, adducts, type)
+calculateMasses <- function(masses, adducts, type, err = TRUE)
 {
     stopifnot(type %in% c("neutral", "mz"))
     
@@ -69,19 +69,27 @@ calculateMasses <- function(masses, adducts, type)
         masses <- rep(masses, length.out = length(adducts))
     
     electronMass <- getFormulaMass("H", -1) - getFormulaMass("H", 0)
+    getm <- function(add)
+    {
+        return(
+            if (length(add@add) > 0 && length(add@sub) > 0)
+                sum(sapply(add@add, getFormulaMass)) - sum(sapply(add@sub, getFormulaMass))
+            else if (length(add@add) > 0)
+                sum(sapply(add@add, getFormulaMass))
+            else if (length(add@sub) > 0)
+                -(sum(sapply(add@sub, getFormulaMass)))
+            else # [M]
+                0
+        )
+    }
     
     return(mapply(masses, adducts, FUN = function(m, add)
     {
         # calculation is split by elemental M multiplier, addition/subtractions, and final charge (z)
         
-        em <- if (length(add@add) > 0 && length(add@sub) > 0)
-            sum(sapply(add@add, getFormulaMass)) - sum(sapply(add@sub, getFormulaMass))
-        else if (length(add@add) > 0)
-            sum(sapply(add@add, getFormulaMass))
-        else if (length(add@sub) > 0)
-            -(sum(sapply(add@sub, getFormulaMass)))
-        else # [M]
-            0
+        em <- if (err) getm(add) else tryCatch(getm(add), error = function(...) NA_real_)
+        if (is.na(em))
+            return(em)
         
         # NOTE: invert charge (electron is lost in pos and gained in neg)
         em <- em + (electronMass * -add@charge)

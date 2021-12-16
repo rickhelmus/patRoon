@@ -200,13 +200,14 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
     for (i in seq_along(adductMapping))
         lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
 
+    # UNDONE: more checks (e.g. doesn't detect nonexistent elements)
     printf("Verify/Standardize adducts\n")
     lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
     
     if (!isFALSE(potAdducts))
     {
         printf("Guessing missing adducts\n")
-        # UNDONE: include lib adducts optionally --> default to FALSE as invalid adducts will throw errors (see UNDONE below)
+        # UNDONE: include lib adducts optionally
         if (is.null(potAdducts))
         {
             potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,
@@ -221,7 +222,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
                     Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
         {
             pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
-            calcMZs <- calculateMasses(em, pa, "mz") # UNDONE: catch errors?
+            calcMZs <- calculateMasses(em, pa, "mz", err = FALSE) # set err to FALSE to ignore invalid adducts
             wh <- which(numLTE(abs(calcMZs - pmz), 0.002)) # UNDONE: tolerance configurable
             doProgress()
             # NOTE: multiple hits are ignored (=NA)

@@ -100,7 +100,7 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 
 
-loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
+loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzDev = 0.002)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
@@ -110,6 +110,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
                       checkmate::checkList(potAdducts, types = c("adduct", "character"), any.missing = FALSE),
                       .var.name = "potAdducts")
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     lib <- readMSP(normalizePath(file), parseComments)
@@ -223,7 +224,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
         {
             pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
             calcMZs <- calculateMasses(em, pa, "mz", err = FALSE) # set err to FALSE to ignore invalid adducts
-            wh <- which(numLTE(abs(calcMZs - pmz), 0.002)) # UNDONE: tolerance configurable
+            wh <- which(numLTE(abs(calcMZs - pmz), absMzDev))
             doProgress()
             # NOTE: multiple hits are ignored (=NA)
             return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)

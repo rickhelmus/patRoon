@@ -127,7 +127,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     
     # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
     for (j in seq_along(lib$records))
-        set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a")), j, NA_character_)
+        set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
     chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "Splash")

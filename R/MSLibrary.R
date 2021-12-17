@@ -243,3 +243,27 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     
     return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
 }
+
+setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
+{
+    # check if Splash's are available, and calculate if needed
+    # merge unique records (by Splash)
+    # make identifiers unique (UNDONE: also when loading the library)
+    # update spectra: add new ones, re-name if necessary
+    
+    if (length(x) == 0)
+        return(y)
+    else if (length(y) == 0)
+        return(x)
+    
+    unY <- records(y)[!Splash %chin% records(x)$Splash]$DB_ID
+    y <- y[unY]
+    
+    recordsAll <- rbind(records(x), records(y), fill = TRUE)
+    specsAll <- c(spectra(x), spectra(y))
+    
+    recordsAll[, DB_ID := make.unique(DB_ID)]
+    names(specsAll) <- recordsAll$DB_ID
+    
+    return(MSLibrary(records = recordsAll, spectra = specsAll, algorithm = "merged"))
+})

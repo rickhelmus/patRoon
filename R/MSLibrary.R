@@ -129,7 +129,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL)
         set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode")
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "Splash")
     numCols <- c("ExactMass", "PrecursorMZ", "MW")
     allCols <- c(chCols, numCols)
     change <- match(tolower(allCols), tolower(names(lib$records)), nomatch = integer())

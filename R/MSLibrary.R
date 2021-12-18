@@ -98,6 +98,30 @@ setMethod("export", "MSLibrary", function(obj, type, out)
     writeMSPLibrary(recs, spectra(obj), normalizePath(out))
 })
 
+setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
+{
+    # merge unique records (by SPLASH)
+    # make identifiers unique (UNDONE: also when loading the library, keep original)
+    
+    if (length(x) == 0)
+        return(y)
+    else if (length(y) == 0)
+        return(x)
+    
+    if (any(is.na(records(x)$SPLASH)) || any(is.na(records(y)$SPLASH)))
+        stop("x/y doesn't has missing SPLASH values. Please load the library with calcSPLASH=TRUE")
+    
+    unY <- records(y)[!SPLASH %chin% records(x)$SPLASH]$DB_ID
+    y <- y[unY]
+    
+    recordsAll <- rbind(records(x), records(y), fill = TRUE)
+    specsAll <- c(spectra(x), spectra(y))
+    
+    recordsAll[, DB_ID := make.unique(DB_ID)]
+    names(specsAll) <- recordsAll$DB_ID
+    
+    return(MSLibrary(records = recordsAll, spectra = specsAll, algorithm = "merged"))
+})
 
 
 loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
@@ -255,28 +279,3 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     
     return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
 }
-
-setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
-{
-    # merge unique records (by SPLASH)
-    # make identifiers unique (UNDONE: also when loading the library, keep original)
-
-    if (length(x) == 0)
-        return(y)
-    else if (length(y) == 0)
-        return(x)
-    
-    if (any(is.na(records(x)$SPLASH)) || any(is.na(records(y)$SPLASH)))
-        stop("x/y doesn't has missing SPLASH values. Please load the library with calcSPLASH=TRUE")
-    
-    unY <- records(y)[!SPLASH %chin% records(x)$SPLASH]$DB_ID
-    y <- y[unY]
-    
-    recordsAll <- rbind(records(x), records(y), fill = TRUE)
-    specsAll <- c(spectra(x), spectra(y))
-    
-    recordsAll[, DB_ID := make.unique(DB_ID)]
-    names(specsAll) <- recordsAll$DB_ID
-    
-    return(MSLibrary(records = recordsAll, spectra = specsAll, algorithm = "merged"))
-})

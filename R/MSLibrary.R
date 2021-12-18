@@ -100,11 +100,11 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 
 
-loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzDev = 0.002)
+loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
-    aapply(checkmate::assertFlag, . ~ parseComments, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ parseComments + calcSPLASH, fixed = list(add = ac))
     checkmate::assert(checkmate::checkNull(potAdducts),
                       checkmate::checkFALSE(potAdducts),
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
@@ -240,6 +240,18 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
         doProgress()
         return(ret)
     }))]
+    
+    if (calcSPLASH && any(is.na(lib$records$SPLASH)))
+    {
+        # UNDONE: this is rather slow... MassBank has SPLASH values, so not that important...
+        printf("Calculating missing SPLASH values\n")
+        checkPackage("splashR", "berlinguyinca/spectra-hash", "splashR")
+        lib$records[is.na(SPLASH), SPLASH := withProg(.N, FALSE, sapply(lib$spectra, function(sp)
+        {
+            doProgress()
+            splashR::getSplash(sp)
+        }))]
+    }
     
     return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
 }

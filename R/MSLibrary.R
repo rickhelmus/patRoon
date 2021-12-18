@@ -258,15 +258,16 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
 
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
-    # check if SPLASHs are available, and calculate if needed
     # merge unique records (by SPLASH)
-    # make identifiers unique (UNDONE: also when loading the library)
-    # update spectra: add new ones, re-name if necessary
-    
+    # make identifiers unique (UNDONE: also when loading the library, keep original)
+
     if (length(x) == 0)
         return(y)
     else if (length(y) == 0)
         return(x)
+    
+    if (any(is.na(records(x)$SPLASH)) || any(is.na(records(y)$SPLASH)))
+        stop("x/y doesn't has missing SPLASH values. Please load the library with calcSPLASH=TRUE")
     
     unY <- records(y)[!SPLASH %chin% records(x)$SPLASH]$DB_ID
     y <- y[unY]

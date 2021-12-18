@@ -2,6 +2,16 @@
 #' @include workflow-step.R
 NULL
 
+makeDBIDsUnique <- function(records)
+{
+    if (anyDuplicated(records$DB_ID))
+    {
+        records[, DB_ID_orig := DB_ID]
+        records[, DB_ID := make.unique(DB_ID, sep = "-")]
+    }
+    return(records)
+}
+
 #' @export
 MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
                       contains = "workflowStep")
@@ -100,9 +110,6 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
-    # merge unique records (by SPLASH)
-    # make identifiers unique (UNDONE: also when loading the library, keep original)
-    
     if (length(x) == 0)
         return(y)
     else if (length(y) == 0)
@@ -117,10 +124,10 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
     recordsAll <- rbind(records(x), records(y), fill = TRUE)
     specsAll <- c(spectra(x), spectra(y))
     
-    recordsAll[, DB_ID := make.unique(DB_ID)]
+    recordsAll <- makeDBIDsUnique(recordsAll)
     names(specsAll) <- recordsAll$DB_ID
     
-    return(MSLibrary(records = recordsAll, spectra = specsAll, algorithm = "merged"))
+    return(MSLibrary(records = recordsAll[], spectra = specsAll, algorithm = "merged"))
 })
 
 
@@ -162,6 +169,9 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     
     if (!all(c("Name", "DB_ID") %in% names(lib$records)))
         stop("MSP file misses mandatory Name and/or DB# data.")
+    
+    lib$records <- makeDBIDsUnique(lib$records)
+    names(lib$spectra) <- lib$records$DB_ID
     
     # make sure columns at least exist, which makes future checks easier
     for (col in allCols)

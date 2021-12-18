@@ -66,15 +66,18 @@ moveLastDTColumn <- function(dt, before)
     return(dt)
 }
 
-checkPackage <- function(pkg, gh = NULL)
+checkPackage <- function(pkg, gh = NULL, ghSubDir = NULL)
 {
     # from http://stackoverflow.com/a/20333756
     if (!requireNamespace(pkg, quietly = TRUE))
     {
         if (!is.null(gh))
-            stop(sprintf("Please install %s from github: remotes::install_github('%s')", pkg, gh))
+        {
+            args <- if (!is.null(ghSubDir)) sprintf("'%s', subDir = '%s')", gh, ghSubDir) else sprintf("'%s'", gh)
+            stop(sprintf("Please install %s from github: remotes::install_github(%s)", pkg, args), call. = FALSE)
+        }
         else
-            stop(sprintf("Please install %s: install.packages('%s')", pkg, pkg))
+            stop(sprintf("Please install %s: install.packages('%s')", pkg, pkg), call. = FALSE)
     }
 }
 

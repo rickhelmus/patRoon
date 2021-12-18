@@ -106,7 +106,7 @@ findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
     #   - mention that filter() doesn't alter KPIC object, but IDs can be used to retrace
     #       - or make function that gives synchronized object?
     
-    checkPackage("KPIC", "https://github.com/hcji/KPIC2")
+    checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)

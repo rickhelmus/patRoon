@@ -64,7 +64,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
                                                                                            instrument = list(ionization = ionization, MSlevs = 1)),
                                                                    extraOptsRC = NULL, extraOptsFM = NULL)
 {
-    checkPackage("RAMClustR", "https://github.com/cbroeckl/RAMClustR")
+    checkPackage("RAMClustR", "cbroeckl/RAMClustR")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)

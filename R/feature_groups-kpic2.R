@@ -47,7 +47,7 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
                                                      groupArgs = list(tolerance = c(0.005, 12)),
                                                      alignArgs = list(), verbose = TRUE)
 {
-    checkPackage("KPIC", "https://github.com/hcji/KPIC2")
+    checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
@@ -64,7 +64,7 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
                                                         verbose = TRUE)
 {
-    checkPackage("KPIC", "https://github.com/hcji/KPIC2")
+    checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(verbose, add = ac)

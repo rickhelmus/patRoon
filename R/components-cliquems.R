@@ -66,7 +66,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                                                                   extraOptsCli = NULL, extraOptsIso = NULL,
                                                                   extraOptsAnn = NULL, parallel = TRUE)
 {
-    checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
+    checkPackage("cliqueMS", "rickhelmus/cliqueMS") # UNDONE
     
     ac <- checkmate::makeAssertCollection()
     ionization <- checkAndGetIonization(ionization, fGroups, add = ac)

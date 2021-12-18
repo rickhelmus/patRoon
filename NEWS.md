@@ -1,3 +1,8 @@
+# patRoon 2.1
+
+- More consistent installation suggestion message when an R package from GitHub is found missing
+
+
 # patRoon 2.0.2
 
 - Fixed: `removeBlanks` feature groups filter would not handle analyses with multiple blanks.

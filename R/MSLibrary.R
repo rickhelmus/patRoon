@@ -130,7 +130,7 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
         set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "Splash")
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "SPLASH")
     numCols <- c("ExactMass", "PrecursorMZ", "MW")
     allCols <- c(chCols, numCols)
     change <- match(tolower(allCols), tolower(names(lib$records)), nomatch = integer())
@@ -246,8 +246,8 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
 
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
-    # check if Splash's are available, and calculate if needed
-    # merge unique records (by Splash)
+    # check if SPLASHs are available, and calculate if needed
+    # merge unique records (by SPLASH)
     # make identifiers unique (UNDONE: also when loading the library)
     # update spectra: add new ones, re-name if necessary
     
@@ -256,7 +256,7 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
     else if (length(y) == 0)
         return(x)
     
-    unY <- records(y)[!Splash %chin% records(x)$Splash]$DB_ID
+    unY <- records(y)[!SPLASH %chin% records(x)$SPLASH]$DB_ID
     y <- y[unY]
     
     recordsAll <- rbind(records(x), records(y), fill = TRUE)

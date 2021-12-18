@@ -97,10 +97,11 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                             curRec.values["InChI"] = cv;
                         }
                         // NOTE: MoNA saves Splash as uppercase in comments
-                        if (curRec.values.find("Splash") == curRec.values.end() && parseComments(com, "SPLASH", cv))
+                        if ((curRec.values.find("Splash") == curRec.values.end() ||
+                             curRec.values.find("SPLASH") == curRec.values.end()) && parseComments(com, "SPLASH", cv))
                         {
-                            addKey("Splash");
-                            curRec.values["Splash"] = cv;
+                            addKey("SPLASH");
+                            curRec.values["SPLASH"] = cv;
                         }
                     }
                     

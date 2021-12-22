@@ -48,4 +48,4 @@ generateFeatureOptPSetKPIC2 <- function(...)
                 kmeans = TRUE))
 }
 
-getDefFeaturesOptParamRangesKPIC2 <- function() list(min_width = 3)
+getDefFeaturesOptParamRangesKPIC2 <- function() list(min_width = c(3, Inf))

@@ -304,8 +304,10 @@ getScriptCode <- function(input, analyses)
         }
     }
     
-    if (input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
-        (input$ionization == "both" && nzchar(input$suspectListPos)))
+    doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
+        (input$ionization == "both" && nzchar(input$suspectListPos))
+    
+    if (doSusps)
     {
         addHeader("suspect screening")
         
@@ -486,7 +488,7 @@ getScriptCode <- function(input, analyses)
             }
         }
         
-        if (nzchar(input$suspectList) && input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)))
+        if (doSusps && input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)))
         {
             addNL()
             addComment("Annotate suspects")
@@ -601,7 +603,9 @@ doCreateProject <- function(input, analyses)
     else
         analyses <- Map(prepareAnas, analyses, list(input$analysisTableFilePos, input$analysisTableFileNeg))
     
-    if (nzchar(input$suspectList) && input$annotateSus && input$genIDLevelFile)
+    doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
+        (input$ionization == "both" && nzchar(input$suspectListPos))
+    if (doSusps && input$annotateSus && input$genIDLevelFile)
         genIDLevelRulesFile(file.path(input$destinationPath, "idlevelrules.yml"))
     
     code <- getScriptCode(input, analyses)

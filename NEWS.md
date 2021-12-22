@@ -1,3 +1,8 @@
+# patRoon 2.0.1
+
+- Fixed: `newProject()` would not add suspect annotation to the output script if the example suspect list or sets workflows were chosen.
+
+
 # patRoon 2.0
 
 This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections below for more information.

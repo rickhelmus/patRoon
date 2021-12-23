@@ -1,6 +1,7 @@
 # patRoon 2.0.1
 
 - Fixed: `newProject()` would not add suspect annotation to the output script if the example suspect list or sets workflows were chosen.
+- Fixed: Default optimization range for KPIC2 `min_width` was incorrect (PR #31, thanks to @@coltonlloyd)
 
 
 # patRoon 2.0

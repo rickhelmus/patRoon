@@ -9,6 +9,10 @@ writeMSPLibrary <- function(recordsM, spectraList, outCV) {
     invisible(.Call(`_patRoon_writeMSPLibrary`, recordsM, spectraList, outCV))
 }
 
+readMoNAJSON <- function(file) {
+    .Call(`_patRoon_readMoNAJSON`, file)
+}
+
 parseAdductConsXMLFile <- function(file) {
     .Call(`_patRoon_parseAdductConsXMLFile`, file)
 }

@@ -1,3 +1,5 @@
+// [[Rcpp::depends(rapidjsonr)]]
+
 #include <fstream>
 #include <iomanip>
 #include <set>
@@ -5,6 +7,9 @@
 #include <unordered_map>
 
 #include <Rcpp.h>
+
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
 
 #include "utils.h"
 
@@ -185,4 +190,38 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
         }
         outf.close();
     }
+}
+
+// [[Rcpp::export]]
+Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
+{
+    std::vector<std::string> inchis;
+    std::ifstream fs;
+    fs.open(Rcpp::as<const char *>(file));
+    if (fs.is_open())
+    {
+        std::string line;
+        while (std::getline(fs, line))
+        {
+            if (line.empty() || line[0] == '[')
+                continue;
+            if (line[0] == ']')
+                break;
+            const auto len = line.length();
+            if (line[len-1] == ',')
+                line.pop_back();
+            rapidjson::Document d;
+            d.ParseInsitu(&line[0]); // see https://stackoverflow.com/a/4152881
+            if (d.HasParseError())
+            {
+                // UNDONE
+                /*fprintf(stderr, "\nError(offset %u): %s\n",
+                        (unsigned)d.GetErrorOffset(),
+                        GetParseError_En(d.GetParseError()));*/
+            }
+            
+        }
+    }
+    
+    return Rcpp::List();
 }

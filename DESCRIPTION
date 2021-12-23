@@ -128,7 +128,8 @@ Suggests:
     pkgload,
     splashR
 LinkingTo:
-    Rcpp
+    Rcpp,
+    rapidjsonr
 RdMacros:
     Rdpack
 Collate: 

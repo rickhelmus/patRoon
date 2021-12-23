@@ -1,3 +1,5 @@
+PKG_CPPFLAGS=-DSTRICT_R_HEADERS
+
 SRC=$(wildcard GenForm-svn/*.cpp)
 OBJECTS_GF=$(SRC:.cpp=.o)
 DEST_GF=GenForm.exe

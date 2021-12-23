@@ -116,7 +116,7 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
         return(x)
     
     if (any(is.na(records(x)$SPLASH)) || any(is.na(records(y)$SPLASH)))
-        stop("x/y doesn't has missing SPLASH values. Please load the library with calcSPLASH=TRUE")
+        stop("x/y has missing SPLASH values. Please load the library with calcSPLASH=TRUE")
     
     unY <- records(y)[!SPLASH %chin% records(x)$SPLASH]$DB_ID
     y <- y[unY]

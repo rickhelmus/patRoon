@@ -125,7 +125,8 @@ Suggests:
     DiagrammeR,
     DiagrammeRsvg,
     rsvg,
-    pkgload
+    pkgload,
+    splashR
 LinkingTo:
     Rcpp
 RdMacros:

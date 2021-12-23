@@ -26,10 +26,10 @@ ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R
 
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar && \
-    wget --progress=dot:mega https://github.com/boecker-lab/sirius/releases/download/v4.9.9/sirius-4.9.9-linux64-headless.zip && \
+    wget --progress=dot:mega https://github.com/boecker-lab/sirius/releases/download/v4.9.12/sirius-4.9.12-linux64-headless.zip && \
     wget --progress=dot:mega https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv && \
     wget --progress=dot:mega https://zenodo.org/record/3472781/files/CompTox_07March19_WWMetaData.csv && \
-    unzip sirius-4.9.9-linux64-headless.zip && rm sirius-4.9.9-linux64-headless.zip && \
+    unzip sirius-4.9.12-linux64-headless.zip && rm sirius-4.9.12-linux64-headless.zip && \
     git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && \
     wget --progress=dot:mega https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \

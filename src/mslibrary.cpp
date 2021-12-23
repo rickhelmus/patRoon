@@ -13,18 +13,20 @@
 
 #include "utils.h"
 
-struct MSPSpectrum
+namespace {
+
+struct MSLibSpectrum
 {
     std::vector<double> mzs, intensities;
 };
 
-struct MSPRecord
+struct MSLibRecord
 {
     std::unordered_map<std::string, std::string> values;
-    MSPSpectrum spectrum;
+    MSLibSpectrum spectrum;
 };
 
-bool parseComments(const std::string &comments, const std::string &field, std::string &out)
+bool parseMSPComments(const std::string &comments, const std::string &field, std::string &out)
 {
     const std::string toMatch = '"' + field + '=';
     auto start = comments.find(toMatch);
@@ -41,12 +43,46 @@ bool parseComments(const std::string &comments, const std::string &field, std::s
     return false;
 }
 
+Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const std::vector<std::string> &keys)
+{
+    Rcpp::List recordsList(keys.size());
+    recordsList.names() = Rcpp::wrap(std::vector<std::string>(keys.begin(), keys.end()));
+    for (const std::string &k : keys)
+    {
+        std::vector<std::string> vals;
+        for (const auto &r : records)
+        {
+            const auto it = r.values.find(k);
+            vals.push_back((it == r.values.end()) ? "NA" : it->second);
+        }
+        recordsList[k] = vals;
+    }
+    
+    Rcpp::List specList(records.size());
+    specList.names() = recordsList["DB_ID"];
+    for (int i=0; i<specList.size(); ++i)
+    {
+        Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);
+        nm(Rcpp::_, 0) = Rcpp::NumericVector(records[i].spectrum.mzs.begin(), records[i].spectrum.mzs.end());
+        nm(Rcpp::_, 1) = Rcpp::NumericVector(records[i].spectrum.intensities.begin(),
+           records[i].spectrum.intensities.end());
+        Rcpp::colnames(nm) = Rcpp::CharacterVector({"mz", "intensity"});
+        specList[i] = nm;
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
+                              Rcpp::Named("spectra") = specList);
+}
+
+}
+
+
 // [[Rcpp::export]]
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
 {
     const bool pComments = Rcpp::as<bool>(pc);
     std::ifstream fs;
-    std::vector<MSPRecord> records;
+    std::vector<MSLibRecord> records;
     std::vector<std::string> keys;
     
     auto addKey = [&keys](const std::string &k)
@@ -59,7 +95,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
     if (fs.is_open())
     {
         std::string line;
-        MSPRecord curRec;
+        MSLibRecord curRec;
         
         while (std::getline(fs, line))
         {
@@ -90,20 +126,20 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                         const std::string com = curRec.values["Comments"];
                         std::string cv;
                         if (curRec.values.find("SMILES") == curRec.values.end() &&
-                            (parseComments(com, "SMILES", cv) || parseComments(com, "computed SMILES", cv)))
+                            (parseMSPComments(com, "SMILES", cv) || parseMSPComments(com, "computed SMILES", cv)))
                         {
                             addKey("SMILES");
                             curRec.values["SMILES"] = cv;
                         }
                         if (curRec.values.find("InChI") == curRec.values.end() &&
-                            (parseComments(com, "InChI", cv) || parseComments(com, "computed InChI", cv)))
+                            (parseMSPComments(com, "InChI", cv) || parseMSPComments(com, "computed InChI", cv)))
                         {
                             addKey("InChI");
                             curRec.values["InChI"] = cv;
                         }
                         // NOTE: MoNA saves Splash as uppercase in comments
                         if ((curRec.values.find("Splash") == curRec.values.end() ||
-                             curRec.values.find("SPLASH") == curRec.values.end()) && parseComments(com, "SPLASH", cv))
+                             curRec.values.find("SPLASH") == curRec.values.end()) && parseMSPComments(com, "SPLASH", cv))
                         {
                             addKey("SPLASH");
                             curRec.values["SPLASH"] = cv;
@@ -111,7 +147,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     }
                     
                     records.push_back(curRec);
-                    curRec = MSPRecord();
+                    curRec = MSLibRecord();
                     
                     if ((records.size() % 25000) == 0)
                         Rcpp::Rcout << "Read " << records.size() << " records\n";
@@ -133,33 +169,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
         Rcpp::Rcout << "Read " << records.size() << " records\n";
     }
     
-    Rcpp::List recordsList(keys.size());
-    recordsList.names() = Rcpp::wrap(std::vector<std::string>(keys.begin(), keys.end()));
-    for (const std::string &k : keys)
-    {
-        std::vector<std::string> vals;
-        for (const auto &r : records)
-        {
-            const auto it = r.values.find(k);
-            vals.push_back((it == r.values.end()) ? "NA" : it->second);
-        }
-        recordsList[k] = vals;
-    }
-
-    Rcpp::List specList(records.size());
-    specList.names() = recordsList["DB_ID"];
-    for (int i=0; i<specList.size(); ++i)
-    {
-        Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);
-        nm(Rcpp::_, 0) = Rcpp::NumericVector(records[i].spectrum.mzs.begin(), records[i].spectrum.mzs.end());
-        nm(Rcpp::_, 1) = Rcpp::NumericVector(records[i].spectrum.intensities.begin(),
-                                             records[i].spectrum.intensities.end());
-        Rcpp::colnames(nm) = Rcpp::CharacterVector({"mz", "intensity"});
-        specList[i] = nm;
-    }
-    
-    return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
-                              Rcpp::Named("spectra") = specList);
+    return convertRecordsToRData(records, keys);
 }
 
 // [[Rcpp::export]]
@@ -195,8 +205,31 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
 // [[Rcpp::export]]
 Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
 {
-    std::vector<std::string> inchis;
     std::ifstream fs;
+    std::vector<MSLibRecord> records;
+    std::vector<std::string> keys;
+    
+    auto addKey = [&keys](const std::string &k)
+    {
+        if (std::find(keys.begin(), keys.end(), k) == keys.end())
+            keys.push_back(k);
+    };
+    
+    const auto getString = [&](const rapidjson::Value &val, const char *var, MSLibRecord &record,
+                               const char *outVar = NULL)
+    {
+        rapidjson::Value::ConstMemberIterator it = val.FindMember(var);
+        if (it != val.MemberEnd() && it->value.IsString())
+        {
+            if (outVar == NULL)
+                outVar = var;
+            record.values[outVar] = it->value.GetString();
+            addKey(outVar);
+            return true;
+        }
+        return false;
+    };
+    
     fs.open(Rcpp::as<const char *>(file));
     if (fs.is_open())
     {
@@ -220,8 +253,28 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                         GetParseError_En(d.GetParseError()));*/
             }
             
+            MSLibRecord curRec;
+
+            // UNDONE: something better than 'continue'? or throw error in getString?
+            
+            if (!getString(d, "id", curRec, "DB_ID")) continue;
+            
+            rapidjson::Value::ConstMemberIterator cit = d.FindMember("compound");
+            if (cit != d.MemberEnd() && cit->value.IsArray() && !cit->value.Empty())
+            {
+                if (!getString(cit->value[0], "inchi", curRec, "InChI")) continue;
+                if (!getString(cit->value[0], "inchiKey", curRec, "InChIKey")) continue;
+            }
+            
+            records.push_back(curRec);
+            
+            if ((records.size() % 25000) == 0)
+                Rcpp::Rcout << "Read " << records.size() << " records\n";
         }
+        
+        fs.close();
+        Rcpp::Rcout << "Read " << records.size() << " records\n";
     }
     
-    return Rcpp::List();
+    return convertRecordsToRData(records, keys);
 }

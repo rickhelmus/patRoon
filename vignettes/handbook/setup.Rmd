@@ -63,7 +63,7 @@ if (runData)
     compsMF <- compounds <-
         generateCompounds(fGroupsAnn, mslists, "metfrag", method = "CL",
                           dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                          adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
+                          adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 5000)
     
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
     componInt <- generateComponents(fGroupsRG, "intclust")
@@ -89,7 +89,7 @@ if (runData)
     compoundsSets <- generateCompounds(fGroupsSetsAnn, mslistsSets, "metfrag", database = "pubchemlite")
     
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
-                 fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
+                 fGroupsRG = fGroupsRG, fGroupsSusp = fGroupsSusp, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
                  ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,

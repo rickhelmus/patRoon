@@ -284,7 +284,7 @@ utils <- setRefClass("utilsInst", methods = list(
         # the PATH is searched last because OpenMS might have added its own old version.
         
         path <- getOption("patRoon.path.pwiz")
-        if (!is.null(path))
+        if (!is.null(path) && nzchar(path))
             return(path)
         
         # Inspired by scan_registry_for_rtools() from pkgload
@@ -464,7 +464,9 @@ utils <- setRefClass("utilsInst", methods = list(
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
         
         pwiz <- findPWizPath()
-        if (!is.null(pwiz) && !nzchar(extDeps$path[1]))
+        # NOTE: ProteoWizard/msConvert may be installed via OpenMS, which is not the version you typically want to use.
+        # Since OpenMS adds their version to PATH, we use findPWizPath() to find the right version
+        if (!is.null(pwiz))
             extDeps$path[1] <- pwiz
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
@@ -476,7 +478,8 @@ utils <- setRefClass("utilsInst", methods = list(
         extDeps <- rbind(extDeps, list(name = "BioTransformer", command = "", copt = "",
                                        path = getOption("patRoon.path.BioTransformer", "")))
         
-        present <- nzchar(extDeps$path) & file.exists(extDeps$path)
+        # NOTE: only check presence for non-commands, since these should be in PATH if $path isn't empty
+        present <- nzchar(extDeps$path) & (file.exists(extDeps$path) | nzchar(extDeps$command))
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
         choices <- c(instChoices, "Missing", "All", "None")
         instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,

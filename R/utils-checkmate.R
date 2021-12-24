@@ -79,7 +79,7 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "blank", checkmate::assertCharacter, any.missing = FALSE, add = add)
-    
+
     checkmate::assert(
         checkmate::checkNull(x[["conc"]]),
         checkmate::checkCharacter(x[["conc"]]),
@@ -87,6 +87,13 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
         .var.name = sprintf("%s[[\"conc\"]]", .var.name)
     )
 
+    checkmate::assert(
+        checkmate::checkNull(x[["istd_conc"]]),
+        checkmate::checkCharacter(x[["istd_conc"]]),
+        checkmate::checkNumeric(x[["istd_conc"]]),
+        .var.name = sprintf("%s[[\"istd_conc\"]]", .var.name)
+    )
+    
     # only continue if previous assertions didn't fail: x needs to be used as list which otherwise gives error
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors
     if (is.null(add) || length(add$getMessages()) == mc)
@@ -123,10 +130,14 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
 
     assertAnalysisInfo(x, ..., add = add)
 
-    if ((is.null(add) || length(add$getMessages()) == mc) &&
-        (!is.null(x) && !is.null(x[["conc"]])))
-        x[["conc"]] <- as.numeric(x[["conc"]])
-
+    if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
+    {
+        if (!is.null(x[["conc"]]))
+            x[["conc"]] <- as.numeric(x[["conc"]])
+        if (!is.null(x[["istd_conc"]]))
+            x[["istd_conc"]] <- as.numeric(x[["istd_conc"]])
+    }
+    
     return(x)
 }
 

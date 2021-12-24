@@ -18,6 +18,8 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
+setGeneric("screenISTDs", function(fGroups, standards, refRGroups, rtWindow = 12, mzWindow = 0.005,
+                                   skipInvalid = TRUE, ...) standardGeneric("screenISTDs"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 

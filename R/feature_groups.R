@@ -72,7 +72,8 @@ NULL
 featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
-                                    groupScores = "data.table", annotations = "data.table"),
+                                    groupScores = "data.table", annotations = "data.table",
+                                    iSTDs = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -80,17 +81,12 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     args <- list(...)
 
     # data.table's don't seem to initialize well (gives error that slot is init as list)
-    if (is.null(args[["groups"]]))
-        args$groups <- data.table()
-    if (is.null(args[["ftindex"]]))
-        args$ftindex <- data.table()
-    if (is.null(args[["groupQualities"]]))
-        args$groupQualities <- data.table()
-    if (is.null(args[["groupScores"]]))
-        args$groupScores <- data.table()
-    if (is.null(args[["annotations"]]))
-        args$annotations <- data.table()
-    
+    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "iSTDs"))
+    {
+        if (is.null(args[[s]]))
+            args[[s]] <- data.table()
+    }
+
     .Object <- do.call(callNextMethod, c(list(.Object), args))
     
     if (nrow(.Object@ftindex) > 0)
@@ -229,6 +225,11 @@ setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
 #' @export
 setMethod("annotations", "featureGroups", function(obj) obj@annotations)
+
+#' @describeIn featureGroups Accessor for \code{iSTDs} slot.
+#' @aliases internalStandards
+#' @export
+setMethod("internalStandards", "featureGroups", function(fGroups) fGroups@iSTDs)
 
 #' @describeIn featureGroups Returns a named \code{character} with adduct annotations assigned to each feature group (if
 #'   available).
@@ -421,6 +422,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         }
         if (nrow(obj@annotations) > 0)
             obj@annotations <- obj@annotations[group %in% names(obj@groups)]
+        if (nrow(obj@iSTDs) > 0)
+            obj@iSTDs <- obj@iSTDs[group %in% names(obj@groups)]
     }
     
     if (!isAnaSubSet)

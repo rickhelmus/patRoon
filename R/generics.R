@@ -17,6 +17,7 @@ setGeneric("comparison", function(..., groupAlgo,
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
+setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 

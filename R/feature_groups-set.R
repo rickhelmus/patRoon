@@ -443,5 +443,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
-                              annotations = ann, algorithm = paste0(algorithm(obj), "_unset")))
+                              annotations = ann, iSTDs = copy(internalStandards(fGroups)),
+                              algorithm = paste0(algorithm(obj), "_unset")))
 })

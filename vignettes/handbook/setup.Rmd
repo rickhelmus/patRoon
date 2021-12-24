@@ -89,7 +89,7 @@ if (runData)
     compoundsSets <- generateCompounds(fGroupsSetsAnn, mslistsSets, "metfrag", database = "pubchemlite")
     
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
-                 fGroupsRG = fGroupsRG, fGroupsSusp = fGroupsSusp, mslists = mslists, formulas = formulas, compsMF = compsMF,
+                 fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
                  ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,

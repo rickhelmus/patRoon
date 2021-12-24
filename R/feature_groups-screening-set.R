@@ -410,6 +410,8 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
                                      analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
                                      features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
+                                     groupQualities = copy(groupQualities(fGroups)),
+                                     groupScores = copy(groupScores(fGroups)),
                                      annotations = copy(annotations(fGroups))))
 })
 

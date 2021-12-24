@@ -514,7 +514,7 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     obj <- obj[, sets = set]
     
     gInfo <- groupInfo(obj)
-    ann <- annotations(obj)
+    ann <- copy(annotations(obj))
     if (nrow(gInfo) > 0)
     {
         adducts <- sapply(unique(ann$adduct), as.adduct)
@@ -522,8 +522,9 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
         ann <- ann[, -"set"]
     }
     
-    return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo,
+    return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
-                              features = unset(getFeatures(obj), set), ftindex = groupFeatIndex(obj),
+                              features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
+                              groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
                               annotations = ann, algorithm = paste0(algorithm(obj), "_unset")))
 })

@@ -244,7 +244,9 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             if (line[len-1] == ',')
                 line.pop_back();
             rapidjson::Document d;
-            d.ParseInsitu(&line[0]); // see https://stackoverflow.com/a/4152881
+            //d.ParseInsitu<rapidjson::kParseNumbersAsStringsFlag>(&line[0]); // see https://stackoverflow.com/a/4152881
+            // BUG: kParseNumbersAsStringsFlag doesn't seem to work with Insitu parsing
+            d.Parse<rapidjson::kParseNumbersAsStringsFlag>(line.c_str());
             if (d.HasParseError())
             {
                 // UNDONE

@@ -205,6 +205,26 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
 // [[Rcpp::export]]
 Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
 {
+    const std::unordered_map<std::string, std::string> JSONCompMDMapping =  {
+        { "molecular formula", "Formula" },
+        { "SMILES", "SMILES" },
+        { "pubchem cid", "PubChemCID" },
+        { "chemspider", "ChemSpiderID" },
+        { "total exact mass", "ExactMass" }
+    };
+    const std::unordered_map<std::string, std::string> JSONRecMDMapping =  {
+        { "instrument", "Instrument" },
+        { "instrument type", "Instrument_type" },
+        { "ms level", "Spectrum_type" },
+        { "ionization", "Ionization" },
+        { "Fragmentation", "Fragmentation" },
+        { "collision energy", "Collision_energy" },
+        { "resolution", "Resolution" },
+        { "ionization mode", "Ion_mode" },
+        { "precursor m/z", "PrecursorMZ" },
+        { "precursor type", "Precursor_type" }
+    };
+    
     std::ifstream fs;
     std::vector<MSLibRecord> records;
     std::vector<std::string> keys;
@@ -229,7 +249,28 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
         }
         return false;
     };
+    const auto getStringMD = [&](const rapidjson::Value &val, MSLibRecord &record,
+                                 const std::unordered_map<std::string, std::string> &mapping)
+    {
+        rapidjson::Value::ConstMemberIterator itn = val.FindMember("name");
+        if (itn != val.MemberEnd() && itn->value.IsString())
+        {
+            const auto mappedVal = mapping.find(itn->value.GetString());
+            if (mappedVal != mapping.end())
+            {
+                rapidjson::Value::ConstMemberIterator itv = val.FindMember("value");
+                if (itv != val.MemberEnd() && itv->value.IsString())
+                {
+                    record.values[mappedVal->second] = itv->value.GetString();
+                    addKey(mappedVal->second);
+                }
+            }
+            return true;
+        }
+        return false;
+    };
     
+        
     fs.open(Rcpp::as<const char *>(file));
     if (fs.is_open())
     {
@@ -266,7 +307,25 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             {
                 if (!getString(cit->value[0], "inchi", curRec, "InChI")) continue;
                 if (!getString(cit->value[0], "inchiKey", curRec, "InChIKey")) continue;
+                
+                rapidjson::Value::ConstMemberIterator mit = cit->value[0].FindMember("metaData");
+                if (mit != cit->value[0].MemberEnd() && mit->value.IsArray())
+                {
+                    for (auto &item : mit->value.GetArray())
+                        getStringMD(item, curRec, JSONCompMDMapping);
+                }
             }
+            
+            cit = d.FindMember("metaData");
+            if (cit != d.MemberEnd() && cit->value.IsArray())
+            {
+                for (auto &item : cit->value.GetArray())
+                    getStringMD(item, curRec, JSONRecMDMapping);
+            }
+            
+            cit = d.FindMember("score");
+            if (cit != d.MemberEnd() && cit->value.IsObject())
+                getString(cit->value, "score", curRec, "Score");
             
             records.push_back(curRec);
             

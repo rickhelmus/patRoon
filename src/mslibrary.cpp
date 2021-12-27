@@ -18,19 +18,13 @@ namespace {
 struct MSLibSpectrum
 {
     std::vector<double> mzs, intensities;
+    std::vector<std::string> annotations;
 };
 
-struct MSLibAnnotations
-{
-    std::vector<double> mzs;
-    std::vector<std::string> formulas;
-};
-    
 struct MSLibRecord
 {
     std::unordered_map<std::string, std::string> values;
     MSLibSpectrum spectrum;
-    MSLibAnnotations annotations;
 };
 
 bool parseMSPComments(const std::string &comments, const std::string &field, std::string &out)
@@ -80,10 +74,7 @@ Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const 
     Rcpp::List annList(records.size());
     annList.names() = recordsList["DB_ID"];
     for (int i=0; i<annList.size(); ++i)
-    {
-        annList[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = records[i].annotations.mzs,
-                                             Rcpp::Named("formula") = records[i].annotations.formulas);
-    }
+        annList[i] = records[i].spectrum.annotations;
     
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
                               Rcpp::Named("spectra") = specList,
@@ -365,14 +356,22 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             cit = d.FindMember("annotations");
             if (cit != d.MemberEnd() && cit->value.IsArray())
             {
+                curRec.spectrum.annotations.resize(curRec.spectrum.mzs.size());
                 for (auto &item : cit->value.GetArray())
                 {
                     rapidjson::Value::ConstMemberIterator itf = item.FindMember("name"), itm = item.FindMember("value");
                     if (itf != item.MemberEnd() && itf->value.IsString() &&
                         itm != item.MemberEnd() && itm->value.IsString())
                     {
-                        curRec.annotations.mzs.push_back(std::stod(itm->value.GetString()));
-                        curRec.annotations.formulas.push_back(itf->value.GetString());
+                        const double mz = std::stod(itm->value.GetString());
+                        for (auto i=0; i<curRec.spectrum.mzs.size(); ++i)
+                        {
+                            if (compareTol(mz, curRec.spectrum.mzs[i], 1E-6))
+                            {
+                                curRec.spectrum.annotations[i] = itf->value.GetString();
+                                break;
+                            }
+                        }
                     }
                 }
             }

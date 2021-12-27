@@ -20,10 +20,17 @@ struct MSLibSpectrum
     std::vector<double> mzs, intensities;
 };
 
+struct MSLibAnnotations
+{
+    std::vector<double> mzs;
+    std::vector<std::string> formulas;
+};
+    
 struct MSLibRecord
 {
     std::unordered_map<std::string, std::string> values;
     MSLibSpectrum spectrum;
+    MSLibAnnotations annotations;
 };
 
 bool parseMSPComments(const std::string &comments, const std::string &field, std::string &out)
@@ -70,8 +77,17 @@ Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const 
         specList[i] = nm;
     }
     
+    Rcpp::List annList(records.size());
+    annList.names() = recordsList["DB_ID"];
+    for (int i=0; i<annList.size(); ++i)
+    {
+        annList[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = records[i].annotations.mzs,
+                                             Rcpp::Named("formula") = records[i].annotations.formulas);
+    }
+    
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
-                              Rcpp::Named("spectra") = specList);
+                              Rcpp::Named("spectra") = specList,
+                              Rcpp::Named("annotations") = annList);
 }
 
 }
@@ -335,6 +351,7 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             cit = d.FindMember("spectrum");
             if (cit != d.MemberEnd() && cit->value.IsString())
             {
+                // m/z / intensity pair is separated by colon, pairs are separated by space
                 std::stringstream strm(cit->value.GetString());
                 double mz, inten;
                 char colon; // dummy
@@ -342,6 +359,21 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                 {
                     curRec.spectrum.mzs.push_back(mz);
                     curRec.spectrum.intensities.push_back(inten);
+                }
+            }
+
+            cit = d.FindMember("annotations");
+            if (cit != d.MemberEnd() && cit->value.IsArray())
+            {
+                for (auto &item : cit->value.GetArray())
+                {
+                    rapidjson::Value::ConstMemberIterator itf = item.FindMember("name"), itm = item.FindMember("value");
+                    if (itf != item.MemberEnd() && itf->value.IsString() &&
+                        itm != item.MemberEnd() && itm->value.IsString())
+                    {
+                        curRec.annotations.mzs.push_back(std::stod(itm->value.GetString()));
+                        curRec.annotations.formulas.push_back(itf->value.GetString());
+                    }
                 }
             }
             

@@ -327,6 +327,19 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             if (cit != d.MemberEnd() && cit->value.IsObject())
                 getString(cit->value, "score", curRec, "Score");
             
+            cit = d.FindMember("spectrum");
+            if (cit != d.MemberEnd() && cit->value.IsString())
+            {
+                std::stringstream strm(cit->value.GetString());
+                double mz, inten;
+                char colon; // dummy
+                while(strm >> mz >> colon >> inten)
+                {
+                    curRec.spectrum.mzs.push_back(mz);
+                    curRec.spectrum.intensities.push_back(inten);
+                }
+            }
+            
             records.push_back(curRec);
             
             if ((records.size() % 25000) == 0)

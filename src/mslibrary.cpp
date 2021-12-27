@@ -208,6 +208,8 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
     const std::unordered_map<std::string, std::string> JSONCompMDMapping =  {
         { "molecular formula", "Formula" },
         { "SMILES", "SMILES" },
+        { "InChI", "InChI" },
+        { "InChIKey", "InChIKey" },
         { "pubchem cid", "PubChemCID" },
         { "chemspider", "ChemSpiderID" },
         { "total exact mass", "ExactMass" }
@@ -305,8 +307,9 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             rapidjson::Value::ConstMemberIterator cit = d.FindMember("compound");
             if (cit != d.MemberEnd() && cit->value.IsArray() && !cit->value.Empty())
             {
-                if (!getString(cit->value[0], "inchi", curRec, "InChI")) continue;
-                if (!getString(cit->value[0], "inchiKey", curRec, "InChIKey")) continue;
+                // NOTE: these will also be taken from the metaData if present
+                getString(cit->value[0], "inchi", curRec, "InChI");
+                getString(cit->value[0], "inchiKey", curRec, "InChIKey");
                 
                 rapidjson::Value::ConstMemberIterator mit = cit->value[0].FindMember("metaData");
                 if (mit != cit->value[0].MemberEnd() && mit->value.IsArray())
@@ -319,6 +322,8 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             cit = d.FindMember("metaData");
             if (cit != d.MemberEnd() && cit->value.IsArray())
             {
+                // NOTE: Some metaData might be present in duplicate (e.g. given/calculated SMILES)
+                // For now the last value is always kept
                 for (auto &item : cit->value.GetArray())
                     getStringMD(item, curRec, JSONRecMDMapping);
             }

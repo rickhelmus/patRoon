@@ -299,10 +299,8 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             d.Parse<rapidjson::kParseNumbersAsStringsFlag>(line.c_str());
             if (d.HasParseError())
             {
-                // UNDONE
-                /*fprintf(stderr, "\nError(offset %u): %s\n",
-                        (unsigned)d.GetErrorOffset(),
-                        GetParseError_En(d.GetParseError()));*/
+                Rcpp::stop("JSON parse error (offset: %u): %s", (unsigned)d.GetErrorOffset(),
+                           rapidjson::GetParseError_En(d.GetParseError()));
             }
             
             MSLibRecord curRec;

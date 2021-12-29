@@ -97,6 +97,17 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
         if (std::find(keys.begin(), keys.end(), k) == keys.end())
             keys.push_back(k);
     };
+    auto parseComment = [&](const std::string &comment, const std::string &outVar, MSLibRecord &record,
+                            const std::string &var, const std::string &altVar = "")
+    {
+        std::string cv;
+        if (record.values.find(outVar) == record.values.end() &&
+            (parseMSPComments(comment, var, cv) || (!altVar.empty() && parseMSPComments(comment, altVar, cv))))
+        {
+            addKey(outVar);
+            record.values[outVar] = cv;
+        }
+    };
     
     fs.open(Rcpp::as<const char *>(file));
     if (fs.is_open())
@@ -131,26 +142,15 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                     if (pComments && curRec.values.find("Comments") != curRec.values.end())
                     {
                         const std::string com = curRec.values["Comments"];
-                        std::string cv;
-                        if (curRec.values.find("SMILES") == curRec.values.end() &&
-                            (parseMSPComments(com, "SMILES", cv) || parseMSPComments(com, "computed SMILES", cv)))
-                        {
-                            addKey("SMILES");
-                            curRec.values["SMILES"] = cv;
-                        }
-                        if (curRec.values.find("InChI") == curRec.values.end() &&
-                            (parseMSPComments(com, "InChI", cv) || parseMSPComments(com, "computed InChI", cv)))
-                        {
-                            addKey("InChI");
-                            curRec.values["InChI"] = cv;
-                        }
+                        parseComment(com, "SMILES", curRec, "SMILES", "computed SMILES");
+                        parseComment(com, "InChI", curRec, "InChI", "computed InChI");
                         // NOTE: MoNA saves Splash as uppercase in comments
-                        if ((curRec.values.find("Splash") == curRec.values.end() ||
-                             curRec.values.find("SPLASH") == curRec.values.end()) && parseMSPComments(com, "SPLASH", cv))
-                        {
-                            addKey("SPLASH");
-                            curRec.values["SPLASH"] = cv;
-                        }
+                        parseComment(com, "SPLASH", curRec, "SPLASH", "Splash");
+                        parseComment(com, "CAS", curRec, "cas");
+                        parseComment(com, "PubChemCID", curRec, "pubchem cid");
+                        parseComment(com, "ChemSpiderID", curRec, "chemspider");
+                        parseComment(com, "Ionization", curRec, "ionization");
+                        parseComment(com, "Resolution", curRec, "resolution");
                     }
                     
                     records.push_back(curRec);
@@ -219,6 +219,7 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
         { "SMILES", "SMILES" },
         { "InChI", "InChI" },
         { "InChIKey", "InChIKey" },
+        { "cas", "CAS" },
         { "pubchem cid", "PubChemCID" },
         { "chemspider", "ChemSpiderID" },
         { "total exact mass", "ExactMass" }
@@ -272,8 +273,11 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                 rapidjson::Value::ConstMemberIterator itv = val.FindMember("value");
                 if (itv != val.MemberEnd() && itv->value.IsString())
                 {
-                    record.values[mappedVal->second] = itv->value.GetString();
-                    addKey(mappedVal->second);
+                    // use insert: some values like SMILES etc may be specified double. The MSP files seem to contain
+                    // the first value, so stick to that for consistency.
+                    const auto p = record.values.insert({mappedVal->second, itv->value.GetString()});
+                    if (p.second) // TRUE if inserted
+                        addKey(mappedVal->second);
                 }
             }
             return true;
@@ -389,7 +393,7 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                         itm != item.MemberEnd() && itm->value.IsString())
                     {
                         const double mz = std::stod(itm->value.GetString());
-                        for (auto i=0; i<curRec.spectrum.mzs.size(); ++i)
+                        for (size_t i=0; i<curRec.spectrum.mzs.size(); ++i)
                         {
                             if (compareTol(mz, curRec.spectrum.mzs[i], 1E-6))
                             {
@@ -404,8 +408,8 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
             cit = d.FindMember("splash");
             if (cit != d.MemberEnd() && cit->value.IsObject())
             {
-                curRec.values["Splash"] = cit->value["splash"].GetString();
-                addKey("Splash");
+                curRec.values["SPLASH"] = cit->value["splash"].GetString();
+                addKey("SPLASH");
             }
             
             records.push_back(curRec);

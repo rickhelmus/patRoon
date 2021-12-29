@@ -12,6 +12,157 @@ makeDBIDsUnique <- function(records)
     return(records)
 }
 
+sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
+{
+    printf("Converting to tables\n")
+    lib$records <- as.data.table(lib$records)
+    # UNDONE: not for now, takes a lot of time for large amounts
+    # lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
+    # {
+    #     ret <- as.data.table(s)
+    #     doProgress()
+    #     return(ret)
+    # }))
+    
+    # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
+    for (j in seq_along(lib$records))
+        set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
+    
+    # Ensure case of column names used by patRoon are consistent
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "SPLASH")
+    numCols <- c("ExactMass", "PrecursorMZ")
+    allCols <- c(chCols, numCols)
+    change <- match(tolower(allCols), tolower(names(lib$records)), nomatch = integer())
+    setnames(lib$records, change, allCols)
+    
+    if (!all(c("Name", "DB_ID") %in% names(lib$records)))
+        stop("MSP file misses mandatory Name and/or DB# data.")
+    
+    lib$records <- makeDBIDsUnique(lib$records)
+    names(lib$spectra) <- lib$records$DB_ID
+    
+    # make sure columns at least exist, which makes future checks easier
+    for (col in allCols)
+    {
+        if (is.null(lib$records[[col]]))
+            lib$records[, (col) := if (col %in% chCols) NA_character_ else NA_real_]
+    }
+    
+    # cleanup character data: trim whitespace and convert empties to NA
+    lib$records[, (chCols) := lapply(.SD, function(x)
+    {
+        x <- trimws(x)
+        return(fifelse(nzchar(x), x, NA_character_))
+    }), .SDcols = chCols]
+    
+    # ensure mass data is numeric, but ignore conversion warnings
+    suppressWarnings({
+        lib$records[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols]
+        if (!is.null(lib$records[["MW"]]))
+            lib$records[, MW := as.numeric(MW)] # MW is not used by patRoon, but still make it numeric if present
+    })
+    
+    # UNDONE: this is quite slow, skip for now?
+    # printf("Sanitizing SMILES/InChI values... ")
+    # lib$records[!is.na(SMILES), SMILES := babelConvert(SMILES, "smi", "smi", FALSE)]
+    # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
+    # printf("Done!\n")
+    
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
+                                           fromFormats = "inchi", fromCols = "InChI")
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchi", destCol = "InChI",
+                                           fromFormats = "smi", fromCols = "SMILES")
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchikey", destCol = "InChIKey",
+                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "Formula",
+                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+    
+    # normalize polarity: ensure uppercase, sometimes shortened as P/N
+    lib$records[, Ion_mode := toupper("POSITIVE")]
+    lib$records[Ion_mode == "P", Ion_mode := "POSITIVE"]
+    lib$records[Ion_mode == "N", Ion_mode := "NEGATIVE"]
+    
+    # cleanup adducts: it's quite a mess in some DBs, for now convert a few common 'flavors'
+    adductMapping <- c("^M\\+H$" = "[M+H]+",
+                       "^\\(M\\+H\\)\\+$" = "[M+H]+",
+                       "^M\\-H$" = "[M-H]-",
+                       "^M\\+Na$" = "[M+Na]+",
+                       "^M\\+K$" = "[M+K]+",
+                       "^M\\+NH4$" = "[M+HN4]+",
+                       "^M\\+Cl$" = "[M+Cl]-", # UNDONE: MoNA records say POSITIVE...
+                       "^M\\+Na\\-2H$" = "[M+Na-2H]-",
+                       "^M\\+2Na$" = "[M+2Na]2+",
+                       "^M\\+$" = "[M]+",
+                       "^M\\-$" = "[M]-",
+                       "^M\\+H\\-H2O$" = "[M+H-H2O]+",
+                       "\\]\\+\\+$" = "\\]2+", # ++ --> 2+
+                       "\\]\\-\\-$" = "\\]2-", # -- --> 2-
+                       "\\]\\+\\*$" = "\\]\\+", # +* (radical) --> +
+                       "\\]\\-\\*$" = "\\]\\-", # -* (radical) --> -
+                       "[\\-\\+]{1}ACN" = "C2H3N", # ACN
+                       "[\\-\\+]{1}FA" = "CH2O2", # formic acid
+                       "[\\-\\+]{1}Hac" = "C2H4O2", # acetic acid
+                       "[\\-\\+]{1}DMSO" = "C2H6OS" # DMSO
+    )
+    for (i in seq_along(adductMapping))
+        lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
+    
+    # UNDONE: more checks (e.g. doesn't detect nonexistent elements)
+    printf("Verify/Standardize adducts\n")
+    lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
+    
+    if (!isFALSE(potAdducts))
+    {
+        printf("Guessing missing adducts\n")
+        # UNDONE: include lib adducts optionally
+        if (is.null(potAdducts))
+        {
+            potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,
+                                   lib$records$Precursor_type))
+            potAdducts <- potAdducts[!is.na(potAdducts)]
+        }
+        
+        potAdducts <- lapply(potAdducts, checkAndToAdduct, .var.name = "potAdducts")
+        potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
+        potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
+        lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
+                    Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+                    {
+                        pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
+                        calcMZs <- calculateMasses(em, pa, "mz", err = FALSE) # set err to FALSE to ignore invalid adducts
+                        wh <- which(numLTE(abs(calcMZs - pmz), absMzDev))
+                        doProgress()
+                        # NOTE: multiple hits are ignored (=NA)
+                        return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)
+                    }))]
+    }
+    
+    printf("Calculating missing precursor m/z values\n")
+    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_type),
+                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_type, FUN = function(em, pt)
+                {
+                    add <- tryCatch(as.adduct(pt), error = function(...) NULL)
+                    ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")
+                    doProgress()
+                    return(ret)
+                }))]
+    
+    if (calcSPLASH && any(is.na(lib$records$SPLASH)))
+    {
+        # UNDONE: this is rather slow... MassBank has SPLASH values, so not that important...
+        printf("Calculating missing SPLASH values\n")
+        checkPackage("splashR", "berlinguyinca/spectra-hash", "splashR")
+        lib$records[is.na(SPLASH), SPLASH := withProg(.N, FALSE, sapply(lib$spectra, function(sp)
+        {
+            doProgress()
+            splashR::getSplash(sp)
+        }))]
+    }
+    
+    return(lib)
+}
+
+
 #' @export
 MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
                       contains = "workflowStep")
@@ -145,147 +296,21 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     checkmate::reportAssertions(ac)
     
     lib <- readMSP(normalizePath(file), parseComments)
-    
-    printf("Converting to tables\n")
-    lib$records <- as.data.table(lib$records)
-    # UNDONE: not for now, takes a lot of time for large amounts
-    # lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
-    # {
-    #     ret <- as.data.table(s)
-    #     doProgress()
-    #     return(ret)
-    # }))
-    
-    # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
-    for (j in seq_along(lib$records))
-        set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
-    
-    # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "SPLASH")
-    numCols <- c("ExactMass", "PrecursorMZ", "MW")
-    allCols <- c(chCols, numCols)
-    change <- match(tolower(allCols), tolower(names(lib$records)), nomatch = integer())
-    setnames(lib$records, change, allCols)
-    
-    if (!all(c("Name", "DB_ID") %in% names(lib$records)))
-        stop("MSP file misses mandatory Name and/or DB# data.")
-    
-    lib$records <- makeDBIDsUnique(lib$records)
-    names(lib$spectra) <- lib$records$DB_ID
-    
-    # make sure columns at least exist, which makes future checks easier
-    for (col in allCols)
-    {
-        if (is.null(lib$records[[col]]))
-            lib$records[, (col) := if (col %in% chCols) NA_character_ else NA_real_]
-    }
-
-    # cleanup character data: trim whitespace and convert empties to NA
-    lib$records[, (chCols) := lapply(.SD, function(x)
-    {
-        x <- trimws(x)
-        return(fifelse(nzchar(x), x, NA_character_))
-    }), .SDcols = chCols]
-
-    # ensure mass data is numeric, but ignore conversion warnings
-    suppressWarnings(lib$records[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols])
-    
-    # UNDONE: this is quite slow, skip for now?
-    # printf("Sanitizing SMILES/InChI values... ")
-    # lib$records[!is.na(SMILES), SMILES := babelConvert(SMILES, "smi", "smi", FALSE)]
-    # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
-    # printf("Done!\n")
-    
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
-                                           fromFormats = "inchi", fromCols = "InChI")
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchi", destCol = "InChI",
-                                           fromFormats = "smi", fromCols = "SMILES")
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchikey", destCol = "InChIKey",
-                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "Formula",
-                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-    
-    # normalize polarity: ensure uppercase, sometimes shortened as P/N
-    lib$records[, Ion_mode := toupper("POSITIVE")]
-    lib$records[Ion_mode == "P", Ion_mode := "POSITIVE"]
-    lib$records[Ion_mode == "N", Ion_mode := "NEGATIVE"]
-    
-    # cleanup adducts: it's quite a mess in some DBs, for now convert a few common 'flavors'
-    adductMapping <- c("^M\\+H$" = "[M+H]+",
-                       "^\\(M\\+H\\)\\+$" = "[M+H]+",
-                       "^M\\-H$" = "[M-H]-",
-                       "^M\\+Na$" = "[M+Na]+",
-                       "^M\\+K$" = "[M+K]+",
-                       "^M\\+NH4$" = "[M+HN4]+",
-                       "^M\\+Cl$" = "[M+Cl]-", # UNDONE: MoNA records say POSITIVE...
-                       "^M\\+Na\\-2H$" = "[M+Na-2H]-",
-                       "^M\\+2Na$" = "[M+2Na]2+",
-                       "^M\\+$" = "[M]+",
-                       "^M\\-$" = "[M]-",
-                       "^M\\+H\\-H2O$" = "[M+H-H2O]+",
-                       "\\]\\+\\+$" = "\\]2+", # ++ --> 2+
-                       "\\]\\-\\-$" = "\\]2-", # -- --> 2-
-                       "\\]\\+\\*$" = "\\]\\+", # +* (radical) --> +
-                       "\\]\\-\\*$" = "\\]\\-", # -* (radical) --> -
-                       "[\\-\\+]{1}ACN" = "C2H3N", # ACN
-                       "[\\-\\+]{1}FA" = "CH2O2", # formic acid
-                       "[\\-\\+]{1}Hac" = "C2H4O2", # acetic acid
-                       "[\\-\\+]{1}DMSO" = "C2H6OS" # DMSO
-    )
-    for (i in seq_along(adductMapping))
-        lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
-
-    # UNDONE: more checks (e.g. doesn't detect nonexistent elements)
-    printf("Verify/Standardize adducts\n")
-    lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
-    
-    if (!isFALSE(potAdducts))
-    {
-        printf("Guessing missing adducts\n")
-        # UNDONE: include lib adducts optionally
-        if (is.null(potAdducts))
-        {
-            potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,
-                                   lib$records$Precursor_type))
-            potAdducts <- potAdducts[!is.na(potAdducts)]
-        }
-        
-        potAdducts <- lapply(potAdducts, checkAndToAdduct, .var.name = "potAdducts")
-        potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
-        potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
-        lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
-                    Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
-        {
-            pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
-            calcMZs <- calculateMasses(em, pa, "mz", err = FALSE) # set err to FALSE to ignore invalid adducts
-            wh <- which(numLTE(abs(calcMZs - pmz), absMzDev))
-            doProgress()
-            # NOTE: multiple hits are ignored (=NA)
-            return(if (length(wh) == 1) as.character(pa[[wh]]) else NA_character_)
-        }))]
-    }
-    
-    printf("Calculating missing precursor m/z values\n")
-    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_type),
-                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_type, FUN = function(em, pt)
-    {
-        add <- tryCatch(as.adduct(pt), error = function(...) NULL)
-        ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")
-        doProgress()
-        return(ret)
-    }))]
-    
-    if (calcSPLASH && any(is.na(lib$records$SPLASH)))
-    {
-        # UNDONE: this is rather slow... MassBank has SPLASH values, so not that important...
-        printf("Calculating missing SPLASH values\n")
-        checkPackage("splashR", "berlinguyinca/spectra-hash", "splashR")
-        lib$records[is.na(SPLASH), SPLASH := withProg(.N, FALSE, sapply(lib$spectra, function(sp)
-        {
-            doProgress()
-            splashR::getSplash(sp)
-        }))]
-    }
+    lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
     
     return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
+}
+
+loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(file, "r", add = ac)
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFlag(calcSPLASH, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    lib <- readMoNAJSON(normalizePath(file))
+    lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
+    
+    return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "json"))
 }

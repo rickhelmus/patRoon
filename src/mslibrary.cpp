@@ -163,6 +163,8 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                 {
                     if (key == "DB#")
                         key = "DB_ID"; // rename for R name compat
+                    else if (key == "Synon" && val == "$:00in-source")
+                        continue; // Skip these weird markers
                     
                     addKey(key);
                     

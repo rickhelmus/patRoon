@@ -29,18 +29,20 @@ unifyLibNames <- function(cTab)
 
 #' @export
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
-                                                                absMzDev = 0.002, adduct = NULL, checkIons = "adduct",
+                                                                minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
+                                                                checkIons = "adduct",
                                                                 specSimParams = getDefSpecSimParams())
 {
     # UNDONE: cache
     # UNDONE: show mirror spectrum in report? Would need library data somehow
     # UNDONE: don't normalize scores (or already not done?)
     # UNDONE: separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
+    # UNDONE: work with IK1?
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
-    aapply(checkmate::assertNumber, . ~ minSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
@@ -58,6 +60,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     annTbl <- annotations(fGroups)
     libRecs <- records(MSLibrary)
     libSpecs <- spectra(MSLibrary)
+    libAnn <- annotations(MSLibrary)
     
     # UNDONE: ms level? or just a filter?
     # UNDONE: support entries without SMILES/InChI(keys)/Formulas?
@@ -116,7 +119,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 
         cTab <- unifyLibNames(cTab)
         cTab[, InChIKey1 := getIKBlock1(InChIKey)]
-        lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, f = function(sp, pmz)
+        lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, cTab$identifier, f = function(sp, pmz, lid)
         {
             # convert to MSPeakLists format
             ret <- as.data.table(sp)
@@ -124,6 +127,11 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             ret <- assignPrecursorToMSPeakList(ret, pmz)
             ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParams$removePrecursor,
                                         relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
+            
+            # add annotations, if any
+            if (!is.null(libAnn[[lid]]) && length(libAnn[[lid]]) > 0) # UNDONE: prune empty annotations while loading the library?
+                ret[, annotation := libAnn[[lid]][ID]]
+            
             return(ret)
         })
         lspecs <- pruneList(lspecs, checkZeroRows = TRUE)
@@ -136,6 +144,8 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         cTab[, score := sims[1, ]]
         
+        cTabAnn <- cTab[numGTE(score, minAnnSim)] # store before filtering/de-duplicating
+        
         cTab <- cTab[numGTE(score, minSim)]
         
         setorderv(cTab, "score", -1)
@@ -145,7 +155,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 
         # fill in fragInfos
         # UNDONE: support libraries with annotations
-        cTab[, fragInfo := list(lapply(lspecs[identifier], function(ls)
+        cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey, f = function(ls, ik)
         {
             bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
             bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
@@ -155,6 +165,45 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             
             fi[, c("ion_formula", "neutral_loss") := NA_character_]
             setorderv(fi, "PLID")
+            
+            if (length(libAnn) > 0)
+            {
+                cta <- cTabAnn[InChIKey == ik]
+                specMatched <- spec[ID %in% fi$PLID] # get peak list with only matched peaks, we need it for binning
+                ann <- rbindlist(lapply(lspecs[cta$identifier], function(lsp)
+                {
+                    if (is.null(lsp[["annotation"]]))
+                        return(NULL)
+                    
+                    # UNDONE: also check formula validity
+                    lsp <- lsp[nzchar(annotation)]
+                    
+                    if (nrow(lsp) == 0)
+                        return(NULL)
+                    
+                    # find overlapping peaks
+                    bsp2 <- as.data.table(binSpectra(specMatched, lsp, "none", 0, specSimParams$absMzDev))
+                    bsp2 <- bsp2[intensity_1 != 0 & intensity_2 != 0] # overlap
+                    
+                    if (nrow(bsp2) == 0)
+                        return(NULL)
+
+                    return(data.table(ID = bsp2$ID_1, annotation = lsp[match(bsp2$ID_2, ID)]$annotation))
+                }))
+                
+                if (nrow(ann) > 0)
+                {
+                    # resolve conflicts in annotation: keep most abundant
+                    ann[, count := .N, by = c("ID", "annotation")]
+                    setorderv(ann, c("ID", "count"), order = c(1, -1))
+                    #if (anyDuplicated(ann$ID)) browser()
+                    annTest <- unique(ann, by = c("ID", "annotation"))
+                    if (anyDuplicated(annTest$ID))
+                        browser()
+                    ann <- unique(ann, by = "ID")
+                }
+            }
+            
             return(fi)
         }))]
         

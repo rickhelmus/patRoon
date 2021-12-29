@@ -316,11 +316,36 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                 getString(cit->value[0], "inchi", curRec, "InChI");
                 getString(cit->value[0], "inchiKey", curRec, "InChIKey");
                 
-                rapidjson::Value::ConstMemberIterator mit = cit->value[0].FindMember("metaData");
-                if (mit != cit->value[0].MemberEnd() && mit->value.IsArray())
+                rapidjson::Value::ConstMemberIterator cit2 = cit->value[0].FindMember("metaData");
+                if (cit2 != cit->value[0].MemberEnd() && cit2->value.IsArray())
                 {
-                    for (auto &item : mit->value.GetArray())
+                    for (auto &item : cit2->value.GetArray())
                         getStringMD(item, curRec, JSONCompMDMapping);
+                }
+                
+                cit2 = cit->value[0].FindMember("names");
+                if (cit2 != cit->value[0].MemberEnd() && cit2->value.IsArray())
+                {
+                    for (auto &item : cit2->value.GetArray())
+                    {
+                        rapidjson::Value::ConstMemberIterator itn = item.FindMember("name");
+                        if (itn != item.MemberEnd() && itn->value.IsString())
+                        {
+                            const std::string n = itn->value.GetString();
+                            auto p = curRec.values.insert({"Name", n});
+                            if (!p.second) // NOT inserted, i.e. already present?
+                            {
+                                // Try the same for Synon, paste if already present
+                                p = curRec.values.insert({"Synon", n});
+                                if (!p.second)
+                                    curRec.values["Synon"] = p.first->second + ";" + n;
+                                else
+                                    addKey("Synon");
+                            }
+                            else
+                                addKey("Name");
+                        }
+                    }
                 }
             }
             
@@ -372,6 +397,13 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                         }
                     }
                 }
+            }
+            
+            cit = d.FindMember("splash");
+            if (cit != d.MemberEnd() && cit->value.IsObject())
+            {
+                curRec.values["Splash"] = cit->value["splash"].GetString();
+                addKey("Splash");
             }
             
             records.push_back(curRec);

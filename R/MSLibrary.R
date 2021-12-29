@@ -164,7 +164,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
 
 
 #' @export
-MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
+MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list", annotations = "list"),
                       contains = "workflowStep")
 
 #' @export
@@ -172,6 +172,9 @@ setMethod("records", "MSLibrary", function(obj) obj@records)
 
 #' @export
 setMethod("spectra", "MSLibrary", function(obj) obj@spectra)
+
+#' @export
+setMethod("annotations", "MSLibrary", function(obj) obj@annotations)
 
 #' @export
 setMethod("length", "MSLibrary", function(x) nrow(records(x)))
@@ -312,5 +315,5 @@ loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcS
     lib <- readMoNAJSON(normalizePath(file))
     lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
     
-    return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "json"))
+    return(MSLibrary(records = lib$records[], spectra = lib$spectra, annotations = lib$annotations, algorithm = "json"))
 }

@@ -133,12 +133,11 @@ LinkingTo:
 RdMacros:
     Rdpack
 Collate: 
+    'RcppExports.R'
     'generics.R'
     'cache.R'
     'main.R'
     'workflow-step.R'
-    'MSLibrary.R'
-    'RcppExports.R'
     'TP.R'
     'TP-structure.R'
     'TP-CTS.R'
@@ -179,6 +178,7 @@ Collate:
     'feature_groups-screening-set.R'
     'components-tps.R'
     'compounds-cluster.R'
+    'MSLibrary.R'
     'compounds-library.R'
     'compounds-metfrag.R'
     'utils-feat_annotations-set.R'
@@ -226,6 +226,7 @@ Collate:
     'formulas-genform.R'
     'formulas-set.R'
     'formulas-sirius.R'
+    'mslibrary.R'
     'mspeaklists-bruker.R'
     'utils-mzr.R'
     'mspeaklists-mzr.R'

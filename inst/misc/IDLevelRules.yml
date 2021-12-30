@@ -2,14 +2,20 @@
     suspectFragments: 3
     retention: 12
 2a:
-    individualMoNAScore:
-        min: 0.9
-        higherThanNext: .inf
+    or:
+        - individualMoNAScore:
+            min: 0.9
+            higherThanNext: .inf
+        - libMatch:
+            min: 0.9
+            higherThanNext: .inf
     rank:
         max: 1
         type: compound
 3a:
-    individualMoNAScore: 0.4
+    or:
+        - individualMoNAScore: 0.4
+        - libMatch: 0.4
 3b:
     suspectFragments: 3
 3c:

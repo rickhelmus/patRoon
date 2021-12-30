@@ -44,14 +44,16 @@
     - caching
     - show mirror spectrum in report? Would need library data somehow
     - don't normalize scores (or already not done?)
-    - add libScore
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
     - work with IK1?
-    - update ID level estimation (add libScore?)
     - pre-filter library with e.g. MS level? or just keep it to filter() for MSLibrary?
     - support entries without SMILES/InChI(keys)/Formulas?
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
     - make collapsing candidates optional and specify on which column to collapse
+- suspects
+    - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
+
+
 
 
 ## Tests

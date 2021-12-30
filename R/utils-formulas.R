@@ -124,10 +124,25 @@ simplifyFormula <- function(formula) sortFormula(formula)
 # (authors: Emma Schymanski / Steffen Neumann). See https://github.com/schymane/ReSOLUTION/
 subscriptFormula <- function(formulas, over = NULL, formulas2 = NULL, parse = TRUE)
 {
-    exprs <- sub("\\*$", "", gsub("([[:digit:]-]+)", "[\\1]*", formulas))
+    doSuperSub <- function(f)
+    {
+        # superscript isotopes
+        f <- sub("\\*$", "", gsub("\\[([[:digit:]-]+)\\]", "^\\1*", f))
+        
+        # subscript element counts
+        f <- sub("\\*$", "", gsub("([[:alpha:]]+)([[:digit:]-]+)", "\\1[\\2]*", f))
+        
+        # HACK: for isotopes specified directly after separated chunk (*) we need to add empty character ('') as it
+        # seems we cannot start with superscripted text
+        f <- gsub("\\*\\^", "*''^", f)
+        return(f)
+    }
+    
+    exprs <- doSuperSub(formulas)
+    
     if (!is.null(formulas2))
     {
-        exprs2 <- sub("\\*$", "", gsub("([[:digit:]-]+)", "[\\1]*", formulas2))
+        exprs2 <- doSuperSub(formulas2)
         exprs <- paste0(exprs, "*'/'*", exprs2)
     }
     
@@ -141,7 +156,16 @@ subscriptFormula <- function(formulas, over = NULL, formulas2 = NULL, parse = TR
 }
 
 # as above, but for HTML
-subscriptFormulaHTML <- function(formulas) gsub("([[:digit:]-]+)", "<sub>\\1</sub>", formulas)
+subscriptFormulaHTML <- function(formulas)
+{
+    # isotopes
+    ret <- gsub("\\[([[:digit:]-]+)\\]", "<sup>\\1</sup>", formulas)
+    
+    # element counts
+    ret <- gsub("([[:alpha:]]+)([[:digit:]-]+)", "\\1<sub>\\2</sub>", ret)
+    
+    return(ret)
+}
 
 averageFormulas <- function(formulas)
 {

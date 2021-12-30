@@ -33,12 +33,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                                                                 checkIons = "adduct",
                                                                 specSimParams = getDefSpecSimParams())
 {
-    # UNDONE: cache
-    # UNDONE: show mirror spectrum in report? Would need library data somehow
-    # UNDONE: don't normalize scores (or already not done?)
-    # UNDONE: separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
-    # UNDONE: work with IK1?
-
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
@@ -62,8 +56,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     libSpecs <- spectra(MSLibrary)
     libAnn <- annotations(MSLibrary)
     
-    # UNDONE: ms level? or just a filter?
-    # UNDONE: support entries without SMILES/InChI(keys)/Formulas?
     libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(Formula)]
     if (checkIons == "adduct")
         libRecs <- libRecs[!is.na(Precursor_type)]
@@ -129,14 +121,14 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                                         relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
             
             # add annotations, if any
-            if (!is.null(libAnn[[lid]]) && length(libAnn[[lid]]) > 0) # UNDONE: prune empty annotations while loading the library?
+            if (!is.null(libAnn[[lid]]) && length(libAnn[[lid]]) > 0)
                 ret[, annotation := libAnn[[lid]][ID]]
             
             return(ret)
         })
         lspecs <- pruneList(lspecs, checkZeroRows = TRUE)
         cTab <- cTab[identifier %in% names(lspecs)]
-        if (nrow(cTab) == 0) # UNDONE: allow results without annotations (i.e. like MF)? Would interfere with min sim score though
+        if (nrow(cTab) == 0)
             return(NULL)
         
         sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
@@ -155,11 +147,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         setorderv(cTab, "score", -1)
         
-        # UNDONE: make optional and specify on which column to collapse
         cTab <- unique(cTab, by = "InChIKey") # NOTE: prior sorting ensure top ranked stays
 
         # fill in fragInfos
-        # UNDONE: support libraries with annotations
         cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey, neutral_formula, f = function(ls, ik, form)
         {
             bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
@@ -181,7 +171,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                         return(NULL)
                     
                     # fixup annotations
-                    # UNDONE: do this while loading the library?
                     lsp <- copy(lsp)
                     lsp[, annotation := trimws(annotation)]
                     lsp[, annotation := sub("\\+|\\-$", "", annotation)] # remove any trailing charge

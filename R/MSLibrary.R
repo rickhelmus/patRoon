@@ -112,14 +112,13 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     for (i in seq_along(adductMapping))
         lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
     
-    # UNDONE: more checks (e.g. doesn't detect nonexistent elements)
     printf("Verify/Standardize adducts\n")
     lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
     
     if (!isFALSE(potAdducts))
     {
         printf("Guessing missing adducts\n")
-        # UNDONE: include lib adducts optionally
+        
         if (is.null(potAdducts))
         {
             potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,

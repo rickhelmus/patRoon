@@ -1,6 +1,5 @@
 # Priority
 
-
 ## Features
 
 - Normalization
@@ -23,6 +22,36 @@
     - selector for CTS transLibrary?
 - plotGraph()
     - keep duplicate selector?
+
+
+## MS library
+
+- library
+    - fixup annotation formulas too?
+    - prune empty annotations while loading the library? If yes, remove checks in generateCompoundsLibrary()
+    - Always sanitize SMILES/InChIs/Formulas? Or make it optional and default enabled? Now only formulas are done...
+    - also verify formulas of adducts?
+    - include lib adducts optionally for adduct guessing
+    - convertToSuspects(): also include MS/MS fragments?
+    - don't merge synonyms? or split them somehow on export? Otherwise doc
+    - filter() method
+        - only with annotations
+        - spectral filters: min peaks, min intensity, top X peaks
+        - generic filter for all record columns, such as instrument type, spectrum type etc
+    - naming OK ('records')?
+- compounds
+    - sets support
+    - caching
+    - show mirror spectrum in report? Would need library data somehow
+    - don't normalize scores (or already not done?)
+    - add libScore
+    - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
+    - work with IK1?
+    - update ID level estimation (add libScore?)
+    - pre-filter library with e.g. MS level? or just keep it to filter() for MSLibrary?
+    - support entries without SMILES/InChI(keys)/Formulas?
+    - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
+    - make collapsing candidates optional and specify on which column to collapse
 
 
 ## Tests

@@ -178,7 +178,6 @@ Collate:
     'feature_groups-screening-set.R'
     'components-tps.R'
     'compounds-cluster.R'
-    'MSLibrary.R'
     'compounds-library.R'
     'compounds-metfrag.R'
     'utils-feat_annotations-set.R'

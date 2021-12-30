@@ -134,7 +134,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
                              0, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
         
-        cTab[, score := sims[1, ]]
+        cTab[, c("score", "libMatch") := sims[1, ]]
         
         if (length(libAnn) > 0)
         {
@@ -221,7 +221,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     
     return(compounds(groupAnnotations = compList, scoreTypes = "score",
-                     scoreRanges = sapply(compList, function(ct) list(score = range(ct$score)), simplify = FALSE),
+                     scoreRanges = sapply(compList, function(ct) list(score = range(ct$score), libMatch = range(ct$libMatch)), simplify = FALSE),
                      algorithm = "library"))
 })
 

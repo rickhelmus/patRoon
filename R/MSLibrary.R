@@ -68,6 +68,11 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
     # printf("Done!\n")
     
+    printf("Clean up formulas...\n")
+    lib$records[!is.na(Formula), Formula := gsub("\\[|\\]|\\+|\\-", "", Formula)] # remove ion species format ([formula]+/-)
+    printf("Clearing invalid formulas...\n")
+    lib$records[!verifyFormulas(Formula), Formula := NA_character_]
+    
     lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
                                            fromFormats = "inchi", fromCols = "InChI")
     lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchi", destCol = "InChI",

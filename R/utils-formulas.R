@@ -8,8 +8,8 @@ splitFormulaToList <- memoise(function(formula)
         
     # NOTE: dash ('-') added to [:digit:] to allow minus sign (which MF manages to report once in a while...)
     
-    # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
-    spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]-]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]-]*", formula)))
+    # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "[13]C2" }
+    spltform <- unlist(regmatches(formula, gregexpr("(\\[[[:digit:]]+\\])?[[:upper:]]{1}[[:lower:]]?[[:digit:]-]*", formula)))
     
     # add '1' to pairs without a count, e.g. "Br" --> "Br1"
     reglist <- regexpr("[[:digit:]-]+$", spltform)

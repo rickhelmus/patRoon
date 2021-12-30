@@ -225,13 +225,13 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                      algorithm = "library"))
 })
 
-if (F) {
 #' @rdname compound-generation
 #' @export
-setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
+                                                                   minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
                                                                   ..., setThreshold = 0, setThresholdAnn = 0)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsLibrary, MSLibrary = MSLibrary, minSim = minSim,
+                         minAnnSim = minAnnSim, absMzDev = absMzDev, ..., setThreshold = setThreshold,
+                         setThresholdAnn = setThresholdAnn)
 })
-}

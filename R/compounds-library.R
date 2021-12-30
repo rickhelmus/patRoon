@@ -86,7 +86,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     else
         allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
     
-    printf("Processing %d feature groups...\n", gCount)
+    printf("Processing %d feature groups with a library of %d records...\n", gCount, nrow(libRecs))
     
     compList <- withProg(length(fGroups), FALSE, sapply(names(fGroups), function(grp)
     {
@@ -144,7 +144,12 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         cTab[, score := sims[1, ]]
         
-        cTabAnn <- cTab[numGTE(score, minAnnSim)] # store before filtering/de-duplicating
+        if (length(libAnn) > 0)
+        {
+            cTabAnn <- cTab[numGTE(score, minAnnSim)] # store before filtering/de-duplicating
+            # needed below for neutral loss calculation
+            thisAdduct <- if (!is.null(adduct)) adduct else as.adduct(annTbl[group == grp]$adduct)
+        }
         
         cTab <- cTab[numGTE(score, minSim)]
         
@@ -155,7 +160,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 
         # fill in fragInfos
         # UNDONE: support libraries with annotations
-        cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey, f = function(ls, ik)
+        cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey, neutral_formula, f = function(ls, ik, form)
         {
             bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
             bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
@@ -196,11 +201,12 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                     # resolve conflicts in annotation: keep most abundant
                     ann[, count := .N, by = c("ID", "annotation")]
                     setorderv(ann, c("ID", "count"), order = c(1, -1))
-                    #if (anyDuplicated(ann$ID)) browser()
-                    annTest <- unique(ann, by = c("ID", "annotation"))
-                    if (anyDuplicated(annTest$ID))
-                        browser()
                     ann <- unique(ann, by = "ID")
+                    
+                    fi[match(ann$ID, PLID), ion_formula := ann$annotation]
+                    fi[!is.na(ion_formula), ion_formula := sub("\\+|\\-$", "", ion_formula)] # remove any trailing charge
+                    ionform <- calculateIonFormula(form, thisAdduct)
+                    fi[!is.na(ion_formula), neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
                 }
             }
             

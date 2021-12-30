@@ -103,7 +103,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         if (is.null(adduct))
         {
             addChr <- annTbl[group == grp]$adduct
-            libRecs <- getRecsForAdduct(libRecs, allAdducts[addChr], addChr)
+            libRecs <- getRecsForAdduct(libRecs, allAdducts[[addChr]], addChr)
         }
         
         if (nrow(cTab) == 0)

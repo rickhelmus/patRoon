@@ -43,7 +43,6 @@
     - sets support
     - caching
     - show mirror spectrum in report? Would need library data somehow
-    - don't normalize scores (or already not done?)
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
     - work with IK1?
     - pre-filter library with e.g. MS level? or just keep it to filter() for MSLibrary?

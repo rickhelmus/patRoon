@@ -220,7 +220,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(compList, nrow))),
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     
-    return(compounds(groupAnnotations = compList, scoreTypes = "score",
+    return(compounds(groupAnnotations = compList, scoreTypes = c("score", "libMatch"),
                      scoreRanges = sapply(compList, function(ct) list(score = range(ct$score), libMatch = range(ct$libMatch)), simplify = FALSE),
                      algorithm = "library"))
 })

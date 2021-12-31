@@ -24,6 +24,11 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     #     return(ret)
     # }))
     
+    lib$spectra <- pruneList(lib$spectra, checkEmptyElements = TRUE)
+    lib$annotations <- pruneList(lib$annotations, checkEmptyElements = TRUE)
+    lib$annotations <- lib$annotations[names(lib$annotations) %chin% names(lib$spectra)]
+    lib$records <- lib$records[DB_ID %chin% names(lib$spectra)]
+    
     # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
     for (j in seq_along(lib$records))
         set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
@@ -171,6 +176,13 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
 MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list", annotations = "list"),
                       contains = "workflowStep")
 
+setMethod("initialize", "MSLibrary", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    .Object@annotations <- makeEmptyListNamed(.Object@annotations)
+    return(.Object)
+})
+
 #' @export
 setMethod("records", "MSLibrary", function(obj) obj@records)
 
@@ -201,10 +213,8 @@ setMethod("[", c("MSLibrary", "ANY", "missing", "missing"), function(x, i, ...)
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, names(x))
-        x@records <- x@records[DB_ID %in% i]
-        x@spectra <- x@spectra[i]
+        x <- delete(x, setdiff(names(x), i))
     }
-    
     return(x)
 })
 
@@ -226,6 +236,157 @@ setMethod("as.data.table", "MSLibrary", function(x)
 {
     allSpecs <- rbindlist(spectra(x), idcol = "DB_ID")
     return(merge(records(x), allSpecs, by = "DB_ID"))
+})
+
+#' @export
+setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
+{
+    if (!is.function(i))
+        i <- assertDeleteArgAndToChr(i, names(obj))
+    checkmate::assert(
+        checkmate::checkFunction(j, null.ok = TRUE),
+        checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
+        .var.name = "j"
+    )
+    if (is.function(i) && is.function(j))
+        stop("i and j cannot both be functions")
+
+    if (length(i) == 0 || (!is.null(j) && length(j) == 0))
+        return(obj) # nothing to remove...
+    
+    # i = vector remove specified records
+    # i = function: remove returned records
+    # j = vector/function: index of peaks to remove from spectra of i (all if i=NULL)
+    
+    if (is.null(j))
+    {
+        if (!is.function(i))
+            obj@records <- obj@records[!DB_ID %chin% i]
+        else
+        {
+            rm <- i(obj@records, ...)
+            if (is.logical(rm))
+                obj@records <- obj@records[!rm]
+            else if (is.character(rm))
+                obj@records <- obj@records[!rm %chin% DB_ID]
+            else
+                obj@records <- obj@records[setdiff(seq_len(nrow(obj@records)), rm)]
+        }
+        
+        obj@spectra <- obj@spectra[obj@records$DB_ID]
+        if (length(obj@annotations) > 0)
+            obj@annotations <- obj@annotations[names(obj@annotations) %chin% obj@records$DB_ID]
+    }
+    else
+    {
+        for (rec in i)
+        {
+            if (is.function(j))
+            {
+                inds <- j(rec, obj@spectra[[rec]], obj@annotations[[rec]])
+                if (is.logical(inds))
+                    inds <- which(inds)
+            }
+            else # j = vector
+                inds <- j[j <= nrow(obj@spectra)]
+            if (length(inds) > 0)
+            {
+                obj@spectra[[rec]] <- obj@spectra[[rec]][-inds, , drop = FALSE]
+                if (!is.null(obj@annotations[[rec]]))
+                    obj@annotations[[rec]] <- obj@annotations[[rec]][-inds]
+            }
+        }
+        obj@spectra <- pruneList(obj@spectra, checkEmptyElements = TRUE)
+        obj@annotations <- pruneList(obj@annotations, checkEmptyElements = TRUE)
+        obj@records <- obj@records[DB_ID %chin% names(obj@spectra)]
+    }
+    
+    return(obj)
+})
+
+#' @export
+setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NULL, mzRangeSpec = NULL,
+                                          relMinIntensity = NULL, topMost = NULL, onlyAnnotated = FALSE,
+                                          negate = FALSE)
+{
+    
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(properties, any.missing = FALSE, null.ok = TRUE, add = ac)
+    if (!is.null(properties))
+    {
+        checkmate::assertNames(names(properties), type = "unique", subset.of = names(records(obj)), add = add)
+        checkmate::qassertr(properties, "V")
+    }
+    aapply(assertRange, . ~ massRange + mzRangeSpec, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(relMinIntensity, null.ok = TRUE, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(onlyAnnotated, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    mark <- if (negate) function(x) !x else function(x) x
+
+    if (onlyAnnotated)
+    {
+        if (negate)
+            obj <- delete(obj, i = intersect(names(obj), names(annotations(obj))))
+        else
+            obj <- delete(obj, i = setdiff(names(obj), names(annotations(obj))))
+    }
+    
+    if (!is.null(properties) || !is.null(massRange))
+    {
+        obj <- delete(obj, i = function(recs, ...)
+        {
+            recs <- copy(recs)
+            recs[, keep := TRUE]
+            
+            if (!is.null(properties) && length(properties) > 0)
+            {
+                for (prop in names(properties))
+                    recs[keep == TRUE, keep := mark(get(prop) %in% properties[[prop]])]
+            }
+            
+            if (!is.null(massRange))
+                recs[keep == TRUE, keep := !is.na(ExactMass) & mark(ExactMass %inrange% massRange)]
+            
+            return(!recs$keep)
+        })
+    }
+    if (!is.null(mzRangeSpec) || !is.null(relMinIntensity))
+    {
+        obj <- delete(obj, j = function(rec, spec, ...)
+        {
+            keep <- rep(TRUE, nrow(spec))
+            if (!is.null(mzRangeSpec))
+                keep <- mark(spec[, "mz"] %inrange% mzRangeSpec)
+            if (!is.null(relMinIntensity))
+            {
+                relInts <- spec[, "intensity"] / max(spec[, "intensity"])
+                keep <- keep & mark(numGTE(relInts, relMinIntensity))
+            }
+            return(!keep)
+        })
+    }
+    if (!is.null(topMost)) # NOTE: do after previous filters
+    {
+        if (!is.null(mzRangeSpec) || !is.null(relMinIntensity) || !is.null(topMost))
+        obj <- delete(obj, j = function(rec, spec, ...)
+        {
+            err <- tryCatch(rep(TRUE, nrow(spec)), error=function(...) NULL)
+            if (is.null(err)) browser()
+            keep <- rep(TRUE, nrow(spec))
+            if (nrow(spec) > topMost)
+            {
+                ord <- order(spec[, "intensity"], decreasing = !negate)
+                keep <- seq_len(nrow(spec)) %in% ord[seq_len(topMost)] # NOTE: keep order
+            }
+            return(!keep)
+        })
+    }
+    
+    return(obj)
 })
 
 #' @export

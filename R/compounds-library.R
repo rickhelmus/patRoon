@@ -121,7 +121,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                                         relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
             
             # add annotations, if any
-            if (!is.null(libAnn[[lid]]) && length(libAnn[[lid]]) > 0)
+            if (!is.null(libAnn[[lid]]))
                 ret[, annotation := libAnn[[lid]][ID]]
             
             return(ret)
@@ -197,7 +197,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                     ann <- unique(ann, by = "ID")
                     
                     fi[match(ann$ID, PLID), ion_formula := ann$annotation]
-                    fi[!is.na(ion_formula), ion_formula := sub("\\+|\\-$", "", ion_formula)] # remove any trailing charge
                     ionform <- calculateIonFormula(form, thisAdduct)
                     fi[!is.na(ion_formula), neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
                 }

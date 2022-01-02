@@ -390,12 +390,39 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 })
 
 #' @export
-setMethod("convertToSuspects", "MSLibrary", function(obj)
+setMethod("convertToSuspects", "MSLibrary", function(obj, avgSpecParams = getDefAvgPListParams())
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAvgPListParams(avgSpecParams, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    avgSpecParams$minIntensityPre <- avgSpecParams$minIntensityPost <- 0 # UNDONE
+    
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
     
     ret <- copy(records(obj))
+    libSpecs <- spectra(obj)
+    
+    ret[, InChIKey1 := getIKBlock1(InChIKey)]
+    
+    printf("Calculating MS/MS fragments...\n")
+    withProg(uniqueN(ret$InChIKey1), FALSE, ret[!is.na(InChIKey1) & !is.na(PrecursorMZ), fragments_mz := {
+        pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
+        {
+            sp <- as.data.table(sp)
+            sp <- assignPrecursorToMSPeakList(sp, pmz)
+            return(sp)
+        })
+        
+        avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
+                                avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
+                                avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
+        doProgress()
+        paste0(avgPL$mz, collapse = ";")
+    }, by = "InChIKey1"])
+    
+    ret <- unique(ret, by = "InChIKey1")
     
     mapCols <- c(Name = "name",
                  SMILES = "SMILES",
@@ -403,10 +430,10 @@ setMethod("convertToSuspects", "MSLibrary", function(obj)
                  InChIKey = "InChIKey",
                  Formula = "formula",
                  Precursor_type = "adduct",
-                 ExactMass = "neutralMass")
+                 ExactMass = "neutralMass",
+                 fragments_mz = "fragments_mz")
     mapCols <- mapCols[names(mapCols) %in% names(ret)]
     setnames(ret, names(mapCols), mapCols)
-    ret <- unique(ret, by = "InChIKey")
     ret <- ret[, mapCols, with = FALSE]
     ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
     

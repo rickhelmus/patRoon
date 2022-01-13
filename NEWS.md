@@ -4,6 +4,7 @@
 - Fixed: Default optimization range for KPIC2 `min_width` was incorrect (PR #31, thanks to @@coltonlloyd)
 - `installPatRoon()` improvements in determining what is already installed
 - Fixed: Group qualities/scores were not transferred to new `featureGroups` objects after calling `screenSuspects()` or `unset()`
+- Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34)
 
 
 # patRoon 2.0

@@ -63,7 +63,7 @@ filterMSFileDirs <- function(files, from)
     {
         fExt <- tools::file_ext(file)
         
-        fromExts <- pruneList(lapply(allFromExts, function(f) f[f %in% fExt]), checkEmptyElements = TRUE)
+        fromExts <- pruneList(lapply(allFromExts, function(f) f[tolower(f) %in% tolower(fExt)]), checkEmptyElements = TRUE)
         if (length(fromExts) == 0)
             return(FALSE)
         

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-12-24" />
+<meta name="date" content="2022-01-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -439,8 +439,8 @@ div.csl-indent {
 <div id="prioritization-workflow" class="section level3" number="5.3.1">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow</h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-529543b37f7083f789d8" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-529543b37f7083f789d8">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6d26f4521ddd37d7ebad" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6d26f4521ddd37d7ebad">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="subset.html#cb83-1" aria-hidden="true" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>)</span>

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-12-24" />
+<meta name="date" content="2022-01-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -357,8 +357,8 @@ div.csl-indent {
 <span id="cb149-8"><a href="advanced.html#cb149-8" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
 <span id="cb149-9"><a href="advanced.html#cb149-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span></code></pre></div>
 <p>Visually, this workflow looks like this:</p>
-<div id="htmlwidget-c1b95f78c168c67b0a76" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c1b95f78c168c67b0a76">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6328845298c60c4456e2" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6328845298c60c4456e2">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Of course, any other processing steps on the feature groups data such as subsetting and <a href="intReview.html#intReview">visually checking features</a> are also possible before the sets workflow is initiated. Furthermore, it is also possible to perform <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> prior to grouping, which is an alternative way to improve neutralization to what <a href="setsAdducts.html#setsAdducts">was discussed before</a>.</p>
 </div>
 <div id="inspecting-and-converting-set-objects" class="section level3" number="6.5.2">

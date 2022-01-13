@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-12-24" />
+<meta name="date" content="2022-01-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -331,8 +331,8 @@ div.csl-indent {
 <h2><span class="header-section-number">6.3</span> Selecting adducts to improve grouping</h2>
 <p>The <code>selectIons()</code> and <code>adduct()</code> functions <a href="incorpAdductIso.html#incorpAdductIso">discussed before</a> can also improve sets workflows. This is because the adduct annotations can be used to improve feature neutralization, which in turn will improve grouping features between positive and negative ionization data. Once adduct annotations are set the features will be re-neutralized and re-grouped.</p>
 <p>A typical workflow with <code>selectIons</code> looks like this:</p>
-<div id="htmlwidget-fc0b0fc6964d12bfbe2d" style="width:250px;height:350px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-fc0b0fc6964d12bfbe2d">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-76f933185e4d05f606c1" style="width:250px;height:350px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-76f933185e4d05f606c1">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="setsAdducts.html#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="co"># as before ...</span></span>
 <span id="cb141-2"><a href="setsAdducts.html#cb141-2" aria-hidden="true" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
 <span id="cb141-3"><a href="setsAdducts.html#cb141-3" aria-hidden="true" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>

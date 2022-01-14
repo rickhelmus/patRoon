@@ -36,8 +36,6 @@ navbar:
       menu:
       - text: Book format
         href: handbook_bd/index.html
-      - text: Single page
-        href: articles/handbook.html
       - text: PDF
         href: handbook_bd/handbook.pdf
     news:

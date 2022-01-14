@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-13" />
+<meta name="date" content="2022-01-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -363,7 +363,7 @@ div.csl-indent {
 <p>In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and <code>onlyMonoIso=TRUE</code>, the feature group will not be removed.</p>
 <p>Although <code>selectIons</code> operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the <code>checkComponents</code> function <a href="intReview.html#intReview">discussed here</a>. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.</p>
 <p>An example usage is shown below.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="incorpAdductIso.html#cb24-1" aria-hidden="true" tabindex="-1"></a>fGroupsSel <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, componCAM, <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="incorpAdductIso.html#cb25-1" aria-hidden="true" tabindex="-1"></a>fGroupsSel <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, componCAM, <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; No isotope annotations available!
 #&gt; Removed 21 feature groups detected as unwanted adducts/isotopes
 #&gt; Annotated 13 feature groups with adducts
@@ -373,13 +373,13 @@ div.csl-indent {
 <h3><span class="header-section-number">4.4.2</span> Setting adduct annotations for feature groups</h3>
 <p>The <code>adducts()</code> function can be used to obtain a character vector with adduct annotations for each feature group. When no adduct annotations are available it will simply return an empty character vector.</p>
 <p>When the <code>selectIons</code> function is used it will automatically add adduct annotations based on the componentization data. In addition, the <code>adducts()&lt;-</code> function can be used to manually add or change adduct annotations.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="incorpAdductIso.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroups) <span class="co"># no adduct annotations</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="incorpAdductIso.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroups) <span class="co"># no adduct annotations</span></span></code></pre></div>
 <pre><code>#&gt; character(0)</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="incorpAdductIso.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># adduct annotations set by selectIons()</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="incorpAdductIso.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># adduct annotations set by selectIons()</span></span></code></pre></div>
 <pre><code>#&gt; M109_R192_20 M111_R330_23 M114_R269_25 M116_R317_29 M120_R268_30 
 #&gt;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+K]+&quot;</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="incorpAdductIso.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+Na]+&quot;</span> <span class="co"># modify annotation</span></span>
-<span id="cb30-2"><a href="incorpAdductIso.html#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># verify</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="incorpAdductIso.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+Na]+&quot;</span> <span class="co"># modify annotation</span></span>
+<span id="cb31-2"><a href="incorpAdductIso.html#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># verify</span></span></code></pre></div>
 <pre><code>#&gt; M109_R192_20 M111_R330_23 M114_R269_25 M116_R317_29 M120_R268_30 
 #&gt;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;    &quot;[M+Na]+&quot;     &quot;[M+H]+&quot;     &quot;[M+K]+&quot;</code></pre>
 <blockquote>

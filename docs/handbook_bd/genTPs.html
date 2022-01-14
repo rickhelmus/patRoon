@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-13" />
+<meta name="date" content="2022-01-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -415,15 +415,15 @@ div.csl-indent {
 <p>In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a <a href="annotation.html#compounds">compound annotation</a> are used as input to obtain TPs. Since <em>all</em> the candidates are used, it is highly recommend to filter the object in advance, for instance, with the <code>topMost</code> filter. For <code>library</code>, the parent input is optional: if no parents are specified then TP data for <em>all</em> parents in the database is used.</p>
 <p>For the <code>logic</code> algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data.</p>
 <p>Some typical examples:</p>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="genTPs.html#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predict environmental TPs with BioTransformer for all parents in a suspect list</span></span>
-<span id="cb150-2"><a href="genTPs.html#cb150-2" aria-hidden="true" tabindex="-1"></a>TPsBT <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;biotransformer&quot;</span>, <span class="at">parents =</span> patRoonData<span class="sc">::</span>suspectsPos,</span>
-<span id="cb150-3"><a href="genTPs.html#cb150-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">type =</span> <span class="st">&quot;env&quot;</span>)</span>
-<span id="cb150-4"><a href="genTPs.html#cb150-4" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain all TPs from the default library</span></span>
-<span id="cb150-5"><a href="genTPs.html#cb150-5" aria-hidden="true" tabindex="-1"></a>TPsLib <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>)</span>
-<span id="cb150-6"><a href="genTPs.html#cb150-6" aria-hidden="true" tabindex="-1"></a><span class="co"># get TPs for the parents from a suspect screening</span></span>
-<span id="cb150-7"><a href="genTPs.html#cb150-7" aria-hidden="true" tabindex="-1"></a>TPsLib <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">parents =</span> fGroupsScr)</span>
-<span id="cb150-8"><a href="genTPs.html#cb150-8" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate TPs for all feature groups</span></span>
-<span id="cb150-9"><a href="genTPs.html#cb150-9" aria-hidden="true" tabindex="-1"></a>TPsLogic <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="genTPs.html#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predict environmental TPs with BioTransformer for all parents in a suspect list</span></span>
+<span id="cb152-2"><a href="genTPs.html#cb152-2" aria-hidden="true" tabindex="-1"></a>TPsBT <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;biotransformer&quot;</span>, <span class="at">parents =</span> patRoonData<span class="sc">::</span>suspectsPos,</span>
+<span id="cb152-3"><a href="genTPs.html#cb152-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">type =</span> <span class="st">&quot;env&quot;</span>)</span>
+<span id="cb152-4"><a href="genTPs.html#cb152-4" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain all TPs from the default library</span></span>
+<span id="cb152-5"><a href="genTPs.html#cb152-5" aria-hidden="true" tabindex="-1"></a>TPsLib <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>)</span>
+<span id="cb152-6"><a href="genTPs.html#cb152-6" aria-hidden="true" tabindex="-1"></a><span class="co"># get TPs for the parents from a suspect screening</span></span>
+<span id="cb152-7"><a href="genTPs.html#cb152-7" aria-hidden="true" tabindex="-1"></a>TPsLib <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">parents =</span> fGroupsScr)</span>
+<span id="cb152-8"><a href="genTPs.html#cb152-8" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate TPs for all feature groups</span></span>
+<span id="cb152-9"><a href="genTPs.html#cb152-9" aria-hidden="true" tabindex="-1"></a>TPsLogic <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
 </div>
 <div id="processing-data-1" class="section level3" number="7.1.2">
 <h3><span class="header-section-number">7.1.2</span> Processing data</h3>
@@ -475,26 +475,26 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some examples:</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="genTPs.html#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="co"># just show a few columns in this example, there are many more!</span></span>
-<span id="cb151-2"><a href="genTPs.html#cb151-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note: the double dot syntax (..cols) is necessary since the data is stored as data.tables</span></span>
-<span id="cb151-3"><a href="genTPs.html#cb151-3" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;formula&quot;</span>, <span class="st">&quot;InChIKey&quot;</span>)</span>
-<span id="cb151-4"><a href="genTPs.html#cb151-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parents</span>(TPs)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ..cols]</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="genTPs.html#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="co"># just show a few columns in this example, there are many more!</span></span>
+<span id="cb153-2"><a href="genTPs.html#cb153-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note: the double dot syntax (..cols) is necessary since the data is stored as data.tables</span></span>
+<span id="cb153-3"><a href="genTPs.html#cb153-3" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;formula&quot;</span>, <span class="st">&quot;InChIKey&quot;</span>)</span>
+<span id="cb153-4"><a href="genTPs.html#cb153-4" aria-hidden="true" tabindex="-1"></a><span class="fu">parents</span>(TPs)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ..cols]</span></code></pre></div>
 <pre><code>#&gt;                            name   formula                    InChIKey
 #&gt; 1:               (-)-bisoprolol C18H31NO4 VHYCDWMUTMEGQY-KRWDZBQOSA-N
 #&gt; 2:         (-)-Epigallocatechin  C15H14O7 XMOCLSLCDHWDHP-IUODEOHRSA-N
 #&gt; 3: (-)-Epigallocatechin gallate C22H18O11 WMBWREPUVVBILR-WIYYLYMNSA-N
 #&gt; 4:             (-)-ethosuximide  C7H11NO2 HAPOVYFOVVWLRS-SSDOTTSWSA-N
 #&gt; 5:                 (-)-etodolac C17H21NO3 NNYBQONXHNTVIJ-QGZVFWFLSA-N</code></pre>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="genTPs.html#cb153-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="st">&quot;DEET&quot;</span>]][, ..cols]</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="genTPs.html#cb155-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="st">&quot;DEET&quot;</span>]][, ..cols]</span></code></pre></div>
 <pre><code>#&gt;                                                    name   formula                    InChIKey
 #&gt; 1:         DEET-TP-N,N-diethyl-m-hydroxymethylbenzamide C12H17NO2 FRZJZRVZZNTMAW-UHFFFAOYSA-N
 #&gt; 2: DEET-TP-N-Ethyl-N-(2-hydroxyethyl)-3-methylbenzamide C12H17NO2 KVTUZBGZTRABBQ-UHFFFAOYSA-N
 #&gt; 3:                                 DEET-TP-acetaldehyde     C2H4O IKHGUXGNUITLKF-UHFFFAOYSA-N
 #&gt; 4:                          DEET-TP-N-ethyl-m-toluamide  C10H13NO FPINATACRXASTP-UHFFFAOYSA-N</code></pre>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="genTPs.html#cb155-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="dv">2</span>]][, ..cols]</span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="genTPs.html#cb157-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="dv">2</span>]][, ..cols]</span></code></pre></div>
 <pre><code>#&gt;                                                                    name   formula                    InChIKey
 #&gt; 1: (-)-Epigallocatechin-TP-(-)-Epigallocatechin, 3p-hydroxy-glucuronide C21H22O13 CQDATFYRGVZXLF-ZVHNUXTDSA-N</code></pre>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="genTPs.html#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(TPs)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="genTPs.html#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(TPs)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
 <pre><code>#&gt;                          parent                               transformation                                                                                 name
 #&gt; 1:               (-)-bisoprolol           O-deisopropylation / Human Phase I                                      (-)-bisoprolol-TP-(-)-bisoprolol, O-deisopropyl
 #&gt; 2:         (-)-Epigallocatechin Aromatic-OH glucuronidation / Human Phase II                 (-)-Epigallocatechin-TP-(-)-Epigallocatechin, 3p-hydroxy-glucuronide
@@ -538,55 +538,55 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="genTPs.html#cb159-1" aria-hidden="true" tabindex="-1"></a>TPs2 <span class="ot">&lt;-</span> TPs[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>] <span class="co"># only keep results for first ten parents</span></span>
-<span id="cb159-2"><a href="genTPs.html#cb159-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-3"><a href="genTPs.html#cb159-3" aria-hidden="true" tabindex="-1"></a><span class="co"># remove transformation products that are isomers to their parent or sibling TPs</span></span>
-<span id="cb159-4"><a href="genTPs.html#cb159-4" aria-hidden="true" tabindex="-1"></a><span class="co"># may simplify data as these are often difficult to identify</span></span>
-<span id="cb159-5"><a href="genTPs.html#cb159-5" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">removeParentIsomers =</span> <span class="cn">TRUE</span>, <span class="at">removeTPIsomers =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb159-6"><a href="genTPs.html#cb159-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-7"><a href="genTPs.html#cb159-7" aria-hidden="true" tabindex="-1"></a><span class="co"># remove duplicate transformation products from each parent</span></span>
-<span id="cb159-8"><a href="genTPs.html#cb159-8" aria-hidden="true" tabindex="-1"></a><span class="co"># these can occur if different pathways yield the same TPs</span></span>
-<span id="cb159-9"><a href="genTPs.html#cb159-9" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">removeDuplicates =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb159-10"><a href="genTPs.html#cb159-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-11"><a href="genTPs.html#cb159-11" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep TPs that have a structural similarity to their parent of &gt;= 0.5</span></span>
-<span id="cb159-12"><a href="genTPs.html#cb159-12" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">minSimilarity =</span> <span class="fl">0.5</span>)</span>
-<span id="cb159-13"><a href="genTPs.html#cb159-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-14"><a href="genTPs.html#cb159-14" aria-hidden="true" tabindex="-1"></a><span class="co"># do a suspect screening for all TPs and their parents</span></span>
-<span id="cb159-15"><a href="genTPs.html#cb159-15" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb159-16"><a href="genTPs.html#cb159-16" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb159-17"><a href="genTPs.html#cb159-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-18"><a href="genTPs.html#cb159-18" aria-hidden="true" tabindex="-1"></a><span class="co"># use the TP data for a specialized MetFrag database</span></span>
-<span id="cb159-19"><a href="genTPs.html#cb159-19" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb159-20"><a href="genTPs.html#cb159-20" aria-hidden="true" tabindex="-1"></a>compoundsTPs <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
-<span id="cb159-21"><a href="genTPs.html#cb159-21" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="genTPs.html#cb161-1" aria-hidden="true" tabindex="-1"></a>TPs2 <span class="ot">&lt;-</span> TPs[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>] <span class="co"># only keep results for first ten parents</span></span>
+<span id="cb161-2"><a href="genTPs.html#cb161-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-3"><a href="genTPs.html#cb161-3" aria-hidden="true" tabindex="-1"></a><span class="co"># remove transformation products that are isomers to their parent or sibling TPs</span></span>
+<span id="cb161-4"><a href="genTPs.html#cb161-4" aria-hidden="true" tabindex="-1"></a><span class="co"># may simplify data as these are often difficult to identify</span></span>
+<span id="cb161-5"><a href="genTPs.html#cb161-5" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">removeParentIsomers =</span> <span class="cn">TRUE</span>, <span class="at">removeTPIsomers =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb161-6"><a href="genTPs.html#cb161-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-7"><a href="genTPs.html#cb161-7" aria-hidden="true" tabindex="-1"></a><span class="co"># remove duplicate transformation products from each parent</span></span>
+<span id="cb161-8"><a href="genTPs.html#cb161-8" aria-hidden="true" tabindex="-1"></a><span class="co"># these can occur if different pathways yield the same TPs</span></span>
+<span id="cb161-9"><a href="genTPs.html#cb161-9" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">removeDuplicates =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb161-10"><a href="genTPs.html#cb161-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-11"><a href="genTPs.html#cb161-11" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep TPs that have a structural similarity to their parent of &gt;= 0.5</span></span>
+<span id="cb161-12"><a href="genTPs.html#cb161-12" aria-hidden="true" tabindex="-1"></a>TPsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(TPs, <span class="at">minSimilarity =</span> <span class="fl">0.5</span>)</span>
+<span id="cb161-13"><a href="genTPs.html#cb161-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-14"><a href="genTPs.html#cb161-14" aria-hidden="true" tabindex="-1"></a><span class="co"># do a suspect screening for all TPs and their parents</span></span>
+<span id="cb161-15"><a href="genTPs.html#cb161-15" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb161-16"><a href="genTPs.html#cb161-16" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb161-17"><a href="genTPs.html#cb161-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-18"><a href="genTPs.html#cb161-18" aria-hidden="true" tabindex="-1"></a><span class="co"># use the TP data for a specialized MetFrag database</span></span>
+<span id="cb161-19"><a href="genTPs.html#cb161-19" aria-hidden="true" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb161-20"><a href="genTPs.html#cb161-20" aria-hidden="true" tabindex="-1"></a>compoundsTPs <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
+<span id="cb161-21"><a href="genTPs.html#cb161-21" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span></code></pre></div>
 <p>The <code>convertToSuspects</code> function is always part of a workflow with <code>biotransformer</code> or <code>library</code> TPs. This is discussed further in the next section. The <code>convertToMFDB</code> function is especially handy with <code>biotransformer</code> workflows, as it allows generating a compound database for TPs that may not be available in other databases. This is further demonstrated in the <a href="TPsExamples.html#TPsEx1">first example</a>.</p>
 </div>
 <div id="TPsCustom" class="section level3" number="7.1.3">
 <h3><span class="header-section-number">7.1.3</span> Custom libraries and transformations</h3>
 <p>By default the <code>library</code> and <code>logic</code> algorithms use data that is installed with <code>patRoon</code> (based on <a href="https://doi.org/10.5281/zenodo.5644560">PubChem transformations</a> and <span class="citation"><a href="#ref-Scholle2015" role="doc-biblioref">Schollee et al.</a> (<a href="#ref-Scholle2015" role="doc-biblioref">2015</a>)</span>, respectively). However, it is also possible to use custom data.</p>
 <p>To use a custom TP library a simple <code>data.frame</code> is needed with the names, SMILES and optionally <code>log P</code> values for the parents and TPs. The <code>log P</code> values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="genTPs.html#cb160-1" aria-hidden="true" tabindex="-1"></a>myTPLib <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">parent_name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;DEET&quot;</span>),</span>
-<span id="cb160-2"><a href="genTPs.html#cb160-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">parent_SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;CCN(CC)C(=O)C1=CC=CC(=C1)C&quot;</span>),</span>
-<span id="cb160-3"><a href="genTPs.html#cb160-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">TP_name =</span> <span class="fu">c</span>(<span class="st">&quot;1-Methylbenzotriazole&quot;</span>, <span class="st">&quot;1-Hydroxybenzotriazole&quot;</span>, <span class="st">&quot;N-ethyl-m-toluamide&quot;</span>),</span>
-<span id="cb160-4"><a href="genTPs.html#cb160-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">TP_SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;CN1C2=CC=CC=C2N=N1&quot;</span>, <span class="st">&quot;C1=CC=C2C(=C1)N=NN2O&quot;</span>, <span class="st">&quot;CCNC(=O)C1=CC=CC(=C1)C&quot;</span>))</span>
-<span id="cb160-5"><a href="genTPs.html#cb160-5" aria-hidden="true" tabindex="-1"></a>myTPLib</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="genTPs.html#cb162-1" aria-hidden="true" tabindex="-1"></a>myTPLib <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">parent_name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;DEET&quot;</span>),</span>
+<span id="cb162-2"><a href="genTPs.html#cb162-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">parent_SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;CCN(CC)C(=O)C1=CC=CC(=C1)C&quot;</span>),</span>
+<span id="cb162-3"><a href="genTPs.html#cb162-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">TP_name =</span> <span class="fu">c</span>(<span class="st">&quot;1-Methylbenzotriazole&quot;</span>, <span class="st">&quot;1-Hydroxybenzotriazole&quot;</span>, <span class="st">&quot;N-ethyl-m-toluamide&quot;</span>),</span>
+<span id="cb162-4"><a href="genTPs.html#cb162-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">TP_SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;CN1C2=CC=CC=C2N=N1&quot;</span>, <span class="st">&quot;C1=CC=C2C(=C1)N=NN2O&quot;</span>, <span class="st">&quot;CCNC(=O)C1=CC=CC(=C1)C&quot;</span>))</span>
+<span id="cb162-5"><a href="genTPs.html#cb162-5" aria-hidden="true" tabindex="-1"></a>myTPLib</span></code></pre></div>
 <pre><code>#&gt;        parent_name              parent_SMILES                TP_name              TP_SMILES
 #&gt; 1 1H-Benzotriazole          C1=CC2=NNN=C2C=C1  1-Methylbenzotriazole     CN1C2=CC=CC=C2N=N1
 #&gt; 2 1H-Benzotriazole          C1=CC2=NNN=C2C=C1 1-Hydroxybenzotriazole   C1=CC=C2C(=C1)N=NN2O
 #&gt; 3             DEET CCN(CC)C(=O)C1=CC=CC(=C1)C    N-ethyl-m-toluamide CCNC(=O)C1=CC=CC(=C1)C</code></pre>
 <p>To use this library, simply pass it to the <code>TPLibrary</code> argument:</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="genTPs.html#cb162-1" aria-hidden="true" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">TPLibrary =</span> myTPLib)</span></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="genTPs.html#cb164-1" aria-hidden="true" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">TPLibrary =</span> myTPLib)</span></code></pre></div>
 <p>Similarly, for <code>logic</code> a table with custom transformation rules can be specified for TP calculations:</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="genTPs.html#cb163-1" aria-hidden="true" tabindex="-1"></a>myTrans <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">transformation =</span> <span class="fu">c</span>(<span class="st">&quot;hydroxylation&quot;</span>, <span class="st">&quot;demethylation&quot;</span>),</span>
-<span id="cb163-2"><a href="genTPs.html#cb163-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">add =</span> <span class="fu">c</span>(<span class="st">&quot;O&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
-<span id="cb163-3"><a href="genTPs.html#cb163-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">sub =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;CH2&quot;</span>),</span>
-<span id="cb163-4"><a href="genTPs.html#cb163-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">retDir =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb163-5"><a href="genTPs.html#cb163-5" aria-hidden="true" tabindex="-1"></a>myTrans</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="genTPs.html#cb165-1" aria-hidden="true" tabindex="-1"></a>myTrans <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">transformation =</span> <span class="fu">c</span>(<span class="st">&quot;hydroxylation&quot;</span>, <span class="st">&quot;demethylation&quot;</span>),</span>
+<span id="cb165-2"><a href="genTPs.html#cb165-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">add =</span> <span class="fu">c</span>(<span class="st">&quot;O&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
+<span id="cb165-3"><a href="genTPs.html#cb165-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">sub =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;CH2&quot;</span>),</span>
+<span id="cb165-4"><a href="genTPs.html#cb165-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">retDir =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb165-5"><a href="genTPs.html#cb165-5" aria-hidden="true" tabindex="-1"></a>myTrans</span></code></pre></div>
 <pre><code>#&gt;   transformation add sub retDir
 #&gt; 1  hydroxylation   O         -1
 #&gt; 2  demethylation     CH2     -1</code></pre>
 <p>The <code>add</code> and <code>sub</code> columns are used to denote the elements that are added or subtracted by the reaction. These are used to calculate mass differences between parents and TPs. The <code>retDir</code> column is used to indicate the retention time direction of the parent compared to the TP: <code>-1</code> (elutes before parent), <code>1</code> (elutes after parent) or <code>0</code> (similar or unknown). The next section describes how this data can be used to filter TPs. The custom rules can be used by passing them to the <code>transformations</code> argument:</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="genTPs.html#cb165-1" aria-hidden="true" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">transformations =</span> myTrans)</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="genTPs.html#cb167-1" aria-hidden="true" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">transformations =</span> myTrans)</span></code></pre></div>
 </div>
 </div>
 <h3>References</h3>

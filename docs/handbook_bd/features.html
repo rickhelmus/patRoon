@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-13" />
+<meta name="date" content="2022-01-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -330,8 +330,8 @@ div.csl-indent {
 <div id="features" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Features</h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-283aba5890ac0b93cf24" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-283aba5890ac0b93cf24">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-df8621c08bf2c7dbb7a6" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-df8621c08bf2c7dbb7a6">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Finding and grouping features</h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -577,13 +577,20 @@ div.csl-indent {
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="features.html#cb16-1" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
 <span id="cb16-2"><a href="features.html#cb16-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>))</span>
 <span id="cb16-3"><a href="features.html#cb16-3" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; Trying to calculate missing InChI data in suspect list... Done! Filled in 3 (100.0%) entries.
+#&gt; Trying to calculate missing InChIKey data in suspect list... Done! Filled in 3 (100.0%) entries.
+#&gt; Trying to calculate missing formula data in suspect list... Done! Filled in 3 (100.0%) entries.
+#&gt; Calculating neutral masses for each suspect...
+#&gt; ================================================================================
+#&gt; ================================================================================
+#&gt; Found 3/3 suspects (100.00%)</code></pre>
 <p>Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the <code>adduct</code> function argument to <code>screenSuspects</code> or by <a href="incorpAdductIso.html#incorpAdductIso">feature group adduct annotations</a>.</p>
 <p>Finally, when the adduct is known for a suspect it can be specified in the suspect list:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="features.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aldicarb is measured with a sodium adduct.</span></span>
-<span id="cb17-2"><a href="features.html#cb17-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;Aldicarb&quot;</span>),</span>
-<span id="cb17-3"><a href="features.html#cb17-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;CC(C)(C=NOC(=O)NC)SC&quot;</span>),</span>
-<span id="cb17-4"><a href="features.html#cb17-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">adduct =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
-<span id="cb17-5"><a href="features.html#cb17-5" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="features.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aldicarb is measured with a sodium adduct.</span></span>
+<span id="cb18-2"><a href="features.html#cb18-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;Aldicarb&quot;</span>),</span>
+<span id="cb18-3"><a href="features.html#cb18-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;CC(C)(C=NOC(=O)NC)SC&quot;</span>),</span>
+<span id="cb18-4"><a href="features.html#cb18-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">adduct =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
+<span id="cb18-5"><a href="features.html#cb18-5" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span></code></pre></div>
 <p>To summarize:</p>
 <ul>
 <li>If a suspect has data in the <code>mz</code> column it will be directly matched with the <em>m/z</em> value of a feature group.</li>
@@ -591,22 +598,22 @@ div.csl-indent {
 <li>Otherwise, suspects and feature groups are matched by their the neutral mass.</li>
 </ul>
 <p>The <code>fragments_mz</code> and <code>fragments_formula</code> columns in the suspect list can be used to specify known fragments for a suspect, which can help <a href="annotation.html#suspAnn">suspect annotation</a>. The former specifies the ionized <em>m/z</em> of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="features.html#cb18-1" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
-<span id="cb18-2"><a href="features.html#cb18-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>),</span>
-<span id="cb18-3"><a href="features.html#cb18-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fragments_formula =</span> <span class="fu">c</span>(<span class="st">&quot;C6H6N&quot;</span>, <span class="st">&quot;C6H8N;C7H6NO&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
-<span id="cb18-4"><a href="features.html#cb18-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fragments_mz =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;118.0652&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="features.html#cb19-1" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
+<span id="cb19-2"><a href="features.html#cb19-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>),</span>
+<span id="cb19-3"><a href="features.html#cb19-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fragments_formula =</span> <span class="fu">c</span>(<span class="st">&quot;C6H6N&quot;</span>, <span class="st">&quot;C6H8N;C7H6NO&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
+<span id="cb19-4"><a href="features.html#cb19-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">fragments_mz =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;118.0652&quot;</span>))</span></code></pre></div>
 </div>
 <div id="removing-feature-groups-without-hits" class="section level4" number="4.2.2.2">
 <h4><span class="header-section-number">4.2.2.2</span> Removing feature groups without hits</h4>
 <p>Note that any feature groups that were not matched to a suspect are <em>not</em> removed by default. If you want to remove these, you can use the <code>onlyHits</code> parameter:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="features.html#cb19-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>) <span class="co"># remove any non-hits immediately</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="features.html#cb20-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>) <span class="co"># remove any non-hits immediately</span></span></code></pre></div>
 <p>The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The <code>filter()</code> function (discussed <a href="filtering.html#filtering">here</a>) can also be used to remove feature groups without a hit at a later stage.</p>
 </div>
 <div id="combining-screening-results" class="section level4" number="4.2.2.3">
 <h4><span class="header-section-number">4.2.2.3</span> Combining screening results</h4>
 <p>The <code>amend</code> function argument to <code>screenSuspects</code> can be used to combine screening results from different suspect lists.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="features.html#cb20-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span>
-<span id="cb20-2"><a href="features.html#cb20-2" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsSusp, suspects2, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="features.html#cb21-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span>
+<span id="cb21-2"><a href="features.html#cb21-2" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsSusp, suspects2, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>In this example the suspect lists defined in <code>suspects</code> and <code>suspects2</code> are both used for screening. By setting <code>amend=TRUE</code> the original screening results (i.e. from <code>suspects</code>) are preserved. Note that <code>onlyHits</code> should only be set in the final call to <code>screenSuspects</code> to ensure that all feature groups are screened.</p>
 </div>
 </div>

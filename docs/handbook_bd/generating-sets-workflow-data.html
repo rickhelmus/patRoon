@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-13" />
+<meta name="date" content="2022-01-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -426,10 +426,10 @@ div.csl-indent {
 <div id="formula-and-compound-annotation" class="section level3" number="6.2.2">
 <h3><span class="header-section-number">6.2.2</span> Formula and compound annotation</h3>
 <p>For formula and compound annotation, the data generated for each set is combined to generate a <em>set consensus</em>. The annotation tables are merged, scores are averaged and candidates are re-ranked. More details can be found in the reference manual (e.g. <code>?generateCompounds</code>). In addition, it possible to only keep candidates that exist in a minimum number of sets. For this, the <code>setThreshold</code> and <code>setThresholdAnn</code> argument can be used:</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="generating-sets-workflow-data.html#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="co"># candidate must be present in all sets</span></span>
-<span id="cb140-2"><a href="generating-sets-workflow-data.html#cb140-2" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">setThreshold =</span> <span class="dv">1</span>)</span>
-<span id="cb140-3"><a href="generating-sets-workflow-data.html#cb140-3" aria-hidden="true" tabindex="-1"></a><span class="co"># candidate must be present in all sets with annotation data</span></span>
-<span id="cb140-4"><a href="generating-sets-workflow-data.html#cb140-4" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">setThresholdAnn =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="generating-sets-workflow-data.html#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="co"># candidate must be present in all sets</span></span>
+<span id="cb142-2"><a href="generating-sets-workflow-data.html#cb142-2" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">setThreshold =</span> <span class="dv">1</span>)</span>
+<span id="cb142-3"><a href="generating-sets-workflow-data.html#cb142-3" aria-hidden="true" tabindex="-1"></a><span class="co"># candidate must be present in all sets with annotation data</span></span>
+<span id="cb142-4"><a href="generating-sets-workflow-data.html#cb142-4" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">setThresholdAnn =</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>In the first example, a formula candidate for a feature group is only kept if it was found for all of the sets. In the second example, a compound candidate is only kept if it was present in all of the sets with annotation data available. The following examples of a common positive/negative sets workflow illustrate the differences:</p>
 <table>
 <thead>

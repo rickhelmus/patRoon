@@ -390,39 +390,55 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 })
 
 #' @export
-setMethod("convertToSuspects", "MSLibrary", function(obj, avgSpecParams = getDefAvgPListParams())
+setMethod("convertToSuspects", "MSLibrary", function(obj,
+                                                     avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
+                                                                                          minIntensityPost = 0,
+                                                                                          topMost = 10),
+                                                     collapse = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAvgPListParams(avgSpecParams, add = ac)
+    checkmate::assertFlag(collapse, add = ac)
     checkmate::reportAssertions(ac)
-    
-    avgSpecParams$minIntensityPre <- avgSpecParams$minIntensityPost <- 0 # UNDONE
     
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
     
     ret <- copy(records(obj))
     libSpecs <- spectra(obj)
-    
-    ret[, InChIKey1 := getIKBlock1(InChIKey)]
-    
+
     printf("Calculating MS/MS fragments...\n")
-    withProg(uniqueN(ret$InChIKey1), FALSE, ret[!is.na(InChIKey1) & !is.na(PrecursorMZ), fragments_mz := {
-        pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
-        {
-            sp <- as.data.table(sp)
-            sp <- assignPrecursorToMSPeakList(sp, pmz)
-            return(sp)
-        })
-        
-        avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
-                                avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
-                                avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
-        doProgress()
-        paste0(avgPL$mz, collapse = ";")
-    }, by = "InChIKey1"])
     
-    ret <- unique(ret, by = "InChIKey1")
+    if (collapse)
+    {
+        ret <- ret[!is.na(InChIKey) & !is.na(PrecursorMZ)]
+        ret[, InChIKey1 := getIKBlock1(InChIKey)]
+        
+        frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, {
+            pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
+            {
+                sp <- as.data.table(sp)
+                sp <- assignPrecursorToMSPeakList(sp, pmz)
+                return(sp)
+            })
+            
+            avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
+                                    avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
+                                    avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
+            doProgress()
+            paste0(avgPL$mz, collapse = ";")
+            
+        }, by = "InChIKey1"])
+        setnames(frMZ, "V1", "fragments_mz")
+        
+        ret <- unique(ret, by = "InChIKey1")
+        ret <- merge(ret, frMZ, by = "InChIKey1")
+    }
+    else
+    {
+        withProg(length(obj), FALSE,
+                 ret[, fragments_mz := sapply(libSpecs, function(spec) paste0(spec[, "mz"], collapse = ";"))])
+    }
     
     mapCols <- c(Name = "name",
                  SMILES = "SMILES",
@@ -437,7 +453,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, avgSpecParams = getDef
     ret <- ret[, mapCols, with = FALSE]
     ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
     
-    return(ret)
+    return(ret[])
 })
 
 setMethod("export", "MSLibrary", function(obj, type, out)
@@ -456,6 +472,8 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
+    # UNDONE: doc that only unique records in y are added, i.e. metadata is not merged
+    
     if (length(x) == 0)
         return(y)
     else if (length(y) == 0)

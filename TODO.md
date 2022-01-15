@@ -31,7 +31,6 @@
     - Always sanitize SMILES/InChIs/Formulas? Or make it optional and default enabled? Now only formulas are done...
     - also verify formulas of adducts?
     - include lib adducts optionally for adduct guessing
-    - convertToSuspects(): also include MS/MS fragments?
     - don't merge synonyms? or split them somehow on export? Otherwise doc
     - naming OK ('records')?
         - metaData?
@@ -43,6 +42,7 @@
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
 - suspects
     - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
+    - amend suspect lists with fragments from MSLibrary
 
 
 

@@ -508,10 +508,19 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    hash <- makeHash(makeFileHash(file), parseComments, potAdducts, absMzDev, calcSPLASH)
+    cd <- loadCacheData("MSLibraryMSP", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     lib <- readMSP(normalizePath(file), parseComments)
     lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
     
-    return(MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp"))
+    ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp")
+    
+    saveCacheData("MSLibraryMSP", ret, hash)
+    
+    return(ret)
 }
 
 loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
@@ -522,8 +531,17 @@ loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcS
     checkmate::assertFlag(calcSPLASH, add = ac)
     checkmate::reportAssertions(ac)
     
+    hash <- makeHash(makeFileHash(file), potAdducts, absMzDev, calcSPLASH)
+    cd <- loadCacheData("MSLibraryJSON", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     lib <- readMoNAJSON(normalizePath(file))
     lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
     
-    return(MSLibrary(records = lib$records[], spectra = lib$spectra, annotations = lib$annotations, algorithm = "json"))
+    ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, annotations = lib$annotations, algorithm = "json")
+    
+    saveCacheData("MSLibraryJSON", ret, hash)
+    
+    return(ret)
 }

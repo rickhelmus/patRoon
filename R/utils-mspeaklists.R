@@ -183,7 +183,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
             ord <- order(s$intensity, decreasing = TRUE)
             keep <- ord[seq_len(topMost)]
             if (retainPrecursor)
-                keep <- unique(c(keep, s[precursor == TRUE, which = TRUE]))
+                keep <- union(keep, which(s$precursor))
             s <- s[keep]
         }
         return(s)

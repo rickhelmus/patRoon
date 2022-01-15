@@ -1,6 +1,7 @@
 # patRoon 2.1
 
 - More consistent installation suggestion message when an R package from GitHub is found missing
+- Optimized `topMost` filter applied during MS peak list averaging
 
 
 # patRoon 2.0.2

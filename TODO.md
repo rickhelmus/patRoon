@@ -39,10 +39,9 @@
     - caching
     - show mirror spectrum in report? Would need library data somehow
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
-    - work with IK1?
-    - support entries without SMILES/InChI(keys)/Formulas?
+    - collapse with IK1?
+        - yes for now, as e.g. sets and consensus expects this (UID column)
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
-    - make collapsing candidates optional and specify on which column to collapse
 - suspects
     - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
 

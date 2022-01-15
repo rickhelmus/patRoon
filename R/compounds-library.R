@@ -147,10 +147,10 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         setorderv(cTab, "score", -1)
         
-        cTab <- unique(cTab, by = "InChIKey") # NOTE: prior sorting ensure top ranked stays
+        cTab <- unique(cTab, by = "InChIKey1") # NOTE: prior sorting ensure top ranked stays
 
         # fill in fragInfos
-        cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey, neutral_formula, f = function(ls, ik, form)
+        cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey1, neutral_formula, f = function(ls, ik1, form)
         {
             bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
             bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
@@ -163,7 +163,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             
             if (length(libAnn) > 0)
             {
-                cta <- cTabAnn[InChIKey == ik]
+                cta <- cTabAnn[InChIKey1 == ik1]
                 specMatched <- spec[ID %in% fi$PLID] # get peak list with only matched peaks, we need it for binning
                 ann <- rbindlist(lapply(lspecs[cta$identifier], function(lsp)
                 {

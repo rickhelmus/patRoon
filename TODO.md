@@ -36,7 +36,6 @@
     - naming OK ('records')?
         - metaData?
 - compounds
-    - caching
     - show mirror spectrum in report? Would need library data somehow
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
     - collapse with IK1?

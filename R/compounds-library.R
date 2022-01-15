@@ -77,6 +77,13 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         libRecs <- getRecsForAdduct(libRecs, adduct, as.character(adduct))
     else
         allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
+
+    cacheDB <- openCacheDBScope()
+    baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams)
+    setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)
+    cachedSet <- loadCacheSet("compoundsLibrary", setHash, cacheDB)
+    resultHashes <- vector("character", gCount)
+    resultHashCount <- 0
     
     printf("Processing %d feature groups with a library of %d records...\n", gCount, nrow(libRecs))
     
@@ -99,16 +106,24 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             return(NULL)
         
         cTab <- libRecs[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
-        
         if (is.null(adduct))
-        {
-            addChr <- annTbl[group == grp]$adduct
-            libRecs <- getRecsForAdduct(libRecs, allAdducts[[addChr]], addChr)
-        }
+            cTab <- getRecsForAdduct(cTab, allAdducts[[addChr]], annTbl[group == grp]$adduct)
         
         if (nrow(cTab) == 0)
             return(NULL)
 
+        hash <- makeHash(baseHash, spec, cTab, libSpecs[cTab$identifier], libAnn[cTab$identifier])
+        resultHashCount <<- resultHashCount + 1
+        resultHashes[resultHashCount] <<- hash
+        
+        cached <- NULL
+        if (!is.null(cachedSet))
+            cached <- cachedSet[[hash]]
+        if (is.null(cached))
+            cached <- loadCacheData("compoundsLibrary", hash, cacheDB)
+        if (!is.null(cached))
+            return(cached)
+        
         cTab <- unifyLibNames(cTab)
         cTab[, InChIKey1 := getIKBlock1(InChIKey)]
         lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, cTab$identifier, f = function(sp, pmz, lid)
@@ -210,8 +225,13 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         cTab[, libPeaksTotal := sapply(libSpecs[identifier], nrow)]
         cTab[, database := "library"]
         
+        saveCacheData("compoundsLibrary", cTab, hash, cacheDB)
+        
         return(cTab)
     }, simplify = FALSE))
+    
+    if (is.null(cachedSet))
+        saveCacheSet("compoundsLibrary", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
     
     compList <- pruneList(compList, checkZeroRows = TRUE)
     

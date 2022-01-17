@@ -53,67 +53,61 @@ distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
 
 babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts = NULL)
 {
-    # Use batch conversion with a single input/output file. Note that obabel
-    # will stop after an error. This can be overidden, however, then it is
-    # unclear which entries failed. Hence, this option is not used, and when an
-    # error occurs the batch conversion is simply restarted with the subsequent
-    # entry.
-    
     if (length(input) == 0)
         return(character())
+
+    indsNoNA <- which(!is.na(input))
     
-    inputFile <- tempfile("obabel_inp", fileext = ".txt")
-    outputFile <- tempfile("obabel_out", fileext = ".txt")
-    doConversion <- function(inp)
+    mpm <- getOption("patRoon.MP.method", "classic")
+    batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
+    minBatchSize <- 1000 # put a minimum as overhead of creating processes is significant
+    batchn <- max(1, min(batchn, round(length(indsNoNA) / minBatchSize)))
+    
+    batches <- splitInNBatches(indsNoNA, batchn)
+    
+    # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
+    # see https://github.com/openbabel/openbabel/issues/2231
+    
+    mainArgs <- c("-an", paste0("-i", inFormat), paste0("-o", outFormat))
+    cmdQueue <- lapply(seq_along(batches), function(bi)
     {
-        cat(inp, file = inputFile, sep = "\n")
-        
-        args <- c(paste0("-i", inFormat), inputFile,
-                  paste0("-o", outFormat), "-O", outputFile, "-xw")
+        b <- batches[[bi]]
+        return(list(args = mainArgs, input = data.frame(input[b], b), logFile = paste0("obabel-batch_", bi, ".txt")))
+    })
+
+    results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
+    {
+        # read space separated results; first column is result, second index
+        ret <- fread(cmd$outFile, sep = " ")
+        if (outFormat == "txt") # HACK HACK HACK: with txt (used by convertToFormulaBabel) the index is the first column
+            setnames(ret, c("index", "result"))
+        else
+            setnames(ret, c("result", "index"))
+        return(ret)
+    }, prepareHandler = function(cmd)
+    {
+        inFile <- tempfile("obabel_in")
+        fwrite(cmd$input, inFile, col.names = FALSE, sep = "\t")
+        outFile <- tempfile("obabel_out")
+        args <- c(cmd$args, c(inFile, "-O", outFile, "-xt", "-xw", "-e"))
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
-        
-        executeCommand(getCommandWithOptPath("obabel", "obabel"), args, stderr = FALSE)
-        # each conversion is followed by a tab (why??) and newline. Read line
-        # by line and remove tab afterwards.
-        ret <- readLines(outputFile)
-        return(trimws(ret, which = "right", whitespace = "\t"))
-    }
+        return(modifyList(cmd, list(command = getCommandWithOptPath("obabel", "obabel"),
+                                    args = args, outFile = outFile)))
+    }, showProgress = FALSE, logSubDir = "obabel")
     
-    stopOrWarn <- function(msg)
-    {
-        do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
-    }
+    results <- rbindlist(results)
+    ret <- rep(NA_character_, length(input))
+    ret[results$index] <- results$result
 
-    inpNA <- is.na(input)
-    doInputs <- input[!inpNA]
-    inputLen <- length(doInputs)
-    conv <- character(inputLen)
-    curIndex <- 1
-    while(TRUE)
+    stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
+    failed <- which(is.na(ret) & !is.na(input))
+    if (length(failed) > 0)
     {
-        curRange <- seq(curIndex, inputLen)
-        out <- doConversion(doInputs[curRange])
-        outl <- length(out)
-        
-        if (outl > 0)
-            conv[seq(curIndex, curIndex + outl - 1)] <- out
-        else # silent fail
-            conv[curIndex] <- NA_character_
-        
-        curIndex <- curIndex + outl + 1
-        
-        if (curIndex <= inputLen)
-            stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", curIndex - 1, doInputs[curIndex - 1],
+        for (i in failed)
+            stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", i, input[i],
                                inFormat, outFormat))
-        else
-            break
     }
-    
-    # merge back in NA inputs
-    ret <- character(length(input))
-    ret[inpNA] <- NA_character_
-    ret[!inpNA] <- conv
     
     return(ret)
 }

@@ -2,7 +2,7 @@
 
 - More consistent installation suggestion message when an R package from GitHub is found missing
 - Optimized `topMost` filter applied during MS peak list averaging
-
+- OpenBabel conversions are now done with multiprocessing to speed up calculations with large inputs
 
 # patRoon 2.0.2
 

@@ -34,6 +34,10 @@
     - don't merge synonyms? or split them somehow on export? Otherwise doc
     - naming OK ('records')?
         - metaData?
+    - sanitize input
+        - trim spaces
+        - Verify SMILES, InChI, InChIKey, Formula, neutralMass (from any of the previous, if available)
+        - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
 - compounds
     - show mirror spectrum in report? Would need library data somehow
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning

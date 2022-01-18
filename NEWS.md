@@ -5,6 +5,7 @@
 - `installPatRoon()` improvements in determining what is already installed
 - Fixed: Group qualities/scores were not transferred to new `featureGroups` objects after calling `screenSuspects()` or `unset()`
 - Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34)
+- Fixed: `newProject()`: `reportCSV()` call in generated script included non-existing `MSPeakLists` argument.
 
 
 # patRoon 2.0

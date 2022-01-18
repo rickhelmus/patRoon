@@ -552,7 +552,6 @@ getScriptCode <- function(input, analyses)
             list(name = "path", value = "report", quote = TRUE),
             list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
-            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
             list(name = "components", value = componVal)
         ))
         addCall(NULL, "reportPDF", condition = "PDF" %in% input$report, list(

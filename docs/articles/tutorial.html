@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -94,7 +96,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rickhelmus/patRoon">
+  <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -109,16 +111,16 @@
 
       
 
-      </header><script src="tutorial_files/header-attrs-2.11/header-attrs.js"></script><script src="tutorial_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><script src="tutorial_files/viz-1.8.2/viz.js"></script><link href="tutorial_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+      </header><script src="tutorial_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><script src="tutorial_files/viz-1.8.2/viz.js"></script><link href="tutorial_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
 <script src="tutorial_files/grViz-binding-1.0.6.1/grViz.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>patRoon tutorial</h1>
-                        <h4 class="author">Rick Helmus</h4>
+                        <h4 data-toc-skip class="author">Rick Helmus</h4>
             
-            <h4 class="date">2022-01-14</h4>
+            <h4 data-toc-skip class="date">2022-01-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
 
     </div>
@@ -142,35 +144,35 @@ p.caption {
   font-size: 0.8em;
 }
 </style>
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<div class="section level1">
+<h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h1>
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-658b5d50d458ceb13a0a" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-658b5d50d458ceb13a0a">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-91e679c503c1c058fd07" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-91e679c503c1c058fd07">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data" class="anchor"></a>Data</h1>
-<p>In this tutorial we will use example data provided within the <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> package. Please make sure this package is installed (see the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html%5D">Handbook</a> for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition (‘standard-X’) and a blank solvent (‘solvent-X’), both in triplicate and measured with positive and negative ionization. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionality of <code>patRoon</code>.</p>
-<p>The provided analyses already have been exported to an open format (<em>.mzML</em>) and are ready to use. For your own data it may be necessary to first export your data to <em>mzXML</em> or <em>mzML</em> and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> or software from your mass spectrometer vendor. Alternatively, <code>patRoon</code> can do this automatically for your analyses with the <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> function. Please see the handbook and reference manual for its usage.</p>
+<div class="section level1">
+<h1 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
+</h1>
+<p>In this tutorial we will use example data provided within the <a href="https://github.com/rickhelmus/patRoonData" class="external-link">patRoonData</a> package. Please make sure this package is installed (see the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html%5D">Handbook</a> for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition (‘standard-X’) and a blank solvent (‘solvent-X’), both in triplicate and measured with positive and negative ionization. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionality of <code>patRoon</code>.</p>
+<p>The provided analyses already have been exported to an open format (<em>.mzML</em>) and are ready to use. For your own data it may be necessary to first export your data to <em>mzXML</em> or <em>mzML</em> and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from <a href="http://proteowizard.sourceforge.net/" class="external-link">ProteoWizard</a> or software from your mass spectrometer vendor. Alternatively, <code>patRoon</code> can do this automatically for your analyses with the <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> function. Please see the handbook and reference manual for its usage.</p>
 </div>
-<div id="new-project" class="section level1">
-<h1 class="hasAnchor">
-<a href="#new-project" class="anchor"></a>New project</h1>
+<div class="section level1">
+<h1 id="new-project">New project<a class="anchor" aria-label="anchor" href="#new-project"></a>
+</h1>
 <p>Whenever you start a new non-target analysis it is highly recommended to start this from a fresh <em>project directory</em>. This directory will contain your <code>R</code> processing script(s) and any other output generated during the workflow. Note that this directory does not have to contain the raw MS data files. In fact, keeping these files separate may be handy, for instance, if you want to run multiple non-target analyses on these files or store the analysis files on a shared location.</p>
 <p>Starting a new project typically consists of</p>
 <ol style="list-style-type: decimal">
 <li>Creating a new directory (unsurprisingly!)</li>
-<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://rdrr.io/r/base/getwd.html">setwd()</a></code>).</li>
+<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd()</a></code>).</li>
 <li>Create (or copy) an <code>R</code> processing script.</li>
 </ol>
 <p>Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequently, always take care to ensure that this directory is active, for instance, after restarting <code>R</code>.</p>
 <p>Steps 1-3 can be easily performed with the <code><a href="../reference/newProject.html">newProject()</a></code> function. Alternatively, you can of course also perform these steps yourself. Both approaches will be discussed in the next sections.</p>
-<div id="automatic-project-creation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#automatic-project-creation" class="anchor"></a>Automatic project creation</h2>
+<div class="section level2">
+<h2 id="automatic-project-creation">Automatic project creation<a class="anchor" aria-label="anchor" href="#automatic-project-creation"></a>
+</h2>
 <p>Ensure that RStudio is active and start the new project utility:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">patRoon</span><span class="fu">::</span><span class="fu"><a href="../reference/newProject.html">newProject</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -197,34 +199,34 @@ p.caption {
 <strong>Reporting tab</strong> Make sure to enable HTML reporting.</li>
 </ul>
 </div>
-<div id="manual-project-creation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#manual-project-creation" class="anchor"></a>Manual project creation</h2>
+<div class="section level2">
+<h2 id="manual-project-creation">Manual project creation<a class="anchor" aria-label="anchor" href="#manual-project-creation"></a>
+</h2>
 <p>For RStudio users it is easiest to simply create a new RStudio project (e.g. <em>File</em> –&gt; <em>New Project</em>). This will create a new directory and ensure that the working directory is set whenever you re-open it. Alternatively, you can do this manually, for instance:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">projDir</span> <span class="op">&lt;-</span> <span class="st">"~/myProjectDir"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="va">projDir</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="va">projDir</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">projDir</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">projDir</span><span class="op">)</span></code></pre></div>
 <p>The next step is to create a new <code>R</code> script. For this tutorial simply copy the script that is shown in the next section to a new <code>.R</code> file.</p>
 </div>
-<div id="template-r-script" class="section level2">
-<h2 class="hasAnchor">
-<a href="#template-r-script" class="anchor"></a>Template R script</h2>
+<div class="section level2">
+<h2 id="template-r-script">Template R script<a class="anchor" aria-label="anchor" href="#template-r-script"></a>
+</h2>
 <p>After you ran <code><a href="../reference/newProject.html">newProject()</a></code> the file below will be created. Before running this script, however, we still have to add and modify some of its code. In the next sections you will learn more about each part of the script, make the necessary changes and run its code.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Script automatically generated on Mon Jul 26 14:32:58 2021</span>
 
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon">patRoon</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon" class="external-link">patRoon</a></span><span class="op">)</span>
 
 <span class="co"># -------------------------</span>
 <span class="co"># initialization</span>
 <span class="co"># -------------------------</span>
 
 <span class="va">workPath</span> <span class="op">&lt;-</span> <span class="st">"C:/myproject"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
 
 <span class="co"># Example data from patRoonData package (triplicate solvent blank + triplicate standard)</span>
-<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span>
+<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span>
 
 <span class="co"># -------------------------</span>
 <span class="co"># features</span>
@@ -273,37 +275,37 @@ p.caption {
 <span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
           components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
 <span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
-           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
+           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
            selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="workflow" class="section level1">
-<h1 class="hasAnchor">
-<a href="#workflow" class="anchor"></a>Workflow</h1>
+<div class="section level1">
+<h1 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
+</h1>
 <p>Now that you have generated a new project with a template script it is time to make some minor modifications and run it afterwards. In the next sections each major part of the script (initialization, finding and grouping features, annotation and reporting) will be discussed separately. Each section will briefly discuss the code, what needs to be modified and finally you will run the code. In addition, several functions will be demonstrated that you can use to inspect generated data.</p>
-<div id="initialization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#initialization" class="anchor"></a>Initialization</h2>
+<div class="section level2">
+<h2 id="initialization">Initialization<a class="anchor" aria-label="anchor" href="#initialization"></a>
+</h2>
 <p>The first part of the script loads <code>patRoon</code>, makes sure the current working directory is set correctly and loads information about the analyses. This part in your script looks more or less like this:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon">patRoon</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon" class="external-link">patRoon</a></span><span class="op">)</span>
 
 <span class="va">workPath</span> <span class="op">&lt;-</span> <span class="st">"C:/my_project"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
 
 
 <span class="co"># Example data from patRoonData package (triplicate solvent blank + triplicate standard)</span>
-<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span></code></pre></div>
+<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span></code></pre></div>
 <p>After you ran this part the analysis information should be stored in the <code>anaInfo</code> variable. This information is important as it will be required for subsequent steps in the workflow. Lets peek at its contents:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">anaInfo</span></code></pre></div>
-<pre><code>#&gt;                                                    path       analysis        group       blank
-#&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-1  solvent-pos solvent-pos
-#&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-2  solvent-pos solvent-pos
-#&gt; 3 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-3  solvent-pos solvent-pos
-#&gt; 4 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-1 standard-pos solvent-pos
-#&gt; 5 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-2 standard-pos solvent-pos
-#&gt; 6 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-3 standard-pos solvent-pos</code></pre>
+<pre><code><span class="co">#&gt;                                                    path       analysis        group       blank</span>
+<span class="co">#&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-1  solvent-pos solvent-pos</span>
+<span class="co">#&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-2  solvent-pos solvent-pos</span>
+<span class="co">#&gt; 3 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-3  solvent-pos solvent-pos</span>
+<span class="co">#&gt; 4 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-1 standard-pos solvent-pos</span>
+<span class="co">#&gt; 5 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-2 standard-pos solvent-pos</span>
+<span class="co">#&gt; 6 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-3 standard-pos solvent-pos</span></code></pre>
 <p>As you can see the generated <code>data.frame</code> consists of four columns:</p>
 <ul>
 <li>
@@ -316,17 +318,17 @@ p.caption {
 <em>blank</em>: which replicate group should be used for blank subtraction.</li>
 </ul>
 <p>The latter two columns are especially important for <a href="#data-cleanup">data cleanup</a>, which will be discussed later. For now keep in mind that the analyses for the solvents and standards each belong to a different replicate group (<code>"solvent"</code> and <code>"standard"</code>) and that the solvents should be used for blank subtraction.</p>
-<p>In this tutorial the analysis information was just copied directly from <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a>. The <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function can be used to generate such a table for your own sample analyses. This function scans a given directory for MS data files and automatically fills in the <code>path</code> and <code>analysis</code> columns from this information. In addition, you can pass replicate group and blank information to this function. Example:</p>
+<p>In this tutorial the analysis information was just copied directly from <a href="https://github.com/rickhelmus/patRoonData" class="external-link">patRoonData</a>. The <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function can be used to generate such a table for your own sample analyses. This function scans a given directory for MS data files and automatically fills in the <code>path</code> and <code>analysis</code> columns from this information. In addition, you can pass replicate group and blank information to this function. Example:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span><span class="op">(</span><span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleDataPath</a></span><span class="op">(</span><span class="op">)</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"solvent-pos"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"standard-pos"</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="fu"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span><span class="op">(</span><span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleDataPath</a></span><span class="op">(</span><span class="op">)</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"solvent-pos"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"standard-pos"</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
                      blanks <span class="op">=</span> <span class="st">"solvent"</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt;                                                    path       analysis        group   blank
-#&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-1  solvent-pos solvent
-#&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-2  solvent-pos solvent
-#&gt; 3 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-3  solvent-pos solvent
-#&gt; 4 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-1 standard-pos solvent
-#&gt; 5 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-2 standard-pos solvent
-#&gt; 6 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-3 standard-pos solvent</code></pre>
+<pre><code><span class="co">#&gt;                                                    path       analysis        group   blank</span>
+<span class="co">#&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-1  solvent-pos solvent</span>
+<span class="co">#&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-2  solvent-pos solvent</span>
+<span class="co">#&gt; 3 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-3  solvent-pos solvent</span>
+<span class="co">#&gt; 4 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-1 standard-pos solvent</span>
+<span class="co">#&gt; 5 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-2 standard-pos solvent</span>
+<span class="co">#&gt; 6 /usr/local/lib/R/site-library/patRoonData/extdata/pos standard-pos-3 standard-pos solvent</span></code></pre>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Of course nothing stops you from creating a <code>data.frame</code> with analysis information manually within <code>R</code> or load the information from a <em>csv</em> file. In fact, when you create a new project with <code><a href="../reference/newProject.html">newProject()</a></code> you can select to generate a separate <em>csv</em> file with analysis information (i.e. by filling in the right information in the analysis tab).</p>
 </blockquote>
@@ -335,56 +337,56 @@ p.caption {
 </blockquote>
 </div>
 </div>
-<div id="find-and-group-features" class="section level1">
-<h1 class="hasAnchor">
-<a href="#find-and-group-features" class="anchor"></a>Find and group features</h1>
+<div class="section level1">
+<h1 id="find-and-group-features">Find and group features<a class="anchor" aria-label="anchor" href="#find-and-group-features"></a>
+</h1>
 <p>The first step of a LC-MS non-target analysis workflow is typically the extraction of so called ‘features’. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.</p>
 <p>To obtain all the features within your dataset the <code>findFeatures</code> function is used. This function requires data on the analysis information (<code>anaInfo</code> variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaluate results afterwards.</p>
-<p>In this tutorial we will use the <a href="http://openms.de/">OpenMS</a> software to find features and stick with default parameters:</p>
+<p>In this tutorial we will use the <a href="http://openms.de/" class="external-link">OpenMS</a> software to find features and stick with default parameters:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fList</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/feature-finding.html">findFeatures</a></span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>, noiseThrInt <span class="op">=</span> <span class="fl">1000</span>, chromSNR <span class="op">=</span> <span class="fl">3</span>, chromFWHM <span class="op">=</span> <span class="fl">5</span>, minFWHM <span class="op">=</span> <span class="fl">1</span>, maxFWHM <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Finding features with OpenMS for 6 analyses ...
-#&gt; ================================================================================
-#&gt; Loading peak intensities for 'solvent-pos-1'...
-#&gt; Loading peak intensities for 'solvent-pos-2'...
-#&gt; Loading peak intensities for 'solvent-pos-3'...
-#&gt; Loading peak intensities for 'standard-pos-1'...
-#&gt; Loading peak intensities for 'standard-pos-2'...
-#&gt; Loading peak intensities for 'standard-pos-3'...
-#&gt; Done!
-#&gt; Feature statistics:
-#&gt; solvent-pos-1: 3747 (15.4%)
-#&gt; solvent-pos-2: 3700 (15.2%)
-#&gt; solvent-pos-3: 3804 (15.7%)
-#&gt; standard-pos-1: 4349 (17.9%)
-#&gt; standard-pos-2: 4469 (18.4%)
-#&gt; standard-pos-3: 4203 (17.3%)
-#&gt; Total: 24272</code></pre>
+<pre><code><span class="co">#&gt; Finding features with OpenMS for 6 analyses ...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loading peak intensities for 'solvent-pos-1'...</span>
+<span class="co">#&gt; Loading peak intensities for 'solvent-pos-2'...</span>
+<span class="co">#&gt; Loading peak intensities for 'solvent-pos-3'...</span>
+<span class="co">#&gt; Loading peak intensities for 'standard-pos-1'...</span>
+<span class="co">#&gt; Loading peak intensities for 'standard-pos-2'...</span>
+<span class="co">#&gt; Loading peak intensities for 'standard-pos-3'...</span>
+<span class="co">#&gt; Done!</span>
+<span class="co">#&gt; Feature statistics:</span>
+<span class="co">#&gt; solvent-pos-1: 3747 (15.4%)</span>
+<span class="co">#&gt; solvent-pos-2: 3700 (15.2%)</span>
+<span class="co">#&gt; solvent-pos-3: 3804 (15.7%)</span>
+<span class="co">#&gt; standard-pos-1: 4349 (17.9%)</span>
+<span class="co">#&gt; standard-pos-2: 4469 (18.4%)</span>
+<span class="co">#&gt; standard-pos-3: 4203 (17.3%)</span>
+<span class="co">#&gt; Total: 24272</span></code></pre>
 <p>After some processing time (especially for larger datasets), the next step is to <em>group features</em>. During this step, features from different analysis are grouped, optionally after alignment of their retention times. This grouping is necessary because it is common that instrumental errors will result in (slight) variations in both retention time and <em>m/z</em> values which may complicate comparison of features between analyses. The resulting groups are referred to as <strong>feature groups</strong> and are crucial input for subsequent workflow steps.</p>
 <p>To group features the <code><a href="../reference/feature-grouping.html">groupFeatures()</a></code> function is used, which has similar argument requirements as <code><a href="../reference/feature-finding.html">findFeatures()</a></code> and likewise has many more options to tune the process.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fGroups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/feature-grouping.html">groupFeatures</a></span><span class="op">(</span><span class="va">fList</span>, <span class="st">"openms"</span>, rtalign <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Grouping features with OpenMS...
-#&gt; ===========
-#&gt; Importing consensus XML...Done!
-#&gt; 
-#&gt; ===========
-#&gt; Done!</code></pre>
-<div id="data-cleanup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-cleanup" class="anchor"></a>Data clean-up</h2>
+<pre><code><span class="co">#&gt; Grouping features with OpenMS...</span>
+<span class="co">#&gt; ===========</span>
+<span class="co">#&gt; Importing consensus XML...Done!</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ===========</span>
+<span class="co">#&gt; Done!</span></code></pre>
+<div class="section level2">
+<h2 id="data-cleanup">Data clean-up<a class="anchor" aria-label="anchor" href="#data-cleanup"></a>
+</h2>
 <p>The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several ways to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object that was made in the previous section (stored in the the <code>fGroups</code> variable). Note that in this tutorial the <code>absMinIntensity</code> was increased to <code>1E5</code> to simplify the results.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fGroups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generics.html">filter</a></span><span class="op">(</span><span class="va">fGroups</span>, preAbsMinIntensity <span class="op">=</span> <span class="fl">100</span>, absMinIntensity <span class="op">=</span> <span class="fl">1E5</span>,
                   relMinReplicateAbundance <span class="op">=</span> <span class="fl">1</span>, maxReplicateIntRSD <span class="op">=</span> <span class="fl">0.75</span>,
                   blankThreshold <span class="op">=</span> <span class="fl">5</span>, removeBlanks <span class="op">=</span> <span class="cn">TRUE</span>,
                   retentionRange <span class="op">=</span> <span class="cn">NULL</span>, mzRange <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Applying intensity filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 24272 features in 7242 groups.
-#&gt; Applying replicate abundance filter... Done! Filtered 7970 (32.84%) features and 3798 (52.44%) feature groups. Remaining: 16302 features in 3444 groups.
-#&gt; Applying blank filter... Done! Filtered 13477 (82.67%) features and 2502 (72.65%) feature groups. Remaining: 2825 features in 942 groups.
-#&gt; Applying intensity filter... Done! Filtered 2439 (86.34%) features and 809 (85.88%) feature groups. Remaining: 386 features in 133 groups.
-#&gt; Applying replicate abundance filter... Done! Filtered 17 (4.40%) features and 10 (7.52%) feature groups. Remaining: 369 features in 123 groups.
-#&gt; Applying replicate group filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 369 features in 123 groups.</code></pre>
+<pre><code><span class="co">#&gt; Applying intensity filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 24272 features in 7242 groups.</span>
+<span class="co">#&gt; Applying replicate abundance filter... Done! Filtered 7970 (32.84%) features and 3798 (52.44%) feature groups. Remaining: 16302 features in 3444 groups.</span>
+<span class="co">#&gt; Applying blank filter... Done! Filtered 13477 (82.67%) features and 2502 (72.65%) feature groups. Remaining: 2825 features in 942 groups.</span>
+<span class="co">#&gt; Applying intensity filter... Done! Filtered 2439 (86.34%) features and 809 (85.88%) feature groups. Remaining: 386 features in 133 groups.</span>
+<span class="co">#&gt; Applying replicate abundance filter... Done! Filtered 17 (4.40%) features and 10 (7.52%) feature groups. Remaining: 369 features in 123 groups.</span>
+<span class="co">#&gt; Applying replicate group filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 369 features in 123 groups.</span></code></pre>
 <p>The following filterings steps will be performed:</p>
 <ul>
 <li>Features are removed if their intensity is below a defined intensity threshold (set by <code>absMinIntensity</code>). This filter is an effective way to not only remove ‘noisy’ data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.</li>
@@ -400,44 +402,44 @@ p.caption {
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fGroups</span> <span class="op">&lt;-</span> <span class="va">fGroups</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">25</span><span class="op">]</span></code></pre></div>
 </div>
-<div id="inspecting-results" class="section level2">
-<h2 class="hasAnchor">
-<a href="#inspecting-results" class="anchor"></a>Inspecting results</h2>
+<div class="section level2">
+<h2 id="inspecting-results">Inspecting results<a class="anchor" aria-label="anchor" href="#inspecting-results"></a>
+</h2>
 <p>In order to have a quick peek at the results we can use the default printing method:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fGroups</span></code></pre></div>
-<pre><code>#&gt; A featureGroupsOpenMS object
-#&gt; Hierarchy:
-#&gt; featureGroups
-#&gt;     |-- featureGroupsOpenMS
-#&gt; ---
-#&gt; Object size (indication): 52.1 kB
-#&gt; Algorithm: openms
-#&gt; Feature groups: M100_R28_65, M102_R7_95, M109_R192_158, M116_R316_230, M120_R268_286, M134_R301_479, ... (25 total)
-#&gt; Features: 75 (3.0 per group)
-#&gt; Analyses: standard-pos-1, standard-pos-2, standard-pos-3 (3 total)
-#&gt; Replicate groups: standard-pos (1 total)
-#&gt; Replicate groups used as blank: solvent-pos (1 total)</code></pre>
+<pre><code><span class="co">#&gt; A featureGroupsOpenMS object</span>
+<span class="co">#&gt; Hierarchy:</span>
+<span class="co">#&gt; featureGroups</span>
+<span class="co">#&gt;     |-- featureGroupsOpenMS</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Object size (indication): 52.1 kB</span>
+<span class="co">#&gt; Algorithm: openms</span>
+<span class="co">#&gt; Feature groups: M100_R28_65, M102_R7_95, M109_R192_158, M116_R316_230, M120_R268_286, M134_R301_479, ... (25 total)</span>
+<span class="co">#&gt; Features: 75 (3.0 per group)</span>
+<span class="co">#&gt; Analyses: standard-pos-1, standard-pos-2, standard-pos-3 (3 total)</span>
+<span class="co">#&gt; Replicate groups: standard-pos (1 total)</span>
+<span class="co">#&gt; Replicate groups used as blank: solvent-pos (1 total)</span></code></pre>
 <p>Furthermore, the <code><a href="../reference/generics.html">as.data.table()</a></code> function can be used to have a look at generated feature groups and their intensities (<em>i.e.</em> peak heights) across all analyses:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt;            group       ret       mz standard-pos-1 standard-pos-2 standard-pos-3
-#&gt; 1:   M100_R28_65  27.98733 100.1120         304644         275468         283104
-#&gt; 2:    M102_R7_95   7.13423 102.1277         342224         320876         327020
-#&gt; 3: M109_R192_158 191.84678 109.0759         186612         187080         176756
-#&gt; 4: M116_R316_230 316.08673 116.0527         742572         772332         851204
-#&gt; 5: M120_R268_286 268.40343 120.0554         264836         245372         216560
-#&gt; 6: M134_R301_479 301.32917 134.0710         415648         348924         318340</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt;            group       ret       mz standard-pos-1 standard-pos-2 standard-pos-3</span>
+<span class="co">#&gt; 1:   M100_R28_65  27.98733 100.1120         304644         275468         283104</span>
+<span class="co">#&gt; 2:    M102_R7_95   7.13423 102.1277         342224         320876         327020</span>
+<span class="co">#&gt; 3: M109_R192_158 191.84678 109.0759         186612         187080         176756</span>
+<span class="co">#&gt; 4: M116_R316_230 316.08673 116.0527         742572         772332         851204</span>
+<span class="co">#&gt; 5: M120_R268_286 268.40343 120.0554         264836         245372         216560</span>
+<span class="co">#&gt; 6: M134_R301_479 301.32917 134.0710         415648         348924         318340</span></code></pre>
 <p>An overview of group properties is returned by the <code><a href="../reference/featureGroups-class.html">groupInfo()</a></code> method:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/featureGroups-class.html">groupInfo</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt;                     rts      mzs
-#&gt; M100_R28_65    27.98733 100.1120
-#&gt; M102_R7_95      7.13423 102.1277
-#&gt; M109_R192_158 191.84678 109.0759
-#&gt; M116_R316_230 316.08673 116.0527
-#&gt; M120_R268_286 268.40343 120.0554
-#&gt; M134_R301_479 301.32917 134.0710</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/featureGroups-class.html">groupInfo</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt;                     rts      mzs</span>
+<span class="co">#&gt; M100_R28_65    27.98733 100.1120</span>
+<span class="co">#&gt; M102_R7_95      7.13423 102.1277</span>
+<span class="co">#&gt; M109_R192_158 191.84678 109.0759</span>
+<span class="co">#&gt; M116_R316_230 316.08673 116.0527</span>
+<span class="co">#&gt; M120_R268_286 268.40343 120.0554</span>
+<span class="co">#&gt; M134_R301_479 301.32917 134.0710</span></code></pre>
 <p>Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all feature groups:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -446,81 +448,81 @@ p.caption {
 <p>Note that we only plot the most intense feature of a feature group here (as set by <code>topMost=1</code>). See the reference docs for many more parameters to these functions (e.g. <code><a href="../reference/generics.html">?plotChroms</a></code>).</p>
 </div>
 </div>
-<div id="annotation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#annotation" class="anchor"></a>Annotation</h1>
-<div id="ms-peak-lists" class="section level2">
-<h2 class="hasAnchor">
-<a href="#ms-peak-lists" class="anchor"></a>MS peak lists</h2>
+<div class="section level1">
+<h1 id="annotation">Annotation<a class="anchor" aria-label="anchor" href="#annotation"></a>
+</h1>
+<div class="section level2">
+<h2 id="ms-peak-lists">MS peak lists<a class="anchor" aria-label="anchor" href="#ms-peak-lists"></a>
+</h2>
 <p>After obtaining a good dataset with features of interest we can start moving to find their chemical identity. Before doing so, however, the first step is to extract all relevant MS data that will be used for annotation. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.</p>
-<p>The <code><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists()</a></code> function will perform this action for us and will generate so called <em>MS peak lists</em> in the process. These lists are basically (averaged) spectra in a tabular form. We will use algorithms from the <a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a> package to do so:</p>
+<p>The <code><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists()</a></code> function will perform this action for us and will generate so called <em>MS peak lists</em> in the process. These lists are basically (averaged) spectra in a tabular form. We will use algorithms from the <a href="https://bioconductor.org/packages/release/bioc/html/mzR.html" class="external-link">mzR</a> package to do so:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">avgPListParams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/MSPeakLists-generation.html">getDefAvgPListParams</a></span><span class="op">(</span>clusterMzWindow <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span>
 <span class="va">mslists</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="st">"mzr"</span>, maxMSRtWindow <span class="op">=</span> <span class="fl">5</span>, precursorMzWindow <span class="op">=</span> <span class="fl">4</span>,
                               avgFeatParams <span class="op">=</span> <span class="va">avgPListParams</span>, avgFGroupParams <span class="op">=</span> <span class="va">avgPListParams</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-1'...
-#&gt; ================================================================================
-#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-2'...
-#&gt; ================================================================================
-#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-3'...
-#&gt; ================================================================================
-#&gt; Generating averaged peak lists for all feature groups...
-#&gt; ================================================================================</code></pre>
+<pre><code><span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-1'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-2'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-3'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Generating averaged peak lists for all feature groups...</span>
+<span class="co">#&gt; ================================================================================</span></code></pre>
 <p>Note that we lowered the <code>clusterMzWindow</code> value to <em>0.002</em>. This window is used during averaging to cluster similar <em>m/z</em> values together. In general the better the resolution of your MS instrument, the lower the value can be set.</p>
 <p>Similar to feature groups the <code><a href="../reference/generics.html">filter()</a></code> generic function can be used to clean up the peak lists afterwards:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mslists</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generics.html">filter</a></span><span class="op">(</span><span class="va">mslists</span>, relMSMSIntThr <span class="op">=</span> <span class="fl">0.02</span>, topMSMSPeaks <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-1'...
-#&gt; ================================================================================
-#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-2'...
-#&gt; ================================================================================
-#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-3'...
-#&gt; ================================================================================
-#&gt; Filtering averaged MS peak lists for 25 feature groups...
-#&gt; ================================================================================
-#&gt; Done! Filtered 1298 (15.51%) MS peaks. Remaining: 7070</code></pre>
+<pre><code><span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-1'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-2'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-3'...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Filtering averaged MS peak lists for 25 feature groups...</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Done! Filtered 1298 (15.51%) MS peaks. Remaining: 7070</span></code></pre>
 <p>Here, all MS/MS mass peaks with intensities below 2% are removed and from the remaining peaks no more than the ten most intense are retained.</p>
 </div>
-<div id="formula-calculation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
-<p>Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/">GenForm</a> to perform this step. Again running this code may take some time.</p>
+<div class="section level2">
+<h2 id="formula-calculation">Formula calculation<a class="anchor" aria-label="anchor" href="#formula-calculation"></a>
+</h2>
+<p>Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/" class="external-link">GenForm</a> to perform this step. Again running this code may take some time.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">formulas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/formula-generation.html">generateFormulas</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">mslists</span>, <span class="st">"genform"</span>, relMzDev <span class="op">=</span> <span class="fl">5</span>, adduct <span class="op">=</span> <span class="st">"[M+H]+"</span>, elements <span class="op">=</span> <span class="st">"CHNOPSCl"</span>,
                              oc <span class="op">=</span> <span class="cn">FALSE</span>, calculateFeatures <span class="op">=</span> <span class="cn">TRUE</span>, featThresholdAnn <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Loading all formulas for analysis 'standard-pos-1'...
-#&gt; Converting to algorithm specific adducts... Done!
-#&gt; ================================================================================
-#&gt; Loaded 33 formulas for 23 features (92.00%).
-#&gt; Loading all formulas for analysis 'standard-pos-2'...
-#&gt; Converting to algorithm specific adducts... Done!
-#&gt; ================================================================================
-#&gt; Loaded 39 formulas for 23 features (92.00%).
-#&gt; Loading all formulas for analysis 'standard-pos-3'...
-#&gt; Converting to algorithm specific adducts... Done!
-#&gt; ================================================================================
-#&gt; Loaded 37 formulas for 23 features (92.00%).
-#&gt; Generating formula consensus...
-#&gt; ================================================================================</code></pre>
+<pre><code><span class="co">#&gt; Loading all formulas for analysis 'standard-pos-1'...</span>
+<span class="co">#&gt; Converting to algorithm specific adducts... Done!</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loaded 33 formulas for 23 features (92.00%).</span>
+<span class="co">#&gt; Loading all formulas for analysis 'standard-pos-2'...</span>
+<span class="co">#&gt; Converting to algorithm specific adducts... Done!</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loaded 39 formulas for 23 features (92.00%).</span>
+<span class="co">#&gt; Loading all formulas for analysis 'standard-pos-3'...</span>
+<span class="co">#&gt; Converting to algorithm specific adducts... Done!</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loaded 37 formulas for 23 features (92.00%).</span>
+<span class="co">#&gt; Generating formula consensus...</span>
+<span class="co">#&gt; ================================================================================</span></code></pre>
 <p>Note that you need to change the elements parameter to this function to make sure that formulae with sulfur and chloride (S/Cl) are also accepted. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> function returns an object that contains formula candidates assigned for each feature group. In the above call the <code>calculateFeatures</code> argument is set to <code>TRUE</code>: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for the complete feature group. During this process any outliers (defined by <code>featThresholdAnn</code>) are automatically removed. In contrast, setting <code>calculateFeatures</code> to <code>FALSE</code> will calculate formulae directly for feature groups (by using MS peak lists that have been averaged for the whole group). This will be significantly faster, but might produce (slightly) less accurate results.</p>
 </blockquote>
 </div>
-<div id="compound-identification" class="section level2">
-<h2 class="hasAnchor">
-<a href="#compound-identification" class="anchor"></a>Compound identification</h2>
+<div class="section level2">
+<h2 id="compound-identification">Compound identification<a class="anchor" aria-label="anchor" href="#compound-identification"></a>
+</h2>
 <!-- UNDONE Move MF installation to front? -->
-<p>Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use <a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a> to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag and the PubChemLite library can be found by <code>patRoon</code>. Please see the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html%5D">Handbook</a> for installation instructions.</p>
+<p>Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use <a href="http://ipb-halle.github.io/MetFrag/" class="external-link">MetFrag</a> to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag and the PubChemLite library can be found by <code>patRoon</code>. Please see the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html%5D">Handbook</a> for installation instructions.</p>
 <p>Then <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is used to execute MetFrag and generate the <code>compounds</code>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">compounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compound-generation.html">generateCompounds</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">mslists</span>, <span class="st">"metfrag"</span>, method <span class="op">=</span> <span class="st">"CL"</span>,
                                dbRelMzDev <span class="op">=</span> <span class="fl">5</span>, fragRelMzDev <span class="op">=</span> <span class="fl">5</span>, fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,
                                adduct <span class="op">=</span> <span class="st">"[M+H]+"</span>, database <span class="op">=</span> <span class="st">"pubchemlite"</span>, maxCandidatesToStop <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Identifying 25 feature groups with MetFrag...
-#&gt; Converting to algorithm specific adducts... Done!
-#&gt; ================================================================================
-#&gt; Loaded 654 compounds from 18 features (72.00%).</code></pre>
+<pre><code><span class="co">#&gt; Identifying 25 feature groups with MetFrag...</span>
+<span class="co">#&gt; Converting to algorithm specific adducts... Done!</span>
+<span class="co">#&gt; ================================================================================</span>
+<span class="co">#&gt; Loaded 654 compounds from 18 features (72.00%).</span></code></pre>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.</p>
 <p>See <code>?generateCompounds()</code> for more information on possible databases and many other parameters that can be set.</p>
 <blockquote>
@@ -529,104 +531,104 @@ p.caption {
 <p>Finally we use the <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code> function to improve ranking of candidates by incorporating the formula calculation data from the previous step.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">compounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compounds-class.html">addFormulaScoring</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="va">formulas</span>, updateScore <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Adding formula scoring...
-#&gt; ================================================================================</code></pre>
+<pre><code><span class="co">#&gt; Adding formula scoring...</span>
+<span class="co">#&gt; ================================================================================</span></code></pre>
 </div>
-<div id="inspecting-results-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#inspecting-results-1" class="anchor"></a>Inspecting results</h2>
+<div class="section level2">
+<h2 id="inspecting-results-1">Inspecting results<a class="anchor" aria-label="anchor" href="#inspecting-results-1"></a>
+</h2>
 <p>Similar as feature groups we can quickly peek at some results:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mslists</span></code></pre></div>
-<pre><code>#&gt; A MSPeakLists object
-#&gt; Hierarchy:
-#&gt; workflowStep
-#&gt;     |-- MSPeakLists
-#&gt;       |-- MSPeakListsSet
-#&gt;       |-- MSPeakListsUnset
-#&gt; ---
-#&gt; Object size (indication): 1.9 MB
-#&gt; Algorithm: mzr
-#&gt; Total peak count: 7070 (MS: 6626 - MS/MS: 444)
-#&gt; Average peak count/analysis: 2357 (MS: 2209 - MS/MS: 148)
-#&gt; Total peak lists: 127 (MS: 75 - MS/MS: 52)
-#&gt; Average peak lists/analysis: 42 (MS: 25 - MS/MS: 17)</code></pre>
+<pre><code><span class="co">#&gt; A MSPeakLists object</span>
+<span class="co">#&gt; Hierarchy:</span>
+<span class="co">#&gt; workflowStep</span>
+<span class="co">#&gt;     |-- MSPeakLists</span>
+<span class="co">#&gt;       |-- MSPeakListsSet</span>
+<span class="co">#&gt;       |-- MSPeakListsUnset</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Object size (indication): 1.9 MB</span>
+<span class="co">#&gt; Algorithm: mzr</span>
+<span class="co">#&gt; Total peak count: 7070 (MS: 6626 - MS/MS: 444)</span>
+<span class="co">#&gt; Average peak count/analysis: 2357 (MS: 2209 - MS/MS: 148)</span>
+<span class="co">#&gt; Total peak lists: 127 (MS: 75 - MS/MS: 52)</span>
+<span class="co">#&gt; Average peak lists/analysis: 42 (MS: 25 - MS/MS: 17)</span></code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">formulas</span></code></pre></div>
-<pre><code>#&gt; A formulas object
-#&gt; Hierarchy:
-#&gt; featureAnnotations
-#&gt;     |-- formulas
-#&gt;       |-- formulasConsensus
-#&gt;       |-- formulasSet
-#&gt;         |-- formulasConsensusSet
-#&gt;       |-- formulasUnset
-#&gt; ---
-#&gt; Object size (indication): 699 kB
-#&gt; Algorithm: genform
-#&gt; Formulas assigned to features:
-#&gt;   - Total formula count: 109
-#&gt;   - Average formulas per analysis: 1.6
-#&gt;   - Average formulas per feature: 1.6
-#&gt; Formulas assigned to feature groups:
-#&gt;   - Total formula count: 29
-#&gt;   - Average formulas per feature group: 1.3</code></pre>
+<pre><code><span class="co">#&gt; A formulas object</span>
+<span class="co">#&gt; Hierarchy:</span>
+<span class="co">#&gt; featureAnnotations</span>
+<span class="co">#&gt;     |-- formulas</span>
+<span class="co">#&gt;       |-- formulasConsensus</span>
+<span class="co">#&gt;       |-- formulasSet</span>
+<span class="co">#&gt;         |-- formulasConsensusSet</span>
+<span class="co">#&gt;       |-- formulasUnset</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Object size (indication): 699 kB</span>
+<span class="co">#&gt; Algorithm: genform</span>
+<span class="co">#&gt; Formulas assigned to features:</span>
+<span class="co">#&gt;   - Total formula count: 109</span>
+<span class="co">#&gt;   - Average formulas per analysis: 1.6</span>
+<span class="co">#&gt;   - Average formulas per feature: 1.6</span>
+<span class="co">#&gt; Formulas assigned to feature groups:</span>
+<span class="co">#&gt;   - Total formula count: 29</span>
+<span class="co">#&gt;   - Average formulas per feature group: 1.3</span></code></pre>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">compounds</span></code></pre></div>
-<pre><code>#&gt; A compoundsMF object
-#&gt; Hierarchy:
-#&gt; compounds
-#&gt;     |-- compoundsMF
-#&gt; ---
-#&gt; Object size (indication): 2.5 MB
-#&gt; Algorithm: metfrag
-#&gt; Number of feature groups with compounds in this object: 18
-#&gt; Number of compounds: 654 (total), 36.3 (mean), 2 - 100 (min - max)</code></pre>
+<pre><code><span class="co">#&gt; A compoundsMF object</span>
+<span class="co">#&gt; Hierarchy:</span>
+<span class="co">#&gt; compounds</span>
+<span class="co">#&gt;     |-- compoundsMF</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Object size (indication): 2.5 MB</span>
+<span class="co">#&gt; Algorithm: metfrag</span>
+<span class="co">#&gt; Number of feature groups with compounds in this object: 18</span>
+<span class="co">#&gt; Number of compounds: 654 (total), 36.3 (mean), 2 - 100 (min - max)</span></code></pre>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">mslists</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt;                group type ID        mz intensity precursor
-#&gt;    1:    M100_R28_65   MS  1  97.06466  33207.64     FALSE
-#&gt;    2:    M100_R28_65   MS  2  98.97522 151933.58     FALSE
-#&gt;    3:    M100_R28_65   MS  3 100.11197 214742.42      TRUE
-#&gt;    4:    M100_R28_65   MS  4 101.05957  28490.67     FALSE
-#&gt;    5:    M100_R28_65   MS  5 102.12770 282241.45     FALSE
-#&gt;   ---                                                     
-#&gt; 1512: M186_R293_1559 MSMS 29 125.09597  47036.71     FALSE
-#&gt; 1513: M186_R293_1559 MSMS 37 142.15887  59948.36     FALSE
-#&gt; 1514: M186_R293_1559 MSMS 39 144.17459 100887.24     FALSE
-#&gt; 1515: M186_R293_1559 MSMS 47 186.22174 277026.44      TRUE
-#&gt; 1516: M186_R293_1559 MSMS 48 187.22492  42499.82     FALSE</code></pre>
+<pre><code><span class="co">#&gt;                group type ID        mz intensity precursor</span>
+<span class="co">#&gt;    1:    M100_R28_65   MS  1  97.06466  33207.64     FALSE</span>
+<span class="co">#&gt;    2:    M100_R28_65   MS  2  98.97522 151933.58     FALSE</span>
+<span class="co">#&gt;    3:    M100_R28_65   MS  3 100.11197 214742.42      TRUE</span>
+<span class="co">#&gt;    4:    M100_R28_65   MS  4 101.05957  28490.67     FALSE</span>
+<span class="co">#&gt;    5:    M100_R28_65   MS  5 102.12770 282241.45     FALSE</span>
+<span class="co">#&gt;   ---                                                     </span>
+<span class="co">#&gt; 1512: M186_R293_1559 MSMS 29 125.09597  47036.71     FALSE</span>
+<span class="co">#&gt; 1513: M186_R293_1559 MSMS 37 142.15887  59948.36     FALSE</span>
+<span class="co">#&gt; 1514: M186_R293_1559 MSMS 39 144.17459 100887.24     FALSE</span>
+<span class="co">#&gt; 1515: M186_R293_1559 MSMS 47 186.22174 277026.44      TRUE</span>
+<span class="co">#&gt; 1516: M186_R293_1559 MSMS 48 187.22492  42499.82     FALSE</span></code></pre>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">formulas</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></code></pre></div>
-<pre><code>#&gt;              group neutral_formula ion_formula neutralMass ion_formula_mz       error dbe
-#&gt;  1:    M100_R28_65          C6H13N      C6H14N     99.1048       100.1121  1.06666667   1
-#&gt;  2:     M102_R7_95          C6H15N      C6H16N    101.1204       102.1277  0.26666667   0
-#&gt;  3:  M109_R192_158          C6H8N2      C6H9N2    108.0687       109.0760  0.60000000   4
-#&gt;  4:  M116_R316_230          C5H9NS     C5H10NS    115.0456       116.0529  1.20000000   2
-#&gt;  5:  M120_R268_286          C6H5N3      C6H6N3    119.0483       120.0556  2.13333333   6
-#&gt; ---                                                                                      
-#&gt; 25: M180_R336_1401      C5H13N3O2S  C5H14N3O2S    179.0728       180.0801 -0.03333333   1
-#&gt; 26: M183_R193_1479        C5H6N6O2    C5H7N6O2    182.0552       183.0625 -1.63333333   6
-#&gt; 27: M183_R313_1481        C6H15O4P    C6H16O4P    182.0708       183.0781  2.93333333   0
-#&gt; 28: M183_R313_1481        CH10N8OS    CH11N8OS    182.0698       183.0771 -2.40000000   1
-#&gt; 29: M186_R293_1559         C12H27N     C12H28N    185.2143       186.2216  1.26666667   0</code></pre>
+<pre><code><span class="co">#&gt;              group neutral_formula ion_formula neutralMass ion_formula_mz       error dbe</span>
+<span class="co">#&gt;  1:    M100_R28_65          C6H13N      C6H14N     99.1048       100.1121  1.06666667   1</span>
+<span class="co">#&gt;  2:     M102_R7_95          C6H15N      C6H16N    101.1204       102.1277  0.26666667   0</span>
+<span class="co">#&gt;  3:  M109_R192_158          C6H8N2      C6H9N2    108.0687       109.0760  0.60000000   4</span>
+<span class="co">#&gt;  4:  M116_R316_230          C5H9NS     C5H10NS    115.0456       116.0529  1.20000000   2</span>
+<span class="co">#&gt;  5:  M120_R268_286          C6H5N3      C6H6N3    119.0483       120.0556  2.13333333   6</span>
+<span class="co">#&gt; ---                                                                                      </span>
+<span class="co">#&gt; 25: M180_R336_1401      C5H13N3O2S  C5H14N3O2S    179.0728       180.0801 -0.03333333   1</span>
+<span class="co">#&gt; 26: M183_R193_1479        C5H6N6O2    C5H7N6O2    182.0552       183.0625 -1.63333333   6</span>
+<span class="co">#&gt; 27: M183_R313_1481        C6H15O4P    C6H16O4P    182.0708       183.0781  2.93333333   0</span>
+<span class="co">#&gt; 28: M183_R313_1481        CH10N8OS    CH11N8OS    182.0698       183.0771 -2.40000000   1</span>
+<span class="co">#&gt; 29: M186_R293_1559         C12H27N     C12H28N    185.2143       186.2216  1.26666667   0</span></code></pre>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></code></pre></div>
-<pre><code>#&gt;               group explainedPeaks    score neutralMass                  SMILES
-#&gt;   1:  M109_R192_158              1 4.190025    108.0687         C1=CC(=CC=C1N)N
-#&gt;   2:  M109_R192_158              1 4.184934    108.0687       C1=CC=C(C(=C1)N)N
-#&gt;   3:  M109_R192_158              1 4.019062    108.0687         C1=CC=C(C=C1)NN
-#&gt;   4:  M109_R192_158              1 3.690572    108.0687       C1=CC(=CC(=C1)N)N
-#&gt;   5:  M109_R192_158              1 3.099843    108.0687         CC1=CC(=NC=C1)N
-#&gt;  ---                                                                           
-#&gt; 650: M186_R293_1559              3 2.885477    185.2143     CCCC(CCC)(CC(C)C)NC
-#&gt; 651: M186_R293_1559              3 2.884977    185.2143       CCCC(CCC)(CCC)NCC
-#&gt; 652: M186_R293_1559              3 2.875313    185.2143   CC(C)CC(C)NC(C)CC(C)C
-#&gt; 653: M186_R293_1559              3 2.875147    185.2143     CCCC(CCC)(CCC)N(C)C
-#&gt; 654: M186_R293_1559              3 2.855758    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</code></pre>
+<pre><code><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span>
+<span class="co">#&gt;   1:  M109_R192_158              1 4.190025    108.0687         C1=CC(=CC=C1N)N</span>
+<span class="co">#&gt;   2:  M109_R192_158              1 4.184934    108.0687       C1=CC=C(C(=C1)N)N</span>
+<span class="co">#&gt;   3:  M109_R192_158              1 4.019062    108.0687         C1=CC=C(C=C1)NN</span>
+<span class="co">#&gt;   4:  M109_R192_158              1 3.690572    108.0687       C1=CC(=CC(=C1)N)N</span>
+<span class="co">#&gt;   5:  M109_R192_158              1 3.099843    108.0687         CC1=CC(=NC=C1)N</span>
+<span class="co">#&gt;  ---                                                                           </span>
+<span class="co">#&gt; 650: M186_R293_1559              3 2.885477    185.2143     CCCC(CCC)(CC(C)C)NC</span>
+<span class="co">#&gt; 651: M186_R293_1559              3 2.884977    185.2143       CCCC(CCC)(CCC)NCC</span>
+<span class="co">#&gt; 652: M186_R293_1559              3 2.875313    185.2143   CC(C)CC(C)NC(C)CC(C)C</span>
+<span class="co">#&gt; 653: M186_R293_1559              3 2.875147    185.2143     CCCC(CCC)(CCC)N(C)C</span>
+<span class="co">#&gt; 654: M186_R293_1559              3 2.855758    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M215_R333_2275"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; NULL</code></pre>
+<pre><code><span class="co">#&gt; NULL</span></code></pre>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">formulas</span>, <span class="fl">1</span>, <span class="st">"M109_R192_158"</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>
@@ -635,15 +637,15 @@ p.caption {
 <p><img src="tutorial_files/figure-html/plotSpectrum-2.png" width="576"></p>
 </div>
 </div>
-<div id="reporting" class="section level1">
-<h1 class="hasAnchor">
-<a href="#reporting" class="anchor"></a>Reporting</h1>
+<div class="section level1">
+<h1 id="reporting">Reporting<a class="anchor" aria-label="anchor" href="#reporting"></a>
+</h1>
 <p>The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (<code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code>) or tabular csv data (<code><a href="../reference/reporting.html">reportCSV()</a></code>).</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
           components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
 <span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
-           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
+           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
            selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>The output of <code><a href="../reference/reporting.html">reportHTML()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms and their parameters. In this case you can simply cherry pick the data that you want to report, for instance:</p>
@@ -654,24 +656,24 @@ p.caption {
 <span class="co"># report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting</span>
 <span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="final-script" class="section level1">
-<h1 class="hasAnchor">
-<a href="#final-script" class="anchor"></a>Final script</h1>
+<div class="section level1">
+<h1 id="final-script">Final script<a class="anchor" aria-label="anchor" href="#final-script"></a>
+</h1>
 <p>In the previous sections the different parts of the processing script were discussed and where necessary modified. As a reference, the final script look similar ot this:</p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Script automatically generated on Mon Jul 26 14:32:58 2021</span>
 
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon">patRoon</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon" class="external-link">patRoon</a></span><span class="op">)</span>
 
 <span class="co"># -------------------------</span>
 <span class="co"># initialization</span>
 <span class="co"># -------------------------</span>
 
 <span class="va">workPath</span> <span class="op">&lt;-</span> <span class="st">"C:/myproject"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">workPath</span><span class="op">)</span>
 
 <span class="co"># Example data from patRoonData package (triplicate solvent blank + triplicate standard)</span>
-<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span>
+<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleAnalysisInfo</a></span><span class="op">(</span><span class="st">"positive"</span><span class="op">)</span>
 
 <span class="co"># -------------------------</span>
 <span class="co"># features</span>
@@ -721,7 +723,7 @@ p.caption {
 <span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
           components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
 <span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,
-           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
+           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
            selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <!-- UNDONE: next steps section -->
 </div>
@@ -738,11 +740,13 @@ p.caption {
 
 
       <footer><div class="copyright">
-  <p>Developed by Rick Helmus.</p>
+  <p></p>
+<p>Developed by Rick Helmus.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -750,6 +754,8 @@ p.caption {
 
   
 
+
+  
 
   </body>
 </html>

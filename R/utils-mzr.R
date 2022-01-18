@@ -259,3 +259,15 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
     return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
                           avgFun, method, pruneMissingPrecursor, retainPrecursor))
 }
+
+verifyDataCentroided <- function(path)
+{
+    msf <- mzR::openMSfile(path)
+    
+    # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading everything
+    # takes some time; _especially_ if it profile data.
+    hd <- mzR::header(msf, seq_len(min(100, length(msf))))
+    if (!is.null(hd[["centroided"]]) && any(hd$centroided == FALSE))
+        warning(paste("Some or all spectra are not centroided of file", path), call. = FALSE)
+    mzR::close(msf)
+}

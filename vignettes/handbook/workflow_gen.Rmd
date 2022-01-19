@@ -719,7 +719,7 @@ compsMF1 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
 
 # Custom scoring in custom database
 compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
-                              database = "csv", adduct = "[M+H]+",
+                              database = "csv",
                               extraOpts = list(LocalDatabasePath = "~/mydb.csv"),
                               scoreTypes = c("fragScore", "myScore", "myScore2"))
 ```

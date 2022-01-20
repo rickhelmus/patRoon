@@ -188,6 +188,8 @@ NULL
 #' @note The file format of analyses for \code{findFeaturesXCMS} and \code{findFeaturesXCMS3} must be \code{mzML} or
 #'   \code{mzXML}.
 #'
+#' @template centroid_note
+#'
 #' @section Sets workflows: The \code{makeSet} method function is used to initiate a \link[=sets-workflow]{sets
 #'   workflow}. This method simply combines all the features from specified \code{\link{features}} objects in a new
 #'   \code{\link{featuresSet}} object. The \link[=analysis-information]{analysis information} for this object is updated
@@ -237,6 +239,8 @@ NULL
 #'   export).
 #'
 #' @template loadrawdata-arg
+#' 
+#' @template centroid_note
 #'
 #' @section Sets workflows: With a \link[=sets-workflow]{sets workflow} the features are first neutralized, \emph{i.e.}
 #'   their \emph{m/z} values is replaced by their neutral monoisotopic mass. The latter is calculated from adduct
@@ -458,6 +462,8 @@ NULL
 #'
 #' @template dasaveclose-args
 #'
+#' @template centroid_note
+#' 
 #' @section Peak list averaging parameters: The parameters set used for averaging peak lists are set by the
 #'   \code{avgFeatParams} and \code{avgFGroupParams} arguments. This should be a named \code{list} with the following
 #'   values: \itemize{

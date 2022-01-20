@@ -10,7 +10,10 @@ origRmds <- file.path(handbookSubRmdPath, origRmds)
 disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
-install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
+# get older pkgdown version for now, see https://github.com/r-lib/pkgdown/issues/2022
+remotes::install_github("r-lib/pkgdown@v1.6.1")
+
+install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()

@@ -269,38 +269,34 @@ verifyDataCentroided <- function(anaInfo)
     cacheDB <- openCacheDB()
     
     printf("Verifying if your data is centroided...\n")
-    anyNotCentroided <- FALSE
-    for (i in seq_len(nrow(anaInfo)))
-    {
-        path <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i])
-        
-        hash <- makeFileHash(path)
-        isCentr <- loadCacheData("dataCentroided", hash, cacheDB)
-        if (is.null(isCentr))
-        {
-            msf <- mzR::openMSfile(path)
-            
-            # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading
-            # everything takes some time, _especially_ if it profile data.
-            hd <- mzR::header(msf, seq_len(min(100, length(msf))))
-            
-            # UNDONE: for now we just don't put out any warnings if there is now centroided flag available
-            isCentr <- is.null(hd[["centroided"]]) || all(hd$centroided)
-        
-            mzR::close(msf)
-            
-            saveCacheData("dataCentroided", isCentr, hash, cacheDB)
-        }
-        
-        if (!isCentr)
-        {
-            warning(paste("Some or all spectra are not centroided of file", path), call. = FALSE)
-            anyNotCentroided <- TRUE
-        }
-    }
     
-    if (anyNotCentroided)
-        warning("Please ensure that your MS data is centroided, for instance by using convertMSFiles()", call. = FALSE)
+    isCentroided <- mapply(anaInfo$analysis, anaInfo$path, FUN = function(ana, path)
+    {
+        fpath <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        
+        hash <- makeFileHash(fpath)
+        cd <- loadCacheData("dataCentroided", hash, cacheDB)
+        if (!is.null(cd))
+            return(cd)
+
+        msf <- mzR::openMSfile(fpath)
+        # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading
+        # everything takes some time, _especially_ if it profile data.
+        hd <- mzR::header(msf, seq_len(min(100, length(msf))))
+        mzR::close(msf)
+        
+        # UNDONE: for now we just don't put out any warnings if there is now centroided flag available
+        isCentr <- is.null(hd[["centroided"]]) || all(hd$centroided)
+        saveCacheData("dataCentroided", isCentr, hash, cacheDB)
+        
+        return(isCentr)
+    })
+    
+    if (!all(isCentroided))
+        warning("It seems that the following files may not be centroided: ",
+                paste0(anaInfo$analysis[!isCentroided], collapse = ", "),
+                ". Please ensure that your MS data is centroided, for instance by using convertMSFiles()",
+                call. = FALSE)
     
     invisible(NULL)
 }

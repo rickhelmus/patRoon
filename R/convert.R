@@ -331,7 +331,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
             from <- checkmate::matchArg(from, "bruker", add = ac)
 
         if (from == to)
-            stop("Input and output formats are the same")
+            warning("Input and output formats are the same")
     }
 
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files), add = ac)

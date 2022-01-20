@@ -50,7 +50,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
 {
     if (length(fGroups) == 0)
         return(list())
-
+    
     gNames <- names(fGroups)
     gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
@@ -58,6 +58,8 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
+    verifyDataCentroided(anaInfo)
+    
     # load EICs per analysis: we don't want to load multiple potentially large
     # analysis files simultaneously. Before that, it's more efficient to first
     # figure out for which feature groups EICs have to be generated per
@@ -203,6 +205,8 @@ setMethod("getEICsForFeatures", "features", function(features)
     
     fTable <- featureTable(features)
     anaInfo <- analysisInfo(features)
+    
+    verifyDataCentroided(anaInfo)
     
     cacheDB <- openCacheDBScope()
     

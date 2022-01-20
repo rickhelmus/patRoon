@@ -92,7 +92,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
     checkPackage("KPIC", "https://github.com/hcji/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ kmeans + parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -159,7 +159,7 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(picsList, "list", min.len = 1, add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(picsList) != nrow(analysisInfo))

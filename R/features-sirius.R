@@ -61,7 +61,7 @@ setMethod("initialize", "featuresSIRIUS",
 findFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzML", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, verifyCentroided = TRUE, "mzML", add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     

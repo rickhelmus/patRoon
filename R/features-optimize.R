@@ -149,7 +149,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
     params <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
+    # NOTE: so far only algos that need centroided data are supported
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, verifyCentroided = TRUE, add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick", "kpic2"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)

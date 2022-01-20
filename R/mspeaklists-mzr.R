@@ -35,6 +35,8 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
 
+    verifyDataCentroided(analysisInfo(fGroups))
+    
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)

@@ -63,7 +63,8 @@ assertCharOrFactor <- function(x, empty.ok = FALSE, null.ok = FALSE, ..., .var.n
     )
 }
 
-assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALSE, null.ok = FALSE,
+                               .var.name = checkmate::vname(x), add = NULL)
 {
     if (is.null(x) && null.ok)
         return(TRUE)
@@ -118,6 +119,8 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
             checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
                                                 paste0(allowedFormats, collapse = ", ")),
                                      var.name = .var.name, collection = add)
+        else if (verifyCentroided)
+            verifyDataCentroided(x)
     }
 
     invisible(NULL)

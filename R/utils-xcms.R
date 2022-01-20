@@ -111,6 +111,10 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
 
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
+    
+    if (loadRawData)
+        verifyDataCentroided(anaInfo)
+    
     xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
 
     if (loadRawData)
@@ -213,7 +217,10 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
     
     rawData <- NULL
     if (loadRawData)
+    {
+        verifyDataCentroided(analysisInfo(obj))
         rawData <- readMSDataForXCMS3(analysisInfo(obj))
+    }
     else
     {
         # create a dummy MSnExp object

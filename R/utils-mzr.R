@@ -260,14 +260,35 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
                           avgFun, method, pruneMissingPrecursor, retainPrecursor))
 }
 
-verifyDataCentroided <- function(path)
+verifyDataCentroided <- function(anaInfo)
 {
-    msf <- mzR::openMSfile(path)
+    cacheDB <- openCacheDB()
     
-    # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading everything
-    # takes some time; _especially_ if it profile data.
-    hd <- mzR::header(msf, seq_len(min(100, length(msf))))
-    if (!is.null(hd[["centroided"]]) && any(hd$centroided == FALSE))
-        warning(paste("Some or all spectra are not centroided of file", path), call. = FALSE)
-    mzR::close(msf)
+    printf("Verifying if your data is centroided...\n")
+    for (i in seq_len(nrow(anaInfo)))
+    {
+        path <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i])
+        
+        hash <- makeFileHash(path)
+        isCentr <- loadCacheData("dataCentroided", hash, cacheDB)
+        if (is.null(isCentr))
+        {
+            msf <- mzR::openMSfile(path)
+            
+            # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading
+            # everything takes some time, _especially_ if it profile data.
+            hd <- mzR::header(msf, seq_len(min(100, length(msf))))
+            
+            # UNDONE: for now we just don't put out any warnings if there is now centroided flag available
+            isCentr <- is.null(hd[["centroided"]]) || all(hd$centroided)
+        
+            mzR::close(msf)
+            
+            saveCacheData("dataCentroided", isCentr, hash, cacheDB)
+        }
+        
+        if (!isCentr)
+            warning(paste("Some or all spectra are not centroided of file", path), call. = FALSE)
+    }
+    invisible(NULL)
 }

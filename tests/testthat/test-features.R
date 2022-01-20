@@ -15,9 +15,6 @@ ffSIRIUS <- findFeatures(anaInfoOne, "sirius")
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
-# convertMSFiles(file.path(anaInfoOne$path, paste0(anaInfoOne$analysis, ".mzML")),
-#                outPath = getWorkPath(), to = "mzXML", algorithm = "openms",
-#                logPath = NULL)
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 

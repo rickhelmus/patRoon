@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-18" />
+<meta name="date" content="2022-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,7 +56,7 @@
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.7/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
@@ -382,35 +382,35 @@ div.csl-indent {
 </ol>
 <p>The first scenario is often used if it is unknown which feature groups may be parents or which are TPs. Furthermore, this scenario may also be used if the dataset is sufficiently simple, for instance, because a suspect screening with the results from <code>convertToSuspects</code> (discussed in the previous section) would reliably discriminate between parents and TPs. A workflow with the first scenario is demonstrated in the <a href="TPsExamples.html#TPsEx2">second example</a>.</p>
 <p>In all other cases it is recommended to use either the second or third scenario, since making a prior distinction between parent and TP feature groups greatly simplifies the dataset and reduces false positives. A relative simple example where this can be used is when there are two sample groups: before and after treatment.</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="linking-parent-and-transformation-product-features.html#cb168-1" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
-<span id="cb168-2"><a href="linking-parent-and-transformation-product-features.html#cb168-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;before&quot;</span>],</span>
-<span id="cb168-3"><a href="linking-parent-and-transformation-product-features.html#cb168-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;after&quot;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="linking-parent-and-transformation-product-features.html#cb174-1" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
+<span id="cb174-2"><a href="linking-parent-and-transformation-product-features.html#cb174-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;before&quot;</span>],</span>
+<span id="cb174-3"><a href="linking-parent-and-transformation-product-features.html#cb174-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;after&quot;</span>])</span></code></pre></div>
 <p>In this example, only those feature groups present in the “before” replicate group are considered as parents, and those in “after” may be considered as a TP. Since it is likely that there will be some overlap in feature groups between both sample groups, the <code>ignoreParents</code> flag can be used to not consider any of the overlap for TP assignments:</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="linking-parent-and-transformation-product-features.html#cb169-1" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
-<span id="cb169-2"><a href="linking-parent-and-transformation-product-features.html#cb169-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;before&quot;</span>],</span>
-<span id="cb169-3"><a href="linking-parent-and-transformation-product-features.html#cb169-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;after&quot;</span>],</span>
-<span id="cb169-4"><a href="linking-parent-and-transformation-product-features.html#cb169-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ignoreParents =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="linking-parent-and-transformation-product-features.html#cb175-1" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
+<span id="cb175-2"><a href="linking-parent-and-transformation-product-features.html#cb175-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;before&quot;</span>],</span>
+<span id="cb175-3"><a href="linking-parent-and-transformation-product-features.html#cb175-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[<span class="at">rGroups =</span> <span class="st">&quot;after&quot;</span>],</span>
+<span id="cb175-4"><a href="linking-parent-and-transformation-product-features.html#cb175-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ignoreParents =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>More sophisticates ways are of course possible to provide an upfront distinction between parent/TP feature groups. In the <a href="TPsExamples.html#TPsEx4">fourth example</a> a workflow is demonstrated where fold changes are used.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The feature groups specified for <code>fGroups</code>/<code>fGroupsTPs</code> <em>must</em> always originate from the same <code>featureGroups</code> object.</p>
 </blockquote>
 <p>For the <code>library</code> and <code>biotransformer</code> algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the <code>convertToSuspects</code> function is used to prepare the suspect list:</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="linking-parent-and-transformation-product-features.html#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set includeParents to TRUE since both the parents and TPs are needed</span></span>
-<span id="cb170-2"><a href="linking-parent-and-transformation-product-features.html#cb170-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb170-3"><a href="linking-parent-and-transformation-product-features.html#cb170-3" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb170-4"><a href="linking-parent-and-transformation-product-features.html#cb170-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-5"><a href="linking-parent-and-transformation-product-features.html#cb170-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the componentization</span></span>
-<span id="cb170-6"><a href="linking-parent-and-transformation-product-features.html#cb170-6" aria-hidden="true" tabindex="-1"></a><span class="co"># a similar distinction between fGroups/fGroupsScr as discussed above can of course also be done</span></span>
-<span id="cb170-7"><a href="linking-parent-and-transformation-product-features.html#cb170-7" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">fGroups =</span> fGroupsScr, ...)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="linking-parent-and-transformation-product-features.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set includeParents to TRUE since both the parents and TPs are needed</span></span>
+<span id="cb176-2"><a href="linking-parent-and-transformation-product-features.html#cb176-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb176-3"><a href="linking-parent-and-transformation-product-features.html#cb176-3" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb176-4"><a href="linking-parent-and-transformation-product-features.html#cb176-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-5"><a href="linking-parent-and-transformation-product-features.html#cb176-5" aria-hidden="true" tabindex="-1"></a><span class="co"># do the componentization</span></span>
+<span id="cb176-6"><a href="linking-parent-and-transformation-product-features.html#cb176-6" aria-hidden="true" tabindex="-1"></a><span class="co"># a similar distinction between fGroups/fGroupsScr as discussed above can of course also be done</span></span>
+<span id="cb176-7"><a href="linking-parent-and-transformation-product-features.html#cb176-7" aria-hidden="true" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">fGroups =</span> fGroupsScr, ...)</span></code></pre></div>
 <p>If a parent screening was already performed in advance, for instance when the input parents to <code>generateTPs</code> are screening results, the screening results for parents and TPs can also be combined. The <a href="TPsExamples.html#TPsEx2">second example</a> demonstrates this.</p>
 <p>Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to a TP suspect, all of them will be incorporated in the component.</p>
 <p>When TPs were generated with the <code>logic</code> algorithm a suspect screening must also be carried out in advance. However, in this case it is not necessary to include the parents (since each parent equals a feature group no mapping is necessary). The <code>onlyHits</code> variable to <code>screenSuspects</code> must not be set in order to keep the parents.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="linking-parent-and-transformation-product-features.html#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only screen for TPs</span></span>
-<span id="cb171-2"><a href="linking-parent-and-transformation-product-features.html#cb171-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb171-3"><a href="linking-parent-and-transformation-product-features.html#cb171-3" aria-hidden="true" tabindex="-1"></a><span class="co"># but keep all other feature groups as these may be parents</span></span>
-<span id="cb171-4"><a href="linking-parent-and-transformation-product-features.html#cb171-4" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb171-5"><a href="linking-parent-and-transformation-product-features.html#cb171-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-6"><a href="linking-parent-and-transformation-product-features.html#cb171-6" aria-hidden="true" tabindex="-1"></a><span class="co"># do the componentization...</span></span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="linking-parent-and-transformation-product-features.html#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only screen for TPs</span></span>
+<span id="cb177-2"><a href="linking-parent-and-transformation-product-features.html#cb177-2" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb177-3"><a href="linking-parent-and-transformation-product-features.html#cb177-3" aria-hidden="true" tabindex="-1"></a><span class="co"># but keep all other feature groups as these may be parents</span></span>
+<span id="cb177-4"><a href="linking-parent-and-transformation-product-features.html#cb177-4" aria-hidden="true" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb177-5"><a href="linking-parent-and-transformation-product-features.html#cb177-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb177-6"><a href="linking-parent-and-transformation-product-features.html#cb177-6" aria-hidden="true" tabindex="-1"></a><span class="co"># do the componentization...</span></span></code></pre></div>
 </div>
 <div id="annotation-similarity-calculation" class="section level4" number="7.2.1.2">
 <h4><span class="header-section-number">7.2.1.2</span> Annotation similarity calculation</h4>
@@ -465,7 +465,7 @@ div.csl-indent {
 <div id="reporting-tp-components" class="section level3" number="7.2.4">
 <h3><span class="header-section-number">7.2.4</span> Reporting TP components</h3>
 <p>The TP components can be reported with the <code>reportHTML</code> function. This is done by setting the <code>components</code> function argument (i.e. equally to all other component types). The results will be displayed with a customized format that allows easy exploring of each parent with its TPs.</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="linking-parent-and-transformation-product-features.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">components =</span> componTP)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="linking-parent-and-transformation-product-features.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">components =</span> componTP)</span></code></pre></div>
 </div>
 </div>
             </section>

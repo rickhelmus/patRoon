@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-18" />
+<meta name="date" content="2022-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,7 +56,7 @@
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.7/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
@@ -330,8 +330,8 @@ div.csl-indent {
 <div id="annotation" class="section level2" number="4.5">
 <h2><span class="header-section-number">4.5</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-832da888ee45426e3aa0" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-832da888ee45426e3aa0">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e7d00deac6cd3e4a0198" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e7d00deac6cd3e4a0198">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.</p>
 <div id="ms-peak-lists" class="section level3" number="4.5.1">
 <h3><span class="header-section-number">4.5.1</span> MS peak lists</h3>
@@ -1525,7 +1525,7 @@ TRUE
 <span id="cb36-4"><a href="annotation.html#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-5"><a href="annotation.html#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom scoring in custom database</span></span>
 <span id="cb36-6"><a href="annotation.html#cb36-6" aria-hidden="true" tabindex="-1"></a>compsMF2 <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
-<span id="cb36-7"><a href="annotation.html#cb36-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb36-7"><a href="annotation.html#cb36-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
 <span id="cb36-8"><a href="annotation.html#cb36-8" aria-hidden="true" tabindex="-1"></a>                              <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>),</span>
 <span id="cb36-9"><a href="annotation.html#cb36-9" aria-hidden="true" tabindex="-1"></a>                              <span class="at">scoreTypes =</span> <span class="fu">c</span>(<span class="st">&quot;fragScore&quot;</span>, <span class="st">&quot;myScore&quot;</span>, <span class="st">&quot;myScore2&quot;</span>))</span></code></pre></div>
 <p>By default ranking is performed with equal weight (i.e. <em>1</em>) for all scorings. This can be changed by the <code>scoreWeights</code> argument, which should be a <code>vector</code> containing the weights for all scorings following the order of <code>scoreTypes</code>, for instance:</p>

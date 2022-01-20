@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-18" />
+<meta name="date" content="2022-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,7 +56,7 @@
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.7/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
@@ -331,11 +331,11 @@ div.csl-indent {
 <h2><span class="header-section-number">8.9</span> Caching</h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
 <p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="caching.html#cb225-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="caching.html#cb231-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn’t wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>
 <p>In order to figure what is in the cache you can run <code>clearCache()</code> without any arguments:</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="caching.html#cb226-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="caching.html#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
 <pre><code>#&gt; Please specify which cache you want to remove. Available are:
 #&gt; - EICData (3 rows)
 #&gt; - MSPeakListsAvg (4 rows)
@@ -348,6 +348,7 @@ div.csl-indent {
 #&gt; - componentsNontarget (1 rows)
 #&gt; - compoundsCluster (1 rows)
 #&gt; - compoundsMetFrag (30 rows)
+#&gt; - dataCentroided (12 rows)
 #&gt; - featAnnUnset (2 rows)
 #&gt; - featureGroupsOpenMS (5 rows)
 #&gt; - featuresOpenMS (69 rows)
@@ -369,10 +370,10 @@ div.csl-indent {
 #&gt; - specData (12 rows)
 #&gt; - all (removes complete cache database)</code></pre>
 <p>Using this output you can re-run the function again, for instance:</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="caching.html#cb228-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
-<span id="cb228-2"><a href="caching.html#cb228-2" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
-<span id="cb228-3"><a href="caching.html#cb228-3" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
-<span id="cb228-4"><a href="caching.html#cb228-4" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="caching.html#cb234-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
+<span id="cb234-2"><a href="caching.html#cb234-2" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
+<span id="cb234-3"><a href="caching.html#cb234-3" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
+<span id="cb234-4"><a href="caching.html#cb234-4" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
 </div>
             </section>
 

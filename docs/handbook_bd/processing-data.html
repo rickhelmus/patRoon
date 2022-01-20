@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-01-18" />
+<meta name="date" content="2022-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,7 +56,7 @@
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.7/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
@@ -330,7 +330,7 @@ div.csl-indent {
 <div id="processing-data" class="section level2" number="6.4">
 <h2><span class="header-section-number">6.4</span> Processing data</h2>
 <p>All data objects that are generated during a sets workflow <em>inherit</em> from the classes from a ‘regular’ workflow. This means that, with some minor exceptions, <em>all</em> of the data processing functionality discussed in the <a href="processing.html#processing">previous chapter</a> (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the <code>as.data.table()</code> method can be used for general inspection:</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="processing-data.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="processing-data.html#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group    score                                     compoundName               set
 #&gt; 1: M198_R317_272 4.025217              3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
 #&gt; 2: M198_R317_272 1.946688              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
@@ -338,19 +338,19 @@ div.csl-indent {
 #&gt; 4: M198_R317_272 1.838637           3-amino-5-chloro-N,N-dimethylbenzamide positive,negative
 #&gt; 5: M198_R317_272 2.366149 5-[[(2R)-azetidin-2-yl]methoxy]-2-chloropyridine positive,negative</code></pre>
 <p>In addition, some the data processing functionality contains additional functionality for a sets workflow:</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="processing-data.html#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
-<span id="cb148-2"><a href="processing-data.html#cb148-2" aria-hidden="true" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
-<span id="cb148-3"><a href="processing-data.html#cb148-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have feature data for all sets</span></span>
-<span id="cb148-4"><a href="processing-data.html#cb148-4" aria-hidden="true" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span>
-<span id="cb148-5"><a href="processing-data.html#cb148-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb148-6"><a href="processing-data.html#cb148-6" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
-<span id="cb148-7"><a href="processing-data.html#cb148-7" aria-hidden="true" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">sets =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb148-8"><a href="processing-data.html#cb148-8" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
-<span id="cb148-9"><a href="processing-data.html#cb148-9" aria-hidden="true" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">sets =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="processing-data.html#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
+<span id="cb154-2"><a href="processing-data.html#cb154-2" aria-hidden="true" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
+<span id="cb154-3"><a href="processing-data.html#cb154-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have feature data for all sets</span></span>
+<span id="cb154-4"><a href="processing-data.html#cb154-4" aria-hidden="true" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span>
+<span id="cb154-5"><a href="processing-data.html#cb154-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb154-6"><a href="processing-data.html#cb154-6" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
+<span id="cb154-7"><a href="processing-data.html#cb154-7" aria-hidden="true" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">sets =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb154-8"><a href="processing-data.html#cb154-8" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
+<span id="cb154-9"><a href="processing-data.html#cb154-9" aria-hidden="true" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">sets =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>And plotting:</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="processing-data.html#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">sets =</span> <span class="cn">TRUE</span>) <span class="co"># compare positive/negative features</span></span>
-<span id="cb149-2"><a href="processing-data.html#cb149-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_272&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
-<span id="cb149-3"><a href="processing-data.html#cb149-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="processing-data.html#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">sets =</span> <span class="cn">TRUE</span>) <span class="co"># compare positive/negative features</span></span>
+<span id="cb155-2"><a href="processing-data.html#cb155-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_272&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
+<span id="cb155-3"><a href="processing-data.html#cb155-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="handbook_files/figure-html/setsProcDataExtraPlotting-1.png" width="50%" /><img src="handbook_files/figure-html/setsProcDataExtraPlotting-2.png" width="50%" /></p>
 <p>The reference manual for the workflow objects contains specific notes applicable to sets workflows (<code>?featureGroups</code>, <code>?compounds</code> etc).</p>
 </div>

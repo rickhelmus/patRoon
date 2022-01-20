@@ -38,8 +38,7 @@ COMStop <- function(...)
 #'   each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
 #'   is less than the number of analyses the remainders will be set to
 #'   \code{NA}. Set to \code{NULL} to not include concentration data.
-#' @param formats A character vector of analyses file types. Valid values are:
-#'   \code{Bruker}, \code{mzXML} and \code{mzML}.
+#' @param formats A character vector of analyses file types. For valid values see \code{\link{MSFileFormats}}.
 #'
 #' @rdname analysis-information
 #' @export

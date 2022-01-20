@@ -269,6 +269,7 @@ verifyDataCentroided <- function(anaInfo)
     cacheDB <- openCacheDB()
     
     printf("Verifying if your data is centroided...\n")
+    anyNotCentroided <- FALSE
     for (i in seq_len(nrow(anaInfo)))
     {
         path <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i])
@@ -292,7 +293,14 @@ verifyDataCentroided <- function(anaInfo)
         }
         
         if (!isCentr)
+        {
             warning(paste("Some or all spectra are not centroided of file", path), call. = FALSE)
+            anyNotCentroided <- TRUE
+        }
     }
+    
+    if (anyNotCentroided)
+        warning("Please ensure that your MS data is centroided, for instance by using convertMSFiles()", call. = FALSE)
+    
     invisible(NULL)
 }

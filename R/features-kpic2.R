@@ -72,16 +72,33 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @details \code{findFeaturesKPIC2} uses the
-#'   \href{https://github.com/hcji/KPIC2}{KPIC2} \R package to extract features.
+#' Find features using KPIC2
 #'
-#' @param kmeans If \code{TRUE} then \code{\link[KPIC]{getPIC.kmeans}} is used to
-#'   obtain PICs, otherwise it is \code{\link[KPIC]{getPIC}}.
+#' Uses the \href{https://github.com/hcji/KPIC2}{KPIC2} \R package to extract features.
+#'
+#' @templateVar algo KPIC2
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam kpic2
+#' @template algo_generator
+#'
+#' @details The MS files should be in the \code{mzML} or \code{mzXML} format.
+#' 
+#' @template centroid_note_mandatory
+#'
+#' @inheritParams findFeatures
+#'
+#' @template parallel-arg
+#'
+#' @param kmeans If \code{TRUE} then \code{\link[KPIC]{getPIC.kmeans}} is used to obtain PICs, otherwise it is
+#'   \code{\link[KPIC]{getPIC}}.
 #' @param level Passed to \code{\link[KPIC]{getPIC}} or \code{\link[KPIC]{getPIC.kmeans}}
+#' @param \dots Further parameters passed to \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}}
 #'
 #' @references \insertRef{Ji2017}{patRoon}
 #'
-#' @rdname feature-finding
+#' @inherit findFeatures return
+#' 
 #' @export
 findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., parallel = TRUE, verbose = TRUE)
 {

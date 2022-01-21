@@ -24,17 +24,34 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
-#'   function from the \pkg{xcms} package to find features.
+#' Find features using XCMS (old interface)
 #'
-#' @param method The method setting used by XCMS peak finding, see
-#'   \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}
+#' Uses the legacy \code{\link[xcms]{xcmsSet}} function from the \pkg{xcms} package to find features.
 #'
-#' @references \addCitations{xcms}{1} \cr\cr
-#'    \addCitations{xcms}{2} \cr\cr
-#'    \addCitations{xcms}{3}
+#' @templateVar algo XCMS
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam xcms
+#' @template algo_generator
 #'
-#' @rdname feature-finding
+#' @details This function uses the legacy interface of \pkg{xcms}. It is recommended to use
+#'   \code{\link{findFeaturesXCMS3}} instead.
+#'
+#'   The file format of analyses must be \code{mzML} or \code{mzXML}.
+#'
+#' @template centroid_note_mandatory
+#'
+#' @inheritParams findFeatures
+#'
+#' @param method The method setting used by XCMS peak finding, see \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}
+#' @param \dots Further parameters passed to \code{\link[xcms]{xcmsSet}}.
+#'
+#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#'
+#' @inherit findFeatures return
+#'
+#' @seealso \code{\link{findFeaturesXCMS3}}
+#'
 #' @export
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = TRUE)
 {

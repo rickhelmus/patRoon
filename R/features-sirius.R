@@ -52,11 +52,32 @@ featuresSIRIUS <- setClass("featuresSIRIUS", contains = "features")
 setMethod("initialize", "featuresSIRIUS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "sirius", ...))
 
-#' @details \code{findFeaturesSIRIUS} uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find
-#'   features. The features are collected by running the \command{lcms-align} command for every analysis.
+#' Find features using SIRIUS
 #'
-#' @rdname feature-finding
+#' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find features.
+#'
+#' @templateVar algo SIRIUS
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam sirius
+#' @template algo_generator
+#'
+#' @inheritParams findFeatures
+#'
+#' @details The features are collected by running the \command{lcms-align} \command{SIRIUS} command for every analysis.
+#'
+#'   The MS files should be in the \file{mzML} or \file{mzXML} format.
+#'
+#' @template centroid_note_mandatory
+#'
+#' @templateVar what \code{findFeaturesSIRIUS}
+#' @template uses-multiProc
+#' @template parallelization-cache_input
+#'
 #' @references \insertRef{Dhrkop2019}{patRoon}
+#'
+#' @inherit findFeatures return
+#'
 #' @export
 findFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
 {

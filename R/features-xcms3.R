@@ -23,16 +23,30 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @details \code{findFeaturesXCMS3} uses the new \code{xcms3} interface from
-#'   the \pkg{xcms} package to find features.
+#' Find features using XCMS (new interface)
+#'
+#' Uses the new \code{xcms3} interface from the \pkg{xcms} package to find features.
+#'
+#' @templateVar algo XCMS3
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam xcms3
+#' @template algo_generator
+#' 
+#' @details The file format of analyses must be \code{mzML} or \code{mzXML}.
+#' 
+#' @template centroid_note_mandatory
+#'
+#' @inheritParams findFeatures
 #'
 #' @param param The method parameters used by XCMS peak finding, see
 #'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}
+#' @param \dots Further parameters passed to \code{\link[xcms]{xcmsSet}}.
 #'
-#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr
-#'   \addCitations{xcms}{3}
+#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
-#' @rdname feature-finding
+#' @inherit findFeatures return
+#' 
 #' @export
 findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., verbose = TRUE)
 {

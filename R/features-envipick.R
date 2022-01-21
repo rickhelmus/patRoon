@@ -9,14 +9,28 @@ setMethod("initialize", "featuresEnviPick",
           function(.Object, ...) callNextMethod(.Object, algorithm = "envipick", ...))
 
 
-#' @details \code{findFeaturesEnviPick} uses the
-#'   \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
-#'   package to extract features.
+#' Find features using enviPick
 #'
-#' @note \code{findFeaturesEnviPick} Requires analysis files to be in the
-#'   \code{mzXML} format.
+#' Uses the \code{\link[enviPick]{enviPickwrap}} function from the \pkg{enviPick} R package to extract features.
 #'
-#' @rdname feature-finding
+#' @templateVar algo enviPick
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam envipick
+#' @template algo_generator
+#'
+#' @template centroid_note_mandatory
+#'
+#' @inheritParams findFeatures
+#' 
+#' @template parallel-arg
+#' 
+#' @param \dots Further parameters passed to \code{\link[enviPick]{enviPickwrap}}.
+#'
+#' @note The analysis files must be in the \code{mzXML} format.
+#'
+#' @inherit findFeatures return
+#'
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = TRUE)
 {

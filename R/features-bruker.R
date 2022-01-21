@@ -10,35 +10,37 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 setMethod("initialize", "featuresBruker",
           function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_da", ...))
 
-
-#' @details \code{findFeaturesBruker} uses the 'Find Molecular Features' (FMF)
-#'   algorithm of Bruker DataAnalysis vendor software to find features. The
-#'   resulting 'compounds' are then transferred from DataAnalysis and stored as
-#'   features.
+#' Find features using Bruker DataAnalysis
 #'
-#' @note \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
-#'   extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}
-#'   package to be installed. Furthermore, DataAnalysis combines multiple
-#'   related masses in a feature (\emph{e.g.} isotopes, adducts) but does not
-#'   report the actual (monoisotopic) mass of the feature. Therefore, it is
-#'   simply assumed that the feature mass equals that of the highest intensity
-#'   mass peak.
+#' Uses the 'Find Molecular Features' (FMF) algorithm of Bruker DataAnalysis vendor software to find features.
 #'
-#' @param doFMF Run the 'Find Molecular Features' algorithm before loading
-#'   compounds. Valid options are: \code{"auto"} (run FMF automatically if
-#'   current results indicate it is necessary) and \code{"force"} (run FMF
-#'   \emph{always}, even if cached results exist). Note that checks done if
-#'   \code{doFMF="auto"} are fairly simplistic, hence set \code{doFMF="force"}
-#'   if feature data needs to be updated.
-#' @param startRange,endRange Start/End retention range (seconds) from which to
-#'   collect features. A 0 (zero) for \code{endRange} marks the end of the
-#'   analysis.
+#' @templateVar algo Bruker
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam bruker
+#' @template algo_generator
+#'
+#' @inheritParams findFeatures
+#'
+#' @details The resulting 'compounds' are transferred from DataAnalysis and stored as features.
+#'
+#'   This algorithm only works with Bruker data files (\code{.d} extension) and requires Bruker DataAnalysis
+#'   and the \pkg{RDCOMClient} package to be installed. Furthermore, DataAnalysis combines multiple related masses in a
+#'   feature (\emph{e.g.} isotopes, adducts) but does not report the actual (monoisotopic) mass of the feature.
+#'   Therefore, it is simply assumed that the feature mass equals that of the highest intensity mass peak.
+#'
+#' @param doFMF Run the 'Find Molecular Features' algorithm before loading compounds. Valid options are: \code{"auto"}
+#'   (run FMF automatically if current results indicate it is necessary) and \code{"force"} (run FMF \emph{always}, even
+#'   if cached results exist). Note that checks done if \code{doFMF="auto"} are fairly simplistic, hence set
+#'   \code{doFMF="force"} if feature data needs to be updated.
+#' @param startRange,endRange Start/End retention range (seconds) from which to collect features. A 0 (zero) for
+#'   \code{endRange} marks the end of the analysis.
 #'
 #' @template dasaveclose-args
-#'
 #' @template DA-restart-note
+#' 
+#' @inherit findFeatures return
 #'
-#' @rdname feature-finding
 #' @export
 findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0,
                                save = TRUE, close = save, verbose = TRUE)

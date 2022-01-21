@@ -43,9 +43,30 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
                 cent = cent, fileName = fileName))
 }
 
-#' @details \code{findFeaturesSAFD} uses \href{https://bitbucket.org/SSamanipour/safd.jl/src/master/}{SAFD} to obtain
-#'   features. This functionality is still experimental. Please see the \verb{Using SAFD} section below for more
-#'   details.
+#' Find features using SAFD
+#'
+#' Uses \href{https://bitbucket.org/SSamanipour/safd.jl/src/master/}{SAFD} to obtain features. This functionality is
+#' still experimental. Please see the details below.
+#'
+#' @templateVar algo SAFD
+#' @templateVar do automatically find features
+#' @templateVar generic findFeatures
+#' @templateVar algoParam safd
+#' @template algo_generator
+#'
+#' @details The support for SAFD is still experimental, and its interface might change in the future.
+#'
+#'   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
+#'   everything works, \emph{e.g.} by running the test data.
+#'
+#'   This algorithm supports profile and centroided MS data. If the use of profile data is desired, centroided data
+#'   must still be available for other functionality of \code{patRoon}. The centroided data is specified through the
+#'   'regular' \link[=analysis-information]{analysis info} mechanism. The location to any profile data is specified
+#'   through the \code{profPath} argument (\code{NULL} for no profile data). The base file names (\emph{i.e.} the file
+#'   name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
+#'   profile data must be \file{mzXML}.
+#'
+#' @inheritParams findFeatures
 #'
 #' @param profPath A \code{character} vector with paths to the profile MS data for each analysis (will be re-cycled if
 #'   necessary). See the \verb{Using SAFD} section for more details.
@@ -53,20 +74,15 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
 #'   passed to the \code{safd_s3D} function.
 #'
-#' @section Using SAFD: The support for SAFD is still experimental, and its interface might change in the future.
-#'
-#'   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
-#'   everything works, \emph{e.g.} by running the test data.
-#'
-#'   This algorithm only supports profile and centroided MS data. If the use of profile data is desired, centroided data
-#'   must still be available for other functionality of \code{patRoon}. The centroided data is specified through the
-#'   'regular' \link[=analysis-information]{analysis info} mechanism. The location to any profile data is specified
-#'   through the \code{profPath} argument (\code{NULL} for no profile data). The base file names (\emph{i.e.} the file
-#'   name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
-#'   profile data must be \code{mzXML}.
+#' @templateVar what \code{findFeaturesSAFD}
+#' @template uses-multiProc
+#' 
+#' @template parallelization-cache_input
 #'
 #' @references \insertRef{Samanipour2019}{patRoon}
-#' @rdname feature-finding
+#' 
+#' @inherit findFeatures return
+#' 
 #' @export
 findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,

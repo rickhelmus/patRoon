@@ -110,7 +110,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
                 {
                     whSMI <- paste0(wh, "_SMILES")
                     TPLibrary[, (whcol) := switch(col,
-                                                  formula = convertToFormulaBabel(get(whSMI), "smi"),
+                                                  formula = babelConvert(get(whSMI), "smi", "formula"),
                                                   InChI = babelConvert(get(whSMI), "smi", "inchi"),
                                                   InChIKey = babelConvert(get(whSMI), "smi", "inchikey"))]
                 }

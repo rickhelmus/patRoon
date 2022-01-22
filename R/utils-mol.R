@@ -39,7 +39,7 @@ getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
     # which seems less buggy compared to parsing the SMILES with RCDK and then
     # using rcdk::get.mol2formula() to get the mass. The latter could give
     # troubles in tryCatch() calls on Linux with certain JVMs.
-    forms <- convertToFormulaBabel(SMILES, "smi", mustWork = mustWork)
+    forms <- babelConvert(SMILES, "smi", "formula", mustWork = mustWork)
     return(sapply(forms, function(f) if (length(f) > 0) getFormulaMass(f) else NA_character_,
                   USE.NAMES = FALSE))
 }
@@ -128,14 +128,6 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     return(ret$result)
 }
 
-convertToFormulaBabel <- function(input, inFormat, mustWork)
-{
-    ret <- babelConvert(input = input, inFormat = inFormat, outFormat = "txt", mustWork = mustWork,
-                        extraOpts = c("--append", "formula"))
-    ret <- sub("[\\+\\-]+$", "", ret) # remove trailing positive/negative charge if present
-    return(ret)
-}
-
 convertChemDataIfNeeded <- function(tab, destFormat, destCol, fromFormats, fromCols)
 {
     hasData <- function(x) !is.na(x) & nzchar(x)
@@ -147,15 +139,11 @@ convertChemDataIfNeeded <- function(tab, destFormat, destCol, fromFormats, fromC
     {
         printf("Trying to calculate missing %s data... ", destCol)
         
-        if (destFormat == "formula")
-            doConv <- function(inp, f) convertToFormulaBabel(inp, f, mustWork = FALSE)
-        else
-            doConv <- function(inp, f) babelConvert(inp, f, destFormat, mustWork = FALSE)
-        
         for (i in seq_along(fromFormats))
         {
             if (!is.null(tab[[fromCols[i]]]))
-                tab[missingInTab(destCol) & !missingInTab(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
+                tab[missingInTab(destCol) & !missingInTab(fromCols[i]),
+                    (destCol) := babelConvert(get(fromCols[i]), fromFormats[i], destFormat, mustWork = FALSE)]
         }
         
         newEntryCount <- countEntries() - curEntryCount

@@ -37,8 +37,8 @@ PubChemTransformations[, c("parent_InChIKey", "TP_InChIKey") := splitIn2Lists(IK
 
 # add other chem properties
 PubChemTransformations[, c("parent_formula", "TP_formula", "parent_InChI", "TP_InChI") :=
-                              .(patRoon:::convertToFormulaBabel(parent_SMILES, "smi", mustWork = TRUE),
-                                patRoon:::convertToFormulaBabel(TP_SMILES, "smi", mustWork = TRUE),
+                              .(patRoon:::babelConvert(parent_SMILES, "smi", "formula", mustWork = TRUE),
+                                patRoon:::babelConvert(TP_SMILES, "smi", "formula", mustWork = TRUE),
                                 patRoon:::babelConvert(parent_SMILES, "smi", "inchi", mustWork = TRUE),
                                 patRoon:::babelConvert(TP_SMILES, "smi", "inchi", mustWork = TRUE))]
 

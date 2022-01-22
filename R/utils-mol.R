@@ -51,11 +51,11 @@ distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
     return(fingerprint::distance(fps[[1]], fps[[2]], fpSimMethod))
 }
 
-babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts = NULL)
+babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, mustWork = TRUE, extraOpts = NULL)
 {
-    if (length(input) == 0)
-        return(character())
-
+    # NOTE: this functions supports formula outFormat as special case
+    
+    input[!nzchar(input)] <- NA_character_ # UNDONE: should we ignore empty strings or not?
     indsNoNA <- which(!is.na(input))
     
     mpm <- getOption("patRoon.MP.method", "classic")
@@ -68,21 +68,30 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts 
     # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
     # see https://github.com/openbabel/openbabel/issues/2231
     
-    mainArgs <- c("-an", paste0("-i", inFormat), paste0("-o", outFormat))
+    mainArgs <- c("-an", paste0("-i", inFormat), paste0("-o", if (outFormat == "formula") "txt" else outFormat))
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {
         b <- batches[[bi]]
         return(list(args = mainArgs, input = data.frame(input[b], b), logFile = paste0("obabel-batch_", bi, ".txt")))
     })
-
-    results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
+    
+    resultsList <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
     {
-        # read space separated results; first column is result, second index
+        # read space separated results
         ret <- fread(cmd$outFile, sep = " ")
-        if (outFormat == "txt") # HACK HACK HACK: with txt (used by convertToFormulaBabel) the index is the first column
-            setnames(ret, c("index", "result"))
+        
+        # NOTE: with formula output the the index is the first column
+        if (outFormat == "formula")
+            setnames(ret, 1, "index")
         else
-            setnames(ret, c("result", "index"))
+            setnames(ret, seq_len(2), c("result", "index"))
+        
+        if (appendFormula || outFormat == "formula")
+        {
+            setnames(ret, ncol(ret), "formula")
+            ret[, formula := sub("[\\+\\-]+$", "", formula)] # remove trailing positive/negative charge if present
+        }
+        
         return(ret)
     }, prepareHandler = function(cmd)
     {
@@ -90,26 +99,33 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts 
         fwrite(cmd$input, inFile, col.names = FALSE, sep = "\t")
         outFile <- tempfile("obabel_out")
         args <- c(cmd$args, c(inFile, "-O", outFile, "-xt", "-xw", "-e"))
+        if (appendFormula || outFormat == "formula")
+            args <- c(args, "--append", "formula")
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
         return(modifyList(cmd, list(command = getCommandWithOptPath("obabel", "obabel"),
                                     args = args, outFile = outFile)))
     }, showProgress = FALSE, logSubDir = "obabel")
     
-    results <- rbindlist(results)
-    ret <- rep(NA_character_, length(input))
-    ret[results$index] <- results$result
-
-    stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
-    failed <- which(is.na(ret) & !is.na(input))
-    if (length(failed) > 0)
-    {
-        for (i in failed)
-            stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", i, input[i],
-                               inFormat, outFormat))
-    }
+    ret <- rbindlist(resultsList)
     
-    return(ret)
+    # expand table for missing values
+    ret <- ret[match(seq_along(input), index)]
+    ret[, index := NULL][]
+    
+    stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
+    failed <- if (outFormat == "formula")
+        which(is.na(ret$formula) & !is.na(input))
+    else
+        which(is.na(ret$result) & !is.na(input))
+    for (i in failed)
+        stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", i, input[i], inFormat, outFormat))
+
+    if (outFormat == "formula")
+        return(ret$formula)
+    else if (appendFormula)
+        return(ret) # return as table
+    return(ret$result)
 }
 
 convertToFormulaBabel <- function(input, inFormat, mustWork)

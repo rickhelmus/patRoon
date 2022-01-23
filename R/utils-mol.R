@@ -56,14 +56,16 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     # NOTE: this functions supports formula outFormat as special case
     
     input[!nzchar(input)] <- NA_character_ # UNDONE: should we ignore empty strings or not?
-    indsNoNA <- which(!is.na(input))
+    
+    # only do non-NA and unique input
+    indsToDo <- which(!is.na(input) & !duplicated(input))
     
     mpm <- getOption("patRoon.MP.method", "classic")
     batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
     minBatchSize <- 1000 # put a minimum as overhead of creating processes is significant
-    batchn <- max(1, min(batchn, round(length(indsNoNA) / minBatchSize)))
+    batchn <- max(1, min(batchn, round(length(indsToDo) / minBatchSize)))
     
-    batches <- splitInNBatches(indsNoNA, batchn)
+    batches <- splitInNBatches(indsToDo, batchn)
     
     # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
     # see https://github.com/openbabel/openbabel/issues/2231
@@ -109,8 +111,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     
     ret <- rbindlist(resultsList)
     
-    # expand table for missing values
-    ret <- ret[match(seq_along(input), index)]
+    # expand table for NA/non-unique input
+    ret <- ret[match(input, input[index])]
     ret[, index := NULL][]
     
     stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))

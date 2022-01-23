@@ -180,3 +180,42 @@ calculateXLogP <- function(SMILES, mustWork)
     
     return(ret)
 }
+
+prepareChemTable <- function(chemData)
+{
+    chemData <- copy(chemData)
+    
+    # UNDONE: skip missing input columns
+    
+    convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE)
+    convertedSMILES <- babelConvert(chemData$InChI, "inchi", "smi", appendFormula = TRUE, mustWork = FALSE)
+    
+    # clear input data that couldn't be converted: it's probably invalid
+    chemData[is.na(convertedInChIs$result), SMILES := NA_character_]
+    chemData[is.na(convertedSMILES$result), InChI := NA_character_]
+    
+    # prefer calculated SMILES/InChIs/InChIKeys where possible
+    chemData[, SMILES := fifelse(!is.na(convertedSMILES$result), convertedSMILES$result, SMILES)]
+    chemData[, InChI := fifelse(!is.na(convertedInChIs$result), convertedInChIs$result, InChI)]
+    chemData[!is.na(InChI), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
+    
+    # clear invalid InChIKeys
+    chemData[!is.na(InChIKey) & !grepl("^[[:upper:]]{14}\\-[[:upper:]]{9}\\-[[:upper:]]{1}$", InChIKey),
+             InChIKey := NA_character_]
+    
+    # prefer calculated formulas
+    chemData[, formula := fifelse(!is.na(convertedSMILES$formula), convertedSMILES$formula, formula)]
+    chemData[, formula := fifelse(!is.na(convertedInChIs$formula), convertedInChIs$formula, formula)]
+    
+    # load non-calculated formulae to (1) NA if invalid and (2) normalize the format
+    # NOTE: use by to avoid duplicated calculations
+    chemData[is.na(SMILES) & !is.na(formula), formula := 
+    {
+        tryCatch(rcdk::get.formula(formula[1]), error = function(...) NA_character_)
+    }, by = "formula"]
+    
+    # prefer calculated masses
+    chemData[!is.na(formula), neutralMass := sapply(formula, getFormulaMass)]
+    
+    return(chemData)
+}

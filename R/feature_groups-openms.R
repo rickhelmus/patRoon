@@ -10,9 +10,17 @@ setMethod("initialize", "featureGroupsOpenMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
 
 
-#' @details \code{groupFeaturesOpenMS} uses the OpenMS tools for grouping of
-#'   features (see \url{http://www.openms.de}). Retention times may be aligned
-#'   by the
+#' Group features using OpenMS
+#'
+#' Group and align features with OpenMS tools
+#'
+#' @templateVar algo OpenMS
+#' @templateVar do group features
+#' @templateVar generic groupFeatures
+#' @templateVar algoParam openms
+#' @template algo_generator
+#'
+#' @details Retention times may be aligned by the
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html}{MapAlignerPoseClustering}
 #'    TOPP tool. Grouping is achieved by either the
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html}{FeatureLinkerUnlabeled}
@@ -20,28 +28,30 @@ setMethod("initialize", "featureGroupsOpenMS",
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
 #'    TOPP tools.
 #'
-#' @param QT If enabled, use \command{FeatureLinkerUnlabeledQT} instead of
-#'   \command{FeatureLinkerUnlabeled} for feature grouping.
-#' @param maxAlignRT,maxAlignMZ Used for retention alignment. Maximum retention
-#'   time or m/z difference (seconds/Dalton) for feature pairing. Sets
-#'   \code{-algorithm:pairfinder:distance_RT:max_difference} and
-#'   \code{-algorithm:pairfinder:distance_MZ:max_difference} otpions,
+#' @template feat-arg
+#' @template rtalign-arg
+#'
+#' @param QT If enabled, use \command{FeatureLinkerUnlabeledQT} instead of \command{FeatureLinkerUnlabeled} for feature
+#'   grouping.
+#' @param maxAlignRT,maxAlignMZ Used for retention alignment. Maximum retention time or m/z difference (seconds/Dalton)
+#'   for feature pairing. Sets \code{-algorithm:pairfinder:distance_RT:max_difference} and
+#'   \code{-algorithm:pairfinder:distance_MZ:max_difference} otpions, respectively.
+#' @param maxGroupRT,maxGroupMZ as \code{maxAlignRT} and \code{maxAlignMZ}, but for grouping of features. Sets
+#'   \code{-algorithm:distance_RT:max_difference} and \code{-algorithm:distance_MZ:max_difference} options,
 #'   respectively.
-#' @param maxGroupRT,maxGroupMZ as \code{maxAlignRT} and \code{maxAlignMZ}, but
-#'   for grouping of features. Sets \code{-algorithm:distance_RT:max_difference}
-#'   and \code{-algorithm:distance_MZ:max_difference} options, respectively.
-#' @param extraOptsRT,extraOptsGroup Named \code{list} containing extra options
-#'   that will be passed to \command{MapAlignerPoseClustering} or
-#'   \command{FeatureLinkerUnlabeledQT/FeatureLinkerUnlabeled}, respectively.
-#'   Any options specified here will override any of the above. Example:
-#'   \code{extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)}
-#'   (corresponds to setting \code{maxGroupRT=12}). Set to \code{NULL} to
-#'   ignore.
+#' @param extraOptsRT,extraOptsGroup Named \code{list} containing extra options that will be passed to
+#'   \command{MapAlignerPoseClustering} or \command{FeatureLinkerUnlabeledQT/FeatureLinkerUnlabeled}, respectively. Any
+#'   options specified here will override any of the above. Example:
+#'   \code{extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)} (corresponds to setting
+#'   \code{maxGroupRT=12}). Set to \code{NULL} to ignore.
+#'
+#' @inheritParams groupFeatures
+#'
+#' @inherit groupFeatures return
 #'
 #' @template refs-openms
 #'
-#' @aliases groupFeaturesOpenMS
-#' @rdname feature-grouping
+#' @name groupFeaturesOpenMS
 #' @export
 setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,
                                                       maxAlignMZ = 0.005, maxGroupRT = 12,

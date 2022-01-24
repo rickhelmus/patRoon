@@ -372,7 +372,7 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
-#' @rdname feature-grouping
+#' @rdname groupFeatures
 #' @export
 setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose = TRUE)
 {

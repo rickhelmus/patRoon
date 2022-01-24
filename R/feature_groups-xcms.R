@@ -9,19 +9,39 @@ featureGroupsXCMS <- setClass("featureGroupsXCMS", slots = c(xs = "ANY"), contai
 setMethod("initialize", "featureGroupsXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
 
-
-#' @details \code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of features. Grouping of features and
+#' Group features using XCMS (old interface)
+#'
+#' Group and align features with the legacy \code{\link[xcms]{xcmsSet}} function from the \pkg{xcms} package.
+#'
+#' @templateVar algo XCMS
+#' @templateVar do group features
+#' @templateVar generic groupFeatures
+#' @templateVar algoParam xcms
+#' @template algo_generator
+#' 
+#' @details Grouping of features and
 #'   alignment of their retention times are performed with the \code{\link[xcms:group-methods]{xcms::group}} and
 #'   \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively. Both functions have an extensive list of
-#'   parameters to modify their behaviour and may therefore be used to potentially optimize results.
-#'   
+#'   parameters to modify their behavior and may therefore be used to potentially optimize results.
+#'
+#' @template feat-arg
+#' @template rtalign-arg
+#' @template loadrawdata-arg
+#' 
 #' @param retcorArgs named \code{character vector} that may contain extra parameters to be used by
 #'   \code{\link[xcms:retcor-methods]{xcms::retcor}}.
+#' @param groupArgs named \code{character vector} that may contain extra grouping parameters to be used by
+#'   \code{\link[xcms:group-methods]{xcms::group}}
+#' 
+#' @inheritParams groupFeatures
+#'
+#' @inherit groupFeatures return
+#'
+#' @template sets-loadrawdata-RTalign-note
 #'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
-#' @aliases groupFeaturesXCMS
-#' @rdname feature-grouping
+#' @name groupFeaturesXCMS
 #' @export
 setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
@@ -38,7 +58,7 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
     return(doGroupFeaturesXCMS(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose))
 })
 
-#' @rdname feature-grouping
+#' @rdname groupFeaturesXCMS
 #' @export
 setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {

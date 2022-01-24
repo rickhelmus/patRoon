@@ -10,11 +10,24 @@ setMethod("initialize", "featureGroupsXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
 
 
-#' @details \code{groupFeaturesXCMS3} uses the new interface from the \pkg{xcms} package for grouping of features.
-#'   Grouping of features and alignment of their retention times are performed with the
+#' Group features using XCMS (new interface)
+#'
+#' Uses the new \code{xcms3} interface from the \pkg{xcms} package to find features.
+#'
+#' @templateVar algo XCMS3
+#' @templateVar do group features
+#' @templateVar generic groupFeatures
+#' @templateVar algoParam xcms3
+#' @template algo_generator
+#' 
+#' @details Grouping of features and alignment of their retention times are performed with the
 #'   \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and \code{\link[xcms:adjustRtime]{xcms::adjustRtime}}
 #'   functions, respectively. Both of these functions support an extensive amount of parameters that modify their
-#'   behaviour and may therefore require optimization.
+#'   behavior and may therefore require optimization.
+#'
+#' @template feat-arg
+#' @template rtalign-arg
+#' @template loadrawdata-arg
 #'
 #' @param groupParam,retAlignParam parameter object that is directly passed to
 #'   \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and \code{\link[xcms:adjustRtime]{xcms::adjustRtime}},
@@ -22,10 +35,15 @@ setMethod("initialize", "featureGroupsXCMS3",
 #' @param preGroupParam grouping parameters applied when features are grouped \emph{prior} to alignment (only with peak
 #'   groups alignment).
 #'
+#' @inheritParams groupFeatures
+#'
+#' @inherit groupFeatures return
+#'
+#' @template sets-loadrawdata-RTalign-note
+#'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
-#' @aliases groupFeaturesXCMS3
-#' @rdname feature-grouping
+#' @name groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
@@ -44,7 +62,7 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
     return(doGroupFeaturesXCMS3(xdata, feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose))
 })
 
-#' @rdname feature-grouping
+#' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),

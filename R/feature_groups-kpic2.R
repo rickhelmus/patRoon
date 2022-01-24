@@ -9,20 +9,36 @@ featureGroupsKPIC2 <- setClass("featureGroupsKPIC2", slots = c(picsSetGrouped = 
 setMethod("initialize", "featureGroupsKPIC2",
           function(.Object, ...) callNextMethod(.Object, algorithm = "kpic2", ...))
 
-
-#' @details \code{groupFeaturesKPIC2} uses the the
-#'   \href{https://github.com/hcji/KPIC2}{KPIC2} \R package for grouping of features. Grouping of features and alignment of
-#'   their retention times are performed with the
-#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}} and
-#'   \code{\link[KPIC:PICset.align]{KPIC::PICset.align}} functions, respectively.
+#' Group features using KPIC2
+#'
+#' Uses the the \href{https://github.com/hcji/KPIC2}{KPIC2} \R package for grouping of features.
+#'
+#' @templateVar algo KPIC2
+#' @templateVar do group features
+#' @templateVar generic groupFeatures
+#' @templateVar algoParam kpic2
+#' @template algo_generator
+#'
+#' @details Grouping of features and alignment of their retention times are performed with the
+#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}} and \code{\link[KPIC:PICset.align]{KPIC::PICset.align}}
+#'   functions, respectively.
+#'
+#' @template feat-arg
+#' @template rtalign-arg
+#' @template loadrawdata-arg
 #'
 #' @param alignArgs named \code{character vector} that may contain extra parameters to be used by
 #'   \code{\link[KPIC:PICset.align]{KPIC::PICset.align}}.
 #'
+#' @inheritParams groupFeatures
+#'
+#' @inherit groupFeatures return
+#'
+#' @template sets-loadrawdata-RTalign-note
+#'
 #' @references \insertRef{Ji2017}{patRoon}
 #'
-#' @aliases groupFeaturesKPIC2
-#' @rdname feature-grouping
+#' @name groupFeaturesKPIC2
 #' @export
 setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupArgs = list(tolerance = c(0.005, 12)),
@@ -40,7 +56,7 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose))
 })
 
-#' @rdname feature-grouping
+#' @rdname groupFeaturesKPIC2
 #' @export
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
                                                         verbose = TRUE)

@@ -23,7 +23,7 @@ printFeatStats <- function(fList)
 #'
 #' @param obj,x,object \code{features} object to be accessed
 #'
-#' @seealso \code{\link{feature-finding}}
+#' @seealso \code{\link{findFeatures}}
 #'
 #' @slot features List of features per analysis file. Use the
 #'   \code{featureTable} method for access.

@@ -123,7 +123,7 @@ NULL
 #'
 #' @details Several properties need to be known about analyses that should be
 #'   processed during various workflow steps such as
-#'   \link[=feature-finding]{finding features}, averaging intensities of feature
+#'   \link{findFeatures}, averaging intensities of feature
 #'   groups and blank subtraction. This information should be made available
 #'   with an 'analysis info' object, which is a \code{data.frame} containing the
 #'   following columns:
@@ -155,67 +155,18 @@ NULL
 #' @name analysis-information
 NULL
 
-
-#' Finding features
-#'
-#' Functions and classes for collection of features.
-#'
-#' Several functions exist to collect features (\emph{i.e.} retention and MS information that represent potential
-#' compounds) from a set of analyses. All 'feature finders' return an object derived from the \code{\link{features}}
-#' base class. The next step in a general workflow is to group and align these features across analyses by
-#' \link[=feature-grouping]{feature groupers}. Note that some feature finders have a plethora of options which sometimes
-#' may have a large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is
-#' largely dependent upon applied analysis methodology and instrumentation.
-#'
-#' @param analysisInfo \link[=analysis-information]{Analysis info table}.
-#' @param obj A \code{features} object that is used (together with other objects passed to \code{\dots}) to create a
-#'   sets object with \code{makeSet}.
-#' @param \dots Further parameters passed to \code{\link[xcms]{xcmsSet}} (\code{findFeaturesXCMS}),
-#'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}} (\code{findFeaturesXCMS3}),
-#'   \code{\link[enviPick]{enviPickwrap}} (\code{featurefinderEnviPick}),
-#'   \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}} (\code{findFeaturesKPIC2}) or to selected feature
-#'   finding or importing algorithms (\code{findFeatures} and \code{importFeatures}).
-#'
-#'   For \code{makeSet}: further \code{\link{features}} objects that should be used for the \link[=sets-workflow]{sets
-#'   workflow}.
-#' @param verbose If set to \code{FALSE} then no text output is shown.
-#'
-#' @template parallel-arg
-#' 
-#' @templateVar what \code{findFeaturesOpenMS}, \code{findFeaturesSIRIUS} and \code{findFeaturesSAFD}
-#' @template uses-multiProc
-#'
-#' @note The file format of analyses for \code{findFeaturesXCMS} and \code{findFeaturesXCMS3} must be \code{mzML} or
-#'   \code{mzXML}.
-#'
-#' @template centroid_note
-#'
-#' @section Sets workflows: The \code{makeSet} method function is used to initiate a \link[=sets-workflow]{sets
-#'   workflow}. This method simply combines all the features from specified \code{\link{features}} objects in a new
-#'   \code{\link{featuresSet}} object. The \link[=analysis-information]{analysis information} for this object is updated
-#'   with all analyses, and a \code{set} column is added to designate the set of each analysis. Note that currently, all
-#'   analyses names \strong{must} be unique across different sets. In the last step the features are \emph{neutralized}:
-#'   the specified \code{adducts} to \code{makeSet} is used calculate the neutral monoisotopic mass for each feature per
-#'   set. This neutralization is important to group features afterwards (see the details on sets workflows in
-#'   \link[=feature-grouping]{feature grouping}).
-#'
-#' @name feature-finding
-#' @return An object of a class which is derived from \code{\link{features}}.
-#' @seealso \code{\link{features-class}} and \code{\link{analysis-information}}
-NULL
-
 #' Grouping of features
 #'
 #' Functions and classes for grouping of features across analyses.
 #'
-#' After \link[=feature-finding]{features have been found} the logical next step is to align and group them across
+#' After \link[=findFeatures]{features have been found} the logical next step is to align and group them across
 #' analyses. This process is necessary to allow comparison of features between multiple analyses, which otherwise would
 #' be difficult due to small deviations in retention and mass data. Thus, algorithms of 'feature groupers' are used to
 #' collect features with similar retention and mass data. In addition, advanced retention time alignment algorithms
 #' exist to enhance grouping of features even with relative large retention time deviations (\emph{e.g.} possibly
-#' observed from analyses collected over a long period). Like \link[=feature-finding]{finding of features}, various
-#' algorithms are supported which may have many parameters that can be fine-tuned. This fine-tuning is likely to be
-#' necessary, since optimal settings often depend on applied methodology and instrumentation.
+#' observed from analyses collected over a long period). Like \link{findFeatures}, various algorithms are supported
+#' which may have many parameters that can be fine-tuned. This fine-tuning is likely to be necessary, since optimal
+#' settings often depend on applied methodology and instrumentation.
 #'
 #' @param algorithm A \code{character} that specifies the algorithm to be used: either \code{"openms"}, \code{"xcms"},
 #'   \code{"xcms3"} or \code{"kpic2"} (\code{features method}), or \code{"sirius"} (\code{data.frame} method).
@@ -239,7 +190,7 @@ NULL
 #'   export).
 #'
 #' @template loadrawdata-arg
-#' 
+#'
 #' @template centroid_note
 #'
 #' @section Sets workflows: With a \link[=sets-workflow]{sets workflow} the features are first neutralized, \emph{i.e.}

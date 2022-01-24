@@ -54,7 +54,10 @@ distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
 babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, mustWork = TRUE, extraOpts = NULL)
 {
     # NOTE: this functions supports formula outFormat as special case
-    
+
+    if (outFormat == "smiles")
+        outFormat <- "smi" # to make checks below easier
+        
     input[!nzchar(input)] <- NA_character_ # UNDONE: should we ignore empty strings or not?
     
     # only do non-NA and unique input
@@ -70,7 +73,11 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
     # see https://github.com/openbabel/openbabel/issues/2231
     
-    mainArgs <- c("-an", paste0("-i", inFormat), paste0("-o", if (outFormat == "formula") "txt" else outFormat))
+    mainArgs <- c(paste0("-o", if (outFormat == "formula") "txt" else outFormat), "-e")
+    if (inFormat == "inchi")
+        mainArgs <- c(mainArgs, "-an")
+    if (outFormat == "inchi")
+        mainArgs <- c(mainArgs, "-xw", "-xt")
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {
         b <- batches[[bi]]
@@ -79,8 +86,22 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     
     resultsList <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
     {
-        # read space separated results
-        ret <- fread(cmd$outFile, sep = " ")
+        if (file.size(cmd$outFile) == 0)
+            return(NULL)
+        
+        # read tab/space separated results
+        
+        if (outFormat == "smi" && appendFormula)
+        {
+            # NOTE: the output will be <SMILES><tab><index><space><formula> but fread can only handle one type of
+            # separator. So we first read with a \t separation. This gets us in column 1 the SMILES and 2 the space
+            # separated index+formula pairs. The latter is then split by another fread call with <space> as separator.
+            
+            ret <- fread(cmd$outFile, sep = "\t", header = FALSE)
+            ret <- cbind(ret[, 1], fread(text = ret[[2]], sep = " ", header = FALSE))
+        }
+        else
+            ret <- fread(cmd$outFile, sep = if (outFormat == "smi") "\t" else " ", header = FALSE)
         
         # NOTE: with formula output the the index is the first column
         if (outFormat == "formula")
@@ -98,9 +119,9 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     }, prepareHandler = function(cmd)
     {
         inFile <- tempfile("obabel_in")
-        fwrite(cmd$input, inFile, col.names = FALSE, sep = "\t")
+        fwrite(cmd$input, inFile, col.names = FALSE, sep = " ")
         outFile <- tempfile("obabel_out")
-        args <- c(cmd$args, c(inFile, "-O", outFile, "-xt", "-xw", "-e"))
+        args <- c(cmd$args, c(paste0("-i", inFormat), inFile, "-O", outFile))
         if (appendFormula || outFormat == "formula")
             args <- c(args, "--append", "formula")
         if (!is.null(extraOpts))
@@ -111,9 +132,19 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     
     ret <- rbindlist(resultsList)
     
-    # expand table for NA/non-unique input
-    ret <- ret[match(input, input[index])]
-    ret[, index := NULL][]
+    if (nrow(ret) == 0)
+    {
+        r <- rep(NA_character_, length(input))
+        ret <- if (outFormat == "formula") data.table(formula = r) else data.table(result = r)
+        if (appendFormula)
+            ret[, formula := r][]
+    }
+    else
+    {
+        # expand table for NA/non-unique input
+        ret <- ret[match(input, input[index])]
+        ret[, index := NULL][]
+    }
     
     stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
     failed <- if (outFormat == "formula")

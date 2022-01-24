@@ -1865,16 +1865,39 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
+#' Grouping of features
+#'
+#' Group equal features across analyses.
+#'
+#' After \link[=findFeatures]{features have been found}, the next step is to align and group them across analyses. This
+#' process is necessary to allow comparison of features between multiple analyses, which otherwise would be difficult
+#' due to small deviations in retention and mass data. Thus, algorithms of 'feature groupers' are used to collect
+#' features with similar retention and mass data. In addition, advanced retention time alignment algorithms exist to
+#' enhance grouping of features even with relative large retention time deviations (\emph{e.g.} possibly observed from
+#' analyses collected over a long period). Like \link{findFeatures}, various algorithms are supported which may have
+#' many parameters that can be fine-tuned. This fine-tuning is likely to be necessary, since optimal settings often
+#' depend on applied methodology and instrumentation.
+#'
 #' @templateVar func groupFeatures
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS
 #' @templateVar ex2 groupFeaturesXCMS3
 #' @templateVar algos openms,xcms,xcms3,kpic2
+#' @templateVar algosSuffix OpenMS,XCMS,XCMS3,KPIC2,SIRIUS
 #' @templateVar noParam TRUE
+#' @templateVar ret featureGroups
 #' @template generic-algo
-#'
-#' @rdname feature-grouping
-#' @aliases groupFeatures
+#' 
+#' @param algorithm A \code{character} that specifies the algorithm to be used: either \code{"openms"}, \code{"xcms"},
+#'   \code{"xcms3"} or \code{"kpic2"} (\code{features method}), or \code{"sirius"} (\code{data.frame} method).
+#' @param obj Either a \code{\link{features}} object to be grouped, or a \code{data.frame} with
+#'   \link[=analysis-information]{analysis info} to be passed to \code{groupFeaturesSIRIUS}
+#' @param \dots Further parameters passed to the selected grouping algorithm.
+#' @param verbose if \code{FALSE} then no text output will be shown.
+#'  
+#' @return An object of a class which is derived from \code{\link{featureGroups}}.
+#' 
+#' @name groupFeatures
 #' @export
 setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = TRUE)
 {
@@ -1894,7 +1917,7 @@ setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = T
 
 #' @details The \code{data.frame} method for \code{groupFeatures} is a special case that currently only supports the
 #'   \code{"sirius"} algorithm.
-#' @rdname feature-grouping
+#' @rdname groupFeatures
 #' @export
 setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose = TRUE)
 {

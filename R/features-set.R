@@ -142,9 +142,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
-#' @template makeSet
-#' @rdname feature-finding
-#' @return \code{makeSet} returns a \code{\link{featuresSet}} object.
+#' @rdname makeSet
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
 {
@@ -165,8 +163,7 @@ setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)
     return(doMakeFeaturesSet(featuresList, adducts))
 })
 
-#' @note \code{makeSet} Currently does not support making sets from \code{\link{featuresSet}} objects.
-#' @rdname feature-finding
+#' @rdname makeSet
 #' @export
 setMethod("makeSet", "featuresSet", function(obj, ...)
 {

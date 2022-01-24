@@ -112,6 +112,7 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### Sets
 
+setGeneric("makeSet", function(obj, ...) standardGeneric("makeSet"))
 setGeneric("updateSetConsensus", function(obj) standardGeneric("updateSetConsensus"))
 
 ### TP generation
@@ -271,11 +272,6 @@ setGeneric("getMCS", function(obj, ...) standardGeneric("getMCS"))
 #' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
-
-#' @templateVar func makeSet
-#' @templateVar desc creates a set from given workflow objects.
-#' @template generics
-setGeneric("makeSet", function(obj, ...) standardGeneric("makeSet"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.

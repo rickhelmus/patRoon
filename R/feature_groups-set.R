@@ -416,17 +416,11 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     return(ret)
 })
 
-#' @templateVar adductNULL TRUE
-#' @template makeSet
-#'
-#' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument description.
+#' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument of \code{\link{groupFeatures}} for details.
 #' @param groupArgs A \code{list} with arguments directly passed to \code{groupFeatures} (can be named). Example:
 #'   \code{groupArgs=list(maxAlignMZ=0.002)}.
 #'
-#' @return \code{makeSet} and the \code{\link{featuresSet}} method of \code{groupFeatures} return a
-#'   \code{\link{featureGroupsSet}} object.
-#'
-#' @rdname feature-grouping
+#' @rdname makeSet
 #' @export
 setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
                                                adducts = NULL, labels = NULL)
@@ -491,8 +485,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
 })
 
-#' @note \code{makeSet} Currently does not support making sets from \code{\link{featureGroupsSet}} objects.
-#' @rdname feature-grouping
+#' @rdname makeSet
 #' @export
 setMethod("makeSet", "featureGroupsSet", function(obj, ...)
 {

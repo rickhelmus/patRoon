@@ -15,6 +15,6 @@ the same between sets). A sets workflow is typically initiated with the \code{\l
 contains much more details about sets workflows.
 }
 \seealso{
-\code{\link{workflowStepSet}}, the \verb{Sets workflows} sections in other documentation pages and the
-  \pkg{patRoon} handbook.
+\code{\link{makeSet}} to initiate sets workflows, \code{\link{workflowStepSet}}, the \verb{Sets workflows}
+  sections in other documentation pages and the \pkg{patRoon} handbook.
 }

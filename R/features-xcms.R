@@ -91,13 +91,24 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
     return(ret)
 }
 
-#' @details \code{importFeaturesXCMS} converts features from an existing
-#'   \code{\link{xcmsSet}} object (obtained with the \pkg{xcms} package)
-#'   to a new \code{\link{features}} object.
+#' Imports features from XCMS (old interface)
 #'
+#' Imports feature data generated with the legacy \code{\link[xcms]{xcmsSet}} function from the \pkg{xcms} package.
+#'
+#' @templateVar algo XCMS
+#' @templateVar generic importFeatures
+#' @templateVar algoParam xcms
+#' @template algo_importer
+#'
+#' @inheritParams importFeatures
+#' 
 #' @param xs An \code{\link{xcmsSet}} object.
+#' 
+#' @inherit findFeaturesXCMS references
+#' @inherit importFeatures return
 #'
-#' @rdname feature-finding
+#' @seealso \code{\link{importFeaturesXCMS3}}
+#'
 #' @export
 importFeaturesXCMS <- function(xs, analysisInfo)
 {

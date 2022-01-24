@@ -459,14 +459,28 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
     f(analysisInfo, ..., verbose = verbose)
 }
 
-#' @details \code{importFeatures} is a generic function to import feature groups
-#'   produced by other software. The actual functionality is provided by
-#'   specific functions such as \code{importFeaturesXCMS} and
-#'   \code{importFeaturesKPIC2}.
-#' @param type What type of data should be imported: \code{"xcms"},
-#'   \code{"xcms3"}, \code{"kpic2"} or \code{"envimass"}.
+#' Import features
 #'
-#' @rdname feature-finding
+#' Generic function to import features produced by other software.
+#'
+#' @templateVar func importFeatures
+#' @templateVar what import features
+#' @templateVar ex1 importFeaturesXCMS3
+#' @templateVar ex2 importFeaturesKPIC2
+#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,EnviMass
+#' @templateVar ret features
+#' @templateVar noParam TRUE
+#' @template generic-algo
+#'
+#' @template analysisInfo-arg
+#' 
+#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"} or \code{"envimass"}.
+#' @param \dots Further arguments passed to the selected import algorithm function.
+#'
+#' @inherit findFeatures return
+#' 
+#' @seealso \code{\link{findFeatures}} to find new features.
+#'
 #' @export
 importFeatures <- function(analysisInfo, type, ...)
 {

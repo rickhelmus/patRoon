@@ -147,12 +147,19 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
                               ftindex = ftindex))
 }
 
-#' @details \code{importFeatureGroupsKPIC2} imports grouped features from an \pkg{KPIC} object.
+#' Imports feature groups from KPIC2
 #'
+#' Imports grouped features from an \pkg{KPIC} object.
+#'
+#' @template analysisInfo-arg
 #' @param picsSetGrouped A grouped \code{PIC set} object (\emph{e.g.} as returned by
 #'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}}).
+#' 
+#' @inherit groupFeaturesKPIC2 references
+#' @inherit importFeatureGroups return
 #'
-#' @rdname feature-grouping
+#' @seealso \code{\link{groupFeatures}}
+#' 
 #' @export
 importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
 {

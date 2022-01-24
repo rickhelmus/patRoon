@@ -6,41 +6,41 @@ featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featu
 setMethod("initialize", "featureGroupsBrukerTASQ",
           function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_tasq", ...))
 
-#' @details \code{importFeatureGroupsBrukerTASQ} will convert screening results
-#'   from Bruker TASQ to a \code{\link{featureGroups}} object. The feature
-#'   groups across analyses are formed based on the name of suspects and their
-#'   closeness in retention time. The latter is necessary because TASQ does not
-#'   necessarily perform checks on retention times and may therefore assign a
-#'   suspect to peaks with different retention times across analyses (or within
-#'   a single analysis). Hence, suspects with equal names are hierarchically
-#'   clustered on their retention times (using \pkg{\link{fastcluster}}) to form
-#'   the feature groups. The cut-off value for this is specified by the
-#'   \code{clusterRTWindow} argument. The input for this function is obtained by
-#'   generating an Excel export of the 'global' results and subsequently
-#'   converting the file to \file{.csv} format.
+#' Imports feature groups from Bruker TASQ
 #'
-#' @param path The file path to an Excel export of the Global results table from
-#'   TASQ, converted to \file{.csv} format.
-#' @param analysisInfo A table with \link[=analysis-information]{analysis
-#'   information}.
-#' @param clusterRTWindow This retention time window (in seconds) is used to
-#'   group hits across analyses together. See also the details section.
+#' Imports screening results from Bruker TASQ as feature groups.
 #'
-#' @return \code{importFeatureGroupsBrukerTASQ} returns a new
-#'   \code{featureGroups} object containing converted screening results from
-#'   Bruker TASQ.
+#' @templateVar algo Bruker TASQ
+#' @templateVar generic importFeatureGroups
+#' @templateVar algoParam brukertasq
+#' @template algo_importer
 #'
-#' @note \code{importFeatureGroupsBrukerTASQ} will use estimated min/max values
-#'   for retention times and dummy min/max \emph{m/z} values for conversion to
-#'   features, since this information is not (readily) available. Hence, when
-#'   plotting, for instance, extracted ion chromatograms (with
-#'   \code{\link{plotChroms}}) the integrated chromatographic peak range shown
-#'   is incorrect.
+#' @details The feature groups across analyses are formed based on the name of suspects and their closeness in retention
+#'   time. The latter is necessary because TASQ does not necessarily perform checks on retention times and may therefore
+#'   assign a suspect to peaks with different retention times across analyses (or within a single analysis). Hence,
+#'   suspects with equal names are hierarchically clustered on their retention times (using \pkg{\link{fastcluster}}) to
+#'   form the feature groups. The cut-off value for this is specified by the \code{clusterRTWindow} argument. The input
+#'   for this function is obtained by generating an Excel export of the 'global' results and subsequently converting the
+#'   file to \file{.csv} format.
 #'
+#' @template analysisInfo-arg
+#'
+#' @param path The file path to an Excel export of the Global results table from TASQ, converted to \file{.csv} format.
+#' @param clusterRTWindow This retention time window (in seconds) is used to group hits across analyses together. See
+#'   also the details section.
+#'
+#' @return A new \code{featureGroups} object containing converted screening results from Bruker TASQ.
+#'
+#' @note This function uses estimated min/max values for retention times and dummy min/max \emph{m/z} values for
+#'   conversion to features, since this information is not (readily) available. Hence, when plotting, for instance,
+#'   extracted ion chromatograms (with \code{\link{plotChroms}}) the integrated chromatographic peak range shown is
+#'   incorrect.
+#'
+#'   This function may use suspect names to base file names used for reporting, logging etc. Therefore, it is important
+#'   that these are file-compatible names.
 #'
 #' @references \addCitations{fastcluster}{1}
 #'
-#' @rdname suspect-screening
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 12)
 {

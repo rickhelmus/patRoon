@@ -166,12 +166,18 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     return(ret)
 }
 
-#' @details \code{importFeatureGroupsXCMS3} converts grouped features from an
-#'   \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
+#' Imports feature groups from XCMS (new interface)
 #'
+#' Imports grouped features from a \code{\link{XCMSnExp}} object from the \pkg{xcms} package.
+#'
+#' @template analysisInfo-arg
 #' @param xdata An \code{\link{XCMSnExp}} object.
+#' 
+#' @inherit groupFeaturesXCMS3 references
+#' @inherit importFeatureGroups return
 #'
-#' @rdname feature-grouping
+#' @seealso \code{\link{groupFeatures}}
+#' 
 #' @export
 importFeatureGroupsXCMS3 <- function(xdata, analysisInfo)
 {

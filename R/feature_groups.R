@@ -1932,18 +1932,30 @@ setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose =
     f(obj, ..., verbose = verbose)
 })
 
-#' @details \code{importFeatureGroups} is a generic function to import feature
-#'   groups produced by other software. The actual functionality is provided by
-#'   specific functions such as \code{importFeatureGroupsBrukerPA} and
-#'   \code{importFeatureGroupsEnviMass}.
+#' Import feature groups from files
 #'
-#' @param path The path that should be used for importing. For
-#'   \code{importFeatureGroupsBrukerPA} an exported 'bucket table' \file{.txt}
-#'   file from Bruker ProfileAnalysis, for \code{importFeatureGroupsBrukerTASQ}
-#'   an exported global result table (converted to \file{.csv}) and for
-#'   \code{importFeatureGroupsEnviMass} the path of the enviMass project.
+#' Generic function to import feature groups produced by other software from files.
 #'
-#' @rdname feature-grouping
+#' @templateVar func importFeatureGroups
+#' @templateVar what import feature groups from files
+#' @templateVar ex1 importFeatureGroupsBrukerTASQ
+#' @templateVar ex2 importFeatureGroupsBrukerPA
+#' @templateVar algosSuffix PA,TASQ,EnviMass
+#' @templateVar ret featureGroups
+#' @templateVar noParam TRUE
+#' @template generic-algo
+#'
+#' @param path The path that should be used for importing. See the algorithm specific functions for more details.
+#' @param type Which file type should be imported or exported: \code{"brukerpa"} (Bruker ProfileAnalysis),
+#'   \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"} (\pkg{enviMass}).
+#' @param \dots Further arguments passed to the selected import algorithm function.
+#' 
+#' @inherit groupFeatures return
+#'
+#' @seealso \code{\link{groupFeatures}} to group features. Other import functions:
+#'   \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}} and
+#'   \code{\link{importFeatureGroupsKPIC2}}.
+#'
 #' @export
 importFeatureGroups <- function(path, type, ...)
 {

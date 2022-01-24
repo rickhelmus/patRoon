@@ -14,19 +14,26 @@ setMethod("initialize", "featureGroupsEnviMass",
           function(.Object, ...) callNextMethod(.Object, algorithm = "envimass", ...))
 
 
-#' @details \code{importFeatureGroupsEnviMass} imports grouped features
-#'   ('profiles') generated with \pkg{enviMass}. Note that this function
-#'   \emph{only} imports 'raw' profiles, \emph{not} any results from further
-#'   componentization steps performed in \pkg{enviMass}. Furthermore, this
-#'   functionality has only been tested with older versions of \pkg{enviMass}.
-#'   Finally, please note that this function only supports features imported by
-#'   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be
-#'   used for both importing functions).
+#' Imports feature groups from enviMass
 #'
-#' @param positive Whether data from positive (\code{TRUE}) or negative
-#'   (\code{FALSE}) should be loaded.
+#' Imports a 'profiles' produced by \pkg{enviMass}.
 #'
-#' @rdname feature-grouping
+#' @templateVar algo enviMass
+#' @templateVar generic importFeatureGroups
+#' @templateVar algoParam envimass
+#' @template algo_importer
+#'
+#' @details This function \emph{only} imports 'raw' profiles, \emph{not} any results from further componentization steps
+#'   performed in \pkg{enviMass}. Furthermore, this functionality has only been tested with older versions of
+#'   \pkg{enviMass}. Finally, please note that this function only supports features imported by
+#'   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be used for both importing functions).
+#'
+#' @param path The path of the enviMass project.
+#' @param feat The \code{\link{features}} object obtained with \code{\link{importFeaturesEnviMass}}.
+#' @param positive Whether data from positive (\code{TRUE}) or negative (\code{FALSE}) should be loaded.
+#'
+#' @inherit importFeatureGroups return
+#' 
 #' @export
 importFeatureGroupsEnviMass <- function(path, feat, positive)
 {

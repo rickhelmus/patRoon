@@ -152,12 +152,18 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
                              ftindex = setnames(getFeatIndicesFromXS(xs), gNames)))
 }
 
-#' @details \code{importFeatureGroupsXCMS} converts grouped features from an
-#'   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
+#' Imports feature groups from XCMS (old interface)
 #'
+#' Imports grouped features from a legacy \code{\link{xcmsSet}} object from the \pkg{xcms} package.
+#'
+#' @template analysisInfo-arg
 #' @param xs An \code{\link{xcmsSet}} object.
+#' 
+#' @inherit groupFeaturesXCMS references
+#' @inherit importFeatureGroups return
 #'
-#' @rdname feature-grouping
+#' @seealso \code{\link{importFeaturesXCMS3}} and \code{\link{groupFeatures}}
+#'
 #' @export
 importFeatureGroupsXCMS <- function(xs, analysisInfo)
 {

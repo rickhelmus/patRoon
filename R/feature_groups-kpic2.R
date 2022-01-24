@@ -173,7 +173,7 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
     return(importFeatureGroupsKPIC2FromFeat(picsSetGrouped, analysisInfo, feat))
 }
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 setMethod("delete", "featureGroupsKPIC2", function(obj, ...)
 {

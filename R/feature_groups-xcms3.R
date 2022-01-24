@@ -193,7 +193,7 @@ importFeatureGroupsXCMS3 <- function(xdata, analysisInfo)
     return(importFeatureGroupsXCMS3FromFeat(xdata, analysisInfo, feat))
 }
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
 {

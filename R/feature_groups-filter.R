@@ -17,7 +17,7 @@ NULL
 #'
 #' @name feature-filtering
 #' @seealso \code{\link{featureGroups-class}}
-#' @seealso \code{\link{feature-grouping}}
+#' @seealso \code{\link{groupFeatures}}
 NULL
 
 intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)

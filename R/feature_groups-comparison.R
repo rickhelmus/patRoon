@@ -170,14 +170,14 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
 #'   averaging their retention times, \emph{m/z} values and intensities, where
 #'   each original feature groups object becomes an 'analysis'. All
 #'   \emph{pseudo} features are then grouped using
-#'   \link[=feature-grouping]{regular feature grouping algorithms} so that a
+#'   \link[=groupFeatures]{regular feature grouping algorithms} so that a
 #'   comparison can be made.
 #'
-#' @param groupAlgo The \code{\link[=feature-grouping]{feature grouping
+#' @param groupAlgo The \code{\link[=groupFeatures]{feature grouping
 #'   algorithm}} that should be used for grouping \emph{pseudo} features (see
 #'   details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2} or \code{"openms"}.
 #' @param groupArgs A \code{list} containing further parameters for
-#'   \code{\link[=feature-grouping]{feature grouping}}.
+#'   \code{\link[=groupFeatures]{feature grouping}}.
 #' @param x,obj The \code{featureGroupsComparison} object.
 #'
 #' @return \code{comparison} returns a \code{\link{featureGroupsComparison}}

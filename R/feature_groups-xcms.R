@@ -179,7 +179,7 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
     return(importFeatureGroupsXCMSFromFeat(xs, analysisInfo, feat))
 }
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 setMethod("delete", "featureGroupsXCMS", function(obj, ...)
 {

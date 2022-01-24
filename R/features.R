@@ -413,10 +413,10 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #'
 #' Several functions exist to collect features (\emph{i.e.} retention and MS information that represent potential
 #' compounds) from a set of analyses. All 'feature finders' return an object derived from the \code{\link{features}}
-#' base class. The next step in a general workflow is to group and align these features across analyses by
-#' \link[=feature-grouping]{feature groupers}. Note that some feature finders have a plethora of options which sometimes
-#' may have a large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is
-#' largely dependent upon applied analysis methodology and instrumentation.
+#' base class. The next step in a general workflow is to group and align these features across analyses with
+#' \code{\link{groupFeatures}}. Note that some feature finders have a plethora of options which sometimes may have a
+#' large effect on the quality of results. Fine-tuning parameters is therefore important, and the optimum is largely
+#' dependent upon applied analysis methodology and instrumentation.
 #'
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #' @param \dots Further parameters passed to the selected feature finding algorithms.
@@ -433,9 +433,9 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #' @template generic-algo
 #'
 #' @template centroid_note
-#' 
+#'
 #' @return An object of a class which is derived from \code{\link{features}}.
-#' 
+#'
 #' @export
 findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {

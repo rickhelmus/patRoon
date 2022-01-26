@@ -127,7 +127,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
                 suspects[, mz := NA_real_] # make it present to simplify code below
             
             if (!is.null(adduct))
-                suspects[is.na(mz), mz := calculateMasses(neutralMass, adduct, type = "mz")]
+                suspects[is.na(mz), mz := calculateMasses(neutralMass, ..adduct, type = "mz")]
             else
             {
                 unAdducts <- sapply(unique(suspects[is.na(mz)]$adduct), as.adduct)

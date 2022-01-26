@@ -6,6 +6,7 @@
 - Fixed: Group qualities/scores were not transferred to new `featureGroups` objects after calling `screenSuspects()` or `unset()`
 - Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34)
 - Fixed: `newProject()`: `reportCSV()` call in generated script included non-existing `MSPeakLists` argument.
+- Fixed: Suspect screening would result in an error if the `adduct` argument was specified (Corey Griffith)
 
 
 # patRoon 2.0

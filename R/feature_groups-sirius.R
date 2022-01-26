@@ -93,6 +93,10 @@ setMethod("initialize", "featureGroupsSIRIUS",
 #'
 #' @details Finding and grouping features is done by running the \command{lcms-align} command on every analyses at once.
 #'   For this reason, grouping feature data from other algorithms than \command{SIRIUS} is not supported.
+#'   
+#'   The MS files should be in the \file{mzML} or \file{mzXML} format.
+#'
+#' @template centroid_note_mandatory
 #'
 #' @template analysisInfo-arg
 #' @inheritParams groupFeatures

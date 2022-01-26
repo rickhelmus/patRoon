@@ -372,6 +372,8 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
+#' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
+#'   \code{\link{featureGroupsSet}} object.
 #' @rdname groupFeatures
 #' @export
 setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose = TRUE)

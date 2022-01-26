@@ -57,6 +57,20 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
 
     if (outFormat == "smiles")
         outFormat <- "smi" # to make checks below easier
+    
+    stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
+
+    input <- trimws(input)
+    input[!nzchar(input)] <- NA_character_
+    
+    # NOTE: input with spaces should be removed as they will mess up parsing whitespace separated output of obabel    
+    invalidInds <- which(!is.na(input) & grepl("[[:space:]]+", input))
+    if (length(invalidInds))
+    {
+        for (i in invalidInds)
+            stopOrWarn(sprintf("Failed to convert %d from %s to %s: input has whitespace", i, inFormat, outFormat))
+        input[invalidInds] <- NA_character_
+    }
         
     input[!nzchar(input)] <- NA_character_ # UNDONE: should we ignore empty strings or not?
     
@@ -146,7 +160,6 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         ret[, index := NULL][]
     }
     
-    stopOrWarn <- function(msg) do.call(if (mustWork) stop else warning, list(msg, call. = FALSE))
     failed <- if (outFormat == "formula")
         which(is.na(ret$formula) & !is.na(input))
     else

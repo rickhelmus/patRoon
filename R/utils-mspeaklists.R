@@ -1,9 +1,63 @@
 emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), precursor = logical())
 
 
-#' @details The \code{getDefAvgPListParams} is used to create a parameter list
-#'   for peak list averaging (discussed below).
-#' @rdname MSPeakLists-generation
+#' Parameters for averaging MS peak list data
+#'
+#' Create parameter lists for averaging MS peak list data.
+#'
+#' The parameters set used for averaging peak lists are set by the \code{avgFeatParams} and \code{avgFGroupParams}
+#' arguments to \code{\link{generateMSPeakLists}} and its related algorithm specific functions. The parameters are
+#' specified as a named \code{list} with the following values: \itemize{
+#'
+#' \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering \emph{m/z} values when spectra are
+#' averaged. For \code{method="hclust"} this corresponds to the cluster height, while for \code{method="distance"} this
+#' value is used to find nearby masses (+/- window).  Too small windows will prevent clustering \emph{m/z} values (thus
+#' erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
+#' \emph{m/z} values from different or even the same spectrum together.
+#'
+#' \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
+#' number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
+#' excluding lower intense MS peaks that may still be of interest.
+#'
+#' \item \code{minIntensityPre} MS peaks with intensities below this value will be removed (applied prior to selection
+#' by \code{topMost}) before averaging.
+#'
+#' \item \code{minIntensityPost} MS peaks with intensities below this value will be removed after averaging.
+#'
+#' \item \code{avgFun} Function that is used to calculate average \emph{m/z} values.
+#'
+#' \item \code{method} Method used for producing averaged MS spectra. Valid values are \code{"hclust"}, used for
+#' hierarchical clustering (using the \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the between peak
+#' distance. The latter method may reduces processing time and memory requirements, at the potential cost of reduced
+#' accuracy.
+#'
+#' \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then peak lists without a precursor peak are
+#' removed. Note that even when this is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak lists
+#' (\emph{e.g.} formulae calulcation) will still skip calculation if a precursor is not found.
+#'
+#' \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then always retain the precursor mass peak even
+#' if is not amongst the \code{topMost} peaks. Note that MS precursor mass peaks are always kept. Furthermore, note that
+#' precursor peaks in both MS and MS/MS data may still be removed by intensity thresholds (this is unlike the
+#' \code{\link[=filter,MSPeakLists-method]{filter}} method function).
+#'
+#' }
+#'
+#' The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The current defaults are:
+#'
+#' @eval paste("@@details", getDefAvgPListParamsRD())
+#'
+#' @param \dots Optional named arguments that override defaults.
+#'
+#' @return \code{getDefAvgPListParams} returns a \code{list} with the peak list averaging parameters.
+#'
+#' @note With Bruker algorithms these parameters only control generation of feature groups averaged peak lists: how peak
+#'   lists for features are generated is controlled by DataAnalysis.
+#'
+#' @section Source: Averaging of mass spectra algorithms used by are based on the
+#'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
+#'
+#' @references \addCitations{fastcluster}{1}
+#'
 #' @export
 getDefAvgPListParams <- function(...)
 {

@@ -6,21 +6,46 @@ NULL
 # use mzR to generate MS peaklists.
 # limitations compared to DA: no bg subtraction, no isotope information
 
-#' @details \code{generateMSPeakListsMzR} uses the \pkg{mzR} package to
-#'   extract MS peak lists. For this analyses should be either in \file{.mzXML}
-#'   or \file{.mzML} format. This function averages multiple spectra over a
-#'   chromatgraphic peak to improve accuracy.
+#' Generate peak lists with mzR
 #'
-#' @param precursorMzWindow The \emph{m/z} window (in Da) to find MS/MS spectra
-#'   of a precursor. This is typically used for Data-Dependent like MS/MS data
-#'   and should correspond to the isolation \emph{m/z} window (\emph{i.e.} +/-
-#'   the precursor \emph{m/z}) that was used to collect the data. For
-#'   Data-Independent MS/MS experiments, where precursor ions are not isolated
-#'   prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value
-#'   should be \code{NULL}.
+#' Uses the \pkg{mzR} package to read the MS data needed for MS peak lists.
 #'
-#' @aliases generateMSPeakListsMzR
-#' @rdname MSPeakLists-generation
+#' @templateVar algo mzR
+#' @templateVar do generate MS peak lists
+#' @templateVar generic generateMSPeakLists
+#' @templateVar algoParam mzr
+#' @template algo_generator
+#'
+#' @details The MS data files should be either in \file{.mzXML} or \file{.mzML} format.
+#'
+#' @template centroid_note_mandatory
+#'
+#' @param precursorMzWindow The \emph{m/z} window (in Da) to find MS/MS spectra of a precursor. This is typically used
+#'   for Data-Dependent like MS/MS data and should correspond to the isolation \emph{m/z} window (\emph{i.e.} +/- the
+#'   precursor \emph{m/z}) that was used to collect the data. For Data-Independent MS/MS experiments, where precursor
+#'   ions are not isolated prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value should be
+#'   \code{NULL}.
+#' @param topMost Only extract MS peak lists from a maximum of \code{topMost} analyses with highest intensity. If
+#'   \code{NULL} all analyses will be used.
+#' @param avgFeatParams Parameters used for averaging MS peak lists of individual features. Analogous to
+#'   \code{avgFGroupParams}.
+#'
+#' @template mspl_algo-args
+#' @inheritParams generateMSPeakLists
+#'
+#' @inherit generateMSPeakLists return
+#'
+#' @references \addCitations{mzR}{1} \cr\cr
+#'
+#'   \addCitations{mzR}{2} \cr\cr
+#'
+#'   \addCitations{mzR}{3} \cr\cr
+#'
+#'   \addCitations{mzR}{4} \cr\cr
+#'
+#'   \addCitations{mzR}{5} \cr\cr
+#'
+#' @name generateMSPeakListsMzR
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
                                                               precursorMzWindow = 4, topMost = NULL,
@@ -149,7 +174,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
                        origFGNames = gNames, algorithm = "mzr"))
 })
 
-#' @rdname MSPeakLists-generation
+#' @rdname generateMSPeakListsMzR
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroupsSet", function(fGroups, ...)
 {

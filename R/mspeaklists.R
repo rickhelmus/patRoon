@@ -6,7 +6,7 @@ NULL
 #'
 #' Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.
 #'
-#' Objects for this class are returned by \link[=MSPeakLists-generation]{MS peak lists generators}.
+#' Objects for this class are returned by \code{\link{generateMSPeakLists}}.
 #'
 #' @param reAverage Set to \code{TRUE} to regenerate group averaged MS peak lists. \strong{NOTE} it is very important
 #'   that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
@@ -695,15 +695,45 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     return(if (drop && length(sims) == 1) drop(sims) else sims)
 })
 
+#' Generation of MS Peak Lists
+#'
+#' Functionality to convert MS and MS/MS data into MS peak lists.
+#'
+#' Formula calculation and identification tools rely on mass spectra that belong to features of interest. For
+#' processing, MS (and MS/MS) spectra are typically reduced to a table with a column containing measured \emph{m/z}
+#' values and a column containing their intensities. These 'MS peak lists' can then be used for
+#' \link[=formula-generation]{formula generation} and \link[=compound-generation]{compound generation}.
+#'
+#' MS and MS/MS peak lists are first generated for all features (or a subset, if the \code{topMost} argument is set).
+#' During this step multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be
+#' generated for each feature group by averaging peak lists of the features within the group. Functionality that uses
+#' peak lists will either use data from individual features or from group averaged peak lists. For instance, the former
+#' may be used by formulae calculation, while compound identification and plotting functionality typically uses group
+#' averaged peak lists.
+#'
 #' @templateVar func generateMSPeakLists
 #' @templateVar what generate MS peak lists
 #' @templateVar ex1 generateMSPeakListsMzR
 #' @templateVar ex2 generateMSPeakListsDA
 #' @templateVar algos bruker,brukerfmf,mzr
+#' @templateVar algosSuffix DA,DAFMF,MzR
+#' @templateVar ret MSPeakLists
 #' @template generic-algo
 #'
-#' @rdname MSPeakLists-generation
-#' @aliases generateMSPeakLists
+#' @param fGroups The \code{\link{featureGroups}} object from which MS peak lists should be extracted.
+#' @param \dots Any parameters to be passed to the selected MS peak lists generation algorithm.
+#'
+#' @template centroid_note
+#' 
+#' @return A \code{\link{MSPeakLists}} object.
+#' 
+#' @section Sets workflows: With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made
+#'   per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
+#'   ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled
+#'   in the final peak lists. However, please note that annotation and other functionality typically uses only the set
+#'   specific peak lists, as this functionality cannot work with mixed peak lists.
+#'
+#' @name generateMSPeakLists
 #' @export
 setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, ...)
 {

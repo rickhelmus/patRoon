@@ -221,9 +221,12 @@ checkFormula <- function(formula, elementsVec, negate)
     return(FALSE)
 }
 
-#' @details \code{formulaScorings} returns a \code{data.frame} with information
-#'   on which scoring terms are used and what their algorithm specific name is.
-#' @rdname formula-generation
+#' Scorings terms for formula candidates
+#'
+#' Returns a \code{data.frame} with information on which scoring terms are used and what their algorithm specific name
+#' is.
+#' 
+#' @seealso generateFormulas
 #' @export
 formulaScorings <- function()
 {

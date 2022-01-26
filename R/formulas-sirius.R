@@ -104,19 +104,36 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     return(forms)
 }
 
-#' @details \code{generateFormulasSIRIUS} uses
-#'   \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to
-#'   generate chemical formulae. Similarity of measured and theoretical isotopic
-#'   patterns will be used for scoring candidates. Note that \command{SIRIUS}
-#'   requires availability of MS/MS data.
+#' Generate formula with SIRIUS
 #'
-#' @templateVar ident FALSE
-#' @template sirius-args
-#' 
+#' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to generate chemical formulae candidates.
+#'
+#' @templateVar algo SIRIUS
+#' @templateVar do generate formula candidates
+#' @templateVar generic generateFormulas
+#' @templateVar algoParam sirius
+#' @template algo_generator
+#'
+#' @details Similarity of measured and theoretical isotopic patterns will be used for scoring candidates. Note that
+#'   \command{SIRIUS} requires availability of MS/MS data.
+#'
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
-#' @aliases generateFormulasSIRIUS
-#' @rdname formula-generation
+#' @template sirius_form-args
+#' @templateVar ident FALSE
+#' @template sirius-args
+#' @template adduct-arg
+#' @templateVar algo sirius
+#' @template form_algo-args
+#' 
+#' @inheritParams generateFormulas
+#'
+#' @inherit generateFormulas return
+#' 
+#' @templateVar what \code{generateFormulasSIRIUS}
+#' @template uses-multiProc
+#'
+#' @name generateFormulasSIRIUS
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
                                                               adduct = NULL, elements = "CHNOP",
@@ -195,7 +212,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
 })
 
-#' @rdname formula-generation
+#' @template featAnnSets-gen_args
+#' @rdname generateFormulasSIRIUS
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL, ...,
                                                                  setThreshold = 0, setThresholdAnn = 0)

@@ -97,8 +97,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #' @templateVar ident TRUE
 #' @template sirius-args
 #'
-#' @templateVar genForm FALSE
-#' @template form-args
+#' @template sirius_form-args
 #'
 #' @return \code{generateCompoundsSIRIUS} returns a \code{\link{compounds}}
 #'   object.

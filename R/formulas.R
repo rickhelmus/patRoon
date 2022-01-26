@@ -428,16 +428,61 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     return(ret)
 })
 
-
+#' Automatic chemical formula generation
+#'
+#' Automatically calculate chemical formulae for all feature groups.
+#'
+#' Several algorithms are provided to automatically generate formulae for given feature groups. All algorithms use the
+#' accurate mass of a feature to back-calculate candidate formulae. Depending on the algorithm and data availability,
+#' other data such as isotopic pattern and MS/MS fragments may be used to further improve formula assignment and
+#' ranking.
+#'
 #' @templateVar func generateFormulas
 #' @templateVar what generate formulae
 #' @templateVar ex1 generateFormulasDA
 #' @templateVar ex2 generateFormulasGenForm
 #' @templateVar algos bruker,genform,sirius
+#' @templateVar algosSuffix DA,GenForm,SIRIUS
+#' @templateVar ret formulas
 #' @template generic-algo
 #'
-#' @rdname formula-generation
-#' @aliases generateFormulas
+#' @param fGroups \code{\link{featureGroups}} object for which formulae should be generated. This should be the same or
+#'   a subset of the object that was used to create the specified \code{MSPeakLists}. In the case of a subset only the
+#'   remaining feature groups in the subset are considered.
+#' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
+#' @param \dots Any parameters to be passed to the selected formula generation algorithm.
+#'
+#' @section Candidate assignment: Formula candidate assignment occurs in one of the following ways: \itemize{
+#'
+#'   \item Candidates are first generated for each feature and then pooled to form consensus candidates for the feature
+#'   group.
+#'
+#'   \item Candidates are directly generated for each feature group by group averaged MS peak list data.
+#'
+#'   }
+#'
+#'   With approach (1), scorings and mass errors are averaged and outliers are removed (controlled by
+#'   \code{featThreshold} and \code{featThresholdAnn} arguments). Other candidate properties that cannot be averaged are
+#'   from the feature from the analysis as specified in the \code{"analysis"} column of the results. The second approach only generates candidate formulae once for every feature group, and is therefore generally much
+#'   faster. However, this inherently prevents removal of outliers.
+#'
+#'   Note that with either approach subsequent workflow steps that use formula data (\emph{e.g.}
+#'   \code{\link{addFormulaScoring}} and \link{reporting} functions) only use formula data that was eventually assigned
+#'   to feature groups.
+#'   
+#' @section Scorings: Each algorithm implements their own scoring system. Their names have been harmonized where
+#'   possible. An overview is obtained with the \code{\link{formulaScorings}} function:
+#'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
+#'
+#' @templateVar UID neutral formula
+#' @template featAnnSets-gen
+#'
+#' @return A \code{\link{formulas}} object containing all generated formulae.
+#'
+#' @seealso The \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
+#'   manual} (also known as MOLGEN-MSMS).
+#'
+#' @name generateFormulas
 #' @export
 setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {

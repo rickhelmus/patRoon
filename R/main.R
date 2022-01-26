@@ -355,8 +355,7 @@ NULL
 #'   values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
 #'   \code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.
 #'
-#' @templateVar genForm TRUE
-#' @template form-args
+#' @template sirius_form-args
 #'
 #' @template adduct-arg
 #'

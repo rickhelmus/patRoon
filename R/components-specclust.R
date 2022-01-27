@@ -11,7 +11,7 @@ NULL
 #'
 #' @template components-altered-note
 #' 
-#' @seealso \code{\link{componentsClust}} for other relevant methods and \link{component-generation}
+#' @seealso \code{\link{componentsClust}} for other relevant methods and \code{\link{generateComponents}}
 #'
 #' @templateVar class componentsSpecClust
 #' @template class-hierarchy
@@ -19,17 +19,41 @@ NULL
 #' @export
 componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClust")
 
-
-#' @details \code{generateComponentsSpecClust} generates components based on MS/MS similarity between feature groups.
-#'   The similarities are converted to a distance matrix and used as input for hierarchical clustering, and the
+#' Generate components based on MS/MS similarity
+#'
+#' Generates components based on MS/MS similarity between feature groups.
+#'
+#' @templateVar algo hierarchical clustering of MS/MS spectra
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam specclust
+#' @template algo_generator
+#'
+#' @details The similarities are converted to a distance matrix and used as input for hierarchical clustering, and the
 #'   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The clustering is performed with
 #'   \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
+#'
+#' @param MSPeakLists The \code{\link{MSPeakLists}} object for the given feature groups that should be used for MS
+#'   spectral similarity calculations.
+#'
+#' @templateVar noDots TRUE
+#' @template compon_algo-args
+#' @template compon_gen-clust
+#' @template dynamictreecut
+#' @template specSimParams-arg
+#'
+#' @inheritParams generateComponents
+#'
+#' @return The components are stored in objects derived from \code{\link{componentsSpecClust}}.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the spectral similarities for each set are
+#'   combined as is described for the \code{\link[=spectrumSimilarity,MSPeakListsSet-method]{spectrumSimilarity}} method
+#'   for sets workflows.
 #'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Bas van de Velde (major contributions to spectral binning and
 #'   similarity calculation).
 #'
-#' @aliases generateComponentsSpecClust
-#' @rdname component-generation
+#' @name generateComponentsSpecClust
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    specSimParams = getDefSpecSimParams(),

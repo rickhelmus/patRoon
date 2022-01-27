@@ -291,7 +291,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
 #'
 #' @param x,obj A \code{componentsTPs} object.
 #'
-#' @seealso \code{\link{components}} for other relevant methods and \link{component-generation}
+#' @seealso \code{\link{components}} for other relevant methods and \code{\link{generateComponents}}
 #'
 #' @templateVar class componentsTPs
 #' @template class-hierarchy
@@ -349,7 +349,7 @@ setMethod("as.data.table", "componentsTPs", function(x)
 #'   parameters} for more details). Set to \code{NULL} to ignore.
 #' @param minFragMatches,minNLMatches Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
 #'   to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
-#'   \link{component-generation} for more details.
+#'   \code{\link{generateComponentsTPs}} for more details.
 #' @param formulas A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
 #'   additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
 #'   \code{\link{generateTPsLogic}}). To verify elemental additions, only TPs with at least one candidate formula that
@@ -491,12 +491,22 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
     makeGraph(obj, onlyLinked, titles)
 })
 
-#' @details \code{generateComponentsTPs} generates components by linking feature groups of transformation products and
-#'   their parents. Moreover, this method typically employs data from \link[=TP-generation]{generated transformation
-#'   products} to find parents and their TPs. However, this data is not necessary, and components can also be made based
-#'   on MS/MS similarity and/or other annotation similarities between the parent and its TPs. For more details see the
+#' Generate components of transformation products
+#'
+#' Generates components by linking feature groups of transformation products and their parents.
+#'
+#' @templateVar algo transformation product screening
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam tp
+#' @template algo_generator
+#'
+#' @details This method typically employs data from \link[=TP-generation]{generated transformation products} to find
+#'   parents and their TPs. However, this data is not necessary, and components can also be made based on MS/MS
+#'   similarity and/or other annotation similarities between the parent and its TPs. For more details see the
 #'   \verb{Linking parents and transformation products} section below.
 #'
+#' @param fGroups The input \code{\link{featureGroups}} for componentization. See \code{fGroupsTPs}.
 #' @param fGroupsTPs A \code{\link{featureGroups}} object containing the feature groups that are expected to be
 #'   transformation products. If a distinction between parents and TPs is not yet known, \code{fGroupsTPs} should equal
 #'   the \code{fGroups} argument. Otherwise, \code{fGroups} should only contain the parent feature groups, and both
@@ -504,17 +514,24 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #' @param ignoreParents If \code{TRUE} then feature groups present in both \code{fGroups} and \code{fGroupsTPs} are not
 #'   considered as TPs.
 #' @param TPs A \code{\link{transformationProducts}} object. Set to \code{NULL} to perform linking without this data.
-#' @param formulas,compounds A \code{\link{formulas}}/\code{\link{compounds}} object to calculate annotation
-#'   similarities between parents and TPs. If \code{NULL} then this data is not calculated. For more details see the
-#'   \verb{Linking parents and transformation products} section below.
+#' @param MSPeakLists,formulas,compounds A \code{\link{MSPeakLists}}/\code{\link{formulas}}/\code{\link{compounds}}
+#'   object to calculate MS/MS or annotation similarities between parents and TPs. If \code{NULL} then this data is not
+#'   calculated. For more details see the \verb{Linking parents and transformation products} section below.
 #' @param minRTDiff Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
 #'   elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
 #'
-#' @section Linking parents and transformation products: With \code{generateComponentsTPs}, each component consists of
-#'   feature groups that are considered to be transformation products for one parent (the parent that 'belongs' to the
-#'   component can be retrieved with the \code{\link{componentInfo}} method). The parent feature groups are taken from
-#'   the \code{fGroups} parameter, while the feature groups for TPs are taken from \code{fGroupsTPs}. If a feature group
-#'   occurs in both variables, it may therefore be considered as both a parent or TP.
+#' @template specSimParams-arg
+#'
+#' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always
+#'   calculates similarities with all supported options.
+#'
+#' @return The components are stored in objects derived from \code{\link{componentsTPs}}.
+#'
+#' @section Linking parents and transformation products: Each component consists of feature groups that are considered
+#'   to be transformation products for one parent (the parent that 'belongs' to the component can be retrieved with the
+#'   \code{\link{componentInfo}} method). The parent feature groups are taken from the \code{fGroups} parameter, while
+#'   the feature groups for TPs are taken from \code{fGroupsTPs}. If a feature group occurs in both variables, it may
+#'   therefore be considered as both a parent or TP.
 #'
 #'   If transformation product data is given, \emph{i.e.} the \code{TPs} argument is set, then a suspect screening of
 #'   the TPs must be performed in advance (see \code{\link{screenSuspects}} and \code{\link{convertToSuspects}} to
@@ -533,7 +550,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #'   only retaining TPs that have high annotation similarity with their parents (see the
 #'   \code{\link[=filter,componentsTPs-method]{filter}} method for \code{\link{componentsTPs}}).
 #'
-#'   An typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
+#'   A typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
 #'   calculating Fold Changes (see the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for
 #'   feature groups and \code{\link{plotVolcano}}). Of course, other statistical techniques from \R are also suitable.
 #'
@@ -565,11 +582,11 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #'
 #'   }
 #'
-#' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always
-#'   calculates similarities with all supported options.
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the component tables are amended with extra
+#'   information such as overall/specific set spectrum similarities. As sets data is mixed, transformation products are
+#'   able to be linked with a parent, even if they were not measured in the same set.
 #'
-#' @aliases generateComponentsTPs
-#' @rdname component-generation
+#' @name generateComponentsTPs
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,
                                                              TPs = NULL, MSPeakLists = NULL, formulas = NULL,
@@ -593,7 +610,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
                               specSimParams = specSimParams))
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsTPs
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,
                                                                 TPs = NULL, MSPeakLists = NULL, formulas = NULL,

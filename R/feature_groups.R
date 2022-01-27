@@ -1735,7 +1735,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     return(obj)
 })
 
-#' @describeIn featureGroups uses \link[=component-generation]{componentization} results to select feature groups with
+#' @describeIn featureGroups uses \link[=generateComponents]{componentization} results to select feature groups with
 #'   preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
 #'   (de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
 #'   copied from the components to the \code{annotations} slot. If the adduct for a feature group is unknown, its

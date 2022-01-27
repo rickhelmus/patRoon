@@ -47,7 +47,7 @@ verifyCompNotAltered <- function(obj)
 #'
 #' @references \insertRef{Scholle2018}{patRoon}
 #'
-#' @seealso \code{\link{components}} and \link{component-generation}
+#' @seealso \code{\link{components}} and \code{\link{generateComponents}}
 #'
 #' @template components_noint
 #' @template components-altered-note

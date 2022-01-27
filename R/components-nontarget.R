@@ -18,7 +18,7 @@ NULL
 #'
 #' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 #'
-#' @seealso \code{\link{components}} and \link{component-generation}
+#' @seealso \code{\link{components}} and \code{\link{generateComponents}}
 #'
 #' @export
 componentsNT <- setClass("componentsNT", slots = c(homol = "list"), contains = "components")
@@ -65,40 +65,54 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     makeGraph(obj, onlyLinked, titles)
 })
 
-
-#' @details \code{generateComponentsNontarget} uses
-#'   \href{https://cran.r-project.org/web/packages/nontarget/index.html}{the
-#'   nontarget R package} to generate components by unsupervised detection of
-#'   homologous series. In the first step the \code{\link{homol.search}}
-#'   function is used to detect all homologues within each replicate group
-#'   (analyses within each replicate group are averaged prior to detection).
-#'   Then, homologous series across replicate groups are merged in case of full
-#'   overlap or when merging of partial overlapping series causes no conflicts.
+#' Componentization of homologous series with nontarget
 #'
-#' @param rtRange A numeric vector containing the minimum and maximum retention
-#'   time (in seconds) between homologues. Series are always considered from low
-#'   to high \emph{m/z}, thus, a negative minimum retention time allows
-#'   detection of homologous series with increasing \emph{m/z} and decreasing
-#'   retention times. These values set the \code{minrt} and \code{maxrt}
-#'   arguments of \code{\link{homol.search}}.
-#' @param mzRange A numeric vector specifying the minimum and maximum \emph{m/z}
-#'   increment of a homologous series. Sets the \code{minmz} and \code{maxmz}
-#'   arguments of \code{\link{homol.search}}.
-#' @param elements A character vector with elements to be considered for
-#'   detection of repeating units. Sets the \code{elements} argument of
-#'   \code{\link{homol.search}} function.
-#' @param absMzDevLink Maximum absolute \emph{m/z} deviation when linking
-#'   series. This should usually be a bit higher than \code{absMzDev} to ensure
-#'   proper linkage.
-#' @param traceHack Currently \code{\link{homol.search}} does not work with \R
-#'   \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
-#'   implements a (messy) workaround
+#' Uses \href{https://cran.r-project.org/web/packages/nontarget/index.html}{the nontarget R package} to generate
+#' components by unsupervised detection of homologous series.
+#'
+#' @templateVar algo nontarget
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam nontarget
+#' @template algo_generator
+#'
+#' @details In the first step the \code{\link{homol.search}} function is used to detect all homologous series within
+#'   each replicate group (analyses within each replicate group are averaged prior to detection). Then, homologous
+#'   series across replicate groups are merged in case of full overlap or when merging of partial overlapping series
+#'   causes no conflicts.
+#'
+#' @param rtRange A numeric vector containing the minimum and maximum retention time (in seconds) between homologues.
+#'   Series are always considered from low to high \emph{m/z}, thus, a negative minimum retention time allows detection
+#'   of homologous series with increasing \emph{m/z} and decreasing retention times. These values set the \code{minrt}
+#'   and \code{maxrt} arguments of \code{\link{homol.search}}.
+#' @param mzRange A numeric vector specifying the minimum and maximum \emph{m/z} increment of a homologous series. Sets
+#'   the \code{minmz} and \code{maxmz} arguments of \code{\link{homol.search}}.
+#' @param elements A character vector with elements to be considered for detection of repeating units. Sets the
+#'   \code{elements} argument of \code{\link{homol.search}} function.
+#' @param rtDev Maximum retention time deviation. Sets the \code{rttol} to \code{\link{homol.search}}.
+#' @param absMzDevLink Maximum absolute \emph{m/z} deviation when linking series. This should usually be a bit higher
+#'   than \code{absMzDev} to ensure proper linkage.
+#' @param traceHack Currently \code{\link{homol.search}} does not work with \R \samp{>3.3.3}. This flag, which is
+#'   enabled by default on these R versions, implements a (messy) workaround
 #'   (\href{https://github.com/blosloos/nontarget/issues/6}{more details here}).
+#'
+#' @templateVar ion TRUE
+#' @templateVar absMzDev \code{mztol} argument to \code{\link{homol.search}}
+#' @templateVar myDots Any further arguments passed to \code{\link{homol.search}}.
+#' @template compon_algo-args
+#'
+#' @inheritParams generateComponents
+#'
+#' @return The generated comnponents are returned as an object from the \code{\link{componentsNT}} class.
+#'
+#' @templateVar class componentsNTSet
+#' @template compon_gen-sets-merged
+#'
+#' @section Sets workflows: The output class supports additional methods such as \code{plotGraph}.
 #'
 #' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 #'
-#' @aliases generateComponentsNontarget
-#' @rdname component-generation
+#' @name generateComponentsNontarget
 #' @export
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization = NULL, rtRange = c(-120, 120),
                                                                    mzRange = c(5, 120), elements = c("C", "H", "O"),
@@ -347,7 +361,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     return(ret)
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsNontarget
 #' @export
 setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {

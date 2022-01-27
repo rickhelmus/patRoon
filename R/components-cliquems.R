@@ -10,10 +10,20 @@ componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list")
 setMethod("initialize", "componentsCliqueMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cliquems", ...))
 
-#' @details \code{generateComponentsCliqueMS} uses \href{https://github.com/osenan/cliqueMS}{cliqueMS} to generate
-#'   components using the \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}} function. The grouping of features in
-#'   each component ('clique') is based on high similarity of chromatographic elution profiles. All features in each
-#'   component are then annotated with the \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}} and
+#' Componentization of adducts, isotopes etc. with cliqueMS
+#'
+#' Uses \href{https://github.com/osenan/cliqueMS}{cliqueMS} to generate components using the
+#' \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}} function.
+#'
+#' @templateVar algo cliqueMS
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam cliquems
+#' @template algo_generator
+#'
+#' @details The grouping of features in each component ('clique') is based on high similarity of chromatographic elution
+#'   profiles. All features in each component are then annotated with the
+#'   \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}} and
 #'   \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}} functions.
 #'
 #' @param maxCharge,maxGrade,ppm Arguments passed to \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}} and/or
@@ -21,14 +31,28 @@ setMethod("initialize", "componentsCliqueMS",
 #' @param adductInfo Sets the \code{adinfo} argument to \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}.
 #'   If \code{NULL} then the default adduct information from \pkg{cliqueMS} is used (\emph{i.e.} the
 #'   \code{positive.adinfo}/\code{negative.adinfo} package datasets).
+#' @param absMzDev Maximum absolute \\emph{m/z} deviation.
 #' @param extraOptsCli,extraOptsIso,extraOptsAnn Named \code{list} with further arguments to be passed to
 #'   \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}}, \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}}
 #'   and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.
 #'
+#' @templateVar ion TRUE
+#' @templateVar minSize TRUE
+#' @template compon_algo-args
+#' @template parallel-arg
+#'
+#' @inheritParams generateComponents
+#'
+#' @return A \code{\link{componentsFeatures}} derived object.
+#'
+#' @template compon_gen-feat
+#'
+#' @templateVar class componentsSet
+#' @template compon_gen-sets-merged
+#'
 #' @references \insertRef{Senan2019}{patRoon}
 #'
-#' @aliases generateComponentsCliqueMS
-#' @rdname component-generation
+#' @name generateComponentsCliqueMS
 #' @export
 setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization = NULL, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,
@@ -183,7 +207,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                               prefAdducts = prefAdducts, featureComponents = featComponents))
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsCliqueMS
 #' @export
 setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {

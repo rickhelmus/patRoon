@@ -9,10 +9,20 @@ componentsOpenMS <- setClass("componentsOpenMS", contains = "componentsFeatures"
 setMethod("initialize", "componentsOpenMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
 
-#' @details \code{generateComponentsOpenMS} uses the
-#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
-#'    utility (see \url{http://www.openms.de}) to generate components. Features that show highly similar chromatographic
-#'   elution profiles are grouped, and subsequently annotated with their adducts.
+#' Componentization of adducts, isotopes etc. with OpenMS
+#'
+#' Uses the
+#' \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+#' utility (see \url{http://www.openms.de}) to generate components.
+#'
+#' @templateVar algo OpenMS
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam openms
+#' @template algo_generator
+#'
+#' @details Features that show highly similar chromatographic elution profiles are grouped, and subsequently annotated
+#'   with their adducts.
 #'
 #' @param chargeMin,chargeMax The minimum/maximum charge to consider. Corresponds to the
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:charge_min}/\command{algorithm:MetaboliteFeatureDeconvolution:charge_min}
@@ -29,23 +39,39 @@ setMethod("initialize", "componentsOpenMS",
 #'   \code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
-#'    for more details. If \code{NULL} then the a default is chosen with \code{defaultOpenMSAdducts} (which is
+#'    for more details. If \code{NULL} then the a default is chosen with \code{\link{defaultOpenMSAdducts}} (which is
 #'   \emph{not} the same as \command{OpenMS}).
 #'
 #'   \setsWF Should be a \code{list} where each entry specifies the potential adducts for a set. Should either be named
 #'   with the sets names or follow the same order as \code{sets(fGroups)}. Example:
-#'   \code{potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" = 0.2))}
+#'   \code{potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" =
+#'   0.2))}
 #' @param minRTOverlap,retWindow Sets feature retention tolerances when grouping features. Sets the
 #'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.
+#' @param extraOpts Named character vector with extra command line parameters directly passed to
+#'   \command{MetaboliteAdductDecharger}. Set to \code{NULL} to ignore.
+#'
+#' @templateVar ion TRUE
+#' @templateVar minSize TRUE
+#' @templateVar absMzDev \command{algorithm:MetaboliteFeatureDeconvolution:mass_max_diff} option
+#' @template compon_algo-args
+#'
+#' @inheritParams generateComponents
+#'
+#' @return A \code{\link{componentsFeatures}} derived object.
+#'
+#' @template compon_gen-feat
+#'
+#' @templateVar class componentsSet
+#' @template compon_gen-sets-merged
 #'
 #' @templateVar what \code{generateComponentsOpenMS}
 #' @template uses-multiProc
 #'
 #' @references \insertRef{Bielow2010}{patRoon}
 #'
-#' @aliases generateComponentsOpenMS
-#' @rdname component-generation
+#' @name generateComponentsOpenMS
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization = NULL, chargeMin = 1,
                                                                 chargeMax = 1, chargeSpan = 3,
@@ -142,7 +168,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                             prefAdducts = prefAdducts, featureComponents = featComponents))
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsOpenMS
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ionization = NULL, chargeMin = 1,
                                                                    chargeMax = 1, chargeSpan = 3, qTry = "heuristic",
@@ -202,9 +228,14 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
                 args = c(settingsArgs, "-in", inFile, "-out_cm", outFile)))
 }
 
-#' @details \code{defaultOpenMSAdducts} returns the default adducts and their probabilities when the OpenMS algorithm is
-#'   used for componentization. See the \code{potentialAdducts} argument for more details.
-#' @rdname component-generation
+#' Default adducts for OpenMS componentization
+#'
+#' Returns the default adducts and their probabilities when the OpenMS algorithm is used for componentization.
+#' 
+#' See the \code{potentialAdducts} argument of \code{\link{generateComponentsOpenMS}} for more details.
+#' 
+#' @param ionization The ionization polarity: either \code{"positive"} or \code{"negative"}.
+#' 
 #' @export
 defaultOpenMSAdducts <- function(ionization)
 {

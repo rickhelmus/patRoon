@@ -10,30 +10,50 @@ setMethod("initialize", "componentsRC",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "ramclustr"))
 
 
-#' @details \code{generateComponentsRAMClustR} uses
-#'   \href{https://github.com/cbroeckl/RAMClustR}{RAMClustR} to generate
-#'   components from feature groups which follow similar chromatographic
-#'   retention profiles, but are not necessarily restricted to known rules
-#'   (\emph{e.g.} adducts or isotopes). This method uses the
-#'   \code{\link[RAMClustR]{ramclustR}} functions for generating the components, whereas
+#' Componentization of adducts, isotopes etc. with RAMClustR
+#'
+#' Uses \href{https://github.com/cbroeckl/RAMClustR}{RAMClustR} to generate components from feature groups which follow
+#' similar chromatographic retention profiles and annotate their relationships (\emph{e.g.} adducts and isotopes).
+#'
+#' @templateVar algo RAMClustR
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam ramclustr
+#' @template algo_generator
+#'
+#' @details This method uses the \code{\link[RAMClustR]{ramclustR}} functions for generating the components, whereas
 #'   \code{\link[RAMClustR]{do.findmain}} is used for annotation.
 #'
-#' @param st,sr,maxt,hmax,normalize Arguments to tune the behaviour of feature
-#'   group clustering. See their documentation from \code{\link[RAMClustR]{ramclustR}}.
-#'   When \code{st} is \code{NULL} it will be automatically calculated as the
+#' @param st,sr,maxt,hmax,normalize Arguments to tune the behaviour of feature group clustering. See their documentation
+#'   from \code{\link[RAMClustR]{ramclustR}}. When \code{st} is \code{NULL} it will be automatically calculated as the
 #'   half of the median for all chromatographic peak widths.
-#' @param RCExperimentVals A named \code{list} containing two more \code{list}s:
-#'   \code{design} and \code{instrument}. These are used to construct the
-#'   \code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}.
-#' @param extraOptsRC,extraOptsFM Named \code{list} with further arguments to be
-#'   passed to \code{\link[RAMClustR]{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}.
-#'   Set to \code{NULL} to ignore.
+#' @param relMzDev Maximum relative mass deviation (\acronym{ppm}). Sets the \code{ppm.error} argument to
+#'   \code{\link[RAMClustR]{do.findmain}}.
+#' @param RCExperimentVals A named \code{list} containing two more \code{list}s: \code{design} and \code{instrument}.
+#'   These are used to construct the \code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}.
+#' @param extraOptsRC,extraOptsFM Named \code{list} with further arguments to be passed to
+#'   \code{\link[RAMClustR]{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}. Set to \code{NULL} to ignore.
 #'
-#' @references \insertRef{Broeckling2013}{patRoon} \cr\cr
-#'   \insertRef{Broeckling2014}{patRoon}
+#' @templateVar ion TRUE
+#' @templateVar RC TRUE
+#' @templateVar minSize TRUE
+#' @templateVar minReps TRUE
+#' @templateVar absMzDev \code{mzabs.error} argument to \code{\link[RAMClustR]{do.findmain}}
+#' @template compon_algo-args
 #'
-#' @aliases generateComponentsRAMClustR
-#' @rdname component-generation
+#' @inheritParams generateComponents
+#'
+#' @inherit generateComponents return
+#'
+#' @templateVar minSize FALSE
+#' @template compon_gen-filters
+#'
+#' @templateVar class componentsSet
+#' @template compon_gen-sets-merged
+#'
+#' @references \insertRef{Broeckling2013}{patRoon} \cr\cr \insertRef{Broeckling2014}{patRoon}
+#'
+#' @name generateComponentsRAMClustR
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ionization = NULL, st = NULL, sr = NULL,
                                                                    maxt = 12, hmax = 0.3, normalize = "TIC",
@@ -186,7 +206,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
     return(ret)
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsRAMClustR
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {

@@ -9,8 +9,7 @@ NULL
 #' Contains data for feature groups that are related in some way. These
 #' \emph{components} commonly include adducts, isotopes and homologues.
 #'
-#' \code{components} objects are obtained from
-#' \link[=component-generation]{component generators}.
+#' \code{components} objects are obtained from \code{\link{generateComponents}}.
 #'
 #' @slot components List of all components in this object. Use the
 #'   \code{componentTable} method for access.
@@ -54,8 +53,7 @@ NULL
 #' @templateVar class components
 #' @template class-hierarchy
 #'
-#' @seealso \link{component-generation},  \code{\link{componentsNT}} and
-#'   \code{\link{componentsIntClust}}
+#' @seealso \code{\link{generateComponents}}
 #'
 #' @export
 components <- setClass("components",
@@ -566,15 +564,33 @@ setMethod("consensus", "components", function(obj, ...)
                       algorithm = paste0(compNames, collapse = ",")))
 })
 
+#' Grouping feature groups in components
+#'
+#' Functionality to automatically group related feature groups (\emph{e.g.} isotopes, adducts and homologues) to assist
+#' and simplify annotation.
+#'
+#' Several algorithms are provided to group feature groups that are related in some (chemical) way to each other. How
+#' feature groups are related depends on the algorithm: examples include adducts, statistics and parents/transformation
+#' products. The linking of this data is generally useful for annotation purposes and reducing data complexity.
+#'
 #' @templateVar func generateComponents
 #' @templateVar what generate components
 #' @templateVar ex1 generateComponentsRAMClustR
 #' @templateVar ex2 generateComponentsNontarget
 #' @templateVar algos ramclustr,camera,nontarget,intclust,openms,cliquems,specclust,tp
+#' @templateVar algosSuffix RAMClustR,CAMERA,Nontarget,IntClust,OpenMS,CliqueMS,SpecClust,TPs
+#' @templateVar ret components
 #' @template generic-algo
 #'
-#' @rdname component-generation
-#' @aliases generateComponents
+#' @param fGroups \code{\link{featureGroups}} object for which components should be generated.
+#' @param \dots Any parameters to be passed to the selected component generation algorithm.
+#'
+#' @return A \code{\link{components}} (derived) object containing all generated components.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the componentization data is generated differently
+#'   depending on the used algorithm. Please see the details in the algorithm specific functions linked in the \verb{See Also} section.
+#'
+#' @name generateComponents
 #' @export
 setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ...)
 {

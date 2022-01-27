@@ -18,7 +18,7 @@ NULL
 #'
 #' @template components-altered-note
 #'
-#' @seealso \code{\link{componentsClust}} for other relevant methods and \link{component-generation}
+#' @seealso \code{\link{componentsClust}} for other relevant methods and \code{\link{generateComponents}}
 #'
 #' @templateVar class componentsIntClust
 #' @template class-hierarchy
@@ -93,19 +93,41 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
     return(makeHash(plotm, ...))
 })
 
-#' @details \code{generateComponentsIntClust} generates components based on intensity profiles of feature groups.
-#'   Hierarchical clustering is performed on normalized (and optionally replicate averaged) intensity data and the
-#'   resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The distance matrix is calculated
-#'   with \code{\link{daisy}} and clustering is performed with \code{\link[fastcluster:hclust]{fastcluster::hclust}}.
-#'   The clustering of the resulting components can be further visualized and modified using the methods defined for
-#'   \code{\link{componentsIntClust}}.
+#' Generate components based on intensity profiles
+#'
+#' Generates components based on intensity profiles of feature groups.
+#'
+#' @templateVar algo hierarchical clustering of intensity profiles
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam intclust
+#' @template algo_generator
+#'
+#' @details Hierarchical clustering is performed on normalized (and optionally replicate averaged) intensity data and
+#'   the resulting dendrogram is automatically cut with \code{\link{cutreeDynamicTree}}. The distance matrix is
+#'   calculated with \code{\link{daisy}} and clustering is performed with
+#'   \code{\link[fastcluster:hclust]{fastcluster::hclust}}. The clustering of the resulting components can be further
+#'   visualized and modified using the methods defined for \code{\link{componentsIntClust}}.
 #'
 #' @param metric Distance metric used to calculate the distance matrix (passed to \code{\link{daisy}}).
 #' @param normFunc,average Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
 #'   normalization and averaging of data.
 #'
-#' @aliases generateComponentsIntClust
-#' @rdname component-generation
+#' @templateVar noDots TRUE
+#' @template compon_algo-args
+#' @template compon_gen-clust
+#' @template dynamictreecut
+#'
+#' @inheritParams generateComponents
+#'
+#' @return The components are stored in objects derived from \code{\link{componentsIntClust}}.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
+#'   set.
+#'
+#' @references \insertRef{Scholle2018}{patRoon}
+#'
+#' @name generateComponentsIntClust
 #' @export
 setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",
                                                                   normFunc = max, average = TRUE,

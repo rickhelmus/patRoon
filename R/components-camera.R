@@ -10,22 +10,43 @@ componentsCamera <- setClass("componentsCamera", slots = c(xsa = "ANY"),
 setMethod("initialize", "componentsCamera",
           function(.Object, ...) callNextMethod(.Object, algorithm = "camera", ...))
 
-
-#' @details \code{generateComponentsCAMERA} provides an interface to
-#'   \href{https://bioconductor.org/packages/release/bioc/html/CAMERA.html}{CAMERA}
-#'    which is used to generate components from known adducts, isotopes and
-#'   in-source fragments. The specified \code{featureGroups} object is
-#'   automatically converted to an \code{\link{xcmsSet}} object using
-#'   \code{\link{getXCMSSet}}.
+#' Componentization of adducts, isotopes etc. with CAMERA
 #'
-#' @param onlyIsotopes Logical value. If \code{TRUE} only isotopes are
-#'   considered when generating components (faster). Corresponds to \code{quick}
-#'   argument of \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}.
+#' Interfaces with \href{https://bioconductor.org/packages/release/bioc/html/CAMERA.html}{CAMERA} to generate components
+#' from known adducts, isotopes and in-source fragments.
+#'
+#' @templateVar algo CAMERA
+#' @templateVar do generate components
+#' @templateVar generic generateComponents
+#' @templateVar algoParam camera
+#' @template algo_generator
+#'
+#' @details The specified \code{featureGroups} object is automatically converted to an \code{\link{xcmsSet}} object
+#'   using \code{\link{getXCMSSet}}.
+#'
+#' @param onlyIsotopes Logical value. If \code{TRUE} only isotopes are considered when generating components (faster).
+#'   Corresponds to \code{quick} argument of \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}.
+#' @param extraOpts Named character vector with extra arguments directly passed to
+#'   \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}. Set to \code{NULL} to ignore.
+#'
+#' @templateVar ion TRUE
+#' @templateVar minSize TRUE
+#' @templateVar minReps TRUE
+#' @template compon_algo-args
+#'
+#' @inheritParams generateComponents
+#'
+#' @inherit generateComponents return
+#' 
+#' @templateVar minSize TRUE
+#' @template compon_gen-filters
+#' 
+#' @templateVar class componentsSet
+#' @template compon_gen-sets-merged
 #'
 #' @references \addCitations{CAMERA}{1}
 #'
-#' @aliases generateComponentsCAMERA
-#' @rdname component-generation
+#' @name generateComponentsCAMERA
 #' @export
 setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization = NULL, onlyIsotopes = FALSE,
                                                                 minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
@@ -166,7 +187,7 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
     return(ret)
 })
 
-#' @rdname component-generation
+#' @rdname generateComponentsCAMERA
 #' @export
 setMethod("generateComponentsCAMERA", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {

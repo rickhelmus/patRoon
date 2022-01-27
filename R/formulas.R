@@ -6,8 +6,8 @@ NULL
 #'
 #' Contains data of generated chemical formulae for given feature groups.
 #'
-#' \code{formulas} objects are obtained from \link[=formula-generation]{formula generators}. This class is derived from
-#' the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
+#' \code{formulas} objects are obtained with \code{\link{generateFormulas}}. This class is derived from the
+#' \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 #'
 #' @slot featureFormulas A \code{list} with all generated formulae for each analysis/feature group. Use the
 #'   \code{annotations} method for access.
@@ -27,14 +27,15 @@ NULL
 #'   \code{j} the feature group of the feature for which annotations should be returned. Otherwise \code{i} specifies
 #'   the feature group for which group annotations should be returned. \code{i}/\code{j} can be specified as
 #'   \code{integer} index or as a \code{character} name.
-#'   
+#'
 #'   Otherwise passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
-#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and \link{formula-generation}.
+#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and
+#'   \code{\link{generateFormulas}}.
 #'
 #' @templateVar class formulas
 #' @template class-hierarchy

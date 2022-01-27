@@ -501,7 +501,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #' @templateVar algoParam tp
 #' @template algo_generator
 #'
-#' @details This method typically employs data from \link[=TP-generation]{generated transformation products} to find
+#' @details This method typically employs data from \link[=generateTPs]{generated transformation products} to find
 #'   parents and their TPs. However, this data is not necessary, and components can also be made based on MS/MS
 #'   similarity and/or other annotation similarities between the parent and its TPs. For more details see the
 #'   \verb{Linking parents and transformation products} section below.

@@ -68,26 +68,54 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
     return(data.table(name = fg, group = fg))
 })
 
-#' @details \code{generateTPsLogic} applies \emph{metabolic logic} to predict transformation products. With this
-#'   algorithm, TPs are predicted from common (environmental) chemical reactions, such as hydroxylation, demethylation
-#'   etc. The generated TPs result from calculating the mass differences between a parent feature after it underwent the
-#'   reaction. While this only results in little information on chemical properties of the TP, an advantage of this
-#'   method is that it does not rely on structural information of the parent, which may be unknown in a full non-target
-#'   analysis.
+#' Obtain transformation products (TPs) with metabolic logic
+#'
+#' Automatically calculate potential transformation products with \emph{metabolic logic}.
+#'
+#' @templateVar algo metabolic logic
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam logic
+#' @template algo_generator
+#'
+#' @details With this algorithm TPs are predicted from common (environmental) chemical reactions, such as hydroxylation,
+#'   demethylation etc. The generated TPs result from calculating the mass differences between a parent feature after it
+#'   underwent the reaction. While this only results in little information on chemical properties of the TP, an
+#'   advantage of this method is that it does not rely on structural information of the parent, which may be unknown in
+#'   a full non-target analysis.
 #'
 #' @param fGroups A \code{\link{featureGroups}} object for which TPs should be calculated.
 #' @param minMass A \code{numeric} that specifies the minimum mass of calculated TPs. If below this mass it will be
 #'   removed.
 #' @param transformations A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
-#'   section below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).
+#'   details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).
+#'
+#' @template adduct-arg
+#'
+#' @inherit generateTPs return
+#'
+#' @section Custom transformations: The \code{transformations} argument to \code{generateTPsLogic} is used to specify
+#'   custom rules to calculate transformation products. This should be a \code{data.frame} with the following columns:
+#'   \itemize{
+#'
+#'   \item \code{transformation} The name of the chemical transformation
+#'
+#'   \item \code{add} The elements that are added by this reaction (\emph{e.g.} \code{"O"}).
+#'
+#'   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
+#'
+#'   \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
+#'   separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
+#'   (no significant change or unknown).
+#'
+#'   }
 #'
 #' @section Source: The algorithm of \code{generateTPsLogic} is directly based on the work done by Schollee \emph{et
 #'   al.} (see references).
 #'
 #' @references \insertRef{Scholle2015}{patRoon}
 #'
-#' @aliases generateTPsLogic
-#' @rdname TP-generation
+#' @name generateTPsLogic
 #' @export
 setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
 {
@@ -105,7 +133,7 @@ setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, a
     return(transformationProductsLogic(parents = res$parents, products = res$products))
 })
 
-#' @rdname TP-generation
+#' @rdname generateTPsLogic
 #' @export
 setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40, transformations = NULL)
 {

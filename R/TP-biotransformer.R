@@ -13,7 +13,7 @@ NULL
 #' @param obj,TPs \code{transformationProductsBTs} object to be accessed
 #'
 #' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
-#'   \code{\link{TP-generation}}
+#'   \code{\link{generateTPs}}
 #'
 #' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
 #'
@@ -122,12 +122,21 @@ BTMPPrepareHandler <- function(cmd)
     return(cmd)
 }
 
-#' @details \code{generateTPsBioTransformer} uses \href{http://biotransformer.ca/}{BioTransformer} to predict TPs. An
-#'   important advantage of this algorithm is that it provides full structural information for TPs. However, to do so,
-#'   structural information also needs to be present for the parents. Afterwards, structural similarities between the
-#'   parent and its TPs are calculated, which can be used to \link[=filter,transformationProductsBT-method]{filter} the
-#'   results. In order to use this function the \file{.jar} command line utility should be installed and specified in
-#'   the \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
+#' Obtain transformation products (TPs) with BioTransformer
+#'
+#' Uses \href{http://biotransformer.ca/}{BioTransformer} to predict TPs
+#'
+#' @templateVar algo BioTransformer
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam biotransformer
+#' @template algo_generator
+#'
+#' @details Structural similarities between the parent and its TPs are calculated, which can be used to
+#'   \link[=filter,transformationProductsBT-method]{filter} the results.
+#'
+#'   In order to use this function the \file{.jar} command line utility should be installed and specified in the
+#'   \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
 #'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
 #'
 #' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
@@ -138,6 +147,9 @@ BTMPPrepareHandler <- function(cmd)
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
 #'   Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.
 #'
+#' @return The TPs are stored in an object from the \code{\link{transformationProductsBT}} class.
+#' 
+#' @template tp_gen-scr
 #' @template fp-args
 #'
 #' @templateVar what \code{generateTPsBioTransformer}
@@ -146,7 +158,6 @@ BTMPPrepareHandler <- function(cmd)
 #' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon} \cr\cr
 #'   \addCitations{rcdk}{1}
 #'
-#' @rdname TP-generation
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL,
                                       skipInvalid = TRUE, fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)

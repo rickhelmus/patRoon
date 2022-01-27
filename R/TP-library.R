@@ -12,7 +12,7 @@ NULL
 #' @param TPs \code{transformationProductsLibrary} object to be accessed
 #'
 #' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
-#'   \code{\link{TP-generation}}
+#'   \code{\link{generateTPs}}
 #'
 #' @templateVar class transformationProductsLibrary
 #' @template class-hierarchy
@@ -24,17 +24,46 @@ setMethod("initialize", "transformationProductsLibrary",
           function(.Object, ...) callNextMethod(.Object, algorithm = "library", ...))
 
 
-#' @details \code{generateTPsLibrary} obtains transformation products from a library. Similar to
-#'   \code{generateTPsBioTransformer}, this algorithm relies and provides structural information for parents/TPs
-#'   (\acronym{SMILES}). By default, a library is used that is based on data from
+#' Obtain transformation products (TPs) from a library
+#'
+#' Automatically obtains transformation products from a library.
+#'
+#' @templateVar algo a library
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam library
+#' @template algo_generator
+#'
+#' @details By default, a library is used that is based on data from
 #'   \href{https://doi.org/10.5281/zenodo.5644560}{PubChem}. However, it also possible to use your own library.
 #'
 #' @param TPLibrary If \code{NULL}, a default \href{https://doi.org/10.5281/zenodo.5644560}{PubChem} based library is
-#'   used. Otherwise, \code{TPLibrary} should be a \code{data.frame}. See section below.
+#'   used. Otherwise, \code{TPLibrary} should be a \code{data.frame}. See the details below.
 #' @param matchParentsBy A \code{character} that specifies how the input parents are matched with the data from the TP
 #'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.
 #'
-#' @rdname TP-generation
+#' @templateVar parNULL TRUE
+#' @template tp_gen-scr
+#'
+#' @return The TPs are stored in an object from the \code{\link{transformationProductsLibrary}} class.
+#'
+#' @section Custom TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
+#'   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
+#'
+#'   \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
+#'
+#'   \item \code{parent_SMILES} and \code{TP_SMILES} The \acronym{SMILES} of the parent structure.
+#'
+#'   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
+#'
+#'   \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
+#'   \code{parent_LogP} and \code{TP_LogP} are specified. (\strong{optional})
+#'
+#'   }
+#'
+#'   Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
+#'   by repeating the value within \code{parent_} columns.
+#'
 #' @export
 generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = TRUE, matchParentsBy = "InChIKey")
 {

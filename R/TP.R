@@ -7,7 +7,7 @@ NULL
 #' Holds information for all TPs for a set of parents.
 #'
 #' This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
-#' derived objects are created by \link[=TP-generation]{TP generators}.
+#' derived objects are created by \link[=generateTPs]{TP generators}.
 #'
 #' The TP data in objects from this class include a \code{retDir} column. These are \code{numeric} values that hint what
 #' the the chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will
@@ -19,7 +19,7 @@ NULL
 #' @param TPs,x,object \code{transformationProducts} object to be accessed
 #'
 #' @seealso Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for
-#'   specific algorithm methods and \code{\link{TP-generation}}
+#'   specific algorithm methods and \code{\link{generateTPs}}
 #'
 #' @slot parents A \code{\link{data.table}} with metadata for all parents that have TPs in this object. Use the
 #'   \code{parents} method for access.
@@ -137,18 +137,24 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
     return(ret)
 })
 
-
+#' Generation of transformation products (TPs)
+#'
+#' Functionality to automatically obtain transformation products for a given set of parent compounds.
+#'
 #' @templateVar func generateTPs
 #' @templateVar what generate transformation products
 #' @templateVar ex1 generateTPsBioTransformer
 #' @templateVar ex2 generateTPsLogic
 #' @templateVar algos biotransformer,logic,library
+#' @templateVar algosSuffix BioTransformer,Logic,Library
+#' @templateVar ret transformationProducts
 #' @template generic-algo
+#' 
+#' @return A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
 #'
-#' @param ... Any parameters to be passed to the selected TP generation algorithm.
+#' @seealso In addition, the derived classes \code{\link{transformationProductsBT}} and
+#'   \code{\link{transformationProductsLibrary}} for algorithm specific methods to post-process TP data.
 #'
-#' @rdname TP-generation
-#' @aliases generateTPs
 #' @export
 generateTPs <- function(algorithm, ...)
 {

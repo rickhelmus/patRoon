@@ -85,33 +85,42 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
     return(ret)
 }
 
-#' @details \code{generateCompoundsSIRIUS} uses
-#'   \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} in
-#'   combination with \href{https://www.csi-fingerid.uni-jena.de/}{CSI:FingerID}
-#'   for compound identification. Similar to
-#'   \code{\link{generateFormulasSIRIUS}}, candidate formulae are generated with
-#'   SIRIUS. These results are then feed to CSI:FingerID to acquire candidate
-#'   structures. This method requires the availability
-#'   of MS/MS data, and feature groups without it will be ignored.
+#' Compound annotation with SIRIUS
+#'
+#' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} in combination with
+#' \href{https://www.csi-fingerid.uni-jena.de/}{CSI:FingerID} for compound annotation.
+#'
+#' @templateVar algo SIRIUS
+#' @templateVar do generate compound candidates
+#' @templateVar generic generateCompounds
+#' @templateVar algoParam sirius
+#' @template algo_generator
+#'
+#' @details Similar to \code{\link{generateFormulasSIRIUS}}, candidate formulae are generated with SIRIUS. These results
+#'   are then feed to CSI:FingerID to acquire candidate structures. This method requires the availability of MS/MS data,
+#'   and feature groups without it will be ignored.
+#'
+#' @param fingerIDDatabase Database specifically used for \command{CSI:FingerID}. If \code{NULL}, the value of the
+#'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that is also \code{NULL}. Sets the
+#'   \option{--fingerid-db} option.
+#' @param topMostFormulas Do not return more than this number of candidate formulae. Note that only compounds for these
+#'   formulae will be searched. Sets the \option{--candidates} commandline option.
+#' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @templateVar ident TRUE
 #' @template sirius-args
-#'
 #' @template sirius_form-args
+#' @template adduct-arg
+#' @template comp_algo-args
+#' 
+#' @inheritParams generateCompounds
 #'
-#' @return \code{generateCompoundsSIRIUS} returns a \code{\link{compounds}}
-#'   object.
-#' @param fingerIDDatabase Database specifically used for
-#'   \command{CSI:FingerID}. If \code{NULL}, the value of the
-#'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that
-#'   is also \code{NULL}. Sets the \option{--fingerid-db} option.
-#' @param topMostFormulas Do not return more than this number of candidate
-#'   formulae. Note that only compounds for these formulae will be searched.
-#'   Sets the \option{--candidates} commandline option.
-#' @param verbose If \code{TRUE} then more output is shown in the terminal.
+#' @inherit generateCompounds return
+#' 
+#' @templateVar what \code{generateCompoundsSIRIUS}
+#' @template uses-multiProc
 #'
-#' @aliases generateCompoundsSIRIUS
-#' @rdname compound-generation
+#' @name generateCompoundsSIRIUS
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP",
@@ -169,7 +178,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                      algorithm = "sirius"))
 })
 
-#' @rdname compound-generation
+#' @template featAnnSets-gen_args
+#' @rdname generateCompoundsSIRIUS
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                   ..., setThreshold = 0, setThresholdAnn = 0)

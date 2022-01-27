@@ -22,7 +22,7 @@ NULL
 #' @templateVar class compoundsMF
 #' @template class-hierarchy
 #'
-#' @seealso \code{\link{compounds}} and \link{compound-generation}
+#' @seealso \code{\link{compounds}} and \code{\link{generateCompoundsMetFrag}}
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'
@@ -429,124 +429,127 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
                    cmd$gName, exitStatus, cmd$logFile))
 }
 
-#' @details \code{generateCompoundsMetFrag} uses the \pkg{metfRag} package or
-#'   \command{MetFrag CL} for compound identification (see
-#'   \url{http://ipb-halle.github.io/MetFrag/}). Several online compound
-#'   databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
-#'   \href{http://www.chemspider.com/}{ChemSpider} may be chosen for retrieval
-#'   of candidate structures. In addition, many options exist to score and
-#'   filter resulting data, and it is highly suggested to optimize these to
-#'   improve results. While MS/MS data is not mandatory, it will usually greatly
-#'   improve candidate scoring. The \command{MetFrag} options \code{PeakList},
-#'   \code{IonizedPrecursorMass} and \code{ExperimentalRetentionTimeValue} (in
-#'   minutes) fields are automatically set from feature data.
+#' Compound annotation with MetFrag
 #'
-#' @param method Which method should be used for MetFrag execution: \code{"CL"}
-#'   for \command{MetFragCL} and \code{"R"} for \command{MetFragR}. The former
-#'   might be faster.
-#' @param timeout Maximum time (in seconds) before a metFrag query for a feature
-#'   group is stopped. Also see \code{timeoutRetries} argument.
-#' @param timeoutRetries Maximum number of retries after reaching a timeout
-#'   before completely skipping the metFrag query for a feature group. Also see
-#'   \code{timeout} argument.
-#' @param dbRelMzDev Relative mass deviation (in ppm) for database search. Sets
-#'   the \option{DatabaseSearchRelativeMassDeviation} option.
-#' @param fragRelMzDev Relative mass deviation (in ppm) for fragment matching.
-#'   Sets the \option{FragmentPeakMatchRelativeMassDeviation} option.
-#' @param fragAbsMzDev Absolute mass deviation (in Da) for fragment matching.
-#'   Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.
-#' @param database Compound database to use. Valid values are: \code{"pubchem"},
-#'   \code{"chemspider"}, \code{"for-ident"}, \code{"comptox"},
-#'   \code{"pubchemlite"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
-#'   \code{"csv"}. See section below for more information. Sets the
-#'   \code{MetFragDatabaseType} option.
-#' @param extendedPubChem If \code{database="pubchem"}: whether to use the
-#'   \emph{extended} database that includes information for compound scoring
-#'   (\emph{i.e.} number of patents/PubMed references). Note that downloading
-#'   candidates from this database might take extra time. Valid values are:
-#'   \code{FALSE} (never use it), \code{TRUE} (always use it) or \code{"auto"}
-#'   (default, use if specified scorings demand it).
-#' @param chemSpiderToken A character string with the
-#'   \href{http://www.chemspider.com/AboutServices.aspx}{ChemSpider security
-#'   token} that should be set when the ChemSpider database is used. Sets the
-#'   \option{ChemSpiderToken} option.
-#' @param scoreTypes A character vector defining the scoring types. See the
-#'   \verb{Scorings} section below for more information. Note that both generic
-#'   and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name}
-#'   and \code{metfrag} columns returned by \code{compoundScorings}). When a
-#'   local database is used, the name should match what is given there
-#'   (\code{e.g} column names when \code{database=csv}). Note that MetFrag may
-#'   still report other scoring data, however, these are not used for ranking.
-#'   Sets the \option{MetFragScoreTypes} option.
-#' @param scoreWeights Numeric vector containing weights of the used scoring
-#'   types. Order is the same as set in \code{scoreTypes}. Values are recycled
-#'   if necessary. Sets the \option{MetFragScoreWeights} option.
-#' @param preProcessingFilters,postProcessingFilters A character vector defining
-#'   pre/post filters applied before/after fragmentation and scoring
-#'   (\emph{e.g.} \code{"UnconnectedCompoundFilter"}, \code{"IsotopeFilter"},
-#'   \code{"ElementExclusionFilter"}). Some methods require further options to
-#'   be set. For all filters and more information refer to the \verb{Candidate
-#'   Filters} section on the
-#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR
-#'   homepage}. Sets the \option{MetFragPreProcessingCandidateFilter} and
-#'   \code{MetFragPostProcessingCandidateFilter} options.
-#' @param maxCandidatesToStop If more than this number of candidate structures
-#'   are found then processing will be aborted and no results this feature group
-#'   will be reported. Low values increase the chance of missing data, whereas
-#'   too high values will use too much computer resources and signficantly
-#'   slowdown the process. Sets the \option{MaxCandidateLimitToStop} option.
-#' @param identifiers A \code{list} containing for each feature group a
-#'   character vector with database identifiers that should be used to find
-#'   candidates for a feature group (the list should be named by feature group
-#'   names). If \code{NULL} all relevant candidates will be retrieved from the
-#'   specified database. An example usage scenario is to obtain the list of
-#'   candidate identifiers from a \code{\link{compounds}} object obtained with
-#'   \code{\link{generateCompoundsSIRIUS}} using the \code{\link{identifiers}}
-#'   method. This way, only those candidates will be searched by MetFrag that
-#'   were generated by SIRIUS+CSI:FingerID. Sets the
-#'   \option{PrecursorCompoundIDs} option.
+#' Uses the \pkg{metfRag} package or \command{MetFrag CL} for compound identification (see
+#' \url{http://ipb-halle.github.io/MetFrag/}).
 #'
-#' @return \code{generateCompoundsMetFrag} returns a \code{\link{compoundsMF}}
-#'   object.
+#' @templateVar algo MetFrag
+#' @templateVar do generate compound candidates
+#' @templateVar generic generateCompounds
+#' @templateVar algoParam metfrag
+#' @template algo_generator
 #'
-#' @section Usage of MetFrag databases: When \code{database="chemspider"}
-#'   setting the \code{chemSpiderToken} argument is mandatory.
+#' @details Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
+#'   \href{http://www.chemspider.com/}{ChemSpider} may be chosen for retrieval of candidate structures. This method
+#'   requires the availability of MS/MS data, and feature groups without it will be ignored. Many options exist to score
+#'   and filter resulting data, and it is highly suggested to optimize these to improve results. The \command{MetFrag}
+#'   options \code{PeakList}, \code{IonizedPrecursorMass} and \code{ExperimentalRetentionTimeValue} (in minutes) fields
+#'   are automatically set from feature data.
 #'
-#'   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
-#'   \code{csv}, \code{comptox}, \code{pubchemlite}) the file location of the
-#'   database should be set in the \code{LocalDatabasePath} value via the
-#'   \code{extraOpts} argument or using the
-#'   \code{patRoon.path.MetFragCompTox}/\code{patRoon.path.MetFragPubChemLite}
-#'   option (only when \code{database="comptox"} or
-#'   \code{database="pubchemlite"}).
+#' @param method Which method should be used for MetFrag execution: \code{"CL"} for \command{MetFragCL} and \code{"R"}
+#'   for \command{MetFragR}. The former is usually much faster and recommended.
+#' @param timeout Maximum time (in seconds) before a metFrag query for a feature group is stopped. Also see
+#'   \code{timeoutRetries} argument.
+#' @param timeoutRetries Maximum number of retries after reaching a timeout before completely skipping the metFrag query
+#'   for a feature group. Also see \code{timeout} argument.
+#' @param dbRelMzDev Relative mass deviation (in ppm) for database search. Sets the
+#'   \option{DatabaseSearchRelativeMassDeviation} option.
+#' @param fragRelMzDev Relative mass deviation (in ppm) for fragment matching. Sets the
+#'   \option{FragmentPeakMatchRelativeMassDeviation} option.
+#' @param fragAbsMzDev Absolute mass deviation (in Da) for fragment matching. Sets the
+#'   \option{FragmentPeakMatchAbsoluteMassDeviation} option.
+#' @param database Compound database to use. Valid values are: \code{"pubchem"}, \code{"chemspider"},
+#'   \code{"for-ident"}, \code{"comptox"}, \code{"pubchemlite"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
+#'   \code{"csv"}. See section below for more information. Sets the \code{MetFragDatabaseType} option.
+#' @param extendedPubChem If \code{database="pubchem"}: whether to use the \emph{extended} database that includes
+#'   information for compound scoring (\emph{i.e.} number of patents/PubMed references). Note that downloading
+#'   candidates from this database might take extra time. Valid values are: \code{FALSE} (never use it), \code{TRUE}
+#'   (always use it) or \code{"auto"} (default, use if specified scorings demand it).
+#' @param chemSpiderToken A character string with the \href{http://www.chemspider.com/AboutServices.aspx}{ChemSpider
+#'   security token} that should be set when the ChemSpider database is used. Sets the \option{ChemSpiderToken} option.
+#' @param scoreTypes A character vector defining the scoring types. See the \verb{Scorings} section below for more
+#'   information. Note that both generic and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name} and
+#'   \code{metfrag} columns returned by \code{\link{compoundScorings}}). When a local database is used, the name should
+#'   match what is given there (\code{e.g} column names when \code{database=csv}). Note that MetFrag may still report
+#'   other scoring data, however, these are not used for ranking. Sets the \option{MetFragScoreTypes} option.
+#' @param scoreWeights Numeric vector containing weights of the used scoring types. Order is the same as set in
+#'   \code{scoreTypes}. Values are recycled if necessary. Sets the \option{MetFragScoreWeights} option.
+#' @param preProcessingFilters,postProcessingFilters A character vector defining pre/post filters applied before/after
+#'   fragmentation and scoring (\emph{e.g.} \code{"UnconnectedCompoundFilter"}, \code{"IsotopeFilter"},
+#'   \code{"ElementExclusionFilter"}). Some methods require further options to be set. For all filters and more
+#'   information refer to the \verb{Candidate Filters} section on the
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR homepage}. Sets the
+#'   \option{MetFragPreProcessingCandidateFilter} and \code{MetFragPostProcessingCandidateFilter} options.
+#' @param maxCandidatesToStop If more than this number of candidate structures are found then processing will be aborted
+#'   and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
+#'   high values will use too much computer resources and signficantly slowdown the process. Sets the
+#'   \option{MaxCandidateLimitToStop} option.
+#' @param identifiers A \code{list} containing for each feature group a character vector with database identifiers that
+#'   should be used to find candidates for a feature group (the list should be named by feature group names). If
+#'   \code{NULL} all relevant candidates will be retrieved from the specified database. An example usage scenario is to
+#'   obtain the list of candidate identifiers from a \code{\link{compounds}} object obtained with
+#'   \code{\link{generateCompoundsSIRIUS}} using the \code{\link{identifiers}} method. This way, only those candidates
+#'   will be searched by MetFrag that were generated by SIRIUS+CSI:FingerID. Sets the \option{PrecursorCompoundIDs}
+#'   option.
+#' @param extraOpts A named \code{list} containing further settings \command{MetFrag}. See the
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR} and
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragcl/}{MetFrag CL} homepages for all available options. Set
+#'   to \code{NULL} to ignore.
 #'
-#'   Examples: \verb{options(patRoon.path.MetFragCompTox =
-#'   "C:/CompTox_17March2019_SelectMetaData.csv")} \verb{extraOpts =
-#'   list(LocalDatabasePath = "C:/myDB.csv")}.
+#' @template adduct-arg
+#' @template comp_algo-args
+#'
+#' @inheritParams generateCompounds
+#'
+#' @return \code{generateCompoundsMetFrag} returns a \code{\link{compoundsMF}} object.
+#'
+#' @section Scorings: \command{MetFrag} supports \emph{many} different scorings to rank candidates. The
+#'   \code{\link{compoundScorings}} function can be used to get an overview: (some columns are omitted)
+#'
+#' @eval paste("@@section Scorings:", patRoon:::tabularRD(patRoon::compoundScorings("metfrag")[, 1:3]))
+#'
+#' @section Scorings: In addition, the \code{\link{compoundScorings}} function is also useful to programmatically
+#'   generate a set of scorings to be used for ranking with \command{MetFrag}. For instance, the following can be given
+#'   to the \code{scoreTypes} argument to use all default scorings for PubChem: \code{compoundScorings("metfrag",
+#'   "pubchem", onlyDefault=TRUE)$name}.
+#'
+#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores} section on the
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR homepage}.
+#'
+#' @section Usage of MetFrag databases: When \code{database="chemspider"} setting the \code{chemSpiderToken} argument is
+#'   mandatory.
+#'
+#'   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv}, \code{csv}, \code{comptox}, \code{pubchemlite})
+#'   the file location of the database should be set in the \code{LocalDatabasePath} value via the \code{extraOpts}
+#'   argument or using the \code{patRoon.path.MetFragCompTox}/\code{patRoon.path.MetFragPubChemLite} option (only when
+#'   \code{database="comptox"} or \code{database="pubchemlite"}).
+#'
+#'   Examples: \verb{options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv")}
+#'
+#'   \verb{extraOpts = list(LocalDatabasePath = "C:/myDB.csv")}.
 #'
 #'   For \code{database="comptox"} the files can be obtained from
 #'   \href{ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files}{here}.
-#'    Furthermore, the files with additions for
-#'   \href{smoking}{https://zenodo.org/record/3364464#.XnjM-XLvKUk} and
-#'   \href{wastewater}{https://zenodo.org/record/3472781#.XnjMAHLvKUk} metadata
-#'   are also supported. Note that only recent \command{MetFrag} versions (>=
-#'   \samp{2.4.5}) support these libraries.
-#'   
-#' @section Parallelization: When local database files are used with
-#'   \code{generateCompoundsMetFrag} (\emph{e.g.} when \code{database} is set to
-#'   \code{"pubchemlite"}, \code{"csv"} etc.) and
-#'   \option{patRoon.MP.method="future"}, then the database file must be present
-#'   on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the
-#'   location for these databases can be configured on the host with the
-#'   respective package options (\option{patRoon.path.MetFragPubChemLite} and
-#'   \option{patRoon.path.MetFragCompTox}). Note that these files must
-#'   \emph{also} be present on the local host computer, even if it is not
-#'   participating in computations.
+#'   Furthermore, the files with additions for \href{smoking}{https://zenodo.org/record/3364464#.XnjM-XLvKUk} and
+#'   \href{wastewater}{https://zenodo.org/record/3472781#.XnjMAHLvKUk} metadata are also supported. For
+#'   \code{database="pubchemlite"} the \file{.csv} database can be downloaded from
+#'   \href{https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv}{here}. Note that only recent
+#'   \command{MetFrag} versions (>= \samp{2.4.5}) support these libraries.
+#'
+#' @templateVar what \code{generateCompoundsMetFrag}
+#' @template uses-multiProc
+#'
+#' @section Parallelization: When local database files are used with \code{generateCompoundsMetFrag} (\emph{e.g.} when
+#'   \code{database} is set to \code{"pubchemlite"}, \code{"csv"} etc.) and \option{patRoon.MP.method="future"}, then
+#'   the database file must be present on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the location
+#'   for these databases can be configured on the host with the respective package options
+#'   (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}). Note that these files must
+#'   \emph{also} be present on the local host computer, even if it is not participating in computations.
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'
-#' @aliases generateCompoundsMetFrag
-#' @rdname compound-generation
+#' @name generateCompoundsMetFrag
 #' @export
 setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists, method = "CL",
                                                                 timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
@@ -771,7 +774,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                        settings = mfSettings))
 })
 
-#' @rdname compound-generation
+#' @template featAnnSets-gen_args
+#' @rdname generateCompoundsMetFrag
 #' @export
 setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, method = "CL", timeout = 300,
                                                                    timeoutRetries = 2, errorRetries = 2, topMost = 100,

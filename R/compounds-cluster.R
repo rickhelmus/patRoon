@@ -9,7 +9,7 @@ NULL
 #' common structure (MCS).
 #'
 #' Often many possible chemical structure candidates are found for each feature
-#' group when performing \link[=compound-generation]{compound identification}.
+#' group when performing \link[=generateCompounds]{compound annotation}.
 #' Therefore, it may be useful to obtain an overview of their general structural
 #' properties. One strategy is to perform hierarchical clustering based on their
 #' chemical (dis)similarity, for instance, using the Tanimoto score. The

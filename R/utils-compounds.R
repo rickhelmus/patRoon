@@ -37,18 +37,19 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     return(fiLeft)
 }
 
-#' @details \code{compoundScorings} displays an overview of scorings may be
-#'   applied to rank candidate compounds (see \verb{Scorings} section below).
+#' Scorings terms for compound candidates
 #'
-#' @param includeSuspectLists,onlyDefault,includeNoDB A logical specifying
-#'   whether scoring terms related to suspect lists, default scoring terms and
-#'   non-database specific scoring terms should be included in the output,
+#' Returns an overview of scorings may be applied to rank candidate compounds.
+#'
+#' @param includeSuspectLists,onlyDefault,includeNoDB A logical specifying whether scoring terms related to suspect
+#'   lists, default scoring terms and non-database specific scoring terms should be included in the output,
 #'   respectively.
 #'
-#' @return \code{compoundScorings} returns a \code{data.frame} with information
-#'   on which scoring terms are used, what their algorithm specific name is and
-#'   other information such as to which database they apply and short remarks.
-#' @rdname compound-generation
+#' @return A \code{data.frame} with information on which scoring terms are used, what their algorithm specific name is
+#'   and other information such as to which database they apply and short remarks.
+#' 
+#' @seealso generateCompounds
+#' 
 #' @export
 compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLists = TRUE,
                              onlyDefault = FALSE, includeNoDB = TRUE)

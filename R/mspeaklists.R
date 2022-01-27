@@ -702,7 +702,7 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 #' Formula calculation and identification tools rely on mass spectra that belong to features of interest. For
 #' processing, MS (and MS/MS) spectra are typically reduced to a table with a column containing measured \emph{m/z}
 #' values and a column containing their intensities. These 'MS peak lists' can then be used for
-#' \link[=generateFormulas]{formula generation} and \link[=compound-generation]{compound generation}.
+#' \link[=generateFormulas]{formula generation} and \link[=generateCompounds]{compound generation}.
 #'
 #' MS and MS/MS peak lists are first generated for all features (or a subset, if the \code{topMost} argument is set).
 #' During this step multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be
@@ -724,9 +724,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 #' @param \dots Any parameters to be passed to the selected MS peak lists generation algorithm.
 #'
 #' @template centroid_note
-#' 
+#'
 #' @return A \code{\link{MSPeakLists}} object.
-#' 
+#'
 #' @section Sets workflows: With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made
 #'   per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
 #'   ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled

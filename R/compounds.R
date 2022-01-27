@@ -6,8 +6,8 @@ NULL
 #'
 #' Contains data for compound annotations for feature groups.
 #'
-#' \code{compounds} objects are obtained from \link[=compound-generation]{compound generators}. This class is derived
-#' from the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
+#' \code{compounds} objects are obtained from \link[=generateCompounds]{compound generators}. This class is derived from
+#' the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 #'
 #' @param formulas The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
 #'   and \code{annotatedPeakList}: set to \code{NULL} to ignore.
@@ -27,7 +27,7 @@ NULL
 #'   for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 #'
 #'   For \code{consensus}: any further (and unique) \code{compounds} objects.
-#'   
+#'
 #'   \setsPassedArgs1{compounds}
 #'
 #' @template plotSpec-args
@@ -40,7 +40,8 @@ NULL
 #'   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
 #'   \code{\link{generateCompounds}}).
 #'
-#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and \link{compound-generation}.
+#' @seealso The \code{\link{featureAnnotations}} base class for more relevant methods and
+#'   \code{\link{generateCompounds}}.
 #'
 #' @templateVar class compounds
 #' @template class-hierarchy
@@ -631,15 +632,44 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     return(ret)
 })
 
+#' Automatic compound annotation
+#'
+#' Automatically perform chemical compound annotation for feature groups.
+#'
+#' Several algorithms are provided to automatically perform compound annotation for feature groups. To this end,
+#' measured masses for all feature groups are searched within online database(s) (\emph{e.g.}
+#' \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem}) to retrieve a list of potential candidate chemical compounds.
+#' Depending on the algorithm and its parameters, further scoring of candidates is then performed using, for instance,
+#' matching of measured and theoretical isotopic patterns, presence within other data sources such as patent databases
+#' and similarity of measured and in-silico predicted MS/MS fragments. Note that this process is often quite time
+#' consuming, especially for large feature group sets. Therefore, this is often one of the last steps within the
+#' workflow and not performed before feature groups have been prioritized.
+#'
 #' @templateVar func generateCompounds
 #' @templateVar what generate compounds
 #' @templateVar ex1 generateCompoundsMetFrag
 #' @templateVar ex2 generateCompoundsSIRIUS
 #' @templateVar algos metfrag,sirius
+#' @templateVar algosSuffix MetFrag,SIRIUS
+#' @templateVar ret compounds
 #' @template generic-algo
 #'
-#' @rdname compound-generation
-#' @aliases generateCompounds
+#' @param fGroups \code{\link{featureGroups}} object which should be annotated. This should be the same or a subset of
+#'   the object that was used to create the specified \code{MSPeakLists}. In the case of a subset only the remaining
+#'   feature groups in the subset are considered.
+#' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
+#' @param \dots Any parameters to be passed to the selected compound generation algorithm.
+#'
+#' @section Scorings: Each algorithm implements their own scoring system. Their names have been simplified and
+#'   harmonized where possible. The \code{\link{compoundScorings}} function can be used to get an overview of both the
+#'   algorithm specific and generic scoring names.
+#'
+#' @templateVar UID first-block \acronym{InChIKey}
+#' @template featAnnSets-gen
+#' 
+#' @return A \code{\link{compounds}} derived object containing all compound annotations.
+#'
+#' @name generateCompounds
 #' @export
 setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {

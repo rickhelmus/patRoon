@@ -3,34 +3,11 @@
 #' @include features-set.R
 NULL
 
-minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
-{
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(sets(fGroups)))
-    if (threshold == 0)
-        return(fGroups)
-    
-    setsAna <- analysisInfo(fGroups)$set
-    return(doFGroupsFilter(fGroups, "minimum sets", c(threshold, negate), function(fGroups)
-    {
-        pred <- function(x) length(unique(setsAna[x > 0])) >= threshold
-        if (negate)
-            pred <- Negate(pred)
-        
-        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
-    }, "minSets", verbose))
-}
-
 #' @param set \setsWF The name of the set.
-#' @param sets \setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
-#'   \code{negate=TRUE}).
+#' @param sets \setsWF For \code{[}: a \code{character} with name(s) of the sets to keep.
 #'
-#'   For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
-#'   \link[=analysis-information]{analysis information}).
-#'
-#'   For \code{plotVenn}, \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its
-#'   meaning and is used to specify the names of the sets to be compared.
-#' @param absMinSets,relMinSets \setsWF Feature groups are only kept when they contain data for at least this (absolute
-#'   or relative) amount of sets. Set to \code{NULL} to ignore.
+#'   For \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its meaning and is used
+#'   to specify the names of the sets to be compared.
 #'
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
@@ -48,16 +25,15 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   re-grouping of features when its \code{reGroup} parameter is set to \code{TRUE}. The implications for this are
 #'   discussed below.
 #'
-#'   \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
-#'   presence in) sets. See the argument descriptions.
+#'   \item the subset operator (\code{[}) has specific arguments to choose (feature presence in) sets. See the argument
+#'   descriptions.
 #'
 #'   \item \code{as.data.table}: normalization of intensities is performed per set.
 #'
 #'   \item \code{export} Only allows to export data from one set. The \code{unset} method is used prior to exporting the
 #'   data.
 #'
-#'   \item \code{overlap}, \code{unique}, \code{plotVenn}, \code{plotInt} allow to handle data per set. See the
-#'   \code{sets} argument description.
+#'   \item \code{overlap} and \code{unique} allow to handle data per set. See the \code{sets} argument description.
 #'
 #'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
 #'
@@ -89,7 +65,7 @@ setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 })
 
 #' @rdname featureGroups-class
-#' @param reGroup Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
+#' @param reGroup \setsWF Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
 #'   \verb{Sets workflow} section for more details.
 #' @export
 setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
@@ -241,62 +217,6 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     }
     
     return(ret[])
-})
-
-#' @rdname featureGroups-class
-#' @export
-setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL, absMinSets = NULL,
-                                                 relMinSets = NULL)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, TRUE, add = ac)
-    aapply(checkmate::assertNumber, . ~ absMinSets + relMinSets, lower = 0, finite = TRUE, null.ok = TRUE,
-           fixed = list(add = ac))
-    checkmate::reportAssertions(ac)
-
-    if (!is.null(sets) && length(sets) > 0)
-    {
-        if (negate)
-            sets <- setdiff(get("sets", pos = 2)(obj), sets)
-        obj <- obj[, sets = sets]
-    }
-
-    if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate = negate)
-    
-    if (!is.null(absMinSets) || !is.null(relMinSets))
-        obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate)
-
-    return(obj)
-})
-
-#' @rdname featureGroups-class
-#' @export
-setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normFunc = NULL, xnames = !sets,
-                                                  showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL, ...,
-                                                  sets = FALSE)
-{
-    aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
-    doPlotFeatInts(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
-})
-
-#' @rdname featureGroups-class
-#' @export
-setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets = FALSE)
-{
-    checkmate::assertFlag(sets)
-    if (sets)
-    {
-        mySets <- get("sets", pos = 2)(obj)
-        if (is.null(which))
-            which <- mySets
-        else
-            checkmate::assertSubset(which, mySets)
-        ai <- analysisInfo(obj)
-        which = sapply(which, function(s) ai[ai$set == s, "group"], simplify = FALSE)
-    }
-    callNextMethod(obj, which = which, ...)
 })
 
 #' @rdname featureGroups-class

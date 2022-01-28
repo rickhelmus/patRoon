@@ -256,3 +256,48 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
     }
     return(ret)
 }
+
+#' Fold change calculation
+#'
+#' @details Fold change calculation can be used to easily identify significant changes between replicate groups. The
+#'   calculation process is configured through a paramater list, which can be constructed with the \code{getFCParams}
+#'   function. The parameter list has the following entries: \itemize{
+#'
+#'   \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
+#'   \code{getFCParams}).
+#'
+#'   \item \code{thresholdFC}: the threshold log FC for a feature group to be classified as increasing/decreasing.
+#'
+#'   \item \code{thresholdPV}: the threshold log P for a feature group to be significantly different.
+#'
+#'   \item \code{zeroMethod},\code{zeroValue}: how to handle zero values when calculating the FC: \code{add} adds an
+#'   offset to zero values, \code{"fixed"} sets zero values to a fixed number and \code{"omit"} removes zero data. The
+#'   number that is added/set by the former two options is defined by \code{zeroValue}.
+#'
+#'   \item \code{PVTestFunc}: a function that is used to calculate P values (usually using \code{\link{t.test}}).
+#'
+#'   \item \code{PVAdjFunc}: a function that is used to adjust P values (usually using \code{\link{p.adjust}})
+#'
+#'   }
+#'   
+#' @param rGroups A \code{character} vector with the names of the two replicate groups to be compared.
+#' @param \dots Optional named arguments that override defaults.
+#' 
+#' @author The code to calculate and plot Fold change data was created by Bas van de Velde.
+#'
+#' @seealso \code{\link{featureGroups-class}} and \link{feature-plotting}
+#'
+#' @export
+getFCParams <- function(rGroups, ...)
+{
+    checkmate::assertCharacter(rGroups, min.chars = 1, len = 2, any.missing = FALSE)
+    
+    def <- list(rGroups = rGroups,
+                thresholdFC = 0.25,
+                thresholdPV = 0.05,
+                zeroMethod = "add",
+                zeroValue = 0.01,
+                PVTestFunc = function(x, y) t.test(x, y, paired = TRUE)$p.value,
+                PVAdjFunc = function(pv) p.adjust(pv, "BH"))
+    return(modifyList(def, list(...)))
+}

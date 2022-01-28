@@ -5,19 +5,21 @@ NULL
 #'
 #' Basic rule based filtering of feature groups.
 #'
-#' @param fGroups,obj \code{\link{featureGroups}} object to which the filter is
-#'   applied.
-#' @param rGroups A character vector of replicate groups that should be kept
-#'   (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).
+#' @param fGroups,obj \code{\link{featureGroups}} object to which the filter is applied.
+#' @param rGroups A character vector of replicate groups that should be kept (\code{filter}) or subtracted from
+#'   (\code{replicateGroupSubtract}).
 #'
-#' @return A filtered \code{\link{featureGroups}} object. Feature groups that
-#'   are filtered away have their intensity set to zero. In case a feature group
-#'   is not present in any of the analyses anymore it will be removed
-#'   completely.
+#' @return A filtered \code{\link{featureGroups}} object. Feature groups that are filtered away have their intensity set
+#'   to zero. In case a feature group is not present in any of the analyses anymore it will be removed completely.
+#'
+#' @section Sets workflows: \setsWFChangedMethods{
+#'
+#'   \item \code{filter} has specific arguments to filter by (feature presence in) sets. See the argument descriptions.
+#'
+#'   }
 #'
 #' @name feature-filtering
-#' @seealso \code{\link{featureGroups-class}}
-#' @seealso \code{\link{groupFeatures}}
+#' @seealso \code{\link{featureGroups-class}} and \code{\link{groupFeatures}}
 NULL
 
 intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
@@ -323,6 +325,24 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
     }, "checkedFeatures"))
 }
 
+minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+{
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(sets(fGroups)))
+    if (threshold == 0)
+        return(fGroups)
+    
+    setsAna <- analysisInfo(fGroups)$set
+    return(doFGroupsFilter(fGroups, "minimum sets", c(threshold, negate), function(fGroups)
+    {
+        pred <- function(x) length(unique(setsAna[x > 0])) >= threshold
+        if (negate)
+            pred <- Negate(pred)
+        
+        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
+    }, "minSets", verbose))
+}
+
+
 #' @details \code{filter} performs common rule based filtering of feature groups such as blank subtraction, minimum
 #'   intensity and minimum replicate abundance. Removing of features occurs by zeroing their intensity values.
 #'   Furthermore, feature groups that are left completely empty (\emph{i.e.} all intensities are zero) will be
@@ -491,6 +511,39 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 
     return(obj)
 })
+
+#' @param \dots \setsPassedArgs1{featureGroups}
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
+#' @param absMinSets,relMinSets \setsWF Feature groups are only kept when they contain data for at least this (absolute
+#'   or relative) amount of sets. Set to \code{NULL} to ignore.
+#' @rdname feature-filtering
+#' @export
+setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL, absMinSets = NULL,
+                                                 relMinSets = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(negate, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ absMinSets + relMinSets, lower = 0, finite = TRUE, null.ok = TRUE,
+           fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+        obj <- obj[, sets = sets]
+    }
+    
+    if (...length() > 0)
+        obj <- callNextMethod(obj, ..., negate = negate)
+    
+    if (!is.null(absMinSets) || !is.null(relMinSets))
+        obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate)
+    
+    return(obj)
+})
+
 
 #' @details \code{replicateGroupSubtract} removes feature groups present in a
 #'   given set of replicate groups (unless intensities are above a given

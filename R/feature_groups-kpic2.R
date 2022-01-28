@@ -172,7 +172,7 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::reportAssertions(ac)
     
-    feat <- importfeaturesKPIC2(picsSetGrouped$picset, analysisInfo)
+    feat <- importFeaturesKPIC2(picsSetGrouped$picset, analysisInfo)
     return(importFeatureGroupsKPIC2FromFeat(picsSetGrouped, analysisInfo, feat))
 }
 

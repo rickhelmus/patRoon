@@ -489,7 +489,7 @@ importFeatures <- function(analysisInfo, type, ...)
     f <- switch(type,
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
-                kpic2 = importfeaturesKPIC2,
+                kpic2 = importFeaturesKPIC2,
                 envimass = importFeaturesEnviMass,
                 stop("Invalid algorithm! Should be: xcms, xcms3, kpic2 or envimass"))
 

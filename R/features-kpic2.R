@@ -153,7 +153,7 @@ findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
     else
         allPics <- cachedData
     
-    ret <- importfeaturesKPIC2(allPics, analysisInfo)
+    ret <- importFeaturesKPIC2(allPics, analysisInfo)
 
     if (verbose)
     {

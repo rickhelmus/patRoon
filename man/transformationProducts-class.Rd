@@ -60,7 +60,7 @@ Holds information for all TPs for a set of parents.
 }
 \details{
 This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
-derived objects are created by \link[=TP-generation]{TP generators}.
+derived objects are created by \link[=generateTPs]{TP generators}.
 
 The TP data in objects from this class include a \code{retDir} column. These are \code{numeric} values that hint what
 the the chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will
@@ -110,5 +110,5 @@ or \code{\link{generateTPsLibrary}} was used to generate the data, the \code{ret
 
 \seealso{
 Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for
-  specific algorithm methods and \code{\link{TP-generation}}
+  specific algorithm methods and \code{\link{generateTPs}}
 }

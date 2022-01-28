@@ -56,12 +56,12 @@
   For \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
   method defined for \code{\link{featureGroups}}.}
 
-\item{groupAlgo}{The \code{\link[=feature-grouping]{feature grouping
+\item{groupAlgo}{The \code{\link[=groupFeatures]{feature grouping
 algorithm}} that should be used for grouping \emph{pseudo} features (see
 details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2} or \code{"openms"}.}
 
 \item{groupArgs}{A \code{list} containing further parameters for
-\code{\link[=feature-grouping]{feature grouping}}.}
+\code{\link[=groupFeatures]{feature grouping}}.}
 
 \item{x, obj}{The \code{featureGroupsComparison} object.}
 
@@ -130,7 +130,7 @@ The \code{comparison} method generates a
   averaging their retention times, \emph{m/z} values and intensities, where
   each original feature groups object becomes an 'analysis'. All
   \emph{pseudo} features are then grouped using
-  \link[=feature-grouping]{regular feature grouping algorithms} so that a
+  \link[=groupFeatures]{regular feature grouping algorithms} so that a
   comparison can be made.
 
 \code{plot} generates an \emph{m/z} \emph{vs} retention time plot.

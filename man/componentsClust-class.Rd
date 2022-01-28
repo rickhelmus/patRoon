@@ -128,5 +128,5 @@ When the object is altered (\emph{e.g.} by filtering or subsetting it), methods 
 \insertRef{Scholle2018}{patRoon}
 }
 \seealso{
-\code{\link{components}} and \link{component-generation}
+\code{\link{components}} and \code{\link{generateComponents}}
 }

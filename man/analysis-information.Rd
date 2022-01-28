@@ -41,7 +41,7 @@ automatically generate this information.
 \details{
 Several properties need to be known about analyses that should be
   processed during various workflow steps such as
-  \link[=feature-finding]{finding features}, averaging intensities of feature
+  \link{findFeatures}, averaging intensities of feature
   groups and blank subtraction. This information should be made available
   with an 'analysis info' object, which is a \code{data.frame} containing the
   following columns:

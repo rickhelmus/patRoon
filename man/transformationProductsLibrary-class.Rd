@@ -35,5 +35,5 @@ database.
 
 \seealso{
 The base class \code{\link{transformationProducts}} for more relevant methods and
-  \code{\link{TP-generation}}
+  \code{\link{generateTPs}}
 }

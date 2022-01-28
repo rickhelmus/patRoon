@@ -181,7 +181,7 @@ filtering.}
   for \code{filter}: passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
 
   For \code{consensus}: any further (and unique) \code{compounds} objects.
-  
+
   \setsPassedArgs1{compounds}}
 
 \item{formulas}{The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
@@ -322,8 +322,8 @@ workflows} section below.}
 Contains data for compound annotations for feature groups.
 }
 \details{
-\code{compounds} objects are obtained from \link[=compound-generation]{compound generators}. This class is derived
-from the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
+\code{compounds} objects are obtained from \link[=generateCompounds]{compound generators}. This class is derived from
+the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -457,5 +457,6 @@ The values ranges in the \code{scoreLimits} slot, which are used for normalizati
 \addCitations{rcdk}{1}
 }
 \seealso{
-The \code{\link{featureAnnotations}} base class for more relevant methods and \link{compound-generation}.
+The \code{\link{featureAnnotations}} base class for more relevant methods and
+  \code{\link{generateCompounds}}.
 }

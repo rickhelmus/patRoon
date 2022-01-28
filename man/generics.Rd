@@ -23,7 +23,6 @@
 \alias{getFeatures}
 \alias{getMCS}
 \alias{groupNames}
-\alias{makeSet}
 \alias{plotChord}
 \alias{plotChroms}
 \alias{plotGraph}
@@ -95,8 +94,6 @@ getFeatures(obj)
 getMCS(obj, ...)
 
 groupNames(obj)
-
-makeSet(obj, ...)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
@@ -305,12 +302,6 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=groupNames,components-method]{components}}; \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}; \code{\link[=groupNames,featureAnnotations-method]{featureAnnotations}}; \code{\link[=groupNames,featureGroups-method]{featureGroups}}; \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}.
-}
-
-\code{makeSet} creates a set from given workflow objects.
-
-\itemize{
-    \item Methods are defined for: \code{\link[=makeSet,featureGroups-method]{featureGroups}}; \code{\link[=makeSet,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=makeSet,features-method]{features}}; \code{\link[=makeSet,featuresSet-method]{featuresSet}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.

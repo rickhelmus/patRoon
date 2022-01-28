@@ -3,6 +3,7 @@
 \name{feature-filtering}
 \alias{feature-filtering}
 \alias{filter,featureGroups-method}
+\alias{filter,featureGroupsSet-method}
 \alias{replicateGroupSubtract,featureGroups-method}
 \alias{replicateGroupSubtract}
 \title{Filtering of grouped features}
@@ -34,6 +35,15 @@
   removeBlanks = FALSE,
   checkFeaturesSession = NULL,
   negate = FALSE
+)
+
+\S4method{filter}{featureGroupsSet}(
+  obj,
+  ...,
+  negate = FALSE,
+  sets = NULL,
+  absMinSets = NULL,
+  relMinSets = NULL
 )
 
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups, threshold = 0)
@@ -84,8 +94,8 @@ SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 
 \item{groupQualityRange}{Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.}
 
-\item{rGroups}{A character vector of replicate groups that should be kept
-(\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
+\item{rGroups}{A character vector of replicate groups that should be kept (\code{filter}) or subtracted from
+(\code{replicateGroupSubtract}).}
 
 \item{results}{Only keep feature groups that have results in the object specified by \code{results}. Valid classes
 are \code{\link{featureAnnotations}} (\emph{e.g.} formula/compound annotations) and \code{\link{components}}. Can
@@ -105,8 +115,14 @@ then all non-selected features/feature groups are removed instead.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
-\item{fGroups, obj}{\code{\link{featureGroups}} object to which the filter is
-applied.}
+\item{\dots}{\setsPassedArgs1{featureGroups}}
+
+\item{sets}{\setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).}
+
+\item{absMinSets, relMinSets}{\setsWF Feature groups are only kept when they contain data for at least this (absolute
+or relative) amount of sets. Set to \code{NULL} to ignore.}
+
+\item{fGroups, obj}{\code{\link{featureGroups}} object to which the filter is applied.}
 
 \item{threshold}{Minimum relative threshold (compared to mean intensity of
 replicate group being subtracted) for a feature group to be \emph{not}
@@ -114,10 +130,8 @@ removed. When \samp{0} a feature group is always removed when present in
 the given replicate groups.}
 }
 \value{
-A filtered \code{\link{featureGroups}} object. Feature groups that
-  are filtered away have their intensity set to zero. In case a feature group
-  is not present in any of the analyses anymore it will be removed
-  completely.
+A filtered \code{\link{featureGroups}} object. Feature groups that are filtered away have their intensity set
+  to zero. In case a feature group is not present in any of the analyses anymore it will be removed completely.
 }
 \description{
 Basic rule based filtering of feature groups.
@@ -132,6 +146,14 @@ Basic rule based filtering of feature groups.
   given set of replicate groups (unless intensities are above a given
   threshold). The replicate groups that are subtracted will be removed.
 }
+\section{Sets workflows}{
+ \setsWFChangedMethods{
+
+  \item \code{filter} has specific arguments to filter by (feature presence in) sets. See the argument descriptions.
+
+  }
+}
+
 \section{Filter order}{
  When multiple arguments are specified to \code{filter}, multiple filters are applied in
   sequence. Since some of these filters may affect each other, choosing their order correctly may be important for
@@ -173,7 +195,5 @@ Basic rule based filtering of feature groups.
 }
 
 \seealso{
-\code{\link{featureGroups-class}}
-
-\code{\link{feature-grouping}}
+\code{\link{featureGroups-class}} and \code{\link{groupFeatures}}
 }

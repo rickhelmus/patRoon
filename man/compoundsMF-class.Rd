@@ -42,5 +42,5 @@ are not contained in this list.}
 \insertRef{Ruttkies2016}{patRoon}
 }
 \seealso{
-\code{\link{compounds}} and \link{compound-generation}
+\code{\link{compounds}} and \code{\link{generateCompoundsMetFrag}}
 }

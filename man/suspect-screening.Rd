@@ -13,7 +13,6 @@
 \alias{screenSuspects,featureGroupsScreeningSet-method}
 \alias{featureGroupsBrukerTASQ-class}
 \alias{featureGroupsBrukerTASQ}
-\alias{importFeatureGroupsBrukerTASQ}
 \alias{featuresBrukerTASQ-class}
 \alias{featuresBrukerTASQ}
 \title{Target and suspect screening}
@@ -63,8 +62,6 @@ genIDLevelRulesFile(out, inLevels = NULL, exLevels = NULL)
   onlyHits,
   amend = FALSE
 )
-
-importFeatureGroupsBrukerTASQ(path, analysisInfo, clusterRTWindow = 12)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be screened.}
@@ -98,23 +95,10 @@ column is present in the suspect list), for instance, due to invalid \code{SMILE
 identification levels to include or exclude, respectively. For instance,
 \code{exLevels="4|5"} would exclude level 4 and 5 from the output file. Set
 to \code{NULL} to ignore.}
-
-\item{path}{The file path to an Excel export of the Global results table from
-TASQ, converted to \file{.csv} format.}
-
-\item{analysisInfo}{A table with \link[=analysis-information]{analysis
-information}.}
-
-\item{clusterRTWindow}{This retention time window (in seconds) is used to
-group hits across analyses together. See also the details section.}
 }
 \value{
 \code{screenSuspects} returns a \code{\link{featureGroupsScreening}} object, which is a copy of the input
   \code{fGroups} object amended with additional screening information.
-
-\code{importFeatureGroupsBrukerTASQ} returns a new
-  \code{featureGroups} object containing converted screening results from
-  Bruker TASQ.
 }
 \description{
 Utilities to screen for analytes with known or suspected identity.
@@ -135,43 +119,20 @@ possible, as it can significantly reduce the load on data interpretation.
   used to configure the rules for automatic estimation of identification
   levels. This file can then be used as input for
   \code{\link{annotateSuspects}}.
-
-\code{importFeatureGroupsBrukerTASQ} will convert screening results
-  from Bruker TASQ to a \code{\link{featureGroups}} object. The feature
-  groups across analyses are formed based on the name of suspects and their
-  closeness in retention time. The latter is necessary because TASQ does not
-  necessarily perform checks on retention times and may therefore assign a
-  suspect to peaks with different retention times across analyses (or within
-  a single analysis). Hence, suspects with equal names are hierarchically
-  clustered on their retention times (using \pkg{\link{fastcluster}}) to form
-  the feature groups. The cut-off value for this is specified by the
-  \code{clusterRTWindow} argument. The input for this function is obtained by
-  generating an Excel export of the 'global' results and subsequently
-  converting the file to \file{.csv} format.
 }
 \note{
-Both \code{screenSuspects} and \code{importFeatureGroupsBrukerTASQ} may use the suspect names to base file
-  names used for reporting, logging etc. Therefore, it is important that these are file-compatible names. For this
-  purpose, \code{screenSuspects} will automatically try to convert long, non-unique and/or otherwise incompatible
-  suspect names.
+Both \code{screenSuspects} may use the suspect names to base file names used for reporting, logging etc.
+  Therefore, it is important that these are file-compatible names. For this purpose, \code{screenSuspects} will
+  automatically try to convert long, non-unique and/or otherwise incompatible suspect names.
 
 For \code{screenSuspects} in some cases you may need to install
   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when only InChI data is available for mass
   calculation).
-
-\code{importFeatureGroupsBrukerTASQ} will use estimated min/max values
-  for retention times and dummy min/max \emph{m/z} values for conversion to
-  features, since this information is not (readily) available. Hence, when
-  plotting, for instance, extracted ion chromatograms (with
-  \code{\link{plotChroms}}) the integrated chromatographic peak range shown
-  is incorrect.
 }
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow}, \code{screenSuspects} performs suspect screening
   for each set separately, and the screening results are combined afterwards. The \code{sets} column in the
   \code{screenInfo} data marks in which sets the suspect hit was found.
-
-  \code{importFeatureGroupsBrukerTASQ} Is currently not supported for sets workflows.
 }
 
 \section{Suspect list format}{
@@ -224,8 +185,6 @@ For \code{screenSuspects} in some cases you may need to install
 
 \references{
 \insertRef{OBoyle2011}{patRoon}
-
-\addCitations{fastcluster}{1}
 }
 \seealso{
 \code{featureGroupsScreening}

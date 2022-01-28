@@ -258,7 +258,7 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
 Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.
 }
 \details{
-Objects for this class are returned by \link[=MSPeakLists-generation]{MS peak lists generators}.
+Objects for this class are returned by \code{\link{generateMSPeakLists}}.
 
 The \code{getDefIsolatePrecParams} is used to create a parameter
   list for isolating the precursor and its isotopes (see \verb{Isolating precursor data}).

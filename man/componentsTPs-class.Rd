@@ -43,7 +43,7 @@ parameters} for more details). Set to \code{NULL} to ignore.}
 
 \item{minFragMatches, minNLMatches}{Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
 to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
-\link{component-generation} for more details.}
+\code{\link{generateComponentsTPs}} for more details.}
 
 \item{formulas}{A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
 additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
@@ -90,5 +90,5 @@ The intensity values for components (used by \code{plotSpectrum}) are set
 \addCitations{igraph}{1} \cr \cr \addCitations{visNetwork}{1}
 }
 \seealso{
-\code{\link{components}} for other relevant methods and \link{component-generation}
+\code{\link{components}} for other relevant methods and \code{\link{generateComponents}}
 }

@@ -194,8 +194,7 @@ Contains data for feature groups that are related in some way. These
 \emph{components} commonly include adducts, isotopes and homologues.
 }
 \details{
-\code{components} objects are obtained from
-\link[=component-generation]{component generators}.
+\code{components} objects are obtained from \code{\link{generateComponents}}.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -273,6 +272,5 @@ for each component. Use the \code{componentInfo} method for access.}
 }
 
 \seealso{
-\link{component-generation},  \code{\link{componentsNT}} and
-  \code{\link{componentsIntClust}}
+\code{\link{generateComponents}}
 }

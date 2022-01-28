@@ -72,5 +72,5 @@ When the object is altered (\emph{e.g.} by filtering or subsetting it), methods 
 }
 
 \seealso{
-\code{\link{componentsClust}} for other relevant methods and \link{component-generation}
+\code{\link{componentsClust}} for other relevant methods and \code{\link{generateComponents}}
 }

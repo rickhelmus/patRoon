@@ -79,5 +79,5 @@ as returned by \code{\link{homol.search}}}
 \addCitations{igraph}{1} \cr \cr \addCitations{visNetwork}{1}
 }
 \seealso{
-\code{\link{components}} and \link{component-generation}
+\code{\link{components}} and \code{\link{generateComponents}}
 }

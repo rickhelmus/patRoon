@@ -256,5 +256,5 @@ For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA
 \insertRef{Chetnik2020}{patRoon}
 }
 \seealso{
-\code{\link{feature-finding}}
+\code{\link{findFeatures}}
 }

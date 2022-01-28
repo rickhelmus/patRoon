@@ -152,11 +152,11 @@
 for feature groups.}
 
 \item{i, j}{For \code{[[}: If both \code{i} and \code{j} are specified then \code{i} specifies the analysis and
-\code{j} the feature group of the feature for which annotations should be returned. Otherwise \code{i} specifies
-the feature group for which group annotations should be returned. \code{i}/\code{j} can be specified as
-\code{integer} index or as a \code{character} name.
+  \code{j} the feature group of the feature for which annotations should be returned. Otherwise \code{i} specifies
+  the feature group for which group annotations should be returned. \code{i}/\code{j} can be specified as
+  \code{integer} index or as a \code{character} name.
 
-Otherwise passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
+  Otherwise passed to the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.}
 
 \item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 
@@ -283,8 +283,8 @@ workflows} section below.}
 Contains data of generated chemical formulae for given feature groups.
 }
 \details{
-\code{formulas} objects are obtained from \link[=formula-generation]{formula generators}. This class is derived from
-the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
+\code{formulas} objects are obtained with \code{\link{generateFormulas}}. This class is derived from the
+\code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -400,5 +400,6 @@ create this object.}
 }
 
 \seealso{
-The \code{\link{featureAnnotations}} base class for more relevant methods and \link{formula-generation}.
+The \code{\link{featureAnnotations}} base class for more relevant methods and
+  \code{\link{generateFormulas}}.
 }

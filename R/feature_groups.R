@@ -1940,7 +1940,7 @@ setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose =
 #' @templateVar what import feature groups from files
 #' @templateVar ex1 importFeatureGroupsBrukerTASQ
 #' @templateVar ex2 importFeatureGroupsBrukerPA
-#' @templateVar algosSuffix PA,TASQ,EnviMass
+#' @templateVar algosSuffix BrukerPA,BrukerTASQ,EnviMass
 #' @templateVar ret featureGroups
 #' @templateVar noParam TRUE
 #' @template generic-algo

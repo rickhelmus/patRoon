@@ -150,6 +150,8 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 #' @templateVar ret transformationProducts
 #' @template generic-algo
 #' 
+#' @param \dots Any parameters to be passed to the selected TP generation algorithm.
+#' 
 #' @return A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
 #'
 #' @seealso In addition, the derived classes \code{\link{transformationProductsBT}} and

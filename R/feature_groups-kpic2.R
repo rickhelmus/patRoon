@@ -27,8 +27,9 @@ setMethod("initialize", "featureGroupsKPIC2",
 #' @template rtalign-arg
 #' @template loadrawdata-arg
 #'
-#' @param alignArgs named \code{character vector} that may contain extra parameters to be used by
-#'   \code{\link[KPIC:PICset.align]{KPIC::PICset.align}}.
+#' @param groupArgs,alignArgs Named \code{character} vector that may contain extra parameters to be used by
+#'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}} and \code{\link[KPIC:PICset.align]{KPIC::PICset.align}},
+#'   respectively.
 #'
 #' @inheritParams groupFeatures
 #'

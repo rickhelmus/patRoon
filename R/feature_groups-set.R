@@ -418,9 +418,11 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     return(ret)
 })
 
-#' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument of \code{\link{groupFeatures}} for details.
+#' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument of
+#'   \code{\link{groupFeatures}} for details.
 #' @param groupArgs A \code{list} with arguments directly passed to \code{groupFeatures} (can be named). Example:
 #'   \code{groupArgs=list(maxAlignMZ=0.002)}.
+#' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
 #' @rdname makeSet
 #' @export

@@ -43,7 +43,9 @@ setMethod("initialize", "featureGroupsXCMS3",
 #'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
-#' @name groupFeaturesXCMS3
+#' @templateVar what groupFeaturesXCMS3
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),

@@ -35,7 +35,8 @@ NULL
 #'
 #' @template DA-restart-note
 #'
-#' @name generateMSPeakListsDA
+#' @templateVar what generateMSPeakListsDA
+#' @template main-rd-method
 #' @export
 setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, minMSIntensity = 500,
                                                              minMSMSIntensity = 500,  clear = TRUE, close = TRUE, save = close,
@@ -184,7 +185,8 @@ setMethod("generateMSPeakListsDA", "featureGroupsSet", function(fGroups, ...)
 #'
 #' @template DA-restart-note
 #' 
-#' @name generateMSPeakListsDAFMF
+#' @templateVar what generateMSPeakListsDAFMF
+#' @template main-rd-method
 #' @export
 setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,
                                                                 close = TRUE, save = close,

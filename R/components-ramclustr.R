@@ -53,7 +53,8 @@ setMethod("initialize", "componentsRC",
 #'
 #' @references \insertRef{Broeckling2013}{patRoon} \cr\cr \insertRef{Broeckling2014}{patRoon}
 #'
-#' @name generateComponentsRAMClustR
+#' @templateVar what generateComponentsRAMClustR
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ionization = NULL, st = NULL, sr = NULL,
                                                                    maxt = 12, hmax = 0.3, normalize = "TIC",

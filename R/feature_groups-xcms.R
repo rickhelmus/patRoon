@@ -41,7 +41,9 @@ setMethod("initialize", "featureGroupsXCMS",
 #'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
-#' @name groupFeaturesXCMS
+#' @templateVar what groupFeaturesXCMS
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 

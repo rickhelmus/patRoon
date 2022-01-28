@@ -133,7 +133,8 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 #' @templateVar what \code{generateFormulasSIRIUS}
 #' @template uses-multiProc
 #'
-#' @name generateFormulasSIRIUS
+#' @templateVar what generateFormulasSIRIUS
+#' @template main-rd-method
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
                                                               adduct = NULL, elements = "CHNOP",

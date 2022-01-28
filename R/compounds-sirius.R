@@ -120,7 +120,8 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #' @templateVar what \code{generateCompoundsSIRIUS}
 #' @template uses-multiProc
 #'
-#' @name generateCompoundsSIRIUS
+#' @templateVar what generateCompoundsSIRIUS
+#' @template main-rd-method
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP",

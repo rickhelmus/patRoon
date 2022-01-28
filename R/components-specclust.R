@@ -53,7 +53,8 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Bas van de Velde (major contributions to spectral binning and
 #'   similarity calculation).
 #'
-#' @name generateComponentsSpecClust
+#' @templateVar what generateComponentsSpecClust
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    specSimParams = getDefSpecSimParams(),

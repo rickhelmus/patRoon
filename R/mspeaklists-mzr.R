@@ -45,7 +45,8 @@ NULL
 #'
 #'   \addCitations{mzR}{5} \cr\cr
 #'
-#' @name generateMSPeakListsMzR
+#' @templateVar what generateMSPeakListsMzR
+#' @template main-rd-method
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
                                                               precursorMzWindow = 4, topMost = NULL,

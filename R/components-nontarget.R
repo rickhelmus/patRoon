@@ -112,7 +112,8 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #'
 #' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 #'
-#' @name generateComponentsNontarget
+#' @templateVar what generateComponentsNontarget
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization = NULL, rtRange = c(-120, 120),
                                                                    mzRange = c(5, 120), elements = c("C", "H", "O"),

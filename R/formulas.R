@@ -483,7 +483,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
 #' @seealso The \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
 #'   manual} (also known as MOLGEN-MSMS).
 #'
-#' @name generateFormulas
+#' @templateVar what generateFormulas
+#' @template main-rd-method
 #' @export
 setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {

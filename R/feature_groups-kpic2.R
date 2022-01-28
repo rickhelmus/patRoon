@@ -39,7 +39,9 @@ setMethod("initialize", "featureGroupsKPIC2",
 #'
 #' @references \insertRef{Ji2017}{patRoon}
 #'
-#' @name groupFeaturesKPIC2
+#' @templateVar what groupFeaturesKPIC2
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupArgs = list(tolerance = c(0.005, 12)),

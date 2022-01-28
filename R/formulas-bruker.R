@@ -56,7 +56,8 @@ getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = charac
 #'
 #' @template DA-restart-note
 #'
-#' @name generateFormulasDA
+#' @templateVar what generateFormulasDA
+#' @template main-rd-method
 #' @export
 setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
                                                           MSMode = "both", adduct = NULL, featThreshold = 0,

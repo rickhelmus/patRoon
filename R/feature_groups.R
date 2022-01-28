@@ -1897,7 +1897,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'  
 #' @return An object of a class which is derived from \code{\link{featureGroups}}.
 #' 
-#' @name groupFeatures
+#' @templateVar what groupFeatures
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = TRUE)
 {

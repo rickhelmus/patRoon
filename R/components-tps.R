@@ -586,7 +586,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 #'   information such as overall/specific set spectrum similarities. As sets data is mixed, transformation products are
 #'   able to be linked with a parent, even if they were not measured in the same set.
 #'
-#' @name generateComponentsTPs
+#' @templateVar what generateComponentsTPs
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, ignoreParents = FALSE,
                                                              TPs = NULL, MSPeakLists = NULL, formulas = NULL,

@@ -51,7 +51,9 @@ setMethod("initialize", "featureGroupsOpenMS",
 #'
 #' @template refs-openms
 #'
-#' @name groupFeaturesOpenMS
+#' @templateVar what groupFeaturesOpenMS
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,
                                                       maxAlignMZ = 0.005, maxGroupRT = 12,

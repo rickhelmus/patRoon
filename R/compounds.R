@@ -669,7 +669,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' 
 #' @return A \code{\link{compounds}} derived object containing all compound annotations.
 #'
-#' @name generateCompounds
+#' @templateVar what generateCompounds
+#' @template main-rd-method
 #' @export
 setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {

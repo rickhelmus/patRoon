@@ -115,7 +115,8 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
 #'
 #' @references \insertRef{Scholle2015}{patRoon}
 #'
-#' @name generateTPsLogic
+#' @templateVar what generateTPsLogic
+#' @template main-rd-method
 #' @export
 setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct = NULL, transformations = NULL)
 {

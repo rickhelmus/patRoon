@@ -71,7 +71,8 @@ setMethod("initialize", "componentsOpenMS",
 #'
 #' @references \insertRef{Bielow2010}{patRoon}
 #'
-#' @name generateComponentsOpenMS
+#' @templateVar what generateComponentsOpenMS
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization = NULL, chargeMin = 1,
                                                                 chargeMax = 1, chargeSpan = 3,

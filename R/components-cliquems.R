@@ -52,7 +52,8 @@ setMethod("initialize", "componentsCliqueMS",
 #'
 #' @references \insertRef{Senan2019}{patRoon}
 #'
-#' @name generateComponentsCliqueMS
+#' @templateVar what generateComponentsCliqueMS
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization = NULL, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,

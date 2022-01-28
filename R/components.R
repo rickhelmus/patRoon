@@ -590,7 +590,8 @@ setMethod("consensus", "components", function(obj, ...)
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the componentization data is generated differently
 #'   depending on the used algorithm. Please see the details in the algorithm specific functions linked in the \verb{See Also} section.
 #'
-#' @name generateComponents
+#' @templateVar what generateComponents
+#' @template main-rd-method
 #' @export
 setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ...)
 {

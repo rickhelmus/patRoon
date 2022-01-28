@@ -127,7 +127,8 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #'
 #' @references \insertRef{Scholle2018}{patRoon}
 #'
-#' @name generateComponentsIntClust
+#' @templateVar what generateComponentsIntClust
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",
                                                                   normFunc = max, average = TRUE,

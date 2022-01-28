@@ -733,7 +733,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 #'   in the final peak lists. However, please note that annotation and other functionality typically uses only the set
 #'   specific peak lists, as this functionality cannot work with mixed peak lists.
 #'
-#' @name generateMSPeakLists
+#' @templateVar what generateMSPeakLists
+#' @template main-rd-method
 #' @export
 setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, ...)
 {

@@ -45,8 +45,9 @@ setMethod("initialize", "componentsCamera",
 #' @template compon_gen-sets-merged
 #'
 #' @references \addCitations{CAMERA}{1}
-#'
-#' @name generateComponentsCAMERA
+#' 
+#' @templateVar what generateComponentsCAMERA
+#' @template main-rd-method
 #' @export
 setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization = NULL, onlyIsotopes = FALSE,
                                                                 minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)

@@ -100,7 +100,7 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 #' @inherit findFeatures return
 #' 
 #' @export
-findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., parallel = TRUE, verbose = TRUE)
+findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: docs
     #   - mention that filter() doesn't alter KPIC object, but IDs can be used to retrace
@@ -178,11 +178,11 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
 #' @param picsList A \code{list} with a \code{pics} objects obtained with \code{\link[KPIC]{getPIC}} or
 #'   \code{\link[KPIC]{getPIC.kmeans}} for each analysis.
 #'
-#' @inherit findfeaturesKPIC2 references
+#' @inherit findFeaturesKPIC2 references
 #' @inherit importFeatures return
 #' 
 #' @export
-importfeaturesKPIC2 <- function(picsList, analysisInfo)
+importFeaturesKPIC2 <- function(picsList, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(picsList, "list", min.len = 1, add = ac)

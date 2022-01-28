@@ -453,7 +453,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 xcms3 = findFeaturesXCMS3,
                 envipick = findFeaturesEnviPick,
                 sirius = findFeaturesSIRIUS,
-                kpic2 = findfeaturesKPIC2,
+                kpic2 = findFeaturesKPIC2,
                 safd = findFeaturesSAFD)
 
     f(analysisInfo, ..., verbose = verbose)

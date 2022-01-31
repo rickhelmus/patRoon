@@ -308,9 +308,9 @@ for feature groups.</p></td>
     <tr>
       <th>i, j</th>
       <td><p>For <code>[[</code>: If both <code>i</code> and <code>j</code> are specified then <code>i</code> specifies the analysis and
-<code>j</code> the feature group of the feature for which annotations should be returned. Otherwise <code>i</code> specifies
-the feature group for which group annotations should be returned. <code>i</code>/<code>j</code> can be specified as
-<code>integer</code> index or as a <code>character</code> name.</p>
+  <code>j</code> the feature group of the feature for which annotations should be returned. Otherwise <code>i</code> specifies
+  the feature group for which group annotations should be returned. <code>i</code>/<code>j</code> can be specified as
+  <code>integer</code> index or as a <code>character</code> name.</p>
 <p>Otherwise passed to the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> method.</p></td>
     </tr>
     <tr>
@@ -469,7 +469,7 @@ workflows</code> section below.</p></td>
     <tr>
       <th>setThreshold, setThresholdAnn</th>
       <td><p>(<strong>sets workflow</strong>) Thresholds used to create the annotation set consensus. See
-<code><a href='formula-generation.html'>generateFormulas</a></code>.</p></td>
+<code><a href='generateFormulas.html'>generateFormulas</a></code>.</p></td>
     </tr>
     <tr>
       <th>set</th>
@@ -487,8 +487,8 @@ workflows</code> section below.</p></td>
   merging results from multiple <code>formulas</code> objects.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>formulas</code> objects are obtained from <a href='formula-generation.html'>formula generators</a>. This class is derived from
-the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> class, please see its documentation for more methods and other details.</p>
+    <p><code>formulas</code> objects are obtained with <code><a href='generateFormulas.html'>generateFormulas</a></code>. This class is derived from the
+<code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> class, please see its documentation for more methods and other details.</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
@@ -525,7 +525,7 @@ the <code>rank</code> columns.</p></li>
 <code>annotations</code> method for access.</p></dd>
 
 <dt><code>setThreshold,setThresholdAnn</code></dt><dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were passed when this object
-was created by <code><a href='formula-generation.html'>generateFormulas</a></code>.</p></dd>
+was created by <code><a href='generateFormulas.html'>generateFormulas</a></code>.</p></dd>
 
 <dt><code>origFGNames</code></dt><dd><p>(<strong>sets workflow</strong>) The original (order of) names of the <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
 create this object.</p></dd>
@@ -565,7 +565,7 @@ create this object.</p></dd>
 <li><p><code>annotatedPeakList</code> Returns a combined annotation table with all sets.</p></li>
 <li><p><code>plotSpectrum</code> Is able to highlight set specific mass peaks (<code>perSet</code> and <code>mirror</code> arguments).</p></li>
 <li><p><code>consensus</code> Creates the algorithm consensus based on the original annotation data (see below for
-  implications). Then, like the sets workflow method for <code><a href='formula-generation.html'>generateFormulas</a></code>, a consensus is made for all
+  implications). Then, like the sets workflow method for <code><a href='generateFormulas.html'>generateFormulas</a></code>, a consensus is made for all
   sets, which can be controlled with the <code>setThreshold</code> and <code>setThresholdAnn</code> arguments. The candidate
   coverage among the different algorithms is calculated for each set (<em>e.g.</em> <code>coverage-positive</code> column)
   and for all sets (<code>coverage</code> column), which is based on the presence of a candidate in all the algorithms from
@@ -597,7 +597,8 @@ create this object.</p></dd>
   the consensus threshold filter.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> base class for more relevant methods and <a href='formula-generation.html'>formula-generation</a>.</p></div>
+    <div class='dont-index'><p>The <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> base class for more relevant methods and
+  <code><a href='generateFormulas.html'>generateFormulas</a></code>.</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

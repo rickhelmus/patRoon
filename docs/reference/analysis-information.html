@@ -210,7 +210,7 @@ is less than the number of analyses the remainders will be set to
 
     <p>Several properties need to be known about analyses that should be
   processed during various workflow steps such as
-  <a href='feature-finding.html'>finding features</a>, averaging intensities of feature
+  <a href='findFeatures.html'>findFeatures</a>, averaging intensities of feature
   groups and blank subtraction. This information should be made available
   with an 'analysis info' object, which is a <code>data.frame</code> containing the
   following columns:</p>
@@ -233,7 +233,7 @@ is less than the number of analyses the remainders will be set to
 
 <p>Most functionality requires the data files to be in either the
   <code class="file">.mzXML</code> or <code class="file">.mzML</code> format. Functionality that utilizes Bruker
-  DataAnalysis (<em>e.g.</em> <code><a href='feature-finding.html'>findFeaturesBruker</a></code>) may only work
+  DataAnalysis (<em>e.g.</em> <code><a href='findFeaturesBruker.html'>findFeaturesBruker</a></code>) may only work
   with data files in the proprietary <code class="file">.d</code> format. Therefore, when tools
   with varying requirements are mixed (a common scenario), the data files
   also need to be present in the required formats. To deal with this

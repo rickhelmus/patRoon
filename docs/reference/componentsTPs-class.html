@@ -163,7 +163,7 @@ more details, see generateComponentsTPs." />
     <div class="ref-description">
     <p>This class is derived from <code><a href='components-class.html'>components</a></code> and is used to store components that result from linking feature
 groups that are (predicted to be) parents with feature groups that (are predicted to be) transformation products. For
-more details, see <code><a href='component-generation.html'>generateComponentsTPs</a></code>.</p>
+more details, see <code><a href='generateComponentsTPs.html'>generateComponentsTPs</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for componentsTPs</span>
@@ -215,13 +215,13 @@ parameters</a> for more details). Set to <code>NULL</code> to ignore.</p></td>
       <th>minFragMatches, minNLMatches</th>
       <td><p>Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
 to <code>NULL</code> to ignore. See the <code>Linking parents and transformation products</code> section in
-<a href='component-generation.html'>component-generation</a> for more details.</p></td>
+<code><a href='generateComponentsTPs.html'>generateComponentsTPs</a></code> for more details.</p></td>
     </tr>
     <tr>
       <th>formulas</th>
       <td><p>A <code><a href='formulas-class.html'>formulas</a></code> object. The formula annotation data in this object is to verify if elemental
 additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
-<code><a href='TP-generation.html'>generateTPsLogic</a></code>). To verify elemental additions, only TPs with at least one candidate formula that
+<code><a href='generateTPsLogic.html'>generateTPsLogic</a></code>). To verify elemental additions, only TPs with at least one candidate formula that
 has these elements are kept. Similarly, for elemental subtractions, any of the parent candidate formulae must
 contain the subtraction elements. Note that TPs are currently not filtered if either the parent or the TP has no
 formula annotations. Set to <code>NULL</code> to ignore.</p></td>
@@ -268,7 +268,7 @@ and rendered with <span class="pkg">visNetwork</span>.</p></li>
     <p>Csardi G, Nepusz T: The igraph software package for complex network research, InterJournal, Complex Systems 1695. 2006. https://igraph.org <br /> <br /> Almende B.V. and Contributors, Benoit Thieurmel and Titouan Robert (2021). visNetwork: Network Visualization using 'vis.js' Library. R package version 2.1.0. http://datastorm-open.github.io/visNetwork/</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='components-class.html'>components</a></code> for other relevant methods and <a href='component-generation.html'>component-generation</a></p></div>
+    <div class='dont-index'><p><code><a href='components-class.html'>components</a></code> for other relevant methods and <code><a href='generateComponents.html'>generateComponents</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

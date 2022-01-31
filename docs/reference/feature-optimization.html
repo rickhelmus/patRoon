@@ -205,8 +205,8 @@ be used to optimize grouping.</p></td>
     </tr>
     <tr>
       <th>algorithm</th>
-      <td><p>The algorithm used for finding or grouping features (see <code><a href='feature-finding.html'>findFeatures</a></code> and
-<code><a href='feature-grouping.html'>groupFeatures</a></code>).</p></td>
+      <td><p>The algorithm used for finding or grouping features (see <code><a href='findFeatures.html'>findFeatures</a></code> and
+<code><a href='groupFeatures.html'>groupFeatures</a></code>).</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -241,7 +241,7 @@ see the parallelization section in the handbook for more details.</p></td>
     </tr>
     <tr>
       <th>anaInfo</th>
-      <td><p><a href='analysis-information.html'>Analysis info table</a> (passed to <code><a href='feature-finding.html'>findFeatures</a></code>).</p></td>
+      <td><p><a href='analysis-information.html'>Analysis info table</a> (passed to <code><a href='findFeatures.html'>findFeatures</a></code>).</p></td>
     </tr>
     <tr>
       <th>isoIdent</th>
@@ -316,8 +316,8 @@ paremeters more easily (see <code>examples</code>).</p></li>
   <samp>5</samp>.</p>
 <p>Using multiple parameter sets with differing fixed values allows optimization of qualitative values (see examples
   below).</p>
-<p>The parameters specified in parameter sets are directly passed through the <code><a href='feature-finding.html'>findFeatures</a></code> or
-  <code><a href='feature-grouping.html'>groupFeatures</a></code> functions. Hence, grouping and retention time alignment parameters used by XCMS should
+<p>The parameters specified in parameter sets are directly passed through the <code><a href='findFeatures.html'>findFeatures</a></code> or
+  <code><a href='groupFeatures.html'>groupFeatures</a></code> functions. Hence, grouping and retention time alignment parameters used by XCMS should
   (still) be set through the <code>groupArgs</code> and <code>retcorArgs</code> parameters.</p>
 <p><strong>NOTE:</strong> For XCMS3, which normally uses parameter classes for settings its options, the parameters must be
   defined in a named list like any other algorithm. The set parameters are then used passed to the constructor of the

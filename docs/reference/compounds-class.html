@@ -333,7 +333,7 @@ filtering.</p></td>
       <td><p>For <code>plotSpectrum</code>: Further arguments passed to <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>for <code>filter</code>: passed to the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> method.</p>
-<p>For <code>consensus</code>: any further (and unique) <code>compounds</code> objects.</p>  
+<p>For <code>consensus</code>: any further (and unique) <code>compounds</code> objects.</p>
 <p>For <a href='sets-workflow.html'>sets workflow</a> methods: further arguments passed to the base <code>compounds</code> method.</p></td>
     </tr>
     <tr>
@@ -401,7 +401,7 @@ results were removed after they were generated (<em>e.g.</em> by use of
       <th>onlyUsed</th>
       <td><p>If <code>TRUE</code> then only scorings are plotted that actually
 have been used to rank data (see the <code>scoreTypes</code> argument to
-<code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code> for more details).</p></td>
+<code><a href='generateCompoundsMetFrag.html'>generateCompoundsMetFrag</a></code> for more details).</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -513,7 +513,7 @@ workflows</code> section below.</p></td>
     <tr>
       <th>setThreshold, setThresholdAnn</th>
       <td><p>(<strong>sets workflow</strong>) Thresholds used to create the annotation set consensus. See
-<code><a href='compound-generation.html'>generateCompounds</a></code>.</p></td>
+<code><a href='generateCompounds.html'>generateCompounds</a></code>.</p></td>
     </tr>
     <tr>
       <th>set</th>
@@ -531,8 +531,8 @@ workflows</code> section below.</p></td>
   <code>compounds</code> objects.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>compounds</code> objects are obtained from <a href='compound-generation.html'>compound generators</a>. This class is derived
-from the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> class, please see its documentation for more methods and other details.</p>
+    <p><code>compounds</code> objects are obtained from <a href='generateCompounds.html'>compound generators</a>. This class is derived from
+the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> class, please see its documentation for more methods and other details.</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
@@ -542,7 +542,7 @@ from the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></c
 <li><p><code>identifiers</code>: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
-<code>identifiers</code> option of <code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code>.</p></li>
+<code>identifiers</code> option of <code><a href='generateCompoundsMetFrag.html'>generateCompoundsMetFrag</a></code>.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
 and speed up further processing. Also see the <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>
 method.</p></li>
@@ -578,7 +578,7 @@ the <code>rank</code> columns.</p></li>
 
 <dl>
 <dt><code>setThreshold,setThresholdAnn</code></dt><dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were passed when this object
-was created by <code><a href='compound-generation.html'>generateCompounds</a></code>.</p></dd>
+was created by <code><a href='generateCompounds.html'>generateCompounds</a></code>.</p></dd>
 
 <dt><code>origFGNames</code></dt><dd><p>(<strong>sets workflow</strong>) The original (order of) names of the <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
 create this object.</p></dd>
@@ -588,7 +588,7 @@ create this object.</p></dd>
 
     <p>The values ranges in the <code>scoreLimits</code> slot, which are used for normalization of scores, are based on the
   <em>original</em> scorings when the compounds were generated (<em>prior</em> to employing the <code>topMost</code> filter to
-  <code><a href='compound-generation.html'>generateCompounds</a></code>).</p>
+  <code><a href='generateCompounds.html'>generateCompounds</a></code>).</p>
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
@@ -624,7 +624,7 @@ create this object.</p></dd>
 <li><p><code>annotatedPeakList</code> Returns a combined annotation table with all sets.</p></li>
 <li><p><code>plotSpectrum</code> Is able to highlight set specific mass peaks (<code>perSet</code> and <code>mirror</code> arguments).</p></li>
 <li><p><code>consensus</code> Creates the algorithm consensus based on the original annotation data (see below for
-  implications). Then, like the sets workflow method for <code><a href='compound-generation.html'>generateCompounds</a></code>, a consensus is made for all
+  implications). Then, like the sets workflow method for <code><a href='generateCompounds.html'>generateCompounds</a></code>, a consensus is made for all
   sets, which can be controlled with the <code>setThreshold</code> and <code>setThresholdAnn</code> arguments. The candidate
   coverage among the different algorithms is calculated for each set (<em>e.g.</em> <code>coverage-positive</code> column)
   and for all sets (<code>coverage</code> column), which is based on the presence of a candidate in all the algorithms from
@@ -660,7 +660,8 @@ create this object.</p></dd>
     <p>Guha, R. (2007). 'Chemical Informatics Functionality in R'. Journal of Statistical Software 6(18)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> base class for more relevant methods and <a href='compound-generation.html'>compound-generation</a>.</p></div>
+    <div class='dont-index'><p>The <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code> base class for more relevant methods and
+  <code><a href='generateCompounds.html'>generateCompounds</a></code>.</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -210,9 +210,7 @@
   <span class='va'>skipInvalid</span>,
   <span class='va'>onlyHits</span>,
   amend <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-<span class='fu'>importFeatureGroupsBrukerTASQ</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>analysisInfo</span>, clusterRTWindow <span class='op'>=</span> <span class='fl'>12</span><span class='op'>)</span></pre>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -268,30 +266,12 @@ identification levels to include or exclude, respectively. For instance,
 <code>exLevels="4|5"</code> would exclude level 4 and 5 from the output file. Set
 to <code>NULL</code> to ignore.</p></td>
     </tr>
-    <tr>
-      <th>path</th>
-      <td><p>The file path to an Excel export of the Global results table from
-TASQ, converted to <code class="file">.csv</code> format.</p></td>
-    </tr>
-    <tr>
-      <th>analysisInfo</th>
-      <td><p>A table with <a href='analysis-information.html'>analysis
-information</a>.</p></td>
-    </tr>
-    <tr>
-      <th>clusterRTWindow</th>
-      <td><p>This retention time window (in seconds) is used to
-group hits across analyses together. See also the details section.</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>screenSuspects</code> returns a <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code> object, which is a copy of the input
   <code>fGroups</code> object amended with additional screening information.</p>
-<p><code>importFeatureGroupsBrukerTASQ</code> returns a new
-  <code>featureGroups</code> object containing converted screening results from
-  Bruker TASQ.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Besides 'full non-target analysis', where compounds may be identified with little to no prior knowledge, a common
@@ -306,39 +286,19 @@ possible, as it can significantly reduce the load on data interpretation.</p>
   used to configure the rules for automatic estimation of identification
   levels. This file can then be used as input for
   <code><a href='featureGroupsScreening-class.html'>annotateSuspects</a></code>.</p>
-<p><code>importFeatureGroupsBrukerTASQ</code> will convert screening results
-  from Bruker TASQ to a <code><a href='featureGroups-class.html'>featureGroups</a></code> object. The feature
-  groups across analyses are formed based on the name of suspects and their
-  closeness in retention time. The latter is necessary because TASQ does not
-  necessarily perform checks on retention times and may therefore assign a
-  suspect to peaks with different retention times across analyses (or within
-  a single analysis). Hence, suspects with equal names are hierarchically
-  clustered on their retention times (using <span class="pkg">fastcluster</span>) to form
-  the feature groups. The cut-off value for this is specified by the
-  <code>clusterRTWindow</code> argument. The input for this function is obtained by
-  generating an Excel export of the 'global' results and subsequently
-  converting the file to <code class="file">.csv</code> format.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>Both <code>screenSuspects</code> and <code>importFeatureGroupsBrukerTASQ</code> may use the suspect names to base file
-  names used for reporting, logging etc. Therefore, it is important that these are file-compatible names. For this
-  purpose, <code>screenSuspects</code> will automatically try to convert long, non-unique and/or otherwise incompatible
-  suspect names.</p>
+    <p>Both <code>screenSuspects</code> may use the suspect names to base file names used for reporting, logging etc.
+  Therefore, it is important that these are file-compatible names. For this purpose, <code>screenSuspects</code> will
+  automatically try to convert long, non-unique and/or otherwise incompatible suspect names.</p>
 <p>For <code>screenSuspects</code> in some cases you may need to install
   <a href='http://openbabel.org/wiki/Main_Page'>OpenBabel</a> (<em>e.g.</em> when only InChI data is available for mass
   calculation).</p>
-<p><code>importFeatureGroupsBrukerTASQ</code> will use estimated min/max values
-  for retention times and dummy min/max <em>m/z</em> values for conversion to
-  features, since this information is not (readily) available. Hence, when
-  plotting, for instance, extracted ion chromatograms (with
-  <code><a href='generics.html'>plotChroms</a></code>) the integrated chromatographic peak range shown
-  is incorrect.</p>
     <h2 class="hasAnchor" id="sets-workflows"><a class="anchor" href="#sets-workflows"></a>Sets workflows</h2>
 
     <p>In a <a href='sets-workflow.html'>sets workflow</a>, <code>screenSuspects</code> performs suspect screening
   for each set separately, and the screening results are combined afterwards. The <code>sets</code> column in the
   <code>screenInfo</code> data marks in which sets the suspect hit was found.</p>
-<p><code>importFeatureGroupsBrukerTASQ</code> Is currently not supported for sets workflows.</p>
     <h2 class="hasAnchor" id="suspect-list-format"><a class="anchor" href="#suspect-list-format"></a>Suspect list format</h2>
 
     <p>the <code>suspects</code> argument for <code>screenSuspects</code> should be a <code>data.frame</code>
@@ -382,7 +342,6 @@ possible, as it can significantly reduce the load on data interpretation.</p>
 <em>Journal of Cheminformatics</em>, <b>3</b>(1).
 doi: <a href='https://doi.org/10.1186/1758-2946-3-33'>10.1186/1758-2946-3-33</a>
 .</p>
-<p>Daniel Müllner (2013). fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python. Journal of Statistical Software, 53(9), 1-18. URL https://www.jstatsoft.org/v53/i09/.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>featureGroupsScreening</code></p></div>

@@ -444,14 +444,14 @@
 <li>Fixed: Hill ordering: H wasn’t sorted alphabetically if no C is present.</li>
 <li>Several fixes were applied to improve handling of <code>SIRIUS</code> ‘adduct fragments’.</li>
 <li>formula/compound annotation consensus ranking is now properly scaled.</li>
-<li>Fixed: <code><a href="../reference/MSPeakLists-generation.html">generateMSPeakListsDAFMF()</a></code> potentially used wrong DA compound data in case features were filtered.</li>
+<li>Fixed: <code><a href="../reference/generateMSPeakListsDAFMF.html">generateMSPeakListsDAFMF()</a></code> potentially used wrong DA compound data in case features were filtered.</li>
 </ul>
 </li>
 <li>Suspect screening
 <ul>
 <li>Fixed: <code><a href="../reference/suspect-screening.html">numericIDLevel()</a></code> now properly handles <code>NA</code> values.</li>
 <li>
-<code><a href="../reference/suspect-screening.html">importFeatureGroupsBrukerTASQ()</a></code>: Improved handling of absent analyses in imported results files.</li>
+<code><a href="../reference/importFeatureGroupsBrukerTASQ.html">importFeatureGroupsBrukerTASQ()</a></code>: Improved handling of absent analyses in imported results files.</li>
 <li>Fixed: Automatic <em>m/z</em> calculation for suspects
 <ul>
 <li>Improperly handled electron masses for adducts involving element subtract (e.g. <code>[M-H]-</code>), resulting in ~1.5 mDa deviations</li>
@@ -589,7 +589,7 @@
 <li>
 <strong>IMPORTANT:</strong> Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.</li>
 <li>Fix: SIRIUS formula calculation with <code>calculateFeatures=TRUE</code> would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps).</li>
-<li>The <code>SIRBatchSize</code> argument to formula and compound generation functions was renamed to <code>splitBatches</code> and its meaning has slightly changed. Please see the reference manual (e.g. <code><a href="../reference/formula-generation.html">?generateFormulas</a></code>) for more details.</li>
+<li>The <code>SIRBatchSize</code> argument to formula and compound generation functions was renamed to <code>splitBatches</code> and its meaning has slightly changed. Please see the reference manual (e.g. <code><a href="../reference/generateFormulas.html">?generateFormulas</a></code>) for more details.</li>
 </ul>
 </li>
 <li>Changes related to MetFrag
@@ -612,7 +612,7 @@
 <li>Several packages such as <code>XCMS</code> are not attached by default, which significantly speeds up loading <code>patRoon</code> (e.g. with <code><a href="https://rdrr.io/r/base/library.html">library()</a></code>).</li>
 <li>The <code><a href="../reference/patRoon-defunct.html">compoundViewer()</a></code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/reporting.html">reportHTML()</a></code>.</li>
 <li>
-<code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
+<code><a href="../reference/generateComponentsNontarget.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
 <li>
 <code><a href="../reference/patRoon-defunct.html">checkChromatograms()</a></code>: fix error when <code>fGroups</code> has only one replicate group</li>
 <li>
@@ -648,7 +648,7 @@
 </ul>
 </li>
 <li>minor fixes for subsetting XCMS <code>features</code> objects</li>
-<li>Fixed: <code><a href="../reference/compound-generation.html">generateCompoundsMetFrag()</a></code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
+<li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
 <li>Fixed: on very rare cases empty peaklists could be present after averaging.</li>
 <li>Fixed: <code>SIRIUS</code> annotation didn’t use set adduct but used default instead</li>
 <li>
@@ -668,7 +668,7 @@
 <li>Reversed argument order of <code>exportedData</code>/<code>verbose</code> to <code><a href="../reference/getXCMSSet.html">getXCMSSet()</a></code> functions to avoid ambiguities</li>
 <li>Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs</li>
 <li>
-<code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: allow wider <em>m/z</em> deviation for proper linkage of different series (controlled by <code>absMzDevLink</code> argument).</li>
+<code><a href="../reference/generateComponentsNontarget.html">generateComponentsNontarget()</a></code>: allow wider <em>m/z</em> deviation for proper linkage of different series (controlled by <code>absMzDevLink</code> argument).</li>
 <li>Fixed: <code><a href="../reference/bruker-utils.html">addAllDAEICs()</a></code> sometimes used wrong names for EICs</li>
 <li>Improved handling of empty feature groups objects when reporting</li>
 <li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
@@ -705,7 +705,7 @@
 <ul>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> didn’t show polarity selection if only a compound identification algorithm was selected.</li>
 <li>Updated external dependency versions in installer script.</li>
-<li>Fixed: <code><a href="../reference/feature-grouping.html">groupFeaturesXCMS3()</a></code> didn’t properly cache results.</li>
+<li>Fixed: <code><a href="../reference/groupFeaturesXCMS3.html">groupFeaturesXCMS3()</a></code> didn’t properly cache results.</li>
 <li>
 <code>MSPeakLists</code>: results for averaged peak lists are now the same order as the input feature groups</li>
 <li>Fixed: XCMS(3) feature group import used wrong variable name internally (reported by Ricardo Cunha)</li>
@@ -720,7 +720,7 @@
 <ul>
 <li>Multiple features can now be annotated at once by <code>SIRIUS</code> (configurable with new <code>SIRBatchSize</code> function argument). This dramatically improves overal calculation times (thanks to Markus Fleischauer for pointing out this possibility!).</li>
 <li>
-<code>generateFormulasSirius()</code> and <code>generateCompoundsSirius()</code> are now properly capitalized to <code><a href="../reference/formula-generation.html">generateFormulasSIRIUS()</a></code> and <code><a href="../reference/compound-generation.html">generateCompoundsSIRIUS()</a></code>
+<code>generateFormulasSirius()</code> and <code>generateCompoundsSirius()</code> are now properly capitalized to <code><a href="../reference/generateFormulasSIRIUS.html">generateFormulasSIRIUS()</a></code> and <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code>
 </li>
 <li>Support for <code>SIRIUS</code> 4.4.</li>
 <li>If all features are annotated at once then <code>SIRIUS</code> output is directly shown on the console.</li>
@@ -918,7 +918,7 @@
 <li>
 <code>GenForm</code> formula calculation with <code>MSMode="both"</code> (the default): instead of repeating calculations with and without MS/MS data and combining the data, it now simply does either of the two depending on MS/MS data availability. The old behavior turned out to be redundant, hence, calculation is now a bit faster.</li>
 <li>
-<code>GenForm</code> now perform <em>precursor isolation</em> to cleanup MS1 data prior to formula calculation. During this step any mass peaks that are unlikely part of the isotopic pattern of the feature are removed, which otherwise would penalize the isotopic scoring. The result is that isotopic scoring is dramatically improved now. This filter step is part of new filter functionality for <code>MSPeakLists</code>, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/formula-generation.html">?generateFormulas</a></code> for more information.</li>
+<code>GenForm</code> now perform <em>precursor isolation</em> to cleanup MS1 data prior to formula calculation. During this step any mass peaks that are unlikely part of the isotopic pattern of the feature are removed, which otherwise would penalize the isotopic scoring. The result is that isotopic scoring is dramatically improved now. This filter step is part of new filter functionality for <code>MSPeakLists</code>, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/generateFormulas.html">?generateFormulas</a></code> for more information.</li>
 <li>When formula consensus are made from multiple features the scorings and mass errors are now averaged (instead of taking the values from the best ranked feature).</li>
 <li>Improved ranking of candidates from a consensus of multiple formula objects (see <code><a href="../reference/formulas-class.html">?formulas</a></code>).</li>
 </ul>
@@ -975,7 +975,7 @@
 <code>withMSMS</code> filter for MS peak lists.</li>
 <li>Timeout for formula calculation with GenForm to avoid excessive calculation times.</li>
 <li>
-<code><a href="../reference/feature-finding.html">importFeatures()</a></code> generic function</li>
+<code><a href="../reference/importFeatures.html">importFeatures()</a></code> generic function</li>
 <li>Reporting functions renamed arguments related to compounds reporting (e.g. compoundTopMost to compound<strong>s</strong>TopMost)</li>
 </ul>
 </div>
@@ -1026,7 +1026,7 @@
 </li>
 <li>CAMERA and RAMClustR components: both now have <code>minSize</code> and <code>relMinReplicates</code> (replaces <code>ubiquitous</code> for CAMERA) arguments. Note that their defaults may filter out (feature groups from) components. See their documentation for more info.</li>
 <li>Changed capitalisation of MetFrag CL location option from <code>patRoon.path.metFragCL</code> to <code>patRoon.path.MetFragCL</code>. The old name still works for backward compatability.</li>
-<li>Documented usage of the CompTox database with MetFrag. See <code><a href="../reference/compound-generation.html">?generateCompounds</a></code>.</li>
+<li>Documented usage of the CompTox database with MetFrag. See <code><a href="../reference/generateCompounds.html">?generateCompounds</a></code>.</li>
 <li>Default normalization of MetFrag scorings now follows MetFrag web behaviour.</li>
 <li>
 <code>topMostFormulas</code> argument for SIRIUS compound generation.</li>
@@ -1069,7 +1069,7 @@
 <li>DataAnalysis formula generation: fixed neutral formula calculation if <code>MSMode="msms"</code>, now needs <code>adduct</code> argument.</li>
 <li>Neutral loss filter for compounds.</li>
 <li>
-<strong>IMPORTANT</strong> Adduct specification is now simplified and more generic by usage of a new <code>adduct</code> class. This means that <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> and <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> now expect slightly differing arguments. Please see their manual pages.</li>
+<strong>IMPORTANT</strong> Adduct specification is now simplified and more generic by usage of a new <code>adduct</code> class. This means that <code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> and <code><a href="../reference/generateFormulas.html">generateFormulas()</a></code> now expect slightly differing arguments. Please see their manual pages.</li>
 <li>Workaround for homologous series generation with nontarget (see <a href="https://github.com/blosloos/nontarget/issues/6" class="uri">https://github.com/blosloos/nontarget/issues/6</a>)</li>
 <li>Improvements to terminate background commandline processes when e.g. R is terminated.</li>
 <li>
@@ -1079,13 +1079,13 @@
 <li>
 <code><a href="../reference/generics.html">filter()</a></code> method for compounds now support generic scoring filtering and on elements of precursor and fragment formulae.</li>
 <li>
-<strong>IMPORTANT</strong> Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See <code><a href="../reference/compound-generation.html">?generateCompounds</a></code> for more details (notably the Scorings section).</li>
+<strong>IMPORTANT</strong> Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See <code><a href="../reference/generateCompounds.html">?generateCompounds</a></code> for more details (notably the Scorings section).</li>
 <li>More MS peak list updates
 <ul>
 <li>Precursor peaks are now flagged in MS peak list data and <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code>
 </li>
-<li>Prune MS peak lists (not MS/MS) if no precursor could be determined (enabled by default, see <code>pruneMissingPrecursorMS</code> option in <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
-<li>Better retain precursor peaks after filtering steps: only intensity thresholds may remove precursors (always for MS data, optional for MS/MS with <code>retainPrecursorMSMS</code> function arguments, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
+<li>Prune MS peak lists (not MS/MS) if no precursor could be determined (enabled by default, see <code>pruneMissingPrecursorMS</code> option in <code><a href="../reference/generateMSPeakLists.html">?generateMSPeakLists</a></code>).</li>
+<li>Better retain precursor peaks after filtering steps: only intensity thresholds may remove precursors (always for MS data, optional for MS/MS with <code>retainPrecursorMSMS</code> function arguments, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/generateMSPeakLists.html">?generateMSPeakLists</a></code>).</li>
 </ul>
 </li>
 <li>All major workflow classes now have <code><a href="../reference/generics.html">algorithm()</a></code> and <code>as.data.table()/as.data.frame()</code> methods. The latter replaces and enhances the <code>makeTable()</code> (<code>formulas</code> class) and <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> (<code>featureGroups</code> class) methods.</li>
@@ -1108,7 +1108,7 @@
 </li>
 <li>Several important updates were made to fomula calculation functionality.
 <ul>
-<li>The interface has been simplified as the functionality from the <code>formula</code> and <code>formulaConsensus</code> classes are now merged: there is no need to call <code><a href="../reference/generics.html">consensus()</a></code> anymore after <code><a href="../reference/formula-generation.html">generateFormulas()</a></code>.</li>
+<li>The interface has been simplified as the functionality from the <code>formula</code> and <code>formulaConsensus</code> classes are now merged: there is no need to call <code><a href="../reference/generics.html">consensus()</a></code> anymore after <code><a href="../reference/generateFormulas.html">generateFormulas()</a></code>.</li>
 <li>Formulae can now directly be calculated for feature groups by using group averaged MS peak lists (by setting <code>calculateFeatures=FALSE</code>). This can greatly speed up calulcation, especially with many analyses.</li>
 <li>The new <code><a href="../reference/generics.html">filter()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code>/<code>as.data.frame</code> methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.</li>
 <li>Other updates on formulas
@@ -1133,7 +1133,7 @@
 <li>More consistent naming for algorithm specific MS peak list generators (i.e. <code>generateMSPeakListsX</code> where X is the algo).</li>
 <li>Additional MS peak lists are generated by averaging the lists of features within a feature group.</li>
 <li>
-<code><a href="../reference/compound-generation.html">generateCompounds()</a></code> and plotting functionality now uses averaged group peak lists instead of peak list of most intense analysis.</li>
+<code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> and plotting functionality now uses averaged group peak lists instead of peak list of most intense analysis.</li>
 <li>
 <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.</li>
 <li>Minimum intensity filter option that is applied after averaging.</li>
@@ -1160,7 +1160,7 @@
 <li>
 <strong>IMPORTANT</strong> <code>getXcmsSet()</code> is renamed to <code><a href="../reference/getXCMSSet.html">getXCMSSet()</a></code>
 </li>
-<li>verbose option for <code><a href="../reference/feature-finding.html">findFeatures()</a></code> / <code><a href="../reference/feature-grouping.html">groupFeatures()</a></code>
+<li>verbose option for <code><a href="../reference/findFeatures.html">findFeatures()</a></code> / <code><a href="../reference/groupFeatures.html">groupFeatures()</a></code>
 </li>
 <li>Changed <code>nintersects</code> default for plotUpSet so that all intersections are plotted by default.</li>
 <li>plotChord() now properly stops if nothing overlaps.</li>

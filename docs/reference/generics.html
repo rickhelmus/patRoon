@@ -210,8 +210,6 @@ please refer to the linked method documentation for each generic.</p>
 
 <span class='fu'>groupNames</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>makeSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
-
 <span class='fu'>plotChord</span><span class='op'>(</span><span class='va'>obj</span>, addSelfLinks <span class='op'>=</span> <span class='cn'>FALSE</span>, addRetMzPlots <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>plotChroms</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -409,7 +407,7 @@ average silhouette width calculation.</p></td>
 
 <p><code>filter</code> provides various functionality to do post-filtering of data.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='components-class.html'>componentsSet</a></code>; <code><a href='componentsTPs-class.html'>componentsTPs</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compounds-class.html'>compoundsSet</a></code>; <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='feature-filtering.html'>featureGroups</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreeningSet</a></code>; <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='features-class.html'>featuresSet</a></code>; <code><a href='formulas-class.html'>formulasSet</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakListsSet</a></code>; <code><a href='transformationProductsBT-class.html'>transformationProductsBT</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='components-class.html'>componentsSet</a></code>; <code><a href='componentsTPs-class.html'>componentsTPs</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compounds-class.html'>compoundsSet</a></code>; <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='feature-filtering.html'>featureGroups</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreeningSet</a></code>; <code><a href='feature-filtering.html'>featureGroupsSet</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='features-class.html'>featuresSet</a></code>; <code><a href='formulas-class.html'>formulasSet</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakListsSet</a></code>; <code><a href='transformationProductsBT-class.html'>transformationProductsBT</a></code>.</p></li>
 </ul>
 
 <p><code>getFeatures</code> returns the object's <code><a href='features-class.html'>features</a></code> object.</p>
@@ -427,19 +425,14 @@ average silhouette width calculation.</p></td>
 <li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>; <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
 
-<p><code>makeSet</code> creates a set from given workflow objects.</p>
-<ul>
-<li><p>Methods are defined for: <code><a href='feature-grouping.html'>featureGroups</a></code>; <code><a href='feature-grouping.html'>featureGroupsSet</a></code>; <code><a href='feature-finding.html'>features</a></code>; <code><a href='feature-finding.html'>featuresSet</a></code>.</p></li>
-</ul>
-
 <p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='feature-plotting.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
 </ul>
 
 <p><code>plotChroms</code> plots extracted ion chromatogram(s).</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='feature-plotting.html'>featureGroups</a></code>.</p></li>
 </ul>
 
 <p><code>plotGraph</code> Plots an interactive network graph.</p>
@@ -449,7 +442,7 @@ average silhouette width calculation.</p></td>
 
 <p><code>plotInt</code> plots the intensity of all contained features.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='feature-plotting.html'>featureGroups</a></code>; <code><a href='feature-plotting.html'>featureGroupsSet</a></code>.</p></li>
 </ul>
 
 <p><code>plotScores</code> plots candidate scorings.</p>
@@ -474,22 +467,22 @@ average silhouette width calculation.</p></td>
 
 <p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>; <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='feature-plotting.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>; <code><a href='feature-plotting.html'>featureGroupsSet</a></code>.</p></li>
 </ul>
 
 <p><code>plotUpSet</code> plots an UpSet diagram to assess unique and overlapping data.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='feature-plotting.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
 </ul>
 
 <p><code>delete</code> Deletes results.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='componentsClust-class.html'>componentsClust</a></code>; <code><a href='components-class.html'>componentsSet</a></code>; <code><a href='compounds-class.html'>compoundsSet</a></code>; <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='feature-grouping.html'>featureGroupsKPIC2</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreeningSet</a></code>; <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>; <code><a href='feature-grouping.html'>featureGroupsXCMS</a></code>; <code><a href='feature-grouping.html'>featureGroupsXCMS3</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='features-class.html'>featuresKPIC2</a></code>; <code><a href='features-class.html'>featuresXCMS</a></code>; <code><a href='features-class.html'>featuresXCMS3</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='formulas-class.html'>formulasSet</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='componentsClust-class.html'>componentsClust</a></code>; <code><a href='components-class.html'>componentsSet</a></code>; <code><a href='compounds-class.html'>compoundsSet</a></code>; <code><a href='featureAnnotations-class.html'>featureAnnotations</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-class.html'>featureGroupsKPIC2</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code>; <code><a href='featureGroupsScreening-class.html'>featureGroupsScreeningSet</a></code>; <code><a href='featureGroups-class.html'>featureGroupsSet</a></code>; <code><a href='featureGroups-class.html'>featureGroupsXCMS</a></code>; <code><a href='featureGroups-class.html'>featureGroupsXCMS3</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='features-class.html'>featuresKPIC2</a></code>; <code><a href='features-class.html'>featuresXCMS</a></code>; <code><a href='features-class.html'>featuresXCMS3</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='formulas-class.html'>formulasSet</a></code>.</p></li>
 </ul>
 
 <p><code>plotVolcano</code> plots a volcano plot.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='feature-plotting.html'>featureGroups</a></code>.</p></li>
 </ul>
 
 <p><code>replicateGroups</code> returns a <code>character</code> vector with the analyses for which data is present in this object.</p>
@@ -569,7 +562,7 @@ average silhouette width calculation.</p></td>
 
 <p><code>plot</code> Generates a plot for an object.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='componentsClust-class.html'>componentsClust,missing</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster,missing</a></code>; <code><a href='featureGroups-class.html'>featureGroups,missing</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison,missing</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult,missing</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='componentsClust-class.html'>componentsClust,missing</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster,missing</a></code>; <code><a href='feature-plotting.html'>featureGroups,missing</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison,missing</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult,missing</a></code>.</p></li>
 </ul>
 
 <p><code>show</code> Prints information about this object.</p>

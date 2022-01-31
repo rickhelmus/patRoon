@@ -463,7 +463,7 @@ Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) 
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak lists generators</a>.</p>
+    <p>Objects for this class are returned by <code><a href='generateMSPeakLists.html'>generateMSPeakLists</a></code>.</p>
 <p>The <code>getDefIsolatePrecParams</code> is used to create a parameter
   list for isolating the precursor and its isotopes (see <code>Isolating precursor data</code>).</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
@@ -573,7 +573,7 @@ for access.</p></dd>
 <p>The following methods are changed or with new functionality:</p><ul>
 <li><p><code>filter</code> and the subset operator (<code>[</code>) Can be used to select data that is only present for selected
   sets. The <code>filter</code> method is applied for each set individually, and afterwards the results are combined again
-  (see <code><a href='MSPeakLists-generation.html'>generateMSPeakLists</a></code>). Note that this has important implications for <em>e.g.</em> relative
+  (see <code><a href='generateMSPeakLists.html'>generateMSPeakLists</a></code>). Note that this has important implications for <em>e.g.</em> relative
   intensity filters (<code>relMSIntThr</code>/<code>relMSMSIntThr</code>), <code>topMSPeaks</code>/<code>topMSMSPeaks</code> and
   <code>minMSMSPeaks</code>. Similarly, when the <code>annotatedBy</code> filter is applied, each set specific MS peak list is
   filtered by the annotation results from only that set.</p></li>

@@ -226,12 +226,12 @@ their index or name, respectively (for the order/names see <code><a href='generi
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This class holds all generated data for transformation products for a set of parents. The class is <code>virtual</code> and
-derived objects are created by <a href='TP-generation.html'>TP generators</a>.</p>
+derived objects are created by <a href='generateTPs.html'>TP generators</a>.</p>
 <p>The TP data in objects from this class include a <code>retDir</code> column. These are <code>numeric</code> values that hint what
 the the chromatographic retention order of a TP might be compared to its parent: a value of <samp>-1</samp> means it will
 elute earlier, <samp>1</samp> it will elute later and <samp>0</samp> that there is no significant difference or the direction is
-unknown. These values are based on a typical reversed phase separation. When <code><a href='TP-generation.html'>generateTPsBioTransformer</a></code>
-or <code><a href='TP-generation.html'>generateTPsLibrary</a></code> was used to generate the data, the <code>retDir</code> values are based on calculated
+unknown. These values are based on a typical reversed phase separation. When <code><a href='generateTPsBioTransformer.html'>generateTPsBioTransformer</a></code>
+or <code><a href='generateTPsLibrary.html'>generateTPsLibrary</a></code> was used to generate the data, the <code>retDir</code> values are based on calculated
 <code>log P</code> values of the parent and its TPs.</p>
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
@@ -277,7 +277,7 @@ or <code><a href='TP-generation.html'>generateTPsLibrary</a></code> was used to 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Derived classes <code><a href='transformationProductsBT-class.html'>transformationProductsBT</a></code> and <code><a href='transformationProductsLibrary-class.html'>transformationProductsLibrary</a></code> for
-  specific algorithm methods and <code><a href='TP-generation.html'>TP-generation</a></code></p></div>
+  specific algorithm methods and <code><a href='generateTPs.html'>generateTPs</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

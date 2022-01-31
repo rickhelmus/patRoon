@@ -90,7 +90,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     mainArgs <- c(paste0("-o", if (outFormat == "formula") "txt" else outFormat), "-e")
     if (inFormat == "inchi")
         mainArgs <- c(mainArgs, "-an")
-    if (outFormat == "inchi")
+    if (outFormat == "inchi" || outFormat == "inchikey")
         mainArgs <- c(mainArgs, "-xw", "-xt")
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {

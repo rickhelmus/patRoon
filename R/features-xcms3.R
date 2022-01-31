@@ -32,21 +32,21 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
 #' @templateVar generic findFeatures
 #' @templateVar algoParam xcms3
 #' @template algo_generator
-#' 
+#'
 #' @details The file format of analyses must be \code{mzML} or \code{mzXML}.
-#' 
+#'
 #' @template centroid_note_mandatory
 #'
 #' @inheritParams findFeatures
 #'
 #' @param param The method parameters used by XCMS peak finding, see
 #'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}
-#' @param \dots Further parameters passed to \code{\link[xcms]{xcmsSet}}.
+#' @param \dots Further parameters passed to \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}.
 #'
 #' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
 #'
 #' @inherit findFeatures return
-#' 
+#'
 #' @export
 findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., verbose = TRUE)
 {

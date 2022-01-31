@@ -211,7 +211,7 @@ Explanation:
   options.
 
  When \code{futures} are used for parallel processing (\code{patRoon.MP.method="future"}),
-  calculations with \command{GenForm} are done with batch mode is disabled (see \code{batchSize} argument), which
+  calculations with \command{GenForm} are done with batch mode disabled (see \code{batchSize} argument), which
   generally limit overall performance.
 }
 

@@ -17,7 +17,7 @@ findFeaturesXCMS3(
 \item{param}{The method parameters used by XCMS peak finding, see
 \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}}
 
-\item{\dots}{Further parameters passed to \code{\link[xcms]{xcmsSet}}.}
+\item{\dots}{Further parameters passed to \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}.}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
 }

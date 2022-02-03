@@ -166,9 +166,19 @@
 <code>installPatRoon()</code> improvements in determining what is already installed</li>
 <li>Fixed: Group qualities/scores were not transferred to new <code>featureGroups</code> objects after calling <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> or <code><a href="../reference/generics.html">unset()</a></code>
 </li>
-<li>Checking of MS file extensions (e.g. for <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code>) is now case insensitive (see issue <a href='https://github.com/rickhelmus/patRoon/issues/34'>#34</a>)</li>
+<li>Checking of MS file extensions (e.g. for <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code>) is now case insensitive (see issue <a href='https://github.com/rickhelmus/patRoon/issues/34'>#34</a> and <a href='https://github.com/rickhelmus/patRoon/issues/43'>#43</a>)</li>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: <code><a href="../reference/reporting.html">reportCSV()</a></code> call in generated script included non-existing <code>MSPeakLists</code> argument.</li>
 <li>Fixed: Suspect screening would result in an error if the <code>adduct</code> argument was specified (Corey Griffith)</li>
+<li>Refactoring of the reference documentation pages (issue <a href='https://github.com/rickhelmus/patRoon/issues/35'>#35</a>)
+<ul>
+<li>Workflow data generation functions and their algorithms specific counterparts (e.g. <code>findFeatures</code>, <code>findFeaturesKPIC2</code>) are now documented on separate pages.</li>
+<li>The plotting functions for <code>featureGroups</code> are now documented in a separate page (?<code>feature-plotting</code>)</li>
+<li>Many small textual improvements were made in the process</li>
+</ul>
+</li>
+<li>Fixed: the <code><a href="../reference/findFeaturesKPIC2.html">findFeaturesKPIC2()</a></code> and <code><a href="../reference/importFeaturesKPIC2.html">importFeaturesKPIC2()</a></code> now have correct casing (was lower case ‘f’)</li>
+<li>Fixed: some function arguments for <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> were not properly verified</li>
+<li>More checks to verify if input mzML/mzXML data actually exists</li>
 </ul>
 </div>
     <div id="patroon-20" class="section level1">

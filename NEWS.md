@@ -7,6 +7,11 @@
 - Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34)
 - Fixed: `newProject()`: `reportCSV()` call in generated script included non-existing `MSPeakLists` argument.
 - Fixed: Suspect screening would result in an error if the `adduct` argument was specified (Corey Griffith)
+- Refactoring of the reference documentation pages (issue #35)
+    - Workflow data generation functions and their algorithms specific counterparts (e.g. `findFeatures`, `findFeaturesKPIC2`) are now documented on separate pages.
+    - The plotting functions for `featureGroups` are now documented in a separate page (?`feature-plotting`)
+    - Many small textual improvements were made in the process
+- Fixed: the `findFeaturesKPIC2()` and `importFeaturesKPIC2()` now have correct casing (was lower case 'f')
 
 
 # patRoon 2.0

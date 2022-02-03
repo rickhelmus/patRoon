@@ -90,7 +90,7 @@ findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400),
                              sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, verifyCentroided = TRUE, add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML", verifyCentroided = TRUE, add = ac)
     if (!is.null(profPath))
     {
         checkmate::assertCharacter(profPath, min.chars = 1, min.len = 1, add = ac)

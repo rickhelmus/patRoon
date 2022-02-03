@@ -85,6 +85,8 @@ filterMSFileDirs <- function(files, from)
 
 listMSFiles <- function(dirs, from)
 {
+    dirs <- unique(dirs)
+    
     allExts <- MSFileExtensions()
     allExts <- unique(unlist(allExts[from]))
 
@@ -324,17 +326,17 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     {
         if (algorithm == "pwiz")
             from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
-                                        several.ok = FALSE, add = ac)
+                                        several.ok = FALSE)
         else if (algorithm == "openms")
-            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = FALSE, add = ac)
+            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = FALSE)
         else # bruker
-            from <- checkmate::matchArg(from, "bruker", add = ac)
+            from <- checkmate::matchArg(from, "bruker")
 
         if (from == to)
             warning("Input and output formats are the same")
     }
 
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files))
 
     if (!is.null(files))
     {

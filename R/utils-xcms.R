@@ -32,7 +32,7 @@ isXCMSClass <- function(cl, name) is(cl, getClass(name, where = "xcms"))
 
 readMSDataForXCMS3 <- function(anaInfo)
 {
-    anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath)
+    anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath, MoreArgs = list(mustExist = TRUE))
     return(MSnbase::readMSData(files = anaFiles,
                                pdata = new("NAnnotatedDataFrame",
                                            data.frame(sample_name = anaInfo$analysis,
@@ -119,7 +119,8 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
 
     if (loadRawData)
         xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)),
-                                      function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]),
+                                      function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i],
+                                                                             mustExist = TRUE),
                                       USE.NAMES = FALSE)
     else
         xcms::filepaths(xs) <- anaInfo$analysis # dummy paths

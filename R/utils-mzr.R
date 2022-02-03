@@ -126,7 +126,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
         if (nrow(EICInfoAna) == 0)
             return(NULL)
         
-        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
         anaHash <- makeFileHash(dfile)
         
         EICInfoAna[, hash := makeHash(anaHash, .SD), by = seq_len(nrow(EICInfoAna)),
@@ -212,7 +212,7 @@ setMethod("getEICsForFeatures", "features", function(features)
     
     EICs <- Map(anaInfo$analysis, anaInfo$path, fTable, f = function(ana, path, ft)
     {
-        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
         anaHash <- makeFileHash(dfile)
         
         hashes <- ft[, makeHash(anaHash, .SD), by = seq_len(nrow(ft)),
@@ -272,7 +272,7 @@ verifyDataCentroided <- function(anaInfo)
     
     isCentroided <- mapply(anaInfo$analysis, anaInfo$path, FUN = function(ana, path)
     {
-        fpath <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        fpath <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
         
         hash <- makeFileHash(fpath)
         cd <- loadCacheData("dataCentroided", hash, cacheDB)

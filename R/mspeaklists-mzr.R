@@ -98,7 +98,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     for (anai in seq_len(anaCount))
     {
         ana <- anaInfo$analysis[anai]
-        fp <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
+        fp <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai], mustExist = TRUE)
         spectra <- NULL
 
         baseHash <- makeHash(ana, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)

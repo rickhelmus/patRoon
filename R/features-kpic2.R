@@ -228,7 +228,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
         {
             anai <- match(ana, anaInfo$analysis)
             
-            ret$path = getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
+            ret$path = getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai], mustExist = TRUE)
             ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
             
             if (!is.null(EICs[[ana]]))

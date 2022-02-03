@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Analysis information — analysis-information • patRoon</title>
+<title>Properties of sample analyses — analysis-information • patRoon</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Analysis information — analysis-information" />
-<meta property="og:description" content="Required information for analyses that should be processed and utilities to
-automatically generate this information." />
+<meta property="og:title" content="Properties of sample analyses — analysis-information" />
+<meta property="og:description" content="Properties for the sample analyses used in the workflow and utilities to automatically generate this information." />
 
 
 
@@ -154,14 +153,13 @@ automatically generate this information." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Analysis information</h1>
+    <h1>Properties of sample analyses</h1>
     <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-exported.R'><code>R/utils-exported.R</code></a></small>
     <div class="hidden name"><code>analysis-information.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Required information for analyses that should be processed and utilities to
-automatically generate this information.</p>
+    <p>Properties for the sample analyses used in the workflow and utilities to automatically generate this information.</p>
     </div>
 
     <pre class="usage"><span class='fu'>generateAnalysisInfo</span><span class='op'>(</span>
@@ -179,26 +177,24 @@ automatically generate this information.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>paths</th>
-      <td><p>A character vector containing one or more file paths that should
-be used for finding the analyses.</p></td>
+      <td><p>A character vector containing one or more file paths that should be used for finding the analyses.</p></td>
     </tr>
     <tr>
       <th>groups, blanks</th>
-      <td><p>An (optional) character vector containing replicate
-groups and references, respectively (will be recycled). If <code>groups</code> is
-an empty character string (<code>""</code>) the analysis name will be set as
-replicate group.</p></td>
+      <td><p>An (optional) character vector containing replicate groups and blanks, respectively (will be
+recycled). If <code>groups</code> is an empty character string (<code>""</code>) the analysis name will be set as replicate
+group.</p></td>
     </tr>
     <tr>
       <th>concs</th>
-      <td><p>An optional numeric vector containing concentration values for
-each analysis. Can be <code>NA</code> if unknown. If the length of <code>concs</code>
-is less than the number of analyses the remainders will be set to
-<code>NA</code>. Set to <code>NULL</code> to not include concentration data.</p></td>
+      <td><p>An optional numeric vector containing concentration values for each analysis. Can be <code>NA</code> if
+unknown. If the length of <code>concs</code> is less than the number of analyses the remainders will be set to <code>NA</code>.
+Set to <code>NULL</code> to not include concentration data.</p></td>
     </tr>
     <tr>
       <th>formats</th>
-      <td><p>A character vector of analyses file types. For valid values see <code><a href='convertMSFiles.html'>MSFileFormats</a></code>.</p></td>
+      <td><p>A character vector of analyses file types to consider. Analyses not present in these formats will be
+ignored. For valid values see <code><a href='convertMSFiles.html'>MSFileFormats</a></code>.</p></td>
     </tr>
     <tr>
       <th>path</th>
@@ -208,55 +204,42 @@ is less than the number of analyses the remainders will be set to
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Several properties need to be known about analyses that should be
-  processed during various workflow steps such as
-  <a href='findFeatures.html'>findFeatures</a>, averaging intensities of feature
-  groups and blank subtraction. This information should be made available
-  with an 'analysis info' object, which is a <code>data.frame</code> containing the
-  following columns:</p>
+    <p>In <span class="pkg">patRoon</span> a <em>sample analysis</em>, or simply <em>analysis</em>, refers to a single MS analysis file (sometimes
+also called <em>sample</em> or <em>file</em>). The <em>analysis information</em> summarizes several properties for the
+analyses, and is used in various steps throughout the workflow, such as <code><a href='findFeatures.html'>findFeatures</a></code>, averaging
+intensities of feature groups and blank subtraction. This information should be in a <code>data.frame</code>, with the
+following columns:</p>
 <ul>
-<li><p><code>path</code> the full path to the analysis.</p></li>
-<li><p><code>analysis</code> the filename <strong>without</strong> extension. Must be <strong>unique</strong>,
-   even if the <code>path</code> is different.</p></li>
-<li><p><code>group</code> name of <em>replicate group</em>. A replicate group is used
-   to group analyses together that are replicates of each other. Thus, the
-   <code>group</code> column for all  analyses considered to be belonging to the same
-   replicate group should have an equal (but unique) value. Used for <em>e.g.</em>
-   avaraging and <code><a href='feature-filtering.html'>filter</a></code>.</p></li>
-<li><p><code>blank</code>: all analyses within this replicate group are used by
-   <code><a href='feature-filtering.html'>filter</a></code> for blank subtraction.
-   Multiple entries can be entered by separation with a comma.</p></li>
-<li><p><code>conc</code> a numeric value specifying the 'concentration' of the analysis.
-   This can be actually any kind of quantitative value such as exposure time,
-   dilution factor or anything else which may be used to form a linear relationship.</p></li>
+<li><p><code>path</code> the full path to the directory of the analysis.</p></li>
+<li><p><code>analysis</code> the file name <strong>without</strong> extension. Must be <strong>unique</strong>, even if the <code>path</code> is
+different.</p></li>
+<li><p><code>group</code> name of <em>replicate group</em>. A replicate group is used to group analyses together that are
+replicates of each other. Thus, the <code>group</code> column for all  analyses considered to be belonging to the same
+replicate group should have an equal (but unique) value. Used for <em>e.g.</em> averaging and
+<code><a href='feature-filtering.html'>filter</a></code>.</p></li>
+<li><p><code>blank</code>: all analyses within this replicate group are used by the <code>featureGroups</code> method of
+<code><a href='feature-filtering.html'>filter</a></code> for blank subtraction. Multiple entries can be entered by
+separation with a comma.</p></li>
+<li><p><code>conc</code> a numeric value specifying the 'concentration' of the analysis. This can be actually any kind of
+numeric value such as exposure time, dilution factor or anything else which may be used to form a linear
+relationship.</p></li>
 </ul>
 
-<p>Most functionality requires the data files to be in either the
-  <code class="file">.mzXML</code> or <code class="file">.mzML</code> format. Functionality that utilizes Bruker
-  DataAnalysis (<em>e.g.</em> <code><a href='findFeaturesBruker.html'>findFeaturesBruker</a></code>) may only work
-  with data files in the proprietary <code class="file">.d</code> format. Therefore, when tools
-  with varying requirements are mixed (a common scenario), the data files
-  also need to be present in the required formats. To deal with this
-  situation the data files with varying formats should all be placed in the
-  same path that was used to specify the location of the analysis.</p>
-<p>Whether analysis data files are present in multiple formats or not, each
-  analysis should only be entered <em>once</em>. The <code>analysis</code> column is
-  used as a basename to automatically find back the data file with the
-  required format, hence, analysis names should be specified as the file name
-  without its file extension.</p>
-<p>The <code>group</code> column is <em>mandatory</em> and needs to be filled in for
-  each analysis. The <code>blank</code> column should also be present, however, these
-  may contain empty character strings (<code>""</code>) for analyses where no blank
-  subtraction should occur. The <code>conc</code> column is only required when
-  obtaining regression information is desired with the
-  <code><a href='featureGroups-class.html'>as.data.table</a></code> method.</p>
-<p><code>generateAnalysisInfo</code> is an utility function that
-  automatically generates an analysis information object. It will collect all
-  datafiles from given file paths and convert the filenames into valid
-  analysis names (<em>i.e.</em> without extensions such as <code class="file">.d</code> and
-  <code class="file">.mzML</code>). Duplicate analyses, which may appear when datafiles with
-  different file extension (<code class="file">.d</code>, <code class="file">.mzXML</code> and/or <code class="file">.mzML</code>) are
-  present, will be automatically removed.</p>
+<p>Most workflows steps work with <code class="file">mzXML</code> and <code class="file">mzML</code> file formats. However, some algorithms only support
+support one format (<em>e.g.</em> <code><a href='findFeaturesOpenMS.html'>findFeaturesOpenMS</a></code>, <code><a href='findFeaturesEnviPick.html'>findFeaturesEnviPick</a></code>) or a
+proprietary format (<code><a href='findFeaturesBruker.html'>findFeaturesBruker</a></code>). To mix such algorithms in the same workflow, the analyses
+should be present in all required formats within the <em>same</em> directory as specified by the <code>path</code> column.</p>
+<p>Each analysis should only be specified <em>once</em> in the analysis information, even if multiple file formats are
+available. The <code>path</code> and <code>analysis</code> columns are internally used by <span class="pkg">patRoon</span> to automatically find the
+path of analysis files with the required format.</p>
+<p>The <code>group</code> column is <em>mandatory</em> and needs to be non-empty for each analysis. The <code>blank</code> column
+should also be present, however, this may be empty (<code>""</code>) for analyses where no blank subtraction should occur.
+The <code>conc</code> column is only required when obtaining regression information is desired with the
+<code><a href='featureGroups-class.html'>as.data.table</a></code> method.</p>
+<p><code>generateAnalysisInfo</code> is an utility function that automatically generates a <code>data.frame</code> with
+  analysis information. It scans the directories specified from the <code>paths</code> argument for analyses, and uses this
+  to automatically fill in the <code>analysis</code> and <code>path</code> columns. Furthermore, this function also correctly
+  handles analyses which are available in multiple formats.</p>
 <p><code>generateAnalysisInfoFromEnviMass</code> loads analysis information
   from an <span class="pkg">enviMass</span> project. Note: this funtionality has only been
   tested with older versions of <span class="pkg">enviMass</span>.</p>

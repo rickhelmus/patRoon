@@ -4,7 +4,7 @@
 - Fixed: Default optimization range for KPIC2 `min_width` was incorrect (PR #31, thanks to @@coltonlloyd)
 - `installPatRoon()` improvements in determining what is already installed
 - Fixed: Group qualities/scores were not transferred to new `featureGroups` objects after calling `screenSuspects()` or `unset()`
-- Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34)
+- Checking of MS file extensions (e.g. for `generateAnalysisInfo()`) is now case insensitive (see issue #34 and #43)
 - Fixed: `newProject()`: `reportCSV()` call in generated script included non-existing `MSPeakLists` argument.
 - Fixed: Suspect screening would result in an error if the `adduct` argument was specified (Corey Griffith)
 - Refactoring of the reference documentation pages (issue #35)
@@ -12,6 +12,8 @@
     - The plotting functions for `featureGroups` are now documented in a separate page (?`feature-plotting`)
     - Many small textual improvements were made in the process
 - Fixed: the `findFeaturesKPIC2()` and `importFeaturesKPIC2()` now have correct casing (was lower case 'f')
+- Fixed: some function arguments for `convertMSFiles()` were not properly verified
+- More checks to verify if input mzML/mzXML data actually exists
 
 
 # patRoon 2.0

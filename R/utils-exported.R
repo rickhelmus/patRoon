@@ -20,25 +20,20 @@ COMStop <- function(...)
     RDCOMClient::COMStop(...)
 }
 
-#' @details \code{generateAnalysisInfo} is an utility function that
-#'   automatically generates an analysis information object. It will collect all
-#'   datafiles from given file paths and convert the filenames into valid
-#'   analysis names (\emph{i.e.} without extensions such as \file{.d} and
-#'   \file{.mzML}). Duplicate analyses, which may appear when datafiles with
-#'   different file extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are
-#'   present, will be automatically removed.
+#' @details \code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
+#'   analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this
+#'   to automatically fill in the \code{analysis} and \code{path} columns. Furthermore, this function also correctly
+#'   handles analyses which are available in multiple formats.
 #'
-#' @param paths A character vector containing one or more file paths that should
-#'   be used for finding the analyses.
-#' @param groups,blanks An (optional) character vector containing replicate
-#'   groups and references, respectively (will be recycled). If \code{groups} is
-#'   an empty character string (\code{""}) the analysis name will be set as
-#'   replicate group.
-#' @param concs An optional numeric vector containing concentration values for
-#'   each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
-#'   is less than the number of analyses the remainders will be set to
-#'   \code{NA}. Set to \code{NULL} to not include concentration data.
-#' @param formats A character vector of analyses file types. For valid values see \code{\link{MSFileFormats}}.
+#' @param paths A character vector containing one or more file paths that should be used for finding the analyses.
+#' @param groups,blanks An (optional) character vector containing replicate groups and blanks, respectively (will be
+#'   recycled). If \code{groups} is an empty character string (\code{""}) the analysis name will be set as replicate
+#'   group.
+#' @param concs An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
+#'   unknown. If the length of \code{concs} is less than the number of analyses the remainders will be set to \code{NA}.
+#'   Set to \code{NULL} to not include concentration data.
+#' @param formats A character vector of analyses file types to consider. Analyses not present in these formats will be
+#'   ignored. For valid values see \code{\link{MSFileFormats}}.
 #'
 #' @rdname analysis-information
 #' @export

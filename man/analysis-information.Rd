@@ -4,7 +4,7 @@
 \alias{analysis-information}
 \alias{generateAnalysisInfo}
 \alias{generateAnalysisInfoFromEnviMass}
-\title{Analysis information}
+\title{Properties of sample analyses}
 \usage{
 generateAnalysisInfo(
   paths,
@@ -17,81 +17,71 @@ generateAnalysisInfo(
 generateAnalysisInfoFromEnviMass(path)
 }
 \arguments{
-\item{paths}{A character vector containing one or more file paths that should
-be used for finding the analyses.}
+\item{paths}{A character vector containing one or more file paths that should be used for finding the analyses.}
 
-\item{groups, blanks}{An (optional) character vector containing replicate
-groups and references, respectively (will be recycled). If \code{groups} is
-an empty character string (\code{""}) the analysis name will be set as
-replicate group.}
+\item{groups, blanks}{An (optional) character vector containing replicate groups and blanks, respectively (will be
+recycled). If \code{groups} is an empty character string (\code{""}) the analysis name will be set as replicate
+group.}
 
-\item{concs}{An optional numeric vector containing concentration values for
-each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
-is less than the number of analyses the remainders will be set to
-\code{NA}. Set to \code{NULL} to not include concentration data.}
+\item{concs}{An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
+unknown. If the length of \code{concs} is less than the number of analyses the remainders will be set to \code{NA}.
+Set to \code{NULL} to not include concentration data.}
 
-\item{formats}{A character vector of analyses file types. For valid values see \code{\link{MSFileFormats}}.}
+\item{formats}{A character vector of analyses file types to consider. Analyses not present in these formats will be
+ignored. For valid values see \code{\link{MSFileFormats}}.}
 
 \item{path}{The path of the enviMass project.}
 }
 \description{
-Required information for analyses that should be processed and utilities to
-automatically generate this information.
+Properties for the sample analyses used in the workflow and utilities to automatically generate this information.
 }
 \details{
-Several properties need to be known about analyses that should be
-  processed during various workflow steps such as
-  \link{findFeatures}, averaging intensities of feature
-  groups and blank subtraction. This information should be made available
-  with an 'analysis info' object, which is a \code{data.frame} containing the
-  following columns:
+In \pkg{patRoon} a \emph{sample analysis}, or simply \emph{analysis}, refers to a single MS analysis file (sometimes
+also called \emph{sample} or \emph{file}). The \emph{analysis information} summarizes several properties for the
+analyses, and is used in various steps throughout the workflow, such as \code{\link{findFeatures}}, averaging
+intensities of feature groups and blank subtraction. This information should be in a \code{data.frame}, with the
+following columns:
 
 \itemize{
-   \item \code{path} the full path to the analysis.
-   \item \code{analysis} the filename \strong{without} extension. Must be \strong{unique},
-   even if the \code{path} is different.
-   \item \code{group} name of \emph{replicate group}. A replicate group is used
-   to group analyses together that are replicates of each other. Thus, the
-   \code{group} column for all  analyses considered to be belonging to the same
-   replicate group should have an equal (but unique) value. Used for \emph{e.g.}
-   avaraging and \code{\link[=filter,featureGroups-method]{filter}}.
-   \item \code{blank}: all analyses within this replicate group are used by
-   \code{\link[=filter,featureGroups-method]{filter}} for blank subtraction.
-   Multiple entries can be entered by separation with a comma.
-   \item \code{conc} a numeric value specifying the 'concentration' of the analysis.
-   This can be actually any kind of quantitative value such as exposure time,
-   dilution factor or anything else which may be used to form a linear relationship.
+
+\item \code{path} the full path to the directory of the analysis.
+
+\item \code{analysis} the file name \strong{without} extension. Must be \strong{unique}, even if the \code{path} is
+different.
+
+\item \code{group} name of \emph{replicate group}. A replicate group is used to group analyses together that are
+replicates of each other. Thus, the \code{group} column for all  analyses considered to be belonging to the same
+replicate group should have an equal (but unique) value. Used for \emph{e.g.} averaging and
+\code{\link[=filter,featureGroups-method]{filter}}.
+
+\item \code{blank}: all analyses within this replicate group are used by the \code{featureGroups} method of
+\code{\link[=filter,featureGroups-method]{filter}} for blank subtraction. Multiple entries can be entered by
+separation with a comma.
+
+\item \code{conc} a numeric value specifying the 'concentration' of the analysis. This can be actually any kind of
+numeric value such as exposure time, dilution factor or anything else which may be used to form a linear
+relationship.
+
 }
 
-Most functionality requires the data files to be in either the
-  \file{.mzXML} or \file{.mzML} format. Functionality that utilizes Bruker
-  DataAnalysis (\emph{e.g.} \code{\link{findFeaturesBruker}}) may only work
-  with data files in the proprietary \file{.d} format. Therefore, when tools
-  with varying requirements are mixed (a common scenario), the data files
-  also need to be present in the required formats. To deal with this
-  situation the data files with varying formats should all be placed in the
-  same path that was used to specify the location of the analysis.
+Most workflows steps work with \file{mzXML} and \file{mzML} file formats. However, some algorithms only support
+support one format (\emph{e.g.} \code{\link{findFeaturesOpenMS}}, \code{\link{findFeaturesEnviPick}}) or a
+proprietary format (\code{\link{findFeaturesBruker}}). To mix such algorithms in the same workflow, the analyses
+should be present in all required formats within the \emph{same} directory as specified by the \code{path} column.
 
-  Whether analysis data files are present in multiple formats or not, each
-  analysis should only be entered \emph{once}. The \code{analysis} column is
-  used as a basename to automatically find back the data file with the
-  required format, hence, analysis names should be specified as the file name
-  without its file extension.
+Each analysis should only be specified \emph{once} in the analysis information, even if multiple file formats are
+available. The \code{path} and \code{analysis} columns are internally used by \pkg{patRoon} to automatically find the
+path of analysis files with the required format.
 
-  The \code{group} column is \emph{mandatory} and needs to be filled in for
-  each analysis. The \code{blank} column should also be present, however, these
-  may contain empty character strings (\code{""}) for analyses where no blank
-  subtraction should occur. The \code{conc} column is only required when
-  obtaining regression information is desired with the
-  \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method.
+The \code{group} column is \emph{mandatory} and needs to be non-empty for each analysis. The \code{blank} column
+should also be present, however, this may be empty (\code{""}) for analyses where no blank subtraction should occur.
+The \code{conc} column is only required when obtaining regression information is desired with the
+\code{\link[=as.data.table,featureGroups-method]{as.data.table}} method.
 
-\code{generateAnalysisInfo} is an utility function that
-  automatically generates an analysis information object. It will collect all
-  datafiles from given file paths and convert the filenames into valid
-  analysis names (\emph{i.e.} without extensions such as \file{.d} and
-  \file{.mzML}). Duplicate analyses, which may appear when datafiles with
-  different file extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are
-  present, will be automatically removed.
+\code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
+  analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this
+  to automatically fill in the \code{analysis} and \code{path} columns. Furthermore, this function also correctly
+  handles analyses which are available in multiple formats.
 
 \code{generateAnalysisInfoFromEnviMass} loads analysis information
   from an \pkg{enviMass} project. Note: this funtionality has only been

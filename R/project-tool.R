@@ -1224,10 +1224,10 @@ newProject <- function(destPath = NULL)
                     dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
                                      group = "", blank = "")
 
-                    fExts <- MSFileExtensions()
-                    dt[, format := sapply(tools::file_ext(files), function(ext)
+                    msExts <- MSFileExtensions()
+                    dt[, format := sapply(tolower(tools::file_ext(files)), function(ext)
                     {
-                        paste0(names(fExts)[sapply(fExts, function(e) ext %in% e)], collapse = "/")
+                        paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
                     })]
 
 
@@ -1253,12 +1253,18 @@ newProject <- function(destPath = NULL)
                 else if (nrow(csvTab) > 0)
                 {
                     msExts <- MSFileExtensions()
+                    msFiles <- listMSFiles(csvTab$path, MSFileFormats())
+                    msFilesNoExt <- tools::file_path_sans_ext(msFiles)
                     formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
                     {
-                        fp <- file.path(path, ana)
-                        ret <- names(msExts)[(sapply(msExts, function(e) any(file.exists(paste0(fp, ".", e)))))]
-                        ret <- paste0(ret, collapse = ", ")
-                        return(if (length(ret) > 0) ret else "")
+                        fps <- msFiles[msFilesNoExt == file.path(path, ana)]
+                        if (length(fps) == 0)
+                            return("")
+                        ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
+                        {
+                            paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
+                        })
+                        return(paste0(ret, collapse = ", "))
                     })
 
                     csvTab[, format := formats]

@@ -121,15 +121,10 @@ findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400),
     anaPaths <- if (is.null(profPath)) analysisInfo$path else profPath
     cmdQueue <- Map(analysisInfo$analysis, anaPaths, f = function(ana, path)
     {
-        fpMZXML <- getMzXMLAnalysisPath(ana, path)
-        fpNCDF <- getAnalysisPath(ana, path, "cdf")
-        fp <- NULL
+        # fpNCDF <- getAnalysisPath(ana, path, "cdf") UNDONE: also support netcdf?
+        fp <- getMzXMLAnalysisPath(ana, path)
         
-        if (file.exists(fpMZXML))
-            fp <- fpMZXML
-        else if (file.exists(fpNCDF))
-            fp <- fpNCDF
-        else
+        if (length(fp) == 0)
             stop(sprintf("Cannot find %s or %s\n", fpMZXML, fpNCDF))
         
         # UNDONE: really want to hash big files?

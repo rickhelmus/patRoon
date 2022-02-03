@@ -96,6 +96,21 @@ listMSFiles <- function(dirs, from)
     return(filterMSFileDirs(files, from))
 }
 
+getMSFilePaths <- function(files, paths, from, mustExist = FALSE)
+{
+    msFilePaths <- listMSFiles(paths, from)
+    msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
+    found <- files %in% msFilesNoExt
+    
+    if (mustExist && any(!found))
+        stop(sprintf("The following analyses are not found with a correct data format (valid: %s): %s",
+                     paste0(from, collapse = ", "),
+                     paste0(files[!found], collapse = ", ")),
+             call. = FALSE)
+    
+    return(msFilePaths[msFilesNoExt %in% files])
+}
+
 convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)
 {
     if (centroid != FALSE)
@@ -356,11 +371,9 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
 
     if (!is.null(anaInfo))
     {
-        ext <- MSFileExtensions()[[from]]
-        afiles <- unlist(Map(anaInfo$path, anaInfo$analysis, f = function(p, a) paste0(file.path(p, a), ".", ext)))
-        afiles <- afiles[file.exists(afiles)]
-        afiles <- filterMSFileDirs(afiles, from)
-        files <- c(files, afiles)
+        afiles <- getMSFilePaths(anaInfo$analysis, anaInfo$path, from)
+        files <- union(files, afiles)
+        browser()
     }
 
     if (is.null(outPath))

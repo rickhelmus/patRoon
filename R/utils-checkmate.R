@@ -96,30 +96,11 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
         # UNDONE: more extensions? (e.g. mzData)
         if (is.null(allowedFormats))
             allowedFormats <- MSFileFormats()
-
-        exts <- unique(unlist(MSFileExtensions()[allowedFormats]))
-
-        existFiles <- mapply(x$path, x$analysis, FUN = function(path, ana)
-        {
-            for (f in allowedFormats)
-            {
-                exts <- MSFileExtensions()[[f]]
-                for (e in exts)
-                {
-                    p <- file.path(path, paste0(ana, ".", e))
-                    if (file.exists(p) && file.info(p, extra_cols = FALSE)$isdir == MSFileFormatIsDir(f, e))
-                        return(TRUE)
-                }
-            }
-            message(sprintf("Analysis does not exist: %s (in %s)", ana, path))
-            return(FALSE)
-        })
         
-        if (any(!existFiles))
-            checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
-                                                paste0(allowedFormats, collapse = ", ")),
-                                     var.name = .var.name, collection = add)
-        else if (verifyCentroided)
+        # stops if files are missing
+        getMSFilePaths(x$analysis, x$path, allowedFormats, mustExist = TRUE)
+
+        if (verifyCentroided)
             verifyDataCentroided(x)
     }
 

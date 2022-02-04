@@ -57,22 +57,26 @@ processing of positive and negative HRMS data. The updated documentation and cod
 
 The identification of chemicals in NTA still remains a grand challenge [@Vermeulen2020]; only a small percentage of
 detected masses can be confidently annotated with spectral libraries [@daSilva2015]. The unidentified "dark matter" is
-partly due to TPs, motivating the need for TP screening workflows. Reported approaches include screening of
-known/predicted TPs, parent/TP classification techniques, isotope labeling experiments and identifying expected
-(dis)similarities in MS data (shown in \autoref{tab:TPApproaches}; also reviewed in @Li2021). However, these approaches
-are typically designed for a single study or available only as a stand-alone and/or commercial tool. `patRoon 2.0` implements a consistent
-interface to the complementary approaches from \autoref{tab:TPApproaches} and other novel functionality to provide
-comprehensive TP screening workflows.
+partly due to TPs, motivating the need for TP screening workflows. Reported approaches to elucidate TPs in the
+environment include screening of known/predicted TPs, parent/TP classification techniques, isotope labeling experiments
+and identifying expected (dis)similarities in MS data (shown in \autoref{tab:TPApproaches}; also reviewed in @Li2021).
+However, these approaches are typically designed for a single study or available only as a stand-alone and/or commercial
+tool. Furthermore, few TP prediction tools support specific pathways observed in the environment (e.g. microbial
+degradation), are open-source and can be readily integrated in workflows for automated batch predictions. `patRoon 2.0`
+implements complementary TP screening approaches with select algorithms from \autoref{tab:TPApproaches} and other novel
+functionality to provide comprehensive TP screening workflows. Moreover, the modular design of `patRoon` enables
+integration of more approaches and algorithms in the future.
 
 
-Approach           | Principle                            | Requirements                                      | Examples
------------------- | ------------------------------------ | ------------------------------------------------- | -----------------------------------------
-TP suspect screening | Screen known/predicted TPs         | Knowledge base/study applicable prediction tools, parent structures  | @DjoumbouFeunang2019, @Wicker2015, @Schymanski2021
-Metabolic logic    | Screen molecular mass differences from known transformations | Known (elemental) transformations | @Scholle2015
-Mass spectral      | Cluster similar MS data              | Correlation structural and spectral similarity. Availability of fragmentation spectra for respective parents/TPs | @Scholle2017, @Treutler2016, @Naake2017, @Depke2017
-Classification     | Parent/TP classification             | In-house statistical/computational expertise      | @Scholle2015, @Brunner2019, @Scholle2021
+Approach           | Principle                        | Requirements                                     | Examples
+------------------ | -------------------------------- | ------------------------------------------------ | -------------------------------------------------
+TP suspect screening | Screen predicted TPs           | Study applicable prediction tools, parent structures | **BioTransformer** [@DjoumbouFeunang2019], `CTS` [@wolfe2016], `enviPath` [@Wicker2015]
+                  || Screen known TPs                 | Knowledge base, parent structures                | **PubChemLite** [@Schymanski2021]
+Metabolic logic    | Screen molecular mass differences from known transformations | Known (elemental) transformations | **@Scholle2015**
+Mass spectral      | Cluster similar MS data          | Correlation structural/spectral similarity. Fragmentation spectra for respective parents/TPs | **@Scholle2017**, `MetFamily` [@Treutler2016], `MetCirc` [@Naake2017], `CluMSID` [@Depke2017]
+Classification     | Parent/TP classification         | In-house statistical/computational expertise     | **@Scholle2015**, **@Brunner2019**, @Scholle2021
 
-Table: Implemented TP screening approaches. \label{tab:TPApproaches}
+Table: Overview of TP screening approaches relevant to environmental screening. **bolded**: implemented/interfaced in `patRoon`. \label{tab:TPApproaches}
 
 Since wide chemical coverage is desired with NTA and since TPs can ionize differently to their parent, HRMS analyses
 are often performed using positive and negative ionization mode. `patRoon 2.0` is now capable of simultaneously

@@ -68,13 +68,13 @@ functionality to provide comprehensive TP screening workflows. Moreover, the mod
 integration of more approaches and algorithms in the future.
 
 
-Approach           | Principle                        | Requirements                                     | Examples
------------------- | -------------------------------- | ------------------------------------------------ | -------------------------------------------------
-TP suspect screening | Screen predicted TPs           | Study applicable prediction tools, parent structures | **BioTransformer** [@DjoumbouFeunang2019], `CTS` [@wolfe2016], `enviPath` [@Wicker2015]
-                  || Screen known TPs                 | Knowledge base, parent structures                | **PubChemLite** [@Schymanski2021]
+Approach           | Principle                        | Requirements                              | Examples
+------------------ | -------------------------------- | ----------------------------------------- | -------------------------------------------------
+TP suspect screening | Screen predicted TPs           | Prediction tools with relevant pathways, parent structures | **BioTransformer** [@DjoumbouFeunang2019], `enviPath` [@Wicker2015], `CTS` [@wolfe2016]
+                  || Screen known TPs                 | Knowledge base, parent structures         | **PubChemLite** [@Schymanski2021]
 Metabolic logic    | Screen molecular mass differences from known transformations | Known (elemental) transformations | **@Scholle2015**
-Mass spectral      | Cluster similar MS data          | Correlation structural/spectral similarity. Fragmentation spectra for respective parents/TPs | **@Scholle2017**, `MetFamily` [@Treutler2016], `MetCirc` [@Naake2017], `CluMSID` [@Depke2017]
-Classification     | Parent/TP classification         | In-house statistical/computational expertise     | **@Scholle2015**, **@Brunner2019**, @Scholle2021
+Mass spectral      | Cluster similar MS data          | Correlation structural/spectral similarity. Fragmentation spectra for parents/TP candidates | **@Scholle2017**, `MetFamily` [@Treutler2016], `MetCirc` [@Naake2017], `CluMSID` [@Depke2017]
+Classification     | Parent/TP classification         | In-house statistical/computational expertise | **@Scholle2015**, **@Brunner2019**, @Scholle2021
 
 Table: Overview of TP screening approaches relevant to environmental screening. **bolded**: implemented/interfaced in `patRoon`. \label{tab:TPApproaches}
 

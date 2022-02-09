@@ -1,5 +1,9 @@
 # Generating workflow data
 
+## Introduction
+
+### Workflow functions
+
 Each step in the non-target workflow is performed by a function that performs the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of `patRoon` is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.
 
 Workflow step         | Function                                          | Output S4 class
@@ -13,7 +17,9 @@ MS peak lists         | `generateMSPeakLists()`                           | `MSP
 Formula annotation    | `generateFormulas()`                              | `formulas`
 Compound annotation   | `generateCompounds()`                             | `compounds`
 
-All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of `R` is generally not important when using `patRoon` (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.
+### Workflow output
+
+The output of each workflow step is stored in objects derived from so called S4 classes. Knowing the details about the S4 class system of `R` is generally not important when using `patRoon` (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.
 
 Another advantage of the S4 class system is the usage of so called _generic functions_. To put simply: a generic function performs a certain task for different types of data objects. A good example is the `plotSpectrum()` function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:
 
@@ -26,7 +32,112 @@ plotSpectrum(formulas, ...) # plot annotated spectrum from formula annotation da
 plotSpectrum(compounds, ...) # likewise but for compound annotation.
 ```
 
-The next sections will further detail on how to actually perform the non-target workflow steps to generate data.
+### Overview of all functions and their output
+
+```{r workflowFuncsClasses,echo=FALSE,out.width="100%",fig.cap="**Workflow functions and output classes.**"}
+
+makeRefURL <- function(node, page, label, tt) glue::glue("'{ node }' [URL=\"https://rickhelmus.github.io/patRoon/reference/{ page }.html\" label=<<U>{ label }</U>> tooltip=\"{ tt }\"]", node = node, page = page, label = label, tt = tt)
+makeRefURLClass <- function(class) makeRefURL(class, paste0(class, "-class"), class, paste(class, "class"))
+makeRefURLFunc <- function(func, page = func) makeRefURL(func, page, paste0(func, "()"), paste0(func, "()"))
+makeRefURLPage <- function(node, page) makeRefURL(node, page, node, node)
+
+URLs <- paste0(makeRefURLClass(c("transformationProducts", "featureGroupsScreening", "features", "featureGroups",
+                                 "MSPeakLists", "formulas", "compounds", "components")),
+               makeRefURLFunc(c("findFeatures", "groupFeatures", "generateTPs", "generateMSPeakLists",
+                                "generateFormulas", "generateCompounds", "generateComponents")),
+               makeRefURLFunc(c("screenSuspects", "annotateSuspects", "generateAnalysisInfo", "addFormulaScoring",
+                                "selectIons", "convertToSuspects", "convertToMFDB"),
+                              c("suspect-screening", "featureGroupsScreening-class", "analysis-information",
+                                "compounds-class", "featureGroups-class", "transformationProducts-class",
+                                "generics")),
+               makeRefURLPage(c("Analysis information", "Suspect list", "database"),
+                              c("analysis-information", "suspect-screening", "generateCompoundsMetFrag")), collapse = "\n")
+
+plotGV(sprintf("
+digraph workflow {
+  newrank = true
+  graph [ rankdir = TB, compound = true, style = invis, splines=ortho ]
+  node [ fixedsize = true,
+         width = 3.4,
+         height = 1,
+         fontsize = 24,
+         style = filled ]
+
+  subgraph cluster_suspAnn {
+    graph [style = invis; margin=20 ]
+    'Suspect list' -> screenSuspects -> featureGroupsScreening -> annotateSuspects
+    annotateSuspects -> featureGroupsScreening
+  }
+
+  subgraph cluster_fGroups {
+    graph [style = invis; margin=25 ]
+    'Raw MS data' -> 'Analysis information' -> 'findFeatures' -> 'features' -> 'groupFeatures' -> 'featureGroups'
+    generateAnalysisInfo -> 'Analysis information'
+  }
+
+  subgraph cluster_tps {
+    graph [style = invis ]
+    Parents -> generateTPs -> transformationProducts
+    transformationProducts -> convertToSuspects
+    convertToSuspects -> 'Suspect list' [constraint=none]
+    transformationProducts -> convertToMFDB -> database
+  }
+
+  subgraph cluster_MSPL {
+    graph [style = invis ]
+    generateMSPeakLists -> MSPeakLists
+  }
+
+  subgraph cluster_form {
+    graph [style = invis; margin=30 ]
+    generateFormulas -> formulas
+  }
+  
+  subgraph cluster_comp {
+    graph [style = invis; margin=30 ]
+    generateCompounds -> compounds
+  }
+
+  subgraph cluster_compon {
+    graph [style = invis margin=25 ]
+    generateComponents -> components
+    components -> selectIons
+    selectIons -> featureGroups
+  }
+
+  featureGroups -> generateMSPeakLists
+  featureGroups -> generateFormulas
+  featureGroups -> generateCompounds
+  featureGroups -> generateComponents
+  featureGroups -> screenSuspects [constraint=none]
+  MSPeakLists -> generateFormulas
+  MSPeakLists -> generateCompounds
+  MSPeakLists -> annotateSuspects [style=dashed, constraint=none]
+  formulas -> annotateSuspects [style=dashed, constraint=none]
+  compounds -> annotateSuspects [style=dashed, constraint=none]
+  formulas -> addFormulaScoring
+  compounds -> addFormulaScoring
+  addFormulaScoring -> compounds
+  transformationProducts -> generateComponents [constraint=none, style=dashed]
+  database -> generateCompounds [constraint=none, style=dashed]
+
+  { rank=same; 'findFeatures'; Parents; 'Suspect list' }
+  { rank=same; generateMSPeakLists; generateComponents }
+  { rank=same; addFormulaScoring; compounds }
+  { rank=same; 'Analysis information'; generateAnalysisInfo }
+                  
+  Parents, 'Suspect list', 'Raw MS data', database [shape=cylinder; fillcolor=cadetblue1]
+  generateAnalysisInfo, findFeatures, groupFeatures, generateTPs, convertToSuspects, convertToMFDB, screenSuspects,
+    annotateSuspects, generateMSPeakLists, generateFormulas, generateCompounds, generateComponents,
+    selectIons, addFormulaScoring [ shape=Mrecord; fillcolor=\"#FFE6CC\" ]
+  transformationProducts, featureGroupsScreening, 'Analysis information', features, featureGroups,
+    MSPeakLists, formulas, compounds, components [ shape=octagon; fillcolor=\"#D5E8D4\" ]
+  
+  %s
+}", URLs), width = 920, height = 800)
+```
+
+The next sections in this chapter will further detail on how to actually perform the non-target workflow steps to generate data. The transformation product screening workflows are discussed in [a separate chapter](#TPs).
 
 ## Preparations
 

@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 source(file.path(vignDir, "shared", "init.R"))
 
 runData <- T
-doOpt <- T
+doOpt <- runData
 if (runData)
 {
     # try to sync with tutorial so cache can be re-used

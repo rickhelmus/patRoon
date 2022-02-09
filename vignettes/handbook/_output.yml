@@ -1,6 +1,7 @@
 bookdown::gitbook:
     split_by: section
     mathjax: null
+    css: styles.css
     config:
         sharing: no
         toc:

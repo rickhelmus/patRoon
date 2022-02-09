@@ -1,4 +1,4 @@
-\newcommand{\addCitations}{\Sexpr[results=text,echo=FALSE,strip.white=FALSE]{format(citation("#1")[[#2]], "textVersion")}}
+\newcommand{\addCitations}{\Sexpr[results=text,echo=FALSE,strip.white=FALSE]{ret <- format(citation("#1")[[#2]], "textVersion"); if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) ret <- gsub("<", "&lt;", ret, fixed = TRUE); return(ret)}}
 
 \newcommand{\setsWF}{(\strong{sets workflow})}
 \newcommand{\setsWFClass}{The \code{#1} class is applicable for \link[=sets-workflow]{sets workflows}. This class is derived from \code{#2} and therefore largely follows the same user interface.}

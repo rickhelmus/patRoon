@@ -15,6 +15,7 @@
 - Fixed: some function arguments for `convertMSFiles()` were not properly verified
 - More checks to verify if input mzML/mzXML data actually exists
 - Improved reference documentation for `analysis-information` (issue #33)
+- Handbook: detailed overview of all workflow functions and classes (issue #41, special thanks to @@hechth)
 
 
 # patRoon 2.0

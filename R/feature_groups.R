@@ -73,7 +73,7 @@ featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
-                                    iSTDs = "data.table"),
+                                    ISTDs = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -81,7 +81,7 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     args <- list(...)
 
     # data.table's don't seem to initialize well (gives error that slot is init as list)
-    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "iSTDs"))
+    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs"))
     {
         if (is.null(args[[s]]))
             args[[s]] <- data.table()
@@ -226,10 +226,10 @@ setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 #' @export
 setMethod("annotations", "featureGroups", function(obj) obj@annotations)
 
-#' @describeIn featureGroups Accessor for \code{iSTDs} slot.
+#' @describeIn featureGroups Accessor for \code{ISTDs} slot.
 #' @aliases internalStandards
 #' @export
-setMethod("internalStandards", "featureGroups", function(fGroups) fGroups@iSTDs)
+setMethod("internalStandards", "featureGroups", function(fGroups) fGroups@ISTDs)
 
 #' @describeIn featureGroups Returns a named \code{character} with adduct annotations assigned to each feature group (if
 #'   available).
@@ -422,8 +422,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         }
         if (nrow(obj@annotations) > 0)
             obj@annotations <- obj@annotations[group %in% names(obj@groups)]
-        if (nrow(obj@iSTDs) > 0)
-            obj@iSTDs <- obj@iSTDs[group %in% names(obj@groups)]
+        if (nrow(obj@ISTDs) > 0)
+            obj@ISTDs <- obj@ISTDs[group %in% names(obj@groups)]
     }
     
     if (!isAnaSubSet)
@@ -1104,17 +1104,17 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     # its output...
     fGroupsScr <- screenSuspects(fGroups, suspects = standards, rtWindow = rtWindow, mzWindow = mzWindow,
                                  skipInvalid = skipInvalid, adduct = adduct)
-    fGroups@iSTDs <- screenInfo(fGroupsScr)
-    origN <- uniqueN(fGroups@iSTDs$name)
+    fGroups@ISTDs <- screenInfo(fGroupsScr)
+    origN <- uniqueN(fGroups@ISTDs$name)
     
     # only keep hits that are present in the analyses with non-NA conc
-    fGroupsWithISTD <- fGroups[, fGroups@iSTDs$group]
+    fGroupsWithISTD <- fGroups[, fGroups@ISTDs$group]
     fGroupsWithISTD <- fGroupsWithISTD[!is.na(anaInfo$istd_conc)]
     fGroupsWithISTD <- minAnalysesFilter(fGroupsWithISTD, relThreshold = 1, verbose = FALSE)
     
-    fGroups@iSTDs <- fGroups@iSTDs[group %in% names(fGroupsWithISTD)]
+    fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
     
-    printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@iSTDs))
+    printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs))
     
     return(fGroups)
 })

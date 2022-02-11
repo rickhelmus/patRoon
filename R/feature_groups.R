@@ -1125,14 +1125,15 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, ISTDRTWindow, minISTDs, normFunc)
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, ISTDRTWindow, ISTDMZWindow, minISTDs,
+                                                            normFunc)
 {
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
-    # UNDONE: also add mzRange? Perhaps to exclude big mz differences?
-    
+    # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(method, c("tic", "istd"), add = ac)
-    checkmate::assertInt(ISTDRTWindow, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
     checkmate::assertFunction(normFunc, add = ac)
     checkmate::reportAssertions(ac)
@@ -1152,11 +1153,13 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, IST
     {
         gInfo <- groupInfo(fGroups)
         gInfoISTDs <- gInfo[unique(ISTDs$group), ]
-        fGroups@ISTDAssignments <- setNames(lapply(gInfo$rts, function(rt)
+        fGroups@ISTDAssignments <- setNames(Map(gInfo$rts, gInfo$mzs, f = function(rt, mz)
         {
             # UNDONE: with configurable N, handle duplicate IS assignments differently? (ie select on suspect RT instead of group RT)
-            gi <- gInfoISTDs[order(abs(gInfoISTDs$rts - rt)), ] # sort by closest eluting ISTDs
-            giInRange <- gi[numLTE(abs(gi$rts - rt), ISTDRTWindow), ]
+            
+            # sort by closest eluting ISTDs with closest m/z
+            gi <- gInfoISTDs[order(abs(gInfoISTDs$rts - rt), abs(gInfoISTDs$mzs - mz)), ]
+            giInRange <- gi[numLTE(abs(gi$rts - rt), ISTDRTWindow) & numLTE(abs(gi$mzs - mz), ISTDMZWindow), ]
             if (nrow(giInRange) >= minISTDs)
                 return(rownames(giInRange)) # only take those in range
             if (nrow(gi) > minISTDs)

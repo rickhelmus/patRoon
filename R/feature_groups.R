@@ -1125,10 +1125,15 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, normFunc)
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, ISTDRTWindow, minISTDs, normFunc)
 {
+    # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
+    # UNDONE: also add mzRange? Perhaps to exclude big mz differences?
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(method, c("tic", "istd"), add = ac)
+    checkmate::assertInt(ISTDRTWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
     checkmate::assertFunction(normFunc, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -1149,11 +1154,13 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, nor
         gInfoISTDs <- gInfo[unique(ISTDs$group), ]
         fGroups@ISTDAssignments <- setNames(lapply(gInfo$rts, function(rt)
         {
-            # UNDONE: configurable RT range
-            # UNDONE: do something if nothing was found. (eg select all?)
-            # UNDONE: configurable closest N
             # UNDONE: with configurable N, handle duplicate IS assignments differently? (ie select on suspect RT instead of group RT)
-            gi <- gInfoISTDs[numLTE(abs(gInfoISTDs$rts - rt), 30), ]
+            gi <- gInfoISTDs[order(abs(gInfoISTDs$rts - rt)), ] # sort by closest eluting ISTDs
+            giInRange <- gi[numLTE(abs(gi$rts - rt), ISTDRTWindow), ]
+            if (nrow(giInRange) >= minISTDs)
+                return(rownames(giInRange)) # only take those in range
+            if (nrow(gi) > minISTDs)
+                gi <- gi[seq_len(minISTDs), ] # just take minimum of ISTDs, even if some are out of range
             return(rownames(gi))
         }), names(fGroups))
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]

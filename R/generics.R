@@ -20,6 +20,7 @@ setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
 setGeneric("screenISTDs", function(fGroups, standards, rtWindow = 12, mzWindow = 0.005,
                                    skipInvalid = TRUE, ...) standardGeneric("screenISTDs"))
+setGeneric("normalizeIntensities", function(fGroups, method, normFunc = sum) standardGeneric("normalizeIntensities"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 

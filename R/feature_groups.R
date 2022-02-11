@@ -1114,7 +1114,61 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     
     fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
     
-    printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs))
+    printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs$name))
+    
+    return(fGroups)
+})
+
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, normFunc)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(method, c("tic", "istd"), add = ac)
+    checkmate::assertFunction(normFunc, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(fGroups)
+    
+    ISTDs <- internalStandards(fGroups)
+    if (nrow(ISTDs) == 0)
+        stop("No internal standards were assigned. Did you run screenISTDs()?", call. = FALSE)
+    
+    anaInfo <- analysisInfo(fGroups)
+    if (is.null(anaInfo[["istd_conc"]]))
+        stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
+    
+    if (method == "istd")
+    {
+        gInfo <- groupInfo(fGroups)
+        gInfoISTDs <- gInfo[unique(ISTDs$group), ]
+        selectedISTDFGroups <- setNames(lapply(gInfo$rts, function(rt)
+        {
+            # UNDONE: configurable RT range
+            # UNDONE: do something if nothing was found. (eg select all?)
+            # UNDONE: configurable closest N
+            # UNDONE: with configurable N, handle duplicate IS assignments differently? (ie select on suspect RT instead of group RT)
+            gi <- gInfoISTDs[numLTE(abs(gInfoISTDs$rts - rt), 30), ]
+            return(rownames(gi))
+        }), names(fGroups))
+        selectedISTDFGroups <- selectedISTDFGroups[lengths(selectedISTDFGroups) > 0]
+        selectedISTDFGroups <- selectedISTDFGroups[!names(selectedISTDFGroups) %in% ISTDs$group]
+        
+        fGroups@features@features <- mapply(featureTable(fGroups), anaInfo$istd_conc, function(ft, iconc)
+        {
+            ft <- copy(ft)
+            ft[group %in% names(selectedISTDFGroups), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
+            {
+                iint <- normFunc(ft[group %in% selectedISTDFGroups[[grp]]]$intensity)
+                return(int / (iint / iconc))
+            })]
+            ft[group %in% names(selectedISTDFGroups), area_rel := mapply(area, group, FUN = function(ar, grp)
+            {
+                iar <- normFunc(ft[group %in% selectedISTDFGroups[[grp]]]$area)
+                return(ar / (iar / iconc))
+            })]
+            return(ft)
+        })
+    }
     
     return(fGroups)
 })

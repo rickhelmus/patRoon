@@ -1185,6 +1185,17 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, IST
             return(ft)
         })
     }
+    else # method == "tic"
+    {
+        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
+        {
+            ft <- copy(ft)
+            nint <- normFunc(ft$intensity) / iconc
+            narea <- normFunc(ft$area) / iconc
+            ft[, c("intensity_rel", "area_rel") := .(intensity / nint, area / narea)]
+            return(ft)
+        })
+    }
     
     return(fGroups)
 })

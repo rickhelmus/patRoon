@@ -73,7 +73,7 @@ featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
-                                    ISTDs = "data.table"),
+                                    ISTDs = "data.table", ISTDAssignments = "list"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -86,6 +86,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
         if (is.null(args[[s]]))
             args[[s]] <- data.table()
     }
+    
+    .Object@ISTDAssignments <- makeEmptyListNamed(.Object@ISTDAssignments)
 
     .Object <- do.call(callNextMethod, c(list(.Object), args))
     
@@ -423,7 +425,11 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         if (nrow(obj@annotations) > 0)
             obj@annotations <- obj@annotations[group %in% names(obj@groups)]
         if (nrow(obj@ISTDs) > 0)
+        {
             obj@ISTDs <- obj@ISTDs[group %in% names(obj@groups)]
+            obj@ISTDAssignments <- obj@ISTDAssignments[names(obj@ISTDAssignments) %chin% names(obj@groups)]
+            obj@ISTDAssignments <- lapply(obj@ISTDAssignments, function(x) x[x %chin% names(obj@groups)])
+        }
     }
     
     if (!isAnaSubSet)
@@ -1141,7 +1147,7 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, nor
     {
         gInfo <- groupInfo(fGroups)
         gInfoISTDs <- gInfo[unique(ISTDs$group), ]
-        selectedISTDFGroups <- setNames(lapply(gInfo$rts, function(rt)
+        fGroups@ISTDAssignments <- setNames(lapply(gInfo$rts, function(rt)
         {
             # UNDONE: configurable RT range
             # UNDONE: do something if nothing was found. (eg select all?)
@@ -1150,20 +1156,20 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, nor
             gi <- gInfoISTDs[numLTE(abs(gInfoISTDs$rts - rt), 30), ]
             return(rownames(gi))
         }), names(fGroups))
-        selectedISTDFGroups <- selectedISTDFGroups[lengths(selectedISTDFGroups) > 0]
-        selectedISTDFGroups <- selectedISTDFGroups[!names(selectedISTDFGroups) %in% ISTDs$group]
+        fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]
+        fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% ISTDs$group]
         
-        fGroups@features@features <- mapply(featureTable(fGroups), anaInfo$istd_conc, function(ft, iconc)
+        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
         {
             ft <- copy(ft)
-            ft[group %in% names(selectedISTDFGroups), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
+            ft[group %in% names(fGroups@ISTDAssignments), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
             {
-                iint <- normFunc(ft[group %in% selectedISTDFGroups[[grp]]]$intensity)
+                iint <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$intensity)
                 return(int / (iint / iconc))
             })]
-            ft[group %in% names(selectedISTDFGroups), area_rel := mapply(area, group, FUN = function(ar, grp)
+            ft[group %in% names(fGroups@ISTDAssignments), area_rel := mapply(area, group, FUN = function(ar, grp)
             {
-                iar <- normFunc(ft[group %in% selectedISTDFGroups[[grp]]]$area)
+                iar <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$area)
                 return(ar / (iar / iconc))
             })]
             return(ft)

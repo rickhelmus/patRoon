@@ -1093,17 +1093,13 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
-setMethod("screenISTDs", "featureGroups", function(fGroups, standards, refRGroups, rtWindow = 12, mzWindow = 0.005,
+setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow = 12, mzWindow = 0.005,
                                                    skipInvalid = TRUE, adduct = NULL)
 {
-    checkmate::assertSubset(refRGroups, replicateGroups(fGroups), empty.ok = FALSE)
-    
     anaInfo <- analysisInfo(fGroups)
     if (is.null(anaInfo[["istd_conc"]]))
         stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
-    if (any(is.na(anaInfo[anaInfo$group %in% refRGroups, "istd_conc"])))
-        stop("One or more reference internal standard concentrations are NA", call. = FALSE)
-        
+
     # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use
     # its output...
     fGroupsScr <- screenSuspects(fGroups, suspects = standards, rtWindow = rtWindow, mzWindow = mzWindow,

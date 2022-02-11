@@ -21,7 +21,7 @@ setGeneric("internalStandards", function(fGroups) standardGeneric("internalStand
 setGeneric("screenISTDs", function(fGroups, standards, rtWindow = 12, mzWindow = 0.005,
                                    skipInvalid = TRUE, ...) standardGeneric("screenISTDs"))
 setGeneric("normalizeIntensities", function(fGroups, method, ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3,
-                                            normFunc = sum) standardGeneric("normalizeIntensities"))
+                                            normFunc = max) standardGeneric("normalizeIntensities"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 

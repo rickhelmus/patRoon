@@ -1099,32 +1099,6 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
-setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow = 12, mzWindow = 0.005,
-                                                   skipInvalid = TRUE, adduct = NULL)
-{
-    anaInfo <- analysisInfo(fGroups)
-    if (is.null(anaInfo[["istd_conc"]]))
-        stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
-
-    # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use
-    # its output...
-    fGroupsScr <- screenSuspects(fGroups, suspects = standards, rtWindow = rtWindow, mzWindow = mzWindow,
-                                 skipInvalid = skipInvalid, adduct = adduct)
-    fGroups@ISTDs <- screenInfo(fGroupsScr)
-    origN <- uniqueN(fGroups@ISTDs$name)
-    
-    # only keep hits that are present in the analyses with non-NA conc
-    fGroupsWithISTD <- fGroups[, fGroups@ISTDs$group]
-    fGroupsWithISTD <- fGroupsWithISTD[!is.na(anaInfo$istd_conc)]
-    fGroupsWithISTD <- minAnalysesFilter(fGroupsWithISTD, relThreshold = 1, verbose = FALSE)
-    
-    fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
-    
-    printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs$name))
-    
-    return(fGroups)
-})
-
 setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, normFunc, standards, ISTDRTWindow,
                                                             ISTDMZWindow, minISTDs, ...)
 {

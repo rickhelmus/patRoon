@@ -1125,17 +1125,22 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, normFunc, standards, ISTDRTWindow,
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, normFunc, standards, ISTDRTWindow,
                                                             ISTDMZWindow, minISTDs, ...)
 {
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
     # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
-    # UNDONE: add adduct argument here, to make it more clear that it needs to be specified if method=="istd"?
+    # UNDONE: add adduct argument here, to make it more clear that it needs to be specified if featNorm=="istd"?
 
+    checkmate::assert(
+        checkmate::checkFALSE(featNorm),
+        checkmate::checkSubset(featNorm, c("tic", "istd")),
+        .var.name = "featNorm"
+    )
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertSubset(method, c("tic", "istd"), add = ac)
     checkmate::assertFunction(normFunc, add = ac)
-    checkmate::assertDataFrame(standards, null.ok = method != "istd", add = ac) # more asserts in screenSuspects()
+    checkmate::assertDataFrame(standards, null.ok = featNorm != "istd", add = ac) # more asserts in screenSuspects()
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -1147,7 +1152,7 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, nor
     if (is.null(anaInfo[["istd_conc"]]))
         stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
     
-    if (method == "istd")
+    if (featNorm == "istd")
     {
         # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use
         # its output...
@@ -1198,7 +1203,7 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, nor
             return(ft)
         })
     }
-    else # method == "tic"
+    else if (featNorm == "tic")
     {
         fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
         {

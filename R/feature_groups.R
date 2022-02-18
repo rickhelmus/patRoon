@@ -1141,16 +1141,16 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, IST
     if (length(fGroups) == 0)
         return(fGroups)
     
-    ISTDs <- internalStandards(fGroups)
-    if (nrow(ISTDs) == 0)
-        stop("No internal standards were assigned. Did you run screenISTDs()?", call. = FALSE)
-    
     anaInfo <- analysisInfo(fGroups)
     if (is.null(anaInfo[["istd_conc"]]))
         stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
     
     if (method == "istd")
     {
+        ISTDs <- internalStandards(fGroups)
+        if (nrow(ISTDs) == 0)
+            stop("No internal standards were assigned. Did you run screenISTDs()?", call. = FALSE)
+        
         gInfo <- groupInfo(fGroups)
         gInfoISTDs <- gInfo[unique(ISTDs$group), ]
         fGroups@ISTDAssignments <- setNames(Map(gInfo$rts, gInfo$mzs, f = function(rt, mz)

@@ -1125,17 +1125,19 @@ setMethod("screenISTDs", "featureGroups", function(fGroups, standards, rtWindow 
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, ISTDRTWindow, ISTDMZWindow, minISTDs,
-                                                            normFunc)
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, normFunc, standards, ISTDRTWindow,
+                                                            ISTDMZWindow, minISTDs, ...)
 {
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
     # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
+    # UNDONE: add adduct argument here, to make it more clear that it needs to be specified if method=="istd"?
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(method, c("tic", "istd"), add = ac)
+    checkmate::assertFunction(normFunc, add = ac)
+    checkmate::assertDataFrame(standards, null.ok = method != "istd", add = ac) # more asserts in screenSuspects()
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
-    checkmate::assertFunction(normFunc, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -1147,12 +1149,23 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, IST
     
     if (method == "istd")
     {
-        ISTDs <- internalStandards(fGroups)
-        if (nrow(ISTDs) == 0)
-            stop("No internal standards were assigned. Did you run screenISTDs()?", call. = FALSE)
+        # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use
+        # its output...
+        fGroupsScr <- screenSuspects(fGroups, suspects = standards, ...)
+        fGroups@ISTDs <- screenInfo(fGroupsScr)
+        origN <- uniqueN(fGroups@ISTDs$name)
+        
+        # only keep hits that are present in the analyses with non-NA conc
+        fGroupsWithISTD <- fGroups[, fGroups@ISTDs$group]
+        fGroupsWithISTD <- fGroupsWithISTD[!is.na(anaInfo$istd_conc)]
+        fGroupsWithISTD <- minAnalysesFilter(fGroupsWithISTD, relThreshold = 1, verbose = FALSE)
+        
+        fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
+        
+        printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs$name))
         
         gInfo <- groupInfo(fGroups)
-        gInfoISTDs <- gInfo[unique(ISTDs$group), ]
+        gInfoISTDs <- gInfo[unique(fGroups@ISTDs$group), ]
         fGroups@ISTDAssignments <- setNames(Map(gInfo$rts, gInfo$mzs, f = function(rt, mz)
         {
             # UNDONE: with configurable N, handle duplicate IS assignments differently? (ie select on suspect RT instead of group RT)
@@ -1167,7 +1180,7 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, method, IST
             return(rownames(gi))
         }), names(fGroups))
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]
-        fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% ISTDs$group]
+        fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% fGroups@ISTDs$group]
         
         fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
         {

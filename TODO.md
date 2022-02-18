@@ -30,6 +30,20 @@
 - Fixed: convertMFDB() now always collapses duplicates, not just for BT
 
 
+## Features
+
+- Normalization
+    - rename normalizeIntensities()?
+    - as.data.table
+        - flag to use normalized values instead of normal values (also for area=T and regression)
+        - move group normalization to normalizeIntensities()
+        - (optionally) add in used ISTDs for each fGroup
+    - Add info to show()
+    - Mark ISTDs similar as suspects in reports
+    - filter/subsetting to easily select/remove ISTDs
+    - maybe: allow usage of normalized intensities with filter()?
+
+
 # Lower priority
 
 

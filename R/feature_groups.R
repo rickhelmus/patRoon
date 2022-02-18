@@ -1118,7 +1118,8 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
         return(fGroups)
     
     anaInfo <- analysisInfo(fGroups)
-    if (is.null(anaInfo[["istd_conc"]]))
+    hasIConcs <- !is.null(anaInfo[["istd_conc"]])
+    if (!hasIConcs && featNorm %in% c("istd", "conc"))
         stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
     
     if (featNorm == "istd")
@@ -1174,7 +1175,8 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
     }
     else if (featNorm == "tic")
     {
-        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
+        iconcs <- if (hasIConcs) anaInfo$istd_conc else rep(1, nrow(anaInfo))
+        fGroups@features@features <- Map(featureTable(fGroups), iconcs, f = function(ft, iconc)
         {
             ft <- copy(ft)
             nint <- normFunc(ft$intensity) / iconc

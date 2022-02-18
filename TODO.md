@@ -42,7 +42,6 @@
     - Mark ISTDs similar as suspects in reports
     - filter/subsetting to easily select/remove ISTDs
     - maybe: allow usage of normalized intensities with filter()?
-    - make istd_conc optional if featNorm != "istd"
 
 
 # Lower priority

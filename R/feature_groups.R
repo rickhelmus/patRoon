@@ -1131,14 +1131,9 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
     # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
     # UNDONE: add adduct argument here, to make it more clear that it needs to be specified if featNorm=="istd"?
-
-    checkmate::assert(
-        checkmate::checkFALSE(featNorm),
-        checkmate::checkSubset(featNorm, c("tic", "istd")),
-        .var.name = "featNorm"
-    )
     
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
     checkmate::assertFunction(normFunc, add = ac)
     checkmate::assertDataFrame(standards, null.ok = featNorm != "istd", add = ac) # more asserts in screenSuspects()
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -1211,6 +1206,15 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
             nint <- normFunc(ft$intensity) / iconc
             narea <- normFunc(ft$area) / iconc
             ft[, c("intensity_rel", "area_rel") := .(intensity / nint, area / narea)]
+            return(ft)
+        })
+    }
+    else if (featNorm == "conc")
+    {
+        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
+        {
+            ft <- copy(ft)
+            ft[, c("intensity_rel", "area_rel") := .(intensity / iconc, area / iconc)]
             return(ft)
         })
     }

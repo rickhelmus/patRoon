@@ -36,7 +36,7 @@
     - rename normalizeIntensities()?
     - as.data.table
         - flag to use normalized values instead of normal values (also for area=T and regression)
-        - move group normalization to normalizeIntensities()
+        - remove group normalization
         - (optionally) add in used ISTDs for each fGroup
     - Add info to show()
     - Mark ISTDs similar as suspects in reports

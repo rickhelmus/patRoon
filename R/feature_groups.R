@@ -1099,8 +1099,8 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, normFunc, standards, ISTDRTWindow,
-                                                            ISTDMZWindow, minISTDs, ...)
+setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards,
+                                                            ISTDRTWindow, ISTDMZWindow, minISTDs, ...)
 {
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
     # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
@@ -1108,6 +1108,7 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
+    checkmate::assertFlag(groupNorm, add = ac)
     checkmate::assertFunction(normFunc, add = ac)
     checkmate::assertDataFrame(standards, null.ok = featNorm != "istd", add = ac) # more asserts in screenSuspects()
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -1191,6 +1192,37 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, n
         {
             ft <- copy(ft)
             ft[, c("intensity_rel", "area_rel") := .(intensity / iconc, area / iconc)]
+            return(ft)
+        })
+    }
+    else # "none"
+    {
+        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
+        {
+            ft <- copy(ft)
+            ft[, c("intensity_rel", "area_rel") := .(intensity, area)]
+            return(ft)
+        })
+    }
+    
+    if (groupNorm)
+    {
+        gNames <- names(fGroups)
+        
+        normInts <- sapply(gNames, function(gn)
+        {
+            normFunc(sapply(featureTable(fGroups), function(ft) ft[group == gn]$intensity_rel))
+        })
+        normAreas <- sapply(gNames, function(gn)
+        {
+            normFunc(sapply(featureTable(fGroups), function(ft) ft[group == gn]$area_rel))
+        })
+        
+        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
+        {
+            ft <- copy(ft)
+            ft[, c("intensity_rel", "area_rel") := .(intensity_rel / normInts[group],
+                                                     area_rel / normAreas[group])]
             return(ft)
         })
     }

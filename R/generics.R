@@ -18,8 +18,8 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
-setGeneric("normalizeIntensities", function(fGroups, featNorm = "none", normFunc = max, standards = NULL,
-                                            ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3,
+setGeneric("normalizeIntensities", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max,
+                                            standards = NULL, ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3,
                                             ...) standardGeneric("normalizeIntensities"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))

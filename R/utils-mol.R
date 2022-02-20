@@ -127,6 +127,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         {
             setnames(ret, ncol(ret), "formula")
             ret[, formula := sub("[\\+\\-]+$", "", formula)] # remove trailing positive/negative charge if present
+            ret[, formula := gsub("D", "[2]H", formula, fixed = TRUE)] # handle deuteriums
         }
         
         return(ret)

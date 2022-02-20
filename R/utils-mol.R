@@ -2,15 +2,16 @@ isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
 emptyMol <- function() rcdk::parse.smiles("")[[1]]
 isEmptyMol <- function(mol) rcdk::get.atom.count(mol) == 0
 
-getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE, emptyIfFails = FALSE)
+getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE, emptyIfFails = FALSE,
+                                   SMILESParser = NULL)
 {
     # vectorization doesn't work if any of the SMILES are not OK
     # mols <- rcdk::parse.smiles(SMILES)
     mols <- lapply(SMILES, function(sm)
     {
-        ret <- rcdk::parse.smiles(sm)[[1]]
+        ret <- rcdk::parse.smiles(sm, smiles.parser = SMILESParser)[[1]]
         if (!isValidMol(ret))
-            ret <- rcdk::parse.smiles(sm, kekulise = FALSE)[[1]] # might work w/out kekulization
+            ret <- rcdk::parse.smiles(sm, kekulise = FALSE, smiles.parser = SMILESParser)[[1]] # might work w/out kekulization
         if (!isValidMol(ret))
         {
             warning(paste("Failed to parse SMILES:", sm))
@@ -248,22 +249,42 @@ prepareChemTable <- function(chemData)
     chemData[!is.na(InChI), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
     
     # clear invalid InChIKeys
-    chemData[!is.na(InChIKey) & !grepl("^[[:upper:]]{14}\\-[[:upper:]]{9}\\-[[:upper:]]{1}$", InChIKey),
+    chemData[!is.na(InChIKey) & !grepl("^[[:upper:]]{14}\\-[[:upper:]]{10}\\-[[:upper:]]{1}$", InChIKey),
              InChIKey := NA_character_]
     
     # prefer calculated formulas
-    chemData[, formula := fifelse(!is.na(convertedSMILES$formula), convertedSMILES$formula, formula)]
-    chemData[, formula := fifelse(!is.na(convertedInChIs$formula), convertedInChIs$formula, formula)]
-    
-    # load non-calculated formulae to (1) NA if invalid and (2) normalize the format
-    # NOTE: use by to avoid duplicated calculations
-    chemData[is.na(SMILES) & !is.na(formula), formula := 
-    {
-        tryCatch(rcdk::get.formula(formula[1]), error = function(...) NA_character_)
-    }, by = "formula"]
+    # NOTE: for formula calculation, both RCDK and OpenBabel cannot output formulas with isotopes. However, OpenBabel
+    # does output deuterium as D.
+    # --> For now don't consider any formulae from isotope labeled SMILES, unless the isotopes are just deuterium
+    convForms <- fifelse(!is.na(convertedSMILES$formula), convertedSMILES$formula, convertedInChIs$formula)
+    isSMIOKForFormula <- !is.na(chemData$SMILES) &
+        !grepl("\\[[[:digit:]]+[[:upper:]]{1}[[:lower:]]*\\]", gsub("[2H]", "", chemData$SMILES, fixed = TRUE))
+    chemData[, formula := fifelse(!is.na(convForms) & isSMIOKForFormula, convForms, formula)]
     
     # prefer calculated masses
-    chemData[!is.na(formula), neutralMass := sapply(formula, getFormulaMass)]
+    # if SMILES are available it's faster to use those for calculating the neutral mass
+    # NOTE: use by to avoid duplicated calculations
+    # NOTE: we could apply this for all non-NA SMILES instead of just those OK for formula calculation
+    # ('isSMIOKForFormula'), however, in the next block we still will get all neutral masses for the entries for which
+    # no formula was calculated
+    
+    smp <- rcdk::get.smiles.parser() # get re-usable instance, which per rcdk docs is faster
+    chemData[isSMIOKForFormula, neutralMass := {
+        ret <- tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
+                        error = function(...) NA_real_)
+        if (is.na(ret) && !is.na(formula[1])) # failed, try from formula
+            ret <- tryCatch(getFormulaMass(formula[1]), error = function(...) NA_real_)
+        ret
+    }, by = "SMILES"]
+        
+    # for non-calculated formulae: set to NA if invalid or normalize the format and get the neutralMass
+    chemData[!is.na(formula) & !isSMIOKForFormula, c("formula", "neutralMass") := {
+        form <- tryCatch(rcdk::get.formula(formula[1]), error = function(...) NULL)
+        if (is.null(form))
+            list(NA_character_, NA_real_)
+        else
+            list(form@string, form@mass)
+    }, by = "formula"]
     
     return(chemData)
 }

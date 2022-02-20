@@ -74,6 +74,10 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     # printf("Done!\n")
     
     printf("Clean up formulas...\n")
+    # remove ion species format ([formula]+/-)
+    lib$records[!is.na(Formula), Formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", Formula)]
+    # remove trailing charges
+    lib$records[!is.na(Formula), Formula := gsub("\\+|\\-$", "", Formula)]
     lib$records[!is.na(Formula), Formula := gsub("\\[|\\]|\\+|\\-", "", Formula)] # remove ion species format ([formula]+/-)
     printf("Clearing invalid formulas...\n")
     lib$records[!verifyFormulas(Formula), Formula := NA_character_]

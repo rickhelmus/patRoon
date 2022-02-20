@@ -112,6 +112,9 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             # separated index+formula pairs. The latter is then split by another fread call with <space> as separator.
             
             ret <- fread(cmd$outFile, sep = "\t", header = FALSE)
+            # BUG: fread thinks single string without newline for text arg is file name, just append newline
+            if (nrow(ret) == 1)
+                ret[[2]] <- paste0(ret[[2]], "\n")
             ret <- cbind(ret[, 1], fread(text = ret[[2]], sep = " ", header = FALSE))
         }
         else

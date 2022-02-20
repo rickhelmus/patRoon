@@ -1,5 +1,10 @@
 # Priority
 
+## General
+
+- add showProgress option for future MP
+
+
 ## Features
 
 - Normalization

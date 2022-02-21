@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-09" />
+<meta name="date" content="2022-02-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -338,6 +338,11 @@ div.csl-indent {
 <h2><span class="header-section-number">6.2</span> Generating sets workflow data</h2>
 <p>As was shown in the previous section, the generation of workflow data with a sets workflow largely follows that as what was discussed in the previous chapters. The same generator functions are used:</p>
 <table>
+<colgroup>
+<col width="21%" />
+<col width="50%" />
+<col width="28%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Workflow step</th>
@@ -439,6 +444,13 @@ div.csl-indent {
 <span id="cb148-4"><a href="generating-sets-workflow-data.html#cb148-4" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">setThresholdAnn =</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>In the first example, a formula candidate for a feature group is only kept if it was found for all of the sets. In the second example, a compound candidate is only kept if it was present in all of the sets with annotation data available. The following examples of a common positive/negative sets workflow illustrate the differences:</p>
 <table>
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="22%" />
+<col width="21%" />
+<col width="28%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Candidate</th>

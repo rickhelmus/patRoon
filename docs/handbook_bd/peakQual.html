@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-09" />
+<meta name="date" content="2022-02-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -336,7 +336,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="peakQual" class="section level2" number="8.3">
 <h2><span class="header-section-number">8.3</span> Chromatographic peak qualities</h2>
-<p>The algorithms used by <code>findFeatures</code> detect chromatographic peaks automatically to find the features. However, it is common that not all detected features have ‘proper’ chromatographic peaks, and some features could be just noise. The <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> <code>R</code> package supports various quality measures for chromatographic peaks. The quality measures include Gaussian fit, symmetry, sharpness and others. In addition, <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> averages all feature data for each feature group and adds a few additional group specific quality measures (<em>e.g.</em> retention time consistency). Please see <span class="citation"><a href="#ref-Chetnik2020" role="doc-biblioref">Chetnik, Petrick, and Pandey</a> (<a href="#ref-Chetnik2020" role="doc-biblioref">2020</a>)</span> for more details. The calculations are integrated into <code>patRoon</code>, and are easily performed with the <code>calculatePeakQualities()</code> generic function.</p>
+<p>The algorithms used by <code>findFeatures</code> detect chromatographic peaks automatically to find the features. However, it is common that not all detected features have ‘proper’ chromatographic peaks, and some features could be just noise. The <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> <code>R</code> package supports various quality measures for chromatographic peaks. The quality measures include Gaussian fit, symmetry, sharpness and others. In addition, <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> averages all feature data for each feature group and adds a few additional group specific quality measures (<em>e.g.</em> retention time consistency). Please see <span class="citation">Chetnik, Petrick, and Pandey (<a href="#ref-Chetnik2020" role="doc-biblioref">2020</a>)</span> for more details. The calculations are integrated into <code>patRoon</code>, and are easily performed with the <code>calculatePeakQualities()</code> generic function.</p>
 <div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="peakQual.html#cb206-1" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">calculatePeakQualities</span>(fList) <span class="co"># calculate for all features</span></span></code></pre></div>
 <pre><code>#&gt; Verifying if your data is centroided...
 #&gt; Calculating feature peak qualities and scores...</code></pre>

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-09" />
+<meta name="date" content="2022-02-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -337,8 +337,8 @@ div.csl-indent {
 <div id="annotation" class="section level2" number="4.6">
 <h2><span class="header-section-number">4.6</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-2f90930452debb62b4f5" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2f90930452debb62b4f5">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-011af9e8fb918772489e" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-011af9e8fb918772489e">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.</p>
 <div id="ms-peak-lists" class="section level3" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> MS peak lists</h3>
@@ -1559,7 +1559,7 @@ TRUE
 </div>
 <div id="suspAnn" class="section level3" number="4.6.4">
 <h3><span class="header-section-number">4.6.4</span> Suspect annotation</h3>
-<p>The data obtained during the previously described annotation steps can be used to improve a suspect screening workflow. The <code>annotateSuspects()</code> method uses the annotation data to calculate various annotation properties for each suspect, such as their rank in formula/compound candidates, which fragments from the suspect list were matched, and a <em>rough</em> indication of the identification level according to <span class="citation"><a href="#ref-Schymanski2014" role="doc-biblioref">Schymanski et al.</a> (<a href="#ref-Schymanski2014" role="doc-biblioref">2014</a>)</span></p>
+<p>The data obtained during the previously described annotation steps can be used to improve a suspect screening workflow. The <code>annotateSuspects()</code> method uses the annotation data to calculate various annotation properties for each suspect, such as their rank in formula/compound candidates, which fragments from the suspect list were matched, and a <em>rough</em> indication of the identification level according to <span class="citation">Schymanski et al. (<a href="#ref-Schymanski2014" role="doc-biblioref">2014</a>)</span></p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="annotation.html#cb39-1" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">annotateSuspects</span>(fGroupsSusp, <span class="at">MSPeakLists =</span> mslists,</span>
 <span id="cb39-2"><a href="annotation.html#cb39-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <pre><code>#&gt; Annotating 5 suspects...

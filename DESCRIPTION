@@ -156,6 +156,7 @@ Collate:
     'components-features.R'
     'components-cliquems.R'
     'components-clust.R'
+    'components-compcreate.R'
     'components-intclust.R'
     'components-set.R'
     'components-nontarget.R'

@@ -1,5 +1,7 @@
 # Priority
 
+- Fix: update annotations slot of fGroups in delete()
+
 # Lower priority
 
 

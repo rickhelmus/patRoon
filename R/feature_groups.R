@@ -1157,6 +1157,8 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, g
                 iar <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$area)
                 return(ar / (iar / iconc))
             })]
+            # HACK: don't want NA values for ISTDs
+            ft[is.na(intensity_rel), c("intensity_rel", "area_rel") := 0]
             return(ft)
         })
     }

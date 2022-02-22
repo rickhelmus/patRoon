@@ -160,30 +160,42 @@ setMethod("show", "featureGroups", function(object)
 #' @describeIn featureGroups Accessor for \code{groups} slot.
 #' @aliases groupTable
 #' @export
-setMethod("groupTable", "featureGroups", function(object, areas = FALSE)
+setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normalized = FALSE)
 {
     checkmate::assertFlag(areas)
+    checkmate::assertFlag(normalized)
 
-    if (areas)
+    if (length(fGroups) == 0 || (!areas && !normalized))
+        return(object@groups)
+
+    anaInfo <- analysisInfo(object)
+    ret <- copy(object@groups)
+    ftindex <- object@ftindex
+    fTable <- featureTable(object)
+    
+    if (is.null(fTable[[1]][["intensity_rel"]]))
+        stop("There is no normalized data, did you run normalizeIntensities()?")
+    
+    colName <- if (areas && normalized)
+        "area_rel"
+    else if (areas)
+        "area"
+    else # if ("normalized")
+        "intensity_rel"
+    
+    for (cl in seq_along(ret))
     {
-        anaInfo <- analysisInfo(object)
-        ret <- copy(object@groups)
-        ftindex <- object@ftindex
-        fTable <- featureTable(object)
-        for (cl in seq_along(ret))
+        ftinds <- ftindex[[cl]]
+        anainds <- seq_len(nrow(ret))[ftinds != 0]
+        ftinds <- ftinds[ftinds != 0]
+        as <- mapply(anainds, ftinds, SIMPLIFY = TRUE, FUN = function(a, i)
         {
-            ftinds <- ftindex[[cl]]
-            anainds <- seq_len(nrow(ret))[ftinds != 0]
-            ftinds <- ftinds[ftinds != 0]
-            as <- mapply(anainds, ftinds, SIMPLIFY = TRUE, FUN = function(a, i)
-            {
-                fTable[[anaInfo$analysis[a]]][["area"]][i]
-            })
-            set(ret, anainds, cl, as)
-        }
-        return(ret)
+            fTable[[anaInfo$analysis[a]]][[colName]][i]
+        })
+        set(ret, anainds, cl, as)
     }
-    return(object@groups)
+    
+    return(ret)
 })
 
 #' @describeIn featureGroups Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
@@ -467,9 +479,9 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
-setMethod("averageGroups", "featureGroups", function(fGroups, areas, func)
+setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized, func)
 {
-    gTable <- copy(groupTable(fGroups, areas))
+    gTable <- copy(groupTable(fGroups, areas, normalized))
     if (nrow(gTable) == 0)
         return()
 

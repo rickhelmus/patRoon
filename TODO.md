@@ -36,7 +36,6 @@
     - rename normalizeIntensities()?
     - Add info to show()
     - Mark ISTDs similar as suspects in reports
-    - filter/subsetting to easily select/remove ISTDs
     - maybe: allow usage of normalized intensities with filter()?
     - plotInt / generateComponentsIntClust: auto normalize if not yet done?
         - Mostly to keep old behaviour

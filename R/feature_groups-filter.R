@@ -418,7 +418,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
 #'
 #'   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
-#'   analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
+#'   analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).
 #'
 #'   }
 #'
@@ -437,7 +437,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, results = NULL, removeBlanks = FALSE,
+                                              rGroups = NULL, results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
                                               checkFeaturesSession = NULL, negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
@@ -461,7 +461,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                       checkmate::checkList(results, c("featureAnnotations", "components"), any.missing = FALSE,
                                            min.len = 1),
                       .var.name = "results")
-    aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ removeBlanks + removeISTDs + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -509,6 +509,15 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
 
+    if (removeISTDs)
+    {
+        if (nrow(internalStandards(obj)) == 0)
+            stop("Cannot remove internal standards: there are no internal standards assigned. ",
+                 "Did you run normalizeIntensities()?")
+        igrps <- internalStandards(obj)$group
+        obj <- delete(obj, j = if (negate) setdiff(names(obj), igrps) else igrps)
+    }
+    
     return(obj)
 })
 

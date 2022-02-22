@@ -163,21 +163,21 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
 #' 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotInt", "featureGroups", function(obj, average = FALSE, normFunc = NULL, xnames = TRUE, showLegend = FALSE,
-                                               pch = 20, type = "b", lty = 3, col = NULL, ...)
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, normalized = FALSE, xnames = TRUE,
+                                               showLegend = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
 {
-    aapply(checkmate::assertFlag, . ~ average + xnames + showLegend)
-    doPlotFeatInts(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
+    aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend)
+    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
 })
 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normFunc = NULL, xnames = !sets,
+setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normalized = FALSE, xnames = !sets,
                                                   showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL, ...,
                                                   sets = FALSE)
 {
-    aapply(checkmate::assertFlag, . ~ average + xnames + showLegend + sets)
-    doPlotFeatInts(obj, average, normFunc, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
+    aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend + sets)
+    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

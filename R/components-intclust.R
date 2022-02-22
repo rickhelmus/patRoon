@@ -131,15 +131,15 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #' @template main-rd-method
 #' @export
 setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",
-                                                                  normFunc = max, average = TRUE,
+                                                                  normalized = TRUE, average = TRUE,
                                                                   maxTreeHeight = 1, deepSplit = TRUE,
                                                                   minModuleSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertFunction(normFunc, add = ac)
     checkmate::assertString(metric, add = ac)
     checkmate::assertString(method, add = ac)
+    checkmate::assertFlag(normalized, add = ac)
     checkmate::assertFlag(average, add = ac)
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
@@ -157,7 +157,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
         stop(paste("Need at least >= 2", if (average) "replicate groups" else "analyses"))
 
     cat("Obtaining feature quantities... ")
-    gTable <- as.data.table(fGroups, average = average, normFunc = normFunc)
+    gTable <- as.data.table(fGroups, average = average, normalized = normalized)
     clusterm <- as.matrix(gTable[, anas, with = FALSE])
     rownames(clusterm) <- names(fGroups)
     cat("Done!\n")

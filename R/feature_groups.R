@@ -573,17 +573,13 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                     normFunc = NULL, FCParams = NULL)
+                                                     normalized = FALSE, FCParams = NULL)
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(average, add = ac)
-    checkmate::assertFlag(areas, add = ac)
-    checkmate::assertFlag(features, add = ac)
-    checkmate::assertFlag(regression, add = ac)
+    aapply(checkmate::assertFlag, . ~ average + areas + features + regression + normalized, fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
-    checkmate::assertFunction(normFunc, null.ok = TRUE, add = ac)
     assertFCParams(FCParams, x, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -596,8 +592,6 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
     if (features && average && regression)
         stop("Cannot add regression data for averaged features.")
-    if (features && average && !is.null(normFunc))
-        stop("Cannot normalize data for averaged features.")
     if (features && !is.null(FCParams))
         stop("Cannot calculate fold-changes with features=TRUE")
     
@@ -648,13 +642,6 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         }
         else
         {
-            if (!is.null(normFunc))
-            {
-                ret[, c("area", "intensity") := .(if (all(area == 0)) area else area / normFunc(area),
-                                                  if (all(intensity == 0)) intensity else intensity / normFunc(intensity)),
-                    by = "group"]
-            }
-            
             doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
@@ -678,25 +665,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     }
     else
     {
-        gTableAvg <- averageGroups(x, areas, func = averageFunc)
-        gTableNonAvg <- groupTable(x, areas)
+        gTableAvg <- averageGroups(x, areas, normalized, func = averageFunc)
+        gTableNonAvg <- groupTable(x, areas, normalized)
 
-        if (!is.null(normFunc))
-        {
-            doNorm <- function(gt)
-            {
-                normv <- gt[, lapply(.SD, normFunc)]
-                gt <- copy(gt)
-                for (g in seq_along(gt))
-                {
-                    if (!all(gt[[g]] == 0))
-                        set(gt, j = g, value = gt[[g]] / normv[[g]])
-                }
-                return(gt)
-            }
-            gTableAvg <- doNorm(gTableAvg); gTableNonAvg <- doNorm(gTableNonAvg)
-        }
-        
         if (average)
         {
             gTable <- gTableAvg

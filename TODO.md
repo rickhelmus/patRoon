@@ -35,13 +35,25 @@
 - Normalization
     - rename normalizeIntensities()?
     - as.data.table
-        - flag to use normalized values instead of normal values (also for area=T and regression)
-        - remove group normalization
         - (optionally) add in used ISTDs for each fGroup
     - Add info to show()
     - Mark ISTDs similar as suspects in reports
     - filter/subsetting to easily select/remove ISTDs
     - maybe: allow usage of normalized intensities with filter()?
+    - normalize per set
+    - plotInt / generateComponentsIntClust: auto normalize if not yet done?
+        - Mostly to keep old behaviour
+        - or in as.data.table()? e.g. if normalized==TRUE
+        - If not, update TPs.Rmd for reporting
+
+
+## Docs
+
+- Features
+    - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
+        - also handbook (at least for generateComponentsIntClust)
+    - update groupTable for normalized arg
+    
 
 
 # Lower priority

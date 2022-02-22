@@ -1088,6 +1088,8 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards,
                                                             ISTDRTWindow, ISTDMZWindow, minISTDs, ...)
 {
+    # NOTE: keep args in sync with sets method
+    
     # UNDONE: default for minISTDs OK? (or no default for minISTDs and ISTDRTWindow?)
     # UNDONE: ISTD: doc that sorting occurs on both RT and m/z deviation
     # UNDONE: add adduct argument here, to make it more clear that it needs to be specified if featNorm=="istd"?

@@ -38,11 +38,11 @@
     - Mark ISTDs similar as suspects in reports
     - filter/subsetting to easily select/remove ISTDs
     - maybe: allow usage of normalized intensities with filter()?
-    - normalize per set
     - plotInt / generateComponentsIntClust: auto normalize if not yet done?
         - Mostly to keep old behaviour
         - or in as.data.table()? e.g. if normalized==TRUE
         - If not, update TPs.Rmd for reporting
+    - split IS assignment in different function anyway?
 
 
 ## Docs

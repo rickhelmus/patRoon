@@ -112,15 +112,20 @@ setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = T
 #' @export
 setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
 {
-    # HACK: subset annotations here as format with sets is different
+    # HACK: subset annotations/ISTD assignments here as format with sets is different
     ann <- annotations(obj)
     if (nrow(ann) > 0)
         obj@annotations <- data.table() # disable subsetting in parent method
+    ISTDAssign <- obj@ISTDAssignments
+    if (length(ISTDAssign) > 0)
+        obj@ISTDAssignments <- list()
     
     obj <- callNextMethod(obj, i, j, ...)
     
     if (nrow(ann) > 0)
         obj@annotations <- ann[set %in% sets(obj) & group %in% names(obj)]
+    if (length(ISTDAssign) > 0)
+        obj@ISTDAssignments <- lapply(ISTDAssign, function(ia) ia[names(ia) %in% names(obj)])
     
     return(obj)
 })
@@ -163,10 +168,13 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     
     anaInfo <- analysisInfo(x)
     
-    # HACK: add annotations later as format with sets is different
+    # HACK: add annotations and ISTD assignments later as format with sets is different
     ann <- x@annotations
     if (nrow(ann) > 0)
         x@annotations <- data.table()
+    ISTDAssign <- x@ISTDAssignments
+    if (length(x@ISTDAssignments) > 0)
+        x@ISTDAssignments <- list()
     
     ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
                           regression = regression, averageFunc = averageFunc, normalized = normalized,
@@ -181,7 +189,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     if (nrow(ann) > 0)
     {
         if (features && !average)
-            ret <- merge(ret, ann, by = c("group", "set"))
+            ret <- merge(ret, ann, by = c("group", "set"), sort = FALSE)
         else
         {
             # collapse annotation info for each group
@@ -190,6 +198,15 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
             ann <- unique(ann, by = "group")[, -"set"]
             ret <- merge(ret, ann, by = "group", sort = FALSE)
         }
+    }
+    
+    if (length(ISTDAssign) > 0 && nrow(ret) > 0)
+    {
+        colISTDs <- function(ia) paste0(ia, collapse = ",")
+        if (!is.null(ret[["set"]]))
+            ret[, ISTD_assigned := sapply(ISTDAssign[[set[1]]][group], colISTDs), by = "set"]
+        else
+            ret[, ISTD_assigned := sapply(group, function(gn) colISTDs(unique(unlist(lapply(ISTDAssign, "[[", gn)))))]
     }
     
     return(ret[])
@@ -266,6 +283,47 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
     # and re-group with new adduct information
     return(do.call(makeSet, c(unname(usFGroups), list(groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
+})
+
+setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
+    checkmate::assertFlag(groupNorm, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (featNorm != "istd" && !groupNorm)
+        return(callNextMethod(fGroups, featNorm, groupNorm, normFunc, standards, ...)) # no need to do per set
+
+    usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    
+    if (featNorm == "istd")
+    {
+        # NOTE: skipInvalid is set to FALSE. We don't have readily access to it (it's in ...), but if the user set it to
+        # TRUE, it will be picked up later by screenSuspects() in the non sets method anyway.
+        standards <- assertAndPrepareSuspectsSets(standards, sets(fGroups), skipInvalid = FALSE)
+    
+        usFGroups <- Map(usFGroups, standards = standards, f = normalizeIntensities,
+                         MoreArgs = c(list(featNorm = featNorm, groupNorm = groupNorm, normFunc = normFunc), list(...)))
+        
+        # merge ISTD slots
+        fGroups@ISTDs <- mergeScreeningSetInfos(usFGroups, lapply(usFGroups, internalStandards))
+        fGroups@ISTDAssignments <- lapply(usFGroups, slot, "ISTDAssignments")
+    }
+    else
+        usFGroups <- lapply(usFGroups, normalizeIntensities, featNorm = featNorm, groupNorm = groupNorm,
+                            normFunc = normFunc, ...)
+    
+    
+    allNormFeats <- Reduce(modifyList, lapply(usFGroups, featureTable))
+    fGroups@features@features <- Map(featureTable(fGroups), allNormFeats[analyses(fGroups)], f = function(ft, ftN)
+    {
+        ft <- copy(ft)
+        ft[match(ftN$group, group), c("intensity_rel", "area_rel") := .(ftN$intensity_rel, ftN$area_rel)]
+        return(ft)
+    })
+    
+    return(fGroups)
 })
 
 #' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
@@ -419,6 +477,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
-                              annotations = ann, ISTDs = copy(internalStandards(fGroups)),
-                              ISTDAssignments = fGroups@ISTDAssignments, algorithm = paste0(algorithm(obj), "_unset")))
+                              annotations = ann, ISTDs = copy(internalStandards(obj)),
+                              ISTDAssignments = obj@ISTDAssignments, algorithm = paste0(algorithm(obj), "_unset")))
 })

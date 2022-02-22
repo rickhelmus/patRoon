@@ -90,7 +90,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
         # add set presence
         scrInfo[, sets := mapply(name, group, FUN = function(n, g) {
             ret <- names(setObjects)
-            return(paste0(ret[sapply(setObjects, function(so) screenInfo(so)[name == n & group == g, .N] > 0)],
+            return(paste0(ret[sapply(sInfos, function(si) si[name == n & group == g, .N] > 0)],
                           collapse = ","))
         })]
     }
@@ -370,42 +370,8 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 {
     verifyNoAdductIonizationArg(adduct)
     
-    if (checkmate::testDataFrame(suspects))
-    {
-        assertSuspectList(suspects, FALSE, skipInvalid)
-        if (length(sets(fGroups)) > 1)
-        {
-            cols <- c("mz", "adduct", "fragments_mz")
-            for (cl in cols)
-            {
-                if (!is.null(suspects[[cl]]) && !all(is.na(suspects[[cl]])))
-                {
-                    warning("The suspect list seems to contain an mz, adduct or fragments_mz column, ",
-                            "which are generally specific to the ionization mode used. ",
-                            "These columns most likely need to removed since the same suspect list will be used for all sets.",
-                            call. = FALSE)
-                    break
-                }
-            }
-        }
-        suspects <- sapply(sets(fGroups), function(s) suspects, simplify = FALSE) # same for all sets
-    }
-    else
-    {
-        checkmate::assertList(suspects, "data.frame", any.missing = FALSE, all.missing = FALSE,
-                              len = length(sets(fGroups)))
-        checkmate::assert(
-            checkmate::checkNames(names(suspects), "unnamed"),
-            checkmate::checkNames(names(suspects), "unique", must.include = sets(fGroups)),
-            .var.name = "suspects"
-        )
-        if (checkmate::testNames(names(suspects), "unnamed"))
-            names(suspects) <- sets(fGroups)
-    }
-    
-    # sync order
-    suspects <- suspects[sets(fGroups)]
-    
+    suspects <- assertAndPrepareSuspectsSets(suspects, sets(fGroups), skipInvalid)
+
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,

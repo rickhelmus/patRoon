@@ -199,6 +199,47 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
     invisible(NULL)
 }
 
+assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = checkmate::vname(x))
+{
+    if (checkmate::testDataFrame(x))
+    {
+        assertSuspectList(x, FALSE, skipInvalid, .var.name = .var.name)
+        if (length(sets(fGroups)) > 1)
+        {
+            cols <- c("mz", "adduct", "fragments_mz")
+            for (cl in cols)
+            {
+                if (!is.null(x[[cl]]) && !all(is.na(x[[cl]])))
+                {
+                    warning("The suspect list seems to contain an mz, adduct or fragments_mz column, ",
+                            "which are generally specific to the ionization mode used. ",
+                            "These columns most likely need to removed since the same suspect list will be used for all sets.",
+                            call. = FALSE)
+                    break
+                }
+            }
+        }
+        x <- sapply(sets, function(s) x, simplify = FALSE) # same for all sets
+    }
+    else
+    {
+        checkmate::assertList(x, "data.frame", any.missing = FALSE, all.missing = FALSE,
+                              len = length(sets))
+        checkmate::assert(
+            checkmate::checkNames(names(x), "unnamed"),
+            checkmate::checkNames(names(x), "unique", must.include = sets),
+            .var.name = .var.name
+        )
+        if (checkmate::testNames(names(x), "unnamed"))
+            names(x) <- sets
+    }
+    
+    # sync order
+    x <- x[sets]
+    
+    return(x)
+}
+
 assertLogicTransformations <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))

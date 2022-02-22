@@ -16,6 +16,7 @@
 - More checks to verify if input mzML/mzXML data actually exists
 - Improved reference documentation for `analysis-information` (issue #33)
 - Handbook: detailed overview of all workflow functions and classes (issue #41, special thanks to @@hechth)
+- Fixed: annotations slot for `featureGroups` was not updated when removing groups with `delete()` (except sets workflows)
 
 
 # patRoon 2.0

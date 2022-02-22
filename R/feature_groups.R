@@ -419,6 +419,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             obj@groupQualities <- obj@groupQualities[group %in% names(obj@groups)]
             obj@groupScores <- obj@groupScores[group %in% names(obj@groups)]
         }
+        if (nrow(obj@annotations) > 0)
+            obj@annotations <- obj@annotations[group %in% names(obj@groups)]
     }
     
     if (!isAnaSubSet)

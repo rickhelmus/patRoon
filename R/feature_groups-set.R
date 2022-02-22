@@ -125,7 +125,14 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
     if (nrow(ann) > 0)
         obj@annotations <- ann[set %in% sets(obj) & group %in% names(obj)]
     if (length(ISTDAssign) > 0)
-        obj@ISTDAssignments <- lapply(ISTDAssign, function(ia) ia[names(ia) %in% names(obj)])
+    {
+        obj@ISTDAssignments <- pruneList(lapply(ISTDAssign, function(ia)
+        {
+            ia <- ia[names(ia) %chin% names(obj)]
+            ia <- pruneList(lapply(ia, function(x) intersect(x, names(obj))), checkEmptyElements = TRUE)
+            return(ia)
+        }), checkEmptyElements = TRUE)
+    }
     
     return(obj)
 })

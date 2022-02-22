@@ -34,8 +34,6 @@
 
 - Normalization
     - rename normalizeIntensities()?
-    - as.data.table
-        - (optionally) add in used ISTDs for each fGroup
     - Add info to show()
     - Mark ISTDs similar as suspects in reports
     - filter/subsetting to easily select/remove ISTDs

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-09" />
+<meta name="date" content="2022-02-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -364,7 +364,7 @@ div.csl-indent {
 <tr class="odd">
 <td>Metabolic logic</td>
 <td><code>generateTPs(algorithm = "logic", ...)</code></td>
-<td>Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on <span class="citation"><a href="#ref-Scholle2015" role="doc-biblioref">Schollee et al.</a> (<a href="#ref-Scholle2015" role="doc-biblioref">2015</a>)</span>.</td>
+<td>Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on <span class="citation">Schollee et al. (<a href="#ref-Scholle2015" role="doc-biblioref">2015</a>)</span>.</td>
 </tr>
 </tbody>
 </table>
@@ -570,7 +570,7 @@ div.csl-indent {
 </div>
 <div id="TPsCustom" class="section level3" number="7.1.3">
 <h3><span class="header-section-number">7.1.3</span> Custom libraries and transformations</h3>
-<p>By default the <code>library</code> and <code>logic</code> algorithms use data that is installed with <code>patRoon</code> (based on <a href="https://doi.org/10.5281/zenodo.5644560">PubChem transformations</a> and <span class="citation"><a href="#ref-Scholle2015" role="doc-biblioref">Schollee et al.</a> (<a href="#ref-Scholle2015" role="doc-biblioref">2015</a>)</span>, respectively). However, it is also possible to use custom data.</p>
+<p>By default the <code>library</code> and <code>logic</code> algorithms use data that is installed with <code>patRoon</code> (based on <a href="https://doi.org/10.5281/zenodo.5644560">PubChem transformations</a> and <span class="citation">Schollee et al. (<a href="#ref-Scholle2015" role="doc-biblioref">2015</a>)</span>, respectively). However, it is also possible to use custom data.</p>
 <p>To use a custom TP library a simple <code>data.frame</code> is needed with the names, SMILES and optionally <code>log P</code> values for the parents and TPs. The <code>log P</code> values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:</p>
 <div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="genTPs.html#cb168-1" aria-hidden="true" tabindex="-1"></a>myTPLib <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">parent_name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;1H-Benzotriazole&quot;</span>, <span class="st">&quot;DEET&quot;</span>),</span>
 <span id="cb168-2"><a href="genTPs.html#cb168-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">parent_SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>, <span class="st">&quot;CCN(CC)C(=O)C1=CC=CC(=C1)C&quot;</span>),</span>

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-09" />
+<meta name="date" content="2022-02-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -342,7 +342,7 @@ div.csl-indent {
 <p>Both functions allow you to easily explore the data in an interactive way. Furthermore, these functions allow you to remove unwanted data. This is useful to remove for example features that are actually noise and feature groups that shouldn’t be in the same component. To remove an unwanted feature, feature group or components, simply uncheck its ‘keep’ checkbox. The next step is to save the selections you made. A <em>check session</em> is a file that stores which data should be removed. Once the session file is saved the <code>filter</code> function can be used to actually remove the data:</p>
 <div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="intReview.html#cb141-1" aria-hidden="true" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">checkFeaturesSession =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb141-2"><a href="intReview.html#cb141-2" aria-hidden="true" tabindex="-1"></a>componCAMF <span class="ot">&lt;-</span> <span class="fu">filter</span>(componCAM, <span class="at">checkComponentsSession =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p>If you saved the session and you re-launch the GUI it will restore the selections made earlier. The <code>clearSession</code> argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their ‘keep state.’</p>
+<p>If you saved the session and you re-launch the GUI it will restore the selections made earlier. The <code>clearSession</code> argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their ‘keep state’.</p>
 <div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="intReview.html#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="at">clearSession =</span> <span class="cn">TRUE</span>) <span class="co"># start GUI with fresh session</span></span></code></pre></div>
 <p>It is also possible to use multiple different sessions. This is especially useful if you do not want to overwrite previous session data or want to inspect different objects. In this case the session file name should be specified:</p>
 <div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="intReview.html#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="st">&quot;mysession.yml&quot;</span>)</span>

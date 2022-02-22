@@ -440,7 +440,6 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         {
             obj@ISTDs <- obj@ISTDs[group %in% names(obj@groups)]
             obj@ISTDAssignments <- obj@ISTDAssignments[names(obj@ISTDAssignments) %chin% names(obj@groups)]
-            obj@ISTDAssignments <- lapply(obj@ISTDAssignments, function(x) x[x %chin% names(obj@groups)])
         }
     }
     

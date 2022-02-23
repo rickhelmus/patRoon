@@ -198,6 +198,16 @@ if (!is.null(rmdVars$components))
     }, USE.NAMES = FALSE)]
 }
 
+ISTDs <- internalStandards(rmdVars$fGroups)[group %chin% allGroups]
+if (nrow(ISTDs) > 0)
+{
+    fGroupsSpecDT[, "Internal standard" := sapply(group, function(grp)
+    {
+        ISTDNames <- ISTDs[group == grp]$name
+        return(if (length(ISTDNames) == 0) "" else paste0(ISTDNames, collapse = ", "))
+    })]
+}
+
 dtOpts <- list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "200px",
                dom = "frtip",
                initComplete = DT::JS("function(settings, json)",

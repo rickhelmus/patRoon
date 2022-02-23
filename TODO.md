@@ -34,7 +34,6 @@
 
 - Normalization
     - rename normalizeIntensities()?
-    - Mark ISTDs similar as suspects in reports
     - maybe: allow usage of normalized intensities with filter()?
     - split IS assignment in different function anyway?
 

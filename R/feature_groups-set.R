@@ -127,6 +127,12 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
     if (length(ISTDAssign) > 0)
         obj@ISTDAssignments <- lapply(ISTDAssign, function(ia) ia[names(ia) %chin% names(obj)])
     
+    if (nrow(internalStandards(obj)) > 0)
+    {
+        mySets <- sets(obj)
+        obj@ISTDs <- obj@ISTDs[sapply(sets, function(s) any(mySets %chin% unlist(strsplit(s, ",", fixed = TRUE))))]
+    }
+    
     return(obj)
 })
 
@@ -481,11 +487,15 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
         gInfo$mzs <- calculateMasses(gInfo$mzs, adducts[ann$adduct], type = "mz")
         ann <- ann[, -"set"]
     }
+    ISTDs <- copy(internalStandards(obj))
+    if (nrow(ISTDs) > 0)
+        ISTDs <- ISTDs[, -"sets"]
+    
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
-                              annotations = ann, ISTDs = copy(internalStandards(obj)),
-                              ISTDAssignments = obj@ISTDAssignments[[set]], algorithm = paste0(algorithm(obj), "_unset")))
+                              annotations = ann, ISTDs = ISTDs, ISTDAssignments = obj@ISTDAssignments[[set]],
+                              algorithm = paste0(algorithm(obj), "_unset")))
 })

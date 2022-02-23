@@ -43,6 +43,9 @@ if (hasFGroupScores(rmdVars$fGroups))
 if (isScreening(rmdVars$fGroups))
     bts <- c(bts, list(list(text = "Suspect name", action = buttonFunc("susp_name"))))
 
+if (!is.null(table[["ISTD_assigned"]]))
+    table[, ISTD_assigned := sapply(ISTD_assigned, function(s) wrapStr(gsub(",", ", ", s, fixed = TRUE), 50))]
+
 tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                 paging = FALSE, autoWidth = FALSE,
                 initComplete = initDT, order = list(list(0, "asc")),

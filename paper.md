@@ -63,9 +63,9 @@ and identifying expected (dis)similarities in MS data (shown in \autoref{tab:TPA
 However, these approaches are typically designed for a single study or available only as a stand-alone and/or commercial
 tool. Furthermore, few TP prediction tools support specific pathways observed in the environment (e.g. microbial
 degradation), are open-source and can be readily integrated in workflows for automated batch predictions. `patRoon 2.0`
-implements complementary TP screening approaches with select algorithms from \autoref{tab:TPApproaches} and other novel
-functionality to provide comprehensive TP screening workflows. Moreover, the modular design of `patRoon` enables
-integration of more approaches and algorithms in the future.
+implements complementary TP screening approaches with select algorithms from \autoref{tab:TPApproaches} and includes
+other novel functionality to provide comprehensive TP screening workflows. The modular design of `patRoon`
+enables integration of more approaches and algorithms in the future.
 
 
 Approach           | Principle                        | Requirements                              | Examples
@@ -76,7 +76,7 @@ Metabolic logic    | Screen molecular mass differences from known transformation
 Mass spectral      | Cluster similar MS data          | Correlation structural/spectral similarity. Fragmentation spectra for parents/TP candidates | **@Scholle2017**, `MetFamily` [@Treutler2016], `MetCirc` [@Naake2017], `CluMSID` [@Depke2017]
 Classification     | Parent/TP classification         | In-house statistical/computational expertise | **@Scholle2015**, **@Brunner2019**, @Scholle2021
 
-Table: Overview of TP screening approaches relevant to environmental screening. **bolded**: implemented/interfaced in `patRoon`. \label{tab:TPApproaches}
+Table: Overview of TP screening approaches relevant to environmental screening. **Bold**: implemented/interfaced in `patRoon`. \label{tab:TPApproaches}
 
 Since wide chemical coverage is desired with NTA and since TPs can ionize differently to their parent, HRMS analyses
 are often performed using positive and negative ionization mode. `patRoon 2.0` is now capable of simultaneously

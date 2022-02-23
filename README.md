@@ -134,7 +134,7 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [pngquant]: https://pngquant.org/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
 [handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
-[handbook-inst]: https://rickhelmus.github.io/patRoon/articles/handbook.html#installation
+[handbook-inst]: https://rickhelmus.github.io/patRoon/handbook_bd/installation.html
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
 [RStudio]: https://www.rstudio.com/
 [processx]: https://github.com/r-lib/processx

@@ -1198,14 +1198,9 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, g
     {
         gNames <- names(fGroups)
         
-        normInts <- sapply(gNames, function(gn)
-        {
-            normFunc(sapply(featureTable(fGroups), function(ft) ft[group == gn]$intensity_rel))
-        })
-        normAreas <- sapply(gNames, function(gn)
-        {
-            normFunc(sapply(featureTable(fGroups), function(ft) ft[group == gn]$area_rel))
-        })
+        featsPerGroup <- split(rbindlist(featureTable(fGroups)), by = "group")
+        normInts <- sapply(lapply(featsPerGroup, "[[", "intensity_rel"), normFunc)
+        normAreas <- sapply(lapply(featsPerGroup, "[[", "area_rel"), normFunc)
         
         fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
         {

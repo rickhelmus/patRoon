@@ -292,8 +292,8 @@ setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm
     checkmate::assertFlag(groupNorm, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (featNorm != "istd" && !groupNorm)
-        return(callNextMethod(fGroups, featNorm, groupNorm, normFunc, standards, ...)) # no need to do per set
+    if (length(fGroups) == 0 || (featNorm != "istd" && !groupNorm))
+        return(callNextMethod(fGroups, featNorm, groupNorm, normFunc, standards = NULL, ...)) # no need to do per set
 
     usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     
@@ -319,7 +319,10 @@ setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm
     fGroups@features@features <- Map(featureTable(fGroups), allNormFeats[analyses(fGroups)], f = function(ft, ftN)
     {
         ft <- copy(ft)
-        ft[match(ftN$group, group), c("intensity_rel", "area_rel") := .(ftN$intensity_rel, ftN$area_rel)]
+        if (nrow(ft) == 0)
+            ft[, c("intensity_rel", "area_rel") := numeric()]
+        else
+            ft[match(ftN$group, group), c("intensity_rel", "area_rel") := .(ftN$intensity_rel, ftN$area_rel)]
         return(ft)
     })
     

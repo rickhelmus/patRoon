@@ -36,6 +36,8 @@
     - rename normalizeIntensities()?
     - maybe: allow usage of normalized intensities with filter()?
     - split IS assignment in different function anyway?
+    - as.data.table(): split ISTD_assignment column per set
+    - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
 
 
 ## Docs

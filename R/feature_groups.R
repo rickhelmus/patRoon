@@ -154,6 +154,16 @@ setMethod("show", "featureGroups", function(object)
     fCount <- length(getFeatures(object)); gCount <- length(object)
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), gCount)
     printf("Features: %d (%.1f per group)\n", fCount, if (gCount > 0) fCount / gCount)
+    if (length(object) > 0)
+    {
+        printf("Has normalized intensities: %s\n", as.character(!is.null(featureTable(object)[[1]][["intensity_rel"]])))
+        printf("Internal standards used for normalization: ")
+        if (nrow(internalStandards(object)) == 0)
+            printf("no\n")
+        else
+            printf("%s (%d assigned total)\n", getStrListWithMax(unique(internalStandards(object)$name), 6, ", "),
+                   nrow(internalStandards(object)))
+    }
     showAnaInfo(analysisInfo(object))
 })
 

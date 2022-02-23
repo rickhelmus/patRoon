@@ -344,9 +344,12 @@ setMethod("spectrumSimilarity", "MSPeakListsSet", function(obj, groupName1, grou
         }
         
         if (length(gn1) == 0 || (!is.null(groupName2) && length(gn2) == 0))
-            return(NULL)
-        # NOTE: don't drop NAs/dimensions here yet
-        ret <- spectrumSimilarity(so, gn1, gn2, ana1, ana2, MSLevel, specSimParams, NAToZero = FALSE, drop = FALSE)
+            ret <- as.matrix(numeric()) # will be expanded below
+        else
+        {
+            # NOTE: don't drop NAs/dimensions here yet
+            ret <- spectrumSimilarity(so, gn1, gn2, ana1, ana2, MSLevel, specSimParams, NAToZero = FALSE, drop = FALSE)
+        }
         return(expandFillSpecSimilarities(ret, groupName1, if (is.null(groupName2)) groupName1 else groupName2))
     }))
 

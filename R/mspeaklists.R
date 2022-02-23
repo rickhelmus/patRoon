@@ -678,7 +678,7 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
         if (is.null(PLP1) || is.null(PLP2))
         {
             sims <- matrix(NA_real_, length(groupName1), length(groupName2))
-            rownames(sims) <- names(groupName1); colnames(sims) <- names(groupName2)
+            rownames(sims) <- groupName1; colnames(sims) <- groupName2
         }
         else
         {

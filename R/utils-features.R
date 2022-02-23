@@ -117,3 +117,11 @@ updateAnnAdducts <- function(annTable, gInfo, adducts)
 }
 
 unSetAnaInfo <- function(anaInfo) anaInfo[, setdiff(names(anaInfo), "set")]
+
+maybeAutoNormalizeFGroups <- function(fGroups)
+{
+    if (length(fGroups) == 0 || !is.null(featureTable(fGroups)[[1]][["intensity_rel"]]))
+        return(fGroups) # no features or already normalized
+    printf("Automatically normalizing feature groups, see ?normalizeIntensities() for more options.\n")
+    return(normalizeIntensities(fGroups, featNorm = "none", groupNorm = TRUE))
+}

@@ -37,10 +37,6 @@
     - Add info to show()
     - Mark ISTDs similar as suspects in reports
     - maybe: allow usage of normalized intensities with filter()?
-    - plotInt / generateComponentsIntClust: auto normalize if not yet done?
-        - Mostly to keep old behaviour
-        - or in as.data.table()? e.g. if normalized==TRUE
-        - If not, update TPs.Rmd for reporting
     - split IS assignment in different function anyway?
 
 
@@ -50,6 +46,10 @@
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)
     - update groupTable for normalized arg
+
+## NEWS
+
+- Added slots to fGroups --> cache should be cleared
     
 
 

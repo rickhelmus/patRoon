@@ -169,6 +169,12 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     anaInfo <- analysisInfo(x)
     
     # HACK: add annotations and ISTD assignments later as format with sets is different
+    
+    # HACK HACK HACK: since we clear out annotations, which are needed in unset() called by normalizeIntensities(), do
+    # this separately here...
+    if (!features && normalized)
+        x <- maybeAutoNormalizeFGroups(x)
+    
     ann <- x@annotations
     if (nrow(ann) > 0)
         x@annotations <- data.table()

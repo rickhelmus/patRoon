@@ -3,7 +3,7 @@
 Transformation Products {data-orientation=rows}
 ===
 
-```{r TPPlots, fig.keep='none'}
+```{r TPPlots, fig.keep='none', include=FALSE}
 
 # sync objects
 components <- rmdVars$components[, intersect(names(rmdVars$fGroups), groupNames(rmdVars$components))]
@@ -33,7 +33,7 @@ if (length(components) > 0)
         })
     }
     
-    plotIntMainArgs <- list(average = TRUE, normFunc = max)
+    plotIntMainArgs <- list(average = TRUE, normalize = TRUE)
     if (isFGSet(rmdVars$fGroups))
     {
         plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))

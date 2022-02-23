@@ -664,6 +664,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     }
     else
     {
+        if (normalized)
+            x <- maybeAutoNormalizeFGroups(x)
+        
         gTableAvg <- averageGroups(x, areas, normalized, func = averageFunc)
         gTableNonAvg <- groupTable(x, areas, normalized)
 

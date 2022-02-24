@@ -572,7 +572,8 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
                                   features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
                                   groupQualities = copy(groupQualities(fGroups)),
                                   groupScores = copy(groupScores(fGroups)), ISTDs = copy(internalStandards(fGroups)),
-                                  ISTDAssignments = fGroups@ISTDAssignments, annotations = copy(annotations(fGroups)))
+                                  ISTDAssignments = internalStandardAssignments(fGroups),
+                                  annotations = copy(annotations(fGroups)))
     
     saveCacheData("screenSuspects", ret, hash)
     

@@ -56,6 +56,16 @@ setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
 #' @rdname featureGroups-class
 #' @export
+setMethod("internalStandardAssignments", "featureGroupsSet", function(fGroups, set = NULL)
+{
+    if (is.null(set))
+        return(fGroups@ISTDAssignments)
+    assertSets(fGroups, set, FALSE)
+    return(fGroups@ISTDAssignments[[set]])
+})
+
+#' @rdname featureGroups-class
+#' @export
 setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 {
     assertSets(obj, set, FALSE)
@@ -116,7 +126,7 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
     ann <- annotations(obj)
     if (nrow(ann) > 0)
         obj@annotations <- data.table() # disable subsetting in parent method
-    ISTDAssign <- obj@ISTDAssignments
+    ISTDAssign <- internalStandardAssignments(obj)
     if (length(ISTDAssign) > 0)
         obj@ISTDAssignments <- list()
     
@@ -184,8 +194,8 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     ann <- x@annotations
     if (nrow(ann) > 0)
         x@annotations <- data.table()
-    ISTDAssign <- x@ISTDAssignments
-    if (length(x@ISTDAssignments) > 0)
+    ISTDAssign <- internalStandardAssignments(x)
+    if (length(ISTDAssign) > 0)
         x@ISTDAssignments <- list()
     
     ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
@@ -494,7 +504,7 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     ISTDs <- copy(internalStandards(obj))
     if (nrow(ISTDs) > 0)
         ISTDs <- ISTDs[, -"sets"]
-    ISTDAssign <- if (length(obj@ISTDAssignments) > 0) obj@ISTDAssignments[[set]] else list()
+    ISTDAssign <- if (length(internalStandardAssignments(obj)) > 0) internalStandardAssignments(obj, set) else list()
     
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,

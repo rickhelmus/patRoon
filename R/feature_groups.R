@@ -255,6 +255,11 @@ setMethod("annotations", "featureGroups", function(obj) obj@annotations)
 #' @export
 setMethod("internalStandards", "featureGroups", function(fGroups) fGroups@ISTDs)
 
+#' @describeIn featureGroups Accessor for \code{ISTDAssignments} slot.
+#' @aliases internalStandardAssignments
+#' @export
+setMethod("internalStandardAssignments", "featureGroups", function(fGroups) fGroups@ISTDAssignments)
+
 #' @describeIn featureGroups Returns a named \code{character} with adduct annotations assigned to each feature group (if
 #'   available).
 #' @export
@@ -449,7 +454,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         if (nrow(obj@ISTDs) > 0)
         {
             obj@ISTDs <- obj@ISTDs[group %in% names(obj@groups)]
-            obj@ISTDAssignments <- obj@ISTDAssignments[names(obj@ISTDAssignments) %chin% names(obj@groups)]
+            obj@ISTDAssignments <- internalStandardAssignments(obj)[names(obj@ISTDAssignments) %chin% names(obj@groups)]
         }
     }
     
@@ -761,8 +766,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     if (nrow(ret) > 0 && nrow(annTable) > 0)
         ret <- merge(ret, annTable, sort = FALSE)
     
-    if (nrow(ret) > 0 && length(x@ISTDAssignments) > 0)
-        ret[, ISTD_assigned := sapply(x@ISTDAssignments[group], function(ia) paste0(ia, collapse = ","))]
+    if (nrow(ret) > 0 && length(internalStandardAssignments(x)) > 0)
+        ret[, ISTD_assigned := sapply(internalStandardAssignments(x)[group], function(ia) paste0(ia, collapse = ","))]
     
     return(ret[])
 })

@@ -1123,6 +1123,10 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, g
     if (!hasIConcs && featNorm %in% c("istd", "conc"))
         stop("No internal standard concentrations defined: no istd_conc column in analysis information", call. = FALSE)
     
+    # reset
+    fGroups@ISTDs <- data.table()
+    fGroups@ISTDAssignments <- list()
+    
     if (featNorm == "istd")
     {
         # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use

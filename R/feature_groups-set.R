@@ -297,16 +297,23 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
-setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards, ...)
+setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards,
+                                                               ISTDRTWindow, ISTDMZWindow, minISTDs, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
     checkmate::assertFlag(groupNorm, add = ac)
     checkmate::reportAssertions(ac)
     
+    baseArgs <- c(list(featNorm = featNorm, groupNorm = groupNorm, normFunc = normFunc, ISTDRTWindow = ISTDRTWindow,
+                       ISTDMZWindow = ISTDMZWindow, minISTDs = minISTDs), list(...))
     if (length(fGroups) == 0 || (featNorm != "istd" && !groupNorm))
-        return(callNextMethod(fGroups, featNorm, groupNorm, normFunc, standards = NULL, ...)) # no need to do per set
+        return(do.call(callNextMethod, c(list(fGroups, standards = NULL), baseArgs))) # no need to do per set
 
+    # reset
+    fGroups@ISTDs <- data.table()
+    fGroups@ISTDAssignments <- list()
+    
     usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     
     if (featNorm == "istd")
@@ -314,17 +321,14 @@ setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm
         # NOTE: skipInvalid is set to FALSE. We don't have readily access to it (it's in ...), but if the user set it to
         # TRUE, it will be picked up later by screenSuspects() in the non sets method anyway.
         standards <- assertAndPrepareSuspectsSets(standards, sets(fGroups), skipInvalid = FALSE)
-    
-        usFGroups <- Map(usFGroups, standards = standards, f = normalizeIntensities,
-                         MoreArgs = c(list(featNorm = featNorm, groupNorm = groupNorm, normFunc = normFunc), list(...)))
+        usFGroups <- Map(usFGroups, standards = standards, f = normalizeIntensities, MoreArgs = baseArgs)
         
         # merge ISTD slots
         fGroups@ISTDs <- mergeScreeningSetInfos(usFGroups, lapply(usFGroups, internalStandards))
         fGroups@ISTDAssignments <- lapply(usFGroups, slot, "ISTDAssignments")
     }
     else
-        usFGroups <- lapply(usFGroups, normalizeIntensities, featNorm = featNorm, groupNorm = groupNorm,
-                            normFunc = normFunc, ...)
+        usFGroups <- lapply(usFGroups, normalizeIntensities, baseArgs)
     
     
     allNormFeats <- Reduce(modifyList, lapply(usFGroups, featureTable))
@@ -490,12 +494,13 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     ISTDs <- copy(internalStandards(obj))
     if (nrow(ISTDs) > 0)
         ISTDs <- ISTDs[, -"sets"]
+    ISTDAssign <- if (length(obj@ISTDAssignments) > 0) obj@ISTDAssignments[[set]] else list()
     
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
-                              annotations = ann, ISTDs = ISTDs, ISTDAssignments = obj@ISTDAssignments[[set]],
+                              annotations = ann, ISTDs = ISTDs, ISTDAssignments = ISTDAssign,
                               algorithm = paste0(algorithm(obj), "_unset")))
 })

@@ -114,7 +114,8 @@
     <p>This function uses SIRIUS to automatically find features. This function is called when calling <code>findFeatures</code> with
   <code>algorithm="sirius"</code>.</p>
 <p>The features are collected by running the <code class="command">lcms-align</code> <code class="command">SIRIUS</code> command for every analysis.</p>
-<p>The MS files should be in the <code class="file">mzML</code> or <code class="file">mzXML</code> format.</p>
+<p>The MS files should be in the <code class="file">mzML</code> or <code class="file">mzXML</code> format. Furthermore, this algorithms requires the
+  presence of (data-dependent) MS/MS data.</p>
 <p>The input MS data files need to be centroided. The <code><a href="convertMSFiles.html">convertMSFiles</a></code> function can be used to
   centroid data.</p>
     </div>

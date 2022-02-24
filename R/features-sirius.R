@@ -66,7 +66,8 @@ setMethod("initialize", "featuresSIRIUS",
 #'
 #' @details The features are collected by running the \command{lcms-align} \command{SIRIUS} command for every analysis.
 #'
-#'   The MS files should be in the \file{mzML} or \file{mzXML} format.
+#'   The MS files should be in the \file{mzML} or \file{mzXML} format. Furthermore, this algorithms requires the
+#'   presence of (data-dependent) MS/MS data.
 #'
 #' @template centroid_note_mandatory
 #'

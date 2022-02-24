@@ -26,8 +26,9 @@ This function uses SIRIUS to group features. This function is called when callin
 
 Finding and grouping features is done by running the \command{lcms-align} command on every analyses at once.
   For this reason, grouping feature data from other algorithms than \command{SIRIUS} is not supported.
-  
-  The MS files should be in the \file{mzML} or \file{mzXML} format.
+
+  The MS files should be in the \file{mzML} or \file{mzXML} format. Furthermore, this algorithms requires the
+  presence of (data-dependent) MS/MS data.
 
 The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
   centroid data.

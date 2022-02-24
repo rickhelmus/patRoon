@@ -23,7 +23,8 @@ This function uses SIRIUS to automatically find features. This function is calle
 
 The features are collected by running the \command{lcms-align} \command{SIRIUS} command for every analysis.
 
-  The MS files should be in the \file{mzML} or \file{mzXML} format.
+  The MS files should be in the \file{mzML} or \file{mzXML} format. Furthermore, this algorithms requires the
+  presence of (data-dependent) MS/MS data.
 
 The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
   centroid data.

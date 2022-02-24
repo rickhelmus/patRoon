@@ -791,3 +791,59 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
     
     invisible(NULL)
 })
+
+setMethod("plotGraph", "featureGroups", function(obj, onlyLinked)
+{
+    checkmate::assertFlag(onlyLinked)
+    
+    if (length(obj) == 0 || nrow(internalStandards(obj)) == 0)
+        stop("No feature groups to plot or no internal standards assigned.", call. = FALSE)
+    
+    ISTDs <- internalStandards(obj)
+    ISTDAssign <- internalStandardAssignments(obj)
+    
+    nodes <- data.table(id = union(names(ISTDAssign), unlist(ISTDAssign)))
+    nodes[, group := fifelse(id %chin% names(ISTDAssign), "fGroup", "ISTD")]
+    nodes[group == "ISTD", ISTD := paste0(ISTDs[group == id]$name, collapse = ","), by = "id"]
+    nodes[group == "fGroup", ISTD := paste0(ISTDs[group %in% ISTDAssign[[id]]]$name, collapse = ","), by = id]
+    nodes[, label := id]
+    
+    gInfo <- groupInfo(obj)
+    sInfo <- if (isScreening(obj)) screenInfo(obj) else NULL
+    nodes[, title := mapply(id, group, FUN = function(grp, type)
+    {
+        istds <- if (type == "ISTD")
+            getStrListWithMax(ISTDs[group == grp]$name, 6, "/")
+        else
+            getStrListWithMax(ISTDs[group %chin% ISTDAssign[[grp]]]$name, 3, "/")
+        ret <- sprintf("<b>%s</b><br>RT: %.2f<br>m/z: %.4f<br>ISTD: %s", grp, gInfo[grp, "rts"], gInfo[grp, "mzs"],
+                       istds)
+        if (!is.null(sInfo) && grp %chin% sInfo$group)
+            ret <- paste0(ret, "<br>", "Suspect(s): ", getStrListWithMax(sInfo[group == grp]$name, 3, "/"))
+        return(ret)
+    })]
+    
+    edges <- rbindlist(Map(names(ISTDAssign), ISTDAssign, f = function(grp, ia) data.table(from = ia, to = grp)))
+    
+    # based on default defined in visInteraction() --> decreased font-size
+    titleStyle <- paste("position: fixed; visibility:hidden; padding: 5px; white-space: nowrap; font-family: verdana;",
+                        "font-size:10px; font-color:#000000; background-color: #f5f4ed; -moz-border-radius: 3px;",
+                        "-webkit-border-radius: 3px; border-radius: 3px; border: 1px solid #808074;",
+                        "box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);")
+    
+    edges[, value := abs(gInfo[from, "rts"] - gInfo[to, "rts"])]
+    edges[, value := max(0.1, 1 - (value / max(value)))]
+    
+    visNetwork::visNetwork(nodes, edges,
+                           submain = paste0("Explore connections by dragging/zooming/selecting.<br>",
+                                            "Smaller retention time difference have wider edges.")) %>%
+        visNetwork::visOptions(selectedBy = list(variable = "ISTD", multiple = TRUE),
+                               highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
+                               nodesIdSelection = list(enabled = TRUE, main = "Select by feat group")) %>%
+        visNetwork::visIgraphLayout(layout = "layout_with_lgl") %>%
+        visNetwork::visEdges(arrows = "from", scaling = list(min = 0.5, max = 2)) %>%
+        visNetwork::visInteraction(tooltipStyle = titleStyle, hideEdgesOnDrag = TRUE, hideEdgesOnZoom = TRUE) %>%
+        visNetwork::visLegend()
+})
+
+setMethod("plotGraph", "featureGroupsSet", function(obj, onlyLinked, set) plotGraph(unset(obj, set), onlyLinked = onlyLinked))

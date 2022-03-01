@@ -47,7 +47,7 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 #' @template plotGraph
 #' 
 #' @export
-setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
+setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE)
 {
     checkmate::assertFlag(onlyLinked)
     

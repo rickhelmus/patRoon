@@ -53,7 +53,7 @@
 ## NEWS
 
 - Added slots to fGroups --> cache should be cleared
-    
+- Removed onlyLinked argument from plotGraph generic (not components methods)
 
 
 # Lower priority

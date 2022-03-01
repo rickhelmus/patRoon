@@ -478,7 +478,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #' @template plotGraph
 #'
 #' @export
-setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
+setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE)
 {
     checkmate::assertFlag(onlyLinked)
 

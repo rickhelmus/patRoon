@@ -792,15 +792,19 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
     invisible(NULL)
 })
 
-setMethod("plotGraph", "featureGroups", function(obj, onlyLinked)
+setMethod("plotGraph", "featureGroups", function(obj, onlyPresent)
 {
-    checkmate::assertFlag(onlyLinked)
+    checkmate::assertFlag(onlyPresent)
     
     if (length(obj) == 0 || nrow(internalStandards(obj)) == 0)
         stop("No feature groups to plot or no internal standards assigned.", call. = FALSE)
     
     ISTDs <- internalStandards(obj)
     ISTDAssign <- internalStandardAssignments(obj)
+    gNames <- names(obj)
+    
+    if (onlyPresent)
+        ISTDAssign <- pruneList(lapply(ISTDAssign, function(ia) ia[ia %chin% gNames]), checkEmptyElements = TRUE)
     
     nodes <- data.table(id = union(names(ISTDAssign), unlist(ISTDAssign)))
     nodes[, group := fifelse(id %chin% names(ISTDAssign), "fGroup", "ISTD")]
@@ -810,7 +814,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyLinked)
     
     gInfo <- groupInfo(obj)
     sInfo <- if (isScreening(obj)) screenInfo(obj) else NULL
-    nodes[, title := mapply(id, group, FUN = function(grp, type)
+    nodes[id %chin% gNames, title := mapply(id, group, FUN = function(grp, type)
     {
         istds <- if (type == "ISTD")
             getStrListWithMax(ISTDs[group == grp]$name, 6, "/")
@@ -822,6 +826,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyLinked)
             ret <- paste0(ret, "<br>", "Suspect(s): ", getStrListWithMax(sInfo[group == grp]$name, 3, "/"))
         return(ret)
     })]
+    nodes[is.na(title), title := sprintf("<b>%s</b> (removed)", id)]
     
     edges <- rbindlist(Map(names(ISTDAssign), ISTDAssign, f = function(grp, ia) data.table(from = ia, to = grp)))
     
@@ -846,4 +851,4 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyLinked)
         visNetwork::visLegend()
 })
 
-setMethod("plotGraph", "featureGroupsSet", function(obj, onlyLinked, set) plotGraph(unset(obj, set), onlyLinked = onlyLinked))
+setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))

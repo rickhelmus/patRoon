@@ -43,8 +43,16 @@ if (hasFGroupScores(rmdVars$fGroups))
 if (isScreening(rmdVars$fGroups))
     bts <- c(bts, list(list(text = "Suspect name", action = buttonFunc("susp_name"))))
 
-if (!is.null(table[["ISTD_assigned"]]))
-    table[, ISTD_assigned := sapply(ISTD_assigned, function(s) wrapStr(gsub(",", ", ", s, fixed = TRUE), 50))]
+wrapISTDs <- function(s) wrapStr(gsub(",", ", ", s, fixed = TRUE), 50)
+if (isFGSet(rmdVars$fGroups))
+{
+    for (s in sets(rmdVars$fGroups))
+    {
+        cn <- paste0("ISTD_assigned-", s)
+        table[, (cn) := sapply(get(cn), wrapISTDs)]
+    }
+} else if (!is.null(table[["ISTD_assigned"]]))
+    table[, ISTD_assigned := sapply(ISTD_assigned, wrapISTDs)]
 
 tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                 paging = FALSE, autoWidth = FALSE,

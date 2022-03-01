@@ -228,7 +228,11 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
         if (!is.null(ret[["set"]]))
             ret[, ISTD_assigned := sapply(ISTDAssign[[set[1]]][group], colISTDs), by = "set"]
         else
-            ret[, ISTD_assigned := sapply(group, function(gn) colISTDs(unique(unlist(lapply(ISTDAssign, "[[", gn)))))]
+        {
+            for (s in sets(x))
+                set(ret, j = paste0("ISTD_assigned-", s), value = sapply(ISTDAssign[[s]][ret$group], colISTDs))
+            # ret[, ISTD_assigned := sapply(group, function(gn) colISTDs(unique(unlist(lapply(ISTDAssign, "[[", gn)))))]
+        }
     }
     
     return(ret[])

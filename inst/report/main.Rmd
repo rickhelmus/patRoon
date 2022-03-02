@@ -61,6 +61,7 @@ if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
 doAnnotation <- !is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) ||
     !is.null(rmdVars$components) || inherits(rmdVars$fGroups, "featureGroupsScreening")
 doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
+doIS <- nrow(internalStandards(rmdVars$fGroups)) > 0
 isComponentsTP <- !is.null(rmdVars$components) && inherits(rmdVars$components, "componentsTPs")
 rmdText <- NULL
 ```
@@ -164,7 +165,7 @@ plotVenn(rmdVars$fGroups)
 plotUpSet(rmdVars$fGroups)
 ```
 
-`r if (doEICs) "EICs\n===\n"`
+`r if (doEICs) "EICs {data-navmenu=\"Features\"}\n===\n"`
 ```{r results='asis', eval=doEICs}
 cat(sprintf("![%s](%s)", names(rmdVars$fGroups), chromPaths), sep = "\n")
 ```
@@ -172,6 +173,25 @@ cat(sprintf("![%s](%s)", names(rmdVars$fGroups), chromPaths), sep = "\n")
 
 ```{r child="featinfo.Rmd", eval=doEICs}
 ```
+
+`r if (doIS) "Internal standard assignments {data-navmenu=\"Features\"}\n===\n"`
+```{r eval=doIS}
+# UNDONE: set onlyPresent?
+
+rmdText <- if (isFGSet(rmdVars$fGroups))
+{
+    paste0("## Plots {.tabset}\n\n", paste0(sapply(sets(rmdVars$fGroups), function(s)
+    {
+        glue::glue("### { s } {{ data-height=600 }}\n\n",
+                   "{ ticks } {{r}}\nplotGraph(rmdVars$fGroups, set = \"{ s }\")\n{ ticks }\n\n",
+                   ticks = "```", s = s)
+    }), collapse = ""))
+} else
+    glue::glue("##\n\n### {{ data-height=600 }}\n\n",
+               "{ ticks }{{r}}\nplotGraph(rmdVars$fGroups)\n{ ticks }\n\n", ticks = "```")
+```
+
+`r if (doIS) paste0(knitr::knit(text = rmdText), collapse = "\n")`
 
 
 ```{r child="components.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0 && !isComponentsTP}

@@ -1,4 +1,4 @@
-Feature info {data-orientation=rows}
+Feature info {data-orientation=rows, data-navmenu="Features"}
 ===
 
 ## { .ftInfo }

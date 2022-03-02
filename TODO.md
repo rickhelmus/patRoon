@@ -33,11 +33,11 @@
 ## Features
 
 - Normalization
-    - rename normalizeIntensities()?
+    - rename normalizeIntensities()? normInts()? normalizeInts()?
     - maybe: allow usage of normalized intensities with filter()?
     - split IS assignment in different function anyway?
     - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
-    - more reporting of ISTD/normalizatio related things?
+    - more reporting of ISTD/normalization related things?
         - eg plotGraph()?
 
 

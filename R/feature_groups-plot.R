@@ -792,7 +792,7 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
     invisible(NULL)
 })
 
-setMethod("plotGraph", "featureGroups", function(obj, onlyPresent)
+setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
 {
     checkmate::assertFlag(onlyPresent)
     
@@ -851,4 +851,4 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent)
         visNetwork::visLegend()
 })
 
-setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))
+setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))

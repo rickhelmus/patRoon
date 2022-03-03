@@ -43,6 +43,12 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     if (nrow(prodAll) == 0)
         stop("Cannot create MetFrag database: no data", call. = FALSE)
 
+    # combine equal TPs from different parents
+    prodAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
+    
+    # ... and remove now duplicates
+    prodAll <- unique(prodAll, by = "InChIKey")
+    
     # set to MetFrag style names
     setnames(prodAll,
              c("name", "formula", "neutralMass"),

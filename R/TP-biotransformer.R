@@ -58,12 +58,6 @@ collapseBTResults <- function(prod)
     # merge parent and sub-parent (ie from consecutive transformation)
     prodAll[, parent := paste0(parent, " (", parent_ID, ")")]
 
-    # combine equal TPs from different parents
-    prodAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
-
-    # ... and remove now duplicates
-    prodAll <- unique(prodAll, by = "InChIKey")
-
     return(prodAll)
 }
 

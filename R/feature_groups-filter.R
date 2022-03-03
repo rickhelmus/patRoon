@@ -513,7 +513,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     {
         if (nrow(internalStandards(obj)) == 0)
             stop("Cannot remove internal standards: there are no internal standards assigned. ",
-                 "Did you run normalizeIntensities()?")
+                 "Did you run normInts()?")
         igrps <- internalStandards(obj)$group
         obj <- delete(obj, j = if (negate) setdiff(names(obj), igrps) else igrps)
     }

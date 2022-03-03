@@ -184,7 +184,7 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
     fTable <- featureTable(object)
     
     if (is.null(fTable[[1]][["intensity_rel"]]))
-        stop("There is no normalized data, did you run normalizeIntensities()?")
+        stop("There is no normalized data, did you run normInts()?")
     
     colName <- if (areas && normalized)
         "area_rel"
@@ -1102,8 +1102,8 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
-setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards,
-                                                            ISTDRTWindow, ISTDMZWindow, minISTDs, ...)
+setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards, ISTDRTWindow,
+                                                ISTDMZWindow, minISTDs, ...)
 {
     # NOTE: keep args in sync with sets method
     
@@ -1221,14 +1221,14 @@ setMethod("normalizeIntensities", "featureGroups", function(fGroups, featNorm, g
         gNames <- names(fGroups)
         
         featsPerGroup <- split(rbindlist(featureTable(fGroups)), by = "group")
-        normInts <- sapply(lapply(featsPerGroup, "[[", "intensity_rel"), normFunc)
-        normAreas <- sapply(lapply(featsPerGroup, "[[", "area_rel"), normFunc)
+        nInts <- sapply(lapply(featsPerGroup, "[[", "intensity_rel"), normFunc)
+        nAreas <- sapply(lapply(featsPerGroup, "[[", "area_rel"), normFunc)
         
         fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
         {
             ft <- copy(ft)
-            ft[, c("intensity_rel", "area_rel") := .(intensity_rel / normInts[group],
-                                                     area_rel / normAreas[group])]
+            ft[, c("intensity_rel", "area_rel") := .(intensity_rel / nInts[group],
+                                                     area_rel / nAreas[group])]
             return(ft)
         })
     }

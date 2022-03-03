@@ -186,7 +186,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     
     # HACK: add annotations and ISTD assignments later as format with sets is different
     
-    # HACK HACK HACK: since we clear out annotations, which are needed in unset() called by normalizeIntensities(), do
+    # HACK HACK HACK: since we clear out annotations, which are needed in unset() called by normInts(), do
     # this separately here...
     if (!features && normalized)
         x <- maybeAutoNormalizeFGroups(x)
@@ -311,8 +311,8 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
-setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards,
-                                                               ISTDRTWindow, ISTDMZWindow, minISTDs, ...)
+setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards, ISTDRTWindow,
+                                                   ISTDMZWindow, minISTDs, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
@@ -335,14 +335,14 @@ setMethod("normalizeIntensities", "featureGroupsSet", function(fGroups, featNorm
         # NOTE: skipInvalid is set to FALSE. We don't have readily access to it (it's in ...), but if the user set it to
         # TRUE, it will be picked up later by screenSuspects() in the non sets method anyway.
         standards <- assertAndPrepareSuspectsSets(standards, sets(fGroups), skipInvalid = FALSE)
-        usFGroups <- Map(usFGroups, standards = standards, f = normalizeIntensities, MoreArgs = baseArgs)
+        usFGroups <- Map(usFGroups, standards = standards, f = normInts, MoreArgs = baseArgs)
         
         # merge ISTD slots
         fGroups@ISTDs <- mergeScreeningSetInfos(usFGroups, lapply(usFGroups, internalStandards))
         fGroups@ISTDAssignments <- lapply(usFGroups, slot, "ISTDAssignments")
     }
     else
-        usFGroups <- lapply(usFGroups, normalizeIntensities, baseArgs)
+        usFGroups <- lapply(usFGroups, normInts, baseArgs)
     
     
     allNormFeats <- Reduce(modifyList, lapply(usFGroups, featureTable))

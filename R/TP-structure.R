@@ -5,6 +5,34 @@ NULL
 #' @export
 transformationProductsStructure <- setClass("transformationProductsStructure", contains = "transformationProducts")
 
+setMethod("initialize", "transformationProductsStructure", function(.Object, calcSims, fpType, fpSimMethod, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    
+    if (length(.Object) > 0 && calcSims)
+    {
+        hash <- makeHash(.Object)
+        cd <- loadCacheData("TPsParentSims", hash)
+        if (!is.null(cd))
+            .Object <- cd
+        else
+        {
+            printf("Calculating parent/TP structural similarities...\n")
+            pspl <- split(parents(.Object), seq_len(nrow(parents(.Object))))
+            .Object@products <- withProg(nrow(parents(.Object)), FALSE, Map(products(.Object), pspl, f = function(pr, pa)
+            {
+                pr <- copy(pr)
+                pr[, similarity := sapply(SMILES, distSMILES, SMI1 = pa$SMILES, fpType = fpType, fpSimMethod = fpSimMethod)]
+                doProgress()
+                return(pr)
+            }))
+            saveCacheData("TPsParentSims", .Object, hash)
+        }
+    }
+    
+    return(.Object)
+})
+
 #' @templateVar class transformationProductsStructure
 #' @template convertToMFDB
 #' @export
@@ -14,12 +42,9 @@ setMethod("convertToMFDB", "transformationProductsStructure", function(TPs, out,
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::assertFlag(includeParents, add = ac)
     checkmate::reportAssertions(ac)
-    
-    # UNDONE: update collapse function and move to doConvertToMFDB(), where it is optional and not used for TP-library
-    cat("Collapsing results... ")
-    prodAll <- if (length(TPs) > 0) collapseBTResults(TPs@products) else data.table()
-    cat("Done!\n")
-    
+
+    prodAll <- rbindlist(products(TPs), idcol = "parent")
+
     doConvertToMFDB(prodAll, parents(TPs), out, includeParents)
 })
 
@@ -89,8 +114,11 @@ setMethod("filter", "transformationProductsStructure", function(obj, removeParen
             })
         }
         
-        if (!is.null(minSimilarity))
+        if (!is.null(minSimilarity) && length(obj) > 0)
         {
+            if (is.null(obj[[1]][["similarity"]]))
+                stop("Cannot filter on structural similarities: no similarities were calculated. ",
+                     "Please set calcSims=TRUE when calling generateTPs().", call. = FALSE)
             pred <- if (negate) function(x) x < minSimilarity else function(x) numGTE(x, minSimilarity)
             obj@products <- lapply(obj@products, function(p) p[pred(similarity)])
         }

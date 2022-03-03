@@ -138,6 +138,7 @@ Collate:
     'workflow-step.R'
     'TP.R'
     'TP-CTS.R'
+    'TP-structure.R'
     'TP-biotransformer.R'
     'TP-library.R'
     'features.R'

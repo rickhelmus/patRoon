@@ -1,5 +1,5 @@
 #' @include main.R
-#' @include TP.R
+#' @include TP-structure.R
 NULL
 
 #' Class to store transformation products (TPs) obtained from a library
@@ -18,7 +18,7 @@ NULL
 #' @template class-hierarchy
 #'
 #' @export
-transformationProductsLibrary <- setClass("transformationProductsLibrary", contains = "transformationProducts")
+transformationProductsLibrary <- setClass("transformationProductsLibrary", contains = "transformationProductsStructure")
 
 setMethod("initialize", "transformationProductsLibrary",
           function(.Object, ...) callNextMethod(.Object, algorithm = "library", ...))
@@ -65,7 +65,8 @@ setMethod("initialize", "transformationProductsLibrary",
 #'   by repeating the value within \code{parent_} columns.
 #'
 #' @export
-generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = TRUE, matchParentsBy = "InChIKey")
+generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = TRUE, matchParentsBy = "InChIKey",
+                               calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto")
 {
     # UNDONE: default match by IK or IK1?
     
@@ -90,8 +91,9 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
         
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
-    checkmate::assertFlag(skipInvalid, add = ac)
+    aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims, fixed = list(add = ac))
     checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
+    aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (is.null(TPLibrary))
@@ -186,25 +188,6 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
     parents <- parents[name %in% names(results)]
     results <- results[match(parents$name, names(results))] # sync order
     
-    return(transformationProductsLibrary(parents = parents, products = results))
+    ret(transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
+                                         products = results))
 }
-
-#' @templateVar class transformationProductsLibrary
-#' @template convertToMFDB
-#' @export
-setMethod("convertToMFDB", "transformationProductsLibrary", function(TPs, out, includeParents = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
-    checkmate::assertFlag(includeParents, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    allTPs <- rbindlist(TPs@products, idcol = "parent")
-    
-    doConvertToMFDB(allTPs, parents(TPs), out, includeParents)
-})
-
-setMethod("linkParentsToFGroups", "transformationProductsLibrary", function(TPs, fGroups)
-{
-    return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
-})

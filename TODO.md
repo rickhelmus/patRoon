@@ -4,6 +4,14 @@
 ## Docs
 
 - Update ref docs for TP-structure
+- calcSims
+
+## NEWS
+
+- sim calc doesn't happen by default anymore for BT
+- TP structure base class
+    - TPLibrary gains filter() method and parent structure sim calculation
+- Fixed: convertMFDB() now always collapses duplicates, not just for BT
 
 
 # Lower priority

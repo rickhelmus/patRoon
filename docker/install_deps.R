@@ -1,30 +1,25 @@
-options(Ncpus = 6)
+options(Ncpus = 8)
 
-install.packages("devtools")
-install.packages("BiocManager")
-
-install.packages("dplyr") # missing dep(?)
-
-BiocManager::install(c("mzR", "xcms", "CAMERA"))
-BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
-
-remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
-remotes::install_github("thomasp85/farver", upgrade = "never")
-remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
-remotes::install_github("blosloos/nontargetData", upgrade = "never")
-remotes::install_github("blosloos/nontarget", upgrade = "never")
-install.packages("vdiffr")
+install.packages(c("devtools", "BiocManager",
+                   "dplyr", # missing dep(?)
+                   "vdiffr", "desc"))
 install.packages(c("circlize", "VennDiagram"),
                  repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
-BiocManager::install("ropls") # for KPIC2
-remotes::install_github("rickhelmus/KPIC2")
-remotes::install_github("rickhelmus/cliqueMS")
-BiocManager::install(c("BiocStyle", "Rgraphviz")) # for MetaClean
-remotes::install_github("KelseyChetnik/MetaClean")
-remotes::install_github("KelseyChetnik/MetaCleanData")
+BiocManager::install(c("mzR", "xcms", "CAMERA",
+                       "Rdisop", "InterpretMSSpectrum", # need to install these deps manually (why??)
+                       "ropls", # for KPIC2
+                       "BiocStyle", "Rgraphviz")) # for MetaClean
 
-install.packages("desc")
+remotes::install_github(c("rickhelmus/patRoonData",
+                          "thomasp85/farver",
+                          "cbroeckl/RAMClustR",
+                          "blosloos/nontargetData",
+                          "blosloos/nontarget",
+                          "rickhelmus/KPIC2",
+                          "rickhelmus/cliqueMS",
+                          "KelseyChetnik/MetaClean", "KelseyChetnik/MetaCleanData"),
+                        upgrade = "never")
 
 getMissingPkgs <- function()
 {

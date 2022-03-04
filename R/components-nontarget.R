@@ -122,6 +122,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
                                                                    traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
                                                                    ...)
 {
+    checkPackage("nontarget", "https://github.com/blosloos/nontarget")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     ionization <- checkAndGetIonization(ionization, fGroups, add = ac)

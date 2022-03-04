@@ -65,6 +65,9 @@ remotes::install_github("rickhelmus/KPIC2")
 # needed for RAMClustR for componentization
 remotes::install_github("cbroeckl/RAMClustR")
 
+# needed for nontarget for componentization
+remotes::install_github("blosloos/nontarget")
+
 # needed for cliqueMS for componentization
 remotes::install_github("rickhelmus/cliqueMS") # note: repository is a fork with minor bug fixes
 

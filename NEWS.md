@@ -18,7 +18,7 @@
 - Handbook: detailed overview of all workflow functions and classes (issue #41, special thanks to @@hechth)
 - Fixed: annotations slot for `featureGroups` was not updated when removing groups with `delete()` (except sets workflows)
 - Fixed: better handle missing spectrum data with spectrumSimilarity()
-
+- Made `nontarget` an optional dependency and install it from GitHub with CI and in the installation docs (see issue #48)
 
 # patRoon 2.0
 

@@ -89,7 +89,6 @@ Imports:
     shinyjs,
     CAMERA,
     enviPat,
-    nontarget,
     knitr,
     rmarkdown,
     flexdashboard,
@@ -111,6 +110,7 @@ Imports:
 Suggests: 
     RDCOMClient,
     metfRag,
+    nontarget,
     RAMClustR,
     KPIC,
     MetaClean,

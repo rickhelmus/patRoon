@@ -11,6 +11,7 @@ BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these
 remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
 remotes::install_github("thomasp85/farver", upgrade = "never")
 remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
+remotes::install_github("blosloos/nontarget", upgrade = "never")
 install.packages("vdiffr")
 install.packages(c("circlize", "VennDiagram"),
                  repos="http://cran.r-project.org") # get most recent version (rpm is too old)

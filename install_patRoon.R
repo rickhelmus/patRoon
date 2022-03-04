@@ -366,13 +366,15 @@ utils <- setRefClass("utilsInst", methods = list(
         curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
         .libPaths(getLibPaths(instPath, pkgWhere))
         
-        optPackages <- packagesNotInstalled(c("KPIC", "RAMClustR", "cliqueMS", "MetaClean", "RDCOMClient"))
+        optPackages <- packagesNotInstalled(c("KPIC", "RAMClustR", "nontarget", "cliqueMS", "MetaClean", "RDCOMClient"))
         
         choices <- character()
         if ("KPIC" %in% optPackages)
             choices <- c(choices, KPIC2 = "KPIC2 (algorithm to find/group features)")
         if ("RAMClustR" %in% optPackages)
             choices <- c(choices, RAMClustR = "RAMClustR (algorithm for componentization)")
+        if ("nontarget" %in% optPackages)
+            choices <- c(choices, nontarget = "nontarget (algorithm for componentization of homologous series)")
         if ("cliqueMS" %in% optPackages)
             choices <- c(choices, cliqueMS = "cliqueMS (algorithm for componentization)")
         if ("MetaClean" %in% optPackages)
@@ -400,6 +402,8 @@ utils <- setRefClass("utilsInst", methods = list(
             }
             if (any(c("all", "RAMClustR") %in% instWhat))
                 checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl")
+            if (any(c("all", "nontarget") %in% instWhat))
+                checkPackages("nontarget", pkgWhere, ask = FALSE, type = "gh", repos = "blosloos")
             if (any(c("all", "cliqueMS") %in% instWhat))
                 checkPackages("cliqueMS", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus")
             if (any(c("all", "MetaClean") %in% instWhat))

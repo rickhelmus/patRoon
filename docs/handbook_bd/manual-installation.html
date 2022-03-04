@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-02-24" />
+<meta name="date" content="2022-03-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -356,19 +356,22 @@ div.csl-indent {
 <span id="cb3-8"><a href="manual-installation.html#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for RAMClustR for componentization</span></span>
 <span id="cb3-9"><a href="manual-installation.html#cb3-9" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</span>
 <span id="cb3-10"><a href="manual-installation.html#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="manual-installation.html#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for cliqueMS for componentization</span></span>
-<span id="cb3-12"><a href="manual-installation.html#cb3-12" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/cliqueMS&quot;</span>) <span class="co"># note: repository is a fork with minor bug fixes</span></span>
+<span id="cb3-11"><a href="manual-installation.html#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for nontarget for componentization</span></span>
+<span id="cb3-12"><a href="manual-installation.html#cb3-12" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/nontarget&quot;</span>)</span>
 <span id="cb3-13"><a href="manual-installation.html#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="manual-installation.html#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
-<span id="cb3-15"><a href="manual-installation.html#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: a fork is installed that fixes some issues with the latest R versions</span></span>
-<span id="cb3-16"><a href="manual-installation.html#cb3-16" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;BSchamberger/RDCOMClient&quot;</span>)</span>
-<span id="cb3-17"><a href="manual-installation.html#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="manual-installation.html#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
-<span id="cb3-19"><a href="manual-installation.html#cb3-19" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span>
+<span id="cb3-14"><a href="manual-installation.html#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for cliqueMS for componentization</span></span>
+<span id="cb3-15"><a href="manual-installation.html#cb3-15" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/cliqueMS&quot;</span>) <span class="co"># note: repository is a fork with minor bug fixes</span></span>
+<span id="cb3-16"><a href="manual-installation.html#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="manual-installation.html#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
+<span id="cb3-18"><a href="manual-installation.html#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: a fork is installed that fixes some issues with the latest R versions</span></span>
+<span id="cb3-19"><a href="manual-installation.html#cb3-19" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;BSchamberger/RDCOMClient&quot;</span>)</span>
 <span id="cb3-20"><a href="manual-installation.html#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="manual-installation.html#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for feature quality calculations with MetaClean</span></span>
-<span id="cb3-22"><a href="manual-installation.html#cb3-22" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">&quot;BiocStyle&quot;</span>, <span class="st">&quot;Rgraphviz&quot;</span>)) </span>
-<span id="cb3-23"><a href="manual-installation.html#cb3-23" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;KelseyChetnik/MetaClean&quot;</span>)</span></code></pre></div>
+<span id="cb3-21"><a href="manual-installation.html#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
+<span id="cb3-22"><a href="manual-installation.html#cb3-22" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span>
+<span id="cb3-23"><a href="manual-installation.html#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="manual-installation.html#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for feature quality calculations with MetaClean</span></span>
+<span id="cb3-25"><a href="manual-installation.html#cb3-25" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">&quot;BiocStyle&quot;</span>, <span class="st">&quot;Rgraphviz&quot;</span>)) </span>
+<span id="cb3-26"><a href="manual-installation.html#cb3-26" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;KelseyChetnik/MetaClean&quot;</span>)</span></code></pre></div>
 <p>Note that only the <code>CAMERA</code> installation is mandatory, the rest involves installation of <em>optional</em> packages. If you are unsure which you need then you can always install the packages at a later stage.</p>
 </div>
 <div id="other-dependencies" class="section level3" number="2.3.2">

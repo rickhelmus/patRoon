@@ -85,12 +85,12 @@ filterMSFileDirs <- function(files, from)
 
 listMSFiles <- function(dirs, from)
 {
-    dirs <- unique(dirs)
+    dirs <- normalizePath(unique(dirs), mustWork = FALSE)
     
     allExts <- MSFileExtensions()
     allExts <- unique(unlist(allExts[from]))
 
-    files <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
+    files <- list.files(dirs, full.names = TRUE, pattern = paste0(paste0(".+\\.", allExts, collapse = "|"), "$"),
                         ignore.case = TRUE)
 
     return(filterMSFileDirs(files, from))

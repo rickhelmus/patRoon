@@ -9,8 +9,8 @@ version: 2.1
 jobs:
     build:
         machine:
-            image: ubuntu-2004:202010-01
-        resource_class: medium
+            image: ubuntu-2004:202111-02
+        resource_class: large
         <<: *set_dock_env
         steps:
             - checkout
@@ -28,8 +28,8 @@ jobs:
                     docker push "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}"
     test:
         machine:
-            image: ubuntu-2004:202010-01
-        resource_class: medium
+            image: ubuntu-2004:202111-02
+        resource_class: large
         <<: *set_dock_env
         steps:
             - run:
@@ -60,8 +60,8 @@ jobs:
                     fi
     docs:
         machine:
-            image: ubuntu-2004:202010-01
-        resource_class: medium
+            image: ubuntu-2004:202111-02
+        resource_class: large
         <<: *set_dock_env
         steps:
             - checkout
@@ -87,8 +87,8 @@ jobs:
                     git push origin ${CIRCLE_BRANCH}
     deps:
         machine:
-            image: ubuntu-2004:202010-01
-        resource_class: medium
+            image: ubuntu-2004:202111-02
+        resource_class: large
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain

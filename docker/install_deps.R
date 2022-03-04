@@ -1,4 +1,4 @@
-options(Ncpus = 3)
+options(Ncpus = 6)
 
 install.packages("devtools")
 install.packages("BiocManager")

@@ -403,7 +403,10 @@ utils <- setRefClass("utilsInst", methods = list(
             if (any(c("all", "RAMClustR") %in% instWhat))
                 checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl")
             if (any(c("all", "nontarget") %in% instWhat))
+            {
+                checkPackages("nontargetData", pkgWhere, ask = FALSE, type = "gh", repos = "blosloos")
                 checkPackages("nontarget", pkgWhere, ask = FALSE, type = "gh", repos = "blosloos")
+            }
             if (any(c("all", "cliqueMS") %in% instWhat))
                 checkPackages("cliqueMS", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus")
             if (any(c("all", "MetaClean") %in% instWhat))

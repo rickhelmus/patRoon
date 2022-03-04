@@ -66,6 +66,7 @@ remotes::install_github("rickhelmus/KPIC2")
 remotes::install_github("cbroeckl/RAMClustR")
 
 # needed for nontarget for componentization
+remotes::install_github("blosloos/nontargetData")
 remotes::install_github("blosloos/nontarget")
 
 # needed for cliqueMS for componentization

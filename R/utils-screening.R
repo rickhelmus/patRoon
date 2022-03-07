@@ -66,7 +66,14 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
             if (!is.null(suspects[[col]]))
                 suspects[, (col) := as.character(get(col))]
         }
-
+        
+        # convert to numerics, may be logical if all are NA...
+        for (col in c("mz", "rt"))
+        {
+            if (!is.null(suspects[[col]]))
+                suspects[, (col) := as.numeric(get(col))]
+        }
+        
         # make name column file safe and unique
         sanNames <- fs::path_sanitize(suspects$name, replacement = "_")
         sanNames <- strtrim(sanNames, 150) # UNDONE: make max length configurable?

@@ -47,9 +47,6 @@ checkFeaturesInterface$methods(
                 checkboxGroupInput("fGroupColumns", "Feature groub table columns",
                                    c("Retention time & m/z" = "retMZ",
                                      "EIC preview" = "EICPreview",
-                                     "Suspect properties (RT, m/z, fragments)" = "suspProp",
-                                     "Estimated suspect identification level" = "estIDLevel",
-                                     "Other suspect annotations" = "suspOther",
                                      "Ion annotations" = "ionAnn",
                                      "Total score" = "totalScore",
                                      "Other scores" = "otherScores"),
@@ -136,8 +133,6 @@ checkFeaturesInterface$methods(
         args <- list(fGroups, areas = rValues$settings$featQuantity == "area",
                      average = rValues$settings$fGroupQuantity == "average",
                      qualities = if (getScores) "score" else FALSE)
-        if (isScreening(fGroups) && any(c("suspProp", "estIDLevel", "suspOther") %in% rValues$settings$fGroupColumns))
-            args <- c(args, list(collapseSuspects = NULL))
         gData <- do.call(as.data.table, args)
         
         if (rValues$settings$fGroupQuantity == "max")
@@ -160,21 +155,6 @@ checkFeaturesInterface$methods(
             gData[, c("ret", "mz") := NULL]
         else if (rValues$settings$retUnit == "min")
             gData[, ret := ret / 60]
-        
-        if (isScreening(fGroups))
-        {
-            if (!"suspProp" %in% rValues$settings$fGroupColumns)
-                gData[, (intersect(names(gData), c("susp_rt", "susp_mz", "fragments_mz", "fragments_formula"))) := NULL]
-            if (!"estIDLevel" %in% rValues$settings$fGroupColumns && !is.null(gData[["estIDLevel"]]))
-                gData[, "estIDLevel" := NULL]
-            if (!"suspOther" %in% rValues$settings$fGroupColumns)
-            {
-                rmCols <- intersect(names(gData), c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp",
-                                                    "annSimBoth", "maxFrags", "maxFragMatches", "maxFragMatchesRel"))
-                if (length(rmCols) > 0)
-                    gData[, (rmCols) := NULL]
-            }
-        }
         
         if (!"ionAnn" %in% rValues$settings$fGroupColumns)
         {

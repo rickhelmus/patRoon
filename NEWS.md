@@ -20,6 +20,7 @@
 - Fixed: better handle missing spectrum data with spectrumSimilarity()
 - Made `nontarget` an optional dependency and install it from GitHub with CI and in the installation docs (see issue #48)
 - Fixed: MS files were not always correctly found
+- Fixed: `newProject()` ignored group/blank input for sets workflows
 
 
 # patRoon 2.0

@@ -1210,8 +1210,8 @@ newProject <- function(destPath = NULL)
             }
         }
         observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
-        observeEvent(input$analysesHot, doObserveAnaHot("analysesHotPos", "analysesPos"))
-        observeEvent(input$analysesHot, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
+        observeEvent(input$analysesHotPos, doObserveAnaHot("analysesHotPos", "analysesPos"))
+        observeEvent(input$analysesHotNeg, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
         
         observeEvent(input$addAnalysesDir, {
             anaDir <- rstudioapi::selectDirectory(path = "~/")

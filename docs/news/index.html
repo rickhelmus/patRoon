@@ -138,6 +138,16 @@ spectrumSimilarity()</li>
 <li>Made <code>nontarget</code> an optional dependency and install it
 from GitHub with CI and in the installation docs (see issue <a href="https://github.com/rickhelmus/patRoon/issues/48" class="external-link">#48</a>)</li>
 <li>Fixed: MS files were not always correctly found</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> ignored group/blank input for sets
+workflows</li>
+<li>Fixed: better error handling for suspect lists with only one valid
+column</li>
+<li>Improve suspect list handling when input
+<code>mz</code>/<code>rt</code> columns are not numeric</li>
+<li>
+<code><a href="../reference/check-GUI.html">checkFeatures()</a></code>: don’t show multiple rows if a suspect
+was matched with multiple feature groups. This change removed the option
+to show specific suspect columns.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0" id="patroon-20">patRoon 2.0<a class="anchor" aria-label="anchor" href="#patroon-20"></a></h2>

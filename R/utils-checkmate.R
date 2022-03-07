@@ -144,7 +144,7 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         if (is.data.table(x))
             x <- x[, intersect(names(x), allCols), with = FALSE]
         else
-            x <- x[, intersect(names(x), allCols)]
+            x <- x[, intersect(names(x), allCols), drop = FALSE]
     }
     
     checkmate::assertDataFrame(x, any.missing = TRUE, min.rows = 1, .var.name = .var.name, add = add)
@@ -176,7 +176,7 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
 
     if (!skipInvalid)
     {
-        cx <- copy(x)
+        cx <- if (is.data.table(x)) copy(x) else as.data.table(x)
         cx[, OK := any(!sapply(.SD, is.na)), by = seq_len(nrow(cx)), .SDcols = intersect(names(x), mzCols)]
         if (all(!cx$OK))
             stop("Suspect list does not contain any (data to calculate) suspect masses", call. = FALSE)

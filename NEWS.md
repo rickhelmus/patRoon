@@ -21,6 +21,7 @@
 - Made `nontarget` an optional dependency and install it from GitHub with CI and in the installation docs (see issue #48)
 - Fixed: MS files were not always correctly found
 - Fixed: `newProject()` ignored group/blank input for sets workflows
+- Fixed: better error handling for suspect lists with only one valid column
 
 
 # patRoon 2.0

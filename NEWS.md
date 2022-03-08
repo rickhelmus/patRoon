@@ -27,6 +27,7 @@
 - Fixed: `checkFeatures()` errored if Plot mode was 'Top most replicates' or 'All'
 - Fixed: several issues with `topMost` plotting of EICs for sets data
 - Fixed: `plotChroms()`: peak area filling (`showPeakAreas=TRUE`) didn't work if the peak height exceeded `ylim`
+- `screenSuspects()` with sets workflows: don't warn about set specific suspect data if all data is NA
 
 
 # patRoon 2.0

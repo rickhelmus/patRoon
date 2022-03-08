@@ -26,6 +26,7 @@
 - `checkFeatures()`: don't show multiple rows if a suspect was matched with multiple feature groups. This change removed the option to show specific suspect columns.
 - Fixed: `checkFeatures()` errored if Plot mode was 'Top most replicates' or 'All'
 - Fixed: several issues with `topMost` plotting of EICs for sets data
+- Fixed: `plotChroms()`: peak area filling (`showPeakAreas=TRUE`) didn't work if the peak height exceeded `ylim`
 
 
 # patRoon 2.0

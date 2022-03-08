@@ -588,6 +588,9 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
                 if (retMin)
                     EICFill$time <- EICFill$time / 60
                 EICFill <- EICFill[EICFill$time %inrange% xlim, ]
+                # filling doesn't work if outside y plot range
+                EICFill$intensity[EICFill$intensity < ylim[1]] <- ylim[1]
+                EICFill$intensity[EICFill$intensity > ylim[2]] <- ylim[2]
                 polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
                         col = fillColors[colInd], border = NA)
             }

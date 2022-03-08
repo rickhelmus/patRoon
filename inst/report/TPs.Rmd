@@ -20,131 +20,134 @@ if (isScreening(rmdVars$fGroups))
 
 plotPathFull <- getPlotPath(FALSE)
 
-message("Generating parent plots...")
-prog <- openProgBar(0, nrow(cInfo))
-
-makeStructPlot <- function(SMI, out)
+if (length(components) > 0)
 {
-    mol <- getMoleculesFromSMILES(SMI, emptyIfFails = TRUE)[[1]]
-    withr::with_png(out, width = 1.5, height = 1.5, units = "in", res = 72, bg = NA, code = {
-        withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
-    })
-}
-
-plotIntMainArgs <- list(average = TRUE, normFunc = max)
-if (isFGSet(rmdVars$fGroups))
-{
-    plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))
-} else
-{
-    plotIntMainArgs <- c(plotIntMainArgs, list(col = "black"))
-}
-
-parentPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(parentRow, i)
-{
-    grpi <- match(parentRow$parent_group, names(rmdVars$fGroups))
-    plots <- list()
-    fg <- rmdVars$fGroups[, parentRow$parent_group]
+    message("Generating parent plots...")
+    prog <- openProgBar(0, nrow(cInfo))
     
-    plots[["int"]] <- file.path(plotPathFull, sprintf("int-parent_%d.png", grpi))
-    makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3,
-                   bg = NA, cacheDB = rmdVars$cacheDB)
-
-    if (!is.null(parentRow[["parent_SMILES"]]))
+    makeStructPlot <- function(SMI, out)
     {
-        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
-        makeStructPlot(parentRow$parent_SMILES, plots[["struct"]])
-    }
-
-    setTxtProgressBar(prog, i)
-    
-    return(plots)
-}), cInfo$name)
-
-message("Generating TP plots...")
-prog <- openProgBar(0, length(components))
-cmpTab <- as.data.table(components)
-# isFGScrAnnotated <- isScreening(rmdVars$fGroups) && screenInfo(rmdVars$fGroups)[[""]]
-
-TPPlotName <- function(cmp, grp) paste0(cmp, "_", grp)
-
-TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), f = function(ctRow, i)
-{
-    grpi <- match(ctRow$group, names(rmdVars$fGroups))
-    plots <- list()
-    fg <- rmdVars$fGroups[, ctRow$group]
-    
-    plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
-    makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3, bg = NA,
-                   cacheDB = rmdVars$cacheDB)
-
-    SMI <- ctRow[["SMILES"]]
-    if (!is.null(SMI))
-    {
-        plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
-        makeStructPlot(SMI, plots[["struct"]])
+        mol <- getMoleculesFromSMILES(SMI, emptyIfFails = TRUE)[[1]]
+        withr::with_png(out, width = 1.5, height = 1.5, units = "in", res = 72, bg = NA, code = {
+            withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
+        })
     }
     
-    if (!is.null(rmdVars[["MSPeakLists"]]))
+    plotIntMainArgs <- list(average = TRUE, normFunc = max)
+    if (isFGSet(rmdVars$fGroups))
     {
-        # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
-        plSpecArgs <- list()
+        plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))
+    } else
+    {
+        plotIntMainArgs <- c(plotIntMainArgs, list(col = "black"))
+    }
+    
+    parentPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(parentRow, i)
+    {
+        grpi <- match(parentRow$parent_group, names(rmdVars$fGroups))
+        plots <- list()
+        fg <- rmdVars$fGroups[, parentRow$parent_group]
         
-        if (isScreening(rmdVars$fGroups))
+        plots[["int"]] <- file.path(plotPathFull, sprintf("int-parent_%d.png", grpi))
+        makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3,
+                       bg = NA, cacheDB = rmdVars$cacheDB)
+        
+        if (!is.null(parentRow[["parent_SMILES"]]))
         {
-            suspParRow <- suspTbl[name == ctRow$parent_name & group == ctRow$parent_group]
-            suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
-            if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
-                all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
-                nrow(suspTPRow) == 1 && !is.na(suspParRow$compRank) && !is.na(suspTPRow$compRank))
+            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
+            makeStructPlot(parentRow$parent_SMILES, plots[["struct"]])
+        }
+        
+        setTxtProgressBar(prog, i)
+        
+        return(plots)
+    }), cInfo$name)
+    
+    message("Generating TP plots...")
+    prog <- openProgBar(0, length(components))
+    cmpTab <- as.data.table(components)
+    # isFGScrAnnotated <- isScreening(rmdVars$fGroups) && screenInfo(rmdVars$fGroups)[[""]]
+    
+    TPPlotName <- function(cmp, grp) paste0(cmp, "_", grp)
+    
+    TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), f = function(ctRow, i)
+    {
+        grpi <- match(ctRow$group, names(rmdVars$fGroups))
+        plots <- list()
+        fg <- rmdVars$fGroups[, ctRow$group]
+        
+        plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
+        makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3, bg = NA,
+                       cacheDB = rmdVars$cacheDB)
+        
+        SMI <- ctRow[["SMILES"]]
+        if (!is.null(SMI))
+        {
+            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
+            makeStructPlot(SMI, plots[["struct"]])
+        }
+        
+        if (!is.null(rmdVars[["MSPeakLists"]]))
+        {
+            # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
+            plSpecArgs <- list()
+            
+            if (isScreening(rmdVars$fGroups))
             {
-                plSpecArgs <- list(obj = rmdVars$compounds, formulas = rmdVars[["formulas"]],
-                                   index = c(suspParRow$compRank, suspTPRow$compRank),
-                                   MSPeakLists = rmdVars$MSPeakLists, plotStruct = FALSE)
+                suspParRow <- suspTbl[name == ctRow$parent_name & group == ctRow$parent_group]
+                suspTPRow <- suspTbl[name == ctRow$TP_name & group == ctRow$group]
+                if (!is.null(rmdVars[["compounds"]]) && !is.null(suspTbl[["compRank"]]) &&
+                    all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$compounds)) &&
+                    nrow(suspTPRow) == 1 && !is.na(suspParRow$compRank) && !is.na(suspTPRow$compRank))
+                {
+                    plSpecArgs <- list(obj = rmdVars$compounds, formulas = rmdVars[["formulas"]],
+                                       index = c(suspParRow$compRank, suspTPRow$compRank),
+                                       MSPeakLists = rmdVars$MSPeakLists, plotStruct = FALSE)
+                }
+                else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
+                         all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
+                         nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank))
+                {
+                    plSpecArgs <- list(obj = rmdVars$formulas,
+                                       index = c(suspParRow$formRank, suspTPRow$formRank),
+                                       MSPeakLists = rmdVars$MSPeakLists)
+                }
             }
-            else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
-                     all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
-                     nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank))
+            
+            if (length(plSpecArgs) == 0 && !is.null(rmdVars$MSPeakLists[[ctRow$parent_group]][["MSMS"]]) &&
+                !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
             {
-                plSpecArgs <- list(obj = rmdVars$formulas,
-                                   index = c(suspParRow$formRank, suspTPRow$formRank),
-                                   MSPeakLists = rmdVars$MSPeakLists)
+                # no formulas/compounds, try peak lists
+                plSpecArgs <- list(obj = rmdVars$MSPeakLists, MSLevel = 2)
+            }
+            
+            if (length(plSpecArgs) > 0)
+            {
+                plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
+                makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$parent_group, ctRow$group),
+                                                                                   specSimParams = rmdVars$specSimParams, title = "")),
+                               5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             }
         }
         
-        if (length(plSpecArgs) == 0 && !is.null(rmdVars$MSPeakLists[[ctRow$parent_group]][["MSMS"]]) &&
-            !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
-        {
-            # no formulas/compounds, try peak lists
-            plSpecArgs <- list(obj = rmdVars$MSPeakLists, MSLevel = 2)
-        }
+        setTxtProgressBar(prog, i)
         
-        if (length(plSpecArgs) > 0)
-        {
-            plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
-            makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$parent_group, ctRow$group),
-                                                                               specSimParams = rmdVars$specSimParams, title = "")),
-                           5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-        }
+        return(plots)
+    }), TPPlotName(cmpTab$name, cmpTab$group))
+    
+    prepPlots <- function(pl)
+    {
+        ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
+        if (rmdVars$optimizePng && length(ap > 0))
+            optimizePngPlots(ap)
+        
+        if (rmdVars$selfContained)
+            pl <- rapply(pl, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
+        return(pl)
     }
     
-    setTxtProgressBar(prog, i)
-    
-    return(plots)
-}), TPPlotName(cmpTab$name, cmpTab$group))
-
-prepPlots <- function(pl)
-{
-    ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
-    if (rmdVars$optimizePng && length(ap > 0))
-        optimizePngPlots(ap)
-    
-    if (rmdVars$selfContained)
-        pl <- rapply(pl, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
-    return(pl)
+    parentPlots <- prepPlots(parentPlots); TPPlots <- prepPlots(TPPlots)
 }
-
-parentPlots <- prepPlots(parentPlots); TPPlots <- prepPlots(TPPlots)
 ```
 
 
@@ -154,7 +157,7 @@ parentPlots <- prepPlots(parentPlots); TPPlots <- prepPlots(TPPlots)
     
 <style> .parents { overflow-x: auto; } </style>
     
-```{r echo=FALSE}
+```{r echo=FALSE,eval=length(components)>0}
 makeTPTab <- function(cr, cols)
 {
     allCols <- unique(unlist(lapply(cols, function(cl) grep(paste0("^", cl), names(cr), value = TRUE))))
@@ -267,7 +270,7 @@ DT::datatable(parentsDT,
 
 <style> .TPsClass { overflow-x: auto; } </style>
     
-```{r echo=FALSE}
+```{r echo=FALSE,eval=length(components)>0}
 
 cTable <- componentTable(components)
 

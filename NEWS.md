@@ -29,6 +29,7 @@
 - Fixed: `plotChroms()`: peak area filling (`showPeakAreas=TRUE`) didn't work if the peak height exceeded `ylim`
 - `screenSuspects()` with sets workflows: don't warn about set specific suspect data if all data is NA
 - `checkFeatures()`/`checkComponents()` now cleanup unavailable selections when saving the session
+- Fixed: `reportHTML()`: Don't try to report TP components if no data is available
 
 
 # patRoon 2.0

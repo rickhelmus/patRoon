@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.1</span>
       </span>
     </div>
 
@@ -148,6 +148,29 @@ column</li>
 <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>: don’t show multiple rows if a suspect
 was matched with multiple feature groups. This change removed the option
 to show specific suspect columns.</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">checkFeatures()</a></code> errored if Plot mode was ‘Top
+most replicates’ or ‘All’</li>
+<li>Fixed: several issues with <code>topMost</code> plotting of EICs for
+sets data</li>
+<li>Fixed: <code><a href="../reference/generics.html">plotChroms()</a></code>: peak area filling
+(<code>showPeakAreas=TRUE</code>) didn’t work if the peak height
+exceeded <code>ylim</code>
+</li>
+<li>
+<code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> with sets workflows: don’t warn about
+set specific suspect data if all data is NA</li>
+<li>
+<code><a href="../reference/check-GUI.html">checkFeatures()</a></code>/<code><a href="../reference/check-GUI.html">checkComponents()</a></code> now
+cleanup unavailable selections when saving the session</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code>: Don’t try to report TP components
+if no data is available</li>
+<li>
+<code>formulasSet</code> method for <code><a href="../reference/generics.html">plotSpectrum()</a></code>:
+don’t try to plot a comparison plot for candidates without MS/MS
+data</li>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code> don’t try to plot a comparison plot for
+formula candidates without MS/MS data</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0" id="patroon-20">patRoon 2.0<a class="anchor" aria-label="anchor" href="#patroon-20"></a></h2>

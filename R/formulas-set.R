@@ -137,6 +137,16 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         usObj <- usObj[theSets]
         
         usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
+        
+        # only keep sets with MS/MS data
+        theSets <- theSets[sapply(theSets, function(s)
+        {
+            all(sapply(groupName, function(gn) !is.null(usMSPL[[s]][[gn]]) && !is.null(usMSPL[[s]][[gn]][["MSMS"]])))
+        })]
+        if (length(theSets) == 0)
+            return(NULL)
+        usObj <- usObj[theSets]; usMSPL <- usMSPL[theSets]
+        
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
                                          specSimParams = specSimParams, mustExist = FALSE))

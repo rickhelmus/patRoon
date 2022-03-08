@@ -106,7 +106,9 @@ if (length(components) > 0)
                 }
                 else if (!is.null(rmdVars[["formulas"]]) && !is.null(suspTbl[["formRank"]]) &&
                          all(c(ctRow$parent_group, ctRow$group) %chin% groupNames(rmdVars$formulas)) &&
-                         nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank))
+                         nrow(suspTPRow) == 1 && !is.na(suspParRow$formRank) && !is.na(suspTPRow$formRank) &&
+                         !is.null(rmdVars$MSPeakLists[[ctRow$parent_group]][["MSMS"]]) &&
+                         !is.null(rmdVars$MSPeakLists[[ctRow$group]][["MSMS"]]))
                 {
                     plSpecArgs <- list(obj = rmdVars$formulas,
                                        index = c(suspParRow$formRank, suspTPRow$formRank),

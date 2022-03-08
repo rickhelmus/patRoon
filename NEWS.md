@@ -30,6 +30,8 @@
 - `screenSuspects()` with sets workflows: don't warn about set specific suspect data if all data is NA
 - `checkFeatures()`/`checkComponents()` now cleanup unavailable selections when saving the session
 - Fixed: `reportHTML()`: Don't try to report TP components if no data is available
+- `formulasSet` method for `plotSpectrum()`: don't try to plot a comparison plot for candidates without MS/MS data
+- `reportHTML()` don't try to plot a comparison plot for formula candidates without MS/MS data
 
 
 # patRoon 2.0

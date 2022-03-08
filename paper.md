@@ -61,7 +61,7 @@ partly due to TPs, motivating the need for TP screening workflows. Reported appr
 environment include screening of known/predicted TPs, parent/TP classification techniques, isotope labeling experiments
 and identifying expected (dis)similarities in MS data (shown in \autoref{tab:TPApproaches}; also reviewed in @Li2021).
 However, these approaches are typically designed for a single study or available only as a stand-alone and/or commercial
-tool. Furthermore, few TP prediction tools support specific pathways observed in the environment (e.g. microbial
+tool. Furthermore, few TP prediction tools support specific pathways observed in the environment (e.g., microbial
 degradation), are open-source and can be readily integrated in workflows for automated batch predictions. `patRoon 2.0`
 implements complementary TP screening approaches with select algorithms from \autoref{tab:TPApproaches} and includes
 other novel functionality to provide comprehensive TP screening workflows. The modular design of `patRoon`
@@ -110,7 +110,7 @@ features by mass.
 MS similarity (\autoref{fig:TPworkflow}D) is calculated, without a predefined parent list, from spectral match and/or
 equivalence of spectral annotations. Spectral match compares MS fragment spectra (MS/MS) with a cosine or Jaccard index
 similarity score [@Stein1994]. This was largely implemented in `C++` to allow efficient comparison of large numbers of
-spectra (typically thousands). The calculation can be adjusted by (1) pre-treatment of spectra, e.g. with peak count and
+spectra (typically thousands). The calculation can be adjusted by (1) pre-treatment of spectra, e.g., with peak count and
 intensity thresholds, (2) weight assignment to intensity and _m/z_ data, and (3) shifting TP spectra to highlight equal
 neutral losses [@Watrous2012;@Scholle2017]. Furthermore, combining matched mass peaks from shifted and non-shifted
 spectra was implemented for similarity calculation of equivalent fragments _and_ neutral losses. MS similarity from
@@ -154,7 +154,7 @@ Table: Filters to prioritize TP components. \label{tab:TPFilters}
 ## Sets workflows: combining positive and negative MS ionization data
 
 In a _sets workflow_, positive and negative data is automatically processed and combined (\autoref{fig:sets_idl}A).
-Features are obtained for each polarity, and optionally prioritized with polarity specific conditions (e.g. minimum
+Features are obtained for each polarity, and optionally prioritized with polarity specific conditions (e.g., minimum
 intensity). Then, the feature _m/z_ values are replaced with neutral masses calculated from adduct information (defined
 manually or via feature adduct annotations), and subsequently aligned and grouped across polarities (with configurable
 tolerances). Subsequent steps largely follow the `patRoon 1.0` workflow [@Helmus2021]. Algorithms incapable of
@@ -194,12 +194,12 @@ Other new functionality of `patRoon 2.0` includes:
 * Interactive graphical tools to inspect and curate workflow data and to train and inspect feature classifications with
 `MetaClean`.
 * Refactoring and updates of `newProject()` to generate code for the new functionality.
-* A `delete` function to remove unwanted workflow data, e.g. to implement custom filters.
+* A `delete` function to remove unwanted workflow data, e.g., to implement custom filters.
 * More approaches to parallelize `R` code and support high performance computing using the [future] package
 [@Bengtsson2020].
 * Bug fixes and improvements from user feedback.
 
-A complete listing of all changes is outlined [the project news file][NEWS].
+A complete listing of all changes is outlined in [the project news file][NEWS].
 
 # Example workflows
 
@@ -288,4 +288,4 @@ for project A18/BM/12341006.
 [future]: https://github.com/HenrikBengtsson/future
 [YAML]: https://yaml.org/
 [Handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
-[NEWS]: https://rickhelmus.github.io/patRoon/news/index.html
+[NEWS]: https://rickhelmus.github.io/patRoon/news/index.html#patroon-20

@@ -24,6 +24,7 @@
 - Fixed: better error handling for suspect lists with only one valid column
 - Improve suspect list handling when input `mz`/`rt` columns are not numeric
 - `checkFeatures()`: don't show multiple rows if a suspect was matched with multiple feature groups. This change removed the option to show specific suspect columns.
+- Fixed: `checkFeatures()` errored if Plot mode was 'Top most replicates' or 'All'
 
 
 # patRoon 2.0

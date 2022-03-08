@@ -4,8 +4,8 @@
 
 
 checkFeaturesInterface <- setRefClass("checkFeaturesInterface", contains = "checkUIInterface",
-                                      fields = c(fGroups = "featureGroups", EICsTopMost = "list",
-                                                 EICsTopMostRG = "list", EICsAll = "list",
+                                      fields = c(fGroups = "featureGroups", rtWindow = "numeric",
+                                                 EICsTopMost = "list", EICsTopMostRG = "list", EICsAll = "list",
                                                  EICPreviews = "list"))
 
 checkFeaturesInterface$methods(
@@ -222,8 +222,8 @@ checkFeaturesInterface$methods(
         })
         
         observeEvent(input$fGroupPlotMode, {
-            if ((input$fGroupPlotMode == "topMostByRGroup" && is.null(EICsTopMostRG)) ||
-                (input$fGroupPlotMode == "all" && is.null(EICsAll)))
+            if ((input$fGroupPlotMode == "topMostByRGroup" && length(EICsTopMostRG) == 0) ||
+                (input$fGroupPlotMode == "all" && length(EICsAll) == 0))
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
@@ -374,7 +374,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkFeaturesInterface$new(fGroups = fGroups, EICsTopMost = EICsTopMost,
+    int <- checkFeaturesInterface$new(fGroups = fGroups, rtWindow = rtWindow, EICsTopMost = EICsTopMost,
                                       EICsTopMostRG = EICsTopMostRG, EICsAll = EICsAll,
                                       EICPreviews = EICPreviews, primarySelections = gNames,
                                       curSession = curSession, session = session)

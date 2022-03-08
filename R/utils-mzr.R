@@ -163,36 +163,38 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
     EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EICs) <- unlist(lapply(EICList, names))
     EICs <- EICs[intersect(analyses(fGroups), names(EICs))] # sync order
-
+    
     if (!is.null(topMost))
     {
-        # topMost is applied per set, make sure that the final result also
-        # doesn't contain >topMost results
+        # topMost is applied per set, make sure that the final result also doesn't contain >topMost results
         
-        topMost <- min(topMost, nrow(analysisInfo(fGroups)))
         gTable <- groupTable(fGroups)
         gNames <- names(fGroups)
         anaInfo <- analysisInfo(fGroups)
-
+        anasInEICs <- names(EICs)
+        anaIndsInEICs <- match(anasInEICs, anaInfo$analysis)
+        topMost <- min(topMost, length(anasInEICs))
+        
         for (fg in gNames)
         {
             if (topMostByRGroup)
             {
-                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, anaInd = seq_len(nrow(anaInfo)))
+                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, ana = anaInfo$analysis)
+                tbl <- tbl[ana %in% anasInEICs]
                 tbl[, rank := frank(-int, ties.method = "first"), by = "group"]
-                topAnalysesInd <- tbl[rank <= topMost]$anaInd
+                topAnalyses <- tbl[rank <= topMost]$ana
             }
             else
             {
-                oint <- order(gTable[[fg]], decreasing = TRUE)
-                topAnalysesInd <- oint[seq_len(topMost)]
+                oint <- order(gTable[[fg]][anaIndsInEICs], decreasing = TRUE)
+                topAnalyses <- anasInEICs[oint[seq_len(topMost)]]
             }
             
-            topAnalyses <- anaInfo$analysis[topAnalysesInd]
             # clearout any analysis results not being in topMost
-            otherAnas <- setdiff(anaInfo$analysis, topAnalyses)
+            otherAnas <- setdiff(anasInEICs, topAnalyses)
             EICs[otherAnas] <- lapply(EICs[otherAnas], function(e) e[setdiff(names(e), fg)])
         }
+        EICs <- pruneList(EICs, checkEmptyElements = TRUE) # in case all EICs were removed from analyses
     }
 
     return(EICs)

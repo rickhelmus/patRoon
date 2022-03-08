@@ -28,6 +28,7 @@
 - Fixed: several issues with `topMost` plotting of EICs for sets data
 - Fixed: `plotChroms()`: peak area filling (`showPeakAreas=TRUE`) didn't work if the peak height exceeded `ylim`
 - `screenSuspects()` with sets workflows: don't warn about set specific suspect data if all data is NA
+- `checkFeatures()`/`checkComponents()` now cleanup unavailable selections when saving the session
 
 
 # patRoon 2.0

@@ -265,6 +265,9 @@ checkFeaturesInterface$methods(
     
     saveSession = function(s)
     {
+        # remove oldd selections if present, eg now removed due to subsetting fGroups
+        s$removeFully <- intersect(s$removeFully, names(fGroups))
+        s$removePartially <- s$removePartially[names(s$removePartially) %in% names(fGroups)]
         sessionGrps <- s$removeFully
         if (length(s$removePartially) > 0)
             sessionGrps <- union(sessionGrps, names(s$removePartially))

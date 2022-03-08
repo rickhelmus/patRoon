@@ -143,6 +143,9 @@ checkComponentsInterface$methods(
     
     saveSession = function(s)
     {
+        # remove oldd selections if present, eg now removed due to subsetting the components
+        s$removeFully <- intersect(s$removeFully, names(components))
+        s$removePartially <- s$removePartially[names(s$removePartially) %in% names(components)]
         sessionGrps <- character()
         if (length(s$removePartially) > 0)
             sessionGrps <- unlist(s$removePartially)

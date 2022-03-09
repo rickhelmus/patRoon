@@ -2,7 +2,7 @@
 
 TPs
 - CTS
-    - filter on likelyhood, and others?
+    - filter on likelihood, and others?
 
 
 ## Docs

@@ -145,27 +145,29 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 #' @templateVar what generate transformation products
 #' @templateVar ex1 generateTPsBioTransformer
 #' @templateVar ex2 generateTPsLogic
-#' @templateVar algos biotransformer,logic,library
-#' @templateVar algosSuffix BioTransformer,Logic,Library
+#' @templateVar algos biotransformer,logic,library,cts
+#' @templateVar algosSuffix BioTransformer,Logic,Library,CTS
 #' @templateVar ret transformationProducts
 #' @template generic-algo
-#' 
+#'
 #' @param \dots Any parameters to be passed to the selected TP generation algorithm.
-#' 
+#'
 #' @return A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
 #'
-#' @seealso In addition, the derived classes \code{\link{transformationProductsBT}} and
-#'   \code{\link{transformationProductsLibrary}} for algorithm specific methods to post-process TP data.
+#' @seealso In addition, the derived classes \code{\link{transformationProductsBT}},
+#'   \code{\link{transformationProductsLibrary}}, \code{\link{transformationProductsCTS}}, which are derived from
+#'   \code{\link{transformationProductsStructure}}, for algorithm specific methods to post-process TP data.
 #'
 #' @export
 generateTPs <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("biotransformer", "logic", "library"))
+    checkmate::assertChoice(algorithm, c("biotransformer", "logic", "library", "cts"))
     
     f <- switch(algorithm,
                 biotransformer = generateTPsBioTransformer,
                 logic = generateTPsLogic,
-                library = generateTPsLibrary)
+                library = generateTPsLibrary,
+                cts = generateTPsCTS)
     
     f(...)
 }

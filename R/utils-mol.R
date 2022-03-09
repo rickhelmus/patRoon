@@ -112,3 +112,29 @@ convertToFormulaBabel <- function(input, inFormat, mustWork)
                         extraOpts = c("--append", "formula"))
     ret <- sub("[\\+\\-]+$", "", ret) # remove trailing positive/negative charge is present
 }
+
+calculateXLogP <- function(SMILES, mustWork)
+{
+    doCalc <- function(mol)
+    {
+        rcdk::convert.implicit.to.explicit(mol)
+        return(rcdk::get.xlogp(mol))
+    }
+    
+    mols <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)
+    ret <- mapply(mols, SMILES, FUN = function(mol, smi)
+    {
+        if (isEmptyMol(mol))
+        {
+            msg <- paste("Failed to parse SMILES to calculate XLogP for", smi)
+            do.call(if (mustWork) stop else start, list(msg, call. = FALSE))
+            return(NA_real_)
+        }
+        
+        if (mustWork)
+            return(doCalc(mol))
+        return(tryCatch(doCalc(mol), error = function(...) NA_real_))
+    })
+    
+    return(ret)
+}

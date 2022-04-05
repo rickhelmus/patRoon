@@ -188,6 +188,6 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
     parents <- parents[name %in% names(results)]
     results <- results[match(parents$name, names(results))] # sync order
     
-    ret(transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
-                                      products = results))
+    return(transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
+                                         parents = parents, products = results))
 }

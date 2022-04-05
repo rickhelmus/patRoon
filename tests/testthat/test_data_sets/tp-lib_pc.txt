@@ -1,1 +1,1 @@
-A transformationProductsLibrary objectHierarchy:transformationProducts    |-- transformationProductsLibrary---Algorithm: libraryParents: (-)-bisoprolol, (-)-Epigallocatechin, (-)-Epigallocatechin gallate, (-)-ethosuximide, (-)-etodolac, (-)-limonene, ... (2457 total)Total TPs: 5431
+A transformationProductsLibrary objectHierarchy:transformationProductsStructure    |-- transformationProductsLibrary---Algorithm: libraryParents: (-)-bisoprolol, (-)-Epigallocatechin, (-)-Epigallocatechin gallate, (-)-ethosuximide, (-)-etodolac, (-)-limonene, ... (2457 total)Total TPs: 5431

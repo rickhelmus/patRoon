@@ -1,1 +1,1 @@
-A transformationProductsBT objectHierarchy:transformationProducts    |-- transformationProductsBT---Algorithm: biotransformerParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Fluometuron, Linuron, ... (9 total)Total TPs: 139
+A transformationProductsBT objectHierarchy:transformationProductsStructure    |-- transformationProductsBT---Algorithm: biotransformerParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Fluometuron, Linuron, ... (9 total)Total TPs: 139

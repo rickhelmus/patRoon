@@ -15,7 +15,7 @@ TPsLibCustom <- generateTPs("library",
                                                    TP_name = "Linuron", TP_SMILES = "CN(C(=O)NC1=CC(=C(C=C1)Cl)Cl)OC"))
 TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
-TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ]) # for filter tests
+TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], calcSims = TRUE) # for filter tests
 
 TPsCTSSusp <- generateTPs("cts", suspL, "photolysis_unranked")
 TPsCTSScr <- generateTPs("cts", fGroups, "photolysis_unranked")
@@ -25,7 +25,7 @@ fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMIL
 TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
-TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty)
+TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
 doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
@@ -98,25 +98,26 @@ test_that("verify TP generation", {
 })
 
 assertSusp <- function(...) patRoon:::assertSuspectList(..., needsAdduct = FALSE, skipInvalid = FALSE)
-testMFDB <- function(...)
+testMFDB <- function(TPs)
 {
-    outf <- tempfile(fileext = ".csv")
-    convertToMFDB(..., out = outf, includeParents = FALSE); db <- fread(outf)
+    getMFDB <- function(...) { outf <- tempfile(fileext = ".csv"); convertToMFDB(..., out = outf); fread(outf) }
+    
+    MFDBNP <- getMFDB(TPs, includeParents = FALSE)
+    MFDBP <- getMFDB(TPs, includeParents = TRUE)
+    
     cols <- c("Identifier", "MolecularFormula", "MonoisotopicMass",
               "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP", "LogP", "parent", "transformation",
               "enzyme", "evidencedoi")
     
-    checkmate::expect_data_table(MFDBNP, any.missing = FALSE, nrows = length(TPsLibScr))
+    unTPN <- uniqueN(as.data.table(TPs), by = "InChIKey")
+    
+    checkmate::expect_data_table(MFDBNP, any.missing = FALSE, nrows = unTPN)
     checkmate::expect_names(names(MFDBNP), subset.of = cols)
     
-    convertToMFDB(..., out = outf, includeParents = TRUE); db <- fread(outf)
-    checkmate::expect_data_table(MFDBP, nrows = length(TPsLibScr) + nrow(parents(TPsLibScr)))
+    checkmate::expect_data_table(MFDBP, nrows = unTPN + nrow(parents(TPs)))
     checkmate::expect_names(names(MFDBP), subset.of = cols)
 }
 
-getMFDB <- function(...) { outf <- tempfile(fileext = ".csv"); convertToMFDB(..., out = outf); fread(outf) }
-MFDBNP <- getMFDB(TPsLibScr, includeParents = FALSE)
-MFDBP <- getMFDB(TPsLibScr, includeParents = TRUE)
 TPsBTSuspFPI <- filter(TPsBTSuspMore, removeParentIsomers = TRUE)
 TPsBTSuspFPIN <- filter(TPsBTSuspMore, removeParentIsomers = TRUE, negate = TRUE)
 pnames <- parents(TPsLogic)$name

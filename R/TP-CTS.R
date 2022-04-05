@@ -9,13 +9,13 @@ setMethod("initialize", "transformationProductsCTS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cts", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-runCTS <- function(parentRow, SMILES, transLibrary, generationLimit, errorRetries, calcXLogP)
+runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcXLogP)
 {
     CTSURL <- "https://qed.epa.gov/cts/rest/metabolizer/run"
     # CTSURL <- "https://qed.epacdx.net/cts/rest/metabolizer/run" # older version??
     
     resp <- httr::RETRY("POST", url = CTSURL, encode = "json", times = errorRetries,
-                        body = list(structure = SMILES, generationLimit = generationLimit,
+                        body = list(structure = parentRow$SMILES, generationLimit = generationLimit,
                                     transformationLibraries = list(transLibrary)))
     
     httr::warn_for_status(resp)
@@ -92,22 +92,64 @@ generateTPsCTS <- function(parents, transLibrary, generationLimit = 1, errorRetr
         results <- list()
     else
     {
-        # UNDONE: do the caching
-        baseHash <- makeHash(transLibrary, generationLimit, errorRetries, skipInvalid, fpType, fpSimMethod)
-        setHash <- makeHash(parents, baseHash)
+        cacheDB <- openCacheDBScope()
         
         if (calcXLogP)
-            parents[, XLogP := calculateXLogP(SMILES, mustWork = FALSE)]
+        {
+            ph <- makeHash(parents)
+            cd <- loadCacheData("TPsCTSXLogP", ph, cacheDB)
+            if (is.null(cd))
+            {
+                printf("Calculating parent XLogP values... ")
+                parents[, XLogP := calculateXLogP(SMILES, mustWork = FALSE)]
+                printf("Done!\n")
+                saveCacheData("TPsCTSXLogP", parents, ph, cacheDB)
+            }
+            else
+                parents <- cd
+        }
         
-        # UNDONE: patRoon:::
-        lapfunc <- if (parallel) future.apply::future_mapply else mapply
-        results <- withProg(nrow(parents), parallel,
-                            do.call(lapfunc, list(split(parents, seq_len(nrow(parents))), parents$SMILES, FUN = runCTS,
-                                                  MoreArgs = list(transLibrary, generationLimit, errorRetries,
-                                                                  calcXLogP))))
-        names(results) <- parents$name
+        parsSplit <- split(parents, seq_len(nrow(parents)))
+        names(parsSplit) <- parents$name
         
-        results <- pruneList(results, checkZeroRows = TRUE)
+        baseHash <- makeHash(transLibrary, generationLimit, errorRetries, skipInvalid, fpType, fpSimMethod)
+        setHash <- makeHash(parents, baseHash)
+        cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
+        hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))
+        cachedResults <- pruneList(sapply(hashes, function(h)
+        {
+            result <- NULL
+            if (!is.null(cachedSet))
+                result <- cachedSet[[h]]
+            if (is.null(result))
+                result <- loadCacheData("TPsCTS", h, cacheDB)
+            return(result)
+        }, simplify = FALSE))
+        
+        parsTBD <- setdiff(parents$name, names(cachedResults))
+        newResults <- list()
+        if (length(parsTBD) > 0)
+        {
+            lapfunc <- if (parallel) future.apply::future_sapply else sapply
+            newResults <- withProg(length(parsTBD), parallel,
+                                   do.call(lapfunc, list(parsSplit[parsTBD], patRoon:::runCTS,
+                                                         transLibrary, generationLimit, errorRetries, calcXLogP,
+                                                         simplify = FALSE)))
+
+            for (pn in names(newResults))
+            {
+                if (!is.null(newResults[[pn]]))
+                    saveCacheData("TPsCTS", newResults[[pn]], hashes[[pn]], cacheDB)
+            }
+                        
+            newResults <- pruneList(newResults, checkZeroRows = TRUE)
+        }
+        
+        if (is.null(cachedSet))
+            saveCacheSet("TPsCTS", hashes, setHash, cacheDB)
+        
+        results <- c(cachedResults, newResults)
+        results <- results[intersect(parents$name, names(results))]
         parents <- parents[name %in% names(results)]
     }
     

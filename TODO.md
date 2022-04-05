@@ -9,6 +9,8 @@ TPs
 
 - Update ref docs for TP-structure
 - calcSims
+- CTS: link to manual/publications for details scoring and other output
+
 
 ## NEWS
 

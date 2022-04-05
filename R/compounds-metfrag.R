@@ -147,6 +147,7 @@ unifyMFNames <- function(mfr)
                  parent = "parent",
                  ALogP = "ALogP",
                  LogP = "LogP",
+                 XLogP = "XLogP",
                  transformation = "transformation",
                  enzyme = "enzyme",
                  evidencedoi = "evidencedoi"

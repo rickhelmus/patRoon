@@ -73,7 +73,7 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     prodAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
-                  "ALogP", "LogP", "parent", "transformation", "enzyme", "evidencedoi")
+                  "ALogP", "LogP", "XLogP", "parent", "transformation", "enzyme", "evidencedoi")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }

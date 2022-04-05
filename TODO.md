@@ -1,9 +1,14 @@
 # Priority
 
-TPs
+## TPs
+
 - CTS
     - filter on likelihood, and others?
 
+
+## Tests
+
+- CTS
 
 ## Docs
 

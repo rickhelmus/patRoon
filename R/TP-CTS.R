@@ -49,6 +49,11 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     # Assign some unique identifier
     ret[, name := paste0(parentRow$name, "-TP", seq_len(nrow(ret)))]
     
+    ret[, c("InChI", "InChIKey", "formula") := .(babelConvert(SMILES, "smi", "inchi", mustWork = TRUE),
+                                                 babelConvert(SMILES, "smi", "inchikey", mustWork = TRUE),
+                                                 convertToFormulaBabel(SMILES, "smi", mustWork = TRUE))]
+    ret[, neutralMass := sapply(formula, getFormulaMass)]
+    
     if (calcXLogP)
     {
         ret[, XLogP := calculateXLogP(SMILES, mustWork = FALSE)]

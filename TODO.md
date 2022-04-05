@@ -4,6 +4,9 @@
 
 - CTS
     - filter on likelihood, and others?
+    - convertToMFDB(): also collapse within parents, like BT
+    - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
+- convertToMFDB(): remove some columns after collapsing that don't make sense anymore
 
 
 ## Tests
@@ -15,6 +18,7 @@
 - Update ref docs for TP-structure
 - calcSims
 - CTS: link to manual/publications for details scoring and other output
+- more details on how TPs are collapsed with convertToMFDB()
 
 
 ## NEWS

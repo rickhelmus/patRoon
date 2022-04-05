@@ -31,13 +31,13 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
         return(NULL)
 
     curTPID <- 0
-    processChilds <- function(chi, parentID = 1)
+    processChilds <- function(chi, parentID = 0)
     {
         curTPID <<- curTPID + 1
         res <- c(list(ID = curTPID, parentID = parentID), chi$data)
         if (length(chi$children) > 0)
         {
-            sub <- lapply(chi$children, processChilds, parentID = curTPID-1) # NOTE: -1 since we just incremented
+            sub <- lapply(chi$children, processChilds, parentID = res$ID) # NOTE: this will alter curTPID, so don't use it for parentID!
             return(rbindlist(c(list(res), sub)))
         }
         return(as.data.table(res))

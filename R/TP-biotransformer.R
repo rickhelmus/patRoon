@@ -67,19 +67,20 @@ BTMPFinishHandler <- function(cmd)
     
     ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
                                              "Molecular formula" = "character"))
-    
-    # UNDONE: transform column names, more?
-    
     # Simplify/harmonize columns a bit
     setnames(ret,
-             c("Molecular formula", "Major Isotope Mass"),
-             c("formula", "neutralMass"))
-    setnames(ret, sub("^Precursor ", "parent_", names(ret)))
-    setnames(ret, c("Reaction", "Reaction ID"), c("transformation", "transformation_ID"))
+             c("Molecular formula", "Major Isotope Mass", "Reaction", "Reaction ID", "Metabolite ID", "Precursor ID",
+               "Enzyme(s)", "Biosystem"),
+             c("formula", "neutralMass", "transformation", "transformation_ID", "ID", "parent_ID", "enzyme",
+               "biosystem"))
+    ret[!nzchar(parent_ID), parent_ID := 0]
+    for (col in c("ID", "parent_ID"))
+        set(ret, i = NULL, j = col, value = as.integer(sub("^BTM", "", ret[[col]])))
     
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
     ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
+    ret[, (grep("^Precursor ", names(ret), value = TRUE)) := NULL]
     
     # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
     ret[!nzchar(formula), formula := {
@@ -88,10 +89,13 @@ BTMPFinishHandler <- function(cmd)
     }]
     
     # Assign some unique identifier
-    ret[, name := paste0(cmd$parent, "-TP", seq_len(nrow(ret)))]
-    
-    ret[, retDir := fifelse(ALogP < parent_ALogP, -1, 1)]
-    
+    ret[, name := paste0(cmd$parent, "-TP", ID)]
+ 
+    # UNDONE   
+#    ret[, retDir := fifelse(ALogP < parent_ALogP, -1, 1)]
+
+    setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+
     return(ret)
 }
 

@@ -42,6 +42,11 @@
 - Added slots to fGroups --> cache should be cleared
 - Removed onlyLinked argument from plotGraph generic (not components methods)
 - reportHTML: features menu with submenus
+- BT
+    - Simplified/Harmonized several columns
+    - Converted ID and parent IDs to integer values
+    - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
+    - equal TPs formed from different routes (but from the same initial parent) are now named the same
 
 
 # Lower priority

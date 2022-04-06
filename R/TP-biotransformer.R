@@ -70,9 +70,9 @@ BTMPFinishHandler <- function(cmd)
     # Simplify/harmonize columns a bit
     setnames(ret,
              c("Molecular formula", "Major Isotope Mass", "Reaction", "Reaction ID", "Metabolite ID", "Precursor ID",
-               "Enzyme(s)", "Biosystem"),
-             c("formula", "neutralMass", "transformation", "transformation_ID", "ID", "parent_ID", "enzyme",
-               "biosystem"))
+               "Precursor ALogP", "Enzyme(s)", "Biosystem"),
+             c("formula", "neutralMass", "transformation", "transformation_ID", "ID", "parent_ID", "parent_ALogP",
+               "enzyme", "biosystem"))
     ret[!nzchar(parent_ID), parent_ID := 0]
     for (col in c("ID", "parent_ID"))
         set(ret, i = NULL, j = col, value = as.integer(sub("^BTM", "", ret[[col]])))
@@ -90,12 +90,13 @@ BTMPFinishHandler <- function(cmd)
     
     # Assign some unique identifier
     ret[, name := paste0(cmd$parent, "-TP", ID)]
- 
-    # UNDONE   
-#    ret[, retDir := fifelse(ALogP < parent_ALogP, -1, 1)]
+
+    # NOTE: take the _original_ parent ALogP as reference
+    parALogP <- ret[parent_ID == 0]$parent_ALogP[1]
+    ret[, retDir := fifelse(ALogP < parALogP, -1, 1)]
 
     setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
-
+    
     return(ret)
 }
 

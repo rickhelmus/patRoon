@@ -30,11 +30,11 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     if (is.null(cont) || is.null(cont[["data"]]) || cont$data$total_products == 0)
         return(NULL)
 
-    curTPID <- 0
-    processChilds <- function(chi, parent_ID = 0)
+    curTPID <- 0L
+    processChilds <- function(chi, parent_ID)
     {
-        curTPID <<- curTPID + 1
-        res <- c(list(ID = curTPID, parent_ID = parent_ID), chi$data)
+        curTPID <<- curTPID + 1L
+        res <- c(list(IDRow = curTPID, parent_IDRow = parent_ID), chi$data)
         if (length(chi$children) > 0)
         {
             sub <- lapply(chi$children, processChilds, parent_ID = res$ID) # NOTE: this will alter curTPID, so don't use it for parent_ID!
@@ -43,11 +43,9 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
         return(as.data.table(res))
     }
     
-    ret <- rbindlist(lapply(cont$data$data$children, processChilds))
-    setnames(ret, "smiles", "SMILES")
+    ret <- rbindlist(lapply(cont$data$data$children, processChilds, parent_ID = NA_integer_))
     
-    # Assign some unique identifier
-    ret[, name := paste0(parentRow$name, "-TP", seq_len(nrow(ret)))]
+    setnames(ret, "smiles", "SMILES")
     
     ret[, c("InChI", "InChIKey", "formula") := .(babelConvert(SMILES, "smi", "inchi", mustWork = TRUE),
                                                  babelConvert(SMILES, "smi", "inchikey", mustWork = TRUE),
@@ -61,6 +59,16 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     }
     else
         ret[, retDir := 0]
+    
+    # convert row IDs to unique IDs
+    ret[, ID := match(InChIKey, unique(InChIKey))]
+    ret[, parent_ID := ID[match(parent_IDRow, IDRow)]]
+    ret[, c("IDRow", "parent_IDRow") := NULL]
+    
+    # Assign some unique identifier
+    ret[, name := paste0(parentRow$name, "-TP", ID)]
+    
+    setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     
     return(ret)
 }

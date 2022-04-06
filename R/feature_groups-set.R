@@ -342,7 +342,7 @@ setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm,
         fGroups@ISTDAssignments <- lapply(usFGroups, slot, "ISTDAssignments")
     }
     else
-        usFGroups <- lapply(usFGroups, normInts, baseArgs)
+        usFGroups <- do.call(lapply, c(list(usFGroups, normInts), baseArgs))
     
     
     allNormFeats <- Reduce(modifyList, lapply(usFGroups, featureTable))

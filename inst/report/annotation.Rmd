@@ -198,9 +198,10 @@ if (!is.null(rmdVars$components))
     }, USE.NAMES = FALSE)]
 }
 
-ISTDs <- internalStandards(rmdVars$fGroups)[group %chin% allGroups]
+ISTDs <- internalStandards(rmdVars$fGroups)
 if (nrow(ISTDs) > 0)
 {
+    ISTDs <- ISTDs[group %chin% allGroups]
     fGroupsSpecDT[, "Internal standard" := sapply(group, function(grp)
     {
         ISTDNames <- ISTDs[group == grp]$name

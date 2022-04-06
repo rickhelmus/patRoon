@@ -6,6 +6,7 @@
     - filter on likelihood, and others?
     - convertToMFDB(): also collapse within parents, like BT
     - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
+- plot function to show hierarchy of (detected) TPs?
 - convertToMFDB(): remove some columns after collapsing that don't make sense anymore
 
 

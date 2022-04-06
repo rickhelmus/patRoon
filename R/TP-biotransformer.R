@@ -73,7 +73,7 @@ BTMPFinishHandler <- function(cmd)
                "Precursor ALogP", "Enzyme(s)", "Biosystem"),
              c("formula", "neutralMass", "transformation", "transformation_ID", "ID", "parent_ID", "parent_ALogP",
                "enzyme", "biosystem"))
-    ret[!nzchar(parent_ID), parent_ID := 0]
+    ret[!nzchar(parent_ID), parent_ID := NA]
     for (col in c("ID", "parent_ID"))
         set(ret, i = NULL, j = col, value = as.integer(sub("^BTM", "", ret[[col]])))
     
@@ -92,7 +92,7 @@ BTMPFinishHandler <- function(cmd)
     ret[, name := paste0(cmd$parent, "-TP", ID)]
 
     # NOTE: take the _original_ parent ALogP as reference
-    parALogP <- ret[parent_ID == 0]$parent_ALogP[1]
+    parALogP <- ret[is.na(parent_ID)]$parent_ALogP[1]
     ret[, retDir := fifelse(ALogP < parALogP, -1, 1)]
 
     setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))

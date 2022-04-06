@@ -212,9 +212,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
                 prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "trans_add",
-                              "trans_sub", "deltaMZ", "generation", "likelihood", "accumulation", "production",
-                              "globalAccumulation")
+                              "trans_sub", "deltaMZ")
                 prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
+                prods <- unique(prods, by = "name") # omit duplicates from different routes
                 
                 comps <- rbindlist(sapply(parentFGs, function(parentFG)
                 {

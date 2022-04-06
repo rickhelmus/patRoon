@@ -117,6 +117,10 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
         stop("Cannot create suspect list: no data", call. = FALSE)
 
     prodAll <- rbindlist(products(TPs))
+    
+    # remove TPs that are equal for a parent that were predicted through different routes
+    prodAll <- unique(prodAll, by = "name")
+    
     keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
     prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
     prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE)

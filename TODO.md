@@ -35,20 +35,21 @@
 
 ## NEWS
 
-- sim calc doesn't happen by default anymore for BT
-- TP structure base class
-    - TPLibrary gains filter() method and parent structure sim calculation
-- Fixed: convertMFDB() now always collapses duplicates, not just for BT
+- TPs
+    - sim calc doesn't happen by default anymore for BT
+    - TP structure base class
+        - TPLibrary gains filter() method and parent structure sim calculation
+    - Fixed: convertMFDB() now always collapses duplicates, not just for BT
+    - BT
+        - Simplified/Harmonized several columns
+        - Converted ID and parent IDs to integer values
+        - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
+        - equal TPs formed from different routes (but from the same initial parent) are now named the same
+        - Fixed: retDir is now derived from _original_ parent, i.e. not its direct parent
+    - convertToSuspects(): only include TPs that are unique from each parent
 - Added slots to fGroups --> cache should be cleared
 - Removed onlyLinked argument from plotGraph generic (not components methods)
 - reportHTML: features menu with submenus
-- BT
-    - Simplified/Harmonized several columns
-    - Converted ID and parent IDs to integer values
-    - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
-    - equal TPs formed from different routes (but from the same initial parent) are now named the same
-    - Fixed: retDir is now derived from _original_ parent, i.e. not its direct parent
-
 
 # Lower priority
 

@@ -1,5 +1,15 @@
 # Priority
 
+
+## Features
+
+- Normalization
+    - maybe: allow usage of normalized intensities with filter()?
+    - split IS assignment in different function anyway?
+    - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
+
+
+
 ## TPs
 
 - CTS
@@ -10,9 +20,6 @@
 - convertToMFDB(): remove some columns after collapsing that don't make sense anymore
 
 
-## Tests
-
-- CTS
 
 ## Docs
 
@@ -20,6 +27,10 @@
 - calcSims
 - CTS: link to manual/publications for details scoring and other output
 - more details on how TPs are collapsed with convertToMFDB()
+- Features
+    - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
+        - also handbook (at least for generateComponentsIntClust)
+    - update groupTable for normalized arg
 
 
 ## NEWS
@@ -28,25 +39,6 @@
 - TP structure base class
     - TPLibrary gains filter() method and parent structure sim calculation
 - Fixed: convertMFDB() now always collapses duplicates, not just for BT
-
-
-## Features
-
-- Normalization
-    - maybe: allow usage of normalized intensities with filter()?
-    - split IS assignment in different function anyway?
-    - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
-
-
-## Docs
-
-- Features
-    - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
-        - also handbook (at least for generateComponentsIntClust)
-    - update groupTable for normalized arg
-
-## NEWS
-
 - Added slots to fGroups --> cache should be cleared
 - Removed onlyLinked argument from plotGraph generic (not components methods)
 - reportHTML: features menu with submenus

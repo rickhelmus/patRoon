@@ -43,6 +43,8 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     if (nrow(prodAll) == 0)
         stop("Cannot create MetFrag database: no data", call. = FALSE)
 
+    prodAll <- unique(prodAll, by = "name") # omit duplicates from the same parent
+    
     # combine equal TPs from different parents
     prodAll[, c("name", "parent") := .(paste0(name, collapse = ","), paste0(parent, collapse = ",")), by = "InChIKey"]
     
@@ -73,7 +75,7 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     prodAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
-                  "ALogP", "LogP", "XLogP", "parent", "transformation", "enzyme", "evidencedoi")
+                  "ALogP", "LogP", "XLogP", "parent")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }

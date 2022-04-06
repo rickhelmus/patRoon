@@ -201,21 +201,3 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
     return(transformationProductsBT(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
                                     products = results))
 }
-
-#' @templateVar class transformationProductsBT
-#' @template convertToMFDB
-#' @export
-setMethod("convertToMFDB", "transformationProductsBT", function(TPs, out, includeParents = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
-    checkmate::assertFlag(includeParents, add = ac)
-    checkmate::reportAssertions(ac)
-
-    # NOTE: need to override method since BT results need to be collapsed
-    cat("Collapsing results... ")
-    prodAll <- if (length(TPs) > 0) collapseBTResults(TPs@products) else data.table()
-    cat("Done!\n")
-
-    doConvertToMFDB(prodAll, parents(TPs), out, includeParents)
-})

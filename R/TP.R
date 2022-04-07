@@ -131,6 +131,63 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
     return(prodAll)
 })
 
+#' @export
+setMethod("plotGraph", "transformationProducts", function(obj)
+{
+    # UNDONE: move to structure class
+    # UNDONE: make sure that it also works with library --> need to add some fields?
+    # UNDONE: make sure all algos have generation
+    # UNDONE: rename IDRow, implement with all algos
+    
+    TPTab <- copy(as.data.table(obj))
+    TPTab[, name := make.unique(name)]
+    TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_IDRow, IDRow)]), by = "parent"]
+    
+    pars <- parents(obj)
+    TPTab[, parent_formula := fifelse(is.na(parent_ID),
+                                      pars$formula[match(parent_name, pars$name)],
+                                      formula[match(parent_name, name)])]
+    TPTab[, formulaDiff := mapply(formula, parent_formula, FUN = function(f, pf)
+    {
+        sfl <- splitFormulaToList(subtractFormula(f, pf))
+        ret <- ""
+        subfl <- sfl[sfl < 0]
+        if (length(subfl) > 0)
+            ret <- paste0("-", formulaListToString(abs(subfl)))
+        addfl <- sfl[sfl > 0]
+        if (length(addfl) > 0)
+            ret <- if (nzchar(ret)) paste0(ret, " +", formulaListToString(addfl)) else paste0("+", formulaListToString(addfl))
+        return(ret)
+    })]
+    
+    nodes <- data.table(id = union(TPTab$parent, TPTab$name))
+    nodes[, isTP := id %chin% TPTab$name]
+    nodes[isTP == TRUE, label := paste0("TP", TPTab$ID[match(id, TPTab$name)])]
+    nodes[isTP == FALSE, label := id]
+    nodes[isTP == TRUE, level := min(TPTab$generation[id == TPTab$name]), by = "id"]
+    nodes[isTP == FALSE, level := 0]
+    nodes[, group := fifelse(!isTP, "Parent", paste("Generation", level))]
+    
+    # UNDONE
+    # nodes[isTP == TRUE, title := sapply(id, function(TP)
+    # {
+    #     TPTabSub <- TPTab[name == TP]
+    #     # name, SMILES, formula, routes, generation, accumulation, production, globalAccumulation, likelihood,
+    #     # Lipinski_Violations, Insecticide_Likeness_Violations, Post_Em_Herbicide_Likeness_Violations,
+    #     # transformation, transformation_ID, enzyme, biosystem
+    # })]
+    
+    edges <- data.table(from = TPTab$parent_name, to = TPTab$name, label = TPTab$formulaDiff)
+
+    visNetwork::visNetwork(nodes = nodes, edges = edges,
+                           submain = "NOTE: TPs produced via multiple pathways are ordered by the <i>minimum</i> generation.") %>%
+        visNetwork::visNodes(shape = "ellipse") %>%
+        visNetwork::visEdges(arrows = "to", font = list(align = "top", size = 12)) %>%
+        visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical")) %>%
+        visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed", levelSeparation = 175) %>%
+        visNetwork::visLegend()
+})
+
 setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)
 
 setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)

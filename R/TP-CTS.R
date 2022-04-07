@@ -63,12 +63,12 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     # convert row IDs to unique IDs
     ret[, ID := match(InChIKey, unique(InChIKey))]
     ret[, parent_ID := ID[match(parent_IDRow, IDRow)]]
-    ret[, c("IDRow", "parent_IDRow") := NULL]
+    # ret[, c("IDRow", "parent_IDRow") := NULL]
     
     # Assign some unique identifier
     ret[, name := paste0(parentRow$name, "-TP", ID)]
     
-    setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+    setcolorder(ret, c("name", "ID", "parent_ID", "IDRow", "parent_IDRow", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     
     return(ret)
 }

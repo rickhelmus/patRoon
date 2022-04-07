@@ -55,6 +55,7 @@
 - reportHTML
     - features menu with submenus
     - improvements TPs
+    - Fixed: properly subscript negative element counts in formulas
 
 
 # Lower priority

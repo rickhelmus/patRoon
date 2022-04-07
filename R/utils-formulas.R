@@ -141,7 +141,7 @@ subscriptFormula <- function(formulas, over = NULL, formulas2 = NULL, parse = TR
 }
 
 # as above, but for HTML
-subscriptFormulaHTML <- function(formulas) gsub("([0-9]+)", "<sub>\\1</sub>", formulas)
+subscriptFormulaHTML <- function(formulas) gsub("([[:digit:]-]+)", "<sub>\\1</sub>", formulas)
 
 averageFormulas <- function(formulas)
 {

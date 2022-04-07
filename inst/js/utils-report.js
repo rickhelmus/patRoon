@@ -77,13 +77,17 @@ function initAnnotation()
 
 function initTPs()
 {
+    filterDTRows("nothing", "parentsPlotsTable");
     filterDTRows("nothing", "TPsTable");
 }
 
 function showTPs(cmp, group)
 {
+    filterDTRows(cmp, "parentsPlotsTable");
     filterDTRows(cmp, "TPsTable");
     selectDTRow(cmp, "parentsTable", 1);
+    
+    $("#parentsTable .dataTable").DataTable().columns.adjust().draw();
 }
 
 $(document).ready(function()

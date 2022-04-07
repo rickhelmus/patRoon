@@ -18,6 +18,10 @@
 - plot function to show hierarchy of (detected) TPs?
 
 
+## Annotation
+
+- reportHTML()/annotatedPeakList()?: for sets the mergedBy column has _unset postfixes
+
 
 ## Docs
 
@@ -48,7 +52,9 @@
     - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
 - Added slots to fGroups --> cache should be cleared
 - Removed onlyLinked argument from plotGraph generic (not components methods)
-- reportHTML: features menu with submenus
+- reportHTML
+    - features menu with submenus
+    - improvements TPs
 
 
 # Lower priority

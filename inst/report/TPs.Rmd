@@ -155,7 +155,7 @@ if (length(components) > 0)
 
 ##
     
-### Parents { data-width=400 .parents }
+### Parents { data-width=200 .parents }
     
 <style> .parents { overflow-x: auto; } </style>
     
@@ -205,57 +205,40 @@ makeTPTab <- function(cr, cols)
 
 chromPlotStyle <- "width: auto; height: 250px;"
 
-parentsDT <- data.table(compInd = seq_len(nrow(cInfo)))
+parentsDT <- copy(cInfo)
+parentsDT <- parentsDT[, intersect(c("name", "parent_name", "parent_group", "parent_formula", "parent_CID"),
+                                   names(cInfo)), with = FALSE]
+parentsDT[, compInd := seq_len(.N)]
 
-splitCI <- split(cInfo, seq_len(nrow(cInfo)))
+setnames(parentsDT, "name", "component")
+setnames(parentsDT, sub("^parent_", "", names(parentsDT)))
 
-parentInfoCols <- intersect(c("name", "parent_name", "parent_group", "parent_formula", "parent_CID"), names(cInfo))
-parentsDT[, parent := sapply(splitCI, function(cir)
-{
-    parInfo <- cir[, parentInfoCols, with = FALSE]
-    setnames(parInfo, sub("^parent_", "", names(parInfo)))
-    
-    if (!is.null(parInfo[["formula"]]))
-        parInfo[, formula := subscriptFormulaHTML(formula)]
-    if (!is.null(parInfo[["CID"]]))
-        parInfo[, CID := makeDBIdentLink("pubchem", CID)]
-
-    par <- makeInfoBox(paste0(names(parInfo), ": ", parInfo, collapse = "<br>"))
-    
-    if (!is.null(parentPlots[[cir$name]][["struct"]]))
-        par <- paste0(imgTags(parentPlots[[cir$name]][["struct"]]), "<br>", par)
-    
-    return(par)
-})]
-
-parentsDT[, EIC := imgTags(chromPaths[match(cInfo$parent_group, names(rmdVars$fGroups))], style = chromPlotStyle)]
+if (!is.null(parentsDT[["formula"]]))
+    parentsDT[, formula := subscriptFormulaHTML(formula)]
+if (!is.null(parentsDT[["CID"]]))
+    parentsDT[, CID := makeDBIdentLink("pubchem", CID)]
 
 if (isScreening(rmdVars$fGroups))
 {
-    suspCols <- c("formRank", "compRank", "annSimBoth", "estIDLevel")
-    if (any(sapply(suspCols, grepl, names(suspTbl))))
-    {
-        parentsDT[, screening := sapply(splitCI, function(cir)
-        {
-            sr <- suspTbl[name == cir$parent_name & group == cir$parent_group]
-            if (nrow(sr) > 0)
-                makeTPTab(sr, suspCols)
-            else
-                ""
-        })]
-    }
+    cols <- c("group", "name", "estIDLevel", "sets")
+    parentsDT <- merge(parentsDT, suspTbl[, intersect(cols, names(suspTbl)), with = FALSE],
+                       by = c("group", "name"), all.x = TRUE, sort = FALSE)
 }
 
-parentsDT[, "intensity profile" := imgTags(sapply(parentPlots[cInfo$name], "[[", "int"))]
+parentsDT[, parent := paste0(sapply(component, function(cmp)
+{
+    if (is.null(parentPlots[[cmp]][["struct"]])) "" else imgTags(parentPlots[[cmp]][["struct"]])
+}), "<br>", component, " (", name, ")")]
+parentsDT[, c("component", "name") := NULL]
 
 parentsDT[, show := { sprintf("<button onclick=\"showTPs('%s', %d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
                               compInd, match(cInfo$parent_group, names(rmdVars$fGroups))) }]
-setcolorder(parentsDT, c("compInd", "show"))
 
-DT::datatable(parentsDT,
-              extensions = "Buttons",
+setcolorder(parentsDT, c("compInd", "show", "parent"))
+
+DT::datatable(parentsDT, extensions = "Buttons", fillContainer = TRUE,
               options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "300px",
-                             dom = "tip",
+                             dom = "tip", deferRender = TRUE, 
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initTPs, 25); }"),
                              order = list(list(0, "asc")),
@@ -263,6 +246,30 @@ DT::datatable(parentsDT,
                                                list(className = "dt-center",
                                                     targets = (seq_len(ncol(parentsDT)))-1))),
               escape = FALSE, rownames = FALSE, elementId = "parentsTable")
+```
+
+### Selected parent { data-width=100 }
+
+```{r echo=FALSE,eval=length(components)>0}
+
+parentsPlotsDT <- data.table(compInd = parentsDT$compInd)
+parentsPlotsDT[, EIC := imgTags(chromPaths[match(cInfo$parent_group, names(rmdVars$fGroups))], style = chromPlotStyle)]
+parentsPlotsDT[, "profile" := imgTags(sapply(parentPlots[cInfo$name], "[[", "int"))]
+
+DT::datatable(parentsPlotsDT,
+              options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "300px",
+                             dom = "t",
+                             # hide column header, thanks to https://stackoverflow.com/a/54325384
+                             headerCallback = DT::JS("function(thead, data, start, end, display)",
+                                                     "{ $(thead).remove(); }"),
+                             order = list(list(0, "asc")),
+                             language = list(zeroRecords = "No parent selected"),
+                             columnDefs = list(list(visible = FALSE, targets = 0),
+                                               list(className = "dt-center",
+                                                    targets = (seq_len(ncol(parentsPlotsDT)))-1))),
+              escape = FALSE, rownames = FALSE,
+              elementId = "parentsPlotsTable") %>%
+    DT::formatStyle(seq_along(parentsPlotsDT), backgroundColor = "white")
 ```
 
 
@@ -358,6 +365,7 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
 DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                     dom = "Blrtp", pageLength = 25, autoWidth = FALSE,
                                     ordering = FALSE,
+                                    language = list(zeroRecords = "No parent selected"),
                                     columnDefs = list(list(visible = FALSE, targets = 0),
                                                       list(className = "dt-center",
                                                            targets = (seq_len(ncol(TPsDT)))-1)),

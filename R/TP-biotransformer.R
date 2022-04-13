@@ -39,27 +39,6 @@ getBaseBTCmd <- function(parent, SMILES, type, steps, extraOpts, baseHash)
                 SMILES = SMILES, hash = makeHash(parent, SMILES, baseHash)))
 }
 
-collapseBTResults <- function(prod)
-{
-    prod <- lapply(prod, function(p)
-    {
-        # merge duplicate compound rows, which can occur due to consecutive
-        # transformation giving the same TP
-        p <- copy(p)
-        col <- "parent_ID"
-        p[!nzchar(get(col)), (col) := "parent"]
-        p[, (col) := paste0(get(col), collapse = "/"), by = "InChIKey"]
-        p <- unique(p, by = "InChIKey")
-    })
-
-    prodAll <- rbindlist(prod, idcol = "parent")
-
-    # merge parent and sub-parent (ie from consecutive transformation)
-    prodAll[, parent := paste0(parent, " (", parent_ID, ")")]
-
-    return(prodAll)
-}
-
 BTMPFinishHandler <- function(cmd)
 {
     if (!file.exists(cmd$outFile))

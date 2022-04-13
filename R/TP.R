@@ -140,6 +140,7 @@ setMethod("plotGraph", "transformationProducts", function(obj)
     # UNDONE: rename IDRow, implement with all algos
     
     TPTab <- copy(as.data.table(obj))
+    
     TPTab[, name := make.unique(name)]
     TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_IDRow, IDRow)]), by = "parent"]
     
@@ -166,26 +167,39 @@ setMethod("plotGraph", "transformationProducts", function(obj)
     nodes[isTP == FALSE, label := id]
     nodes[isTP == TRUE, level := min(TPTab$generation[id == TPTab$name]), by = "id"]
     nodes[isTP == FALSE, level := 0]
-    nodes[, group := fifelse(!isTP, "Parent", paste("Generation", level))]
+    nodes[, group := if (.N > 1) label else "unique", by = "label"]
     
-    # UNDONE
-    # nodes[isTP == TRUE, title := sapply(id, function(TP)
-    # {
-    #     TPTabSub <- TPTab[name == TP]
-    #     # name, SMILES, formula, routes, generation, accumulation, production, globalAccumulation, likelihood,
-    #     # Lipinski_Violations, Insecticide_Likeness_Violations, Post_Em_Herbicide_Likeness_Violations,
-    #     # transformation, transformation_ID, enzyme, biosystem
-    # })]
+    # UNDONE: make util?
+    imgf <- tempfile(fileext = ".png") # temp file is re-used
+    getURIFromSMILES <- function(SMILES)
+    {
+        mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
+        withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
+        return(knitr::image_uri(imgf))
+    }
+    nodes[, shape := "image"]
+    nodes[isTP == TRUE, image := sapply(TPTab$SMILES[match(id, TPTab$name)], getURIFromSMILES)]
+    nodes[isTP == FALSE, image := sapply(pars$SMILES[match(id, pars$name)], getURIFromSMILES)]
+    
+    TPCols <- intersect(c("name", "SMILES", "formula", "routes", "generation", "accumulation", "production",
+                          "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
+                          "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
+                          "biosystem"), names(TPTab))
+    nodes[isTP == TRUE, title := sapply(id, function(TP)
+    {
+        TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]
+        return(paste0(names(TPTabSub), ": ", TPTabSub, collapse = "<br>"))
+    })]
     
     edges <- data.table(from = TPTab$parent_name, to = TPTab$name, label = TPTab$formulaDiff)
 
-    visNetwork::visNetwork(nodes = nodes, edges = edges,
-                           submain = "NOTE: TPs produced via multiple pathways are ordered by the <i>minimum</i> generation.") %>%
-        visNetwork::visNodes(shape = "ellipse") %>%
+    visNetwork::visNetwork(nodes = nodes, edges = edges) %>%
+        visNetwork::visNodes(shapeProperties = list(useBorderWithImage = FALSE)) %>%
         visNetwork::visEdges(arrows = "to", font = list(align = "top", size = 12)) %>%
-        visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical")) %>%
-        visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed", levelSeparation = 175) %>%
-        visNetwork::visLegend()
+        visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
+                               selectedBy = list(variable = "group", main = "Select duplicate TPs",
+                                                 values = unique(nodes$group[nodes$group != "unique"]))) %>%
+        visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 })
 
 setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)

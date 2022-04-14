@@ -54,6 +54,7 @@
         - IDs
         - generations
         - name --> name_lib, new name column for consistency
+        - caching
     - convertToSuspects()/generateComponentsTPs(): only include TPs that are unique from each parent
     - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
 - Added slots to fGroups --> cache should be cleared

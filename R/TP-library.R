@@ -98,6 +98,11 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, matchParentsBy, calcSims, fpType, fpSimMethod)
+    cd <- loadCacheData("TPsLib", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     if (is.null(TPLibrary))
         TPLibrary <- copy(PubChemTransformations) # default to embedded PC transformations
     else
@@ -201,6 +206,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
         }
     }
     
+    # fill in cehm IDs and names now that we sorted out all TPs
     results <- Map(results, names(results), f = function(r, pn)
     {
         set(r, j = "chem_ID", value = match(r$InChIKey, unique(r$InChIKey)))
@@ -223,6 +229,8 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     parents <- parents[name %in% names(results)]
     results <- results[match(parents$name, names(results))] # sync order
     
-    return(transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
-                                         parents = parents, products = results))
+    ret <- transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
+                                         parents = parents, products = results)
+    saveCacheData("TPsLib", ret, hash)
+    return(ret)
 }

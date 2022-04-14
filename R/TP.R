@@ -136,13 +136,14 @@ setMethod("plotGraph", "transformationProducts", function(obj)
 {
     # UNDONE: move to structure class
     # UNDONE: make sure that it also works with library --> need to add some fields?
-    # UNDONE: make sure all algos have generation
-    # UNDONE: rename IDRow, implement with all algos
+    # UNDONE: implement IDs with all algos
+    # UNDONE: make structure plotting optional
+    # UNDONE: don't make unique, but use IDs
     
     TPTab <- copy(as.data.table(obj))
     
     TPTab[, name := make.unique(name)]
-    TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_IDRow, IDRow)]), by = "parent"]
+    TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
     
     pars <- parents(obj)
     TPTab[, parent_formula := fifelse(is.na(parent_ID),
@@ -163,11 +164,11 @@ setMethod("plotGraph", "transformationProducts", function(obj)
     
     nodes <- data.table(id = union(TPTab$parent, TPTab$name))
     nodes[, isTP := id %chin% TPTab$name]
-    nodes[isTP == TRUE, label := paste0("TP", TPTab$ID[match(id, TPTab$name)])]
+    nodes[isTP == TRUE, label := paste0("TP", TPTab$chem_ID[match(id, TPTab$name)])]
     nodes[isTP == FALSE, label := id]
-    nodes[isTP == TRUE, level := min(TPTab$generation[id == TPTab$name]), by = "id"]
-    nodes[isTP == FALSE, level := 0]
     nodes[, group := if (.N > 1) label else "unique", by = "label"]
+    nodes[isTP == FALSE, level := 0]
+    nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
     
     # UNDONE: make util?
     imgf <- tempfile(fileext = ".png") # temp file is re-used

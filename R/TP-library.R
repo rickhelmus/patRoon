@@ -65,8 +65,9 @@ setMethod("initialize", "transformationProductsLibrary",
 #'   by repeating the value within \code{parent_} columns.
 #'
 #' @export
-generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = TRUE, matchParentsBy = "InChIKey",
-                               calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto")
+generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1, skipInvalid = TRUE,
+                               matchParentsBy = "InChIKey", calcSims = FALSE, fpType = "extended",
+                               fpSimMethod = "tanimoto")
 {
     # UNDONE: default match by IK or IK1?
     
@@ -91,6 +92,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
         
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims, fixed = list(add = ac))
     checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
@@ -153,9 +155,11 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
         parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
         setnames(parents, sub("^parent_", "", names(parents)))
     }
-    
+
     results <- split(TPLibrary, by = "parent_name")
-    results <- Map(results, names(results), f = function(r, pn)
+    
+    curTPIDs <- setNames(vector("integer", length = length(results)), names(results))
+    prepTPs <- function(r, pn, pid, gen, prvLogPDiff)
     {
         # remove parent columns
         set(r, j = grep("^parent_", names(r), value = TRUE), value = NULL)
@@ -163,13 +167,44 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, skipInvalid = T
         # remove TP_ prefix
         cols <- grep("^TP_", names(r), value = TRUE)
         setnames(r, cols, sub("^TP_", "", cols))
-        
-        # make TP names unique
-        r[, name := paste0(pn, "-TP-", name)]
+        setnames(r, "name", "name_lib")
         
         r[, retDir := 0] # may be changed below
+        r[, generation := gen]
+        
+        r[, ID := curTPIDs[pn] + seq_len(nrow(r))]
+        curTPIDs[pn] <<- curTPIDs[pn] + nrow(r)
+        r[, parent_ID := pid]
+        
+        # make it additive so LogPDiff corresponds to the original parent
+        if (!is.null(r[["LogPDiff"]]) && !is.null(prvLogPDiff))
+            r[, LogPDiff := LogPDiff + prvLogPDiff]
         
         return(r)
+    }
+    results <- Map(results, names(results), f = prepTPs, MoreArgs = list(pid = NA_integer_, gen = 1, prvLogPDiff = NULL))
+    
+    if (generations > 1)
+    {
+        for (gen in seq(2, generations))
+        {
+            results <- Map(results, names(results), f = function(r, pn)
+            {
+                tps <- r[generation == (gen-1)]
+                nexttps <- rbindlist(lapply(split(tps, seq_len(nrow(tps))), function(tpRow)
+                {
+                    nt <- copy(TPLibrary[parent_InChIKey == tpRow$InChIKey])
+                    return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$LogPDiff))
+                }))
+                return(rbind(r, nexttps))
+            })
+        }
+    }
+    
+    results <- Map(results, names(results), f = function(r, pn)
+    {
+        set(r, j = "chem_ID", value = match(r$InChIKey, unique(r$InChIKey)))
+        set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
     })
     
     if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))

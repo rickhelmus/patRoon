@@ -50,6 +50,10 @@
         - equal TPs formed from different routes (but from the same initial parent) are now named the same
         - Fixed: retDir is now derived from _original_ parent, i.e. not its direct parent
         - TP parent expansion
+    - Lib
+        - IDs
+        - generations
+        - name --> name_lib, new name column for consistency
     - convertToSuspects()/generateComponentsTPs(): only include TPs that are unique from each parent
     - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
 - Added slots to fGroups --> cache should be cleared

@@ -44,21 +44,39 @@ BTMPFinishHandler <- function(cmd)
     if (!file.exists(cmd$outFile))
         return(data.table()) # no results
     
-    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
-                                             "Molecular formula" = "character"))
+    results <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
+                                                 "Molecular formula" = "character"))
+    
     # Simplify/harmonize columns a bit
-    setnames(ret,
+    setnames(results,
              c("Molecular formula", "Major Isotope Mass", "Reaction", "Reaction ID", "Metabolite ID", "Precursor ID",
                "Precursor ALogP", "Enzyme(s)", "Biosystem"),
-             c("formula", "neutralMass", "transformation", "transformation_ID", "ID", "parent_ID", "parent_ALogP",
+             c("formula", "neutralMass", "transformation", "transformation_ID", "chem_ID", "parent_chem_ID", "parent_ALogP",
                "enzyme", "biosystem"))
-    ret[!nzchar(parent_ID), parent_ID := NA]
-    for (col in c("ID", "parent_ID"))
-        set(ret, i = NULL, j = col, value = as.integer(sub("^BTM", "", ret[[col]])))
+    results[!nzchar(parent_chem_ID), parent_chem_ID := 0L]
+    for (col in c("chem_ID", "parent_chem_ID"))
+        set(results, i = NULL, j = col, value = as.integer(sub("^BTM", "", results[[col]])))
+    # results[is.na(parent_chem_ID), parent_chem_ID := 0L]
     
+    # BT only specifies to which chemical structure a TP is, not if it the parent came from a specific route. For now
+    # assume the TP could be from any of the parents.
+    # UNDONE: take steps/generation into account? This expansion may lead to TPs with generation>steps.
+    curTPID <- 0
+    processChilds <- function(parID, parChemID, generation)
+    {
+        resSub <- copy(results[parent_chem_ID == parChemID])
+        resSub[, c("ID", "parent_ID", "generation") := .(curTPID + seq_len(nrow(resSub)), parID, generation)]
+        curTPID <<- curTPID + nrow(resSub)
+        return(rbindlist(c(list(resSub), Map(resSub$ID, resSub$chem_ID, f = processChilds,
+                                             MoreArgs = list(generation = generation + 1)))))
+    }
+    
+    ret <- processChilds(0, 0, 1)
+    ret[parent_ID == 0, parent_ID := NA_integer_]
+
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
-    ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
+    ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title", "parent_chem_ID") := NULL]
     ret[, (grep("^Precursor ", names(ret), value = TRUE)) := NULL]
     
     # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
@@ -68,13 +86,13 @@ BTMPFinishHandler <- function(cmd)
     }]
     
     # Assign some unique identifier
-    ret[, name := paste0(cmd$parent, "-TP", ID)]
+    ret[, name := paste0(cmd$parent, "-TP", chem_ID)]
 
     # NOTE: take the _original_ parent ALogP as reference
     parALogP <- ret[is.na(parent_ID)]$parent_ALogP[1]
     ret[, retDir := fifelse(ALogP < parALogP, -1, 1)]
 
-    setcolorder(ret, c("name", "ID", "parent_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+    setcolorder(ret, c("name", "ID", "parent_ID", "chem_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     
     return(ret)
 }

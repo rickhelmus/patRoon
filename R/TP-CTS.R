@@ -34,7 +34,7 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     processChilds <- function(chi, parent_ID)
     {
         curTPID <<- curTPID + 1L
-        res <- c(list(IDRow = curTPID, parent_IDRow = parent_ID), chi$data)
+        res <- c(list(ID = curTPID, parent_ID = parent_ID), chi$data)
         if (length(chi$children) > 0)
         {
             sub <- lapply(chi$children, processChilds, parent_ID = res$ID) # NOTE: this will alter curTPID, so don't use it for parent_ID!
@@ -61,14 +61,12 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
         ret[, retDir := 0]
     
     # convert row IDs to unique IDs
-    ret[, ID := match(InChIKey, unique(InChIKey))]
-    ret[, parent_ID := ID[match(parent_IDRow, IDRow)]]
-    # ret[, c("IDRow", "parent_IDRow") := NULL]
+    ret[, chem_ID := match(InChIKey, unique(InChIKey))]
     
     # Assign some unique identifier
-    ret[, name := paste0(parentRow$name, "-TP", ID)]
+    ret[, name := paste0(parentRow$name, "-TP", chem_ID)]
     
-    setcolorder(ret, c("name", "ID", "parent_ID", "IDRow", "parent_IDRow", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+    setcolorder(ret, c("name", "ID", "parent_ID", "chem_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     
     return(ret)
 }

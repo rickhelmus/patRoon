@@ -4,6 +4,8 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true)](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
 [![Docker image](https://img.shields.io/docker/image-size/patroonorg/patroonrs/latest)][DockerImg]
+[![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
 
 `patRoon` aims to provide comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental
 analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss
@@ -100,8 +102,7 @@ software platform for environmental mass spectrometry based non-target
 screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformatics_ **13**, 1 (2021)
 
 Rick Helmus, Bas van de Velde, Andrea M. Brunner, Thomas L. ter Laak, Annemarie P. van Wezel and Emma L. Schymanski.
-**patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening**. _In
-preparation_
+[patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening]( https://doi.org/10.21105/joss.04029). _Journal of Open Source Software_, 7(71), 4029
 
 `patRoon` builds on many open-source software tools and open data sources. Therefore, it is important to also cite their
 work when using these algorithms via `patRoon`.

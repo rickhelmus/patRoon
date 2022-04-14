@@ -132,19 +132,57 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
 })
 
 #' @export
-setMethod("plotGraph", "transformationProducts", function(obj)
+setMethod("plotGraph", "transformationProducts", function(obj, components = NULL, prune = TRUE,
+                                                          onlyCompletePaths = FALSE)
 {
     # UNDONE: move to structure class
-    # UNDONE: make sure that it also works with library --> need to add some fields?
-    # UNDONE: implement IDs with all algos
     # UNDONE: make structure plotting optional
-    # UNDONE: don't make unique, but use IDs
+    # UNDONE: don't make name unique, but use IDs?
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(components, "componentsTPs", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ prune + onlyCompletePaths, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
     
     TPTab <- copy(as.data.table(obj))
-    
-    TPTab[, name := make.unique(name)]
+    TPTab[, c("name_orig", "name") := .(name, make.unique(name))]
     TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
     
+    if (!is.null(components))
+    {
+        cmpTab <- as.data.table(components)
+        TPTab <- TPTab[parent %chin% cmpTab$parent_name] # omit missing root parents
+        TPTab[, present := name_orig %chin% cmpTab$TP_name]
+        
+        TPTab[, childPresent := FALSE]
+        markChildPresent <- function(TPNames)
+        {
+            if (length(TPNames) == 0)
+                return()
+            TPTab[name %chin% TPNames, childPresent := TRUE]
+            pars <- TPTab[name %chin% TPNames]$parent_name
+            markChildPresent(pars[TPTab[name %chin% pars]$childPresent == FALSE])
+        }
+        markChildPresent(TPTab[present == TRUE]$parent_name)
+        
+        if (prune)
+            TPTab <- TPTab[present == TRUE | childPresent == TRUE]
+        if (onlyCompletePaths)
+        {
+            TPTab <- TPTab[present == TRUE]
+            # keep removing TPs without parent until no change
+            oldn <- nrow(TPTab)
+            repeat
+            {
+                TPTab <- TPTab[parent_name == parent | parent_name %chin% name]
+                newn <- nrow(TPTab)
+                if (oldn == newn)
+                    break
+                oldn <- newn
+            }
+        }
+    }
+        
     pars <- parents(obj)
     TPTab[, parent_formula := fifelse(is.na(parent_ID),
                                       pars$formula[match(parent_name, pars$name)],
@@ -167,6 +205,10 @@ setMethod("plotGraph", "transformationProducts", function(obj)
     nodes[isTP == TRUE, label := paste0("TP", TPTab$chem_ID[match(id, TPTab$name)])]
     nodes[isTP == FALSE, label := id]
     nodes[, group := if (.N > 1) label else "unique", by = "label"]
+    nodes[, present := isTP == FALSE | TPTab$present[match(id, TPTab$name)]]
+    nodes[present == TRUE, shapeProperties := list(list(list(useBorderWithImage = TRUE)))]
+    nodes[present == FALSE, shapeProperties := list(list(list(useBorderWithImage = FALSE)))]
+    nodes[, present := NULL]
     nodes[isTP == FALSE, level := 0]
     nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
     

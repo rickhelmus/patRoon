@@ -16,7 +16,6 @@
     - filter on likelihood, and others?
     - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
     - routes --> transformation
-- plot function to show hierarchy of (detected) TPs?
 
 
 ## Annotation

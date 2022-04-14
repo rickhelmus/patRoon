@@ -182,10 +182,10 @@ setMethod("plotGraph", "transformationProducts", function(obj)
     nodes[isTP == TRUE, image := sapply(TPTab$SMILES[match(id, TPTab$name)], getURIFromSMILES)]
     nodes[isTP == FALSE, image := sapply(pars$SMILES[match(id, pars$name)], getURIFromSMILES)]
     
-    TPCols <- intersect(c("name", "SMILES", "formula", "routes", "generation", "accumulation", "production",
+    TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "routes", "generation", "accumulation", "production",
                           "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
                           "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
-                          "biosystem"), names(TPTab))
+                          "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref"), names(TPTab))
     nodes[isTP == TRUE, title := sapply(id, function(TP)
     {
         TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]

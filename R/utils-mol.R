@@ -234,7 +234,7 @@ prepareChemTable <- function(chemData)
 {
     chemData <- copy(chemData)
     
-    # UNDONE: skip missing input columns
+    # UNDONE: add missing input columns
     
     convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE)
     convertedSMILES <- babelConvert(chemData$InChI, "inchi", "smi", appendFormula = TRUE, mustWork = FALSE)
@@ -261,15 +261,15 @@ prepareChemTable <- function(chemData)
         !grepl("\\[[[:digit:]]+[[:upper:]]{1}[[:lower:]]*\\]", gsub("[2H]", "", chemData$SMILES, fixed = TRUE))
     chemData[, formula := fifelse(!is.na(convForms) & isSMIOKForFormula, convForms, formula)]
     
-    # prefer calculated masses
-    # if SMILES are available it's faster to use those for calculating the neutral mass
-    # NOTE: use by to avoid duplicated calculations
-    # NOTE: we could apply this for all non-NA SMILES instead of just those OK for formula calculation
-    # ('isSMIOKForFormula'), however, in the next block we still will get all neutral masses for the entries for which
-    # no formula was calculated
+    # Prefer calculated masses if SMILES are available it's faster to use those for calculating the neutral mass.
+    # NOTE: use by to avoid duplicated calculations.
+    # NOTE: if a formula is available and it was _not_ calculated then the neutral mass is obtained in the next block,
+    # which is more efficient as there both the formula and neutral mass are calculated.
     
     smp <- rcdk::get.smiles.parser() # get re-usable instance, which per rcdk docs is faster
-    chemData[isSMIOKForFormula, neutralMass := {
+    # Get neutral mass for candidates with calculated formulas or without formula but with available SMILES (e.g.
+    # isotope labeled compounds).
+    chemData[isSMIOKForFormula | (is.na(formula) & !is.na(SMILES)), neutralMass := {
         ret <- tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
                         error = function(...) NA_real_)
         if (is.na(ret) && !is.na(formula[1])) # failed, try from formula

@@ -14,7 +14,7 @@ makeDBIDsUnique <- function(records)
 
 sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
 {
-    printf("Converting to tables\n")
+    printf("Converting to tables... ")
     lib$records <- as.data.table(lib$records)
     # UNDONE: not for now, takes a lot of time for large amounts
     # lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
@@ -23,6 +23,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     #     doProgress()
     #     return(ret)
     # }))
+    printf("Done!\n")
     
     lib$spectra <- pruneList(lib$spectra, checkEmptyElements = TRUE)
     lib$annotations <- pruneList(lib$annotations, checkEmptyElements = TRUE)
@@ -78,23 +79,17 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
     # printf("Done!\n")
     
-    printf("Clean up formulas...\n")
+    printf("Clean up formulas... ")
     # remove ion species format ([formula]+/-)
     lib$records[!is.na(formula), formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", formula)]
     # remove trailing charges
     lib$records[!is.na(formula), formula := gsub("\\+|\\-$", "", formula)]
     lib$records[!is.na(formula), formula := gsub("\\[|\\]|\\+|\\-", "", formula)] # remove ion species format ([formula]+/-)
-    printf("Clearing invalid formulas...\n")
-    lib$records[!verifyFormulas(formula), formula := NA_character_]
+    printf("Done!\n")
     
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
-                                           fromFormats = "inchi", fromCols = "InChI")
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchi", destCol = "InChI",
-                                           fromFormats = "smi", fromCols = "SMILES")
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchikey", destCol = "InChIKey",
-                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "formula",
-                                           fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+    printf("Calculating/Validating chemical data... ")
+    lib$records <- prepareChemTable(lib$records)
+    printf("Done!\n")
     
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
     lib$records[, Ion_mode := toupper("POSITIVE")]
@@ -126,12 +121,13 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     for (i in seq_along(adductMapping))
         lib$records[, Precursor_type := sub(names(adductMapping)[i], adductMapping[i], Precursor_type)]
     
-    printf("Verify/Standardize adducts\n")
+    printf("Verify/Standardize adducts... ")
     lib$records[!is.na(Precursor_type), Precursor_type := normalizeAdducts(Precursor_type, err = FALSE)]
+    printf("Done!\n")
     
     if (!isFALSE(potAdducts))
     {
-        printf("Guessing missing adducts\n")
+        printf("Guessing missing adducts...\n")
         
         if (is.null(potAdducts))
         {
@@ -155,7 +151,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
                     }))]
     }
     
-    printf("Calculating missing precursor m/z values\n")
+    printf("Calculating missing precursor m/z values...\n")
     lib$records[is.na(PrecursorMZ) & !is.na(neutralMass) & !is.na(Precursor_type),
                 PrecursorMZ := withProg(.N, FALSE, mapply(neutralMass, Precursor_type, FUN = function(em, pt)
                 {
@@ -168,7 +164,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     if (calcSPLASH && any(is.na(lib$records$SPLASH)))
     {
         # UNDONE: this is rather slow... MassBank has SPLASH values, so not that important...
-        printf("Calculating missing SPLASH values\n")
+        printf("Calculating missing SPLASH values...\n")
         checkPackage("splashR", "berlinguyinca/spectra-hash", "splashR")
         lib$records[is.na(SPLASH), SPLASH := withProg(.N, FALSE, sapply(lib$spectra, function(sp)
         {

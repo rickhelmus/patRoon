@@ -55,6 +55,8 @@
 - suspects
     - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
     - amend suspect lists with fragments from MSLibrary
+    - update ID levels
+- prepareChemTable(): for suspects and status messages/progress bars?
 
 
 

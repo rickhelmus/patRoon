@@ -234,7 +234,12 @@ prepareChemTable <- function(chemData)
 {
     chemData <- copy(chemData)
     
-    # UNDONE: add missing input columns
+    # add missing input columns to simplify things a bit
+    for (col in c("SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+    {
+        if (is.null(chemData[[col]]))
+            chemData[, (col) := if (col == "neutralMass") NA_real_ else NA_character_]
+    }
     
     convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE)
     convertedSMILES <- babelConvert(chemData$InChI, "inchi", "smi", appendFormula = TRUE, mustWork = FALSE)

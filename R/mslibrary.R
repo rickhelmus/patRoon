@@ -34,11 +34,16 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
         set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "Formula", "Precursor_type", "Ion_mode", "SPLASH")
-    numCols <- c("ExactMass", "PrecursorMZ")
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "formula", "Precursor_type", "Ion_mode", "SPLASH")
+    numCols <- c("neutralMass", "PrecursorMZ")
     allCols <- c(chCols, numCols)
     colInds <- match(tolower(allCols), tolower(names(lib$records)))
     setnames(lib$records, colInds[!is.na(colInds)], allCols[!is.na(colInds)])
+    
+    # ExactMass --> neutralMass (for consistency with other patRoon code)
+    emInd <- match("exactmass", tolower(names(lib$records)))
+    if (!is.na(emInd) && !"neutralMass" %in% names(lib$records))
+        setnames(lib$records, emInd, "neutralMass")
     
     if (!all(c("Name", "DB_ID") %in% names(lib$records)))
         stop("MSP file misses mandatory Name and/or DB# data.")
@@ -75,12 +80,12 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     
     printf("Clean up formulas...\n")
     # remove ion species format ([formula]+/-)
-    lib$records[!is.na(Formula), Formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", Formula)]
+    lib$records[!is.na(formula), formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", formula)]
     # remove trailing charges
-    lib$records[!is.na(Formula), Formula := gsub("\\+|\\-$", "", Formula)]
-    lib$records[!is.na(Formula), Formula := gsub("\\[|\\]|\\+|\\-", "", Formula)] # remove ion species format ([formula]+/-)
+    lib$records[!is.na(formula), formula := gsub("\\+|\\-$", "", formula)]
+    lib$records[!is.na(formula), formula := gsub("\\[|\\]|\\+|\\-", "", formula)] # remove ion species format ([formula]+/-)
     printf("Clearing invalid formulas...\n")
-    lib$records[!verifyFormulas(Formula), Formula := NA_character_]
+    lib$records[!verifyFormulas(formula), formula := NA_character_]
     
     lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "smi", destCol = "SMILES",
                                            fromFormats = "inchi", fromCols = "InChI")
@@ -88,7 +93,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
                                            fromFormats = "smi", fromCols = "SMILES")
     lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "inchikey", destCol = "InChIKey",
                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "Formula",
+    lib$records <- convertChemDataIfNeeded(lib$records, destFormat = "formula", destCol = "formula",
                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
     
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
@@ -138,8 +143,8 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
         potAdducts <- lapply(potAdducts, checkAndToAdduct, .var.name = "potAdducts")
         potAdductsPos <- potAdducts[sapply(potAdducts, slot, "charge") > 0]
         potAdductsNeg <- potAdducts[sapply(potAdducts, slot, "charge") < 0]
-        lib$records[is.na(Precursor_type) & !is.na(ExactMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
-                    Precursor_type := withProg(.N, FALSE, mapply(ExactMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
+        lib$records[is.na(Precursor_type) & !is.na(neutralMass) & !is.na(PrecursorMZ) & !is.na(Ion_mode),
+                    Precursor_type := withProg(.N, FALSE, mapply(neutralMass, PrecursorMZ, Ion_mode, FUN = function(em, pmz, im)
                     {
                         pa <- if (im == "POSITIVE") potAdductsPos else potAdductsNeg
                         calcMZs <- calculateMasses(em, pa, "mz", err = FALSE) # set err to FALSE to ignore invalid adducts
@@ -151,8 +156,8 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     }
     
     printf("Calculating missing precursor m/z values\n")
-    lib$records[is.na(PrecursorMZ) & !is.na(ExactMass) & !is.na(Precursor_type),
-                PrecursorMZ := withProg(.N, FALSE, mapply(ExactMass, Precursor_type, FUN = function(em, pt)
+    lib$records[is.na(PrecursorMZ) & !is.na(neutralMass) & !is.na(Precursor_type),
+                PrecursorMZ := withProg(.N, FALSE, mapply(neutralMass, Precursor_type, FUN = function(em, pt)
                 {
                     add <- tryCatch(as.adduct(pt), error = function(...) NULL)
                     ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")
@@ -353,7 +358,7 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
             }
             
             if (!is.null(massRange))
-                recs[keep == TRUE, keep := !is.na(ExactMass) & mark(ExactMass %inrange% massRange)]
+                recs[keep == TRUE, keep := !is.na(neutralMass) & mark(neutralMass %inrange% massRange)]
             
             return(!recs$keep)
         })
@@ -448,9 +453,9 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
                  SMILES = "SMILES",
                  InChI = "InChI",
                  InChIKey = "InChIKey",
-                 Formula = "formula",
+                 formula = "formula",
                  Precursor_type = "adduct",
-                 ExactMass = "neutralMass",
+                 neutralMass = "neutralMass",
                  fragments_mz = "fragments_mz")
     mapCols <- mapCols[names(mapCols) %in% names(ret)]
     setnames(ret, names(mapCols), mapCols)

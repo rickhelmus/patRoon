@@ -12,8 +12,8 @@ unifyLibNames <- function(cTab)
                  SMILES = "SMILES",
                  InChI = "InChI",
                  InChIKey = "InChIKey",
-                 Formula = "neutral_formula",
-                 ExactMass = "neutralMass",
+                 formula = "neutral_formula",
+                 neutralMass = "neutralMass",
                  Precursor_type = "precursorType",
                  Spectrum_Type = "spectrumType",
                  PrecursorMZ = "ion_formula_mz",
@@ -56,7 +56,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     libSpecs <- spectra(MSLibrary)
     libAnn <- annotations(MSLibrary)
     
-    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(Formula)]
+    libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(formula)]
     if (checkIons == "adduct")
         libRecs <- libRecs[!is.na(Precursor_type)]
     if (checkIons != "none")

@@ -39,6 +39,9 @@
     - don't merge synonyms? or split them somehow on export? Otherwise doc
     - naming OK ('records')?
         - metaData?
+    - Column name harmonization
+        - More column names?
+        - Make option in as.data.table() to enable/disable name harmonization?
     - sanitize input
         - trim spaces
         - Verify SMILES, InChI, InChIKey, Formula, neutralMass (from any of the previous, if available)

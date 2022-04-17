@@ -33,7 +33,6 @@
 
 - library
     - fixup annotation formulas too?
-    - Always sanitize SMILES/InChIs/Formulas? Or make it optional and default enabled? Now only formulas are done...
     - also verify formulas of adducts?
     - include lib adducts optionally for adduct guessing
     - don't merge synonyms? or split them somehow on export? Otherwise doc
@@ -43,8 +42,6 @@
         - More column names?
         - Make option in as.data.table() to enable/disable name harmonization?
     - sanitize input
-        - trim spaces
-        - Verify SMILES, InChI, InChIKey, Formula, neutralMass (from any of the previous, if available)
         - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
 - compounds
     - show mirror spectrum in report? Would need library data somehow

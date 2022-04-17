@@ -3,24 +3,32 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
     ncmd <- length(commandQueue)
     ret <- list()
     
+    quoteCmd <- function(cmd) paste(shQuote(cmd$command), paste0(shQuote(cmd$args), collapse = " "), sep = " ")
+    
+    if (Sys.info()[["sysname"]] == "Windows")
+    {
+        # fail with last exit code if a command failed: see https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
+        # NOTE: need to enable delayed expansion and use exclamation marks for current errorlevel expansion.
+        ORDoExit <- "|| exit /b !errorlevel!"
+        
+        # mark success of a command by creating an empty file named after the command index
+        ANDMarkSucceed <- paste("&& type NUL >", file.path(sucDir, cmdInds))
+    }
+    else
+    {
+        ORDoExit <- "|| exit $?"
+        ANDMarkSucceed <- paste("&& touch", file.path(sucDir, cmdInds))
+    }
+    
     if (ncmd > 1)
     {
         # execute multiple processes at once
         
-        cmdList <- sapply(commandQueue,
-                          function(cmd) paste(shQuote(cmd$command), paste0(shQuote(cmd$args), collapse = " "),
-                                              sep = " "))
+        cmdList <- sapply(commandQueue, quoteCmd)
         
         if (Sys.info()[["sysname"]] == "Windows")
         {
             # on Windows we easily reach the commandline text limit --> execute as batch file
-            
-            # fail with last exit code if a command failed: see https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
-            # NOTE: need to enable delayed expansion and use exclamation marks for current errorlevel expansion.
-            ORDoExit <- "|| exit /b !errorlevel!"
-            
-            # mark success of a command by creating an empty file named after the command index
-            ANDMarkSucceed <- paste("&& type NUL >", file.path(sucDir, cmdInds))
             
             # use call in order to be able to execute batch files
             cmdList <- paste("call", cmdList)
@@ -36,16 +44,21 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
             # not supported anymore by processx :( --> call sh instead for nix
             # ret$commandline <- paste0(cmdList, collapse = " ; ")
             
-            ORDoExit <- "|| exit $?"
-            ANDMarkSucceed <- paste("&& touch", file.path(sucDir, cmdInds))
-            
             ret$command <- "/bin/sh"
             ret$args <- c("-c", paste0(cmdList, ANDMarkSucceed, ORDoExit, collapse = " && "))
         }
     }
     else
     {
-        ret[c("command", "args")] <- commandQueue[[1]][c("command", "args")]
+        if (Sys.info()[["sysname"]] == "Windows")
+            ret[c("command", "args")] <- commandQueue[[1]][c("command", "args")]
+        else
+        {
+            # HACK: on Linux (and others?) sometimes NA is returned for status messages, use success markers there like
+            # batch mode above
+            ret$command <- "/bin/sh"
+            ret$args <- c("-c", paste(quoteCmd(commandQueue[[1]]), ANDMarkSucceed, ORDoExit))
+        }
         if (!is.null(commandQueue[[1]]$logFile))
             ret[c("stdout", "stderr")] <- "|"
     }
@@ -92,10 +105,12 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
     if (length(starti) == 0)
         starti <- 0
     
+    useSucMarkers <- ncmd > 1 || Sys.info()[["sysname"]] != "Windows"
+    
     for (i in seq(starti + 1, ncmd))
     {
         # succeeded?
-        if (ncmd > 1 && file.exists(file.path(sucDir, cmdInds[i])))
+        if (useSucMarkers && file.exists(file.path(sucDir, cmdInds[i])))
             next
         
         # already marked as failed during a previous restart?
@@ -271,12 +286,8 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
             {
                 ncmd <- length(cmdInds)
                 
-                # NOTE: as per docs get_exit_status() might return NA, in this
-                # case check if a command failed (by checking for missing
-                # success marker files)
-                # UNDONE: when batchSize=1 we don't create/check success
-                # markers. Fix this? So far never had NA exit statuses in that
-                # situation.
+                # NOTE: as per docs get_exit_status() might return NA, in this case check if a command failed (by
+                # checking for missing success marker files)
                 exitStatus <- runningProcs[[pi]]$get_exit_status()
                 
                 if (is.na(exitStatus) || exitStatus != 0) # something (may have) failed?

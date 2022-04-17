@@ -59,6 +59,11 @@
 - prepareChemTable(): for suspects and status messages/progress bars?
 
 
+## NEWS
+
+- prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
+- MP: more workarounds to handle NA exit codes on Linux
+
 
 
 ## Tests

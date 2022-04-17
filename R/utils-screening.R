@@ -58,44 +58,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
             suspects[, name := sanNames]
         }
         
-        # get missing identifiers & formulae if necessary and possible
-        suspects <- convertChemDataIfNeeded(suspects, destFormat = "smi", destCol = "SMILES",
-                                            fromFormats = "inchi", fromCols = "InChI")
-        suspects <- convertChemDataIfNeeded(suspects, destFormat = "inchi", destCol = "InChI",
-                                            fromFormats = "smi", fromCols = "SMILES")
-        suspects <- convertChemDataIfNeeded(suspects, destFormat = "inchikey", destCol = "InChIKey",
-                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-        suspects <- convertChemDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
-                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
-        
-        # neutral masses given for all?
-        if (!is.null(suspects[["neutralMass"]]) && !any(is.na(suspects[["neutralMass"]])))
-            neutralMasses <- suspects[["neutralMass"]]
-        else
-        {
-            printf("Calculating neutral masses for each suspect...\n")
-            prog <- openProgBar(0, nrow(suspects))
-            
-            canUse <- function(v) !is.null(v) && !is.na(v) && (!is.character(v) || nzchar(v))
-            neutralMasses <- sapply(seq_len(nrow(suspects)), function(i)
-            {
-                if (canUse(suspects[["neutralMass"]][i]))
-                    ret <- suspects$neutralMass[i]
-                else if (canUse(suspects[["formula"]][i]))
-                    ret <- getFormulaMass(suspects$formula[i])
-                else if (canUse(suspects[["SMILES"]][i]))
-                    ret <- getNeutralMassFromSMILES(suspects$SMILES[i], mustWork = FALSE)[[1]]
-                else
-                    ret <- NA
-                
-                setTxtProgressBar(prog, i)
-                return(ret)
-            })
-            
-            close(prog)
-        }
-
-        suspects[, neutralMass := neutralMasses]
+        suspects <- prepareChemTable(suspects)
         
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&

@@ -179,31 +179,6 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     return(ret$result)
 }
 
-convertChemDataIfNeeded <- function(tab, destFormat, destCol, fromFormats, fromCols)
-{
-    hasData <- function(x) !is.na(x) & nzchar(x)
-    missingInTab <- function(x) if (is.null(tab[[x]])) rep(TRUE, nrow(tab)) else !hasData(tab[[x]])
-    
-    countEntries <- function() if (is.null(tab[[destCol]])) 0 else sum(hasData(tab[[destCol]]))
-    curEntryCount <- countEntries()
-    if (curEntryCount < nrow(tab))
-    {
-        printf("Trying to calculate missing %s data... ", destCol)
-        
-        for (i in seq_along(fromFormats))
-        {
-            if (!is.null(tab[[fromCols[i]]]))
-                tab[missingInTab(destCol) & !missingInTab(fromCols[i]),
-                    (destCol) := babelConvert(get(fromCols[i]), fromFormats[i], destFormat, mustWork = FALSE)]
-        }
-        
-        newEntryCount <- countEntries() - curEntryCount
-        printf("Done! Filled in %d (%.1f%%) entries.\n", newEntryCount,
-               if (newEntryCount > 0) newEntryCount * 100 / nrow(tab) else 0)
-    }
-    return(tab)
-}
-
 calculateXLogP <- function(SMILES, mustWork)
 {
     doCalc <- function(mol)

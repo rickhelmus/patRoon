@@ -232,13 +232,18 @@ calculateXLogP <- function(SMILES, mustWork)
 
 prepareChemTable <- function(chemData)
 {
+    printf("Calculating/Validating chemical data... ")
+    
     chemData <- copy(chemData)
     
     # add missing input columns to simplify things a bit
+    # trim white space to improve input data
     for (col in c("SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     {
         if (is.null(chemData[[col]]))
             chemData[, (col) := if (col == "neutralMass") NA_real_ else NA_character_]
+        else if (is.character(chemData[[col]]))
+            chemData[, (col) := trimws(get(col))]
     }
     
     convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE)
@@ -290,6 +295,8 @@ prepareChemTable <- function(chemData)
         else
             list(form@string, form@mass)
     }, by = "formula"]
+    
+    printf("Done!\n")
     
     return(chemData)
 }

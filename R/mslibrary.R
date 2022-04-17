@@ -87,9 +87,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
     lib$records[!is.na(formula), formula := gsub("\\[|\\]|\\+|\\-", "", formula)] # remove ion species format ([formula]+/-)
     printf("Done!\n")
     
-    printf("Calculating/Validating chemical data... ")
     lib$records <- prepareChemTable(lib$records)
-    printf("Done!\n")
     
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
     lib$records[, Ion_mode := toupper("POSITIVE")]

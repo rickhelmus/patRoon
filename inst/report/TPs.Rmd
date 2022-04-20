@@ -225,16 +225,16 @@ if (isScreening(rmdVars$fGroups))
                        by = c("group", "name"), all.x = TRUE, sort = FALSE)
 }
 
-parentsDT[, parent := paste0(sapply(component, function(cmp)
+parentsDT[, component := paste0(sapply(component, function(cmp)
 {
     if (is.null(parentPlots[[cmp]][["struct"]])) "" else imgTags(parentPlots[[cmp]][["struct"]])
 }), "<br>", component, " (", name, ")")]
-parentsDT[, c("component", "name") := NULL]
+parentsDT[, name := NULL]
 
 parentsDT[, show := { sprintf("<button onclick=\"showTPs('%s', %d);\" style=\"padding: 0px 3px 0px 3px\">Show</button>",
                               compInd, match(cInfo$parent_group, names(rmdVars$fGroups))) }]
 
-setcolorder(parentsDT, c("compInd", "show", "parent"))
+setcolorder(parentsDT, c("compInd", "show", "component"))
 
 DT::datatable(parentsDT, extensions = "Buttons", fillContainer = TRUE,
               options = list(paging = FALSE, pageLength = -1, scrollX = TRUE, scrollY = "300px",

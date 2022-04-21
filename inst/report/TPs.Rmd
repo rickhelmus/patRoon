@@ -273,7 +273,7 @@ DT::datatable(parentsPlotsDT,
 ```
 
 
-##
+## {.tabset}
 
 ### Transformation Products { .TPsClass }
 
@@ -374,3 +374,18 @@ DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRend
               rownames = FALSE, escape = FALSE, elementId = "TPsTable")
 ```
 
+### Transformation Pathway
+
+```{r}
+rmdText <- sapply(seq_len(nrow(cInfo)), function(i)
+{
+    glue::glue("\n{ ticks } {{r}}\n",
+               "gr <- plotGraph(rmdVars$TPs[{ TPInd }])\n",
+               "gr$elementId <- paste0('TPGraph_', { i })\n",
+               "gr\n",
+               "{ ticks }\n\n", ticks = "```", i = i, TPInd = match(cInfo$parent_name[i], parents(rmdVars$TPs)$name))
+})
+rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n") else ""
+```
+
+`r if (nzchar(rmdText)) rmdText`

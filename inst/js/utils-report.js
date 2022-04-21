@@ -79,6 +79,14 @@ function initTPs()
 {
     filterDTRows("nothing", "parentsPlotsTable");
     filterDTRows("nothing", "TPsTable");
+    
+    var table = $("#parentsTable .dataTable").DataTable();
+    var IDs = Array.from(table.column(0).data());
+    for (const i of IDs)
+    {
+        el = document.getElementById("TPGraph_" + i);
+        el.style.display = "none";
+    }
 }
 
 function showTPs(cmp, group)
@@ -86,6 +94,19 @@ function showTPs(cmp, group)
     filterDTRows(cmp, "parentsPlotsTable");
     filterDTRows(cmp, "TPsTable");
     selectDTRow(cmp, "parentsTable", 1);
+    
+    TPGraphs = document.querySelectorAll('[id ^= "TPGraph_"]');
+    elName = "TPGraph_" + cmp
+    for (var i=0; i<TPGraphs.length; i++)
+    {
+        if (TPGraphs[i].id == elName)
+        {
+            TPGraphs[i].style.display = "";
+            document.getElementById("graphTPGraph_" + cmp).chart.fit(); // HACK: reset zoom
+        }
+        else
+            TPGraphs[i].style.display = "none";
+    }
     
     $("#parentsTable .dataTable").DataTable().columns.adjust().draw();
 }

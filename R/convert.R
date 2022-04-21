@@ -373,7 +373,6 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     {
         afiles <- getMSFilePaths(anaInfo$analysis, anaInfo$path, from)
         files <- union(files, afiles)
-        browser()
     }
 
     if (is.null(outPath))

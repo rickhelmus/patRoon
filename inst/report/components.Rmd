@@ -179,7 +179,7 @@ if (isSet)
 } else
     rmdText <- paste0(hd(""), subhd("Components"), body("NULL"))
 
-rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n")
+rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n") else ""
 ```
 
 `r if (nzchar(rmdText)) rmdText`

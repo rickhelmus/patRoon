@@ -132,16 +132,16 @@ setMethod("convertToSuspects", "transformationProducts", function(TPs, includePa
 })
 
 #' @export
-setMethod("plotGraph", "transformationProducts", function(obj, components = NULL, prune = TRUE,
+setMethod("plotGraph", "transformationProducts", function(obj, components = NULL, structuresMax = 25, prune = TRUE,
                                                           onlyCompletePaths = FALSE)
 {
     # UNDONE: move to structure class
-    # UNDONE: make structure plotting optional
     # UNDONE: don't make name unique, but use IDs?
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(components, "componentsTPs", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ prune + onlyCompletePaths, fixed = list(add = ac))
+    checkmate::assertCount(structuresMax, add = ac)
     checkmate::reportAssertions(ac)
     
     TPTab <- copy(as.data.table(obj))
@@ -212,17 +212,23 @@ setMethod("plotGraph", "transformationProducts", function(obj, components = NULL
     nodes[isTP == FALSE, level := 0]
     nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
     
-    # UNDONE: make util?
-    imgf <- tempfile(fileext = ".png") # temp file is re-used
-    getURIFromSMILES <- function(SMILES)
+    if (nrow(nodes) <= structuresMax)
     {
-        mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
-        withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
-        return(knitr::image_uri(imgf))
+        # UNDONE: make util?
+        imgf <- tempfile(fileext = ".png") # temp file is re-used
+        getURIFromSMILES <- function(SMILES)
+        {
+            mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
+            withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
+            return(knitr::image_uri(imgf))
+        }
+        nodes[, shape := "image"]
+        nodes[, SMILES := fifelse(isTP, TPTab$SMILES[match(id, TPTab$name)], pars$SMILES[match(id, pars$name)])]
+        nodes[, image := getURIFromSMILES(SMILES[1]), by = "SMILES"]
+        nodes[, SMILES := NULL]
     }
-    nodes[, shape := "image"]
-    nodes[isTP == TRUE, image := sapply(TPTab$SMILES[match(id, TPTab$name)], getURIFromSMILES)]
-    nodes[isTP == FALSE, image := sapply(pars$SMILES[match(id, pars$name)], getURIFromSMILES)]
+    else
+        nodes[, shape := "ellipse"]
     
     TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "routes", "generation", "accumulation", "production",
                           "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",

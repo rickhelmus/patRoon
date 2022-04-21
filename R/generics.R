@@ -410,8 +410,8 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                   compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
-                                  MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), retMin = TRUE,
-                                  EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = 1,
+                                  MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
+                                  retMin = TRUE, EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = 1,
                                   EICTopMostByRGroup = TRUE, EICOnlyPresent = TRUE, selfContained = TRUE,
                                   optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
                                   noDate = FALSE) standardGeneric("reportHTML"))

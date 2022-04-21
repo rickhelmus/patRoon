@@ -767,7 +767,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                                   compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
-                                                  MSPeakLists, specSimParams, retMin, EICRtWindow, EICMzExpWindow,
+                                                  MSPeakLists, specSimParams, TPs, retMin, EICRtWindow, EICMzExpWindow,
                                                   EICTopMost, EICTopMostByRGroup, EICOnlyPresent, selfContained,
                                                   optimizePng, clearPath, openReport, noDate)
 {
@@ -780,8 +780,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     aapply(checkmate::assertFlag, . ~ compoundsOnlyUsedScorings + interactiveHeat + retMin + EICTopMostByRGroup +
                EICOnlyPresent + selfContained + optimizePng + clearPath + openReport + noDate,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
-           c("formulas", "compounds", "components", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists + TPs,
+           c("formulas", "compounds", "components", "MSPeakLists", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ formulasExclNormScores + compoundsExclNormScores,
@@ -848,7 +848,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                     compoundsExclNormScores = compoundsExclNormScores,
                     compoundsOnlyUsedScorings = compoundsOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, specSimParams = specSimParams,
-                    selfContained = selfContained, optimizePng = optimizePng, noDate = noDate)
+                    TPs = TPs, selfContained = selfContained, optimizePng = optimizePng, noDate = noDate)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

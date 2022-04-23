@@ -44,6 +44,7 @@
     - sanitize input
         - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
 - compounds
+    - update for data.table spectra
     - show mirror spectrum in report? Would need library data somehow
     - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
     - collapse with IK1?

@@ -59,25 +59,18 @@ Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const 
         recordsList[k] = vals;
     }
     
-    Rcpp::List specList(records.size());
-    specList.names() = recordsList["DB_ID"];
-    for (int i=0; i<specList.size(); ++i)
+    Rcpp::List specListMZs(records.size()), specListInts(records.size()), annList(records.size());
+    specListMZs.names() = specListInts.names() = annList.names() = recordsList["DB_ID"];
+    for (int i=0; i<records.size(); ++i)
     {
-        Rcpp::NumericMatrix nm(records[i].spectrum.mzs.size(), 2);
-        nm(Rcpp::_, 0) = Rcpp::NumericVector(records[i].spectrum.mzs.begin(), records[i].spectrum.mzs.end());
-        nm(Rcpp::_, 1) = Rcpp::NumericVector(records[i].spectrum.intensities.begin(),
-           records[i].spectrum.intensities.end());
-        Rcpp::colnames(nm) = Rcpp::CharacterVector({"mz", "intensity"});
-        specList[i] = nm;
+        specListMZs[i] = records[i].spectrum.mzs;
+        specListInts[i] = records[i].spectrum.intensities;
+        annList[i] = records[i].spectrum.annotations;
     }
     
-    Rcpp::List annList(records.size());
-    annList.names() = recordsList["DB_ID"];
-    for (int i=0; i<annList.size(); ++i)
-        annList[i] = records[i].spectrum.annotations;
-    
     return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(recordsList),
-                              Rcpp::Named("spectra") = specList,
+                              Rcpp::Named("spectraMZs") = specListMZs,
+                              Rcpp::Named("spectraInts") = specListInts,
                               Rcpp::Named("annotations") = annList);
 }
 

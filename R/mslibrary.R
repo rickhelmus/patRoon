@@ -16,18 +16,16 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
 {
     printf("Converting to tables... ")
     lib$records <- as.data.table(lib$records)
-    # UNDONE: not for now, takes a lot of time for large amounts
-    # lib$spectra <- withProg(length(lib$spectra), FALSE, lapply(lib$spectra, function(s)
-    # {
-    #     ret <- as.data.table(s)
-    #     doProgress()
-    #     return(ret)
-    # }))
+    lib$spectra <- Map(lib$spectraMZs, lib$spectraInts, lib$annotations, f = function(mz, int, ann)
+    {
+        if (length(ann) == 0)
+            data.table(mz = mz, intensity = int)
+        else
+            data.table(mz = mz, intensity = int, formula = ann)
+    })
     printf("Done!\n")
     
-    lib$spectra <- pruneList(lib$spectra, checkEmptyElements = TRUE)
-    lib$annotations <- pruneList(lib$annotations, checkEmptyElements = TRUE)
-    lib$annotations <- lib$annotations[names(lib$annotations) %chin% names(lib$spectra)]
+    lib$spectra <- pruneList(lib$spectra, checkZeroRows = TRUE)
     lib$records <- lib$records[DB_ID %chin% names(lib$spectra)]
     
     # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...
@@ -170,13 +168,12 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
 
 
 #' @export
-MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list", annotations = "list"),
+MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
                       contains = "workflowStep")
 
 setMethod("initialize", "MSLibrary", function(.Object, ...)
 {
     .Object <- callNextMethod(.Object, ...)
-    .Object@annotations <- makeEmptyListNamed(.Object@annotations)
     return(.Object)
 })
 
@@ -185,9 +182,6 @@ setMethod("records", "MSLibrary", function(obj) obj@records)
 
 #' @export
 setMethod("spectra", "MSLibrary", function(obj) obj@spectra)
-
-#' @export
-setMethod("annotations", "MSLibrary", function(obj) obj@annotations)
 
 #' @export
 setMethod("length", "MSLibrary", function(x) nrow(records(x)))
@@ -231,7 +225,7 @@ setMethod("$", "MSLibrary", function(x, name)
 #' @export
 setMethod("as.data.table", "MSLibrary", function(x)
 {
-    allSpecs <- rbindlist(spectra(x), idcol = "DB_ID")
+    allSpecs <- rbindlist(spectra(x), idcol = "DB_ID", fill = TRUE)
     return(merge(records(x), allSpecs, by = "DB_ID"))
 })
 
@@ -271,8 +265,6 @@ setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
         }
         
         obj@spectra <- obj@spectra[obj@records$DB_ID]
-        if (length(obj@annotations) > 0)
-            obj@annotations <- obj@annotations[names(obj@annotations) %chin% obj@records$DB_ID]
     }
     else
     {
@@ -280,21 +272,16 @@ setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
         {
             if (is.function(j))
             {
-                inds <- j(rec, obj@spectra[[rec]], obj@annotations[[rec]])
+                inds <- j(rec, obj@spectra[[rec]])
                 if (is.logical(inds))
                     inds <- which(inds)
             }
             else # j = vector
                 inds <- j[j <= nrow(obj@spectra)]
             if (length(inds) > 0)
-            {
                 obj@spectra[[rec]] <- obj@spectra[[rec]][-inds, , drop = FALSE]
-                if (!is.null(obj@annotations[[rec]]))
-                    obj@annotations[[rec]] <- obj@annotations[[rec]][-inds]
-            }
         }
-        obj@spectra <- pruneList(obj@spectra, checkEmptyElements = TRUE)
-        obj@annotations <- pruneList(obj@annotations, checkEmptyElements = TRUE)
+        obj@spectra <- pruneList(obj@spectra, checkZeroRows = TRUE)
         obj@records <- obj@records[DB_ID %chin% names(obj@spectra)]
     }
     
@@ -326,10 +313,8 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 
     if (onlyAnnotated)
     {
-        if (negate)
-            obj <- delete(obj, i = intersect(names(obj), names(annotations(obj))))
-        else
-            obj <- delete(obj, i = setdiff(names(obj), names(annotations(obj))))
+        noAnnot <- sapply(spectra(obj), function(sp) is.null(sp[["formula"]]))
+        obj <- delete(obj, i = if (negate) !noAnnot else noAnnot)
     }
     
     if (!is.null(properties) || !is.null(massRange))
@@ -536,7 +521,7 @@ loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcS
     lib <- readMoNAJSON(normalizePath(file))
     lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
     
-    ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, annotations = lib$annotations, algorithm = "json")
+    ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "json")
     
     saveCacheData("MSLibraryJSON", ret, hash)
     

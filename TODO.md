@@ -49,11 +49,12 @@
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
+        - wouldn't this be minSim = 0?
 - suspects
     - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
     - amend suspect lists with fragments from MSLibrary
     - update ID levels
-- prepareChemTable(): for suspects and status messages/progress bars?
+- prepareChemTable(): more status messages/progress bars?
 
 
 ## NEWS

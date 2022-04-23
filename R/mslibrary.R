@@ -73,12 +73,6 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
             lib$records[, MW := as.numeric(MW)] # MW is not used by patRoon, but still make it numeric if present
     })
     
-    # UNDONE: this is quite slow, skip for now?
-    # printf("Sanitizing SMILES/InChI values... ")
-    # lib$records[!is.na(SMILES), SMILES := babelConvert(SMILES, "smi", "smi", FALSE)]
-    # lib$records[!is.na(InChI), InChI := babelConvert(InChI, "inchi", "inchi", FALSE)]
-    # printf("Done!\n")
-    
     printf("Clean up formulas... ")
     # remove ion species format ([formula]+/-)
     lib$records[!is.na(formula), formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", formula)]

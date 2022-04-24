@@ -54,8 +54,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     annTbl <- annotations(fGroups)
     libRecs <- records(MSLibrary)
     libSpecs <- spectra(MSLibrary)
-    libAnn <- annotations(MSLibrary)
-    
+
     libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(formula)]
     if (checkIons == "adduct")
         libRecs <- libRecs[!is.na(Precursor_type)]
@@ -112,7 +111,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         if (nrow(cTab) == 0)
             return(NULL)
 
-        hash <- makeHash(baseHash, spec, cTab, libSpecs[cTab$identifier], libAnn[cTab$identifier])
+        hash <- makeHash(baseHash, spec, cTab, libSpecs[cTab$identifier])
         resultHashCount <<- resultHashCount + 1
         resultHashes[resultHashCount] <<- hash
         
@@ -129,16 +128,11 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, cTab$identifier, f = function(sp, pmz, lid)
         {
             # convert to MSPeakLists format
-            ret <- as.data.table(sp)
+            ret <- copy(sp)
             ret[, ID := seq_len(.N)]
             ret <- assignPrecursorToMSPeakList(ret, pmz)
             ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParams$removePrecursor,
                                         relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
-            
-            # add annotations, if any
-            if (!is.null(libAnn[[lid]]))
-                ret[, annotation := libAnn[[lid]][ID]]
-            
             return(ret)
         })
         lspecs <- pruneList(lspecs, checkZeroRows = TRUE)
@@ -151,7 +145,17 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         cTab[, c("score", "libMatch") := sims[1, ]]
         
-        if (length(libAnn) > 0)
+        hasAnnons <- FALSE
+        for (sp in lspecs)
+        {
+            if (!is.null(sp[["annotation"]]))
+            {
+                hasAnnons <- TRUE
+                break
+            }
+        }
+        
+        if (hasAnnons)
         {
             cTabAnn <- cTab[numGTE(score, minAnnSim)] # store before filtering/de-duplicating
             # needed below for neutral loss calculation
@@ -176,7 +180,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             fi[, c("ion_formula", "neutral_loss") := NA_character_]
             setorderv(fi, "PLID")
             
-            if (length(libAnn) > 0)
+            if (hasAnnons)
             {
                 cta <- cTabAnn[InChIKey1 == ik1]
                 specMatched <- spec[ID %in% fi$PLID] # get peak list with only matched peaks, we need it for binning

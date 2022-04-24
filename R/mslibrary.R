@@ -21,7 +21,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
         if (length(ann) == 0)
             data.table(mz = mz, intensity = int)
         else
-            data.table(mz = mz, intensity = int, formula = ann)
+            data.table(mz = mz, intensity = int, annotation = ann)
     })
     printf("Done!\n")
     
@@ -313,7 +313,7 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 
     if (onlyAnnotated)
     {
-        noAnnot <- sapply(spectra(obj), function(sp) is.null(sp[["formula"]]))
+        noAnnot <- sapply(spectra(obj), function(sp) is.null(sp[["annotation"]]))
         obj <- delete(obj, i = if (negate) !noAnnot else noAnnot)
     }
     

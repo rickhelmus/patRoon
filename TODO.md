@@ -53,6 +53,7 @@
         - equal TPs formed from different routes (but from the same initial parent) are now named the same
         - Fixed: retDir is now derived from _original_ parent, i.e. not its direct parent
         - TP parent expansion
+        - steps --> generations for consistency with other algos
     - Lib
         - IDs
         - generations

@@ -27,12 +27,12 @@ setMethod("initialize", "transformationProductsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBaseBTCmd <- function(parent, SMILES, type, steps, extraOpts, baseHash)
+getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash)
 {
     mainArgs <- c("-b", type,
                   "-k", "pred",
                   "-ismi", SMILES,
-                  "-s", as.character(steps),
+                  "-s", as.character(generations),
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", parent, ".txt"), parent = parent,
@@ -133,7 +133,7 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
-#' @param steps The number of steps for the predictions. Sets the \command{-s} command line option.
+#' @param steps The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
 #' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
@@ -151,7 +151,7 @@ BTMPPrepareHandler <- function(cmd)
 #'   \addCitations{rcdk}{1}
 #'
 #' @export
-generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpts = NULL,
+generateTPsBioTransformer <- function(parents, type = "env", generations = 2, extraOpts = NULL,
                                       skipInvalid = TRUE, calcSims = FALSE, fpType = "extended",
                                       fpSimMethod = "tanimoto", MP = FALSE)
 {
@@ -167,7 +167,7 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
-    checkmate::assertCount(steps, positive = TRUE, add = ac)
+    checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims + MP, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
@@ -175,11 +175,11 @@ generateTPsBioTransformer <- function(parents, type = "env", steps = 2, extraOpt
 
     parents <- getTPParents(parents, skipInvalid)
 
-    baseHash <- makeHash(type, steps, extraOpts, skipInvalid, fpType, fpSimMethod)
+    baseHash <- makeHash(type, generations, extraOpts, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,
-                    MoreArgs = list(type = type, steps = steps, extraOpts = extraOpts, baseHash = baseHash))
+                    MoreArgs = list(type = type, generations = generations, extraOpts = extraOpts, baseHash = baseHash))
 
     results <- list()
 

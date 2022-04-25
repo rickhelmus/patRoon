@@ -9,13 +9,13 @@ setMethod("initialize", "transformationProductsCTS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cts", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcXLogP)
+runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP)
 {
     CTSURL <- "https://qed.epa.gov/cts/rest/metabolizer/run"
     # CTSURL <- "https://qed.epacdx.net/cts/rest/metabolizer/run" # older version??
     
     resp <- httr::RETRY("POST", url = CTSURL, encode = "json", times = errorRetries,
-                        body = list(structure = parentRow$SMILES, generationLimit = generationLimit,
+                        body = list(structure = parentRow$SMILES, generationLimit = generations,
                                     transformationLibraries = list(transLibrary)))
     
     httr::warn_for_status(resp)
@@ -73,7 +73,7 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
 
 
 #' @export
-generateTPsCTS <- function(parents, transLibrary, generationLimit = 1, errorRetries = 3, skipInvalid = TRUE,
+generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
                            calcXLogP = TRUE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
                            parallel = TRUE)
 {
@@ -92,7 +92,7 @@ generateTPsCTS <- function(parents, transLibrary, generationLimit = 1, errorRetr
                                             "photolysis_ranked", "mammalian_metabolism",
                                             "combined_abioticreduction_hydrolysis", 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
-    aapply(checkmate::assertCount, . ~ generationLimit + errorRetries, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + calcXLogP + calcSims + parallel, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -123,7 +123,7 @@ generateTPsCTS <- function(parents, transLibrary, generationLimit = 1, errorRetr
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(transLibrary, generationLimit, errorRetries, skipInvalid, fpType, fpSimMethod)
+        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))
@@ -144,7 +144,7 @@ generateTPsCTS <- function(parents, transLibrary, generationLimit = 1, errorRetr
             lapfunc <- if (parallel) future.apply::future_sapply else sapply
             newResults <- withProg(length(parsTBD), parallel,
                                    do.call(lapfunc, list(parsSplit[parsTBD], patRoon:::runCTS,
-                                                         transLibrary, generationLimit, errorRetries, calcXLogP,
+                                                         transLibrary, generations, errorRetries, calcXLogP,
                                                          simplify = FALSE)))
 
             for (pn in names(newResults))

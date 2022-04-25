@@ -37,14 +37,14 @@ COMStop <- function(...)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
+generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, istd_concs = NULL,
                                  formats = MSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
     checkmate::assertCharacter(blanks, min.len = 1, add = ac)
-    checkmate::assertNumeric(concs, finite = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertNumeric, . ~ concs + istd_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -64,16 +64,22 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
     ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
     ret$blank <- blanks
     
-    if (!is.null(concs))
+    getConcs <- function(x)
     {
-        if (length(concs) >= nrow(ret))
-            ret$conc <- concs[seq_len(nrow(ret))]
-        else
-        {
-            ret$conc <- NA
-            ret$conc[seq_along(concs)] <- concs
-        }
+        if (length(x) >= nrow(ret))
+            return(x[seq_len(nrow(ret))])
+        ret <- rep(NA_real_, nrow(ret))
+        ret[seq_along(x)] <- x
+        return(ret)
     }
+    
+    if (!is.null(concs))
+        ret$conc <- getConcs(concs)
+
+    if (!is.null(istd_concs))
+        ret$istd_conc <- getConcs(istd_concs)
+    else
+        ret$istd_conc <- NA_real_
     
     return(ret)
 }

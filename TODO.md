@@ -15,7 +15,6 @@
 - CTS
     - filter on likelihood, and others?
     - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
-    - routes --> transformation
 - Reporting
     - Split formulaDiff like plotGraph()?
     

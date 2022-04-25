@@ -45,7 +45,7 @@ runCTS <- function(parentRow, transLibrary, generationLimit, errorRetries, calcX
     
     ret <- rbindlist(lapply(cont$data$data$children, processChilds, parent_ID = NA_integer_))
     
-    setnames(ret, "smiles", "SMILES")
+    setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
     ret[, c("InChI", "InChIKey", "formula") := .(babelConvert(SMILES, "smi", "inchi", mustWork = TRUE),
                                                  babelConvert(SMILES, "smi", "inchikey", mustWork = TRUE),

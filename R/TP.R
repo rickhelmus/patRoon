@@ -141,6 +141,54 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
     return(ret)
 })
 
+#' @export
+setMethod("filter", "transformationProductsStructure", function(obj, properties = NULL, negate = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(properties, any.missing = FALSE, null.ok = TRUE, add = ac)
+    if (!is.null(properties))
+    {
+        checkmate::assertNames(names(properties), type = "unique", add = add)
+        checkmate::qassertr(properties, "V")
+    }
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0 || is.null(properties) || length(properties) == 0)
+        return(obj)
+    
+    oldn <- length(obj)
+    
+    hash <- makeHash(obj, properties, negate)
+    cache <- loadCacheData("filterTPs", hash)
+    if (!is.null(cache))
+        obj <- cache
+    else
+    {
+        obj@products <- lapply(obj@products, function(prod)
+        {
+            for (prop in names(properties))
+            {
+                if (is.null(prod[[prop]]))
+                    stop(sprintf("Property %s not present.", prop), call. = FALSE)
+                prod <- if (negate) prod[!get(prop) %in% properties[[prop]]] else prod[get(prop) %in% properties[[prop]]]
+            }
+            return(prod)
+        })
+        
+        obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
+        obj@parents <- obj@parents[name %in% names(obj@products)]
+        
+        saveCacheData("filterTPs", obj, hash)
+    }
+    
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    
+    return(obj)
+})
+
+
 #' Generation of transformation products (TPs)
 #'
 #' Functionality to automatically obtain transformation products for a given set of parent compounds.

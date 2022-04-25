@@ -13,7 +13,6 @@
 ## TPs
 
 - CTS
-    - filter on likelihood, and others?
     - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
 - Reporting
     - Split formulaDiff like plotGraph()?
@@ -27,6 +26,8 @@
 ## Docs
 
 - Update ref docs for TP-structure
+- filter() for base TP class (properties)
+    - e.g. likelihood property for CTS
 - calcSims
 - CTS: link to manual/publications for details scoring and other output
 - more details on how TPs are collapsed with convertToMFDB()
@@ -42,6 +43,7 @@
     - sim calc doesn't happen by default anymore for BT
     - TP structure base class
         - TPLibrary gains filter() method and parent structure sim calculation
+    - filter() for TP base class
     - Fixed: convertMFDB() now always collapses duplicates, not just for BT
     - BT
         - Simplified/Harmonized several columns

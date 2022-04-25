@@ -61,6 +61,7 @@
     - improvements TPs
     - Fixed: properly subscript negative element counts in formulas
 - Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
+- Fixed: newProject(): loading analysis info from CSV now works on Windows
 
 
 # Lower priority

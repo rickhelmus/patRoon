@@ -1254,7 +1254,7 @@ newProject <- function(destPath = NULL)
                 else if (nrow(csvTab) > 0)
                 {
                     msExts <- MSFileExtensions()
-                    msFiles <- listMSFiles(csvTab$path, MSFileFormats())
+                    msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
                     msFilesNoExt <- tools::file_path_sans_ext(msFiles)
                     formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
                     {

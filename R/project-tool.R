@@ -1080,7 +1080,7 @@ getNewProjectUI <- function(destPath)
                         checkboxInput("doTPs", "Perform transformation product screening"),
                         conditionalPanel(
                             condition = "input.doTPs",
-                            selectInput("TPGen", "TP algorithm", c("BioTransformer", "Library", "Logic")),
+                            selectInput("TPGen", "TP algorithm", c("BioTransformer", "CTS", "Library", "Logic")),
                             conditionalPanel(
                                 condition = "input.TPGen != \"Logic\"",
                                 selectInput("TPGenInput", "Parent input", getTPGenInputs(FALSE)),

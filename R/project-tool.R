@@ -431,7 +431,12 @@ getScriptCode <- function(input, analyses)
                                                   all = "NULL"),
                  condition = input$TPGen != "Logic"),
             list(value = "fGroups", condition = input$TPGen == "Logic"),
-            getAdductArg(input$TPGen == "Logic")
+            getAdductArg(input$TPGen == "Logic"),
+            list(name = "type", value = "env", quote = TRUE, condition = input$TPGen == "BioTransformer"),
+            list(name = "transLibrary", value = "photolysis_ranked", quote = TRUE, condition = input$TPGen == "CTS"),
+            list(name = "generations", value = if (input$TPGen == "BioTransformer") 2 else 1,
+                 condition = input$TPGen != "Logic"),
+            list(name = "calcSims", value = FALSE, condition = input$TPGen != "Logic")
         ))
         
         addNL()

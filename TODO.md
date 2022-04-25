@@ -20,7 +20,7 @@
 - Reporting
     - Split formulaDiff like plotGraph()?
 - newProject()
-    - CTS algo
+    - selector for CTS transLibrary?
     
 
 ## Docs
@@ -61,6 +61,7 @@
         - caching
     - convertToSuspects()/generateComponentsTPs(): only include TPs that are unique from each parent
     - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
+    - additional args for generateTPs()
 - Removed onlyLinked argument from plotGraph generic (not components methods)
 - reportHTML
     - features menu with submenus

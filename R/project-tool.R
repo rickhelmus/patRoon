@@ -166,6 +166,47 @@ getScriptCode <- function(input, analyses)
             list(name = "stringsAsFactors", value = FALSE)
         ))
     }
+    addLoadSuspList <- function(name, doEx, varBase, exVarBase, inpVarBase)
+    {
+        # Generalized for suspect screening and ISTD normalization
+        
+        varBasePos <- paste0(varBase, "Pos"); varBaseNeg <- paste0(varBase, "Neg")
+        
+        if (doEx)
+        {
+            addComment(paste("Get example", name))
+            
+            exVarBasePos <- paste0("patRoonData::", exVarBase, "Pos")
+            exVarBaseNeg <- paste0("patRoonData::", exVarBase, "Neg")
+            
+            if (input$ionization == "positive")
+                addAssignment(varBase, exVarBasePos)
+            else if (input$ionization == "negative")
+                addAssignment(varBase, exVarBaseNeg)
+            else
+            {
+                addAssignment(varBasePos, exVarBasePos)
+                addAssignment(varBaseNeg, exVarBaseNeg)
+            }
+        }
+        else
+        {
+            addComment(paste("Load", name))
+            
+            if (input$ionization != "both")
+                addLoadSuspCall("varBase", input[[inpVarBase]])
+            else
+            {
+                if (nzchar(input$suspectListNeg))
+                {
+                    addLoadSuspCall(varBasePos, input[[paste0(inpVarBase, "Pos")]])
+                    addLoadSuspCall(varBaseNeg, input[[paste0(inpVarBase, "Neg")]])
+                }
+                else
+                    addLoadSuspCall(varBase, input[[paste0(inpVarBase, "Pos")]])
+            }
+        }
+    }
     addScreenCall <- function(susp, oh = TRUE, am = NULL)
     {
         addCall("fGroups", "screenSuspects", list(
@@ -305,6 +346,43 @@ getScriptCode <- function(input, analyses)
         }
     }
     
+    if (input$featNorm != "none" || input$groupNorm)
+    {
+        addHeader("normalization")
+        
+        if (input$featNorm == "istd")
+        {
+            addLoadSuspList("ISTD list",
+                            (input$ionization != "both" && !nzchar(input$ISTDList)) ||
+                                (input$ionization == "both" && !nzchar(input$ISTDListPos)),
+                            "ISTDList", "ISTDList", "ISTDList")
+            addNL()
+            if (input$ionization != "both")
+                addComment("Set adduct to NULL if ISTD list contains an adduct column")
+            
+            standards <- if (input$ionization != "both" || (!input$exSuspList && !nzchar(input$suspectListNeg)))
+                "ISTDList"
+            else
+                c("ISTDListPos", "ISTDListNeg")
+        }
+        else
+            standards <- NULL
+        
+        addCall("fGroups", "normInts", list(
+            list(value = "fGroups"),
+            list(name = "featNorm", value = input$featNorm, quote = TRUE),
+            list(name = "groupNorm", value = input$groupNorm),
+            list(name = "normFunc", value = "max"),
+            list(name = "standards", value = standards, condition = input$featNorm == "istd"),
+            list(name = "ISTDRTWindow", value = 120, condition = input$featNorm == "istd"),
+            list(name = "ISTDMZWindow", value = 300, condition = input$featNorm == "istd"),
+            list(name = "minISTDs", value = 3, condition = input$featNorm == "istd"),
+            list(name = "rtWindow", value = 12, condition = input$featNorm == "istd"),
+            list(name = "mzWindow", value = 0.005, condition = input$featNorm == "istd"),
+            getAdductArg(input$featNorm == "istd")
+        ))
+    }
+    
     doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos))
     
@@ -312,38 +390,8 @@ getScriptCode <- function(input, analyses)
     {
         addHeader("suspect screening")
         
-        if (input$exSuspList)
-        {
-            addComment("Get example suspect list")
-            
-            if (input$ionization == "positive")
-                addAssignment("suspList", "patRoonData::suspectsPos")
-            else if (input$ionization == "negative")
-                addAssignment("suspList", "patRoonData::suspectsNeg")
-            else
-            {
-                addAssignment("suspListPos", "patRoonData::suspectsPos")
-                addAssignment("suspListNeg", "patRoonData::suspectsNeg")
-            }
-        }
-        else
-        {
-            addComment("Load suspect list")
-            
-            if (input$ionization != "both")
-                addLoadSuspCall("suspList", input$suspectList)
-            else
-            {
-                if (nzchar(input$suspectListNeg))
-                {
-                    addLoadSuspCall("suspListPos", input$suspectListPos)
-                    addLoadSuspCall("suspListNeg", input$suspectListNeg)
-                }
-                else
-                    addLoadSuspCall("suspList", input$suspectListPos)
-            }
-        }
-        
+        addLoadSuspList("suspect list", input$exSuspList, "suspList", "suspects", "suspectList")
+
         useScrForTPScreening <- input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "screening"
         
         addNL()
@@ -919,6 +967,43 @@ getNewProjectUI <- function(destPath)
                             ),
                             rangeNumeric("retention", "retention time (s)", step = 10),
                             rangeNumeric("mz", "m/z", step = 10)
+                        ),
+                        hr(),
+                        fillCol(
+                            height = 125,
+                            flex = NA,
+                            
+                            selectInput("featNorm", "Feature normalization", c("None" = "none",
+                                                                               "Internal standard" = "istd",
+                                                                               "Internal standard concentration" = "conc",
+                                                                               "TIC" = "tic")),
+                            checkboxInput("groupNorm", "Group normalization"),
+
+                            conditionalPanel(
+                                condition = "input.featNorm == \"istd\" && input.ionization != \"both\"",
+                                fileSelect("ISTDList", "ISTDListButton", "Internal standard list",
+                                           placeholder = "Leave empty for example list")
+                            ),
+                            conditionalPanel(
+                                condition = "input.featNorm == \"istd\" && input.ionization == \"both\"",
+                                fillRow(
+                                    height = 60,
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("ISTDListPos", "ISTDListButtonPos", "Internal standard list (positive)",
+                                                   placeholder = "Leave empty for example list")
+                                    ),
+                                    fillCol(
+                                        width = "95%",
+                                        fileSelect("ISTDListNeg", "ISTDListButtonNeg", "Internal standard list (negative)",
+                                                   placeholder = "Leave empty if same as positive")
+                                    )
+                                )
+                            ),
+                            conditionalPanel(
+                                condition = "input.featNorm == \"istd\" || input.featNorm == \"conc\"",
+                                textNote(HTML("Please make sure that the <i>istd_conc</i> column of the analysis information is set."))
+                            )
                         )
                     )
                 )
@@ -1309,12 +1394,15 @@ newProject <- function(destPath = NULL)
         observeEvent(input$suspectListButton, selectSuspList("suspectList"))
         observeEvent(input$suspectListButtonPos, selectSuspList("suspectListPos"))
         observeEvent(input$suspectListButtonNeg, selectSuspList("suspectListNeg"))
-        
         observeEvent(input$exSuspList, {
             for (id in c("suspectList", "suspectListButton", "suspectListPos", "suspectListButtonPos",
                          "suspectListNeg", "suspectListButtonNeg"))
                 shinyjs::toggleState(id, !input$exSuspList)
         })
+        
+        observeEvent(input$ISTDListButton, selectSuspList("ISTDList"))
+        observeEvent(input$ISTDListButtonPos, selectSuspList("ISTDListPos"))
+        observeEvent(input$ISTDListButtonNeg, selectSuspList("ISTDListNeg"))
         
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
         output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))

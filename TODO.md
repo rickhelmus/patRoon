@@ -7,7 +7,10 @@
     - maybe: allow usage of normalized intensities with filter()?
     - split IS assignment in different function anyway?
     - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
-
+    - reportHTML: report normalized intensities in featInfo?
+    - Example ISTD lists in patRoonData
+    - normInts(): default normFunc OK? and others?
+        - update newProject() for any changes
 
 
 ## TPs
@@ -16,6 +19,8 @@
     - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
 - Reporting
     - Split formulaDiff like plotGraph()?
+- newProject()
+    - CTS algo
     
 
 ## Docs
@@ -55,12 +60,26 @@
         - caching
     - convertToSuspects()/generateComponentsTPs(): only include TPs that are unique from each parent
     - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
-- Added slots to fGroups --> cache should be cleared
 - Removed onlyLinked argument from plotGraph generic (not components methods)
 - reportHTML
     - features menu with submenus
     - improvements TPs
+        - simplified parent table with separated plots
+        - plotGraph() (needs TP arg)
     - Fixed: properly subscript negative element counts in formulas
+- normalization changes
+    - Added slots to fGroups --> cache should be cleared
+    - normFunc --> normalized for plotInt(), generateComponentsIntClust(), as.data.table()
+        - with auto normalization for compat
+    - as.data.table() can now report normalized values for avaraged feature data (features && average && normalized) == TRUE
+    - removeISTDs arg for fGroups filter()
+    - plotGraph() for fGroups
+    - normInts() method for fGroups
+        - new normalization methods: istd, tic, conc amongst features. Normalization across groups as before.
+    - normalized argument for groupTable()
+    - internalStandards() / internalStandardAssignments() methods (and slots)
+    - istd_conc column in analysisInfo
+    - newProject() changes
 - Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
 - Fixed: newProject(): loading analysis info from CSV now works on Windows
 - istd_concs argument to generateAnalysisInfo()

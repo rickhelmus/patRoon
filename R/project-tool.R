@@ -592,7 +592,7 @@ doCreateProject <- function(input, analyses)
         
         # Make analysis table
         if (input$generateAnaInfo == "table")
-            write.csv(anas[, c("path", "analysis", "group", "blank")],
+            write.csv(anas[, c("path", "analysis", "group", "blank", "istd_conc")],
                       file.path(input$destinationPath, tableFile), row.names = FALSE)
         
         return(anas)
@@ -1055,7 +1055,8 @@ newProject <- function(destPath = NULL)
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
     emptyAnaTable <- function() data.table(analysis = character(0), format = character(0),
-                                           group = character(0), blank = character(0), path = character(0))
+                                           group = character(0), blank = character(0), istd_conc = numeric(0),
+                                           path = character(0))
     
     server <- function(input, output, session)
     {
@@ -1068,7 +1069,8 @@ newProject <- function(destPath = NULL)
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
                              hotOpts)) %>%
-                rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text")
+                rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
+                rhandsontable::hot_col("istd_conc", readOnly = FALSE, type = "numeric")
             
             return(hot)
         }
@@ -1223,7 +1225,7 @@ newProject <- function(destPath = NULL)
                 if (length(files) > 0)
                 {
                     dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", blank = "")
+                                     group = "", blank = "", istd_conc = NA_real_)
 
                     msExts <- MSFileExtensions()
                     dt[, format := sapply(tolower(tools::file_ext(files)), function(ext)
@@ -1231,10 +1233,9 @@ newProject <- function(destPath = NULL)
                         paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
                     })]
 
-
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    setcolorder(dt, c("analysis", "format", "group", "blank", "path"))
+                    setcolorder(dt, c("analysis", "format", "group", "blank", "istd_conc", "path"))
 
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
@@ -1270,6 +1271,9 @@ newProject <- function(destPath = NULL)
 
                     csvTab[, format := formats]
                     csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
+                    
+                    if (is.null(csvTab[["istd_conc"]])) # older files lack this column
+                        csvTab[, istd_conc := NA_real_]
                     
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab)

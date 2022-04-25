@@ -268,7 +268,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     checkmate::assertIntegerish(size, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkFlag(isotopes, null.ok = TRUE),
                       checkmate::checkIntegerish(isotopes, lower = 0),
-                      .var.name = isotopes)
+                      .var.name = "isotopes")
     checkmate::assertNumeric(rtIncrement, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     if (!is.logical(checkComponentsSession))
@@ -386,7 +386,7 @@ setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, 
     checkmate::assert(
         checkmate::checkInt(index, lower = 1, upper = length(componentTable(obj))),
         checkChoiceSilent(index, names(obj))
-    , .var.name = index)
+    , .var.name = "index")
     checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
@@ -505,7 +505,7 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5
     checkmate::assert(
         checkmate::checkInt(index, lower = 1, upper = length(componentTable(obj))),
         checkChoiceSilent(index, names(obj))
-    , .var.name = index)
+    , .var.name = "index")
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)

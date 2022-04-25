@@ -326,7 +326,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"), add = ac)
     checkmate::assert(checkmate::checkFlag(centroid),
                       checkmate::checkChoice(centroid, c("vendor", "cwt")),
-                      .var.name = centroid)
+                      .var.name = "centroid")
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(PWizBatchSize, add = ac)

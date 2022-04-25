@@ -91,7 +91,8 @@ getScriptCode <- function(input, analyses)
             addCall(anaInfoVarName, "generateAnalysisInfo", list(
                 list(name = "paths", value = unique(anaTable$path), quote = TRUE),
                 list(name = "groups", value = anaTable$group, quote = TRUE),
-                list(name = "blanks", value = anaTable$blank, quote = TRUE)
+                list(name = "blanks", value = anaTable$blank, quote = TRUE),
+                list(name = "istd_concs", value = anaTable$istd_conc)
             ))
         }
         else if (input$generateAnaInfo == "example")

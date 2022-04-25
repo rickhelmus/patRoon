@@ -108,7 +108,7 @@ function showTPs(cmp, group)
             TPGraphs[i].style.display = "none";
     }
     
-    $("#parentsTable .dataTable").DataTable().columns.adjust().draw();
+    $("#parentsTable .dataTable").DataTable().columns.adjust().draw(false);
 }
 
 $(document).ready(function()

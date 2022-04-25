@@ -18,11 +18,6 @@
     - Split formulaDiff like plotGraph()?
     
 
-## Annotation
-
-- reportHTML()/annotatedPeakList()?: for sets the mergedBy column has _unset postfixes
-
-
 ## Docs
 
 - Update ref docs for TP-structure
@@ -65,6 +60,7 @@
     - features menu with submenus
     - improvements TPs
     - Fixed: properly subscript negative element counts in formulas
+- Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
 
 
 # Lower priority

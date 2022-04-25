@@ -377,6 +377,10 @@ DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRend
 ### Transformation Pathway
 
 ```{r}
+rmdText <- ""
+```
+
+```{r eval=length(components)>0 && !is.null(rmdVars[["TPs"]]) && length(rmdVars$TPs) >0 && inherits(rmdVars$TPs, "transformationProductsStructure")}
 rmdText <- sapply(seq_len(nrow(cInfo)), function(i)
 {
     glue::glue("\n{ ticks } {{r}}\n",

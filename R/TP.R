@@ -142,7 +142,7 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 })
 
 #' @export
-setMethod("filter", "transformationProductsStructure", function(obj, properties = NULL, negate = FALSE)
+setMethod("filter", "transformationProducts", function(obj, properties = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(properties, any.missing = FALSE, null.ok = TRUE, add = ac)

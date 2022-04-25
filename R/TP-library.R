@@ -206,7 +206,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
         }
     }
     
-    # fill in cehm IDs and names now that we sorted out all TPs
+    # fill in chem IDs and names now that we sorted out all TPs
     results <- Map(results, names(results), f = function(r, pn)
     {
         set(r, j = "chem_ID", value = match(r$InChIKey, unique(r$InChIKey)))

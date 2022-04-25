@@ -412,8 +412,8 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
                                   MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
                                   retMin = TRUE, EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = 1,
-                                  EICTopMostByRGroup = TRUE, EICOnlyPresent = TRUE, selfContained = TRUE,
-                                  optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
+                                  EICTopMostByRGroup = TRUE, EICOnlyPresent = TRUE, TPGraphStructuresMax = 25,
+                                  selfContained = TRUE, optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
                                   noDate = FALSE) standardGeneric("reportHTML"))
 
 setGeneric("groupNamesResults", function(obj) standardGeneric("groupNamesResults"))

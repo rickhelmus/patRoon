@@ -380,7 +380,7 @@ DT::datatable(TPsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRend
 rmdText <- sapply(seq_len(nrow(cInfo)), function(i)
 {
     glue::glue("\n{ ticks } {{r}}\n",
-               "gr <- plotGraph(rmdVars$TPs[{ TPInd }])\n",
+               "gr <- plotGraph(rmdVars$TPs[{ TPInd }], components = components, structuresMax = rmdVars$TPGraphStructuresMax)\n",
                "gr$elementId <- paste0('TPGraph_', { i })\n",
                "gr\n",
                "{ ticks }\n\n", ticks = "```", i = i, TPInd = match(cInfo$parent_name[i], parents(rmdVars$TPs)$name))

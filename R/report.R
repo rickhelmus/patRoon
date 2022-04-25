@@ -768,8 +768,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                   MSPeakLists, specSimParams, TPs, retMin, EICRtWindow, EICMzExpWindow,
-                                                  EICTopMost, EICTopMostByRGroup, EICOnlyPresent, selfContained,
-                                                  optimizePng, clearPath, openReport, noDate)
+                                                  EICTopMost, EICTopMostByRGroup, EICOnlyPresent, TPGraphStructuresMax,
+                                                  selfContained, optimizePng, clearPath, openReport, noDate)
 {
     # UNDONE: mention pandoc win limits
 
@@ -788,6 +788,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
            min.chars = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ formulasTopMost + compoundsTopMost + EICTopMost,
            positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(TPGraphStructuresMax, add = ac)
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -848,7 +849,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                     compoundsExclNormScores = compoundsExclNormScores,
                     compoundsOnlyUsedScorings = compoundsOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, specSimParams = specSimParams,
-                    TPs = TPs, selfContained = selfContained, optimizePng = optimizePng, noDate = noDate)
+                    TPs = TPs, TPGraphStructuresMax = TPGraphStructuresMax, selfContained = selfContained,
+                    optimizePng = optimizePng, noDate = noDate)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

@@ -569,6 +569,7 @@ getScriptCode <- function(input, analyses)
             list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
             list(name = "components", value = componVal),
+            list(name = "TPs", value = "TPs", condition = input$doTPs),
             list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
             list(name = "selfContained", value = FALSE),
             list(name = "openReport", value = TRUE)

@@ -99,7 +99,7 @@ function showTPs(cmp, group)
     elName = "TPGraph_" + cmp
     for (var i=0; i<TPGraphs.length; i++)
     {
-        if (TPGraphs[i].id == elName)
+        if (TPGraphs[i].id == elName && TPGraphs[i].children.length > 0) // NOTE: no children if plot couldn't be made
         {
             TPGraphs[i].style.display = "";
             document.getElementById("graphTPGraph_" + cmp).chart.fit(); // HACK: reset zoom

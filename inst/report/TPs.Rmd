@@ -383,11 +383,16 @@ rmdText <- ""
 ```{r eval=length(components)>0 && !is.null(rmdVars[["TPs"]]) && length(rmdVars$TPs) >0 && inherits(rmdVars$TPs, "transformationProductsStructure")}
 rmdText <- sapply(seq_len(nrow(cInfo)), function(i)
 {
-    glue::glue("\n{ ticks } {{r}}\n",
-               "gr <- plotGraph(rmdVars$TPs[{ TPInd }], components = components, structuresMax = rmdVars$TPGraphStructuresMax)\n",
-               "gr$elementId <- paste0('TPGraph_', { i })\n",
-               "gr\n",
-               "{ ticks }\n\n", ticks = "```", i = i, TPInd = match(cInfo$parent_name[i], parents(rmdVars$TPs)$name))
+    DOMID <- paste0('TPGraph_', i)
+    TPInd <- match(cInfo$parent_name[i], parents(rmdVars$TPs)$name, nomatch = NA)
+    if (is.na(TPInd))
+        sprintf("<div id='%s'></div>", DOMID)
+    else
+        glue::glue("\n{ ticks } {{r}}\n",
+                   "gr <- plotGraph(rmdVars$TPs[{ TPInd }], components = components, structuresMax = rmdVars$TPGraphStructuresMax)\n",
+                   "gr$elementId <- '{ DOMID }'\n",
+                   "gr\n",
+                   "{ ticks }\n\n", ticks = "```", TPInd = TPInd, DOMID = DOMID)
 })
 rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n") else ""
 ```

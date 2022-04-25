@@ -147,6 +147,9 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
     checkmate::assertCount(structuresMax, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(obj) == 0)
+        stop("No TPs to plot", call. = FALSE)
+    
     TPTab <- copy(as.data.table(obj))
     TPTab[, c("name_orig", "name") := .(name, make.unique(name))]
     TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
@@ -215,7 +218,7 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
     nodes[isTP == FALSE, level := 0]
     nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
     
-    if (nrow(nodes) <= structuresMax)
+    if (nrow(nodes) <= structuresMax && nrow(nodes) > 0)
     {
         # UNDONE: make util?
         imgf <- tempfile(fileext = ".png") # temp file is re-used
@@ -233,7 +236,7 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
     else
         nodes[, shape := "ellipse"]
     
-    TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "routes", "generation", "accumulation", "production",
+    TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "generation", "accumulation", "production",
                           "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
                           "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
                           "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref"), names(TPTab))

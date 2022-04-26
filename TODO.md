@@ -34,7 +34,7 @@
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)
-    - update groupTable for normalized arg
+    - update groupTable and plotVolcano for normalized arg
 - istd_concs argument to generateAnalysisInfo()
 
 
@@ -78,7 +78,7 @@
     - plotGraph() for fGroups
     - normInts() method for fGroups
         - new normalization methods: istd, tic, conc amongst features. Normalization across groups as before.
-    - normalized argument for groupTable()
+    - normalized argument for groupTable() and plotVolcano()
     - internalStandards() / internalStandardAssignments() methods (and slots)
     - istd_conc column in analysisInfo
     - newProject() changes

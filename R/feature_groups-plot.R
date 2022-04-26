@@ -743,13 +743,14 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 #' @param averageFunc Function used for averaging.
 #' @rdname feature-plotting
 #' @export
-setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean, col = NULL,
-                                                   pch = 19, ...)
+setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean,
+                                                   normalized = FALSE, col = NULL, pch = 19, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertFCParams(FCParams, obj, null.ok = FALSE, add = ac)
     checkmate::assertFlag(showLegend, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
+    checkmate::assertFlag(normalized, add = ac)
     checkmate::reportAssertions(ac)
     
     ac <- checkmate::makeAssertCollection()
@@ -762,7 +763,7 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
         col <- getBrewerPal(5, "Paired")
     names(col) <- c("increase", "decrease", "FC", "significant", "insignificant")
     
-    gt <- as.data.table(obj, FCParams = FCParams, averageFunc = averageFunc)
+    gt <- as.data.table(obj, FCParams = FCParams, averageFunc = averageFunc, normalized = normalized)
     gt[, colour := col[classification]]
     
     oldp <- par(no.readonly = TRUE)

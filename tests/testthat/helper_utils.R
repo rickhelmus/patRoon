@@ -90,6 +90,8 @@ if (testWithSets())
     getExpFeats <- function(x) x[, sets = "positive"]
     getExpFG <- function(x) x[, sets = "positive"]
     doExport <- function(x, ...) export(x, ..., set = "positive")
+    
+    getISTDAssignments <- function(fg) internalStandardAssignments(fg, "positive")
 
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
@@ -100,6 +102,9 @@ if (testWithSets())
         susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
         screenSuspects(fg, susp, ...)
     }
+    
+    doNormInts <- function(fg, ...) normInts(fg, ..., standards = list(patRoonData::ISTDListPos,
+                                                                       patRoonData::ISTDListNeg))
         
     # zero threshold makes comparisons in testing much easier
     doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
@@ -131,6 +136,7 @@ if (testWithSets())
     getExpFeats <- function(x) x
     getExpFG <- function(x) x
     doExport <- function(x, ...) export(x, ...)
+    getISTDAssignments <- function(fg) internalStandardAssignments(fg)
 
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
@@ -142,6 +148,7 @@ if (testWithSets())
         else
             screenSuspects(fg, susp, ...)
     }
+    doNormInts <- function(fg, ...) normInts(fg, ..., standards = patRoonData::ISTDListPos)
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doFormCons <- function(...) consensus(...)
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")

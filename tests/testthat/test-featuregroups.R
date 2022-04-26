@@ -342,6 +342,43 @@ test_that("replicate group subtraction", {
     expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent-pos"), 0)
 })
 
+fgISTD <- fgOpenMS
+fgISTD@analysisInfo$istd_conc <- c(NA, NA, NA, 1, 2, 1)
+fgNormISTDMin1 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 1)
+fgNormISTDMin2 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 2)
+fgNormTIC <- doNormInts(fgISTD, "tic")
+fgNormConc <- doNormInts(fgISTD, "conc")
+fgNormGroup <- doNormInts(fgISTD, groupNorm = TRUE)
+
+checkISTDNormWindows <- function(fg, minISTD, RTWin, MZWin)
+{
+    ia <- getISTDAssignments(fg)
+    ia <- ia[lengths(ia) > minISTD]
+    gInfo <- groupInfo(fg)
+    calcDev <- function(grp, istdGrps, what) abs(gInfo[grp, what] - gInfo[istdGrps, what])
+    maxRTDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "rts"))))
+    maxMZDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "mzs"))))
+    expect_lte(maxRTDev, RTWin)
+    expect_lte(maxMZDev, MZWin)
+}
+
+test_that("Normalization", {
+    # first three analyses are without IS, should give zero intensities
+    expect_true(all(groupTable(fgNormISTDMin1[1:3], normalized = TRUE) == 0))
+    expect_true(all(groupTable(fgNormConc[1:3], normalized = TRUE) == 0))
+    
+    expect_true(all(lengths(getISTDAssignments(fgNormISTDMin1)) >= 1))
+    expect_true(all(lengths(getISTDAssignments(fgNormISTDMin2)) >= 2))
+    
+    checkISTDNormWindows(fgNormISTDMin1, 1, 120, 300)
+    
+    expect_equal(groupTable(fgNormTIC, normalized = FALSE), groupTable(fgISTD))
+    expect_range(groupTable(fgNormTIC, normalized = TRUE), c(0, 1))
+    expect_range(groupTable(fgNormGroup, normalized = TRUE), c(0, 1))
+    # sample 5 in fgNormConc has halved intensities
+    expect_equal(groupTable(fgNormConc[5], normalized = TRUE) * 2, groupTable(fgISTD[5]))
+})
+
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
 fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")

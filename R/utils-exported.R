@@ -75,11 +75,8 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, 
     
     if (!is.null(concs))
         ret$conc <- getConcs(concs)
-
     if (!is.null(istd_concs))
         ret$istd_conc <- getConcs(istd_concs)
-    else
-        ret$istd_conc <- NA_real_
     
     return(ret)
 }

@@ -21,7 +21,12 @@
     - Split formulaDiff like plotGraph()?
 - newProject()
     - selector for CTS transLibrary?
-    
+
+
+## Tests
+
+- normalization
+    - plotGraph
 
 ## Docs
 
@@ -35,7 +40,11 @@
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)
     - update groupTable and plotVolcano for normalized arg
-- istd_concs argument to generateAnalysisInfo()
+    - istd_concs argument to generateAnalysisInfo()
+    - clearly document how istd_conc is used in calculations
+        - for istd: featInt / (istdInt / istd_conc) (i.e. first correct ISTD with conc)
+        - for tic: featInt / ticInt / istd_conc (i.e. istd_conc is like injection volume)
+        - for tic: featInt / istd_conc (see ^)
 
 
 ## NEWS

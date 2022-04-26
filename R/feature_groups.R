@@ -183,7 +183,7 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
     ftindex <- object@ftindex
     fTable <- featureTable(object)
     
-    if (is.null(fTable[[1]][["intensity_rel"]]))
+    if (normalized && is.null(fTable[[1]][["intensity_rel"]]))
         stop("There is no normalized data, did you run normInts()?")
     
     colName <- if (areas && normalized)
@@ -1170,18 +1170,24 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
         {
             ft <- copy(ft)
-            ft[group %in% names(fGroups@ISTDAssignments), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
+            
+            if (is.na(iconc))
+                ft[, c("intensity_rel", "area_rel") := 0]
+            else
             {
-                iint <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$intensity)
-                return(int / (iint / iconc))
-            })]
-            ft[group %in% names(fGroups@ISTDAssignments), area_rel := mapply(area, group, FUN = function(ar, grp)
-            {
-                iar <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$area)
-                return(ar / (iar / iconc))
-            })]
-            # HACK: don't want NA values for ISTDs
-            ft[is.na(intensity_rel), c("intensity_rel", "area_rel") := 0]
+                ft[group %in% names(fGroups@ISTDAssignments), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
+                {
+                    iint <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$intensity)
+                    return(int / (iint / iconc))
+                })]
+                ft[group %in% names(fGroups@ISTDAssignments), area_rel := mapply(area, group, FUN = function(ar, grp)
+                {
+                    iar <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$area)
+                    return(ar / (iar / iconc))
+                })]
+                # HACK: don't want NA values
+                ft[is.na(intensity_rel), c("intensity_rel", "area_rel") := 0]
+            }
             return(ft)
         })
     }
@@ -1191,9 +1197,12 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@features@features <- Map(featureTable(fGroups), iconcs, f = function(ft, iconc)
         {
             ft <- copy(ft)
-            nint <- normFunc(ft$intensity) / iconc
-            narea <- normFunc(ft$area) / iconc
-            ft[, c("intensity_rel", "area_rel") := .(intensity / nint, area / narea)]
+            nint <- normFunc(ft$intensity) * iconc
+            narea <- normFunc(ft$area) * iconc
+            if (is.na(iconc) || nint == 0)
+                ft[, c("intensity_rel", "area_rel") := 0]
+            else
+                ft[, c("intensity_rel", "area_rel") := .(intensity / nint, area / narea)]
             return(ft)
         })
     }
@@ -1202,7 +1211,10 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@features@features <- Map(featureTable(fGroups), anaInfo$istd_conc, f = function(ft, iconc)
         {
             ft <- copy(ft)
-            ft[, c("intensity_rel", "area_rel") := .(intensity / iconc, area / iconc)]
+            if (is.na(iconc))
+                ft[, c("intensity_rel", "area_rel") := 0]
+            else
+                ft[, c("intensity_rel", "area_rel") := .(intensity / iconc, area / iconc)]
             return(ft)
         })
     }

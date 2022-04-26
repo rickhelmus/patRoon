@@ -53,9 +53,10 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
     return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
 })
 
-#' @describeIn transformationProductsStructure Performs rule-based filtering of the \command{BioTransformer} predictions.
-#'   Useful to simplify and clean-up the data.
+#' @describeIn transformationProductsStructure Performs rule-based filtering of the \command{BioTransformer}
+#'   predictions. Useful to simplify and clean-up the data.
 #'
+#' @param \dots Further argument passed to the base \code{\link[=filter,transformationProducts-method]{filter method}}.
 #' @param removeDuplicates If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
 #'   removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP
 #'   candidate with duplicate structure will be kept.
@@ -72,7 +73,7 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
 #' @return \code{filter} returns a filtered \code{transformationProductsStructure} object.
 #'
 #' @export
-setMethod("filter", "transformationProductsStructure", function(obj, removeParentIsomers = FALSE,
+setMethod("filter", "transformationProductsStructure", function(obj, ..., removeParentIsomers = FALSE,
                                                                 removeTPIsomers = FALSE, removeDuplicates = FALSE,
                                                                 minSimilarity = NULL, negate = FALSE)
 {
@@ -128,6 +129,9 @@ setMethod("filter", "transformationProductsStructure", function(obj, removeParen
         
         saveCacheData("filterTPs", obj, hash)
     }
+    
+    if (...length() > 0)
+        obj <- callNextMethod(obj, ..., negate = negate)
     
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)

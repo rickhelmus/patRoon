@@ -8,6 +8,7 @@ TPsLogic <- doGenLogicTPs(fGroups)
 TPsLogicCustom <- doGenLogicTPs(fGroups, transformations = data.table(transformation = "test", add = "C",
                                                                       sub = "", retDir = 1))
 TPsLibPC <- generateTPs("library")
+TPsLibPCGen2 <- generateTPs("library", generations = 2)
 TPsLibSusp <- generateTPs("library", suspL)
 TPsLibScr <- generateTPs("library", fGroups)
 TPsLibCustom <- generateTPs("library",
@@ -70,8 +71,9 @@ test_that("verify TP generation", {
     checkmate::expect_names(parents(TPsLibScr)$name, subset.of = screenInfo(fGroups)$name)
     checkmate::expect_names(names(parents(TPsLibPC)), must.include = c("name", "SMILES", "InChI", "InChIKey",
                                                                        "formula", "neutralMass"))
+    expect_range(as.data.table(TPsLibPCGen2)$generation, 1:2)
     expect_equal(parents(TPsLibCustom)$name, "Diuron")
-    expect_match(TPsLibCustom[[1]]$name, "Linuron")
+    expect_match(TPsLibCustom[[1]]$name_lib, "Linuron")
 
     checkmate::expect_names(parents(TPsBTSusp)$name, subset.of = suspL$name)
     checkmate::expect_names(parents(TPsBTScr)$name, subset.of = screenInfo(fGroups)$name)
@@ -106,7 +108,7 @@ testMFDB <- function(TPs)
     MFDBP <- getMFDB(TPs, includeParents = TRUE)
     
     cols <- c("Identifier", "MolecularFormula", "MonoisotopicMass",
-              "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP", "LogP", "parent", "transformation",
+              "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP", "LogP", "XLogP", "parent", "transformation",
               "enzyme", "evidencedoi")
     
     unTPN <- uniqueN(as.data.table(TPs), by = "InChIKey")
@@ -146,6 +148,8 @@ test_that("basic usage", {
     testMFDB(TPsCTSSusp)
     expect_error(convertToMFDB(TPsBTEmpty, tempfile(fileext = ".csv")), "create")
     
+    expect_setequal(as.data.table(filter(TPsLibPC, properties = list(retDir = c(-1, 1))))$retDir, c(-1, 1))
+    expect_setequal(as.data.table(filter(TPsLibPC, properties = list(retDir = c(-1, 1)), negate = TRUE))$retDir, 0)
     expect_equal(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeDuplicates = TRUE)), by = c("SMILES", "parent")), 0)
     expect_gt(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeDuplicates = TRUE, negate = TRUE)),
                               by = c("SMILES", "parent")), 0)
@@ -156,6 +160,8 @@ test_that("basic usage", {
                               by = c("formula", "parent")), 0)
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
+    
+    expect_HTML(plotGraph(TPsLibScr[1]))
     
     skip_if_not(doMetFrag)
     
@@ -265,13 +271,14 @@ if (doMetFrag)
 
 test_that("TP component usage", {
     expect_HTML(plotGraph(componTPsLogic, onlyLinked = FALSE))
+    expect_HTML(plotGraph(TPsLibSusp[componentInfo(componTPsLib)$parent_name[1]], components = componTPsLib))
     
     expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetF)[, -"size"])
     expect_equal(as.data.table(componTPsLogic)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetFN)[, -"size"])
     
-    expect_reportHTML(makeReportHTML(fGroupsMoreScr, components = componTPsBT))
+    expect_reportHTML(makeReportHTML(fGroupsMoreScr, components = componTPsBT, TPs = TPsBTSusp))
     
     skip_if_not(doMetFrag)
     

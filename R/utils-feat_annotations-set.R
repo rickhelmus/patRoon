@@ -201,7 +201,8 @@ doAnnotatePeakListSet <- function(obj, index, groupName, MSPeakLists, formulas, 
             args <- c(args, list(formulas = usForm[[s]]))
         ret <- do.call(annotatedPeakList, args)
         
-        if (!is.null(ret) && !is.null(usForm[[s]]) && !is.null(ret[["mergedBy"]]) && any(!is.na(ret$mergedBy)))
+        if (!is.null(ret) && !is.null(formulas) && !is.null(usForm[[s]]) && !is.null(ret[["mergedBy"]]) &&
+            any(!is.na(ret$mergedBy)))
         {
             # HACK: The algorithms in the mergedBy column are taken from the unset objects (i.e. suffixed with _unset).
             # Convert them to their original set versions.

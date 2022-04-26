@@ -7,7 +7,8 @@ install.packages(c("circlize", "VennDiagram"),
                  repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
 BiocManager::install(c("mzR", "xcms", "CAMERA",
-                       "Rdisop", "InterpretMSSpectrum", # need to install these deps manually (why??)
+                       "Rdisop", # need to install this dep manually (why??)
+                       "InterpretMSSpectrum", # for RAMClustR
                        "ropls", # for KPIC2
                        "BiocStyle", "Rgraphviz")) # for MetaClean
 

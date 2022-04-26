@@ -54,15 +54,15 @@ test_that("components generation works", {
     expect_gte(min(componentInfo(compsCAMSize)$size), 3)
     
     expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)
-    expect_gt(length(unique(as.data.table(compsClMSNoAB)$adduct_ion)),
-              length(unique(as.data.table(compsClMS)$adduct_ion)))
     
     skip_on_os("windows")
     
-    # BUG: cliqueMS gives different results on Windows/Linux, skip former for ref checking for now.
+    # BUG: cliqueMS gives different results on Windows/Linux.
     # NOTE: can't compare cliqueMS data as it has environments in them that change
     expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
-    
+
+    expect_gt(length(unique(as.data.table(compsClMSNoAB)$adduct_ion)),
+              length(unique(as.data.table(compsClMS)$adduct_ion)))
 })
 
 test_that("verify components show", {

@@ -63,6 +63,7 @@ BiocManager::install("ropls")
 remotes::install_github("rickhelmus/KPIC2") 
 
 # needed for RAMClustR for componentization
+BiocManager::install("InterpretMSSpectrum")
 remotes::install_github("cbroeckl/RAMClustR")
 
 # needed for nontarget for componentization

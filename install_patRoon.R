@@ -401,7 +401,10 @@ utils <- setRefClass("utilsInst", methods = list(
                 checkPackages("KPIC", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", pkgReposNames = "KPIC2")
             }
             if (any(c("all", "RAMClustR") %in% instWhat))
+            {
+                checkPackages("InterpretMSSpectrum", pkgWhere, ask = FALSE, type = "bioc")
                 checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl")
+            }
             if (any(c("all", "nontarget") %in% instWhat))
             {
                 checkPackages("nontargetData", pkgWhere, ask = FALSE, type = "gh", repos = "blosloos")

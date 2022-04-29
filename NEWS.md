@@ -1,3 +1,8 @@
+# patRoon 2.0.2
+
+- Fixed: `removeBlanks` feature groups filter would not handle analyses with multiple blanks. 
+
+
 # patRoon 2.0.1
 
 - Fixed: `newProject()` would not add suspect annotation to the output script if the example suspect list or sets workflows were chosen.

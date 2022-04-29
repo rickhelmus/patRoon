@@ -507,7 +507,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(resultsFilter, results)
     if (removeBlanks)
-        obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$blank), negate = !negate)
+        obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
 
     return(obj)
 })

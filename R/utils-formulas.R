@@ -171,6 +171,11 @@ verifyFormulas <- function(formulas)
 {
     data("isotopes", package = "enviPat", envir = environment())
     formulas[is.na(formulas)] <- "" # check_chemform() doesn't handle NAs
+    
+    # NOTE: check_chemform() errors when there are whitespaces in formulas. So far verifyFormulas() is only called on
+    # data from MS libraries, which clearout spaces to avoid this. If verifyFormulas() is called from other code, this
+    # should be dealt with...
+    
     return(!enviPat::check_chemform(isotopes, formulas)$warning)
 }
 

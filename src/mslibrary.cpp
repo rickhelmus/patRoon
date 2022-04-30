@@ -73,7 +73,7 @@ Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const 
     
     Rcpp::List specListMZs(records.size()), specListInts(records.size()), annList(records.size());
     specListMZs.names() = specListInts.names() = annList.names() = recordsList["DB_ID"];
-    for (int i=0; i<records.size(); ++i)
+    for (auto i=0; i<records.size(); ++i)
     {
         specListMZs[i] = records[i].spectrum.mzs;
         specListInts[i] = records[i].spectrum.intensities;

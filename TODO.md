@@ -33,6 +33,7 @@
 
 - library
     - fixup annotation formulas too?
+        - for now a little bit in C++ fixAnnFormula(), maybe implement verifyFormulas() in C++ someday?
     - also verify formulas of adducts?
     - include lib adducts optionally for adduct guessing
     - don't merge synonyms? or split them somehow on export? Otherwise doc

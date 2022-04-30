@@ -189,10 +189,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                     if (is.null(lsp[["annotation"]]))
                         return(NULL)
                     
-                    # fixup annotations
-                    lsp <- copy(lsp)
-                    lsp[, annotation := trimws(annotation)]
-                    lsp[, annotation := sub("\\+|\\-$", "", annotation)] # remove any trailing charge
+                    # verify annotations
                     lsp <- lsp[verifyFormulas(annotation)]
                     
                     if (nrow(lsp) == 0)

@@ -35,6 +35,10 @@ void trim(std::string &s)
 }
 // ---
 
+bool hasWS(const std::string &s)
+{
+    return std::find_if(s.begin(), s.end(), [](unsigned char ch) { return std::isspace(ch); }) != s.end();
+}
 
 bool strStartsWith(const std::string &str, const std::string &pref)
 {

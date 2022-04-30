@@ -121,9 +121,12 @@ sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
         
         if (is.null(potAdducts))
         {
-            potAdducts <- unique(c(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic,
-                                   lib$records$Precursor_type))
-            potAdducts <- potAdducts[!is.na(potAdducts)]
+            potAdducts <- union(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic)
+            if (potAdductsLib)
+            {
+                potAdducts <- union(potAdducts, lib$records$Precursor_type)
+                potAdducts <- potAdducts[!is.na(potAdducts)]
+            }
         }
         
         potAdducts <- lapply(potAdducts, checkAndToAdduct, .var.name = "potAdducts")
@@ -477,11 +480,12 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 })
 
 
-loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
+loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002,
+                           calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
-    aapply(checkmate::assertFlag, . ~ parseComments + calcSPLASH, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ parseComments + potAdductsLib + calcSPLASH, fixed = list(add = ac))
     checkmate::assert(checkmate::checkNull(potAdducts),
                       checkmate::checkFALSE(potAdducts),
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
@@ -490,13 +494,13 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(makeFileHash(file), parseComments, potAdducts, absMzDev, calcSPLASH)
+    hash <- makeHash(makeFileHash(file), parseComments, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     cd <- loadCacheData("MSLibraryMSP", hash)
     if (!is.null(cd))
         return(cd)
     
     lib <- readMSP(normalizePath(file), parseComments)
-    lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
+    lib <- sanitizeMSLibrary(lib, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     
     ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp")
     
@@ -505,21 +509,21 @@ loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, absMzD
     return(ret)
 }
 
-loadMoNAJSONLibrary <- function(file, potAdducts = NULL, absMzDev = 0.002, calcSPLASH = TRUE)
+loadMoNAJSONLibrary <- function(file, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertFlag(calcSPLASH, add = ac)
+    aapply(checkmate::assertFlag, . ~ potAdductsLib + calcSPLASH, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(makeFileHash(file), potAdducts, absMzDev, calcSPLASH)
+    hash <- makeHash(makeFileHash(file), potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     cd <- loadCacheData("MSLibraryJSON", hash)
     if (!is.null(cd))
         return(cd)
     
     lib <- readMoNAJSON(normalizePath(file))
-    lib <- sanitizeMSLibrary(lib, potAdducts, absMzDev, calcSPLASH)
+    lib <- sanitizeMSLibrary(lib, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     
     ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "json")
     

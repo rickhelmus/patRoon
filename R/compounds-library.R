@@ -31,7 +31,8 @@ unifyLibNames <- function(cTab)
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
                                                                 minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
                                                                 checkIons = "adduct",
-                                                                specSimParams = getDefSpecSimParams())
+                                                                specSimParams = getDefSpecSimParams(),
+                                                                specSimParamsLib = getDefSpecSimParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
@@ -39,6 +40,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     assertSpecSimParams(specSimParams, add = ac)
+    assertSpecSimParams(specSimParamsLib, add = ac)
     checkmate::reportAssertions(ac)
     
     if (specSimParams$shift != "none")
@@ -78,7 +80,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
 
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams)
+    baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams, specSimParamsLib)
     setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)
     cachedSet <- loadCacheSet("compoundsLibrary", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
@@ -131,8 +133,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             ret <- copy(sp)
             ret[, ID := seq_len(.N)]
             ret <- assignPrecursorToMSPeakList(ret, pmz)
-            ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParams$removePrecursor,
-                                        relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
+            ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParamsLib$removePrecursor,
+                                        relMinIntensity = specSimParamsLib$relMinIntensity,
+                                        minPeaks = specSimParamsLib$minPeaks)
             return(ret)
         })
         lspecs <- pruneList(lspecs, checkZeroRows = TRUE)

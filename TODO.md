@@ -45,7 +45,6 @@
         - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
 - compounds
     - show mirror spectrum in report? Would need library data somehow
-    - separate specSimParams for lib? E.g. to assume that lib spectra are cleaner and don't need intensity cleaning
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
@@ -56,6 +55,12 @@
     - update ID levels
 - prepareChemTable(): more status messages/progress bars?
 
+
+## DOCS
+
+- mslibrary
+    - generateCompoundsLibrary()
+        - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
 
 ## NEWS
 

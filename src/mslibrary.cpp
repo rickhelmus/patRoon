@@ -44,6 +44,18 @@ bool parseMSPComments(const std::string &comments, const std::string &field, std
     return false;
 }
 
+void fixAnnFormula(std::string &form)
+{
+    trim(form);
+    
+    // get rid of trailing charges
+    const auto len = form.length();
+    if (len > 0 && (form[len-1] == '+' || form[len-1] == '-'))
+        form.pop_back();
+    if (hasWS(form))
+        form.clear(); // formulas with whitespace are invalid and cleared out
+}
+
 Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const std::vector<std::string> &keys)
 {
     Rcpp::List recordsList(keys.size());
@@ -390,7 +402,9 @@ Rcpp::List readMoNAJSON(Rcpp::CharacterVector file)
                         {
                             if (compareTol(mz, curRec.spectrum.mzs[i], 1E-6))
                             {
-                                curRec.spectrum.annotations[i] = itf->value.GetString();
+                                std::string form = itf->value.GetString();
+                                fixAnnFormula(form);
+                                curRec.spectrum.annotations[i] = form;
                                 break;
                             }
                         }

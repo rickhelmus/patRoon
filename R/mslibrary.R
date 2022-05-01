@@ -12,7 +12,7 @@ makeDBIDsUnique <- function(records)
     return(records)
 }
 
-sanitizeMSLibrary <- function(lib, potAdducts, absMzDev, calcSPLASH)
+sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
 {
     printf("Converting to tables... ")
     lib$records <- as.data.table(lib$records)

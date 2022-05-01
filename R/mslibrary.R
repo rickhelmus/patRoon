@@ -379,64 +379,96 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
                                                                                           minIntensityPost = 0,
                                                                                           topMost = 10),
-                                                     collapse = TRUE)
+                                                     collapse = TRUE,
+                                                     suspects = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertAvgPListParams(avgSpecParams, add = ac)
     checkmate::assertFlag(collapse, add = ac)
+    if (!is.null(suspects))
+        assertSuspectList(suspects, FALSE, FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
-    
-    ret <- copy(records(obj))
-    libSpecs <- spectra(obj)
 
+    libSpecs <- spectra(obj)
+    
+    getAvgFrags <- function(DB_ID, PrecursorMZ)
+    {
+        pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
+        {
+            sp <- copy(sp)[, c("mz", "intensity"), with = FALSE] # skip annotation, if present
+            sp <- assignPrecursorToMSPeakList(sp, pmz)
+            return(sp)
+        })
+        
+        avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
+                                avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
+                                avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
+        doProgress()
+        paste0(avgPL$mz, collapse = ";")
+    }
+        
     printf("Calculating MS/MS fragments...\n")
     
-    if (collapse)
+    if (!is.null(suspects))
     {
-        ret <- ret[!is.na(InChIKey) & !is.na(PrecursorMZ)]
+        ret <- if (is.data.table(suspects)) copy(suspects) else as.data.table(suspects)
+        ret <- prepareSuspectList(ret, NULL, FALSE, calcMZs = FALSE)
         ret[, InChIKey1 := getIKBlock1(InChIKey)]
         
-        frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, {
-            pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
-            {
-                sp <- as.data.table(sp)
-                sp <- assignPrecursorToMSPeakList(sp, pmz)
-                return(sp)
-            })
-            
-            avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
-                                    avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
-                                    avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
-            doProgress()
-            paste0(avgPL$mz, collapse = ";")
-            
-        }, by = "InChIKey1"])
-        setnames(frMZ, "V1", "fragments_mz")
+        recs <- copy(records(obj))
+        recs <- recs[!is.na(InChIKey) & !is.na(PrecursorMZ)]
+        recs[, InChIKey1 := getIKBlock1(InChIKey)]
         
-        ret <- unique(ret, by = "InChIKey1")
-        ret <- merge(ret, frMZ, by = "InChIKey1")
+        withProg(uniqueN(ret$InChIKey1), FALSE, ret[, fragments_mz := sapply(InChIKey1, function(IK1)
+        {
+            recsSub <- recs[InChIKey1 == IK1]
+            if (nrow(recsSub) == 0)
+                return("")
+            return(getAvgFrags(recsSub$DB_ID, recsSub$PrecursorMZ))
+        }), by = "InChIKey1"])
+        
+        ret[, InChIKey1 := NULL]
     }
     else
     {
-        withProg(length(obj), FALSE,
-                 ret[, fragments_mz := sapply(libSpecs, function(spec) paste0(spec[, "mz"], collapse = ";"))])
+        ret <- copy(records(obj))
+        
+        if (collapse)
+        {
+            ret <- ret[!is.na(InChIKey) & !is.na(PrecursorMZ)]
+            ret[, InChIKey1 := getIKBlock1(InChIKey)]
+            
+            frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(DB_ID, PrecursorMZ), by = "InChIKey1"])
+            setnames(frMZ, "V1", "fragments_mz")
+            
+            ret <- unique(ret, by = "InChIKey1")
+            ret <- merge(ret, frMZ, by = "InChIKey1")
+        }
+        else
+        {
+            withProg(length(obj), FALSE, ret[, fragments_mz := sapply(libSpecs, function(spec)
+            {
+                doProgress()
+                paste0(spec[, "mz"], collapse = ";")
+            })])
+        }
+        
+        mapCols <- c(Name = "name",
+                     SMILES = "SMILES",
+                     InChI = "InChI",
+                     InChIKey = "InChIKey",
+                     formula = "formula",
+                     Precursor_type = "adduct",
+                     neutralMass = "neutralMass",
+                     fragments_mz = "fragments_mz")
+        mapCols <- mapCols[names(mapCols) %in% names(ret)]
+        setnames(ret, names(mapCols), mapCols)
+        ret <- ret[, mapCols, with = FALSE]
+        ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
     }
-    
-    mapCols <- c(Name = "name",
-                 SMILES = "SMILES",
-                 InChI = "InChI",
-                 InChIKey = "InChIKey",
-                 formula = "formula",
-                 Precursor_type = "adduct",
-                 neutralMass = "neutralMass",
-                 fragments_mz = "fragments_mz")
-    mapCols <- mapCols[names(mapCols) %in% names(ret)]
-    setnames(ret, names(mapCols), mapCols)
-    ret <- ret[, mapCols, with = FALSE]
-    ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
     
     return(ret[])
 })

@@ -244,7 +244,7 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
                           "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
                           "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
                           "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref", "similarity",
-                          "mergedBy"), names(TPTab))
+                          "mergedBy", "coverage"), names(TPTab))
     nodes[isTP == TRUE, title := sapply(id, function(TP)
     {
         TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]

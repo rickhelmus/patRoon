@@ -289,16 +289,20 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
-    trCols <- intersect(c("formula", "retDir", "TP_retDir", "retDiff", "mzDiff", "formulaDiff",
-                          "generation", "likelihood", "accumulation", "production", "globalAccumulation",
-                          "set", "CID", "SMILES"),
+    trCols <- intersect(c("formula", "retDir", "TP_retDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID", "SMILES",
+                          "similarity", "mergedBy", "coverage"),
                         names(cmp))
     ret[, TP := sapply(splitCmp, function(cr)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]
         if (rmdVars$retMin)
             tpInfo[, retDiff := retDiff / 60]
-        tpInfo[, c("retDiff", "mzDiff") := .(round(retDiff, 2), round(mzDiff, 5))]
+        for (col in c("retDiff", "similarity", "coverage"))
+        {
+            if (!is.null(tpInfo[[col]]))
+                set(tpInfo, j = col, value = round(tpInfo[[col]], 2))
+        }
+        tpInfo[, mzDiff := round(mzDiff, 5)]
         setnames(tpInfo, "TP_name", "name")
         
         if (!is.null(tpInfo[["retDir"]]) && !is.null(tpInfo[["TP_retDir"]]))

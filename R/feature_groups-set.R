@@ -319,9 +319,12 @@ setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm,
     checkmate::assertFlag(groupNorm, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        return(fGroups)
+    
     baseArgs <- c(list(featNorm = featNorm, groupNorm = groupNorm, normFunc = normFunc, ISTDRTWindow = ISTDRTWindow,
                        ISTDMZWindow = ISTDMZWindow, minISTDs = minISTDs), list(...))
-    if (length(fGroups) == 0 || (featNorm != "istd" && !groupNorm))
+    if (featNorm != "istd" && !groupNorm)
         return(do.call(callNextMethod, c(list(fGroups, standards = NULL), baseArgs))) # no need to do per set
 
     # reset

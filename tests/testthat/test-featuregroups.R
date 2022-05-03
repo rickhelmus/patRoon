@@ -346,6 +346,7 @@ fgISTD <- fgOpenMS
 fgISTD@analysisInfo$istd_conc <- c(NA, NA, NA, 1, 2, 1)
 fgNormISTDMin1 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 1)
 fgNormISTDMin2 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 2)
+fgNormISTDEmpty <- doNormInts(fgOpenMSEmpty, "istd")
 fgNormTIC <- doNormInts(fgISTD, "tic")
 fgNormConc <- doNormInts(fgISTD, "conc")
 fgNormGroup <- doNormInts(fgISTD, groupNorm = TRUE)
@@ -377,6 +378,11 @@ test_that("Normalization", {
     expect_range(groupTable(fgNormGroup, normalized = TRUE), c(0, 1))
     # sample 5 in fgNormConc has halved intensities
     expect_equal(groupTable(fgNormConc[5], normalized = TRUE) * 2, groupTable(fgISTD[5]))
+    
+    expect_length(fgNormISTDEmpty, 0)
+    expect_length(doNormInts(fgOpenMSEmpty, "tic"), 0)
+    expect_length(doNormInts(fgOpenMSEmpty, "conc"), 0)
+    expect_length(doNormInts(fgOpenMSEmpty, groupNorm = TRUE), 0)
 })
 
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
@@ -517,6 +523,8 @@ test_that("plotting works", {
     
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
                  length(consensus(fGCompOpenMS, relMinAbundance = 1)))
+    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE))
+    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE))
 })
 
 test_that("plotting empty objects works", {
@@ -544,6 +552,8 @@ test_that("plotting empty objects works", {
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_ggplot(plotUpSet(fGConsOneEmpty))
+    
+    expect_error(plotGraph(fgNormISTDEmpty), "No feature groups")
 })
 
 if (testWithSets())
@@ -612,4 +622,8 @@ test_that("sets functionality", {
     expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), sets = TRUE), 0)
     
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, sets = TRUE))
+    
+    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
+    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))
+    expect_error(plotGraph(fgNormISTDEmpty, set = "positive"), "No feature groups")
 })

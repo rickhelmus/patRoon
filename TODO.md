@@ -25,8 +25,6 @@
 
 ## Tests
 
-- normalization
-    - plotGraph
 
 ## Docs
 

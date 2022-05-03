@@ -30,6 +30,9 @@ setMethod("initialize", "transformationProductsLibrary",
 #' @templateVar parNULL TRUE
 #' @template tp_gen-scr
 #'
+#' @template tp_gen-sim
+#' @template fp-args
+#' 
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
 #' @section Custom TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a

@@ -31,12 +31,9 @@
 ## Docs
 
 - TPs
-    - Update ref docs for TP-structure
     - filter() for base TP class (properties)
         - e.g. likelihood property for CTS
-    - calcSims
     - CTS: link to manual/publications for details scoring and other output
-    - update for common generator args, move BT link to filter, make sure sim calculation is explained for all generators
     - handbook
         - update for transformationProductsStructure
 - Features

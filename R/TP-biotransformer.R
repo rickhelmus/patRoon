@@ -106,10 +106,7 @@ BTMPPrepareHandler <- function(cmd)
 #' @templateVar algoParam biotransformer
 #' @template algo_generator
 #'
-#' @details Structural similarities between the parent and its TPs are calculated, which can be used to
-#'   \link[=filter,transformationProductsBT-method]{filter} the results.
-#'
-#'   In order to use this function the \file{.jar} command line utility should be installed and specified in the
+#' @details In order to use this function the \file{.jar} command line utility should be installed and specified in the
 #'   \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
 #'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
 #'
@@ -124,13 +121,13 @@ BTMPPrepareHandler <- function(cmd)
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #' 
 #' @template tp_gen-scr
+#' @template tp_gen-sim
 #' @template fp-args
 #'
 #' @templateVar what \code{generateTPsBioTransformer}
 #' @template uses-multiProc
 #'
-#' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon} \cr\cr
-#'   \addCitations{rcdk}{1}
+#' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
 #'
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", generations = 2, extraOpts = NULL,

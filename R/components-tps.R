@@ -475,6 +475,9 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #'   other if one or more transformation products overlap. The graph is constructed with the \pkg{\link{igraph}} package
 #'   and rendered with \pkg{\link{visNetwork}}.
 #'
+#' @inheritParams plotGraph,componentsNT-method
+#' @inherit plotGraph,componentsNT-method references
+#' 
 #' @template plotGraph
 #'
 #' @export

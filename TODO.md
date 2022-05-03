@@ -5,10 +5,10 @@
 
 - Normalization
     - maybe: allow usage of normalized intensities with filter()?
-    - split IS assignment in different function anyway?
     - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
     - reportHTML: report normalized intensities in featInfo?
     - Example ISTD lists in patRoonData
+        - merge into master
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
 
@@ -21,6 +21,8 @@
     - Split formulaDiff like plotGraph()?
 - newProject()
     - selector for CTS transLibrary?
+- plotGraph()
+    - keep duplicate selector?
 
 
 ## Tests
@@ -35,12 +37,9 @@
     - calcSims
     - CTS: link to manual/publications for details scoring and other output
     - more details on how TPs are collapsed with convertToMFDB()
-    - plotVenn(): mention that parents are compared by name, hence, same parent input should have been used (mainly important for library)
-    - consensus
-        - retDir set to 0 if conflicts
-        - similarities are averaged
-    - consensus()/plotVenn()/plotUpSet(): InChIKey is used for comparison
-    - filter(): how NA similarity values are handled (from consensus)
+    - update for common generator args, move BT link to filter, make sure sim calculation is explained for all generators
+    - handbook
+        - update for transformationProductsStructure
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)

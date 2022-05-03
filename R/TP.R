@@ -18,8 +18,8 @@ NULL
 #'
 #' @param TPs,x,object \code{transformationProducts} object to be accessed
 #'
-#' @seealso Derived classes \code{\link{transformationProductsBT}} and \code{\link{transformationProductsLibrary}} for
-#'   specific algorithm methods and \code{\link{generateTPs}}
+#' @seealso The derived \code{\link{transformationProductsStructure}} class for more methods and
+#'   \code{\link{generateTPs}}
 #'
 #' @slot parents A \code{\link{data.table}} with metadata for all parents that have TPs in this object. Use the
 #'   \code{parents} method for access.
@@ -206,9 +206,8 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, n
 #'
 #' @return A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
 #'
-#' @seealso In addition, the derived classes \code{\link{transformationProductsBT}},
-#'   \code{\link{transformationProductsLibrary}}, \code{\link{transformationProductsCTS}}, which are derived from
-#'   \code{\link{transformationProductsStructure}}, for algorithm specific methods to post-process TP data.
+#' @seealso The derived class \code{\link{transformationProductsStructure}} for more specific methods to post-process TP
+#'   data.
 #'
 #' @export
 generateTPs <- function(algorithm, ...)

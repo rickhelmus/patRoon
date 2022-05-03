@@ -2,22 +2,7 @@
 #' @include TP-structure.R
 NULL
 
-#' Class to store transformation products (TPs) obtained from a library
-#'
-#' This class is used to store prediction results that are available in a TP library.
-#'
-#' Objects from this class are generate with \code{\link{generateTPsLibrary}}. This class is derived from the
-#' \code{\link{transformationProducts}} base class, please see its documentation for more details.
-#'
-#' @param TPs \code{transformationProductsLibrary} object to be accessed
-#'
-#' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
-#'   \code{\link{generateTPs}}
-#'
-#' @templateVar class transformationProductsLibrary
-#' @template class-hierarchy
-#'
-#' @export
+#' @rdname transformationProductsStructure-class
 transformationProductsLibrary <- setClass("transformationProductsLibrary", contains = "transformationProductsStructure")
 
 setMethod("initialize", "transformationProductsLibrary",
@@ -45,7 +30,7 @@ setMethod("initialize", "transformationProductsLibrary",
 #' @templateVar parNULL TRUE
 #' @template tp_gen-scr
 #'
-#' @return The TPs are stored in an object from the \code{\link{transformationProductsLibrary}} class.
+#' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
 #' @section Custom TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
 #'   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{

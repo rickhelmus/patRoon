@@ -2,7 +2,7 @@
 #' @include TP-structure.R
 NULL
 
-#' @export
+#' @rdname transformationProductsStructure-class
 transformationProductsCTS <- setClass("transformationProductsCTS", contains = "transformationProductsStructure")
 
 setMethod("initialize", "transformationProductsCTS",

@@ -2,8 +2,37 @@
 #' @include TP.R
 NULL
 
+#' Base transformation products (TP) class with structure information
+#'
+#' Holds information for all TPs for a set of parents, including structural information.
+#'
+#' This (virtual) class is derived from the \code{\link{transformationProducts}} base class, please see its
+#' documentation for more details. Objects from this class are returned by \link[=generateTPs]{TP generators}. More
+#' specifically, algorithms that works with chemical structures (\emph{e.g.} \code{biotransformer}), uses this class to
+#' store their results. The methods defined for this class extend the functionality for the base
+#' \code{\link{transformationProducts}} class.
+#'
+#' @param obj,TPs \code{transformationProductsStructure} derived object to be accessed
+#' @param commonParents Only consider TPs from parents that are common to all compared objects.
+#' @param \dots For \code{filter}: Further argument passed to the base
+#'   \code{\link[=filter,transformationProducts-method]{filter method}}.
+#'
+#'   For \code{plotVenn}, \code{plotUpSet} and \code{consensus}: further (unique) \code{transformationProductsStructure}
+#'   objects.
+#'
+#' @section Comparison between objects: The methods that compare different objects (\emph{e.g.} \code{plotVenn} and
+#'   \code{consensus}) use the \acronym{InChIKey} to match TPs between objects. Moreover, the parents between objects
+#'   are matched by their name. Hence, it is \emph{crucial} that the input parents to \code{\link{generateTPs}}
+#'   (\emph{i.e.} the \code{parents} argument) are named equally.
+#'
+#' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and \code{\link{generateTPs}}
+#'
+#' @templateVar class transformationProductsStructure
+#' @template class-hierarchy
+#'
 #' @export
-transformationProductsStructure <- setClass("transformationProductsStructure", contains = "transformationProducts")
+transformationProductsStructure <- setClass("transformationProductsStructure",
+                                            contains = c("VIRTUAL", "transformationProducts"))
 
 setMethod("initialize", "transformationProductsStructure", function(.Object, calcSims, fpType, fpSimMethod, ...)
 {
@@ -53,10 +82,8 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
     return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])
 })
 
-#' @describeIn transformationProductsStructure Performs rule-based filtering of the \command{BioTransformer}
-#'   predictions. Useful to simplify and clean-up the data.
+#' @describeIn transformationProductsStructure Performs rule-based filtering. Useful to simplify and clean-up the data.
 #'
-#' @param \dots Further argument passed to the base \code{\link[=filter,transformationProducts-method]{filter method}}.
 #' @param removeDuplicates If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
 #'   removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP
 #'   candidate with duplicate structure will be kept.
@@ -64,10 +91,12 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
 #' @param removeTPIsomers If \code{TRUE} then all TPs with equal formula as any sibling TPs (isomers) are removed.
 #'   Unlike \code{removeDuplicates}, \emph{all} TP candidates are removed (including the first match). This filter
 #'   automatically sets \code{removeDuplicates=TRUE} to avoid complete removal of TPs with equal structure.
-#' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. For
-#'   details on how these similarities are calculated, see the \code{\link{generateTPsBioTransformer}} function. May be
+#' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. This
+#'   data is only available if the \code{calcSims} argument to \code{\link{generateTPs}} was set to \code{TRUE}. May be
 #'   useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
 #'   MS/MS spectral similarity (which can be evaluated after componentization with \code{\link{generateComponentsTPs}}.
+#'   Any values that are \code{NA} are removed (which only occur when a consensus was made from objects that not all
+#'   have similarity information).
 #' @param negate If \code{TRUE} then filters are performed in opposite manner.
 #'
 #' @return \code{filter} returns a filtered \code{transformationProductsStructure} object.
@@ -142,6 +171,25 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     return(obj)
 })
 
+#' @describeIn transformationProductsStructure Plots an interactive hierarchy graph of the transformation products. The
+#'   resulting graph can be browsed interactively and allows exploration of the different TP formation pathways.
+#'   Furthermore, results from \link[=generateComponentsTPs]{TP componentization} can be used to match the hierarchy
+#'   with screening results. The graph is rendered with \pkg{\link{visNetwork}}.
+#'
+#' @param which Either a \code{character} or \code{integer} vector with one or more names/indices of the parents to
+#'   plot.
+#' @param components If specified (\emph{i.e.} not \code{NULL}), a \code{\link{componentsTPs}} object that is used for
+#'   matching the graph with screening results. The TPs that were found will be marked. See also the \code{prune} and
+#'   \code{onlyCompletePaths} arguments.
+#' @param structuresMax An \code{integer} with the maximum number of structures to plot. Setting a maximum is mainly
+#'   done to avoid long times needed to construct the graph.
+#' @param prune If \code{TRUE} and \code{components} is set, then pathways without \emph{any} detected TPs are not shown
+#'   (pruned). See also the \code{onlyCompletePaths} and \code{components} arguments.
+#' @param onlyCompletePaths If \code{TRUE} and \code{components} is set, then only pathways are shown for which
+#'   \emph{all} TPs were detected. See also the \code{prune} and \code{components} arguments.
+#'
+#' @template plotGraph
+#'
 #' @export
 setMethod("plotGraph", "transformationProductsStructure", function(obj, which, components = NULL, structuresMax = 25,
                                                                    prune = TRUE, onlyCompletePaths = FALSE)
@@ -272,6 +320,13 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, which, c
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 })
 
+#' @describeIn transformationProductsStructure plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
+#'   candidates of up to five different \code{featureAnnotations} objects.
+#'
+#' @inheritParams plotVenn,featureAnnotations-method
+#'
+#' @template plotvenn-ret
+#' 
 #' @export
 setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., commonParents = FALSE,
                                                                   labels = NULL, vennArgs = NULL)
@@ -310,6 +365,9 @@ setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., comm
     }, nrow), vennArgs))
 })
 
+#' @describeIn transformationProductsStructure Plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function)
+#'   outlining unique and shared TPs between different \code{transformationProductsStructure} objects.
+#' @template plotUpSet
 #' @export
 setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., commonParents = FALSE, labels = NULL,
                                                                    nsets = length(list(...)) + 1, nintersects = NA,
@@ -361,9 +419,25 @@ setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., com
     do.call(UpSetR::upset, c(list(TPTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
+#' @rdname transformationProductsStructure-class
 transformationProductsStructureConsensus <- setClass("transformationProductsStructureConsensus",
                                                      contains = "transformationProductsStructure")
 
+#' @describeIn transformationProductsStructure Generates a consensus from different
+#'   \code{transformationProductsStructure} objects.
+#'
+#' @templateVar what TPs
+#' @template consensus-common-args
+#'
+#' @param labels A \code{character} with names to use for labelling. If \code{NULL} labels are automatically generated.
+#'
+#' @return \code{consensus} returns a \code{transformationProductsStructure} object that is produced by merging results
+#'   from multiple \code{transformationProductsStructure} objects.
+#'
+#' @note \code{consensus}: If the \code{retDir} values differs between matched TPs it will be set to \samp{0}. If
+#'   structure similarity data is available (\emph{i.e.} \code{calcSims=TRUE} to \code{generateTPs}) then the mean
+#'   similarity is calculated.
+#'
 #' @export
 setMethod("consensus", "transformationProductsStructure", function(obj, ..., absMinAbundance = NULL,
                                                                    relMinAbundance = NULL, uniqueFrom = NULL,

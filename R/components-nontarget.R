@@ -43,8 +43,11 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 #'   \pkg{\link{visNetwork}}.
 #'
 #' @param obj The \code{componentsNT} object to plot.
-#' 
+#' @param onlyLinked If \code{TRUE} then only components with links are plotted.
+#'
 #' @template plotGraph
+#' 
+#' @references \addCitations{igraph}{1}
 #' 
 #' @export
 setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE)

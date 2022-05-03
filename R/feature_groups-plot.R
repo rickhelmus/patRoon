@@ -703,10 +703,8 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
 
 #' @details \code{plotUpSet} plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining unique
 #'   and shared feature groups between given replicate groups.
-#'
-#' @param nsets,nintersects See \code{\link[UpSetR]{upset}}.
-#'
-#' @references \insertRef{Conway2017}{patRoon} \cr\cr \insertRef{Lex2014}{patRoon}
+#'   
+#' @template plotUpSet
 #'
 #' @rdname feature-plotting
 #' @export

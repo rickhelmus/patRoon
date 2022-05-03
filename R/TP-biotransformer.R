@@ -2,25 +2,7 @@
 #' @include TP-structure.R
 NULL
 
-#' Class to store transformation products (TPs) predicted by BioTransformer
-#'
-#' This class is used to store prediction results that are generated with
-#' \href{http://biotransformer.ca/}{BioTransformer}.
-#'
-#' Objects from this class are generate with \code{\link{generateTPsBioTransformer}}. This class is derived from the
-#' \code{\link{transformationProducts}} base class, please see its documentation for more details.
-#'
-#' @param obj,TPs \code{transformationProductsBTs} object to be accessed
-#'
-#' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and
-#'   \code{\link{generateTPs}}
-#'
-#' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
-#'
-#' @templateVar class transformationProductsBT
-#' @template class-hierarchy
-#'
-#' @export
+#' @rdname transformationProductsStructure-class
 transformationProductsBT <- setClass("transformationProductsBT", contains = "transformationProductsStructure")
 
 setMethod("initialize", "transformationProductsBT",
@@ -139,7 +121,7 @@ BTMPPrepareHandler <- function(cmd)
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
 #'   Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.
 #'
-#' @return The TPs are stored in an object from the \code{\link{transformationProductsBT}} class.
+#' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #' 
 #' @template tp_gen-scr
 #' @template fp-args

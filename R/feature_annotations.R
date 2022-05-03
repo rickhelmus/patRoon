@@ -432,7 +432,7 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     {
         ret <- as.data.table(f)
         if (length(ret) == 0)
-            ret <- data.table(group = character(), InChIKey1 = character())
+            ret <- data.table(group = character(), UID = character())
         ret <- unique(ret[, c("group", "UID")])[, (l) := 1]
     })
     

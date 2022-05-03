@@ -38,6 +38,9 @@
     - CTS: link to manual/publications for details scoring and other output
     - more details on how TPs are collapsed with convertToMFDB()
     - plotVenn(): mention that parents are compared by name, hence, same parent input should have been used (mainly important for library)
+    - consensus
+        - retDir set to 0 if conflicts
+        - similarities are averaged
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)

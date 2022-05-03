@@ -243,7 +243,8 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
     TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "generation", "accumulation", "production",
                           "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
                           "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
-                          "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref"), names(TPTab))
+                          "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref", "similarity",
+                          "mergedBy"), names(TPTab))
     nodes[isTP == TRUE, title := sapply(id, function(TP)
     {
         TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]
@@ -347,4 +348,86 @@ setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., com
         stop("Need at least two non-empty objects to plot")
     
     do.call(UpSetR::upset, c(list(TPTab, nsets = nsets, nintersects = nintersects), upsetArgs))
+})
+
+transformationProductsStructureConsensus <- setClass("transformationProductsStructureConsensus",
+                                                     contains = "transformationProductsStructure")
+
+#' @export
+setMethod("consensus", "transformationProductsStructure", function(obj, ..., absMinAbundance = NULL,
+                                                                   relMinAbundance = NULL, uniqueFrom = NULL,
+                                                                   uniqueOuter = FALSE, labels = NULL)
+{
+    allTPs <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allTPs, types = "transformationProductsStructure", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allTPs), null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allTPs, algorithm))
+    
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
+    
+    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allTPs), NULLToZero(relMinAbundance))
+    if (!is.null(uniqueFrom) && !is.character(uniqueFrom))
+        uniqueFrom <- labels[uniqueFrom]
+    names(allTPs) <- labels
+    
+    # merge all TPs in a large table, collapse hierarchies, only keep algorithm independent columns
+    # NOTE: name and IDs will be re-assigned later
+    TPCols <- c("parent", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "retDir", "similarity")
+    allTPsTab <- rbindlist(lapply(allTPs, function(TPs)
+    {
+        tab <- as.data.table(TPs)
+        return(unique(tab[, intersect(TPCols, names(tab)), with = FALSE]))
+    }), idcol = "mergedBy")
+    
+    byTPCols <- c("parent", "InChIKey")
+    
+    # set retDir to 0 if there are conflicts
+    allTPsTab[, retDir := if (!allSame(retDir)) 0 else retDir, by = byTPCols]
+    
+    # just average similarities
+    if (!is.null(allTPsTab[["similarity"]]))
+        allTPsTab[, similarity := mean(similarity), by = byTPCols]
+    
+    if (!is.null(uniqueFrom))
+    {
+        allTPsTab[, keep := all(mergedBy %chin% uniqueFrom) && (!uniqueOuter || .N == 1), by = byTPCols]
+        allTPsTab <- allTPsTab[keep == TRUE][, keep := NULL]
+    }
+    
+    allTPsTab[, coverage := uniqueN(mergedBy) / length(allTPs), by = byTPCols]
+    
+    allTPsTab[, mergedBy := paste0(unique(mergedBy), collapse = ","), by = byTPCols]
+    allTPsTab <- unique(allTPsTab, by = byTPCols)
+    
+    if (relMinAbundance > 0)
+        allTPsTab[coverage >= relMinAbundance]
+    
+    allTPsTab[, c("parent_ID", "generation") := .(NA_integer_, 1)] # just assume all TPs are from the same parent
+    allTPsTab[, ID := seq_len(.N), by = "parent"]
+    allTPsTab[, c("chem_ID", "name") := .(ID, paste0(parent, "-TP", ID))]
+    
+    setcolorder(allTPsTab, c("name", "ID", "parent_ID", "chem_ID"))
+    setcolorder(allTPsTab, setdiff(c(names(allTPsTab), "generation"), c("coverage", "mergedBy"))) # move coverage/mergedBy to end
+    
+    mergedTPs <- split(allTPsTab, by = "parent", keep.by = FALSE)
+    
+    # same for parents: combine tables, only keep columns not specific to screening, remove duplicates and re-order
+    parCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
+    allParentsTab <- rbindlist(lapply(allTPs, function(TPs) parents(TPs)[, intersect(parCols, names(parents(TPs))),
+                                                                         with = FALSE]), idcol = "mergedBy")
+    allParentsTab[, mergedBy := paste0(unique(mergedBy), collapse = ","), by = "name"]
+    allParentsTab <- unique(allParentsTab, by = "name")
+    allParentsTab <- allParentsTab[match(name, names(mergedTPs))] # sync order
+    setcolorder(allParentsTab, parCols) # move mergedBy to end
+    
+    # HACK: dummy values for fpType/fpSimMethod, they are not really used as calcSims is always FALSE
+    return(transformationProductsStructureConsensus(calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
+                                                    parents = allParentsTab, products = mergedTPs,
+                                                    algorithm = paste0(unique(sapply(allTPs, algorithm)), collapse = ",")))
 })

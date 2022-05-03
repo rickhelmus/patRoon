@@ -143,10 +143,16 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
 })
 
 #' @export
-setMethod("plotGraph", "transformationProductsStructure", function(obj, components = NULL, structuresMax = 25,
+setMethod("plotGraph", "transformationProductsStructure", function(obj, which, components = NULL, structuresMax = 25,
                                                                    prune = TRUE, onlyCompletePaths = FALSE)
 {
     # UNDONE: don't make name unique, but use IDs?
+    
+    checkmate::assert(
+        checkmate::checkSubset(which, names(obj), empty.ok = FALSE),
+        checkmate::checkIntegerish(which, lower = 1, upper = nrow(parents(obj)), any.missing = FALSE, min.len = 1),
+        .var.name = "which"
+    )
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(components, "componentsTPs", null.ok = TRUE, add = ac)
@@ -154,6 +160,7 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
     checkmate::assertCount(structuresMax, add = ac)
     checkmate::reportAssertions(ac)
     
+    obj <- obj[which]
     if (length(obj) == 0)
         stop("No TPs to plot", call. = FALSE)
     

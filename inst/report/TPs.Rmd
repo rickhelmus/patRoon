@@ -393,7 +393,7 @@ rmdText <- sapply(seq_len(nrow(cInfo)), function(i)
         sprintf("<div id='%s'></div>", DOMID)
     else
         glue::glue("\n{ ticks } {{r}}\n",
-                   "gr <- plotGraph(rmdVars$TPs[{ TPInd }], components = components, structuresMax = rmdVars$TPGraphStructuresMax)\n",
+                   "gr <- plotGraph(rmdVars$TPs, which = { TPInd }, components = components, structuresMax = rmdVars$TPGraphStructuresMax)\n",
                    "gr$elementId <- '{ DOMID }'\n",
                    "gr\n",
                    "{ ticks }\n\n", ticks = "```", TPInd = TPInd, DOMID = DOMID)

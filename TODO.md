@@ -30,12 +30,14 @@
 
 ## Docs
 
-- Update ref docs for TP-structure
-- filter() for base TP class (properties)
-    - e.g. likelihood property for CTS
-- calcSims
-- CTS: link to manual/publications for details scoring and other output
-- more details on how TPs are collapsed with convertToMFDB()
+- TPs
+    - Update ref docs for TP-structure
+    - filter() for base TP class (properties)
+        - e.g. likelihood property for CTS
+    - calcSims
+    - CTS: link to manual/publications for details scoring and other output
+    - more details on how TPs are collapsed with convertToMFDB()
+    - plotVenn(): mention that parents are compared by name, hence, same parent input should have been used (mainly important for library)
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)

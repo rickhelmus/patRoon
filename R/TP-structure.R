@@ -260,3 +260,37 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
                                                  values = unique(nodes$group[nodes$group != "unique"]))) %>%
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 })
+
+#' @export
+setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., commonParents = FALSE,
+                                                                  labels = NULL, vennArgs = NULL)
+{
+    allTPs <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allTPs, types = "transformationProductsStructure", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertFlag(commonParents, add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allTPs), null.ok = TRUE, add = ac)
+    checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allTPs, algorithm))
+    if (is.null(vennArgs))
+        vennArgs <- list()
+
+    if (commonParents)
+    {
+        commonPars <- Reduce(intersect, lapply(allTPs, names))
+        allTPs <- lapply(allTPs, "[", commonPars)
+    }
+        
+    allTPTabs <- lapply(allTPs, as.data.table)
+    do.call(makeVennPlot, c(list(allTPTabs, labels, lengths(allTPs), function(obj1, obj2)
+    {
+        if (length(obj1) == 0 || length(obj2) == 0)
+            return(data.table())
+        fintersect(obj1[, c("parent", "InChIKey")], obj2[, c("parent", "InChIKey")])
+    }, nrow), vennArgs))
+})

@@ -36,7 +36,6 @@
         - e.g. likelihood property for CTS
     - calcSims
     - CTS: link to manual/publications for details scoring and other output
-    - more details on how TPs are collapsed with convertToMFDB()
     - update for common generator args, move BT link to filter, make sure sim calculation is explained for all generators
     - handbook
         - update for transformationProductsStructure

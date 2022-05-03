@@ -55,8 +55,6 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     setnames(prodAll,
              c("name", "formula", "neutralMass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass"))
-    if (!is.null(prodAll[["Enzyme(s)"]])) # BT
-        setnames(prodAll, "Enzyme(s)", "enzyme")
     
     if (includeParents)
     {

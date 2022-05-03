@@ -265,6 +265,8 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, componen
 setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., commonParents = FALSE,
                                                                   labels = NULL, vennArgs = NULL)
 {
+    # UNDONE: this method is mostly a copy of the featureAnnotations method, merge?
+    
     allTPs <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
@@ -285,9 +287,10 @@ setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., comm
         commonPars <- Reduce(intersect, lapply(allTPs, names))
         allTPs <- lapply(allTPs, "[", commonPars)
     }
-        
+    
     allTPTabs <- lapply(allTPs, as.data.table)
-    do.call(makeVennPlot, c(list(allTPTabs, labels, lengths(allTPs), function(obj1, obj2)
+    unLengths <- sapply(allTPs, function(TPs) sum(sapply(products(TPs), function(p) nrow(unique(p, by = "InChIKey")))))
+    do.call(makeVennPlot, c(list(allTPTabs, labels, unLengths, function(obj1, obj2)
     {
         if (length(obj1) == 0 || length(obj2) == 0)
             return(data.table())

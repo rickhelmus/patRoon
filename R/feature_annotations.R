@@ -431,7 +431,7 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     allAnnTabs <- mapply(allFeatAnnotations, labels, SIMPLIFY = FALSE, FUN = function(f, l)
     {
         ret <- as.data.table(f)
-        if (length(ret) == 0)
+        if (nrow(ret) == 0)
             ret <- data.table(group = character(), UID = character())
         ret <- unique(ret[, c("group", "UID")])[, (l) := 1]
     })

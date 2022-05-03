@@ -39,6 +39,7 @@
     - consensus
         - retDir set to 0 if conflicts
         - similarities are averaged
+    - consensus()/plotVenn()/plotUpSet(): InChIKey is used for comparison
     - filter(): how NA similarity values are handled (from consensus)
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized

@@ -161,8 +161,6 @@ test_that("basic usage", {
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
     
-    expect_HTML(plotGraph(TPsLibScr[1]))
-    
     skip_if_not(doMetFrag)
     
     expect_error(assertSusp(convertToSuspects(TPsLibComp, includeParents = TRUE)), NA)
@@ -172,6 +170,50 @@ test_that("basic usage", {
     testMFDB(TPsBTComp)
     testMFDB(TPsCTSComp)
 })
+
+TPsCons <- consensus(TPsLibScr, TPsBTScr)
+collapsedTPLen <- function(TPs) sum(sapply(products(TPs), function(x) uniqueN(x$InChIKey)))
+test_that("consensus works", {
+    expect_length(consensus(TPsLibScr, TPsBTEmpty), collapsedTPLen(TPsLibScr))
+    
+    expect_known_value(TPsCons, testFile("TPs-cons"))
+    expect_known_show(TPsCons, testFile("TPs-cons", text = TRUE))
+    expect_setequal(names(consensus(TPsLibScr, TPsBTScr)), union(names(TPsLibScr), names(TPsBTScr)))
+    expect_lt(length(consensus(TPsLibScr, TPsBTScr, relMinAbundance = 1)), collapsedTPLen(TPsCons))
+    expect_length(consensus(TPsLibEmpty, TPsBTEmpty), 0)
+    
+    expect_equal(sum(lengths(list(consensus(TPsLibScr, TPsBTScr, uniqueFrom = 1),
+                                  consensus(TPsLibScr, TPsBTScr, uniqueFrom = 2),
+                                  consensus(TPsLibScr, TPsBTScr, relMinAbundance = 1)))),
+                 collapsedTPLen(TPsCons))
+    expect_equal(sum(lengths(list(consensus(TPsLibScr, TPsBTScr, uniqueFrom = 1:2, uniqueOuter = TRUE),
+                                  consensus(TPsLibScr, TPsBTScr, relMinAbundance = 1)))),
+                 collapsedTPLen(TPsCons))
+    expect_length(consensus(TPsLibScr, TPsBTScr, uniqueFrom = 1:2), collapsedTPLen(TPsCons))
+    expect_lt(length(consensus(TPsLibScr, TPsBTScr, uniqueFrom = 1:2, uniqueOuter = TRUE)), collapsedTPLen(TPsCons))
+    expect_length(consensus(TPsLibEmpty, TPsBTEmpty, uniqueFrom = 1), 0)
+    expect_length(consensus(TPsLibEmpty, TPsBTEmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
+})
+
+test_that("plotting works", {
+    expect_HTML(plotGraph(TPsLibScr[1]))
+    
+    expect_doppel("venn", function() plotVenn(TPsLibScr, TPsBTScr))
+    expect_error(plotVenn(TPsLibEmpty, TPsBTEmpty))
+    expect_equal(expect_plot(plotVenn(TPsLibScr, TPsBTScr))$areas[2], collapsedTPLen(TPsBTScr))
+    expect_equal(expect_plot(plotVenn(TPsLibScr, TPsBTEmpty))$areas[1], collapsedTPLen(TPsLibScr))
+    expect_equal(expect_plot(plotVenn(TPsLibEmpty, TPsBTScr))$areas[2], collapsedTPLen(TPsBTScr))
+    expect_equal(expect_plot(plotVenn(TPsLibScr, TPsBTEmpty))$intersectionCounts, 0)
+    
+    expect_ggplot(plotUpSet(TPsLibScr, TPsBTScr))
+    expect_error(plotUpSet(TPsLibEmpty, TPsBTEmpty))
+    expect_error(plotUpSet(TPsLibScr, TPsBTEmpty))
+    
+    expect_equal(expect_plot(plotVenn(TPsLibScr, TPsBTScr))$intersectionCounts,
+                 length(consensus(TPsLibScr, TPsBTScr, relMinAbundance = 1)))
+    
+})
+
 
 fGroupsMore <- getTestFGroups(getTestAnaInfoAnn())
 componTPsNone <- generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL)

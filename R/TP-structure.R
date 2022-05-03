@@ -293,7 +293,8 @@ setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., comm
     }
     
     allTPTabs <- lapply(allTPs, as.data.table)
-    unLengths <- sapply(allTPs, function(TPs) sum(sapply(products(TPs), function(p) nrow(unique(p, by = "InChIKey")))))
+    unLengths <- sapply(allTPs, function(TPs) if (length(TPs) == 0) 0 else sum(sapply(products(TPs),
+                                                                                      function(p) uniqueN(p$InChIKey))))
     do.call(makeVennPlot, c(list(allTPTabs, labels, unLengths, function(obj1, obj2)
     {
         if (length(obj1) == 0 || length(obj2) == 0)
@@ -388,38 +389,43 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
         return(unique(tab[, intersect(TPCols, names(tab)), with = FALSE]))
     }), idcol = "mergedBy", fill = TRUE)
     
-    byTPCols <- c("parent", "InChIKey")
-    
-    # set retDir to 0 if there are conflicts
-    allTPsTab[, retDir := if (!allSame(retDir)) 0 else retDir, by = byTPCols]
-    
-    # just average similarities
-    if (!is.null(allTPsTab[["similarity"]]))
-        allTPsTab[, similarity := if (all(is.na(similarity))) NA_real_ else mean(similarity, na.rm = TRUE),
-                  by = byTPCols]
-    
-    if (!is.null(uniqueFrom))
+    if (nrow(allTPsTab) == 0)
+        mergedTPs <- list()
+    else
     {
-        allTPsTab[, keep := all(mergedBy %chin% uniqueFrom) && (!uniqueOuter || .N == 1), by = byTPCols]
-        allTPsTab <- allTPsTab[keep == TRUE][, keep := NULL]
+        byTPCols <- c("parent", "InChIKey")
+        
+        # set retDir to 0 if there are conflicts
+        allTPsTab[, retDir := if (!allSame(retDir)) 0 else retDir, by = byTPCols]
+        
+        # just average similarities
+        if (!is.null(allTPsTab[["similarity"]]))
+            allTPsTab[, similarity := if (all(is.na(similarity))) NA_real_ else mean(similarity, na.rm = TRUE),
+                      by = byTPCols]
+        
+        if (!is.null(uniqueFrom))
+        {
+            allTPsTab[, keep := all(mergedBy %chin% uniqueFrom) && (!uniqueOuter || .N == 1), by = byTPCols]
+            allTPsTab <- allTPsTab[keep == TRUE][, keep := NULL]
+        }
+        
+        allTPsTab[, coverage := uniqueN(mergedBy) / length(allTPs), by = byTPCols]
+        
+        allTPsTab[, mergedBy := paste0(unique(mergedBy), collapse = ","), by = byTPCols]
+        allTPsTab <- unique(allTPsTab, by = byTPCols)
+        
+        if (relMinAbundance > 0)
+            allTPsTab <- allTPsTab[coverage >= relMinAbundance]
+        
+        allTPsTab[, c("parent_ID", "generation") := .(NA_integer_, 1)] # just assume all TPs are from the same parent
+        allTPsTab[, ID := seq_len(.N), by = "parent"]
+        allTPsTab[, c("chem_ID", "name") := .(ID, paste0(parent, "-TP", ID))]
+        
+        setcolorder(allTPsTab, c("name", "ID", "parent_ID", "chem_ID"))
+        setcolorder(allTPsTab, setdiff(c(names(allTPsTab), "generation"), c("coverage", "mergedBy"))) # move coverage/mergedBy to end
+        
+        mergedTPs <- split(allTPsTab, by = "parent", keep.by = FALSE)
     }
-    
-    allTPsTab[, coverage := uniqueN(mergedBy) / length(allTPs), by = byTPCols]
-    
-    allTPsTab[, mergedBy := paste0(unique(mergedBy), collapse = ","), by = byTPCols]
-    allTPsTab <- unique(allTPsTab, by = byTPCols)
-    
-    if (relMinAbundance > 0)
-        allTPsTab[coverage >= relMinAbundance]
-    
-    allTPsTab[, c("parent_ID", "generation") := .(NA_integer_, 1)] # just assume all TPs are from the same parent
-    allTPsTab[, ID := seq_len(.N), by = "parent"]
-    allTPsTab[, c("chem_ID", "name") := .(ID, paste0(parent, "-TP", ID))]
-    
-    setcolorder(allTPsTab, c("name", "ID", "parent_ID", "chem_ID"))
-    setcolorder(allTPsTab, setdiff(c(names(allTPsTab), "generation"), c("coverage", "mergedBy"))) # move coverage/mergedBy to end
-    
-    mergedTPs <- split(allTPsTab, by = "parent", keep.by = FALSE)
     
     # same for parents: combine tables, only keep columns not specific to screening, remove duplicates and re-order
     parCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")

@@ -21,7 +21,6 @@
     - Split formulaDiff like plotGraph()?
 - newProject()
     - selector for CTS transLibrary?
-- filter(): handle NA similarity values (from consensus)
 
 
 ## Tests
@@ -42,6 +41,7 @@
     - consensus
         - retDir set to 0 if conflicts
         - similarities are averaged
+    - filter(): how NA similarity values are handled (from consensus)
 - Features
     - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
         - also handbook (at least for generateComponentsIntClust)

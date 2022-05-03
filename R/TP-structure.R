@@ -120,7 +120,10 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
             if (is.null(obj[[1]][["similarity"]]))
                 stop("Cannot filter on structural similarities: no similarities were calculated. ",
                      "Please set calcSims=TRUE when calling generateTPs().", call. = FALSE)
-            pred <- if (negate) function(x) x < minSimilarity else function(x) numGTE(x, minSimilarity)
+            pred <- if (negate)
+                function(x) is.na(x) | x < minSimilarity
+            else
+                function(x) !is.na(x) & numGTE(x, minSimilarity)
             obj@products <- lapply(obj@products, function(p) p[pred(similarity)])
         }
         

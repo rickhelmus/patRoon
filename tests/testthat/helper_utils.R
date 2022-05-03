@@ -98,7 +98,7 @@ if (testWithSets())
     
     doScreen <- function(fg, susp, ...)
     {
-        cols <- !grepl("^mz$", names(susp), fixed = TRUE)
+        cols <- !grepl("^mz$", names(susp))
         susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
         screenSuspects(fg, susp, ...)
     }

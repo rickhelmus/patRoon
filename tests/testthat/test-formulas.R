@@ -188,8 +188,6 @@ test_that("as.data.table() works", {
 if (doSIRIUS)
     fCons <- doFormCons(formsGF, formsSIR)
 
-getAllNeutralForms <- function(obj) as.data.table(obj)$neutral_formula
-
 test_that("consensus works", {
     expect_length(doFormCons(formsGF, formsGFEmpty), length(formsGF))
 

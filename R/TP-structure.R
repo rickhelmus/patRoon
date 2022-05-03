@@ -383,7 +383,7 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
     {
         tab <- as.data.table(TPs)
         return(unique(tab[, intersect(TPCols, names(tab)), with = FALSE]))
-    }), idcol = "mergedBy")
+    }), idcol = "mergedBy", fill = TRUE)
     
     byTPCols <- c("parent", "InChIKey")
     
@@ -392,7 +392,8 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
     
     # just average similarities
     if (!is.null(allTPsTab[["similarity"]]))
-        allTPsTab[, similarity := mean(similarity), by = byTPCols]
+        allTPsTab[, similarity := if (all(is.na(similarity))) NA_real_ else mean(similarity, na.rm = TRUE),
+                  by = byTPCols]
     
     if (!is.null(uniqueFrom))
     {

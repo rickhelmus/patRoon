@@ -21,6 +21,7 @@
     - Split formulaDiff like plotGraph()?
 - newProject()
     - selector for CTS transLibrary?
+- filter(): handle NA similarity values (from consensus)
 
 
 ## Tests

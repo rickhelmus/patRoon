@@ -31,20 +31,14 @@
 ## Docs
 
 - TPs
-    - filter() for base TP class (properties)
-        - e.g. likelihood property for CTS
-    - CTS: link to manual/publications for details scoring and other output
     - handbook
         - update for transformationProductsStructure
 - Features
-    - Update as.data.table(fGroups) / plotInt() / generateComponentsIntClust(): normFunc --> normalized
-        - also handbook (at least for generateComponentsIntClust)
-    - update groupTable and plotVolcano for normalized arg
-    - istd_concs argument to generateAnalysisInfo()
-    - clearly document how istd_conc is used in calculations
-        - for istd: featInt / (istdInt / istd_conc) (i.e. first correct ISTD with conc)
-        - for tic: featInt / ticInt / istd_conc (i.e. istd_conc is like injection volume)
-        - for tic: featInt / istd_conc (see ^)
+    - Update handbook for normFunc --> normalized
+    - update sets workflows section(s)
+        - standards argument for normInts
+        - set argument for plotGraph
+        - normInts works per set
 
 
 ## NEWS
@@ -89,11 +83,11 @@
         - new normalization methods: istd, tic, conc amongst features. Normalization across groups as before.
     - normalized argument for groupTable() and plotVolcano()
     - internalStandards() / internalStandardAssignments() methods (and slots)
-    - istd_conc column in analysisInfo
+    - norm_conc column in analysisInfo
     - newProject() changes
 - Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
 - Fixed: newProject(): loading analysis info from CSV now works on Windows
-- istd_concs argument to generateAnalysisInfo()
+- norm_concs argument to generateAnalysisInfo()
 
 
 # Lower priority

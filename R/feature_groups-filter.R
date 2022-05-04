@@ -377,6 +377,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
 #'   \code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
 #'   set, blank subtraction is performed prior to removing any analyses.
+#' @param removeISTDs If \code{TRUE} then all feature groups marked as internal standard (IS) are removed. This requires
+#'   IS assignments done by \code{\link{normInts}}, see its documentation for more details.
 #' @param groupQualityRange Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.
 #' @param checkFeaturesSession If set then features and/or feature groups are removed that were selected for removal
 #'   (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and

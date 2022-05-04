@@ -343,7 +343,7 @@ test_that("replicate group subtraction", {
 })
 
 fgISTD <- fgOpenMS
-fgISTD@analysisInfo$istd_conc <- c(NA, NA, NA, 1, 2, 1)
+fgISTD@analysisInfo$norm_conc <- c(NA, NA, NA, 1, 2, 1)
 fgNormISTDMin1 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 1)
 fgNormISTDMin2 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 2)
 fgNormISTDEmpty <- doNormInts(fgOpenMSEmpty, "istd")

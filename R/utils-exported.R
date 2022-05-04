@@ -37,14 +37,14 @@ COMStop <- function(...)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, istd_concs = NULL,
+generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, norm_concs = NULL,
                                  formats = MSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
     checkmate::assertCharacter(blanks, min.len = 1, add = ac)
-    aapply(checkmate::assertNumeric, . ~ concs + istd_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumeric, . ~ concs + norm_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -75,8 +75,8 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, 
     
     if (!is.null(concs))
         ret$conc <- getConcs(concs)
-    if (!is.null(istd_concs))
-        ret$istd_conc <- getConcs(istd_concs)
+    if (!is.null(norm_concs))
+        ret$norm_conc <- getConcs(norm_concs)
     
     return(ret)
 }

@@ -88,10 +88,10 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     )
 
     checkmate::assert(
-        checkmate::checkNull(x[["istd_conc"]]),
-        checkmate::checkCharacter(x[["istd_conc"]]),
-        checkmate::checkNumeric(x[["istd_conc"]]),
-        .var.name = sprintf("%s[[\"istd_conc\"]]", .var.name)
+        checkmate::checkNull(x[["norm_conc"]]),
+        checkmate::checkCharacter(x[["norm_conc"]]),
+        checkmate::checkNumeric(x[["norm_conc"]]),
+        .var.name = sprintf("%s[[\"norm_conc\"]]", .var.name)
     )
     
     # only continue if previous assertions didn't fail: x needs to be used as list which otherwise gives error
@@ -134,8 +134,8 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     {
         if (!is.null(x[["conc"]]))
             x[["conc"]] <- as.numeric(x[["conc"]])
-        if (!is.null(x[["istd_conc"]]))
-            x[["istd_conc"]] <- as.numeric(x[["istd_conc"]])
+        if (!is.null(x[["norm_conc"]]))
+            x[["norm_conc"]] <- as.numeric(x[["norm_conc"]])
     }
     
     return(x)

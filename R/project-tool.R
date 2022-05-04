@@ -92,7 +92,7 @@ getScriptCode <- function(input, analyses)
                 list(name = "paths", value = unique(anaTable$path), quote = TRUE),
                 list(name = "groups", value = anaTable$group, quote = TRUE),
                 list(name = "blanks", value = anaTable$blank, quote = TRUE),
-                list(name = "istd_concs", value = anaTable$istd_conc)
+                list(name = "norm_concs", value = anaTable$norm_conc)
             ))
         }
         else if (input$generateAnaInfo == "example")
@@ -646,7 +646,7 @@ doCreateProject <- function(input, analyses)
         
         # Make analysis table
         if (input$generateAnaInfo == "table")
-            write.csv(anas[, c("path", "analysis", "group", "blank", "istd_conc")],
+            write.csv(anas[, c("path", "analysis", "group", "blank", "norm_conc")],
                       file.path(input$destinationPath, tableFile), row.names = FALSE)
         
         return(anas)
@@ -1007,7 +1007,7 @@ getNewProjectUI <- function(destPath)
                             ),
                             conditionalPanel(
                                 condition = "input.featNorm == \"istd\" || input.featNorm == \"conc\"",
-                                textNote(HTML("Please make sure that the <i>istd_conc</i> column of the analysis information is set."))
+                                textNote(HTML("Please make sure that the <i>norm_conc</i> column of the analysis information is set."))
                             )
                         )
                     )
@@ -1146,7 +1146,7 @@ newProject <- function(destPath = NULL)
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
     emptyAnaTable <- function() data.table(analysis = character(0), format = character(0),
-                                           group = character(0), blank = character(0), istd_conc = numeric(0),
+                                           group = character(0), blank = character(0), norm_conc = numeric(0),
                                            path = character(0))
     
     server <- function(input, output, session)
@@ -1161,7 +1161,7 @@ newProject <- function(destPath = NULL)
                            c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
-                rhandsontable::hot_col("istd_conc", readOnly = FALSE, type = "numeric")
+                rhandsontable::hot_col("norm_conc", readOnly = FALSE, type = "numeric")
             
             return(hot)
         }
@@ -1316,7 +1316,7 @@ newProject <- function(destPath = NULL)
                 if (length(files) > 0)
                 {
                     dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", blank = "", istd_conc = NA_real_)
+                                     group = "", blank = "", norm_conc = NA_real_)
 
                     msExts <- MSFileExtensions()
                     dt[, format := sapply(tolower(tools::file_ext(files)), function(ext)
@@ -1326,7 +1326,7 @@ newProject <- function(destPath = NULL)
 
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    setcolorder(dt, c("analysis", "format", "group", "blank", "istd_conc", "path"))
+                    setcolorder(dt, c("analysis", "format", "group", "blank", "norm_conc", "path"))
 
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
@@ -1363,8 +1363,8 @@ newProject <- function(destPath = NULL)
                     csvTab[, format := formats]
                     csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
                     
-                    if (is.null(csvTab[["istd_conc"]])) # older files lack this column
-                        csvTab[, istd_conc := NA_real_]
+                    if (is.null(csvTab[["norm_conc"]])) # older files lack this column
+                        csvTab[, norm_conc := NA_real_]
                     
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab)

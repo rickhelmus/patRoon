@@ -97,17 +97,18 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
 #'   MS/MS spectral similarity (which can be evaluated after componentization with \code{\link{generateComponentsTPs}}.
 #'   Any values that are \code{NA} are removed (which only occur when a consensus was made from objects that not all
 #'   have similarity information).
-#' @param negate If \code{TRUE} then filters are performed in opposite manner.
+#' 
+#' @inheritParams filter,transformationProducts-method
 #'
 #' @return \code{filter} returns a filtered \code{transformationProductsStructure} object.
 #'
 #' @export
 setMethod("filter", "transformationProductsStructure", function(obj, ..., removeParentIsomers = FALSE,
                                                                 removeTPIsomers = FALSE, removeDuplicates = FALSE,
-                                                                minSimilarity = NULL, negate = FALSE)
+                                                                minSimilarity = NULL, verbose = TRUE, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ removeParentIsomers + removeTPIsomers + removeDuplicates + negate,
+    aapply(checkmate::assertFlag, . ~ removeParentIsomers + removeTPIsomers + removeDuplicates + verbose + negate,
            fixed = list(add = ac))
     checkmate::assertNumber(minSimilarity, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -163,10 +164,13 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     }
     
     if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate = negate)
+        obj <- callNextMethod(obj, ..., verbose = FALSE, negate = negate)
     
-    newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    if (verbose)
+    {
+        newn <- length(obj)
+        printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    }
     
     return(obj)
 })

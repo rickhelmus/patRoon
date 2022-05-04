@@ -146,21 +146,23 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 #' @param properties A named \code{list} with properties to be filtered. Each item in the \code{list} should be named
 #'   with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
 #'   \emph{e.g.} \code{names(TPs)[[1]]}. Example: \code{properties=list(likelihood=c("LIKELY","PROBABLE"))}.
+#' @param verbose If set to \code{FALSE} then no text output is shown.
 #' @param negate If \code{TRUE} then filters are performed in opposite manner.
 #'
 #' @return \code{filter} returns a filtered \code{transformationProducts} object.
 #'
 #' @export
-setMethod("filter", "transformationProducts", function(obj, properties = NULL, negate = FALSE)
+setMethod("filter", "transformationProducts", function(obj, properties = NULL, verbose = TRUE, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(properties, any.missing = FALSE, null.ok = TRUE, add = ac)
     if (!is.null(properties))
     {
-        checkmate::assertNames(names(properties), type = "unique", add = add)
+        props <- if (length(obj) > 0) names(as.data.table(obj)[, -"parent"]) else NULL
+        checkmate::assertNames(names(properties), type = "unique", subset.of = props, add = ac)
         checkmate::qassertr(properties, "V")
     }
-    checkmate::assertFlag(negate, add = ac)
+    aapply(checkmate::assertFlag, . ~ verbose + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0 || is.null(properties) || length(properties) == 0)
@@ -191,8 +193,11 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, n
         saveCacheData("filterTPs", obj, hash)
     }
     
-    newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    if (verbose)
+    {
+        newn <- length(obj)
+        printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    }
     
     return(obj)
 })

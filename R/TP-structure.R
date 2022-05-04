@@ -367,6 +367,7 @@ setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., comm
 
 #' @describeIn transformationProductsStructure Plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function)
 #'   outlining unique and shared TPs between different \code{transformationProductsStructure} objects.
+#' @templateVar withArgs TRUE
 #' @template plotUpSet
 #' @export
 setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., commonParents = FALSE, labels = NULL,

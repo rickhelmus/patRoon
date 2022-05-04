@@ -707,57 +707,48 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 })
 
 
-#' @details \code{reportHTML} will report graphical data (\emph{e.g.}
-#'   chromatograms and mass spectra) and summary information in an easy
-#'   browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and
-#'   \link{knitr}.
+#' @details \code{reportHTML} will report graphical data (\emph{e.g.} chromatograms and mass spectra) and summary
+#'   information in an easy browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and \link{knitr}.
 #'
-#' @param reportPlots A character vector specifying what should be plotted.
-#'   Valid options are: \code{"chord"}, \code{"venn"}, \code{"upset"} (plot a
-#'   chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
-#'   individual feature groups) and \code{"formulas"} (plot annotated formula
-#'   spectra). Set to \code{"none"} to plot none of these.
-#' @param includeMFWebLinks A \code{character} specifying to which feature
-#'   groups a web link should be added in the annotation page to
-#'   \href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}.
-#'   Options are: \code{"compounds"} (only to those with compounds results),
-#'   \code{"MSMS"} (only to those with MSMS peak lists) or \code{"none"}.
-#' @param interactiveHeat If \code{TRUE} an interactive heatmap HTML widget will
-#'   be generated to display hierarchical clustering results. Set to
-#'   \code{FALSE} for a 'regular' static plot.
-#' @param selfContained If \code{TRUE} the output will be a standalone HTML file
-#'   which contains all graphics and script dependencies. When \code{FALSE}, the
-#'   latter will be placed in an additional directory (\file{report_files})
-#'   which should remain present when viewing the output file. Especially on
-#'   Windows, a non-self contained output might be desirable when reporting
-#'   large amounts of data to prevent \command{pandoc} from running out of
-#'   memory.
-#' @param optimizePng If \code{TRUE} then \command{pngquant} is used to reduce
-#'   the size of generated graphics. A significant reduction in disk space usage
-#'   may be seen, however, at the cost additional processing time. Multiple
-#'   \command{pngquant} processes will be executed in parallel, which can be
-#'   configured with \option{patRoon.MP.maxProcs} (parallelization will always
-#'   happen with the \code{"classic"} method, see
+#' @param reportPlots A character vector specifying what should be plotted. Valid options are: \code{"chord"},
+#'   \code{"venn"}, \code{"upset"} (plot a chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
+#'   individual feature groups) and \code{"formulas"} (plot annotated formula spectra). Set to \code{"none"} to plot
+#'   none of these.
+#' @param includeMFWebLinks A \code{character} specifying to which feature groups a web link should be added in the
+#'   annotation page to \href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}. Options are:
+#'   \code{"compounds"} (only to those with compounds results), \code{"MSMS"} (only to those with MSMS peak lists) or
+#'   \code{"none"}.
+#' @param interactiveHeat If \code{TRUE} an interactive heatmap HTML widget will be generated to display hierarchical
+#'   clustering results. Set to \code{FALSE} for a 'regular' static plot.
+#' @param TPs A \code{\link{transformationProducts}} object that should used for plotting hierarchies. Ignored if
+#'   \code{TPs=NULL} or \code{components} is not a \code{componentsTPs} object.
+#' @param TPGraphStructuresMax Maximum number of TP structures to plot in TP hierarchies, see the \code{TPs} argument.
+#'   Sets the \code{structuresMax} argument to \code{\link[=plotGraph,featureGroups-method]{plotGraph}}.
+#' @param selfContained If \code{TRUE} the output will be a standalone HTML file which contains all graphics and script
+#'   dependencies. When \code{FALSE}, the latter will be placed in an additional directory (\file{report_files}) which
+#'   should remain present when viewing the output file. Especially on Windows, a non-self contained output might be
+#'   desirable when reporting large amounts of data to prevent \command{pandoc} from running out of memory.
+#' @param optimizePng If \code{TRUE} then \command{pngquant} is used to reduce the size of generated graphics. A
+#'   significant reduction in disk space usage may be seen, however, at the cost additional processing time. Multiple
+#'   \command{pngquant} processes will be executed in parallel, which can be configured with
+#'   \option{patRoon.MP.maxProcs} (parallelization will always happen with the \code{"classic"} method, see
 #'   \link[=patRoon-package]{patRoon options}).
-#' @param openReport If set to \code{TRUE} then the output report file will be
-#'   opened with the system browser.
-#' @param noDate If \code{TRUE} then the current date is not added to the
-#'   report. This is mainly used for testing and its main purpose is to
-#'   guarentees equal report files when `reportHTML()` is called multiple times
-#'   with equal arguments.
+#' @param openReport If set to \code{TRUE} then the output report file will be opened with the system browser.
+#' @param noDate If \code{TRUE} then the current date is not added to the report. This is mainly used for testing and
+#'   its main purpose is to guarentees equal report files when `reportHTML()` is called multiple times with equal
+#'   arguments.
 #'
 #' @template specSimParams-arg
 #'
 #' @templateVar what \code{reportHTML}
 #' @template uses-multiProc
-#' 
-#' @section Parallelization: Currently, \code{reportHTML} only uses
-#'   \code{"classic"} multiprocessing, regardless of the
+#'
+#' @section Parallelization: Currently, \code{reportHTML} only uses \code{"classic"} multiprocessing, regardless of the
 #'   \option{patRoon.MP.method} option.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
-#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
-#'   \addCitations{knitr}{2} \cr\cr \addCitations{knitr}{3}
+#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
+#'   \addCitations{knitr}{3}
 #'
 #' @rdname reporting
 #' @aliases reportHTML

@@ -24,6 +24,9 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @param TPLibrary If \code{NULL}, a default \href{https://doi.org/10.5281/zenodo.5644560}{PubChem} based library is
 #'   used. Otherwise, \code{TPLibrary} should be a \code{data.frame}. See the details below.
+#' @param generations An \code{integer} that specifies the number of transformation generations. TPs for subsequent
+#'   iterations obtained by repeating the library search where the TPs from the previous generation are considered
+#'   parents.
 #' @param matchParentsBy A \code{character} that specifies how the input parents are matched with the data from the TP
 #'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.
 #'
@@ -32,7 +35,7 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @template tp_gen-sim
 #' @template fp-args
-#' 
+#'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
 #' @section Custom TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a

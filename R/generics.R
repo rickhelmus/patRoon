@@ -292,7 +292,6 @@ setGeneric("plotChroms", function(obj, ...) standardGeneric("plotChroms"))
 #' @templateVar func plotGraph
 #' @templateVar desc Plots an interactive network graph.
 #' @template generics
-#' @param onlyLinked Only plots linked objects if \code{TRUE}.
 setGeneric("plotGraph", function(obj, ...) standardGeneric("plotGraph"))
 
 #' @templateVar func plotInt

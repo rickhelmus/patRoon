@@ -403,6 +403,7 @@ setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, ve
 
 #' @describeIn featureAnnotations plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining
 #'   unique and shared candidates between different \code{featureAnnotations} objects.
+#' @templateVar withArgs TRUE
 #' @template plotUpSet
 #' @export
 setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,

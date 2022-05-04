@@ -12,11 +12,11 @@ NULL
 #' The TP data in objects from this class include a \code{retDir} column. These are \code{numeric} values that hint what
 #' the the chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will
 #' elute earlier, \samp{1} it will elute later and \samp{0} that there is no significant difference or the direction is
-#' unknown. These values are based on a typical reversed phase separation. When \code{\link{generateTPsBioTransformer}}
-#' or \code{\link{generateTPsLibrary}} was used to generate the data, the \code{retDir} values are based on calculated
-#' \code{log P} values of the parent and its TPs.
+#' unknown. These values are based on a typical reversed phase separation. When structural information is available
+#' (\emph{e.g.} when \code{\link{generateTPsBioTransformer}} or \code{\link{generateTPsLibrary}} was used to generate
+#' the data), the \code{retDir} values are based on calculated \code{log P} values of the parent and its TPs.
 #'
-#' @param TPs,x,object \code{transformationProducts} object to be accessed
+#' @param TPs,x,obj,object \code{transformationProducts} object to be accessed
 #'
 #' @seealso The derived \code{\link{transformationProductsStructure}} class for more methods and
 #'   \code{\link{generateTPs}}
@@ -141,6 +141,15 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
     return(ret)
 })
 
+#' @describeIn transformationProducts Performs rule-based filtering. Useful to simplify and clean-up the data.
+#'
+#' @param properties A named \code{list} with properties to be filtered. Each item in the \code{list} should be named
+#'   with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
+#'   \emph{e.g.} \code{names(TPs)[[1]]}. Example: \code{properties=list(likelihood=c("LIKELY","PROBABLE"))}.
+#' @param negate If \code{TRUE} then filters are performed in opposite manner.
+#'
+#' @return \code{filter} returns a filtered \code{transformationProducts} object.
+#'
 #' @export
 setMethod("filter", "transformationProducts", function(obj, properties = NULL, negate = FALSE)
 {

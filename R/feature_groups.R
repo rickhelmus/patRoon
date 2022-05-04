@@ -1164,6 +1164,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
 #'   data.
 #'
+#' @aliases normInts
 #' @export
 setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards, ISTDRTWindow,
                                                 ISTDMZWindow, minISTDs, ...)

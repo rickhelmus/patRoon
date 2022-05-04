@@ -61,6 +61,10 @@ NULL
 #'   \code{calculatePeakQualities} method).
 #' @slot annotations A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
 #'   method).
+#' @slot ISTDs A \code{data.table} with screening results for internal standards (filled in by the \code{normInts}
+#'   method).
+#' @slot ISTDAssignments A \code{list}, where each item is named by a feature group and consists of a vector with
+#'   feature group names of the internal standards assigned to it (filled in by the \code{normInts} method).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -1163,6 +1167,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   aforementioned normalization methods. Group normalization was the only method with \pkg{patRoon} \samp{<2.1}, and
 #'   still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
 #'   data.
+#'
+#' @return \code{normInts} returns a \code{featureGroups} object, amended with data in the \code{ISTDs} and
+#'   \code{ISTDAssignments} slots if \code{featNorm="istd"}.
 #'
 #' @aliases normInts
 #' @export

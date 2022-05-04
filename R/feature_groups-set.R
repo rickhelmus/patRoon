@@ -11,7 +11,7 @@ NULL
 #'
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
-#' @slot annotations \setsWF As the \code{featureGroups} slot, but contains the annotation data per set.
+#' @slot annotations,ISTDAssignments \setsWF As the \code{featureGroups} slots, but contains the data per set.
 #'
 #' @section Sets workflows: \setsWFClass{featureGroupsSet}{featureGroups}
 #'

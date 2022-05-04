@@ -738,7 +738,8 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 
 #' @details \code{plotVolcano} Plots Fold change data in a 'Volcano plot'.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details.
-#' @param averageFunc Function used for averaging.
+#' @param averageFunc,normalized Used for intensity data treatment, see the documentation for the
+#'   \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.
 #' @rdname feature-plotting
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean,

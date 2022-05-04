@@ -110,7 +110,7 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #'   visualized and modified using the methods defined for \code{\link{componentsIntClust}}.
 #'
 #' @param metric Distance metric used to calculate the distance matrix (passed to \code{\link{daisy}}).
-#' @param normFunc,average Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
+#' @param normalized,average Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
 #'   normalization and averaging of data.
 #'
 #' @templateVar noDots TRUE

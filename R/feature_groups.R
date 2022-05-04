@@ -30,6 +30,11 @@ NULL
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak intensities.
 #'
 #'   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.
+#' @param normalized If \code{TRUE} then normalized intensity data is used (see the \verb{Feature intensity
+#'   normalization} section.
+#'
+#'   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
+#'   then an automatic group normalization is performed.
 #' @param which A character vector with replicate groups used for comparison.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 #'   \code{NULL} to not perform FC calculations.
@@ -586,10 +591,6 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
 #'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
-#' @param normFunc Function that should be used for normalization of data. The function is called for all
-#'   intensities/areas of a feature group and these quantities are divided by the result of the function call. For
-#'   example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
-#'   zero then the function will not be called. Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,

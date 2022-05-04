@@ -20,6 +20,8 @@ NULL
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
 #'
+#'   For \code{normInts}: passed to \code{\link{screenSuspects}} if \code{featNorm="istd"}.
+#'
 #'   \setsPassedArgs1{featureGroups}
 #' @param average If \code{TRUE} then data within replicate groups are averaged.
 #'

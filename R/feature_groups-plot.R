@@ -792,6 +792,18 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
     invisible(NULL)
 })
 
+#' @details \code{plotGraph} generates an interactive network plot which is used to explore internal standard (IS)
+#'   assignments to each feature group. This requires the availability of IS assignments, see the documentation for
+#'   \code{\link{normInts}} for details. The graph is rendered with \pkg{\link{visNetwork}}.
+#'
+#' @param onlyPresent Only plot feature groups of internal standards that are still present in the \code{featureGroups}
+#'   input object (which may be otherwise be removed by \emph{e.g.} subsetting or
+#'   \code{\link[=filter,featureGroups-method]{filter}}).
+#' 
+#' @template plotGraph
+#'
+#' @rdname feature-plotting
+#' @export
 setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
 {
     checkmate::assertFlag(onlyPresent)
@@ -851,4 +863,6 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
         visNetwork::visLegend()
 })
 
+#' @rdname feature-plotting
+#' @export
 setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))

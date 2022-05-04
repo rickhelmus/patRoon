@@ -138,13 +138,17 @@ NULL
 #' replicate group should have an equal (but unique) value. Used for \emph{e.g.} averaging and
 #' \code{\link[=filter,featureGroups-method]{filter}}.
 #'
-#' \item \code{blank}: all analyses within this replicate group are used by the \code{featureGroups} method of
+#' \item \code{blank} all analyses within this replicate group are used by the \code{featureGroups} method of
 #' \code{\link[=filter,featureGroups-method]{filter}} for blank subtraction. Multiple entries can be entered by
 #' separation with a comma.
 #'
-#' \item \code{conc} a numeric value specifying the 'concentration' of the analysis. This can be actually any kind of
+#' \item \code{conc} a numeric value specifying the 'concentration' for the analysis. This can be actually any kind of
 #' numeric value such as exposure time, dilution factor or anything else which may be used to form a linear
 #' relationship.
+#'
+#' \item \code{norm_conc} a numeric value specifying the \emph{normalization concentration} for the analysis. See the
+#' \verb{Feature intensity normalization} section in the \link[=featureGroups-class]{featureGroups documentation}) for
+#' more details.
 #'
 #' }
 #'
@@ -160,7 +164,8 @@ NULL
 #' The \code{group} column is \emph{mandatory} and needs to be non-empty for each analysis. The \code{blank} column
 #' should also be present, however, this may be empty (\code{""}) for analyses where no blank subtraction should occur.
 #' The \code{conc} column is only required when obtaining regression information is desired with the
-#' \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method.
+#' \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method. Similarly, the \code{norm_conc} is only
+#' necessary for the \code{\link{normInts}} method.
 #'
 #' @name analysis-information
 NULL

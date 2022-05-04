@@ -32,6 +32,11 @@ COMStop <- function(...)
 #' @param concs An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
 #'   unknown. If the length of \code{concs} is less than the number of analyses the remainders will be set to \code{NA}.
 #'   Set to \code{NULL} to not include concentration data.
+#' @param norm_concs An optional numeric vector containing concentrations used for \emph{feature normalization} (see the
+#'   \verb{Feature intensity normalization} section in the \link[=featureGroups-class]{featureGroups documentation}).
+#'   \code{NA} values are allowed for analyses that should not be normalized (\emph{e.g.} because no IS is present). If
+#'   the length of \code{norm_concs} is less than the number of analyses the remainders will be set to \code{NA}. Set to
+#'   \code{NULL} to not include normalization concentration data.
 #' @param formats A character vector of analyses file types to consider. Analyses not present in these formats will be
 #'   ignored. For valid values see \code{\link{MSFileFormats}}.
 #'

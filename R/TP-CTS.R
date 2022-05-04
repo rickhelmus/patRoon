@@ -72,6 +72,43 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP
 }
 
 
+#' Obtain transformation products (TPs) with Chemical Transformation Simulator (CTS)
+#'
+#' Uses \href{https://qed.epa.gov/cts/}{Chemical Transformation Simulator (CTS)} to predict TPs.
+#'
+#' @templateVar algo CTS
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam cts
+#' @template algo_generator
+#'
+#' @details This function uses the \CRANpkg{httr} package to access the Web API of CTS for automatic TP prediction.
+#'   Hence, an Internet connection is mandatory. Please take care to not 'abuse' the CTS servers, \emph{e.g.} by running
+#'   very large batch calculations in parallel, as this may result in rejected connections.
+#'
+#' @param transLibrary A \code{character} specifying which transformation library should be used. Currently supported
+#'   are: \code{"hydrolysis"}, \code{"abiotic_reduction"}, \code{"photolysis_unranked"}, \code{"photolysis_ranked"},
+#'   \code{"mammalian_metabolism"}, \code{"combined_abioticreduction_hydrolysis"},
+#'   \code{"combined_photolysis_abiotic_hydrolysis"}.
+#' @param generations An \code{integer} that specifies the number of transformation generations to predict.
+#' @param errorRetries The maximum number of connection retries. Sets the \code{times} argument to the
+#'   \code{\link[httr:RETRY]{http::RETRY}} function.
+#' @param calcXLogP If \code{TRUE} then \code{XLogP} values will be calculated of parent and TPs to predict their
+#'   retention order (\code{retDir}). The calculations are done with \CRANpkg{rcdk}.
+#'
+#' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
+#'
+#' @template parallel-arg
+#' @template tp_gen-scr
+#' @template tp_gen-sim
+#' @template fp-args
+#'
+#' @seealso The website: \url{https://qed.epa.gov/cts/} and the
+#'   \href{https://www.epa.gov/chemical-research/users-guide-chemical-transformation-simulator-cts}{CTS User guide}.
+#'
+#' @references \insertRef{Wolfe2016}{patRoon} \cr\cr \insertRef{TebesStevens2017}{patRoon} \cr\cr
+#'   \insertRef{Yuan2020}{patRoon} \cr\cr \insertRef{Yuan2021}{patRoon}
+#'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
                            calcXLogP = TRUE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",

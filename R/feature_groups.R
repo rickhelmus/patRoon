@@ -1102,6 +1102,69 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
+#' @describeIn featureGroups Provides various methods to normalizes feature intensities for each sample analysis or of
+#'   all features within a feature group. See the \verb{Feature intensity normalization} section below.
+#'
+#' @section Feature intensity normalization: The \code{normInts} method performs normalization of feature intensities
+#'   (and areas). These values are amended in the \code{features} slot, while the original intensities/areas are kept.
+#'   To use the normalized intensities set \code{normalized=TRUE} to methods such as \code{\link{plotInt}},
+#'   \code{\link{generateComponentsIntClust}} and \code{as.data.table}. Please see the \code{normalized} argument
+#'   documentation for these methods for more details.
+#'
+#'   The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
+#'   analysis. Most methods require that the IS concentration (\code{istd_conc} in the
+#'   \link[=analysis-information]{analysis information}) is defined for each sample analysis, and will output zero
+#'   intensities otherwise. The different normalization methods are:
+#'
+#'   \enumerate{
+#'
+#'   \item \code{featNorm="istd"} Uses \emph{internal standards} (IS) for normalization. The IS are screened internally
+#'   by the \code{\link{screenSuspects}} function. Hence, the IS specified by the \code{standards} argument should
+#'   follow the format of a \link[=suspect-screening]{suspect list}. Note that labelled elements in IS formulae should
+#'   be specified with the \CRANpkg{rcdk} format, \emph{e.g.} \code{"[13]C"} for 13C, \code{"[2]H"} for a deuterium etc.
+#'   Example IS lists are provided with the \pkg{patRoonData} package.
+#'
+#'   The assignment of IS to features is automatically performed, using the following criteria: \enumerate{
+#'
+#'   \item Only analyses are considered with a defined IS concentration.
+#'
+#'   \item The IS must be detected in all of the analyses in which the feature was detected.
+#'
+#'   \item The retention time and \emph{m/z} are reasonably close (\code{ISTDRTWindow}/\code{ISTDMZWindow} arguments).
+#'   However, additional IS candidates outside these windows will be chosen if the number of candidates is less than the
+#'   \code{minISTDs} argument. In this case the next close(st) candidate(s) will be chosen.
+#'
+#'   }
+#'
+#'   Normalization of features within the same feature group always occur with the same IS. If multiple IS are assigned
+#'   to a feature then normalization occurs with the combined intensity (area), which is calculated with the function
+#'   defined by the \code{normFunc} argument. The (combined) IS intensity is then normalized by the IS sample
+#'   concentration, and finally used for feature normalization.
+#'
+#'   \item \code{featNorm="tic"} Uses the Total Ion Current (TIC) to normalize intensities. The TIC is calculated by
+#'   combining all intensities with the function defined by the \code{normFunc} argument. For this reason, you may need
+#'   to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. The
+#'   normalized feature intensities are finally divided by the IS concentration.
+#'
+#'   \item \code{featNorm="conc"} Simply divides all intensities (areas) with the IS concentration defined for the
+#'   sample.
+#'
+#'   \item \code{featNorm="none"} Performs no normalization. The raw intensity values are simply copied. This is mainly
+#'   useful if you only want to do group normalization (described below).
+#'
+#'   }
+#'
+#'   The meaning of the IS concentration differs for each method: for \code{"istd"} it is used to normalize different IS
+#'   concentrations, whereas for \code{"tic"} and \code{"conc"} it is used to normalize different sample amounts
+#'   (\emph{e.g.} injection volume).
+#'
+#'   If \code{groupNorm=TRUE} then feature intensities (areas) will be normalized by the combined values for its feature
+#'   group (again, combination occurs with \code{normFunc}). This \emph{group normalization} always occurs \emph{after}
+#'   aforementioned normalization methods. Group normalization was the only method with \pkg{patRoon} \samp{<2.1}, and
+#'   still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
+#'   data.
+#'
+#' @export
 setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, normFunc, standards, ISTDRTWindow,
                                                 ISTDMZWindow, minISTDs, ...)
 {

@@ -311,6 +311,8 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                    verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
 })
 
+#' @rdname featureGroups-class
+#' @export
 setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm, normFunc, standards, ISTDRTWindow,
                                                    ISTDMZWindow, minISTDs, ...)
 {

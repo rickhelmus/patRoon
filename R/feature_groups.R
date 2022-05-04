@@ -1112,6 +1112,20 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @describeIn featureGroups Provides various methods to normalizes feature intensities for each sample analysis or of
 #'   all features within a feature group. See the \verb{Feature intensity normalization} section below.
 #'
+#' @param featNorm The method applied for feature normalization: \code{"istd"}, \code{"tic"}, \code{"conc"} or
+#'   \code{"none"}. See the \verb{Feature intensity normalization} section for details.
+#' @param groupNorm If \code{TRUE} then group normalization is performed. See the \verb{Feature intensity normalization}
+#'   section for details.
+#' @param normFunc A \code{function} to combine data for normalization. See the \verb{Feature intensity normalization}
+#'   section for details.
+#' @param standards A \code{data.table} (or \code{data.frame}) with all internal standards. Should follow the format of
+#'   a \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
+#'   normalization} section for details.
+#' @param ISTDRTWindow,ISTDMZWindow The retention time and \emph{m/z} windows for IS selection. Only used if
+#'   \code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.
+#' @param minISTDs The minimum number of IS that should be assigned to each feature (if possible). Only used if
+#'   \code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.
+#'
 #' @section Feature intensity normalization: The \code{normInts} method performs normalization of feature intensities
 #'   (and areas). These values are amended in the \code{features} slot, while the original intensities/areas are kept.
 #'   To use the normalized intensities set \code{normalized=TRUE} to methods such as \code{\link{plotInt}},

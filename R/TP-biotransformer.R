@@ -112,7 +112,7 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
-#' @param steps The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
+#' @param generations The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
 #' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.

@@ -186,7 +186,7 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
     checkmate::assertFlag(areas)
     checkmate::assertFlag(normalized)
 
-    if (length(fGroups) == 0 || (!areas && !normalized))
+    if (length(object) == 0 || (!areas && !normalized))
         return(object@groups)
 
     anaInfo <- analysisInfo(object)

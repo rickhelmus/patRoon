@@ -18,10 +18,11 @@ sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLA
     lib$records <- as.data.table(lib$records)
     lib$spectra <- Map(lib$spectraMZs, lib$spectraInts, lib$annotations, f = function(mz, int, ann)
     {
+        # NOTE: use setDT(list(...)) here since it seems to be quite a bit faster than data.table(...)
         if (length(ann) == 0)
-            data.table(mz = mz, intensity = int)
+            setDT(list(mz = mz, intensity = int))
         else
-            data.table(mz = mz, intensity = int, annotation = ann)
+            setDT(list(mz = mz, intensity = int, annotation = ann))
     })
     printf("Done!\n")
     

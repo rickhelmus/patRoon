@@ -47,10 +47,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP
     
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
-    ret[, c("InChI", "InChIKey", "formula") := .(babelConvert(SMILES, "smi", "inchi", mustWork = TRUE),
-                                                 babelConvert(SMILES, "smi", "inchikey", mustWork = TRUE),
-                                                 convertToFormulaBabel(SMILES, "smi", mustWork = TRUE))]
-    ret[, neutralMass := sapply(formula, getFormulaMass)]
+    ret <- prepareChemTable(ret)
     
     if (calcXLogP)
     {

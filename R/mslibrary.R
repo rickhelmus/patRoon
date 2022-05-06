@@ -150,7 +150,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLA
                 PrecursorMZ := withProg(.N, FALSE, mapply(neutralMass, Precursor_type, FUN = function(em, pt)
                 {
                     add <- tryCatch(as.adduct(pt), error = function(...) NULL)
-                    ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz")
+                    ret <- if (is.null(add)) NA_real_ else em + calculateMasses(em, add, type = "mz", err = FALSE)
                     doProgress()
                     return(ret)
                 }))]

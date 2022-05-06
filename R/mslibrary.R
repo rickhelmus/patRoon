@@ -503,8 +503,6 @@ setMethod("export", "MSLibrary", function(obj, type, out)
 
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
-    # UNDONE: doc that only unique records in y are added, i.e. metadata is not merged
-    
     if (length(x) == 0)
         return(y)
     else if (length(y) == 0)

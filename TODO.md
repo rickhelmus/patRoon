@@ -63,7 +63,8 @@
     - convertToSuspects()
         - fragments_mz is overwritten
         - collapses/matches by IK1
-    
+    - merge()
+        - doc that only unique records in y are added, i.e. metadata is not merged
 
 ## NEWS
 

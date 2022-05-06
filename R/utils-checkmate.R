@@ -204,7 +204,7 @@ assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = check
     if (checkmate::testDataFrame(x))
     {
         assertSuspectList(x, FALSE, skipInvalid, .var.name = .var.name)
-        if (length(sets(fGroups)) > 1)
+        if (length(sets) > 1)
         {
             cols <- c("mz", "adduct", "fragments_mz")
             for (cl in cols)

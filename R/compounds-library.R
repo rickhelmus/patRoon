@@ -1,7 +1,7 @@
 #' @include main.R
 #' @include compounds.R
 #' @include feature_groups-set.R
-#' @include MSLibrary.R
+#' @include mslibrary.R
 NULL
 
 unifyLibNames <- function(cTab)

@@ -47,7 +47,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
     
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
-    ret <- prepareChemTable(ret)
+    ret <- prepareChemTable(ret, verbose = FALSE)
     
     if (calcLogP != "none")
     {

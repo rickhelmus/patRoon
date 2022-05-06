@@ -224,9 +224,10 @@ calculateLogP <- function(SMILES, method, mustWork)
     return(ret)
 }
 
-prepareChemTable <- function(chemData)
+prepareChemTable <- function(chemData, verbose = TRUE)
 {
-    printf("Calculating/Validating chemical data... ")
+    if (verbose)
+        printf("Calculating/Validating chemical data... ")
     
     chemData <- copy(chemData)
     
@@ -290,7 +291,8 @@ prepareChemTable <- function(chemData)
             list(form@string, form@mass)
     }, by = "formula"]
     
-    printf("Done!\n")
+    if (verbose)
+        printf("Done!\n")
     
     return(chemData)
 }

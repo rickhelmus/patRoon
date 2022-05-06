@@ -9,7 +9,7 @@ setMethod("initialize", "transformationProductsCTS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cts", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP)
+runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
 {
     CTSURL <- "https://qed.epa.gov/cts/rest/metabolizer/run"
     # CTSURL <- "https://qed.epacdx.net/cts/rest/metabolizer/run" # older version??
@@ -49,10 +49,10 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP
     
     ret <- prepareChemTable(ret)
     
-    if (calcXLogP)
+    if (calcLogP != "none")
     {
-        ret[, XLogP := calculateXLogP(SMILES, mustWork = FALSE)]
-        ret[, retDir := fifelse(XLogP < parentRow$XLogP, -1, 1)]
+        ret[, LogP := calculateLogP(SMILES, method = calcLogP, mustWork = FALSE)]
+        ret[, retDir := fifelse(LogP < parentRow$LogP, -1, 1)]
     }
     else
         ret[, retDir := 0]
@@ -90,8 +90,11 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP
 #' @param generations An \code{integer} that specifies the number of transformation generations to predict.
 #' @param errorRetries The maximum number of connection retries. Sets the \code{times} argument to the
 #'   \code{\link[httr:RETRY]{http::RETRY}} function.
-#' @param calcXLogP If \code{TRUE} then \code{XLogP} values will be calculated of parent and TPs to predict their
-#'   retention order (\code{retDir}). The calculations are done with \CRANpkg{rcdk}.
+#' @param calcLogP A \code{character} specifying whether \code{Log P} values should be calculated with
+#'   \code{\link[rcdk:get.xlogp]{rcdk::get.xlogp}} (\code{calcLogP="rcdk"}),
+#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
+#'   (\code{calcLogP="none"}). The \code{log P} values will be calculated of parent and TPs to predict their retention
+#'   order (\code{retDir}).
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
@@ -104,11 +107,11 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcXLogP
 #'   \href{https://www.epa.gov/chemical-research/users-guide-chemical-transformation-simulator-cts}{CTS User guide}.
 #'
 #' @references \insertRef{Wolfe2016}{patRoon} \cr\cr \insertRef{TebesStevens2017}{patRoon} \cr\cr
-#'   \insertRef{Yuan2020}{patRoon} \cr\cr \insertRef{Yuan2021}{patRoon}
+#'   \insertRef{Yuan2020}{patRoon} \cr\cr \insertRef{Yuan2021}{patRoon} \cr\cr \insertRef{OBoyle2011}{patRoon}
 #'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
-                           calcXLogP = TRUE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
+                           calcLogP = "rcdk", calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
                            parallel = TRUE)
 {
     checkmate::assert(
@@ -127,7 +130,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_abioticreduction_hydrolysis", 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ skipInvalid + calcXLogP + calcSims + parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims + parallel, fixed = list(add = ac))
+    checkmate::assertSubset(calcLogP, c("rcdk", "obabel", "none"), empty.ok = FALSE, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
@@ -139,16 +143,16 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     {
         cacheDB <- openCacheDBScope()
         
-        if (calcXLogP)
+        if (calcLogP != "none")
         {
             ph <- makeHash(parents)
-            cd <- loadCacheData("TPsCTSXLogP", ph, cacheDB)
+            cd <- loadCacheData("TPsCTSLogP", ph, cacheDB)
             if (is.null(cd))
             {
-                printf("Calculating parent XLogP values... ")
-                parents[, XLogP := calculateXLogP(SMILES, mustWork = FALSE)]
+                printf("Calculating parent LogP values... ")
+                parents[, LogP := calculateLogP(SMILES, method = calcLogP, mustWork = FALSE)]
                 printf("Done!\n")
-                saveCacheData("TPsCTSXLogP", parents, ph, cacheDB)
+                saveCacheData("TPsCTSLogP", parents, ph, cacheDB)
             }
             else
                 parents <- cd
@@ -178,7 +182,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
             lapfunc <- if (parallel) future.apply::future_sapply else sapply
             newResults <- withProg(length(parsTBD), parallel,
                                    do.call(lapfunc, list(parsSplit[parsTBD], patRoon:::runCTS,
-                                                         transLibrary, generations, errorRetries, calcXLogP,
+                                                         transLibrary, generations, errorRetries, calcLogP,
                                                          simplify = FALSE)))
 
             for (pn in names(newResults))

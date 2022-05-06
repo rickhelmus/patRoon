@@ -54,7 +54,7 @@ distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
 
 babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, mustWork = TRUE, extraOpts = NULL)
 {
-    # NOTE: this functions supports formula outFormat as special case
+    # NOTE: this functions supports formula and logP outFormat as special cases
 
     if (outFormat == "smiles")
         outFormat <- "smi" # to make checks below easier
@@ -88,7 +88,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
     # see https://github.com/openbabel/openbabel/issues/2231
     
-    mainArgs <- c(paste0("-o", if (outFormat == "formula") "txt" else outFormat), "-e")
+    mainArgs <- c(paste0("-o", if (outFormat %in% c("formula", "logP")) "txt" else outFormat), "-e")
     if (inFormat == "inchi")
         mainArgs <- c(mainArgs, "-an")
     if (outFormat == "inchi" || outFormat == "inchikey")
@@ -121,8 +121,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         else
             ret <- fread(cmd$outFile, sep = if (outFormat == "smi") "\t" else " ", header = FALSE)
         
-        # NOTE: with formula output the the index is the first column
-        if (outFormat == "formula")
+        # NOTE: with formula/logP output the the index is the first column
+        if (outFormat %in% c("formula", "logP"))
             setnames(ret, 1, "index")
         else
             setnames(ret, seq_len(2), c("result", "index"))
@@ -133,6 +133,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             ret[, formula := sub("[\\+\\-]+$", "", formula)] # remove trailing positive/negative charge if present
             ret[, formula := gsub("D", "[2]H", formula, fixed = TRUE)] # handle deuteriums
         }
+        else if (outFormat == "logP")
+            setnames(ret, ncol(ret), "logP")
         
         return(ret)
     }, prepareHandler = function(cmd)
@@ -143,6 +145,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         args <- c(cmd$args, c(paste0("-i", inFormat), inFile, "-O", outFile))
         if (appendFormula || outFormat == "formula")
             args <- c(args, "--append", "formula")
+        else if (outFormat == "logP")
+            args <- c(args, "--append", "logP")
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
         return(modifyList(cmd, list(command = getCommandWithOptPath("obabel", "obabel"),
@@ -154,7 +158,12 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     if (nrow(ret) == 0)
     {
         r <- rep(NA_character_, length(input))
-        ret <- if (outFormat == "formula") data.table(formula = r) else data.table(result = r)
+        ret <- if (outFormat == "formula")
+            data.table(formula = r)
+        else if (outFormat == "logP")
+            data.table(logP = rep(NA_real_, length(input)))
+        else
+            data.table(result = r)
         if (appendFormula)
             ret[, formula := r][]
     }
@@ -167,6 +176,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     
     failed <- if (outFormat == "formula")
         which(is.na(ret$formula) & !is.na(input))
+    else if (outFormat == "logP")
+        which(is.na(ret$logP) & !is.na(input))
     else
         which(is.na(ret$result) & !is.na(input))
     for (i in failed)
@@ -174,33 +185,41 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
 
     if (outFormat == "formula")
         return(ret$formula)
-    else if (appendFormula)
+    if (outFormat == "logP")
+        return(ret$logP)
+    if (appendFormula)
         return(ret) # return as table
     return(ret$result)
 }
 
-calculateXLogP <- function(SMILES, mustWork)
+calculateLogP <- function(SMILES, method, mustWork)
 {
-    doCalc <- function(mol)
+    if (method == "rcdk")
     {
-        rcdk::convert.implicit.to.explicit(mol)
-        return(rcdk::get.xlogp(mol))
-    }
-    
-    mols <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)
-    ret <- mapply(mols, SMILES, FUN = function(mol, smi)
-    {
-        if (isEmptyMol(mol))
+        doCalc <- function(mol)
         {
-            msg <- paste("Failed to parse SMILES to calculate XLogP for", smi)
-            do.call(if (mustWork) stop else start, list(msg, call. = FALSE))
-            return(NA_real_)
+            rcdk::convert.implicit.to.explicit(mol)
+            return(rcdk::get.xlogp(mol))
         }
         
-        if (mustWork)
-            return(doCalc(mol))
-        return(tryCatch(doCalc(mol), error = function(...) NA_real_))
-    })
+        mols <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)
+        ret <- mapply(mols, SMILES, FUN = function(mol, smi)
+        {
+            if (isEmptyMol(mol))
+            {
+                msg <- paste("Failed to parse SMILES to calculate XLogP for", smi)
+                do.call(if (mustWork) stop else start, list(msg, call. = FALSE))
+                return(NA_real_)
+            }
+            
+            if (mustWork)
+                return(doCalc(mol))
+            return(tryCatch(doCalc(mol), error = function(...) NA_real_))
+        })
+        
+    }
+    else # obabel
+        ret <- babelConvert(SMILES, "smi", "logP", mustWork = mustWork)
     
     return(ret)
 }

@@ -35,16 +35,20 @@
     - fixup annotation formulas too?
         - for now a little bit in C++ fixAnnFormula(), maybe implement verifyFormulas() in C++ someday?
     - also verify formulas of adducts?
+        - would be nice in general to check for user input, but for now calculateMasses(err=FALSE) seems to suffice
     - don't merge synonyms? or split them somehow on export? Otherwise doc
-    - naming OK ('records')?
-        - metaData?
     - Column name harmonization
         - More column names?
         - Make option in as.data.table() to enable/disable name harmonization?
     - sanitize input
         - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
+            - now prohibited since first value is always taken
+            - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
+    - future
+        - plotSpectrum, plotVenn, same data format for MSPeakLists
 - compounds
-    - show mirror spectrum in report? Would need library data somehow
+    - show mirror spectrum in report?
+        - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
     - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
@@ -61,6 +65,9 @@
 - mslibrary
     - generateCompoundsLibrary()
         - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
+    - convertToSuspects()
+        - fragments_mz is overwritten
+        - collapses/matches by IK1
 
 ## NEWS
 

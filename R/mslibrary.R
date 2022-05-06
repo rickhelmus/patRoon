@@ -376,13 +376,14 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 })
 
 #' @export
-setMethod("convertToSuspects", "MSLibrary", function(obj,
+setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
-                                                                                          minIntensityPost = 0,
+                                                                                          minIntensityPost = 2,
                                                                                           topMost = 10),
-                                                     collapse = TRUE,
-                                                     suspects = NULL)
+                                                     collapse = TRUE, suspects = NULL)
 {
+    adduct <- checkAndToAdduct(adduct)
+    
     ac <- checkmate::makeAssertCollection()
     assertAvgPListParams(avgSpecParams, add = ac)
     checkmate::assertFlag(collapse, add = ac)
@@ -393,11 +394,15 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
 
+    libRecs <- records(obj)
+    libRecs <- libRecs[Precursor_type == as.character(adduct)]
+    if (nrow(libRecs) == 0)
+        stop("No records found (for input adduct)", call. = FALSE)
     libSpecs <- spectra(obj)
     
-    getAvgFrags <- function(DB_ID, PrecursorMZ)
+    getAvgFrags <- function(specs, PrecursorMZ)
     {
-        pls <- Map(libSpecs[DB_ID], PrecursorMZ, f = function(sp, pmz)
+        pls <- Map(specs, PrecursorMZ, f = function(sp, pmz)
         {
             sp <- copy(sp)[, c("mz", "intensity"), with = FALSE] # skip annotation, if present
             sp <- assignPrecursorToMSPeakList(sp, pmz)
@@ -423,7 +428,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
             warning(paste("Ignored the following suspects because no InChIKey1 could be calculated:",
                            getStrListWithMax(ret$name, 10, ", ")))
         
-        recs <- copy(records(obj))
+        recs <- copy(libRecs)
         recs <- recs[!is.na(InChIKey) & !is.na(PrecursorMZ)]
         recs[, InChIKey1 := getIKBlock1(InChIKey)]
         
@@ -432,29 +437,33 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
             recsSub <- recs[InChIKey1 == IK1]
             if (is.na(IK1) || nrow(recsSub) == 0)
                 return("")
-            return(getAvgFrags(recsSub$DB_ID, recsSub$PrecursorMZ))
+            return(getAvgFrags(libSpecs[recsSub$DB_ID], recsSub$PrecursorMZ))
         }), by = "InChIKey1"])
         
         ret[, InChIKey1 := NULL]
+        
+        frCount <- sum(nzchar(ret$fragments_mz))
+        printf("Filled in fragments for %d/%d (%.2f%%) suspects\n", frCount, nrow(ret), frCount / nrow(ret) * 100)
     }
     else
     {
-        ret <- copy(records(obj))
+        ret <- copy(libRecs)
         
         if (collapse)
         {
             ret <- ret[!is.na(InChIKey) & !is.na(PrecursorMZ)]
             ret[, InChIKey1 := getIKBlock1(InChIKey)]
-            
-            frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(DB_ID, PrecursorMZ), by = "InChIKey1"])
+
+            frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(libSpecs[DB_ID], PrecursorMZ),
+                                                                by = "InChIKey1"])
             setnames(frMZ, "V1", "fragments_mz")
-            
+
             ret <- unique(ret, by = "InChIKey1")
             ret <- merge(ret, frMZ, by = "InChIKey1")
         }
         else
         {
-            withProg(length(obj), FALSE, ret[, fragments_mz := sapply(libSpecs, function(spec)
+            withProg(nrow(ret), FALSE, ret[, fragments_mz := sapply(libSpecs[ret$DB_ID], function(spec)
             {
                 doProgress()
                 paste0(spec[, "mz"], collapse = ";")

@@ -36,7 +36,6 @@
         - for now a little bit in C++ fixAnnFormula(), maybe implement verifyFormulas() in C++ someday?
     - also verify formulas of adducts?
         - would be nice in general to check for user input, but for now calculateMasses(err=FALSE) seems to suffice
-    - don't merge synonyms? or split them somehow on export? Otherwise doc
     - Column name harmonization
         - More column names?
         - Make option in as.data.table() to enable/disable name harmonization?
@@ -51,23 +50,20 @@
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
-    - support hits without matched peaks (i.e. like MF)? Would interfere with min sim score though
-        - wouldn't this be minSim = 0?
-- suspects
-    - anMSMSSimilarity doesn't make too much sense... either take (max if consensus?) libMatch or clearly doc
-    - amend suspect lists with fragments from MSLibrary
-    - update ID levels
 - prepareChemTable(): more status messages/progress bars?
 
 
 ## DOCS
 
 - mslibrary
+    - synonyms are merged, and not unmerged when exporting as msp (or suspect list)
     - generateCompoundsLibrary()
         - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
+        - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
     - convertToSuspects()
         - fragments_mz is overwritten
         - collapses/matches by IK1
+    
 
 ## NEWS
 

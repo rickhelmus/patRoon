@@ -354,3 +354,18 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
     return(MSLibrary(records = recordsAll[], spectra = specsAll, algorithm = "merged"))
 })
 
+
+loadMSLibrary <- function(file, algorithm, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(file, "r", add = ac)
+    checkmate::assertChoice(algorithm, c("msp", "json"), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    f <- switch(algorithm,
+                msp = loadMSPLibrary,
+                json = loadMoNAJSONLibrary,
+                xcms = findFeaturesXCMS)
+    
+    f(file, ...)
+}

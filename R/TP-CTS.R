@@ -131,7 +131,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims + parallel, fixed = list(add = ac))
-    checkmate::assertSubset(calcLogP, c("rcdk", "obabel", "none"), empty.ok = FALSE, add = ac)
+    checkmate::assertChoice(calcLogP, c("rcdk", "obabel", "none"), add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     

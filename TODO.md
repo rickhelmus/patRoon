@@ -13,6 +13,7 @@
     - reportHTML: report normalized intensities in featInfo?
     - Example ISTD lists in patRoonData
         - merge into master
+        - and then switch CI back
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
 

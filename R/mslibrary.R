@@ -419,6 +419,10 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
         ret <- prepareSuspectList(ret, NULL, FALSE, calcMZs = FALSE)
         ret[, InChIKey1 := getIKBlock1(InChIKey)]
         
+        if (any(is.na(ret$InChIKey1)))
+            warning(paste("Ignored the following suspects because no InChIKey1 could be calculated:",
+                           getStrListWithMax(ret$name, 10, ", ")))
+        
         recs <- copy(records(obj))
         recs <- recs[!is.na(InChIKey) & !is.na(PrecursorMZ)]
         recs[, InChIKey1 := getIKBlock1(InChIKey)]
@@ -426,7 +430,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj,
         withProg(uniqueN(ret$InChIKey1), FALSE, ret[, fragments_mz := sapply(InChIKey1, function(IK1)
         {
             recsSub <- recs[InChIKey1 == IK1]
-            if (nrow(recsSub) == 0)
+            if (is.na(IK1) || nrow(recsSub) == 0)
                 return("")
             return(getAvgFrags(recsSub$DB_ID, recsSub$PrecursorMZ))
         }), by = "InChIKey1"])

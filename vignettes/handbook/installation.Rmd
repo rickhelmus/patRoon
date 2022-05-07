@@ -58,6 +58,9 @@ When you decide to use the `patRoonDeps` repository you can simply _skip_ this s
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("CAMERA")
 
+# needed for finding features with enviPick
+remotes::install_github("blosloos/enviPick")
+
 # needed for finding/grouping features with KPIC2
 BiocManager::install("ropls")
 remotes::install_github("rickhelmus/KPIC2") 

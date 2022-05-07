@@ -34,6 +34,8 @@ setMethod("initialize", "featuresEnviPick",
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = TRUE)
 {
+    checkPackage("enviPick", "blosloos/enviPick")
+    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML", verifyCentroided = TRUE)
     aapply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))

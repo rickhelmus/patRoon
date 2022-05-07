@@ -58,7 +58,6 @@ Imports:
     data.table,
     withr,
     digest,
-    enviPick,
     DBI,
     RSQLite (>= 2.2.4),
     fst,
@@ -110,6 +109,7 @@ Imports:
 Suggests: 
     RDCOMClient,
     metfRag,
+    enviPick,
     nontarget,
     RAMClustR,
     KPIC,

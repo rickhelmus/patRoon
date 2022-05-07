@@ -1,6 +1,7 @@
 # patRoon 2.0.2
 
-- Fixed: `removeBlanks` feature groups filter would not handle analyses with multiple blanks. 
+- Fixed: `removeBlanks` feature groups filter would not handle analyses with multiple blanks.
+- Made `enviPick` optional dependency and added instructions to install from GitHub, as it was removed from CRAN.
 
 
 # patRoon 2.0.1

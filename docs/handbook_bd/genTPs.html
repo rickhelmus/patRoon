@@ -492,21 +492,21 @@ div.csl-indent {
 #&gt; 4:             (-)-ethosuximide  C7H11NO2 HAPOVYFOVVWLRS-SSDOTTSWSA-N
 #&gt; 5:                 (-)-etodolac C17H21NO3 NNYBQONXHNTVIJ-QGZVFWFLSA-N</code></pre>
 <div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="genTPs.html#cb161-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="st">&quot;DEET&quot;</span>]][, ..cols]</span></code></pre></div>
-<pre><code>#&gt;                                                    name   formula                    InChIKey
-#&gt; 1:         DEET-TP-N,N-diethyl-m-hydroxymethylbenzamide C12H17NO2 FRZJZRVZZNTMAW-UHFFFAOYSA-N
-#&gt; 2: DEET-TP-N-Ethyl-N-(2-hydroxyethyl)-3-methylbenzamide C12H17NO2 KVTUZBGZTRABBQ-UHFFFAOYSA-N
-#&gt; 3:                                 DEET-TP-acetaldehyde     C2H4O IKHGUXGNUITLKF-UHFFFAOYSA-N
-#&gt; 4:                          DEET-TP-N-ethyl-m-toluamide  C10H13NO FPINATACRXASTP-UHFFFAOYSA-N</code></pre>
+<pre><code>#&gt;        name   formula                    InChIKey
+#&gt; 1: DEET-TP1 C12H17NO2 FRZJZRVZZNTMAW-UHFFFAOYSA-N
+#&gt; 2: DEET-TP2 C12H17NO2 KVTUZBGZTRABBQ-UHFFFAOYSA-N
+#&gt; 3: DEET-TP3     C2H4O IKHGUXGNUITLKF-UHFFFAOYSA-N
+#&gt; 4: DEET-TP4  C10H13NO FPINATACRXASTP-UHFFFAOYSA-N</code></pre>
 <div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="genTPs.html#cb163-1" aria-hidden="true" tabindex="-1"></a>TPs[[<span class="dv">2</span>]][, ..cols]</span></code></pre></div>
-<pre><code>#&gt;                                                                    name   formula                    InChIKey
-#&gt; 1: (-)-Epigallocatechin-TP-(-)-Epigallocatechin, 3p-hydroxy-glucuronide C21H22O13 CQDATFYRGVZXLF-ZVHNUXTDSA-N</code></pre>
+<pre><code>#&gt;                        name   formula                    InChIKey
+#&gt; 1: (-)-Epigallocatechin-TP1 C21H22O13 CQDATFYRGVZXLF-ZVHNUXTDSA-N</code></pre>
 <div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="genTPs.html#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(TPs)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
-<pre><code>#&gt;                          parent                               transformation                                                                                 name
-#&gt; 1:               (-)-bisoprolol           O-deisopropylation / Human Phase I                                      (-)-bisoprolol-TP-(-)-bisoprolol, O-deisopropyl
-#&gt; 2:         (-)-Epigallocatechin Aromatic-OH glucuronidation / Human Phase II                 (-)-Epigallocatechin-TP-(-)-Epigallocatechin, 3p-hydroxy-glucuronide
-#&gt; 3: (-)-Epigallocatechin gallate Aromatic-OH glucuronidation / Human Phase II (-)-Epigallocatechin gallate-TP-(-)-Epigallocatechin gallate, 3p-hydroxy-glucuronide
-#&gt; 4: (-)-Epigallocatechin gallate Aromatic-OH glucuronidation / Human Phase II (-)-Epigallocatechin gallate-TP-(-)-Epigallocatechin gallate, 4p-hydroxy-glucuronide
-#&gt; 5:             (-)-ethosuximide      Aliphatic Hydroxylation / Human Phase I                 (-)-ethosuximide-TP-3-(1-Hydroxyethyl)-3-methylpyrrolidine-2,5-dione</code></pre>
+<pre><code>#&gt;                          parent                               transformation                                             name_lib
+#&gt; 1:               (-)-bisoprolol           O-deisopropylation / Human Phase I                        (-)-bisoprolol, O-deisopropyl
+#&gt; 2:         (-)-Epigallocatechin Aromatic-OH glucuronidation / Human Phase II         (-)-Epigallocatechin, 3p-hydroxy-glucuronide
+#&gt; 3: (-)-Epigallocatechin gallate Aromatic-OH glucuronidation / Human Phase II (-)-Epigallocatechin gallate, 3p-hydroxy-glucuronide
+#&gt; 4: (-)-Epigallocatechin gallate Aromatic-OH glucuronidation / Human Phase II (-)-Epigallocatechin gallate, 4p-hydroxy-glucuronide
+#&gt; 5:             (-)-ethosuximide      Aliphatic Hydroxylation / Human Phase I     3-(1-Hydroxyethyl)-3-methylpyrrolidine-2,5-dione</code></pre>
 <p>In addition, the following generic functions are available to modify or convert the object data:</p>
 <table>
 <colgroup>

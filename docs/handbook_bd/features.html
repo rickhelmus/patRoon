@@ -336,8 +336,8 @@ div.csl-indent {
 <div id="features" class="section level2 hasAnchor" number="4.3">
 <h2><span class="header-section-number">4.3</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-c69ab12874f4f1e5a64d" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c69ab12874f4f1e5a64d">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6dc3c5467696d57bd000" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6dc3c5467696d57bd000">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3 hasAnchor" number="4.3.1">
 <h3><span class="header-section-number">4.3.1</span> Finding and grouping features<a href="features.html#finding-and-grouping-features" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -583,11 +583,7 @@ div.csl-indent {
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="features.html#cb16-1" aria-hidden="true" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
 <span id="cb16-2"><a href="features.html#cb16-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>))</span>
 <span id="cb16-3"><a href="features.html#cb16-3" aria-hidden="true" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
-<pre><code>#&gt; Trying to calculate missing InChI data in suspect list... Done! Filled in 3 (100.0%) entries.
-#&gt; Trying to calculate missing InChIKey data in suspect list... Done! Filled in 3 (100.0%) entries.
-#&gt; Trying to calculate missing formula data in suspect list... Done! Filled in 3 (100.0%) entries.
-#&gt; Calculating neutral masses for each suspect...
-#&gt; ================================================================================
+<pre><code>#&gt; Calculating/Validating chemical data... Done!
 #&gt; ================================================================================
 #&gt; Found 3/3 suspects (100.00%)</code></pre>
 <p>Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the <code>adduct</code> function argument to <code>screenSuspects</code> or by <a href="incorpAdductIso.html#incorpAdductIso">feature group adduct annotations</a>.</p>

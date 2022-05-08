@@ -470,17 +470,17 @@ div.csl-indent {
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="inspecting-results.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb55-2"><a href="inspecting-results.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
-#&gt;    1:  solvent-pos-1 f_14325162761960340254  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1 f_12400799828807705517   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1 f_13147219647229804891 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1 f_13633272584855080922  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1 f_15367552141931719418   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1    f_67319903492525283  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1 f_13567518504797933652   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1  f_5672177052561244258 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_5408709700840780433  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1 f_17744405943110541836   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2920: standard-pos-3 f_12801302800810124351 318.892 425.18866  666531.5    232636
-#&gt; 2921: standard-pos-3 f_10440127279835860197   9.114 427.03242  362024.1    114744
-#&gt; 2922: standard-pos-3  f_8966966093621105121 318.892 427.18678  200193.5     77768
-#&gt; 2923: standard-pos-3  f_8473110663538408755 382.682 432.23984  217612.9     97648
-#&gt; 2924: standard-pos-3  f_5588636448573618992   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2920: standard-pos-3  f_9139453948515979192 318.892 425.18866  666531.5    232636
+#&gt; 2921: standard-pos-3 f_17004373325921426543   9.114 427.03242  362024.1    114744
+#&gt; 2922: standard-pos-3 f_10953396039733207843 318.892 427.18678  200193.5     77768
+#&gt; 2923: standard-pos-3 f_15540788306185415177 382.682 432.23984  217612.9     97648
+#&gt; 2924: standard-pos-3  f_8376909066326243892   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="inspecting-results.html#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb57-2"><a href="inspecting-results.html#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos
@@ -557,31 +557,31 @@ div.csl-indent {
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="inspecting-results.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># formula annotations for the first formula candidate of feature group M137_R249_53</span></span>
 <span id="cb69-2"><a href="inspecting-results.html#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(formulas, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
 <span id="cb69-3"><a href="inspecting-results.html#cb69-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
-<pre><code>#&gt;     ID        mz intensity precursor ion_formula dbe ion_formula_mz error neutral_loss
-#&gt;  1:  2  94.06500  9406.111     FALSE       C6H8N 3.5       94.06513  1.30         CHNO
-#&gt;  2:  6  98.97522  2212.000     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt;  3:  7 105.06971  1662.111     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt;  4: 14 120.04434  7176.222     FALSE      C7H6NO 5.5      120.04439  0.40          H3N
-#&gt;  5: 19 122.07222  2246.000     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt;  6: 21 135.08004  1565.556     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt;  7: 23 137.07039  5348.667      TRUE     C7H9N2O 4.5      137.07094  3.35             
-#&gt;  8: 24 137.09572  2026.889     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt;  9: 26 138.09116 12356.667     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;
-#&gt; 10: 27 139.07503  5020.667     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;</code></pre>
+<pre><code>#&gt;     ID        mz intensity precursor ion_formula dbe ion_formula_mz error neutral_loss annotated
+#&gt;  1:  2  94.06500  9406.111     FALSE       C6H8N 3.5       94.06513  1.30         CHNO      TRUE
+#&gt;  2:  6  98.97522  2212.000     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt;  3:  7 105.06971  1662.111     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt;  4: 14 120.04434  7176.222     FALSE      C7H6NO 5.5      120.04439  0.40          H3N      TRUE
+#&gt;  5: 19 122.07222  2246.000     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt;  6: 21 135.08004  1565.556     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt;  7: 23 137.07039  5348.667      TRUE     C7H9N2O 4.5      137.07094  3.35                   TRUE
+#&gt;  8: 24 137.09572  2026.889     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt;  9: 26 138.09116 12356.667     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE
+#&gt; 10: 27 139.07503  5020.667     FALSE        &lt;NA&gt;  NA             NA    NA         &lt;NA&gt;     FALSE</code></pre>
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="inspecting-results.html#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compound annotation for first candidate of feature group M137_R249_53</span></span>
 <span id="cb71-2"><a href="inspecting-results.html#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
 <span id="cb71-3"><a href="inspecting-results.html#cb71-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
-<pre><code>#&gt;     ID        mz intensity precursor ion_formula ion_formula_MF neutral_loss score
-#&gt;  1:  2  94.06500  9406.111     FALSE       C6H8N   [C6H6N+H]+H+         CHNO   405
-#&gt;  2:  6  98.97522  2212.000     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  3:  7 105.06971  1662.111     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  4: 14 120.04434  7176.222     FALSE      C7H6NO      [C7H6NO]+          H3N   305
-#&gt;  5: 19 122.07222  2246.000     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  6: 21 135.08004  1565.556     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  7: 23 137.07039  5348.667      TRUE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  8: 24 137.09572  2026.889     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt;  9: 26 138.09116 12356.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA
-#&gt; 10: 27 139.07503  5020.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA</code></pre>
+<pre><code>#&gt;     ID        mz intensity precursor ion_formula ion_formula_MF neutral_loss score annotated
+#&gt;  1:  2  94.06500  9406.111     FALSE       C6H8N   [C6H6N+H]+H+         CHNO   405      TRUE
+#&gt;  2:  6  98.97522  2212.000     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  3:  7 105.06971  1662.111     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  4: 14 120.04434  7176.222     FALSE      C7H6NO      [C7H6NO]+          H3N   305      TRUE
+#&gt;  5: 19 122.07222  2246.000     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  6: 21 135.08004  1565.556     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  7: 23 137.07039  5348.667      TRUE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  8: 24 137.09572  2026.889     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt;  9: 26 138.09116 12356.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
+#&gt; 10: 27 139.07503  5020.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE</code></pre>
 <p>More advanced examples for these functions are shown below.</p>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="inspecting-results.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Feature table, can also be accessed by numeric index</span></span>
 <span id="cb73-2"><a href="inspecting-results.html#cb73-2" aria-hidden="true" tabindex="-1"></a>fList[[<span class="dv">1</span>]]</span>

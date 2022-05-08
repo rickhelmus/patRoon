@@ -106,7 +106,13 @@ jobs:
                 command: |
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker tag "${IMAGE_NAME_DEPS}" "${IMAGE_NAME_DEPS}:${git_sha}-${CIRCLE_BRANCH}"
-                    docker push "${IMAGE_NAME_DEPS}:latest" && docker push "${IMAGE_NAME_DEPS}:${git_sha}-${CIRCLE_BRANCH}"
+                    docker push "${IMAGE_NAME_DEPS}:${git_sha}-${CIRCLE_BRANCH}"
+                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                        docker push "${IMAGE_NAME_DEPS}:latest"
+                    else
+                        docker tag "${IMAGE_NAME_DEPS}" "${IMAGE_NAME_DEPS}:${CIRCLE_BRANCH}"
+                        docker push "${IMAGE_NAME_DEPS}:${CIRCLE_BRANCH}"
+                    fi
 
 parameters:
     do_trigger_deps:

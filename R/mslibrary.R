@@ -363,8 +363,8 @@ loadMSLibrary <- function(file, algorithm, ...)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
-                msp = loadMSPLibrary,
-                json = loadMoNAJSONLibrary,
+                msp = loadMSLibraryMSP,
+                json = loadMSLibraryMoNAJSON,
                 xcms = findFeaturesXCMS)
     
     f(file, ...)

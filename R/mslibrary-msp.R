@@ -1,8 +1,8 @@
 #' @include mslibrary.R
 NULL
 
-loadMSPLibrary <- function(file, parseComments = TRUE, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002,
-                           calcSPLASH = TRUE)
+loadMSLibraryMSP <- function(file, parseComments = TRUE, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002,
+                             calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)

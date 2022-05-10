@@ -1,7 +1,7 @@
 #' @include mslibrary.R
 NULL
 
-loadMoNAJSONLibrary <- function(file, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
+loadMSLibraryMoNAJSON <- function(file, potAdducts = NULL, potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)

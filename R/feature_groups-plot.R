@@ -33,6 +33,8 @@ NULL
 #' @section Sets workflows: \setsWFChangedMethods{
 #'
 #'   \item \code{plotVenn} and \code{plotInt} allow to handle data per set. See the \code{sets} argument description.
+#'   
+#'   \item \code{plotGraph} only plots data per set, and requires the \code{set} argument to be set.
 #'
 #'   }
 #'
@@ -864,5 +866,6 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
 })
 
 #' @rdname feature-plotting
+#' @param set \setsWF The set for which data must be plotted.
 #' @export
 setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))

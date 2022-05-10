@@ -1121,6 +1121,10 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @param standards A \code{data.table} (or \code{data.frame}) with all internal standards. Should follow the format of
 #'   a \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
 #'   normalization} section for details.
+#'   
+#'   \setsWF Can also be a \code{list} with internal standard lists.
+#'   
+#'   See the \code{suspects} argument to \code{\link{screenSuspects}} for more details.
 #' @param ISTDRTWindow,ISTDMZWindow The retention time and \emph{m/z} windows for IS selection. Only used if
 #'   \code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.
 #' @param minISTDs The minimum number of IS that should be assigned to each feature (if possible). Only used if

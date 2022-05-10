@@ -36,6 +36,8 @@ NULL
 #'   \item \code{overlap} and \code{unique} allow to handle data per set. See the \code{sets} argument description.
 #'
 #'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
+#'   
+#'   \item \code{normInts} Performs normalization for each set \emph{independently}.
 #'
 #'   }
 #'

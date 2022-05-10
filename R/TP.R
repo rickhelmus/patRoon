@@ -143,12 +143,13 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 
 #' @describeIn transformationProducts Performs rule-based filtering. Useful to simplify and clean-up the data.
 #'
-#' @param properties A named \code{list} with properties to be filtered. Each item in the \code{list} should be named
-#'   with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
-#'   \emph{e.g.} \code{names(TPs)[[1]]}. Example: \code{properties=list(likelihood=c("LIKELY","PROBABLE"))}.
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #' @param negate If \code{TRUE} then filters are performed in opposite manner.
 #'
+#' @templateVar getProps names(TPs)[[1]]
+#' @templateVar ex likelihood=c("LIKELY","PROBABLE")
+#' @template filter-properties
+#' 
 #' @return \code{filter} returns a filtered \code{transformationProducts} object.
 #'
 #' @export

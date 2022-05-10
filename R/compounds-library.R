@@ -27,6 +27,64 @@ unifyLibNames <- function(cTab)
 }
 
 
+#' Compound annotation with an MS library
+#'
+#' Uses a MS library loaded by \code{\link{loadMSLibrary}} for compound annotation.
+#'
+#' @templateVar algo MS library spectra
+#' @templateVar do generate compound candidates
+#' @templateVar generic generateCompounds
+#' @templateVar algoParam library
+#' @template algo_generator
+#'
+#' @details This method matches measured MS/MS data (peak lists) with those from an MS library to find candidate
+#'   structures. Hence, only feature groups with MS/MS peak list data are annotated.
+#'
+#'   The library is searched for candidates with the following criteria: \enumerate{
+#'
+#'   \item Only records with ion \emph{m/z} (\code{PrecursorMZ}), \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey}
+#'   and \code{formula} data are considered.
+#'
+#'   \item Depending on the value of the \code{checkIons} argument, records with different adduct
+#'   (\code{Precursor_type}) or polarity (\code{Ion_mode}) may be ignored.
+#'
+#'   \item The \emph{m/z} values of the candidate and feature group should match (tolerance set by \code{absMzDev}
+#'   argument).
+#'
+#'   \item The spectral similarity should not be lower than the value defined for the \code{minSim} argument.
+#'
+#'   \item If multiple candidates with the same first-block \acronym{InChIKey} are found then only the candidate with
+#'   the best spectral match is kept.
+#'
+#'   }
+#'
+#'   If the library contains annotations these will be added to the matched MS/MS peaks. However, since the candidate
+#'   selected from criterion #5 above may not contain all the annotation data available from the MS library, annotations
+#'   from other records are also considered (controlled by the \code{minAnnSim} argument). If this leads to different
+#'   annotations for the same mass peak then only the most abundant annotation is kept.
+#'
+#' @param MSLibrary The \code{\link{MSLibrary}} object that should be used to find candidates.
+#' @param minSim The minimum spectral similarity for candidate records.
+#' @param minAnnSim The minimum spectral similarity of a record for it to be used to find annotations (see the
+#'   \verb{Details} section).
+#' @param absMzDev The maximum absolute \emph{m/z} deviation between the feature group and library record \emph{m/z}
+#'   values for candidate selection.
+#' @param checkIons A \code{character} that excludes library records with different adduct (\code{checkIons="adduct"})
+#'   or MS ionization polarity (\code{checkIons="polarity"}). If \code{checkIons="none"} then these filters are not
+#'   applied.
+#' @param specSimParamsLib Like \code{specSimParams}, but these parameters \emph{only} influence pre-treatment of
+#'   library spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).
+#'
+#' @template adduct-arg
+#' @template specSimParams-arg
+#'
+#' @inheritParams generateCompounds
+#'
+#' @seealso \code{\link{loadMSLibrary}} to obtain MS library data and the methods for \code{\link{MSLibrary}} to treat
+#'   the data before using it for annotation.
+#'
+#' @templateVar what generateCompoundsLibrary
+#' @template main-rd-method
 #' @export
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
                                                                 minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
@@ -248,7 +306,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                      algorithm = "library"))
 })
 
-#' @rdname compound-generation
+#' @template featAnnSets-gen_args
+#' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
+#' @rdname generateCompoundsLibrary
 #' @export
 setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
                                                                    minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,

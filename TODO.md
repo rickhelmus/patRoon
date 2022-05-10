@@ -46,12 +46,19 @@
             - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
     - future
         - plotSpectrum, plotVenn, same data format for MSPeakLists
+    - sanitizeMSLibrary(): converts formula ion species format twice?
+    - More printing for show(): number of spectra, annotations
+    - convertToSuspects(): caching
 - compounds
     - show mirror spectrum in report?
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
 - prepareChemTable(): more status messages/progress bars?
+- add (default) MS/MS filters to filter(), convertToSuspects() and generateCompoundsLibrary()?
+    - otherwise doc that user should filter lib
+- merge --> consensus? or c()?
+- other generic name for spectra()?
 
 
 ## Docs
@@ -62,16 +69,11 @@
 - Features
     - Update handbook for normFunc --> normalized
 - mslibrary
-    - synonyms are merged, and not unmerged when exporting as msp (or suspect list)
     - generateCompoundsLibrary()
-        - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
         - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
-    - convertToSuspects()
-        - fragments_mz is overwritten
-        - collapses/matches by IK1
-    - merge()
-        - doc that only unique records in y are added, i.e. metadata is not merged
-
+    - Describe prepareChemTable() and add links in loadMSLibrary(), screenSuspects() etc
+    - Handbook (and refs): update that libraryMatch is also used for ID level estimation
+        
 
 ## NEWS
 

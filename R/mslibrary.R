@@ -2,6 +2,28 @@
 #' @include workflow-step.R
 NULL
 
+#' Class to store data from a loaded MS library
+#'
+#' Stores the spectra and metadata from the records of an MS library.
+#'
+#' This class is used by \code{\link{loadMSLibrary}} to store the loaded MS library data.
+#'
+#' @param x,obj,object \code{MSLibrary} object to be accessed.
+#'
+#' @seealso \code{\link{loadMSLibrary}}
+#'
+#' @slot records A \code{\link{data.table}} with metadata for all records. Use the \code{records} method for access.
+#' @slot spectra A \code{list} with all (annotated) spectra. Each spectrum is stored in a \code{\link{data.table}}. Use
+#'   the \code{spectra} method for access.
+#'
+#' @templateVar seli records
+#' @templateVar selOrderi names()
+#' @templateVar dollarOpName record
+#' @template sub_sel_del-args
+#'
+#' @templateVar class MSLibrary
+#' @template class-hierarchy
+#'
 #' @export
 MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
                       contains = "workflowStep")
@@ -12,18 +34,25 @@ setMethod("initialize", "MSLibrary", function(.Object, ...)
     return(.Object)
 })
 
+#' @describeIn MSLibrary Accessor method for the \code{records} slot of an \code{MSLibrary} class.
+#' @aliases records
 #' @export
 setMethod("records", "MSLibrary", function(obj) obj@records)
 
+#' @describeIn MSLibrary Accessor method for the \code{spectra} slot of an \code{MSLibrary} class.
+#' @aliases spectra
 #' @export
 setMethod("spectra", "MSLibrary", function(obj) obj@spectra)
 
+#' @describeIn MSLibrary Obtains the total number of records stored.
 #' @export
 setMethod("length", "MSLibrary", function(x) nrow(records(x)))
 
+#' @describeIn MSLibrary Obtains the names of the stored records (\code{DB_ID} field).
 #' @export
 setMethod("names", "MSLibrary", function(x) names(spectra(x)))
 
+#' @describeIn MSLibrary Shows summary information for this object.
 #' @export
 setMethod("show", "MSLibrary", function(object)
 {
@@ -33,6 +62,8 @@ setMethod("show", "MSLibrary", function(object)
     printf("Total records: %d\n", length(object))
 })
 
+#' @describeIn MSLibrary Subset on records.
+#' @param \dots Unused.
 #' @export
 setMethod("[", c("MSLibrary", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -44,6 +75,7 @@ setMethod("[", c("MSLibrary", "ANY", "missing", "missing"), function(x, i, ...)
     return(x)
 })
 
+#' @describeIn MSLibrary Extracts a spectrum table for a record.
 #' @export
 setMethod("[[", c("MSLibrary", "ANY", "missing"), function(x, i, j)
 {
@@ -51,12 +83,14 @@ setMethod("[[", c("MSLibrary", "ANY", "missing"), function(x, i, j)
     return(x@spectra[[i]])
 })
 
+#' @describeIn MSLibrary Extracts a spectrum table for a record.
 #' @export
 setMethod("$", "MSLibrary", function(x, name)
 {
     eval(substitute(x@spectra$NAME_ARG, list(NAME_ARG = name)))
 })
 
+#' @describeIn MSLibrary Converts all the data (spectra and metadata) to a single \code{data.table}.
 #' @export
 setMethod("as.data.table", "MSLibrary", function(x)
 {
@@ -64,6 +98,9 @@ setMethod("as.data.table", "MSLibrary", function(x)
     return(merge(records(x), allSpecs, by = "DB_ID"))
 })
 
+#' @templateVar where MSLibrary
+#' @templateVar what full records or spectra
+#' @template delete
 #' @export
 setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
 {
@@ -123,6 +160,26 @@ setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
+#' @describeIn MSLibrary Performs rule-based filtering of records and spectra. This may be especially to improve
+#'   annotation with \code{\link{generateCompoundsLibrary}}.
+#'
+#' @param massRange Records with a neutral mass outside this range will be removed. Should be a two-sized \code{numeric}
+#'   vector with the lower and upper mass range. Set to \code{NULL} to ignore.
+#' @param mzRangeSpec Similar to the \code{massRange} argument, but removes any peaks from recorded mass spectra outside
+#'   the given \emph{m/z} range.
+#' @param relMinIntensity The minimum relative intensity (\samp{0-1}) of a mass peak to be kept. Set to \code{NULL} to
+#'   ignore.
+#' @param topMost Only keep \code{topMost} number of mass peaks for each spectrum. This filter is applied after others.
+#'   Set to \code{NULL} to ignore.
+#' @param onlyAnnotated If \code{TRUE} then only recorded spectra that are formula annotated are kept.
+#' @param negate If \code{TRUE} then filters are performed in opposite manner.
+#'
+#' @templateVar getProps names(records)
+#' @templateVar ex Instrument_type=c("LC-ESI-QTOF","LC-ESI-TOF")
+#' @template filter-properties
+#'
+#' @return \code{filter} returns a filtered \code{MSLibrary} object.
+#'
 #' @export
 setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NULL, mzRangeSpec = NULL,
                                           relMinIntensity = NULL, topMost = NULL, onlyAnnotated = FALSE,
@@ -206,6 +263,45 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
     return(obj)
 })
 
+#' @describeIn MSLibrary Converts the MS library data to a suspect list, which can be used with
+#'   \code{\link{screenSuspects}}. See the \verb{Suspect conversion} section for details.
+#'
+#' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
+#'   Any records with a different adduct (\code{Precursor_type}) are not considered.
+#' @param avgSpecParams A \code{list} with parameters used for averaging spectra. See \code{\link{getDefAvgPListParams}}
+#'   for more details.
+#' @param collapse Whether records with the same first-block \acronym{InChIKey} should be collapsed. See the
+#'   \verb{Suspect conversion} section for details.
+#' @param suspects If not \code{NULL} then this should be a suspect list (see \code{\link{screenSuspects}}) which will
+#'   be amended with spectra data. See the \verb{Suspect conversion} section for details.
+#'
+#' @return \code{convertToSuspects} return a suspect list (\code{data.table}), which can be used with
+#'   \code{\link{screenSuspects}}.
+#'
+#' @section Suspect conversion: The \code{convertToSuspects} method converts MS library data to a suspect list, which
+#'   can be used with \emph{e.g.} \code{\link{screenSuspects}}. Furthermore, this function can also amend existing
+#'   suspect lists with spectral data.
+#'
+#'   Conversion occurs in either of the following three methods: \enumerate{
+#'
+#'   \item \emph{Direct} (\code{collapse=FALSE} and \code{suspects=NULL}): each record is considered a suspect, and the
+#'   resulting suspect list is generated directly by converting the records metadata. The \code{fragments_mz} column for
+#'   each suspect is constructed from the mass peaks of the corresponding record.
+#'
+#'   \item \emph{Collapse} (\code{collapse=TRUE} and \code{suspects=NULL}): All records with the same first-block
+#'   \acronym{InChIKey} are first merged, and their spectra are averaged using the parameters from the
+#'   \code{avgSpecParams} argument (see \code{\link{getDefAvgPListParams}}). The suspect list is based on the merged
+#'   records, where the \code{fragments_mz} column is constructed from the averaged spectra. This is generally a good
+#'   default, especially with large MS libraries.
+#'
+#'   \item \emph{Amend} (\code{suspects} is not \code{NULL}): only those records are considered if their first-block
+#'   \acronym{InChIKey} is present in the suspect list. The remaining records and their spectra are then collapsed as
+#'   described for the \emph{Collapse} method, and the \code{fragments_mz} column for each suspect is set from the
+#'   averaged spectra. If a suspect is not present in the library, its \code{fragments_mz} value will be empty. Note
+#'   that any existing \code{fragments_mz} data will be overwritten.
+#'
+#'   }
+#'
 #' @export
 setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
@@ -318,20 +414,43 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
     return(ret[])
 })
 
-setMethod("export", "MSLibrary", function(obj, type, out)
+#' @describeIn MSLibrary Exports the library data to a \file{.msp} file. The export is accelerated by an \code{C++}
+#'   interface with \CRANpkg{Rcpp}.
+#'
+#' @param type The export type. Currently just \code{"msp"}.
+#' @param out The file path to the output library file.
+#'
+#' @note \code{export} does not split any \code{Synon} data that was merged when the library was loaded.
+#' 
+#' @references \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3}
+#'
+#' @export
+setMethod("export", "MSLibrary", function(obj, type = "msp", out)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(type, "msp", add = ac)
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    # convert records to character matrix to simplfy Rcpp processing
+    # convert records to character matrix to simplify Rcpp processing
     recs <- copy(records(obj))
     recs[, (names(recs)) := lapply(.SD, as.character)]
     recs <- as.matrix(recs)
     writeMSPLibrary(recs, spectra(obj), normalizePath(out))
 })
 
+#' @describeIn MSLibrary Merges two \code{MSLibrary} objects (\code{x} and \code{y}). The records from \code{y} that are
+#'   unique are added to \code{x}. Records that were already in \code{x} are simply ignored. The
+#'   \href{https://splash.fiehnlab.ucdavis.edu/}{SPLASH} values are used to test equality between records, hence, the
+#'   \code{calcSPLASH} argument to \code{\link{loadMSLibrary}} should be \code{TRUE}.
+#'
+#' @param y The \code{MSLibrary} to be merged with \code{x}.
+#'
+#' @return \code{merge} returns a merged \code{MSLibrary} object.
+#'
+#' @references \insertRef{Wohlgemuth2016}{patRoon}
+#'
+#' @export
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
 {
     if (length(x) == 0)

@@ -21,6 +21,8 @@
 #'
 #'   The loaded library data is post-treated as follows: \itemize{
 #'
+#'   \item The \code{DB#} field is renamed to \code{DB_ID} to improve compatibility with \R column names.
+#'   
 #'   \item Synonyms (\code{Synon} fields) are merged together, mainly to save memory usage.
 #'
 #'   \item Inconsistently formatted \code{NA} data (\emph{e.g.} \code{"n/a"}, \code{"N/A"} or empty strings) are set to

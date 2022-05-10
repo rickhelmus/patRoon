@@ -5,6 +5,10 @@ loadMSLibraryMoNAJSON <- function(file, potAdducts = TRUE, potAdductsLib = TRUE,
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
+    checkmate::assert(checkmate::checkFlag(potAdducts),
+                      checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
+                      checkmate::checkList(potAdducts, types = c("adduct", "character"), any.missing = FALSE),
+                      .var.name = "potAdducts")
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ potAdductsLib + calcSPLASH, fixed = list(add = ac))
     checkmate::reportAssertions(ac)

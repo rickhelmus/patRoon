@@ -54,29 +54,6 @@
 - prepareChemTable(): more status messages/progress bars?
 
 
-## DOCS
-
-- mslibrary
-    - synonyms are merged, and not unmerged when exporting as msp (or suspect list)
-    - generateCompoundsLibrary()
-        - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
-        - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
-    - convertToSuspects()
-        - fragments_mz is overwritten
-        - collapses/matches by IK1
-    - merge()
-        - doc that only unique records in y are added, i.e. metadata is not merged
-
-## NEWS
-
-- prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
-- MP: more workarounds to handle NA exit codes on Linux
-
-
-
-## Tests
-
-
 ## Docs
 
 - TPs
@@ -88,6 +65,16 @@
         - standards argument for normInts
         - set argument for plotGraph
         - normInts works per set
+- mslibrary
+    - synonyms are merged, and not unmerged when exporting as msp (or suspect list)
+    - generateCompoundsLibrary()
+        - note that only few specSimParamsLib fields are used (e.g. not method, absMzDev etc)
+        - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
+    - convertToSuspects()
+        - fragments_mz is overwritten
+        - collapses/matches by IK1
+    - merge()
+        - doc that only unique records in y are added, i.e. metadata is not merged
 
 
 ## NEWS
@@ -137,6 +124,8 @@
 - Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
 - Fixed: newProject(): loading analysis info from CSV now works on Windows
 - norm_concs argument to generateAnalysisInfo()
+- prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
+- MP: more workarounds to handle NA exit codes on Linux
 
 
 # Lower priority

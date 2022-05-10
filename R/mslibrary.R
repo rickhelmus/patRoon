@@ -354,7 +354,25 @@ setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)
     return(MSLibrary(records = recordsAll[], spectra = specsAll, algorithm = "merged"))
 })
 
-
+#' Loading of MS library data
+#'
+#' Loads, parses, verifies and curates MS library data, \emph{e.g.} obtained from MassBank.
+#'
+#' @templateVar func loadMSLibrary
+#' @templateVar what loads MS library data
+#' @templateVar ex1 loadMSLibraryMSP
+#' @templateVar ex2 loadMSLibraryMoNAJSON
+#' @templateVar algos msp,json
+#' @templateVar algosSuffix MSP,MoNAJSON
+#' @templateVar ret MSLibrary
+#' @template generic-algo
+#'
+#' @param file A \code{character} string that specifies the the file path to the library.
+#' @param \dots Any parameters to be passed to the selected MS library loading algorithm.
+#'
+#' @return A \code{\link{MSLibrary}} object containing the loaded library data.
+#'
+#' @export
 loadMSLibrary <- function(file, algorithm, ...)
 {
     ac <- checkmate::makeAssertCollection()

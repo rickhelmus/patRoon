@@ -1,6 +1,27 @@
 #' @include mslibrary.R
 NULL
 
+#' Load MS library data from MassBank of North America (\acronym{MoNA})
+#'
+#' This function loads, verifies and curates MS library data from \href{https://mona.fiehnlab.ucdavis.edu/}{MoNA}
+#' \file{.json} files.
+#'
+#' @templateVar algo an efficient \code{C++} JSON loader
+#' @templateVar do load MS library data
+#' @templateVar generic loadMSLibrary
+#' @templateVar algoParam json
+#' @template algo_generator
+#'
+#' @templateVar format JSON
+#' @template loadMSLibrary
+#'
+#' @details This function uses \code{C++} with \CRANpkg{Rcpp} and \CRANpkg{rapidjsonr} to efficiently load and parse
+#'   JSON files from \href{https://mona.fiehnlab.ucdavis.edu/}{MoNA}. An advantage compared to
+#'   \code{\link{loadMSLibraryMSP}} is that this function supports loading spectral annotations.
+#'   
+#'   The record field names are converted to those used in \file{.msp} files.
+#'
+#' @export
 loadMSLibraryMoNAJSON <- function(file, potAdducts = TRUE, potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

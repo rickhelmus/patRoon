@@ -364,8 +364,7 @@ loadMSLibrary <- function(file, algorithm, ...)
     
     f <- switch(algorithm,
                 msp = loadMSLibraryMSP,
-                json = loadMSLibraryMoNAJSON,
-                xcms = findFeaturesXCMS)
+                json = loadMSLibraryMoNAJSON)
     
     f(file, ...)
 }

@@ -42,7 +42,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLA
         setnames(lib$records, emInd, "neutralMass")
     
     if (!all(c("Name", "DB_ID") %in% names(lib$records)))
-        stop("MSP file misses mandatory Name and/or DB# data.")
+        stop("Library file misses mandatory Name and/or DB# data.")
     
     lib$records <- makeDBIDsUnique(lib$records)
     names(lib$spectra) <- lib$records$DB_ID

@@ -9,7 +9,6 @@ setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
 setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE,
                                      func = mean) standardGeneric("averageGroups"))
-setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE, ...) standardGeneric("overlap"))
 setGeneric("selectIons", function(fGroups, components, prefAdduct, ...) standardGeneric("selectIons"))

@@ -7,8 +7,7 @@ loadMSLibraryMSP <- function(file, parseComments = TRUE, potAdducts = NULL, potA
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     aapply(checkmate::assertFlag, . ~ parseComments + potAdductsLib + calcSPLASH, fixed = list(add = ac))
-    checkmate::assert(checkmate::checkNull(potAdducts),
-                      checkmate::checkFALSE(potAdducts),
+    checkmate::assert(checkmate::checkFlag(potAdducts),
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
                       checkmate::checkList(potAdducts, types = c("adduct", "character"), any.missing = FALSE),
                       .var.name = "potAdducts")

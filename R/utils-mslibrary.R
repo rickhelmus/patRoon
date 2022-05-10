@@ -116,7 +116,7 @@ sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLA
     {
         printf("Guessing missing adducts...\n")
         
-        if (is.null(potAdducts))
+        if (isTRUE(potAdducts))
         {
             potAdducts <- union(GenFormAdducts()$adduct_generic, MetFragAdducts()$adduct_generic)
             if (potAdductsLib)

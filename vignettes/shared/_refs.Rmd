@@ -55,9 +55,11 @@
 [cliqueMS]: https://github.com/osenan/cliqueMS
 [MetaboliteAdductDecharger]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html
 [BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/
+[CTS]: https://qed.epa.gov/cts/
 [KPIC2]: https://github.com/hcji/KPIC2
 [SAFD]: https://bitbucket.org/SSamanipour/safd.jl/src/master/
 [YAML]: https://en.wikipedia.org/wiki/YAML
 [MetaClean]: https://github.com/KelseyChetnik/MetaClean/
 [PubChemLiteTR]: https://doi.org/10.5281/zenodo.5644560
-[Handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html]
+[Handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
+

@@ -64,8 +64,7 @@
 ## Docs
 
 - TPs
-    - handbook
-        - update for transformationProductsStructure
+    - consensus: flattens hierarchy (and other specifics?)
 - Features
     - Update handbook for normFunc --> normalized
 - mslibrary
@@ -77,6 +76,7 @@
 
 ## NEWS
 
+- cache needs to be cleared for upgrade
 - TPs
     - sim calc doesn't happen by default anymore for BT
     - TP structure base class

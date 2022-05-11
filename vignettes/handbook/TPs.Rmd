@@ -36,24 +36,33 @@ The `generateTPs` function is used to obtain TPs for a particular set of parents
 Algorithm        | Usage                                            | Remarks
 ---------------- | ------------------------------------------------ | ---------------------------------
 [BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
+[CTS]            | `generateTPs(algorithm = "cts", ...)`            | Predicts TPs with full structural information
 Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem transformations][PubChemLiteTR] or custom)
 Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
 
-The `biotransformer` and `library` algorithms provide full structural information of the TPs (e.g. formula, SMILES, predicted Log P). However, these algorithms also depend on the full chemical structure of the parent compound. Hence, these algorithms are typically suitable when parents are known in advance or were found by a suspect screening. On the other hand, metabolic logic only requires the feature mass, and this simplicity allows it to predict TPs for all features. This algorithm is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives.
+The output of these algorithms can be distinguished in two groups:
+
+1. **Structural TPs** (`biotransformer`, `cts` and `library`) come with full structural information for the TPs (e.g. formula, SMILES, predicted Log P). As such, the corresponding algorithms also require the full chemical structure of the parent compound.
+2. **Calculated TPs** (`logic`) are based solely on _m/z_ differences and only require the feature masses. 
+
+The algorithms yielding structural TPs are typically suitable when parents are known in advance, for instance, from a target or suspect screening. On the other hand, the simplicity of calculated TPs always allows TP prediction for all features, which is most suitable for full non-target analysis. However, extra care must be taken to rule out false positives.
 
 An overview of common arguments for TP generation is listed below.
 
 Argument                      | Algorithm(s)      | Remarks
 ----------------------------- | ----------------- | --------------------------------------------------------
-`parents`                     | `biotransformer`, `library` | The input parents. See section below.
+`parents`                     | `biotransformer`, `cts`, `library` | The input parents. See section below.
 `fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
 `type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
+`transLibrary`                | `cts`             | The transformation library that should be used: `"hydrolysis"`, `"abiotic_reduction"`, `"photolysis_unranked"`, `"photolysis_ranked"`, `"mammalian_metabolism"`, `"combined_abioticreduction_hydrolysis"`, `"combined_photolysis_abiotic_hydrolysis"`. See [cts] for more details.
 `TPLibrary`/`transformations` | `library`/`logic` | [Custom TP library/transformation rules](#TPsCustom).
+`generation`                  | `biotransformer`, `cts`, `library` | The amount of transformation generations to predict.
 `adduct`                      | `logic`           | The assumed adduct of the parents (e.g. `"[M+H]+"`). Not needed when [adduct annotations](#incorpAdductIso) are available.
+`calcSims`                    | `biotransformer`, `cts`, `library` | If `TRUE` then structural similarities between the parent and TPs is calculated, which can be useful for post-processing (discussed later).
 
 ### Parent input
 
-The input parent structures for the `biotransformer` and `library` algorithms must be one the following:
+The input parent structures to generate structural TPs (`biotransformer`, `cts` and `library` algorithms) must be specified as one of the following:
 
 * A suspect list (follows the same format as [suspect screening](#suspscr))
 * A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
@@ -81,23 +90,18 @@ TPsLogic <- generateTPs("logic", fGroups, adduct = "[M+H]+")
 
 Similar to other workflow data, several generic functions are available to inspect the data:
 
-Generic                            | Classes | Remarks                                                             
------------------------------------|---------|---------------------------------------------------------------------
-`length()`                         | All     | Returns the total number of transformation products
-`names()`                          | All     | Returns the names of the parents
-`parents()`                        | All     | Returns a table with information about the parents
-`products()`                       | All     | Returns a `list` with for each parent a table with TPs
-`as.data.table()`, `as.data.frame` | All     | Convert all the object information into a `data.table`/`data.frame`
-`"[["` / `"$"` operators           | All     | Extract TP information for a specified parent
+Generic                            | Remarks                                                             
+-----------------------------------|----------------------------------------------------------------------
+`length()`                         | Returns the total number of transformation products
+`names()`                          | Returns the names of the parents
+`parents()`                        | Returns a table with information about the parents
+`products()`                       | Returns a `list` with for each parent a table with TPs
+`as.data.table()`, `as.data.frame` | Convert all the object information into a `data.table`/`data.frame`
+`"[["` / `"$"` operators           | Extract TP information for a specified parent
 
 Some examples:
 
-```{r include=FALSE,eval=TRUE}
-# NOTE: this is always evaluated as it takes very little time...
-TPs <- generateTPs("library")
-```
-
-```{r TPsProcInsp,eval=TRUE}
+```{r TPsProcInsp,eval=runData}
 # just show a few columns in this example, there are many more!
 # note: the double dot syntax (..cols) is necessary since the data is stored as data.tables
 cols <- c("name", "formula", "InChIKey")
@@ -112,13 +116,36 @@ In addition, the following generic functions are available to modify or convert 
 Generic             | Classes                    | Remarks
 ------------------- | -------------------------- | --------------------------------------------------------
 `"["` operator      | All                        | Subset this object on given parents
-`filter`            | `transformationProductsBT` | Filters this object
+`filter`            | All                        | Filters this object
 `convertToSuspects` | All                        | Generates a suspect list of all TPs (and optionally parents) that is suitable for `screenSuspects`
-`convertToMFDB`     | `transformationProductsBT`, `transformationProductsLibrary` | Generates a [MetFrag] database for all TPs (and optionally parents)
 
 ```{r TPsProcMod,eval=FALSE}
 TPs2 <- TPs[1:10] # only keep results for first ten parents
 
+# only keep TPs with likely/probably likelihood (specific property for CTS algorithm)
+TPsF <- filter(TPs, properties = list(likelihood = c("LIKELY", "PROBABLE")))
+
+# do a suspect screening for all TPs and their parents
+suspects <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
+```
+
+The `convertToSuspects` function is always part of a workflow, and is discussed further in the next section.
+
+#### Structural TPs specifics
+
+For structural TPs several additional generic functions are available:
+
+Generic             | Remarks
+------------------- | --------------------------------------------------------
+`filter`            | Filters this object (additional functionality for structural TPs)
+`convertToMFDB`     | Generates a [MetFrag] database for all TPs (and optionally parents)
+`plotGraph`         | Generates an interactive plot to explore transformation hierarchies
+`plotVenn`, `plotUpSet` | Compare results between different algorithms with Venn/UpSet diagrams
+
+The `convertToMFDB` function is especially handy with predicted TPs, as it allows generating a compound database for TPs that may not be available in commonly used databases. This is further demonstrated in the [first example](#TPsEx1).
+
+```{r TPsProcStruct,eval=FALSE}
 # remove transformation products that are isomers to their parent or sibling TPs
 # may simplify data as these are often difficult to identify
 TPsF <- filter(TPs, removeParentIsomers = TRUE, removeTPIsomers = TRUE)
@@ -128,11 +155,8 @@ TPsF <- filter(TPs, removeParentIsomers = TRUE, removeTPIsomers = TRUE)
 TPsF <- filter(TPs, removeDuplicates = TRUE)
 
 # only keep TPs that have a structural similarity to their parent of >= 0.5
+# (needs calcSims=TRUE when executing generateTPs())
 TPsF <- filter(TPs, minSimilarity = 0.5)
-
-# do a suspect screening for all TPs and their parents
-suspects <- convertToSuspects(TPs, includeParents = TRUE)
-fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 
 # use the TP data for a specialized MetFrag database
 convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
@@ -140,7 +164,12 @@ compoundsTPs <- generateCompounds(fGroups, mslists, "metfrag", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
 ```
 
-The `convertToSuspects` function is always part of a workflow with `biotransformer` or `library` TPs. This is discussed further in the next section. The `convertToMFDB` function is especially handy with `biotransformer` workflows, as it allows generating a compound database for TPs that may not be available in other databases. This is further demonstrated in the [first example](#TPsEx1).
+```{r TPsPlots,eval=runData}
+plotVenn(TPsLib, TPsBT, labels = c("lib", "BT"))
+plotGraph(TPsBT, which = "Triazophos") # hierarchy for Triazophos parent
+```
+
+Finally, results from different algorithms can be combined with the `consensus` generic function. This is further discussed in [algorithm consensus](#consensus).
 
 ### Custom libraries and transformations {#TPsCustom}
 
@@ -279,6 +308,12 @@ Filter        | Remarks
 The `retDirMatch` filter compares the expected and observed _retention time direction_ of a TP in order to decide if it should be kept. The direction is a value of either `-1` (TP elutes before parent), `+1` (TP elutes after parent) or `0` (TP elutes very close to the parent or its direction is unknown). The directions are taken from the [generated transformation products](#genTPs). For the `library` and `biotransformer` algorithms the log P values are compared of a TP and its parent. Here, it is assumed that lower log P values result in earlier elution (i.e. typical with reversed phase LC). For the `logic` algorithm the retention time direction is taken from the transformation rules table. Note that specifying a large enough value for the `minRTDiff` argument to `generateComponents` is important to ensure that some tolerance exists while comparing retention time directions of parent and TPs. This filter does nothing if either the observed or expected direction is zero.
 
 When TPs data was generated with the `logic` algorithm it is recommended to use the `formulas` filter. This filter uses formula annotations to verify that (1) a parent feature group contains the elements that are subtracted during the transformation and (2) the TP feature group contains the elements that were added during the transformation. Since the 'right' candidate formula is most likely not yet known, this filter looks at _all_ candidates. Therefore, it is recommended to filter the `formulas` object, for instance, with the `topMost` filter.
+
+Finally, the `plotGraph()` method function that was introduced exploring transformation hierarchies for structure TPs, can also incorporate componentization results to simplify the plot and mark TP hits:
+
+```{r plotGraphCompTP,eval=runData}
+plotGraph(TPsBT, which = "Atrazine", components = componTP)
+```
 
 ### Omitting transformation product input
 

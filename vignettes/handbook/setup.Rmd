@@ -88,12 +88,18 @@ if (runData)
     mslistsSets <- filter(mslistsSets, topMSMSPeaks = 10)
     compoundsSets <- generateCompounds(fGroupsSetsAnn, mslistsSets, "metfrag", database = "pubchemlite")
     
+    TPs <- TPsLib <- generateTPs("library", parents = patRoonData::suspectsPos)
+    TPsBT <- generateTPs("biotransformer", parents = patRoonData::suspectsPos)
+    fGroupsTPs <- screenSuspects(fGroups, convertToSuspects(TPsBT, includeParents = TRUE), adduct = "[M+H]+", onlyHits = TRUE)
+    componTP <- generateComponents(fGroupsTPs, "tp", TPs = TPsBT)
+    
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
                  fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
                  ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,
-                 mslistsSets = mslistsSets, compoundsSets = compoundsSets),
+                 mslistsSets = mslistsSets, compoundsSets = compoundsSets,
+                 TPsLib = TPsLib, TPsBT = TPsBT, fGroupsTPs = fGroupsTPs, componTP = componTP),
             "~/handbook-obj.Rds")
 }
 ```

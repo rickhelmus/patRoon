@@ -30,7 +30,8 @@ sanitizeMSLibrary <- function(lib, potAdducts, potAdductsLib, absMzDev, calcSPLA
         set(lib$records, which(lib$records[[j]] %chin% c("NA", "n/a", "N/A")), j, NA_character_)
     
     # Ensure case of column names used by patRoon are consistent
-    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "formula", "Precursor_type", "Ion_mode", "SPLASH")
+    chCols <- c("Name", "SMILES", "InChI", "InChIKey", "formula", "Precursor_type", "Ion_mode", "Spectrum_type",
+                "SPLASH")
     numCols <- c("neutralMass", "PrecursorMZ")
     allCols <- c(chCols, numCols)
     colInds <- match(tolower(allCols), tolower(names(lib$records)))

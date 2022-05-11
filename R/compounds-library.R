@@ -15,7 +15,7 @@ unifyLibNames <- function(cTab)
                  formula = "neutral_formula",
                  neutralMass = "neutralMass",
                  Precursor_type = "precursorType",
-                 Spectrum_Type = "spectrumType",
+                 Spectrum_type = "spectrumType",
                  PrecursorMZ = "ion_formula_mz",
                  Instrument_Type = "instrumentType"
     )
@@ -77,6 +77,7 @@ unifyLibNames <- function(cTab)
 #'
 #' @template adduct-arg
 #' @template specSimParams-arg
+#' @template spectrumType-arg
 #'
 #' @inheritParams generateCompounds
 #'
@@ -88,7 +89,7 @@ unifyLibNames <- function(cTab)
 #' @export
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
                                                                 minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
-                                                                checkIons = "adduct",
+                                                                checkIons = "adduct", spectrumType = "MS2",
                                                                 specSimParams = getDefSpecSimParams(),
                                                                 specSimParamsLib = getDefSpecSimParams())
 {
@@ -97,6 +98,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
     aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
+    checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     assertSpecSimParams(specSimParamsLib, add = ac)
     checkmate::reportAssertions(ac)
@@ -137,6 +139,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     else
         allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
 
+    if (!is.null(spectrumType))
+        libRecs <- libRecs[Spectrum_type %chin% spectrumType]
+    
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams, specSimParamsLib)
     setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)

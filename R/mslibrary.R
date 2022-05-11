@@ -274,7 +274,9 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 #'   \verb{Suspect conversion} section for details.
 #' @param suspects If not \code{NULL} then this should be a suspect list (see \code{\link{screenSuspects}}) which will
 #'   be amended with spectra data. See the \verb{Suspect conversion} section for details.
-#'
+#'   
+#' @template spectrumType-arg
+#' 
 #' @return \code{convertToSuspects} return a suspect list (\code{data.table}), which can be used with
 #'   \code{\link{screenSuspects}}.
 #'
@@ -303,7 +305,7 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 #'   }
 #'
 #' @export
-setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
+setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType = "MS2",
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
                                                                                           minIntensityPost = 2,
                                                                                           topMost = 10),
@@ -312,6 +314,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
     adduct <- checkAndToAdduct(adduct)
     
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgSpecParams, add = ac)
     checkmate::assertFlag(collapse, add = ac)
     if (!is.null(suspects))
@@ -323,8 +326,10 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct,
 
     libRecs <- records(obj)
     libRecs <- libRecs[Precursor_type == as.character(adduct)]
+    if (!is.null(spectrumType))
+        libRecs <- libRecs[Spectrum_type %chin% spectrumType]
     if (nrow(libRecs) == 0)
-        stop("No records found (for input adduct)", call. = FALSE)
+        stop("No records found (for input adduct/spectrum type)", call. = FALSE)
     libSpecs <- spectra(obj)
     
     getAvgFrags <- function(specs, PrecursorMZ)

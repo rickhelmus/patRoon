@@ -55,8 +55,6 @@
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
 - prepareChemTable(): more status messages/progress bars?
-- add (default) MS/MS filters to filter(), convertToSuspects() and generateCompoundsLibrary()?
-    - otherwise doc that user should filter lib
 - merge --> consensus? or c()?
 - other generic name for spectra()?
 

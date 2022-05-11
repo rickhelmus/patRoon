@@ -1121,9 +1121,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @param standards A \code{data.table} (or \code{data.frame}) with all internal standards. Should follow the format of
 #'   a \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
 #'   normalization} section for details.
-#'   
+#'
 #'   \setsWF Can also be a \code{list} with internal standard lists.
-#'   
+#'
 #'   See the \code{suspects} argument to \code{\link{screenSuspects}} for more details.
 #' @param ISTDRTWindow,ISTDMZWindow The retention time and \emph{m/z} windows for IS selection. Only used if
 #'   \code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.
@@ -1168,8 +1168,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'
 #'   \item \code{featNorm="tic"} Uses the Total Ion Current (TIC) to normalize intensities. The TIC is calculated by
 #'   combining all intensities with the function defined by the \code{normFunc} argument. For this reason, you may need
-#'   to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. The
-#'   normalized feature intensities are finally divided by the normalization concentration.
+#'   to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. If
+#'   normalization concentrations are specified then the TIC normalized intensities are divided by the normalization
+#'   concentration.
 #'
 #'   \item \code{featNorm="conc"} Simply divides all intensities (areas) with the normalization concentration defined
 #'   for the sample.

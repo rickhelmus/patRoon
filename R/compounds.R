@@ -643,8 +643,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' @templateVar what generate compounds
 #' @templateVar ex1 generateCompoundsMetFrag
 #' @templateVar ex2 generateCompoundsSIRIUS
-#' @templateVar algos metfrag,sirius
-#' @templateVar algosSuffix MetFrag,SIRIUS
+#' @templateVar algos metfrag,sirius,library
+#' @templateVar algosSuffix MetFrag,SIRIUS,Library
 #' @templateVar ret compounds
 #' @template generic-algo
 #'
@@ -670,12 +670,13 @@ setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, a
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertChoice(algorithm, c("metfrag", "sirius"), add = ac)
+    checkmate::assertChoice(algorithm, c("metfrag", "sirius", "library"), add = ac)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
                 metfrag = generateCompoundsMetFrag,
-                sirius = generateCompoundsSIRIUS)
+                sirius = generateCompoundsSIRIUS,
+                library = generateCompoundsLibrary)
 
     f(fGroups, MSPeakLists, ...)
 })

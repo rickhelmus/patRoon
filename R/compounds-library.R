@@ -171,7 +171,10 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         cTab <- libRecs[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
         if (is.null(adduct))
-            cTab <- getRecsForAdduct(cTab, allAdducts[[addChr]], annTbl[group == grp]$adduct)
+        {
+            addChr <- annTbl[group == grp]$adduct
+            cTab <- getRecsForAdduct(cTab, allAdducts[[addChr]], addChr)
+        }
         
         if (nrow(cTab) == 0)
             return(NULL)

@@ -1137,9 +1137,12 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   documentation for these methods for more details.
 #'
 #'   The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
-#'   analysis. Most methods require that the \emph{normalization concentration} (\code{norm_conc} in the
-#'   \link[=analysis-information]{analysis information}) is defined for each sample analysis, and will output zero
-#'   intensities otherwise. The different normalization methods are:
+#'   analysis. Most methods are influenced by the \emph{normalization concentration} (\code{norm_conc} in the
+#'   \link[=analysis-information]{analysis information}) set for each sample analysis. For \code{NA} or zero values the
+#'   output will be zero. If the \code{norm_conc} is completely absent from the analysis information, the normalization
+#'   concentration is defaulted to one.
+#'
+#'   The different normalization methods are:
 #'
 #'   \enumerate{
 #'
@@ -1163,14 +1166,13 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'
 #'   Normalization of features within the same feature group always occur with the same IS. If multiple IS are assigned
 #'   to a feature then normalization occurs with the combined intensity (area), which is calculated with the function
-#'   defined by the \code{normFunc} argument. The (combined) IS intensity is then normalized by the normalization sample
+#'   defined by the \code{normFunc} argument. The (combined) IS intensity is then normalized by the normalization
 #'   concentration, and finally used for feature normalization.
 #'
 #'   \item \code{featNorm="tic"} Uses the Total Ion Current (TIC) to normalize intensities. The TIC is calculated by
 #'   combining all intensities with the function defined by the \code{normFunc} argument. For this reason, you may need
-#'   to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. If
-#'   normalization concentrations are specified then the TIC normalized intensities are divided by the normalization
-#'   concentration.
+#'   to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. The
+#'   TIC normalized intensities are finally divided by the normalization concentration.
 #'
 #'   \item \code{featNorm="conc"} Simply divides all intensities (areas) with the normalization concentration defined
 #'   for the sample.
@@ -1180,9 +1182,9 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'
 #'   }
 #'
-#'   The meaning of the normalization concentration differs for each method: for \code{"istd"} it is used to normalize
-#'   different IS concentrations, whereas for \code{"tic"} and \code{"conc"} it is used to normalize different sample
-#'   amounts (\emph{e.g.} injection volume).
+#'   The meaning of the normalization concentration differs for each method: for \code{"istd"} it resembles the IS
+#'   concentration of a sample analysis, whereas for \code{"tic"} and \code{"conc"} it is used to normalize different
+#'   sample amounts (\emph{e.g.} injection volume).
 #'
 #'   If \code{groupNorm=TRUE} then feature intensities (areas) will be normalized by the combined values for its feature
 #'   group (again, combination occurs with \code{normFunc}). This \emph{group normalization} always occurs \emph{after}
@@ -1217,9 +1219,13 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         return(fGroups)
     
     anaInfo <- analysisInfo(fGroups)
-    hasIConcs <- !is.null(anaInfo[["norm_conc"]])
-    if (!hasIConcs && featNorm %in% c("istd", "conc"))
-        stop("No internal standard concentrations defined: no norm_conc column in analysis information", call. = FALSE)
+    
+    normConcs <- anaInfo[["norm_conc"]]
+    if (is.null(normConcs))
+    {
+        printf("NOTE: No normalization concentrations defined (norm_conc column is absent in analysis information). Defaulting to 1.\n")
+        normConcs <- rep(1, nrow(anaInfo))
+    }
     
     # reset
     fGroups@ISTDs <- data.table()
@@ -1235,7 +1241,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         
         # only keep hits that are present in the analyses with non-NA conc
         fGroupsWithISTD <- fGroups[, fGroups@ISTDs$group]
-        fGroupsWithISTD <- fGroupsWithISTD[!is.na(anaInfo$norm_conc)]
+        fGroupsWithISTD <- fGroupsWithISTD[!is.na(normConcs) & normConcs != 0]
         fGroupsWithISTD <- minAnalysesFilter(fGroupsWithISTD, relThreshold = 1, verbose = FALSE)
         
         fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
@@ -1260,23 +1266,23 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% fGroups@ISTDs$group]
         
-        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$norm_conc, f = function(ft, iconc)
+        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
             
-            if (is.na(iconc))
+            if (is.na(nconc) || nconc == 0)
                 ft[, c("intensity_rel", "area_rel") := 0]
             else
             {
                 ft[group %in% names(fGroups@ISTDAssignments), intensity_rel := mapply(intensity, group, FUN = function(int, grp)
                 {
                     iint <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$intensity)
-                    return(int / (iint / iconc))
+                    return(int / (iint / nconc))
                 })]
                 ft[group %in% names(fGroups@ISTDAssignments), area_rel := mapply(area, group, FUN = function(ar, grp)
                 {
                     iar <- normFunc(ft[group %in% fGroups@ISTDAssignments[[grp]]]$area)
-                    return(ar / (iar / iconc))
+                    return(ar / (iar / nconc))
                 })]
                 # HACK: don't want NA values
                 ft[is.na(intensity_rel), c("intensity_rel", "area_rel") := 0]
@@ -1286,13 +1292,12 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else if (featNorm == "tic")
     {
-        iconcs <- if (hasIConcs) anaInfo$norm_conc else rep(1, nrow(anaInfo))
-        fGroups@features@features <- Map(featureTable(fGroups), iconcs, f = function(ft, iconc)
+        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
-            nint <- normFunc(ft$intensity) * iconc
-            narea <- normFunc(ft$area) * iconc
-            if (is.na(iconc) || nint == 0)
+            nint <- normFunc(ft$intensity) * nconc
+            narea <- normFunc(ft$area) * nconc
+            if (is.na(nconc) || nconc == 0 || nint == 0)
                 ft[, c("intensity_rel", "area_rel") := 0]
             else
                 ft[, c("intensity_rel", "area_rel") := .(intensity / nint, area / narea)]
@@ -1301,13 +1306,13 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else if (featNorm == "conc")
     {
-        fGroups@features@features <- Map(featureTable(fGroups), anaInfo$norm_conc, f = function(ft, iconc)
+        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
-            if (is.na(iconc))
+            if (is.na(nconc) || nconc == 0)
                 ft[, c("intensity_rel", "area_rel") := 0]
             else
-                ft[, c("intensity_rel", "area_rel") := .(intensity / iconc, area / iconc)]
+                ft[, c("intensity_rel", "area_rel") := .(intensity / nconc, area / nconc)]
             return(ft)
         })
     }

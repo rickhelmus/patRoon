@@ -16,11 +16,6 @@
         - and then switch CI back
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
-        - make norm_conc always optional 
-            - warn for conc if absent
-            - set to 1 if absent
-            - don't call it IS conc when reporting errors
-            - update ref docs
 
 
 ## TPs

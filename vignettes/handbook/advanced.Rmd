@@ -75,7 +75,7 @@ generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                      norm_concs = c(NA, NA, NA, 2, 2, 1))
 ```
 
-The normalization concentration does not need to be an absolute value. In the end, what matters are the relative numbers between the sample analyses. For example, if the concentrations for two analyses are `c(1, 2)` or `c(1.5, 3.0)` the normalization occurs the same. Setting the concentration to `NA` will skip normalization for an analysis. If the normalization concentration is absent from the analysis information it will be defaulted to `1`.
+The normalization concentration does not need to be an absolute value. In the end, what matters are the relative numbers between the sample analyses. For example, if the concentrations for two analyses are `c(1, 2)` or `c(1.5, 3.0)` the normalization occurs the same. Setting the concentration to `NA` (or `0`) will skip normalization for an analysis. If the normalization concentration is absent from the analysis information it will be defaulted to `1`.
 
 #### Internal standard normalization
 

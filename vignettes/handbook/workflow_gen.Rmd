@@ -333,7 +333,7 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
 fGroupsSusp <- screenSuspects(fGroups, suspects)
 ```
 
-#### Suspect list format
+#### Suspect list format {#suspFormat}
 
 The example above has a very simple suspect list with just three compounds. The format of the suspect list is quite flexible, and can contain the following columns:
 
@@ -553,7 +553,7 @@ Argument                                      | Algorithm   | Default          |
 --------------------------------------------- | ----------- | ---------------- | ----------------------------------------------
 `method`                                      | All         | `"complete"`     | Clustering method. See `?hclust`
 `metric`                                      | `intclust`  | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
-`normFunc`                                    | `intclust`  | `max`            | Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.
+`normalized                                   | `intclust`  | `TRUE`           | Whether normalized feature intensities should be used. Detailed [here](#fNorm).
 `average`                                     | `intclust`  | `TRUE`           | Whether intensities of replicates should first be averaged.
 `MSPeakLists`                                 | `specclust` | -                | The [MS peak lists] object used for spectral similarity calculations
 `specSimParams`                               | `specclust` | `getDefSpecSimParams()` | Parameters used for [spectral similarity calculation](#specSim).

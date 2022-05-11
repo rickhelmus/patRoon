@@ -35,6 +35,19 @@ if (runData)
     fGroupsRG <- groupFeatures(fListRG, "openms")
     fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
     
+    anaInfoNorm <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                        groups = c(rep("solvent", 3), rep("standard", 3)),
+                                        blanks = "solvent",
+                                        norm_concs = c(NA, NA, NA, 2, 2, 1))
+    fListNorm <- getFeats(anaInfoNorm)
+    fGroupsNorm <- groupFeatures(fListNorm, "openms")
+    fGroupsNorm <- filter(fGroupsNorm, preAbsMinIntensity = 100, absMinIntensity = 10000,
+                          relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                          blankThreshold = 5, removeBlanks = TRUE,
+                          retentionRange = c(120, Inf), mzRange = NULL)
+    fGroupsNorm <- normInts(fGroupsNorm, featNorm = "istd", standards = patRoonData::ISTDListPos, adduct = "[M+H]+",
+                            ISTDRTWindow = 20, ISTDMZWindow = 200, minISTDs = 2)
+                                        
     anaInfoConc <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                         groups = c(rep("solvent", 3), rep("standard", 3)),
                                         blanks = "solvent",
@@ -94,7 +107,7 @@ if (runData)
     componTP <- generateComponents(fGroupsTPs, "tp", TPs = TPsBT)
     
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
-                 fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
+                 fGroupsRG = fGroupsRG, fGroupsNorm = fGroupsNorm, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
                  ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,

@@ -16,6 +16,11 @@
         - and then switch CI back
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
+        - make norm_conc always optional 
+            - warn for conc if absent
+            - set to 1 if absent
+            - don't call it IS conc when reporting errors
+            - update ref docs
 
 
 ## TPs
@@ -65,13 +70,12 @@
 
 - TPs
     - consensus: flattens hierarchy (and other specifics?)
-- Features
-    - Update handbook for normFunc --> normalized
 - mslibrary
     - generateCompoundsLibrary()
         - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
     - Describe prepareChemTable() and add links in loadMSLibrary(), screenSuspects() etc
     - Handbook (and refs): update that libraryMatch is also used for ID level estimation
+    - Handbook/refs: update notes on when OpenBabel is needed
         
 
 ## NEWS

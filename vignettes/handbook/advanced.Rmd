@@ -40,6 +40,112 @@ formulas <- generateFormulas(..., adduct = "[M-H]-") # same as above
 
 More details can be found in the reference manual (`?adduct` and ``?`adduct-utils` ``).
 
+## Feature intensity normalization {#fNorm}
+
+Feature intensities are often compared between sample analyses, for instance, to evaluate trends between sample points. However, matrix effects, varying detector sensitivity and differences in analysed sample amount may complicate such comparison. For this reason, it may be desired to _normalize_ the feature intensities.
+
+The `normInts()` function is used to normalize feature intensities (peak heights and areas). Two different types are supported:
+
+1. **Feature normalization**: normalization occurs by intensities within the same sample analysis
+2. **Group normalization**: normalization occurs by intensities among features within the same group
+
+Both normalization types can be combined.
+
+### Feature normalization
+
+Feature normalization itself supports the following normalization methods:
+
+Method             | Usage                              | Description
+------------------ | ---------------------------------- | --------------------------------------------------
+TIC                | `normInts(featNorm = "tic", ...)`  | Normalizes by the combined intensity of all features, also known as the Total Ion Current (TIC).
+Internal Standard  | `normInts(featNorm = "istd", ...)` | Uses internal standards (IS) to normalize feature intensities.
+Concentration      | `normInts(featNorm = "conc", ...)` | Normalizes feature intensities of a sample analysis by its _normalization concentration_ (explained below).
+None               | `normInts(featNorm = "none", ...)` | Performs no feature normalization. Set this if you only want to perform group normalization (discussed in the next section). 
+
+#### Normalization concetration
+
+All methods (except `"none"`) are influenced by the _normalization concentration_, which is a property set for each sample analysis. For IS normalization, this should equal the concentration of the IS present in the sample. Otherwise the normalization concentration resembles the injected sample amount. The normalization concentration is defined in the `norm_conc` column of the [analysis information](#anaInfo). For example:
+
+```{r eval=runData}
+# obtain analysis information as usual, but add normalization concentrations.
+# The blanks are set to NA, and will therefore not be normalized.
+generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                     groups = c(rep("solvent", 3), rep("standard", 3)),
+                     blanks = "solvent",
+                     norm_concs = c(NA, NA, NA, 2, 2, 1))
+```
+
+The normalization concentration does not need to be an absolute value. In the end, what matters are the relative numbers between the sample analyses. For example, if the concentrations for two analyses are `c(1, 2)` or `c(1.5, 3.0)` the normalization occurs the same. Setting the concentration to `NA` will skip normalization for an analysis. If the normalization concentration is absent from the analysis information it will be defaulted to `1`.
+
+#### Internal standard normalization
+
+For IS normalization an internal standard list should be specified with the properties of the internal standards. Essentially, the format of this list is exactly the same as a [suspect list](#suspFormat). Example lists can be found in the `patRoonData` package:
+
+```{r eval=TRUE}
+patRoonData::ISTDListPos[1:5, ]
+```
+
+As can be seen from above, labelled isotopes can be specified with square brackets, _e.g._ [2H] for deuterium.
+
+The next step is to perform the normalization with `normInts()`:
+
+```{r eval=FALSE}
+fGroupsNorm <- normInts(fGroups, featNorm = "istd", standards = patRoonData::ISTDListPos, adduct = "[M+H]+",
+                        ISTDRTWindow = 20, ISTDMZWindow = 200, minISTDs = 2)
+```
+
+This will do the following:
+
+* Perform a [suspect screening](#suspscr) to find the specified IS (`standards` argument).
+* Remove the IS candidates which are absent in one or more of the analyses to be normalized.
+* Select IS candidates for each feature group, based on close retention time (`ISTDRTWindow` argument), _m/z_ (`ISTDMZWindow` argument) and a minimum number (`minISTDs`). If the number of IS candidates within specified retention time and _m/z_ windows is below `minISTDs`, the close(st) candidate(s) outside these windows are additionally chosen.
+* Normalization of features is performed with the combined IS intensities.
+
+To evaluate the assignments for a particular feature group, the `internalStandardAssignments()` function and `plotGraph()` functions can be used:
+
+```{r eval=runData}
+fg <- names(fGroupsNorm)[2]
+internalStandardAssignments(fGroupsNorm)[[fg]] # IS assignments for 2nd feature group
+plotGraph(fGroupsNorm) # interactively explore assignments
+```
+
+#### Other methods
+
+Like IS normalization, other feature normalization methods also occurs with `normInts()`:
+
+```{r eval=FALSE}
+fGroupsNorm <- normInts(fGroups, featNorm = "tic") # TIC normalization
+fGroupsNorm <- normInts(fGroups, featNorm = "conc") # Concentration normalization
+```
+
+### Group normalization
+
+Normalizing feature intensities among group member is easily performed by setting `groupNorm=TRUE`:
+
+```{r eval=FALSE}
+# only perform group normalization
+fGroupsNorm <- normInts(fGroups, featNorm = "none", groupNorm = TRUE)
+# first perform TIC feature normalization and then group normalization
+fGroupsNorm <- normInts(fGroups, featNorm = "tic", groupNorm = TRUE)
+```
+
+### Using normalized intensities
+
+The normalized intensity (peak heigh/area) values can easily be obtained with `as.data.table()`:
+
+```{r normTab,eval=runData}
+as.data.table(fGroupsNorm, normalized = TRUE)[1:5]
+# can be combined with other parameters
+as.data.table(fGroupsNorm, normalized = TRUE, average = TRUE, areas = TRUE)[1:5]
+# feature values (no need to set normalized=TRUE)
+as.data.table(fGroupsNorm, features = TRUE)[1:5, .(group, analysis, intensity_rel, area_rel)]
+```
+Several other `patRoon` functions also accept the `normalized` argument to use normalized data, such as `plotInt()` ([discussed here](#vis_feat_ann)), `plotVolcano()` ([discussed here](#FCCalc)) and `generateComponents()` with intensity clustering ([discussed here](#compClust)).
+
+### Default normalization
+
+If normalized data is requested (`normalized=TRUE`, see previous section) and `normInts()` was _not_ called on the feature group data, a _default normalization_ will occur. This is nothing more than a group normalization (`normInts(groupNorm=TRUE, ...)`), and was mainly implemented to ensure backwards compatibility with previous `patRoon` versions. 
+
 ## Feature parameter optimization {#fOpt}
 
 Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent [Isotopologue Parameter Optimization (IPO)](IPO) `R` package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.

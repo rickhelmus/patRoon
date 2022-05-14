@@ -145,7 +145,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         
         if (calcLogP != "none")
         {
-            ph <- makeHash(parents)
+            ph <- makeHash(parents, calcLogP)
             cd <- loadCacheData("TPsCTSLogP", ph, cacheDB)
             if (is.null(cd))
             {
@@ -161,7 +161,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, fpType, fpSimMethod)
+        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, preferCalcDescriptors,
+                             calcLogP, calcSims, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))

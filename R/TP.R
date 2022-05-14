@@ -123,7 +123,7 @@ setMethod("convertToSuspects", "transformationProducts", function(obj, includePa
     
     keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
     prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
-    prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE)
+    prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE, FALSE, FALSE)
     
     if (includeParents)
         prodAll <- rbind(parents(obj), prodAll, fill = TRUE)

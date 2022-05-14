@@ -1,7 +1,8 @@
-getTPParents <- function(parents, skipInvalid)
+getTPParents <- function(parents, skipInvalid, preferCalcDescriptors)
 {
     if (is.data.frame(parents))
-        parents <- prepareSuspectList(parents, NULL, skipInvalid, calcMZs = FALSE)
+        parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
+                                      preferCalcDescriptors = preferCalcDescriptors, calcMZs = FALSE)
     else if (inherits(parents, "compounds"))
     {
         compTab <- as.data.table(parents)
@@ -10,7 +11,8 @@ getTPParents <- function(parents, skipInvalid)
         else
             setnames(compTab, "identifier", "name")
         parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
-        parents <- prepareSuspectList(parents, NULL, skipInvalid, calcMZs = FALSE)
+        parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = FALSE,
+                                      preferCalcDescriptors = preferCalcDescriptors, calcMZs = FALSE)
     }
     else # suspect screening
     {

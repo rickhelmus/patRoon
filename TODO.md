@@ -49,6 +49,7 @@
     - sanitizeMSLibrary(): converts formula ion species format twice?
     - More printing for show(): number of spectra, annotations
     - convertToSuspects(): caching
+    - convertToSuspects: check if suspect list has InChIKey column
 - compounds
     - show mirror spectrum in report?
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra

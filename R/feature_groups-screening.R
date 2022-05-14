@@ -537,8 +537,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #' @rdname suspect-screening
 #' @aliases screenSuspects
 #' @export
-setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
-                                                      adduct, skipInvalid, onlyHits)
+setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid,
+                                                      preferCalcDescriptors, onlyHits)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
 
@@ -548,16 +548,17 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(onlyHits, add = ac)
+    aapply(checkmate::assertFlag, . ~ skipInvalid + preferCalcDescriptors + onlyHits, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct, fGroups)
     
     # do this before checking cache to ensure proper errors/warnings are thrown!
-    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
+    suspects <- prepareSuspectList(suspects, adduct, skipInvalid, checkDesc = TRUE,
+                                   preferCalcDescriptors = preferCalcDescriptors)
     
-    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, preferCalcDescriptors, onlyHits)
     cd <- loadCacheData("screenSuspects", hash)
     if (!is.null(cd))
         return(cd)

@@ -224,12 +224,13 @@ calculateLogP <- function(SMILES, method, mustWork)
     return(ret)
 }
 
-prepareChemTable <- function(chemData, verbose = TRUE)
+prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
 {
     if (verbose)
         printf("Calculating/Validating chemical data... ")
     
     chemData <- copy(chemData)
+    smp <- rcdk::get.smiles.parser() # get re-usable instance, which per rcdk docs is faster
     
     # add missing input columns to simplify things a bit
     # trim white space to improve input data
@@ -247,43 +248,52 @@ prepareChemTable <- function(chemData, verbose = TRUE)
     # clear input data that couldn't be converted: it's probably invalid
     chemData[is.na(convertedInChIs$result), SMILES := NA_character_]
     chemData[is.na(convertedSMILES$result), InChI := NA_character_]
-    
-    # prefer calculated SMILES/InChIs/InChIKeys where possible
-    chemData[, SMILES := fifelse(!is.na(convertedSMILES$result), convertedSMILES$result, SMILES)]
-    chemData[, InChI := fifelse(!is.na(convertedInChIs$result), convertedInChIs$result, InChI)]
-    chemData[!is.na(InChI), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
-    
+
     # clear invalid InChIKeys
     chemData[!is.na(InChIKey) & !grepl("^[[:upper:]]{14}\\-[[:upper:]]{10}\\-[[:upper:]]{1}$", InChIKey),
              InChIKey := NA_character_]
     
-    # prefer calculated formulas
     # NOTE: for formula calculation, both RCDK and OpenBabel cannot output formulas with isotopes. However, OpenBabel
     # does output deuterium as D.
     # --> For now don't consider any formulae from isotope labeled SMILES, unless the isotopes are just deuterium
     convForms <- fifelse(!is.na(convertedSMILES$formula), convertedSMILES$formula, convertedInChIs$formula)
     isSMIOKForFormula <- !is.na(chemData$SMILES) &
         !grepl("\\[[[:digit:]]+[[:upper:]]{1}[[:lower:]]*\\]", gsub("[2H]", "", chemData$SMILES, fixed = TRUE))
-    chemData[, formula := fifelse(!is.na(convForms) & isSMIOKForFormula, convForms, formula)]
     
-    # Prefer calculated masses if SMILES are available it's faster to use those for calculating the neutral mass.
+    if (preferCalcDescriptors)
+    {
+        chemData[, SMILES := fifelse(!is.na(convertedSMILES$result), convertedSMILES$result, SMILES)]
+        chemData[, InChI := fifelse(!is.na(convertedInChIs$result), convertedInChIs$result, InChI)]
+        chemData[!is.na(InChI), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
+        takeConvertedFormula <- !is.na(convForms) & isSMIOKForFormula
+    }
+    else
+    {
+        chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
+        chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
+        chemData[!is.na(InChI) & is.na(InChIKey), InChIKey := babelConvert(InChI, "inchi", "inchikey",
+                                                                           mustWork = FALSE)]
+        takeConvertedFormula <- is.na(chemData$formula) & !is.na(convForms) & isSMIOKForFormula
+    }
+    
+    chemData[, formula := fifelse(takeConvertedFormula, convForms, formula)]
+    
     # NOTE: use by to avoid duplicated calculations.
-    # NOTE: if a formula is available and it was _not_ calculated then the neutral mass is obtained in the next block,
-    # which is more efficient as there both the formula and neutral mass are calculated.
+    # NOTE: For neutral mass calculation prefer SMILES over formulae as it's faster.
+    # NOTE: However, for formulae that were not calculated and therefore need to be validated, the neutral mass is taken
+    # from the formulae since rcdk::get.formula returns both.
     
-    smp <- rcdk::get.smiles.parser() # get re-usable instance, which per rcdk docs is faster
-    # Get neutral mass for candidates with calculated formulas or without formula but with available SMILES (e.g.
-    # isotope labeled compounds).
-    chemData[isSMIOKForFormula | (is.na(formula) & !is.na(SMILES)), neutralMass := {
+    # Get neutral mass from SMILES: only consider if formula was calculated (thus not verified below) or unavailable.
+    chemData[(preferCalcDescriptors | is.na(neutralMass)) & (takeConvertedFormula | (is.na(formula) & !is.na(SMILES))), neutralMass := {
         ret <- tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
                         error = function(...) NA_real_)
         if (is.na(ret) && !is.na(formula[1])) # failed, try from formula
             ret <- tryCatch(getFormulaMass(formula[1]), error = function(...) NA_real_)
         ret
     }, by = "SMILES"]
-        
+    
     # for non-calculated formulae: set to NA if invalid or normalize the format and get the neutralMass
-    chemData[!is.na(formula) & !isSMIOKForFormula, c("formula", "neutralMass") := {
+    chemData[!is.na(formula) & !takeConvertedFormula, c("formula", "neutralMassCalc") := {
         form <- tryCatch(rcdk::get.formula(formula[1]), error = function(...) NULL)
         if (is.null(form))
             list(NA_character_, NA_real_)
@@ -291,8 +301,11 @@ prepareChemTable <- function(chemData, verbose = TRUE)
             list(form@string, form@mass)
     }, by = "formula"]
     
+    chemData[!is.na(neutralMassCalc) & (preferCalcDescriptors | is.na(neutralMass)), neutralMass := neutralMassCalc]
+    chemData[, neutralMassCalc := NULL]
+    
     if (verbose)
         printf("Done!\n")
     
-    return(chemData)
+    return(chemData[])
 }

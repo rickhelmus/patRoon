@@ -309,14 +309,14 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
                                                                                           minIntensityPost = 2,
                                                                                           topMost = 10),
-                                                     collapse = TRUE, suspects = NULL)
+                                                     collapse = TRUE, suspects = NULL, preferCalcDescriptors = TRUE)
 {
     adduct <- checkAndToAdduct(adduct)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgSpecParams, add = ac)
-    checkmate::assertFlag(collapse, add = ac)
+    aapply(checkmate::assertFlag, . ~ preferCalcDescriptors + collapse, fixed = list(add = ac))
     if (!is.null(suspects))
         assertSuspectList(suspects, FALSE, FALSE, add = ac)
     checkmate::reportAssertions(ac)
@@ -353,7 +353,9 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     if (!is.null(suspects))
     {
         ret <- if (is.data.table(suspects)) copy(suspects) else as.data.table(suspects)
-        ret <- prepareSuspectList(ret, NULL, FALSE, calcMZs = FALSE)
+        # checkDesc = TRUE: we want to be able to calculate InChIKey1 values
+        ret <- prepareSuspectList(ret, NULL, FALSE, checkDesc = TRUE, preferCalcDescriptors = preferCalcDescriptors,
+                                  calcMZs = FALSE)
         ret[, InChIKey1 := getIKBlock1(InChIKey)]
         
         if (any(is.na(ret$InChIKey1)))
@@ -413,7 +415,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         mapCols <- mapCols[names(mapCols) %in% names(ret)]
         setnames(ret, names(mapCols), mapCols)
         ret <- ret[, mapCols, with = FALSE]
-        ret <- prepareSuspectList(ret, NULL, FALSE, FALSE)
+        ret <- prepareSuspectList(ret, NULL, FALSE, FALSE, FALSE, FALSE)
     }
     
     return(ret[])

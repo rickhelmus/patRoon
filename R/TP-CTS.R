@@ -47,7 +47,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
     
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
-    ret <- prepareChemTable(ret, verbose = FALSE)
+    ret <- prepareChemTable(ret, preferCalcDescriptors = FALSE, verbose = FALSE)
     
     if (calcLogP != "none")
     {
@@ -111,8 +111,8 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
 #'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
-                           calcLogP = "rcdk", calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
-                           parallel = TRUE)
+                           preferCalcDescriptors = TRUE, calcLogP = "rcdk", calcSims = FALSE, fpType = "extended",
+                           fpSimMethod = "tanimoto", parallel = TRUE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -130,12 +130,12 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_abioticreduction_hydrolysis", 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims + parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + preferCalcDescriptors + calcSims + parallel, fixed = list(add = ac))
     checkmate::assertChoice(calcLogP, c("rcdk", "obabel", "none"), add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    parents <- getTPParents(parents, skipInvalid)
+    parents <- getTPParents(parents, skipInvalid, preferCalcDescriptors)
     
     if (nrow(parents) == 0)
         results <- list()

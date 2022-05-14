@@ -57,8 +57,8 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @export
 generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1, skipInvalid = TRUE,
-                               matchParentsBy = "InChIKey", calcSims = FALSE, fpType = "extended",
-                               fpSimMethod = "tanimoto")
+                               preferCalcDescriptors = TRUE, matchParentsBy = "InChIKey", calcSims = FALSE,
+                               fpType = "extended", fpSimMethod = "tanimoto")
 {
     # UNDONE: default match by IK or IK1?
     
@@ -84,12 +84,13 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + calcSims, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + preferCalcDescriptors + calcSims, fixed = list(add = ac))
     checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, matchParentsBy, calcSims, fpType, fpSimMethod)
+    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, preferCalcDescriptors, matchParentsBy, calcSims,
+                     fpType, fpSimMethod)
     cd <- loadCacheData("TPsLib", hash)
     if (!is.null(cd))
         return(cd)
@@ -123,7 +124,7 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
 
     if (!is.null(parents))
     {
-        parents <- getTPParents(parents, skipInvalid)
+        parents <- getTPParents(parents, skipInvalid, preferCalcDescriptors)
         
         # match with library
         if (matchParentsBy == "InChIKey1")

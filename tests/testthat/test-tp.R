@@ -196,7 +196,7 @@ test_that("consensus works", {
 })
 
 test_that("plotting works", {
-    expect_HTML(plotGraph(TPsLibScr[1]))
+    expect_HTML(plotGraph(TPsLibScr, which = 1))
     
     expect_doppel("venn", function() plotVenn(TPsLibScr, TPsBTScr))
     expect_error(plotVenn(TPsLibEmpty, TPsBTEmpty))
@@ -313,7 +313,7 @@ if (doMetFrag)
 
 test_that("TP component usage", {
     expect_HTML(plotGraph(componTPsLogic, onlyLinked = FALSE))
-    expect_HTML(plotGraph(TPsLibSusp[componentInfo(componTPsLib)$parent_name[1]], components = componTPsLib))
+    expect_HTML(plotGraph(TPsLibSusp, which = componentInfo(componTPsLib)$parent_name[1], components = componTPsLib))
     
     expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetF)[, -"size"])

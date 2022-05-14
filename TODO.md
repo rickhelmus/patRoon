@@ -70,7 +70,7 @@
     - Describe prepareChemTable() and add links in loadMSLibrary(), screenSuspects() etc
     - Handbook (and refs): update that libraryMatch is also used for ID level estimation
     - Handbook/refs: update notes on when OpenBabel is needed
-        
+    - preferCalcDescriptors
 
 ## NEWS
 

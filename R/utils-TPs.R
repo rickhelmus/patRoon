@@ -10,7 +10,8 @@ getTPParents <- function(parents, skipInvalid, preferCalcDescriptors)
             compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
         else
             setnames(compTab, "identifier", "name")
-        parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey"), with = FALSE]
+        parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey", "neutral_formula", "neutralMass"), with = FALSE]
+        setnames(parents, "neutral_formula", "formula")
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = FALSE,
                                       preferCalcDescriptors = preferCalcDescriptors, calcMZs = FALSE)
     }

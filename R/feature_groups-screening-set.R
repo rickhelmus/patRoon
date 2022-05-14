@@ -366,7 +366,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                         adduct, skipInvalid, onlyHits)
+                                                         adduct, skipInvalid, preferCalcDescriptors, onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -375,7 +375,9 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
-                                                         adduct = NULL, skipInvalid = skipInvalid, onlyHits = onlyHits))
+                                                         adduct = NULL, skipInvalid = skipInvalid,
+                                                         preferCalcDescriptors = preferCalcDescriptors,
+                                                         onlyHits = onlyHits))
     
     scr <- mergeScreeningSetInfos(setObjects)
     if (onlyHits)
@@ -395,11 +397,13 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                                  adduct, skipInvalid, onlyHits, amend = FALSE)
+                                                                  adduct, skipInvalid, preferCalcDescriptors,
+                                                                  onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, preferCalcDescriptors,
+                                      onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

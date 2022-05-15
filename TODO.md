@@ -58,6 +58,8 @@
 - prepareChemTable(): more status messages/progress bars?
 - merge --> consensus? or c()?
 - other generic name for spectra()?
+- Links in reportHTML()
+- newProject() for library compounds
 
 
 ## Docs
@@ -121,6 +123,7 @@
 - Fixed: newProject(): loading analysis info from CSV now works on Windows
 - norm_concs argument to generateAnalysisInfo()
 - prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
+    - neutral mass calculation _slightly_ different results
 - MP: more workarounds to handle NA exit codes on Linux
 - Fixed: reportHTML(): improve handling of missing or split IDs when generating compound DB links
 

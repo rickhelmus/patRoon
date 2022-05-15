@@ -95,23 +95,32 @@ makeDBIdentLink <- function(db, ident)
 {
     ident <- as.character(ident)
     
-    if (is.na(ident) || !nzchar(ident))
+    if (length(ident) == 0)
         return(character())
     
     # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
     # set consensus results can also merge multiple identifiers
-    idlist <- unlist(strsplit(ident, ";| "))
+    idlist <- strsplit(ident, ";| ")
     
     if (grepl("pubchem", tolower(db)))
         fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
     else if (tolower(db) == "chemspider")
         fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
-    else if (startsWith(idlist[1], "DTX"))
+    else if (startsWith(idlist[[1]], "DTX"))
         fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
     else
-        return(paste0(idlist, collapse = "; "))
+        fmt <- NULL
+
+    ret <- character(length(ident))
+    NAIdent <- is.na(ident) | !nzchar(ident)
+    ret[NAIdent] <- NA_character_
+    ret[!NAIdent] <- sapply(idlist[!NAIdent], function(id) {
+        if (!is.null(fmt))
+            id <- sprintf(fmt, id, id)
+        return(paste0(id, collapse = "; "))
+    })
     
-    return(paste0(sprintf(fmt, idlist, idlist), collapse = "; "))
+    return(ret)
 }
 
 getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)

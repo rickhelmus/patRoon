@@ -122,6 +122,7 @@
 - norm_concs argument to generateAnalysisInfo()
 - prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
 - MP: more workarounds to handle NA exit codes on Linux
+- Fixed: reportHTML(): improve handling of missing or split IDs when generating compound DB links
 
 
 # Lower priority

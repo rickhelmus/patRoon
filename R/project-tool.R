@@ -505,6 +505,18 @@ getScriptCode <- function(input, analyses)
         
         if (nzchar(input$compIdent))
         {
+            addNL()
+            
+            if (input$compIdent == "Library")
+            {
+                addComment("Load MS library. You may want to filter it, please see the manuals for more details.")
+                addCall("mslibrary", "loadMSLibrary", list(
+                    list(value = input$MSLibraryPath, quote = TRUE),
+                    list(value = input$MSLibraryFormat, quote = TRUE),
+                    list(name = "absMzDev", value = 0.002)
+                ))
+            }
+            
             doTPDB <- input$compIdent == "MetFrag" && input$doTPs && input$TPGen != "Logic" && input$TPDoMFDB
             if (doTPDB)
                 addCall(NULL, "convertToMFDB", list(
@@ -512,7 +524,6 @@ getScriptCode <- function(input, analyses)
                     list(value = "TP-database.csv", quote = TRUE),
                     list(name = "includeParents", value = TRUE)))
             
-            addNL()
             addComment("Calculate compound structure candidates")
             addCall("compounds", "generateCompounds", list(
                 list(value = "fGroups"),
@@ -530,6 +541,10 @@ getScriptCode <- function(input, analyses)
                 list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$compIdent == "SIRIUS"),
+                list(name = "MSLibrary", value = "mslibrary", condition = input$compIdent == "Library"),
+                list(name = "minSim", value = 0.75, condition = input$compIdent == "Library"),
+                list(name = "absMzDev", value = 0.002, condition = input$compIdent == "Library"),
+                list(name = "specSimParams", value = "getDefSpecSimParams()", condition = input$compIdent == "Library"),
                 list(name = "setThresholdAnn", value = 0, condition = input$ionization == "both")
             ))
             if (input$compIdent == "MetFrag")
@@ -1039,7 +1054,7 @@ getNewProjectUI <- function(destPath)
                                 textNote("DataAnalysis only works with features from DataAnalysis")
                             ),
                             selectInput("compIdent", "Compound identification",
-                                        c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag"),
+                                        c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
                                         multiple = FALSE, width = "100%")
                         ),
                         conditionalPanel(
@@ -1055,6 +1070,21 @@ getNewProjectUI <- function(destPath)
                                 conditionalPanel(
                                     condition = "input.peakListGen == \"mzR\" && !input.DIA",
                                     numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 4, width = "100%"),
+                                )
+                            )
+                        ),
+                        conditionalPanel(
+                            condition = "input.compIdent == \"Library\"",
+                            fillRow(
+                                height = 90,
+                                fillCol(
+                                    width = "95%",
+                                    selectInput("MSLibraryFormat", "Library format",
+                                                c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE)
+                                ),
+                                fillCol(
+                                    width = "95%",
+                                    fileSelect("MSLibraryPath", "MSLibraryPathButton", "MS library path")
                                 )
                             )
                         ),
@@ -1272,6 +1302,8 @@ newProject <- function(destPath = NULL)
                                                        file.path(input$destinationPath, input$scriptFile)),
                                                "Yes", "No"))
             {}
+            else if (input$compIdent == "Library" && !nzchar(input$MSLibraryPath))
+                rstudioapi::showDialog("No MS library", "Please select an MS library!", "")
             else if (input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "suspects" &&
                      !nzchar(input$TPSuspectList))
                 rstudioapi::showDialog("No parent suspect list", "Please select a parent suspect list!", "")
@@ -1439,6 +1471,12 @@ newProject <- function(destPath = NULL)
         })
         
         observeEvent(input$TPSuspButton, selectSuspList("TPSuspectList"))
+        
+        observeEvent(input$MSLibraryPathButton, {
+            MSFile <- rstudioapi::selectFile(path = "~/")
+            if (!is.null(MSFile))
+                updateTextInput(session, "MSLibraryPath", value = MSFile)
+        })
     }
 
     runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))

@@ -58,13 +58,13 @@
 - prepareChemTable(): more status messages/progress bars?
 - merge --> consensus? or c()?
 - other generic name for spectra()?
-- newProject() for library compounds
 
 
 ## Docs
 
 - TPs
     - consensus: flattens hierarchy (and other specifics?)
+    - TPs argument for reportHTML(): update Handbook examples, update refs etc
 - mslibrary
     - generateCompoundsLibrary()
         - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.

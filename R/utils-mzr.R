@@ -37,14 +37,6 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
     return(hd)
 }
 
-getEIC <- function(spectra, rtRange, mzRange, MSLevel = 1, precursor = NULL, precursorMzWindow = NULL)
-{
-    hd <- getSpectraHeader(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
-    return(data.table(time = hd$retentionTime,
-                      intensity = sapply(spectra$spectra[hd$seqNum],
-                                         function(s) sum(s[numGTE(mz, mzRange[1]) & numLTE(mz, mzRange[2]), intensity]))))
-}
-
 setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                                          onlyPresent)
 {

@@ -304,3 +304,25 @@ getFCParams <- function(rGroups, ...)
                 PVAdjFunc = function(pv) p.adjust(pv, "BH"))
     return(modifyList(def, list(...)))
 }
+
+#' Obtains extracted ion chromatograms (EICs)
+#'
+#' This function generates one or more EIC(s) for given retention time and \emph{m/z} ranges.
+#'
+#' @param file The file path to the sample analysis data file (\file{.mzXML} or \file{.mzML}).
+#' @param ranges A \code{data.frame} with \code{numeric} columns \code{"retmin"}, \code{"retmin"}, \code{"mzmin"},
+#'   \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
+#'
+#' @return A \code{list} with EIC data for each of the rows in \code{ranges}. 
+#'
+#' @export
+getEICs <- function(file, ranges)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(file, "r", add = ac)
+    checkmate::assertDataFrame(ranges, types = "numeric", any.missing = FALSE, add = ac)
+    assertHasNames(ranges, c("mzmin", "mzmax", "retmin", "retmax"))
+    checkmate::reportAssertions(ac)
+    
+    return(doGetEICs(file, as.data.table(ranges)))
+}

@@ -37,6 +37,31 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
     return(hd)
 }
 
+doGetEICs <- function(file, ranges, cacheDB = NULL)
+{
+    anaHash <- makeFileHash(file)
+    
+    # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
+    hashes <- ranges[, makeHash(anaHash, .SD), by = seq_len(nrow(ranges)),
+                     .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+    
+    EICs <- lapply(hashes, loadCacheData, category = "mzREIC", dbArg = cacheDB)
+    isNotCached <- sapply(EICs, is.null)
+    
+    if (any(isNotCached))
+    {
+        spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
+        rangesToDo <- ranges[isNotCached]
+        EICs[isNotCached] <- loadEICs(spectra, rangesToDo$retmin, rangesToDo$retmax,
+                                      rangesToDo$mzmin, rangesToDo$mzmax)
+        
+        for (i in which(isNotCached))
+            saveCacheData("mzREIC", EICs[[i]], hashes[i], cacheDB)
+    }
+    
+    return(EICs)
+}
+
 setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                                          onlyPresent)
 {
@@ -73,7 +98,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
     if (!is.null(topMost))
         topMost <- min(topMost, nrow(anaInfo))
     
-    EICInfo <- rbindlist(sapply(gNames, function(fg)
+    EICInfoTab <- sapply(gNames, function(fg)
     {
         if (!is.null(topMost))
         {
@@ -108,40 +133,18 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
         return(data.table(analysis = anaInfo$analysis[topAnalysesInd],
                           retmin = rtMins, retmax = rtMaxs,
                           mzmin = mzMins, mzmax = mzMaxs))
-    }, simplify = FALSE), idcol = "group")
+    }, simplify = FALSE)
     
     cacheDB <- openCacheDBScope()
-
-    EICs <- Map(anaInfo$analysis, anaInfo$path, f = function(ana, path)
-    {
-        EICInfoAna <- EICInfo[analysis == ana]
-        if (nrow(EICInfoAna) == 0)
-            return(NULL)
-        
-        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
-        anaHash <- makeFileHash(dfile)
-        
-        EICInfoAna[, hash := makeHash(anaHash, .SD), by = seq_len(nrow(EICInfoAna)),
-                   .SDcols = c("retmin", "retmax", "mzmin", "mzmax")]
-
-        gEICs <- pruneList(setNames(lapply(EICInfoAna$hash, loadCacheData, category = "mzREIC", dbArg = cacheDB),
-                                    EICInfoAna$group))
-
-        EICInfoAnaTODO <- EICInfoAna[!group %in% names(gEICs)]
-        if (nrow(EICInfoAnaTODO) > 0)
-        {
-            spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
-            eics <- setNames(loadEICs(spectra, EICInfoAnaTODO$retmin, EICInfoAnaTODO$retmax,
-                                      EICInfoAnaTODO$mzmin, EICInfoAnaTODO$mzmax), EICInfoAnaTODO$group)
-
-            for (i in seq_along(eics))
-                saveCacheData("mzREIC", eics[[i]], EICInfoAnaTODO$hash[i], cacheDB)
-            
-            gEICs <- c(gEICs, eics)
-        }
-
-        return(gEICs)
-    })
+    
+    EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
+    EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
+    anaInfoEICs <- anaInfo[anaInfo$analysis %in% names(EICInfo), ]
+    anaPaths <- mapply(anaInfoEICs$analysis, anaInfoEICs$path, FUN = getMzMLOrMzXMLAnalysisPath,
+                       MoreArgs = list(mustExist = TRUE))
+    
+    EICs <- Map(anaPaths, EICInfo, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
+    EICs <- Map(EICs, lapply(EICInfo, "[[", "group"), f = setNames)
     
     return(pruneList(EICs))
 })
@@ -203,31 +206,9 @@ setMethod("getEICsForFeatures", "features", function(features)
     verifyDataCentroided(anaInfo)
     
     cacheDB <- openCacheDBScope()
-    
-    EICs <- Map(anaInfo$analysis, anaInfo$path, fTable, f = function(ana, path, ft)
-    {
-        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
-        anaHash <- makeFileHash(dfile)
-        
-        hashes <- ft[, makeHash(anaHash, .SD), by = seq_len(nrow(ft)),
-                     .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
-        
-        fEICs <- lapply(hashes, loadCacheData, category = "mzREIC", dbArg = cacheDB)
-        isNotCached <- sapply(fEICs, is.null)
-        
-        if (any(isNotCached) > 0)
-        {
-            spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
-            ftTODO <- ft[isNotCached]
-            fEICs[isNotCached] <- loadEICs(spectra, ftTODO$retmin, ftTODO$retmax,
-                                           ftTODO$mzmin, ftTODO$mzmax)
-            
-            for (i in which(isNotCached))
-                saveCacheData("mzREIC", fEICs[[i]], hashes[i], cacheDB)
-        }
-        
-        return(fEICs)
-    })
+    anaPaths <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath,
+                       MoreArgs = list(mustExist = TRUE))
+    EICs <- Map(anaPaths, fTable, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
     
     return(pruneList(EICs))
 })

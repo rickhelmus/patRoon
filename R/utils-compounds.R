@@ -103,11 +103,16 @@ makeDBIdentLink <- function(db, ident)
     idlist <- strsplit(ident, ";| ")
     
     if (grepl("pubchem", tolower(db)))
-        fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
+        fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/{ id }\">{ id }</a>"
     else if (tolower(db) == "chemspider")
-        fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
-    else if (startsWith(idlist[[1]], "DTX"))
-        fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
+        fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q={ id }\">{ id }</a>"
+    else if (startsWith(idlist[[1]][1], "DTX"))
+        fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search={ id }\">{ id }</a>"
+    else if (tolower(db) == "library")
+        fmt <- paste0("{ id } (",
+                      "<a target=\"_blank\" href=\"https://massbank.eu/MassBank/RecordDisplay?id={ id }\">MB.eu</a>",
+                      " | ",
+                      "<a target=\"_blank\" href=\"https://mona.fiehnlab.ucdavis.edu/spectra/display/{ id }\">MoNA</a>)")
     else
         fmt <- NULL
 
@@ -116,7 +121,7 @@ makeDBIdentLink <- function(db, ident)
     ret[NAIdent] <- NA_character_
     ret[!NAIdent] <- sapply(idlist[!NAIdent], function(id) {
         if (!is.null(fmt))
-            id <- sprintf(fmt, id, id)
+            id <- glue::glue(fmt, id = id)
         return(paste0(id, collapse = "; "))
     })
     

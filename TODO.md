@@ -58,7 +58,6 @@
 - prepareChemTable(): more status messages/progress bars?
 - merge --> consensus? or c()?
 - other generic name for spectra()?
-- Links in reportHTML()
 - newProject() for library compounds
 
 

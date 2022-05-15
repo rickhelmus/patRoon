@@ -260,22 +260,18 @@ prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
     isSMIOKForFormula <- !is.na(chemData$SMILES) &
         !grepl("\\[[[:digit:]]+[[:upper:]]{1}[[:lower:]]*\\]", gsub("[2H]", "", chemData$SMILES, fixed = TRUE))
     
-    if (preferCalcDescriptors)
+    chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
+    chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
+    
+    takeConvertedIK <- !is.na(chemData$InChI)
+    takeConvertedFormula <- !is.na(convForms) & isSMIOKForFormula
+    if (!preferCalcDescriptors)
     {
-        chemData[, SMILES := fifelse(!is.na(convertedSMILES$result), convertedSMILES$result, SMILES)]
-        chemData[, InChI := fifelse(!is.na(convertedInChIs$result), convertedInChIs$result, InChI)]
-        chemData[!is.na(InChI), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
-        takeConvertedFormula <- !is.na(convForms) & isSMIOKForFormula
-    }
-    else
-    {
-        chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
-        chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
-        chemData[!is.na(InChI) & is.na(InChIKey), InChIKey := babelConvert(InChI, "inchi", "inchikey",
-                                                                           mustWork = FALSE)]
-        takeConvertedFormula <- is.na(chemData$formula) & !is.na(convForms) & isSMIOKForFormula
+        takeConvertedIK <- takeConvertedIK & is.na(chemData$InChIKey)
+        takeConvertedFormula <- takeConvertedFormula & is.na(chemData$formula)
     }
     
+    chemData[takeConvertedIK, InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
     chemData[, formula := fifelse(takeConvertedFormula, convForms, formula)]
     
     # NOTE: use by to avoid duplicated calculations.

@@ -322,8 +322,6 @@ fGroupsSIRIUS <- groupFeatures(anaInfo, "sirius") # find/group features with SIR
 
 ### Suspect screening {#suspscr}
 
-> **_NOTE_**: you may need to install [OpenBabel], for instance, when only InChI data is available for mass calculation.
-
 After features have been grouped a so called suspect screening step may be performed to find features that may correspond to suspects within a given suspect list. The `screenSuspects()` function is used for this purpose, for instance:
 
 
@@ -353,6 +351,8 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
 fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
 ```
 
+> **_NOTE_**: It is highly recommended to install [OpenBabel] to automatically validate and amend chemical properties such as SMILES, InChI, formulae etc in the suspect list.
+
 Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the `adduct` function argument to `screenSuspects` or by [feature group adduct annotations](#incorpAdductIso).
 
 Finally, when the adduct is known for a suspect it can be specified in the suspect list:
@@ -379,6 +379,7 @@ suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyq
                        fragments_formula = c("C6H6N", "C6H8N;C7H6NO", ""),
                        fragments_mz = c("", "", "118.0652"))
 ```
+
 
 #### Removing feature groups without hits
 

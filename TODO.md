@@ -3,6 +3,7 @@
 ## General
 
 - add showProgress option for future MP
+- ppm spectral averaging (Ricardo)
 
 
 ## Features

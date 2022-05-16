@@ -94,6 +94,8 @@ setMethod("$", "MSLibrary", function(x, name)
 #' @export
 setMethod("as.data.table", "MSLibrary", function(x)
 {
+    if (length(x) == 0)
+        return(records(x))
     allSpecs <- rbindlist(spectra(x), idcol = "DB_ID", fill = TRUE)
     return(merge(records(x), allSpecs, by = "DB_ID"))
 })
@@ -140,19 +142,20 @@ setMethod("delete", "MSLibrary", function(obj, i = NULL, j = NULL, ...)
     }
     else
     {
-        for (rec in i)
+        obj@spectra[i] <- Map(obj@spectra[i], i, f = function(sp, ind)
         {
             if (is.function(j))
             {
-                inds <- j(rec, obj@spectra[[rec]])
-                if (is.logical(inds))
-                    inds <- which(inds)
+                rm <- j(ind, sp)
+                if (is.logical(rm))
+                    return(sp[!rm])
+                return(sp[setdiff(seq_len(nrow(sp)), rm)])
             }
-            else # j = vector
-                inds <- j[j <= nrow(obj@spectra)]
-            if (length(inds) > 0)
-                obj@spectra[[rec]] <- obj@spectra[[rec]][-inds, , drop = FALSE]
-        }
+            
+            # j = vector
+            inds <- j[j <= nrow(sp)]
+            return(if (length(inds) > 0) sp[-inds] else sp)
+        })
         obj@spectra <- pruneList(obj@spectra, checkZeroRows = TRUE)
         obj@records <- obj@records[DB_ID %chin% names(obj@spectra)]
     }
@@ -234,10 +237,10 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
         {
             keep <- rep(TRUE, nrow(spec))
             if (!is.null(mzRangeSpec))
-                keep <- mark(spec[, "mz"] %inrange% mzRangeSpec)
+                keep <- mark(spec$mz %inrange% mzRangeSpec)
             if (!is.null(relMinIntensity))
             {
-                relInts <- spec[, "intensity"] / max(spec[, "intensity"])
+                relInts <- spec$intensity / max(spec$intensity)
                 keep <- keep & mark(numGTE(relInts, relMinIntensity))
             }
             return(!keep)
@@ -253,7 +256,7 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
             keep <- rep(TRUE, nrow(spec))
             if (nrow(spec) > topMost)
             {
-                ord <- order(spec[, "intensity"], decreasing = !negate)
+                ord <- order(spec$intensity, decreasing = !negate)
                 keep <- seq_len(nrow(spec)) %in% ord[seq_len(topMost)] # NOTE: keep order
             }
             return(!keep)

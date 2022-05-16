@@ -1,5 +1,7 @@
 testWithSets <- function() T # UNDONE: check environment variable or something
 
+getTestDataPathGeneric <- function() "test_data"
+
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
@@ -38,7 +40,8 @@ if (testWithSets())
     isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)
     
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp_sets", file, ...) else "test_temp_sets"
-    getTestDataPath <- function() "test_data_sets"
+    getTestDataPath <- function() paste0(getTestDataPathGeneric(), "_sets")
+    
     getTestAnaInfo <- function()
     {
         return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
@@ -117,7 +120,7 @@ if (testWithSets())
 } else
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
-    getTestDataPath <- function() "test_data"
+    getTestDataPath <- getTestDataPathGeneric
     getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
     getDAAnaInfo <- function(...)
     {

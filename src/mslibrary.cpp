@@ -58,6 +58,12 @@ void fixAnnFormula(std::string &form)
 
 Rcpp::List convertRecordsToRData(const std::vector<MSLibRecord> &records, const std::vector<std::string> &keys)
 {
+    if (records.empty())
+        return Rcpp::List::create(Rcpp::Named("records") = Rcpp::DataFrame(),
+                                  Rcpp::Named("spectraMZs") = Rcpp::List(),
+                                  Rcpp::Named("spectraInts") = Rcpp::List(),
+                                  Rcpp::Named("annotations") = Rcpp::List());
+    
     Rcpp::List recordsList(keys.size());
     recordsList.names() = Rcpp::wrap(std::vector<std::string>(keys.begin(), keys.end()));
     for (const std::string &k : keys)

@@ -23,6 +23,14 @@ sanitizeMSLibrary <- function(lib, prefCalcChemProps, potAdducts, potAdductsLib,
     printf("Done!\n")
     
     lib$spectra <- pruneList(lib$spectra, checkZeroRows = TRUE)
+
+    if (nrow(lib$records) == 0)
+    {
+        lib$spectra <- makeEmptyListNamed(lib$spectra)
+        lib$records <- data.table(DB_ID = character())
+        return(lib)
+    }
+
     lib$records <- lib$records[DB_ID %chin% names(lib$spectra)]
     
     # C++ code sets "NA" as string, convert to NA. Similarly, library may have 'n/a' markers...

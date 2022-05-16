@@ -106,6 +106,10 @@ if (runData)
     fGroupsTPs <- screenSuspects(fGroups, convertToSuspects(TPsBT, includeParents = TRUE), adduct = "[M+H]+", onlyHits = TRUE)
     componTP <- generateComponents(fGroupsTPs, "tp", TPs = TPsBT)
     
+    mslibraryMSP <- mslibrary <- loadMSLibrary(file.path(vignDir, "..", "tests", "testthat", "test_data",
+                                                         "MoNA-export-CASMI_2012.msp"), "msp")
+    mslibraryJSON <- loadMSLibrary(file.path(vignDir, "..", "tests", "testthat", "test_data", "MoNA-export-CASMI_2016.json"), "json")
+    
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
                  fGroupsRG = fGroupsRG, fGroupsNorm = fGroupsNorm, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,

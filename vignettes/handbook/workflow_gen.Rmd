@@ -747,18 +747,23 @@ formulasBr <- generateFormulas(fGroups, mslists, "bruker", MSMode = "MSMS") # On
 
 ### Compounds {#compounds}
 
-An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance. 
+An important step in a typical non-target workflow is structural identification for features of interest, as this information may finally reveal _what_ a feature is. In a first step all possible candidate structures for a feature are obtained from a database (based on e.g. monoisotopic mass or formula). These candidates are then ranked, for instance, by matching the feature MS/MS data with in-silico or library MS/MS spectra or its relevance to the environment. 
 
-Structure assignment in `patRoon` is performed automatically for all feature groups with the `generateCompounds()` function. Currently, this function supports two algorithms:
+Structure assignment in `patRoon` is performed automatically for all feature groups with the `generateCompounds()` function. Currently, this function supports the following algorithms:
 
-Algorithm                    | Usage                                           | Remarks
----------------------------- | ----------------------------------------------- | ------------------------------------------------
-[MetFrag]                    | `generateCompounds(algorithm = "metfrag", ...)` | Supports many databases (including custom) and scorings for candidate ranking.
-[SIRIUS] with [CSI:FingerID] | `generateCompounds(algorithm = "sirius", ...)`  | Incorporates prior comprohensive formula calculations.
+Algorithm              | Usage                                           | Remarks
+---------------------- | ----------------------------------------------- | ------------------------------------------------
+[MetFrag]              | `generateCompounds(algorithm = "metfrag", ...)` | Supports many databases (including offline and custom), matching MS/MS data with in-silico and library MS/MS data, and many other scorings to rank candidates.
+[SIRIUS] with [CSI:FingerID] | `generateCompounds(algorithm = "sirius", ...)`  | Matches with in-silico MS/MS data, incorporates formula annotations to improve candidate selection.
+Library                | `generateCompounds(algorithm = "library", ...)` | Obtains candidates by matching MS/MS data with an offline MS library, _e.g._ obtained from [MassBank.eu] or [MoNA].
 
-Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
+All algorithms rank their candidates by matching MS/MS data with in-silico generated MS/MS data (MetFrag and SIRIUS) and/or experimental MS/MS data from an MS library (MetFrag with MoNA scoring and Library algorithm). The latter may yield better candidates, and the Library algorithm is also generally much faster. However, in-silico annotation is not limited by the availability of experimental MS/MS data.
 
-Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
+Compound annotation is often a relative time and resource intensive procedure. For this reason, annotation occurs for each feature group and not individual features. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
+
+#### Database selection for MetFrag and SIRIUS
+
+Selecting the right database is important for proper candidate assignment. If the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
 
 <!-- UNDONE: add missing databases when support is added -->
 
@@ -773,6 +778,7 @@ Database            | Algorithm(s)            | Remarks
 `hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
 `bio`               | `"sirius"`              | Selects all supports biological databases.
 `csv`, `psv`, `sdf` | `"metfrag"`             | Custom database (see next section). [CSV example][csvDB-ex].
+
 
 #### Configuring MetFrag databases and scoring
 
@@ -845,11 +851,35 @@ compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
 
 Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the `maxCandidatesToStop` argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.
 
-#### Timeout and error handling
 
-The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error. Furthermore, MetFrag typically returns an error when too many candidates are found (as set by the `maxCandidatesToStop` argument). By default processing is restarted if an error has occurred (configured by the `errorRetries` argument). Similarly, the `timeoutRetries` and `timeout` arguments can be used to avoid being 'stuck' on obtaining results, for instance, due to an unstable internet connection.
+#### MetFrag error and timeout handling
 
-If no compounds could be assigned due to an error a warning will be issued. In this case it is best to see what went wrong by manually checking the log files, which by default are stored in the _log/metfrag_ folder.
+The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error or when the aforementioned maximum number of candidates is reached (`maxCandidatesToStop` argument). By default, the processing is restarted if an error has occurred (configured by the `errorRetries` argument). Similarly, the `timeoutRetries` and `timeout` arguments can be used to avoid being 'stuck' on obtaining results, for instance, due to an unstable internet connection. If no compounds could be assigned due to an error a warning will be issued. In this case it is best to see what went wrong by manually checking the log files, which by default are stored in the _log/metfrag_ folder.
+
+
+#### Annotation with the _Library_ algorithm {#compAnnLib}
+
+To use the _Library_ algorithm we first need to load an MS library. Currently, MS libraries in the MSP and [MoNA] JSON formats are supported. Note that the former format is not so well standardized, and the support in `patRoon` was mainly tailored for MSP files from [MassBank.eu] and [MoNA]. To load the MS library the `loadMSLibrary()` function is used:
+
+```{r eval=FALSE}
+mslibrary <- loadMSLibrary("~/MassBank_NIST.msp", "msp") # MassBank.eu MSP library
+mslibrary <- loadMSLibrary("~/MoNA-export-CASMI_2016.msp", "msp") # MoNA MSP library
+mslibrary <- loadMSLibrary("~/MoNA-export-MassBank.json", "json") # MoNA JSON library
+```
+
+> **_NOTE_** Currently it is only possible to load formula annotated MS/MS peaks with the MoNA JSON format.
+
+Once loaded, the MS library can be post-processed with various filtering, subsetting and export functionality, which may be useful for more tailored compound annotation. This is further discussed in the [advanced chapter](#MSLibraries).
+
+The compound annotation is performed with `generateCompounds()`:
+
+```{r eval=FALSE}
+compsLib <- generateCompounds(fGroups, mslists, "library", MSLibrary = mslibrary)
+
+# set minimum MS/MS spectral match for candidates to 0.5
+compsLib <- generateCompounds(fGroups, mslists, "library", MSLibrary = mslibrary, minSim = 0.5)
+```
+
 
 #### Formula scoring
 
@@ -879,8 +909,8 @@ The calculation of identification levels is performed by a set of pre-defined ru
 Level | Description | Rules
 ----- | ----------- | --------------------------------
 1     | Target match               | Retention time deviates <12 seconds from suspect list. At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
-2a    | Good MS/MS library match   | Suspect is top ranked in the `compounds` results. The `individualMoNAScore` is at least `0.9` and all other candidates have no MoNA library score.
-3a    | Fair library match | The `individualMoNAScore` is at least 0.4.
+2a    | Good MS/MS library match   | Suspect is top ranked in the `compounds` results. The `individualMoNAScore` (MetFrag) or `libMatch` (Library algorithm) is at least `0.9` and no other candidates were matched with the MS library.
+3a    | Fair library match | The `individualMoNAScore` or `libMatch` is at least 0.4.
 3b    | Known MS/MS match          | At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
 3c    | Good in-silico MS/MS match | The annotation MS/MS similarity (`annSimComp` column) is at least `0.7`.
 4a    | Good formula MS/MS match   | Suspect is top ranked formula candidate, annotation MS/MS similarity (`annSimForm` column) is at least `0.7` and isotopic match (`isoScore`) of at least 0.5. The latter two scores are at least `0.2` higher than next best ranked candidate.

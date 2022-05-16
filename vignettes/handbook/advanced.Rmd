@@ -384,6 +384,83 @@ fGroupsCons <- consensus(fGroupComp,
                          uniqueOuter = TRUE) # as above, but also exclude any overlap between OpenMS/XCMS
 ```
 
+
+## MS libraries {#MSLibraries}
+
+The `loadMSLibraries()` function is used to load MS spectral libraries, and was already briefly introduced for [compound annotation](#compAnnLib). Currently, loading of MSP files and [MoNA] JSON files is supported, while loading of formula annotations for MS peaks is currently only supported for the latter. The underlying algorithms implement several optimizations to efficiently load large number of records. Furthermore, `loadMSLibraries()` automatically verifies record data such as formulas, adducts and masses, and automatically calculates missing or invalid data where possible.
+
+```{r loadMSLibs,eval=FALSE}
+mslibraryMSP <- loadMSLibrary("MoNA-export-CASMI_2016.msp", "msp")
+mslibraryJSON <- loadMSLibrary("MoNA-export-CASMI_2016.json", "json")
+```
+
+Several advanced parameters are available that influence the loading of MS library data, see the reference manual (`?loadMSLibrary`) for details.
+
+Once loaded, the usual methods are available to inspect its data:
+
+```{r inspMSLib,eval=runData}
+show(mslibraryMSP)
+mslibraryMSP[[1]] # MS/MS spectrum for first candidate
+mslibraryJSON[["SM801601"]] # a record with annotations
+ # overview of all metadata (select few columns for readability)
+records(mslibraryJSON)[, .(DB_ID, Name, InChIKey, formula)]
+# convert all data to a data.table (may be huge!)
+as.data.table(mslibraryMSP)[, .(DB_ID, SMILES, formula, mz, intensity)]
+```
+
+Furthermore, like many other objects in `patRoon`, the MS library objects can be subset and filtered:
+
+```{r subFiltMSLib,eval=FALSE}
+mslibrarySub <- mslibrary[1:100] # only keep first 100 records
+
+# only keep records a neutral mass of 100-200
+mslibraryF <- filter(mslibrary, massRange = c(100, 200))
+# remove records with neutral mass below 100
+mslibraryF <- filter(mslibrary, massRange = c(0, 100), negate = TRUE)
+# only keep mass peaks with m/z 100-500
+mslibraryF <- filter(mslibrary, mzRangeSpec = c(100, 500))
+# remove low intensity peaks (<1%) and only keep top 10
+mslibraryF <- filter(mslibrary, relMinIntensity = 0.01, topMost = 10)
+# only keep mass peak with annotations
+mslibraryF <- filter(mslibraryJSON, onlyAnnotated = TRUE)
+```
+
+In addition, the `properties` filter may be useful to tailor the library data. The library properties can be obtained as following:
+
+```{r getPropsMSLib,eval=runData,echo=c(2, 3)}
+oldW <- options(width = 80) # HACK: make sure vectors below are shown nicely
+names(records(mslibrary)) # get all property names
+unique(records(mslibrary)[["Instrument_type"]]) # Get the available instrument types
+options(width = oldW[[1]])
+```
+
+Then to filter the MS library:
+
+```{r filtPropsMSLib,eval=FALSE}
+# only keep APCI instrument types
+mslibraryF <- filter(mslibrary, properties = list(Instrument_type = c("LC-APCI-ITFT", "APCI-ITFT")))
+# remove Q-TOF by negation
+mslibraryF <- filter(mslibrary, properties = list(Instrument_type = "LC-ESI-QTOF"), negate = TRUE)
+```
+
+More advanced filtering can be performed with the `delete()` generic function, see the reference manual for details (`?MSLibrary`).
+
+Finally, functionality exists to convert, export and merge MS libraries:
+
+```{r otherMSLib,eval=FALSE}
+# Convert the MS library to a suspect list.
+# By setting collapse to TRUE, all records with the same first block InChIKey
+# are collapsed and mass peaks are averaged.
+suspL <- convertToSuspects(mslibrary, adduct = "[M+H]+", collapse = TRUE)
+# Amend custom suspect list with library data (fragments_mz column)
+suspL <- convertToSuspects(mslibrary, adduct = "[M+H]+", suspects = patRoonData::suspectsPos)
+
+export(mslibrary, out = "myMSLib.msp") # export to a new MSP library
+
+mslibraryM <- merge(mslibraryMSP, mslibraryJSON) # merge two libraries
+```
+
+
 ## Compound clustering {#compclust}
 
 When large databases such as [PubChem] or [ChemSpider] are used for compound annotation, it is common to find _many_ candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform _compound clustering_. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the _maximum common substructure_ (MCS) can be derived, which represents the largest possible substructure that 'fit' in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.

@@ -4,6 +4,7 @@
 
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
+- PFAS MF lib support
 
 
 ## Features
@@ -21,8 +22,6 @@
 
 ## TPs
 
-- CTS
-    - update SMILES to InChI/InChIKey/formula/neutralMass conversion after merging with msident
 - Reporting
     - Split formulaDiff like plotGraph()?
 - newProject()
@@ -56,23 +55,19 @@
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
-- prepareChemTable(): more status messages/progress bars?
+- prepareChemTable()
+    - more status messages/progress bars?
+    - skip/warn if obabel is not available
 - merge --> consensus? or c()?
 - other generic name for spectra()?
 
 
-## Docs
+## Tests
 
-- TPs
-    - consensus: flattens hierarchy (and other specifics?)
-    - TPs argument for reportHTML(): update Handbook examples, update refs etc
-- mslibrary
-    - generateCompoundsLibrary()
-        - annSimComp is calculated differently than libMatch, also because of different (default) parameters, hence small differences may occur.
-    - Describe prepareChemTable() and add links in loadMSLibrary(), screenSuspects() etc
-    - Handbook (and refs): update that libraryMatch is also used for ID level estimation
-    - Handbook/refs: update notes on when OpenBabel is needed
-    - preferCalcDescriptors
+- MS library
+    - README for MoNA msp/json files
+    
+
 
 ## NEWS
 
@@ -81,6 +76,7 @@
     - sim calc doesn't happen by default anymore for BT
     - TP structure base class
         - TPLibrary gains filter() method and parent structure sim calculation
+        - plotVenn(), plotUpSet() and consensus()
     - filter() for TP base class
     - Fixed: convertMFDB() now always collapses duplicates, not just for BT
     - BT

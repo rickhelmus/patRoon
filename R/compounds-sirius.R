@@ -126,7 +126,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP",
                                                                profile = "qtof", formulaDatabase = NULL,
-                                                               fingerIDDatabase = "pubchem", noise = NULL, errorRetries = 2,
+                                                               fingerIDDatabase = "pubchem", noise = NULL,
                                                                cores = NULL, topMost = 100, topMostFormulas = 5,
                                                                extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
                                                                splitBatches = FALSE)
@@ -138,7 +138,6 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ formulaDatabase + fingerIDDatabase, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertCount(errorRetries, add = ac)
     checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))

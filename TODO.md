@@ -127,6 +127,7 @@
 - MP: more workarounds to handle NA exit codes on Linux
 - Fixed: reportHTML(): improve handling of missing or split IDs when generating compound DB links
 - getEICs() utility (suggested by Ricardo Cunha)
+- generateCompoundsSIRIUS(): removed unused errorRetries argument
 
 
 # Lower priority

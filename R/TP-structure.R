@@ -429,7 +429,8 @@ transformationProductsStructureConsensus <- setClass("transformationProductsStru
                                                      contains = "transformationProductsStructure")
 
 #' @describeIn transformationProductsStructure Generates a consensus from different
-#'   \code{transformationProductsStructure} objects.
+#'   \code{transformationProductsStructure} objects. Currently this removes any hierarchical data, and all TPs are
+#'   considered to originate from the same (original) parent.
 #'
 #' @templateVar what TPs
 #' @template consensus-common-args

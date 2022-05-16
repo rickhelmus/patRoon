@@ -522,17 +522,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #'
 #'   }
 #'
+#' @templateVar whatCP suspect list
+#' @template chemPropCalc
 #'
 #' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}} object, which is a copy of the input
 #'   \code{fGroups} object amended with additional screening information.
 #'
-#' @note For \code{screenSuspects} in some cases you may need to install
-#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when only InChI data is available for mass
-#'   calculation).
-#'
 #' @seealso \code{featureGroupsScreening}
-#'
-#' @references \insertRef{OBoyle2011}{patRoon}
 #'
 #' @rdname suspect-screening
 #' @aliases screenSuspects

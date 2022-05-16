@@ -41,7 +41,7 @@
 #'   to a regular formula format.
 #'
 #'   \item Chemical identifiers such as \acronym{SMILES} and formulae are verified and missing values are calculated if
-#'   possible. See XXX for more details.
+#'   possible. See below for more details.
 #'
 #'   \item Shortened data in the \code{Ion_mode} field (\acronym{P}/\acronym{N}) is converted to the long format
 #'   (\code{POSITIVE}/\code{NEGATIVE}).

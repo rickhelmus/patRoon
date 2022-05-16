@@ -35,6 +35,9 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @template tp_gen-sim
 #' @template fp-args
+#' 
+#' @templateVar whatCP parent suspect list
+#' @template chemPropCalc
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'

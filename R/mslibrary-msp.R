@@ -13,6 +13,9 @@ NULL
 #'
 #' @templateVar format MSP
 #' @template loadMSLibrary
+#' 
+#' @templateVar whatCP MS library
+#' @template chemPropCalc
 #'
 #' @details This function uses \code{C++} with \CRANpkg{Rcpp} to efficiently load and parse MSP files, and is mainly
 #'   optimized for loading the \file{.msp} files from \href{https://massbank.eu/MassBank/}{MassBank EU}. Files from

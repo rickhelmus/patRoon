@@ -124,6 +124,9 @@ BTMPPrepareHandler <- function(cmd)
 #' @template tp_gen-sim
 #' @template fp-args
 #'
+#' @templateVar whatCP parent suspect list
+#' @template chemPropCalc
+#'
 #' @templateVar what \code{generateTPsBioTransformer}
 #' @template uses-multiProc
 #'

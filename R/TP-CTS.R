@@ -103,6 +103,9 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
 #' @template tp_gen-sim
 #' @template fp-args
 #'
+#' @templateVar whatCP parent suspect list
+#' @template chemPropCalc
+#'
 #' @seealso The website: \url{https://qed.epa.gov/cts/} and the
 #'   \href{https://www.epa.gov/chemical-research/users-guide-chemical-transformation-simulator-cts}{CTS User guide}.
 #'

@@ -15,6 +15,9 @@ NULL
 #' @templateVar format JSON
 #' @template loadMSLibrary
 #'
+#' @templateVar whatCP MS library
+#' @template chemPropCalc
+#'
 #' @details This function uses \code{C++} with \CRANpkg{Rcpp} and \CRANpkg{rapidjsonr} to efficiently load and parse
 #'   JSON files from \href{https://mona.fiehnlab.ucdavis.edu/}{MoNA}. An advantage compared to
 #'   \code{\link{loadMSLibraryMSP}} is that this function supports loading spectral annotations.

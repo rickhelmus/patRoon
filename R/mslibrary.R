@@ -304,6 +304,9 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 #'
 #'   }
 #'
+#' @templateVar whatCP input suspect list to \code{convertToSuspects}
+#' @template chemPropCalc
+#'
 #' @export
 setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType = "MS2",
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,

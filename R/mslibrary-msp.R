@@ -48,7 +48,7 @@ loadMSLibraryMSP <- function(file, parseComments = TRUE, preferCalcDescriptors =
         return(cd)
     
     lib <- readMSP(normalizePath(file), parseComments)
-    lib <- sanitizeMSLibrary(lib, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
+    lib <- sanitizeMSLibrary(lib, preferCalcDescriptors, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     
     ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp")
     

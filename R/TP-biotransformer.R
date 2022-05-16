@@ -131,7 +131,7 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", generations = 2, extraOpts = NULL,
-                                      skipInvalid = TRUE, preferCalcDescriptors = TRUE, calcSims = FALSE,
+                                      skipInvalid = TRUE, prefCalcChemProps = TRUE, calcSims = FALSE,
                                       fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)
 {
     checkmate::assert(
@@ -148,11 +148,11 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ex
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + preferCalcDescriptors + calcSims + MP, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims + MP, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    parents <- getTPParents(parents, skipInvalid, preferCalcDescriptors)
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
 
     baseHash <- makeHash(type, generations, extraOpts, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(parents, baseHash)

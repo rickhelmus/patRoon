@@ -366,7 +366,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                         adduct, skipInvalid, preferCalcDescriptors, onlyHits)
+                                                         adduct, skipInvalid, prefCalcChemProps, onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -376,7 +376,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
                                                          adduct = NULL, skipInvalid = skipInvalid,
-                                                         preferCalcDescriptors = preferCalcDescriptors,
+                                                         prefCalcChemProps = prefCalcChemProps,
                                                          onlyHits = onlyHits))
     
     scr <- mergeScreeningSetInfos(setObjects)
@@ -397,12 +397,12 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                                  adduct, skipInvalid, preferCalcDescriptors,
+                                                                  adduct, skipInvalid, prefCalcChemProps,
                                                                   onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, preferCalcDescriptors,
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
                                       onlyHits)
     if (!amend)
         return(fGroupsScreened)

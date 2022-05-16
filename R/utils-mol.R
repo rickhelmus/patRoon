@@ -224,7 +224,7 @@ calculateLogP <- function(SMILES, method, mustWork)
     return(ret)
 }
 
-prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
+prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
 {
     if (verbose)
         printf("Calculating/Validating chemical data... ")
@@ -265,7 +265,7 @@ prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
     
     takeConvertedIK <- !is.na(chemData$InChI)
     takeConvertedFormula <- !is.na(convForms) & isSMIOKForFormula
-    if (!preferCalcDescriptors)
+    if (!prefCalcChemProps)
     {
         takeConvertedIK <- takeConvertedIK & is.na(chemData$InChIKey)
         takeConvertedFormula <- takeConvertedFormula & is.na(chemData$formula)
@@ -280,7 +280,7 @@ prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
     # from the formulae since rcdk::get.formula returns both.
     
     # Get neutral mass from SMILES: only consider if formula was calculated (thus not verified below) or unavailable.
-    chemData[(preferCalcDescriptors | is.na(neutralMass)) & (takeConvertedFormula | (is.na(formula) & !is.na(SMILES))), neutralMass := {
+    chemData[(prefCalcChemProps | is.na(neutralMass)) & (takeConvertedFormula | (is.na(formula) & !is.na(SMILES))), neutralMass := {
         ret <- tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
                         error = function(...) NA_real_)
         if (is.na(ret) && !is.na(formula[1])) # failed, try from formula
@@ -297,7 +297,7 @@ prepareChemTable <- function(chemData, preferCalcDescriptors, verbose = TRUE)
             list(form@string, form@mass)
     }, by = "formula"]
     
-    chemData[!is.na(neutralMassCalc) & (preferCalcDescriptors | is.na(neutralMass)), neutralMass := neutralMassCalc]
+    chemData[!is.na(neutralMassCalc) & (prefCalcChemProps | is.na(neutralMass)), neutralMass := neutralMassCalc]
     chemData[, neutralMassCalc := NULL]
     
     if (verbose)

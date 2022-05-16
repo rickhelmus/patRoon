@@ -309,14 +309,14 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
                                                                                           minIntensityPost = 2,
                                                                                           topMost = 10),
-                                                     collapse = TRUE, suspects = NULL, preferCalcDescriptors = TRUE)
+                                                     collapse = TRUE, suspects = NULL, prefCalcChemProps = TRUE)
 {
     adduct <- checkAndToAdduct(adduct)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgSpecParams, add = ac)
-    aapply(checkmate::assertFlag, . ~ preferCalcDescriptors + collapse, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ prefCalcChemProps + collapse, fixed = list(add = ac))
     if (!is.null(suspects))
         assertSuspectList(suspects, FALSE, FALSE, add = ac)
     checkmate::reportAssertions(ac)
@@ -354,7 +354,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     {
         ret <- if (is.data.table(suspects)) copy(suspects) else as.data.table(suspects)
         # checkDesc = TRUE: we want to be able to calculate InChIKey1 values
-        ret <- prepareSuspectList(ret, NULL, FALSE, checkDesc = TRUE, preferCalcDescriptors = preferCalcDescriptors,
+        ret <- prepareSuspectList(ret, NULL, FALSE, checkDesc = TRUE, prefCalcChemProps = prefCalcChemProps,
                                   calcMZs = FALSE)
         ret[, InChIKey1 := getIKBlock1(InChIKey)]
         

@@ -47,7 +47,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
     
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
-    ret <- prepareChemTable(ret, preferCalcDescriptors = FALSE, verbose = FALSE)
+    ret <- prepareChemTable(ret, prefCalcChemProps = FALSE, verbose = FALSE)
     
     if (calcLogP != "none")
     {
@@ -111,7 +111,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
 #'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
-                           preferCalcDescriptors = TRUE, calcLogP = "rcdk", calcSims = FALSE, fpType = "extended",
+                           prefCalcChemProps = TRUE, calcLogP = "rcdk", calcSims = FALSE, fpType = "extended",
                            fpSimMethod = "tanimoto", parallel = TRUE)
 {
     checkmate::assert(
@@ -130,12 +130,12 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_abioticreduction_hydrolysis", 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ skipInvalid + preferCalcDescriptors + calcSims + parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims + parallel, fixed = list(add = ac))
     checkmate::assertChoice(calcLogP, c("rcdk", "obabel", "none"), add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    parents <- getTPParents(parents, skipInvalid, preferCalcDescriptors)
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
     
     if (nrow(parents) == 0)
         results <- list()
@@ -161,7 +161,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, preferCalcDescriptors,
+        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, prefCalcChemProps,
                              calcLogP, calcSims, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)

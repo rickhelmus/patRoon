@@ -22,12 +22,12 @@ NULL
 #'   The record field names are converted to those used in \file{.msp} files.
 #'
 #' @export
-loadMSLibraryMoNAJSON <- function(file, preferCalcDescriptors = TRUE, potAdducts = TRUE, potAdductsLib = TRUE,
+loadMSLibraryMoNAJSON <- function(file, prefCalcChemProps = TRUE, potAdducts = TRUE, potAdductsLib = TRUE,
                                   absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
-    aapply(checkmate::assertFlag, . ~ preferCalcDescriptors + potAdductsLib + calcSPLASH, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ prefCalcChemProps + potAdductsLib + calcSPLASH, fixed = list(add = ac))
     checkmate::assert(checkmate::checkFlag(potAdducts),
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
                       checkmate::checkList(potAdducts, types = c("adduct", "character"), any.missing = FALSE),
@@ -35,13 +35,13 @@ loadMSLibraryMoNAJSON <- function(file, preferCalcDescriptors = TRUE, potAdducts
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(makeFileHash(file), preferCalcDescriptors, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
+    hash <- makeHash(makeFileHash(file), prefCalcChemProps, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     cd <- loadCacheData("MSLibraryJSON", hash)
     if (!is.null(cd))
         return(cd)
     
     lib <- readMoNAJSON(normalizePath(file))
-    lib <- sanitizeMSLibrary(lib, preferCalcDescriptors, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
+    lib <- sanitizeMSLibrary(lib, prefCalcChemProps, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     
     ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "json")
     

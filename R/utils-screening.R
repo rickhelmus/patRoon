@@ -18,7 +18,7 @@ doScreeningShow <- function(obj)
     printf("Suspects annotated: %s\n", if (!is.null(screenInfo(obj)[["estIDLevel"]])) "yes" else "no")
 }
 
-prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, preferCalcDescriptors, calcMZs = TRUE)
+prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, calcMZs = TRUE)
 {
     hash <- makeHash(suspects, adduct, skipInvalid, calcMZs)
     cd <- loadCacheData("screenSuspectsPrepList", hash)
@@ -59,7 +59,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, preferC
         }
         
         if (checkDesc)
-            suspects <- prepareChemTable(suspects, preferCalcDescriptors = preferCalcDescriptors)
+            suspects <- prepareChemTable(suspects, prefCalcChemProps = prefCalcChemProps)
         
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&

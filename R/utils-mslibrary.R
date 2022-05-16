@@ -8,7 +8,7 @@ makeDBIDsUnique <- function(records)
     return(records)
 }
 
-sanitizeMSLibrary <- function(lib, preferCalcDescriptors, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
+sanitizeMSLibrary <- function(lib, prefCalcChemProps, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
 {
     printf("Converting to tables... ")
     lib$records <- as.data.table(lib$records)
@@ -77,7 +77,7 @@ sanitizeMSLibrary <- function(lib, preferCalcDescriptors, potAdducts, potAdducts
     lib$records[!is.na(formula), formula := gsub("\\[|\\]|\\+|\\-", "", formula)] # remove ion species format ([formula]+/-)
     printf("Done!\n")
     
-    lib$records <- prepareChemTable(lib$records, preferCalcDescriptors = preferCalcDescriptors)
+    lib$records <- prepareChemTable(lib$records, prefCalcChemProps = prefCalcChemProps)
     
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
     lib$records[, Ion_mode := toupper("POSITIVE")]

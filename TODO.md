@@ -62,12 +62,6 @@
 - other generic name for spectra()?
 
 
-## Tests
-
-- MS library
-    - README for MoNA msp/json files
-    
-
 
 ## NEWS
 

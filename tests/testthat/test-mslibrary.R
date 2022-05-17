@@ -2,9 +2,20 @@ context("MS library")
 
 peakCount <- function(msl) sum(sapply(spectra(msl), nrow))
 
-mslibraryMSP <- loadMSLibrary(file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2012.msp"), "msp")
-mslibraryJSON <- loadMSLibrary(file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2016.json"), "json")
+MSPPath <- file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2012.msp")
+JSONPath <- file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2016.json")
+
+mslibraryMSP <- loadMSLibrary(MSPPath, "msp")
+mslibraryJSON <- loadMSLibrary(JSONPath, "json")
 emptyFile <- tempfile(); file.create(emptyFile)
+
+loadMSPFileWithoutField <- function(field, ...)
+{
+    out <- withr::local_tempfile(fileext = ".msp")
+    MSPLines <- readLines(MSPPath)
+    writeLines(MSPLines[!grepl(paste0("^", field), MSPLines)], out)
+    return(loadMSLibrary(out, "msp", ...))
+}
 
 test_that("verify library loading", {
     expect_known_value(mslibraryMSP, testFile("mslibrary-msp"))
@@ -14,6 +25,11 @@ test_that("verify library loading", {
 
     expect_length(loadMSLibrary(emptyFile, "msp"), 0)
     expect_length(loadMSLibrary(emptyFile, "json"), 0)
+    
+    expect_gt(length(records(mslibraryMSP)), length(records(loadMSLibrary(MSPPath, "msp", parseComments = FALSE))))
+    
+    expect_setequal(records(loadMSPFileWithoutField("Precursor_type", potAdducts = "[M+H]+"))$Precursor_type, c(NA, "[M+H]+"))
+    expect_true(any(!is.na(records(loadMSPFileWithoutField("PrecursorMZ"))$PrecursorMZ)))
 })
 
 mslibraryEmpty <- mslibraryMSP["none"]
@@ -33,6 +49,9 @@ test_that("basic usage",{
     expect_equal(names(mslibraryMSP), records(mslibraryMSP)$DB_ID)
     expect_equal(nrow(as.data.table(mslibraryMSP)), peakCount(mslibraryMSP))
     expect_equal(nrow(as.data.table(mslibraryEmpty)), 0)
+    
+    expect_setequal(union(records(mslibraryMSP)$SPLASH, records(mslibraryJSON)$SPLASH),
+                    records(merge(mslibraryMSP, mslibraryJSON))$SPLASH)
 })
 
 test_that("delete and filter", {
@@ -69,4 +88,22 @@ test_that("delete and filter", {
     expect_true(all(nzchar(as.data.table(filter(mslibraryJSON, onlyAnnotated = TRUE))$annotation)))
     # HACK: merge MSP/JSON to get library containing records with and without annotations
     expect_null(as.data.table(filter(merge(mslibraryMSP, mslibraryJSON), onlyAnnotated = TRUE, negate = TRUE))[["annotation"]])
+})
+
+suspColl <- convertToSuspects(mslibraryMSP, collapse = TRUE, adduct = "[M+H]+")
+suspAmend <- convertToSuspects(mslibraryJSON, suspects = patRoonData::suspectsPos, adduct = "[M+H]+")
+expPath <- withr::local_tempfile(fileext = ".msp")
+export(mslibraryJSON, "msp", expPath)
+mslibraryExp <- loadMSLibrary(expPath, "msp")
+test_that("conversion",{
+    expect_equal(nrow(records(mslibraryMSP)[Precursor_type == "[M+H]+"]),
+                 nrow(convertToSuspects(mslibraryMSP, collapse = FALSE, adduct = "[M+H]+")))
+    checkmate::expect_names(names(suspColl), must.include = c("name", "SMILES", "InChI", "InChIKey",
+                                                              "formula", "neutralMass", "fragments_mz"))
+    checkmate::expect_names(names(suspAmend), must.include = c(names(patRoonData::suspectsPos), "fragments_mz"))
+    expect_equal(nrow(suspColl), uniqueN(getIKBlock1(records(mslibraryMSP)[Precursor_type == "[M+H]+"]$InChIKey)))
+    expect_equal(as.data.frame(suspAmend[, names(patRoonData::suspectsPos), with = FALSE]), patRoonData::suspectsPos)
+    
+    expect_length(mslibraryExp, length(mslibraryJSON))
+    expect_equal(records(mslibraryExp), records(mslibraryJSON))
 })

@@ -449,7 +449,7 @@ setMethod("export", "MSLibrary", function(obj, type = "msp", out)
     recs <- copy(records(obj))
     recs[, (names(recs)) := lapply(.SD, as.character)]
     recs <- as.matrix(recs)
-    writeMSPLibrary(recs, spectra(obj), normalizePath(out))
+    writeMSPLibrary(recs, spectra(obj), normalizePath(out, mustWork = FALSE))
 })
 
 #' @describeIn MSLibrary Merges two \code{MSLibrary} objects (\code{x} and \code{y}). The records from \code{y} that are

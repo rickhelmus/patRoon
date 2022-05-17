@@ -209,10 +209,11 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
                 const char *f = fields[col], *v = recordsM(row, col);
                 outf << ((!strcmp(f, "DB_ID")) ? "DB#" : f) << ": " << v << "\n";
             }
-            const Rcpp::NumericMatrix spec = spectraList[row];
+            const Rcpp::DataFrame spec = Rcpp::as<Rcpp::DataFrame>(spectraList[row]);
             outf << "Num Peaks: " << spec.nrow() << "\n";
+            const std::vector<double> mzs = spec[0], ints = spec[1];
             for (int srow=0; srow<spec.nrow(); ++srow)
-                outf << spec(srow, 0) << " " << spec(srow, 1) << "\n";
+                outf << mzs[srow] << " " << ints[srow] << "\n";
             outf << "\n";
             
             if (row > 0 && (row == (recordsM.nrow()-1) || (row % 25000) == 0))

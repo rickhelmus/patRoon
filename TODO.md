@@ -118,7 +118,7 @@
 - Fixed: reportHTML(): improve handling of missing or split IDs when generating compound DB links
 - getEICs() utility (suggested by Ricardo Cunha)
 - generateCompoundsSIRIUS(): removed unused errorRetries argument
-
+- Fixed: generateCompoundsSIRIUS(): `topMost` was used where `topMostFormulas` was supposed to be used
 
 # Lower priority
 

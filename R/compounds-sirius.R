@@ -156,9 +156,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     printf("Processing %d feature groups with SIRIUS-CSI:FingerID...\n", gCount)
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
-                        formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
-                        verbose, "compoundsSIRIUS", patRoon:::processSIRIUSCompounds,
-                        list(database = fingerIDDatabase, topMost = topMost),
+                        formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMostFormulas, projectPath,
+                        extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
+                        patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
                         splitBatches)
     
     # prune empty/NULL results

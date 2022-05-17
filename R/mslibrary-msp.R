@@ -13,13 +13,14 @@ NULL
 #'
 #' @templateVar format MSP
 #' @template loadMSLibrary
-#' 
+#'
 #' @templateVar whatCP MS library
 #' @template chemPropCalc
 #'
 #' @details This function uses \code{C++} with \CRANpkg{Rcpp} to efficiently load and parse MSP files, and is mainly
-#'   optimized for loading the \file{.msp} files from \href{https://massbank.eu/MassBank/}{MassBank EU}. Files from
-#'   other sources may also work, any feedback on this is welcome!
+#'   optimized for loading the \file{.msp} files from \href{https://massbank.eu/MassBank/}{MassBank EU} and
+#'   \href{https://mona.fiehnlab.ucdavis.edu/}{MoNA}. Files from other sources may also work, any feedback on this is
+#'   welcome!
 #'
 #' @param parseComments If \code{TRUE} then comments in the file are parsed to obtain additional fields, such as
 #'   \acronym{SMILES}, \code{PubChemCID} and \code{Resolution}. Note that some records specify this data either in the

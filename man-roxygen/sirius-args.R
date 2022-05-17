@@ -16,6 +16,11 @@
 #'   \command{SIRIUS} calls (which may be run in parallel depending on the \link[=patRoon-package]{set package
 #'   options}). If \code{splitBatches=FALSE} then all feature calculations are performed from a single \command{SIRIUS}
 #'   execution, which is often the fastest if calculations are performed on a single computer.
+#' @param projectPath,dryRun These are mainly for internal purposes. \code{projectPath} sets the output directory for
+#'   the \command{SIRIUS} output (a temporary directory if \code{NULL}). If \code{dryRun} is \code{TRUE} then no
+#'   computations are done and only the results from \code{projectPath} are processed.
+#'   
+#'   \setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.
 #'
 #' @note For annotations performed with \command{SIRIUS} it is often the fastest to keep the default
 #'   \code{splitBatches=FALSE}. In this case, all \command{SIRIUS} output will be printed to the terminal (unless

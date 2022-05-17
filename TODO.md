@@ -5,6 +5,7 @@
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
 - PFAS MF lib support
+- update SIRIUS
 
 
 ## Features

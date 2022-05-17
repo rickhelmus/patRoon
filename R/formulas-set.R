@@ -228,15 +228,20 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
 })
 
 
-generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn)
+generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn,
+                                setArgs = list())
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
     verifyNoAdductIonizationArg(adduct)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
-    setObjects <- Map(unsetFGroupsList, msplArgs,
-                      f = function(fg, mspl) generator(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...))
+    
+    if (length(setArgs) == 0)
+        setArgs <- vector("list", length(unsetFGroupsList))
+    
+    setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
+                      f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...), sa)))
     setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))

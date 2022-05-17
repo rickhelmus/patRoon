@@ -8,8 +8,7 @@ plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
 
 doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
-# disable for now, CSI seems slow/unresponsive
-doSIRIUS <- FALSE #!is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
+doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 if (doMetFrag)
 {
@@ -21,7 +20,10 @@ if (doMetFrag)
 
 if (doSIRIUS)
 {
-    compsSIR <- doGenComps(fGroups, plists, "sirius")
+    if (FALSE)
+        updateSIRIUSCompsProjDirs(fGroups, plists)
+    
+    compsSIR <- doGenComps(fGroups, plists, "sirius", dryRun = TRUE, projectPath = getSIRProjPath())
     compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius")
     compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
 }

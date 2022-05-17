@@ -90,32 +90,37 @@ SIRMPPrepareHandler <- function(cmd)
     command <- patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS")
     
     inPath <- tempfile("sirius_in")
-    outPath <- tempfile("sirius_out")
+    outPath <- if (is.null(cmd[["projectPath"]])) tempfile("sirius_out") else cmd$projectPath
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
     stopifnot(!file.exists(inPath) || !file.exists(outPath))
     dir.create(inPath)
     
-    msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, FUN = function(pmz, mspl, msmspl)
+    msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, cmd$resNames, FUN = function(pmz, mspl, msmspl, n)
     {
-        ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
+        ret <- file.path(inPath, paste0(n, ".ms"))
         patRoon:::makeSirMSFile(mspl, msmspl, pmz, cmd$adduct, ret)
         return(ret)
     })
     
-    bArgs <- c("-i", inPath, "-o", outPath, cmd$args)
+    bArgs <- character()
+    if (!cmd$dryRun)
+        bArgs <- c("-i", inPath)
+    bArgs <- c(bArgs, "-o", outPath, cmd$args)
+    
     return(utils::modifyList(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
 }
 
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adducts, adductsChr, ppmMax, elements,
-                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                      extraOptsGeneral, extraOptsFormula, verbose,
-                      processFunc, processArgs, splitBatches)
+                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath,
+                      extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches, dryRun)
 {
     mainArgs <- character()
     if (!is.null(cores))
         mainArgs <- c("--cores", cores)
     if (!is.null(extraOptsGeneral))
         mainArgs <- c(mainArgs, extraOptsGeneral)
+    if (dryRun)
+        mainArgs <- c(mainArgs, "--no-project-check") # internal option, see https://github.com/boecker-lab/sirius/issues/42
     
     formArgs <- c("formula",
                   "-p", profile,
@@ -153,7 +158,8 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
             batch <- batches[[bi]]
             fArgs <- c(formArgs, "-i", addChr)
             return(list(args = c(mainArgs, fArgs, cmpArgs), precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
-                        MSMSPL = MSMSPLists[batch], adduct = add, processFunc = processFunc, processArgs = processArgs,
+                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, resNames = resNames[batch],
+                        processFunc = processFunc, processArgs = processArgs, dryRun = dryRun,
                         logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))
         })
         
@@ -172,9 +178,9 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
 }
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
-                     database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
-                     splitBatches)
+                     splitBatches, dryRun)
 {
     if (length(MSPeakLists) == 0)
         return(list())
@@ -252,8 +258,9 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             msmspls <- lapply(doPLists, "[[", "MSMS")
             allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta$name[doWhich], profile, flPLMeta$adduct[doWhich],
                                     flPLMeta$adductChr[doWhich], relMzDev, elements, database, noise, cores,
-                                    withFingerID, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
-                                    verbose, processFunc, processArgs, splitBatches)
+                                    withFingerID, fingerIDDatabase, topMost, projectPath,
+                                    extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches,
+                                    dryRun)
         }
         else
             allResults <- list()

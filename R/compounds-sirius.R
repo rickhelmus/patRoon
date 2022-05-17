@@ -124,17 +124,18 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #' @template main-rd-method
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                                               elements = "CHNOP",
+                                                               projectPath = NULL, elements = "CHNOP",
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL,
                                                                cores = NULL, topMost = 100, topMostFormulas = 5,
-                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
-                                                               splitBatches = FALSE)
+                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL,
+                                                               verbose = TRUE, splitBatches = FALSE, dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertString(projectPath, null.ok = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ formulaDatabase + fingerIDDatabase, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -143,10 +144,14 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
+    checkmate::assertFlag(dryRun, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
         return(compounds(algorithm = "sirius"))
+    
+    if (!is.null(projectPath))
+        projectPath <- normalizePath(projectPath, mustWork = FALSE)
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     if (is.null(fingerIDDatabase))
@@ -159,7 +164,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMostFormulas, projectPath,
                         extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
                         patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
-                        splitBatches)
+                        splitBatches, dryRun)
     
     # prune empty/NULL results
     if (length(results) > 0)
@@ -182,8 +187,11 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 #' @rdname generateCompoundsSIRIUS
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                                                  ..., setThreshold = 0, setThresholdAnn = 0)
+                                                                  projectPath = NULL, ..., setThreshold = 0,
+                                                                  setThresholdAnn = 0)
 {
+    checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
+    sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
     generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn, setArgs = sa)
 })

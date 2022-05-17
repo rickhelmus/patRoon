@@ -101,6 +101,8 @@ if (testWithSets())
 
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
+
+    getSIRProjPath <- function() file.path(getTestDataPath(), paste0("SIRProj", c("-pos", "-neg")))
     
     doScreen <- function(fg, susp, ...)
     {
@@ -111,7 +113,7 @@ if (testWithSets())
     
     doNormInts <- function(fg, ...) normInts(fg, ..., standards = list(patRoonData::ISTDListPos,
                                                                        patRoonData::ISTDListNeg))
-        
+    
     # zero threshold makes comparisons in testing much easier
     doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
     doFormCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
@@ -146,6 +148,8 @@ if (testWithSets())
 
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
+    
+    getSIRProjPath <- function() file.path(getTestDataPath(), "SIRProj")
     
     doScreen <- function(fg, susp, ...)
     {
@@ -228,6 +232,20 @@ makeMZXMLs <- function(anaInfo)
     convertMSFiles(anaInfo = anaInfo, from = "mzXML", outPath = getWorkPath(), to = "mzXML",
                    algorithm = "openms", overWrite = TRUE)
     return(anaInfo)
+}
+
+updateSIRIUSCompsProjDirs <- function(fGroups, mslists)
+{
+    unlink(getSIRProjPath(), recursive = TRUE)
+    withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRProjPath()))
+    for (pp in getSIRProjPath())
+    {
+        if (!dir.exists(pp))
+            next
+        allDirs <- dirname(Sys.glob(file.path(pp, "*", "spectrum.ms")))
+        dirsWithFI <- dirname(Sys.glob(file.path(pp, "*", "fingerid")))
+        unlink(setdiff(allDirs, dirsWithFI), recursive = TRUE)
+    }
 }
 
 expect_file <- function(object, file, removeIfExists = TRUE)

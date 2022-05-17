@@ -137,17 +137,18 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 #' @template main-rd-method
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
-                                                              adduct = NULL, elements = "CHNOP",
+                                                              adduct = NULL, projectPath = NULL, elements = "CHNOP",
                                                               profile = "qtof", database = NULL, noise = NULL,
                                                               cores = NULL, topMost = 100, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
                                                               absAlignMzDev = 0.002, verbose = TRUE,
-                                                              splitBatches = FALSE)
+                                                              splitBatches = FALSE, dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertString(projectPath, null.ok = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile, fixed = list(add = ac))
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -159,10 +160,14 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
            fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
+    checkmate::assertFlag(dryRun, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
         return(formulas(algorithm = "sirius"))
+    
+    if (!is.null(projectPath))
+        projectPath <- normalizePath(projectPath, mustWork = FALSE)
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     gNames <- names(fGroups)
@@ -170,9 +175,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
-                          database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
-                          verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
-                          splitBatches)
+                          database, noise, cores, FALSE, NULL, topMost, projectPath, extraOptsGeneral,
+                          extraOptsFormula, verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
+                          splitBatches, dryRun)
         
     if (calculateFeatures)
     {
@@ -216,9 +221,12 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
 #' @template featAnnSets-gen_args
 #' @rdname generateFormulasSIRIUS
 #' @export
-setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL, ...,
-                                                                 setThreshold = 0, setThresholdAnn = 0)
+setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+                                                                 projectPath = NULL, ..., setThreshold = 0,
+                                                                 setThresholdAnn = 0)
 {
+    checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
+    sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
     generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasSIRIUS, relMzDev = relMzDev, ...,
-                        setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+                        setThreshold = setThreshold, setThresholdAnn = setThresholdAnn, setArgs = sa)
 })

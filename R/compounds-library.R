@@ -120,16 +120,19 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(formula)]
     if (checkIons == "adduct")
         libRecs <- libRecs[!is.na(Precursor_type)]
-    if (checkIons != "none")
+    else if (checkIons == "polarity")
         libRecs <- libRecs[!is.na(Ion_mode)]
     
     getRecsForAdduct <- function(recs, add, addChr)
     {
         if (checkIons == "none")
             return(recs)
-        pos <- add@charge > 0
-        recs <- recs[((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
-        if (checkIons == "adduct")
+        else if (checkIons == "polarity")
+        {
+            pos <- add@charge > 0
+            recs <- recs[((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
+        }
+        else # if (checkIons == "adduct")
             recs <- recs[Precursor_type == addChr]
         return(recs)
     }

@@ -35,6 +35,9 @@ getDAAnaInfoAll <- function(pat = NULL)
     return(ret)
 }
 
+getMSLibMSPPath <- function() file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2012.msp")
+getMSLibJSONPath <- function() file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2016.json")
+
 if (testWithSets())
 {
     isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)

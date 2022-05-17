@@ -2,17 +2,14 @@ context("MS library")
 
 peakCount <- function(msl) sum(sapply(spectra(msl), nrow))
 
-MSPPath <- file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2012.msp")
-JSONPath <- file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2016.json")
-
-mslibraryMSP <- loadMSLibrary(MSPPath, "msp")
-mslibraryJSON <- loadMSLibrary(JSONPath, "json")
+mslibraryMSP <- loadMSLibrary(getMSLibMSPPath(), "msp")
+mslibraryJSON <- loadMSLibrary(getMSLibJSONPath(), "json")
 emptyFile <- tempfile(); file.create(emptyFile)
 
 loadMSPFileWithoutField <- function(field, ...)
 {
     out <- withr::local_tempfile(fileext = ".msp")
-    MSPLines <- readLines(MSPPath)
+    MSPLines <- readLines(getMSLibMSPPath())
     writeLines(MSPLines[!grepl(paste0("^", field), MSPLines)], out)
     return(loadMSLibrary(out, "msp", ...))
 }
@@ -26,7 +23,7 @@ test_that("verify library loading", {
     expect_length(loadMSLibrary(emptyFile, "msp"), 0)
     expect_length(loadMSLibrary(emptyFile, "json"), 0)
     
-    expect_gt(length(records(mslibraryMSP)), length(records(loadMSLibrary(MSPPath, "msp", parseComments = FALSE))))
+    expect_gt(length(records(mslibraryMSP)), length(records(loadMSLibrary(getMSLibMSPPath(), "msp", parseComments = FALSE))))
     
     expect_setequal(records(loadMSPFileWithoutField("Precursor_type", potAdducts = "[M+H]+"))$Precursor_type, c(NA, "[M+H]+"))
     expect_true(any(!is.na(records(loadMSPFileWithoutField("PrecursorMZ"))$PrecursorMZ)))

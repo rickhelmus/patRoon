@@ -26,6 +26,11 @@ if (doSIRIUS)
     compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
 }
 
+mslibrary <- loadMSLibrary(getMSLibJSONPath(), "json")
+compsLib <- doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0) # set minSim to 0 to get more 'hits'
+compsLibEmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "library", MSLibrary = mslibrary)
+compsLibEmptyPL <- doGenComps(fGroups, plistsEmpty, "library", MSLibrary = mslibrary)
+
 test_that("verify MetFragCL compound generation", {
     skip_if_not(doMetFrag)
     expect_known_value(compsMF, testFile("compounds-mf"))
@@ -44,6 +49,17 @@ test_that("verify SIRIUS compound generation", {
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
     expect_length(doGenComps(fGroups, plistsEmptyMS, "sirius"), 0)
+})
+
+test_that("verify Library compound generation", {
+    expect_known_value(compsLib, testFile("compounds-lib"))
+    expect_known_show(compsLib, testFile("compounds-lib", text = TRUE))
+    expect_length(compsLibEmpty, 0)
+    expect_length(compsLibEmptyPL, 0)
+    expect_length(doGenComps(fGroups, plistsEmptyMS, "library", MSLibrary = mslibrary), 0)
+    expect_length(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary["none"]), 0)
+    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))$libMatch), 0.25)
+    expect_true(all(!is.na(as.data.table(compsLib, fragments = TRUE)$frag_ion_formula))) # check presence annotations
 })
 
 hasCompounds <- doMetFrag || doSIRIUS
@@ -124,6 +140,10 @@ test_that("delete and filter", {
     expect_gt(length(filter(compsExplained, lossElements = "C1-100", negate = TRUE)), 0)
     expect_length(filter(compsExplained, lossElements = "Na1-100", negate = TRUE), length(compsExplained))
 
+    expect_lt(length(filter(compsLib, minScore = 0.25)), length(compsLib))
+    expect_lt(length(filter(compsLib, minScore = 0.25, negate = TRUE)), length(compsLib))
+    expect_equal(filter(compsLib, minScore = 0.25), filter(compsLib, scoreLimits = list(libMatch = c(0.25, Inf))))
+    
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 0.75)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minScore = 0.75, negate = TRUE)), length(compsMFIso))

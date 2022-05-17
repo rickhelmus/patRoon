@@ -251,8 +251,6 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
         if (!is.null(mzRangeSpec) || !is.null(relMinIntensity) || !is.null(topMost))
         obj <- delete(obj, j = function(rec, spec, ...)
         {
-            err <- tryCatch(rep(TRUE, nrow(spec)), error=function(...) NULL)
-            if (is.null(err)) browser()
             keep <- rep(TRUE, nrow(spec))
             if (nrow(spec) > topMost)
             {

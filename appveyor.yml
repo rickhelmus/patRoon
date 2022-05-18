@@ -39,7 +39,7 @@ install:
     #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  # - C:\RLibrary
+  - C:\RLibrary
   - C:\Program Files\Pandoc\
   - C:\deps
 
@@ -81,6 +81,7 @@ build_script:
     - travis-tool.sh install_github rickhelmus/cliqueMS
     - travis-tool.sh install_github KelseyChetnik/MetaClean
     - travis-tool.sh install_github KelseyChetnik/MetaCleanData
+    - travis-tool.sh install_github berlinguyinca/spectra-hash/splashR
     - travis-tool.sh install_r vdiffr
     - travis-tool.sh install_r covr
     - travis-tool.sh install_deps

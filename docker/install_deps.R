@@ -20,7 +20,8 @@ remotes::install_github(c("rickhelmus/patRoonData@version21",
                           "blosloos/nontarget",
                           "rickhelmus/KPIC2",
                           "rickhelmus/cliqueMS",
-                          "KelseyChetnik/MetaClean", "KelseyChetnik/MetaCleanData"),
+                          "KelseyChetnik/MetaClean", "KelseyChetnik/MetaCleanData",
+                          "berlinguyinca/spectra-hash/splashR"),
                         upgrade = "never")
 
 getMissingPkgs <- function()

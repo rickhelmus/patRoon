@@ -1,6 +1,6 @@
 testWithSets <- function() T # UNDONE: check environment variable or something
 
-getTestDataPathGeneric <- function() normalizePath("test_data")
+getTestDataPathGeneric <- function() "test_data"
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -238,7 +238,7 @@ updateSIRIUSCompsProj <- function(fGroups, mslists)
 {
     unlink(getSIRProjPath(), recursive = TRUE)
     withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRProjPath()))
-    for (pp in getSIRProjPath())
+    for (pp in normalizePath(getSIRProjPath()))
     {
         if (!dir.exists(pp))
             next

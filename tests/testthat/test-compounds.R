@@ -21,9 +21,9 @@ if (doMetFrag)
 if (doSIRIUS)
 {
     if (FALSE)
-        updateSIRIUSCompsProjDirs(fGroups, plists)
+        updateSIRIUSCompsProj(fGroups, plists)
     
-    compsSIR <- doGenComps(fGroups, plists, "sirius", dryRun = TRUE, projectPath = getSIRProjPath())
+    compsSIR <- doGenComps(fGroups, plists, "sirius", dryRun = TRUE, projectPath = paste0(getSIRProjPath(), ".sirius"))
     compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius")
     compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
 }

@@ -77,6 +77,14 @@ unifySirNames <- function(sir)
 
 SIRMPFinishHandler <- function(cmd)
 {
+    if (tools::file_ext(cmd$outPath) == "sirius")
+    {
+        # project directory was zipped, unzip to temp directory and process that instead
+        uzpath <- tempfile()
+        unzip(cmd$outPath, exdir = uzpath)
+        cmd$outPath <- uzpath
+    }
+    
     pArgs <- list(adduct = cmd$adduct)
     if (!is.null(cmd[["processArgs"]]))
         pArgs <- c(pArgs, cmd$processArgs)

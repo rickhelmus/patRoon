@@ -1,6 +1,6 @@
 testWithSets <- function() T # UNDONE: check environment variable or something
 
-getTestDataPathGeneric <- function() "test_data"
+getTestDataPathGeneric <- function() normalizePath("test_data")
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -234,7 +234,7 @@ makeMZXMLs <- function(anaInfo)
     return(anaInfo)
 }
 
-updateSIRIUSCompsProjDirs <- function(fGroups, mslists)
+updateSIRIUSCompsProj <- function(fGroups, mslists)
 {
     unlink(getSIRProjPath(), recursive = TRUE)
     withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRProjPath()))
@@ -242,9 +242,16 @@ updateSIRIUSCompsProjDirs <- function(fGroups, mslists)
     {
         if (!dir.exists(pp))
             next
+        
+        # remove directories without FingerID results, as these will trigger new online searches even with dryRun=TRUE
         allDirs <- dirname(Sys.glob(file.path(pp, "*", "spectrum.ms")))
         dirsWithFI <- dirname(Sys.glob(file.path(pp, "*", "fingerid")))
         unlink(setdiff(allDirs, dirsWithFI), recursive = TRUE)
+        
+        # zip to save space, .sirius extension seems to be needed. Change dir to fix the root.
+        zipf <- paste0(pp, ".sirius")
+        unlink(zipf)
+        withr::with_dir(pp, zip(zipf, Sys.glob("*")))
     }
 }
 

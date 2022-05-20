@@ -340,6 +340,11 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
 
+    hash <- makeHash(obj, adduct, spectrumType, avgSpecParams, collapse, suspects, prefCalcChemProps)
+    cd <- loadCacheData("convertToSuspectsMSLibrary", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     libRecs <- records(obj)
     libRecs <- libRecs[Precursor_type == as.character(adduct)]
     if (!is.null(spectrumType))
@@ -433,6 +438,8 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         ret <- ret[, mapCols, with = FALSE]
         ret <- prepareSuspectList(ret, NULL, FALSE, FALSE, FALSE, FALSE)
     }
+    
+    saveCacheData("convertToSuspectsMSLibrary", ret, hash)
     
     return(ret[])
 })

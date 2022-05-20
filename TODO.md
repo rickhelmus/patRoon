@@ -45,8 +45,7 @@
             - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
     - future
         - plotSpectrum, plotVenn, same data format for MSPeakLists
-    - convertToSuspects(): caching
-    - convertToSuspects: check if suspect list has InChIKey column
+    - convertToSuspects(): make adduct optional?
 - compounds
     - show mirror spectrum in report?
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra

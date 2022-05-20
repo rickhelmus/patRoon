@@ -783,7 +783,7 @@ Database            | Algorithm(s)            | Remarks
 
 #### Configuring MetFrag databases and scoring
 
-Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PubChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PubChemLite][PCLite-dl] (or the PubChem derived [OECD PFAS database][PC-PFAS]). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
 
 ```{r compDB,eval=FALSE}
 # PubChem: the default

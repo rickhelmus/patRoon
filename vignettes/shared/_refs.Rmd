@@ -18,6 +18,7 @@
 [CompTox-WW]: https://zenodo.org/record/3472781#.XnjMAHLvKUk
 [PCLite-dl]: https://zenodo.org/record/6503754
 [PCLite-paper]: https://doi.org/10.1186/s13321-021-00489-0
+[PC-PFAS]: https://zenodo.org/record/6385954
 [csvDB-ex]: https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
 [CSI:FingerID]: https://www.csi-fingerid.uni-jena.de/

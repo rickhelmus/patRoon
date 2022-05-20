@@ -94,7 +94,7 @@ Note that only the `CAMERA` installation is mandatory, the rest involves install
 
 Depending on which functionality is used, the following external dependencies may need to be installed:
 
-Software                            | Remarks
+Dependency                          | Remarks
 ----------------------------------- | -----------------------------------------------------
 [Java JDK][JavaJDK]                 | **Mandatory** for e.g. plotting structures and using MetFrag.
 [Rtools]                            | Necessary on Window and when `patRoon` is _not_ installed from `patRoonDeps`.
@@ -103,13 +103,14 @@ Software                            | Remarks
 [MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
 [MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
 [MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag.
+[MetFrag PubChem OECD PFAS DB][PC-PFAS] | Database file to use the OECD PFAS database with MetFrag.
 [SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
 [BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar).
 [SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
 [OpenBabel]                         | Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChI and formulae. While optional, highly recommended.
 [pngquant]                          | Used to reduce size of HTML reports, definitely optional.
 
-Most of these packages are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage.
+Most of these dependencies are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage if needed.
 
 After installation of these dependencies you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the `options()` R function, for instance:
 
@@ -121,6 +122,7 @@ options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant bi
 options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar") # full location to the jar file
 options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
 options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv") # full location to desired PubChemLite CSV file
+options(patRoon.path.MetFragPubChemLite = "~/PubChem_OECDPFAS_largerPFASparts_20220324") # full location to PFAS DB (NOTE: configured like PubChemLite)
 options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
 options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
 ```

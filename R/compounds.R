@@ -67,7 +67,7 @@ setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@merged
 #' @describeIn compounds Returns default scorings that are excluded from normalization.
 #' @export
 setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount",
-                                                                "libMatch"))
+                                                                "annotHitCount", "libMatch"))
 
 setMethod("annScoreNames", "compounds", function(obj, onlyNums) compScoreNames(onlyNums))
 

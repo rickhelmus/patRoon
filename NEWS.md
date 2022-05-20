@@ -1,8 +1,80 @@
 # patRoon 2.1
 
+This release extends the `2.0` release with new functionality, several important changes and bug fixes. The `newProject()` function was updated for the new functionality. Please see the updated Handbook and sections below for more information.
+
+Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+
+## Important new functionality and changes
+
+- Transformation product (TP) screening
+    - The `generateTPs()` function now supports an additional algorithm that interfaces with the [Chemical Transformation Simulator](https://qed.epa.gov/cts) (CTS). An important advantage of this algorithm is that it supports several abiotic transformation pathway libraries.
+    - Functionality was added to generate interactive plots of transformation pathways using the `plotGraph()` generic function. Furthermore, this function can incorporate componentization results to easily display which TPs are present in the screening results.
+    - A new class, `transformationProductsStructure`, is now used to store results for algorithms that provide structural information (`biotransformer`, `library` and `cts`). This better harmonizes the functionality between algorithms (e.g. `filter()`)
+    - `plotVenn()`, `plotUpSet()` and `consensus()` methods are now available to compare and combine TP data.
+    - TPs with equal structures but originating from different pathways are now handled differently to easy data interpretation
+        - The names for these TPs are now the same (but still unique per parent).
+        - These TPs are only included once in components, reports, suspect list conversion etc. to simplify data processing.
+        - For this reason `convertToMFDB()`/`generateComponentsTPs()` don't include any columns anymore that are specific to the transformation pathway.
+- Feature intensity normalization
+    - The functionality to normalize feature intensities was significantly extended in this release of `patRoon`. A new method function, `normInts()` now supports various normalization methods, such as normalization by internal standards and the TIC. With internal standard normalization, the `plotGraph()` function can be used to interactively evaluate which internal standards were automatically assigned to each feature group.
+    - Major changes
+        - The `normInts()` function now handles all normalization and stores normalized intensities/areas in the feature data.
+        - Functions that can use normalized data (`as.data.table()`, `plotInt()` etc) now have a new `normalized` argument, which should be `TRUE` to use normalized data. The `normFunc` argument to these functions was removed since it is not necessary anymore.
+        - If `normalized=TRUE` and `normInts()` was not called on the feature data, a simple automatic default normalization is done. This is primarily for backwards compatibility.
+    - Minor changes/additions
+        - `as.data.table()` can now report normalized values for averaged feature data (if (`features` && `average` && `normalized`) == TRUE)
+        - `removeISTDs` argument for `filter()` to remove feature groups that are assigned as internal standards.
+        - The analysis information can contain a normalization concentration column (`norm_conc`) that influences normalization calculations. The `generateAnalysisInfo()` function can now initialize this data.
+        - `ISTDs` and `ISTDAssignments` slots and their accessor methods `internalStandards()` and `internalStandardAssignments()` to store/access the internal standard assignment data.
+- MS libraries
+    - This release adds support for loading and post-processing MS libraries (e.g. MSP or JSON files from MassBank) and using them for compound annotation. An important advantage is that annotation may be more reliable since experimental spectra are matched, and the process is much faster since no online database search or in-silico annotation need to be performed. The rules for identification level estimation were updated accordingly to support the new spectral match score (`libMatch`).
+- The functionality to automatically curate and calculate chemical properties such as `SMILES`, `InChI` and formulas for e.g. suspect lists was significantly changed. More data is now verified, and several optimizations were implemented to better handle large suspect lists or MS libraries. Note that minor changes in `neutralMass` values may be observed. For more details please see the reference manual (e.g. `?screenSuspects`).
+
+
+## Other new functionality
+
+- Transformation products (TPs)
+    - The `filter()` method new  base class for storing TP data (`transformationProducts`)
+    - New `calcSims` argument: if `TRUE` then structural similarities will be calculated between parents/TPs. 
+    -  The `library` algorithm now caches its results and multiple transformation generations (`generations` argument)
+- `reportHTML()`
+    - Improved layout for TP reporting
+    - Plotting of transformation hierarchies (requires setting the new `TPs` argument).
+    - All reported feature information (chromatograms etc) are now placed inside a new menu
+- `generateFormulasSIRIUS()`/`generateCompoundsSIRIUS()`: `projectPath` and `dryRun` arguments. These are mainly for internal use.
+- `getEICs()` utility to obtain raw EIC data (suggested by Ricardo Cunha).
+
+
+## Minor changes
+
+- Transformation products (TPs)
+    - `biotransformer`
+        - Does not automatically calculate structural similarities anymore. This now requires setting the `calcSims` argument to `TRUE` (see above).
+        - Simplified/Harmonized several column names
+        - Converted ID and parent IDs to integer values. This was primarily done for consistency with other algorithms.
+        - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
+        - The `steps` argument was renamed to `generations` for consistency with other algorithms.
+    - `library` algorithm: naming of TPs is similarly done as other algorithms. The library TP names are now stored in the `name_lib` column.
+- Removed the `onlyLinked` argument from the `plotGraph()` generic. This was done as the new `plotGraph()` methods don't support this argument. Note that the argument was only removed from the generic, the original `plotGraph()` methods still support the argument.
+- `generateCompoundsSIRIUS()`: removed unused `errorRetries` argument
+- Updated used versions of PubChemLite, MetFrag and pugixml
+- Support for the MetFrag OECD PFAS compound database (https://zenodo.org/record/6385954). Should be configured like PubChemLite.
 - More consistent installation suggestion message when an R package from GitHub is found missing
 - Optimized `topMost` filter applied during MS peak list averaging
-- OpenBabel conversions are now done with multiprocessing to speed up calculations with large inputs
+
+
+## Fixes
+
+- Transformation products (TPs)
+    - Fixed: `convertMFDB()` now always collapses duplicates, not just for `biotransformer` results.
+    - Fixed: `biotransformer`: `retDir` is now derived from the _original_ parent, i.e. not its direct parent
+- Fixed: `reportHTML()` now properly subscripts negative element counts in formulas
+- Fixed: `reportHTML()` improve handling of missing or split compound identifiers when generating URL links
+- Fixed: annotatedPeakList() for `compounds`: avoid _unset suffixes in mergedBy column from data of sets workflows
+- Fixed: `newProject()`: loading analysis info from CSV now works again on Windows
+- More workarounds to avoid `NA` exit codes on Linux systems 
+- Fixed: `generateCompoundsSIRIUS()`: `topMost` argument was used where `topMostFormulas` was supposed to be used
+- Fixed: `as.data.table()` method for `featureAnnotations` would throw an error for empty results with `OM=TRUE`
 
 # patRoon 2.0.2
 

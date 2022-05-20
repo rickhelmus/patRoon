@@ -54,67 +54,16 @@
     - more status messages/progress bars?
     - skip/warn if obabel is not available?
 
+## DOCS
 
+- BT TP parent expansion
 
 ## NEWS
 
-- cache needs to be cleared for upgrade
 - TPs
-    - sim calc doesn't happen by default anymore for BT
-    - TP structure base class
-        - TPLibrary gains filter() method and parent structure sim calculation
-        - plotVenn(), plotUpSet() and consensus()
-    - filter() for TP base class
-    - Fixed: convertMFDB() now always collapses duplicates, not just for BT
     - BT
-        - Simplified/Harmonized several columns
-        - Converted ID and parent IDs to integer values
-        - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
-        - equal TPs formed from different routes (but from the same initial parent) are now named the same
-        - Fixed: retDir is now derived from _original_ parent, i.e. not its direct parent
         - TP parent expansion
-        - steps --> generations for consistency with other algos
-    - Lib
-        - IDs
-        - generations
-        - name --> name_lib, new name column for consistency
-        - caching
-    - convertToSuspects()/generateComponentsTPs(): only include TPs that are unique from each parent
-    - convertToMFDB()/generateComponentsTPs(): don't include columns that are specific to a parent/TP pair
     - additional args for generateTPs()
-- Removed onlyLinked argument from plotGraph generic (not components methods)
-- reportHTML
-    - features menu with submenus
-    - improvements TPs
-        - simplified parent table with separated plots
-        - plotGraph() (needs TP arg)
-    - Fixed: properly subscript negative element counts in formulas
-- normalization changes
-    - Added slots to fGroups --> cache should be cleared
-    - normFunc --> normalized for plotInt(), generateComponentsIntClust(), as.data.table()
-        - with auto normalization for compat
-    - as.data.table() can now report normalized values for avaraged feature data (features && average && normalized) == TRUE
-    - removeISTDs arg for fGroups filter()
-    - plotGraph() for fGroups
-    - normInts() method for fGroups
-        - new normalization methods: istd, tic, conc amongst features. Normalization across groups as before.
-    - normalized argument for groupTable() and plotVolcano()
-    - internalStandards() / internalStandardAssignments() methods (and slots)
-    - norm_conc column in analysisInfo
-    - newProject() changes
-- Fixed: annotatedPeakList() for compounds: avoid _unset suffixes in mergedBy column
-- Fixed: newProject(): loading analysis info from CSV now works on Windows
-- norm_concs argument to generateAnalysisInfo()
-- prepareChemTable() etc: faster and more thorough calculations, fixes for labeled compounds, ...
-    - neutral mass calculation _slightly_ different results
-- MP: more workarounds to handle NA exit codes on Linux
-- Fixed: reportHTML(): improve handling of missing or split IDs when generating compound DB links
-- getEICs() utility (suggested by Ricardo Cunha)
-- generateCompoundsSIRIUS(): removed unused errorRetries argument
-- Fixed: generateCompoundsSIRIUS(): `topMost` was used where `topMostFormulas` was supposed to be used
-- Fixed: as.data.table() method for featureAnnotations would throw an error for empty results with OM=TRUE
-- Updated PubChemLite, MetFrag, pugixml
-- Support for MF OECD PFAS DB
 
 
 # Lower priority

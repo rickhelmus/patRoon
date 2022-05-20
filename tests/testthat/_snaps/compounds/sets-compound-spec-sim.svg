@@ -37,19 +37,20 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw2NDUuNTN8MC4wMHw1NzYuMDA=)'>
-<text x='278.73' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text x='289.13' y='36.02' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='294.74' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text x='305.14' y='36.02' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>5</text>
-<text x='310.75' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text x='321.15' y='36.02' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='326.76' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='4.00px' lengthAdjust='spacingAndGlyphs'>/</text>
-<text x='330.76' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text x='341.16' y='36.02' style='font-size: 10.08px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>12</text>
-<text x='352.37' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text x='362.78' y='36.02' style='font-size: 10.08px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>17</text>
-<text x='373.99' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text x='384.39' y='33.36' style='font-size: 14.40px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>O</text>
+<text x='261.52' y='22.55' style='font-size: 14.40px; font-family: sans;' textLength='151.29px' lengthAdjust='spacingAndGlyphs'>1H-benzotriazole/DEET</text>
+<text x='278.73' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text x='289.13' y='46.83' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='294.74' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text x='305.14' y='46.83' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='310.75' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text x='321.15' y='46.83' style='font-size: 10.08px; font-family: sans;' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='326.76' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='4.00px' lengthAdjust='spacingAndGlyphs'>/</text>
+<text x='330.76' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text x='341.16' y='46.83' style='font-size: 10.08px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>12</text>
+<text x='352.37' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text x='362.78' y='46.83' style='font-size: 10.08px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>17</text>
+<text x='373.99' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='10.40px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text x='384.39' y='44.17' style='font-size: 14.40px; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>O</text>
 <text x='337.16' y='557.28' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='19.34px' lengthAdjust='spacingAndGlyphs'>m/z</text>
 <text transform='translate(12.96,280.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='108.06px' lengthAdjust='spacingAndGlyphs'>Normalized intensity</text>
 </g>

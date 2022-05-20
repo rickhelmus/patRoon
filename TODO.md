@@ -45,7 +45,6 @@
             - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
     - future
         - plotSpectrum, plotVenn, same data format for MSPeakLists
-    - convertToSuspects(): make adduct optional?
 - compounds
     - show mirror spectrum in report?
         - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
@@ -155,7 +154,6 @@
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
 - Somehow integrate XCMS::fillChromPeaks
-- Export generic EIC generation, i.e. without the need of feature data
 
 
 ## Annotation

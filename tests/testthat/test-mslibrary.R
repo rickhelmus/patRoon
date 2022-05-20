@@ -98,6 +98,8 @@ test_that("conversion",{
     checkmate::expect_names(names(suspColl), must.include = c("name", "SMILES", "InChI", "InChIKey",
                                                               "formula", "neutralMass", "fragments_mz"))
     checkmate::expect_names(names(suspAmend), must.include = c(names(patRoonData::suspectsPos), "fragments_mz"))
+    checkmate::expect_names(names(convertToSuspects(mslibraryMSP, adduct = NULL)), disjunct.from = "fragments_mz")
+    expect_warning(convertToSuspects(mslibraryMSP, adduct = NULL, suspects = patRoonData::suspectsPos))
     expect_equal(nrow(suspColl), uniqueN(getIKBlock1(records(mslibraryMSP)[Precursor_type == "[M+H]+"]$InChIKey)))
     expect_equal(as.data.frame(suspAmend[, names(patRoonData::suspectsPos), with = FALSE]), patRoonData::suspectsPos)
     

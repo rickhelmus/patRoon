@@ -280,16 +280,18 @@ setMethod("filter", "MSLibrary", function(obj, properties = NULL, massRange = NU
 #'   \code{\link{screenSuspects}}. See the \verb{Suspect conversion} section for details.
 #'
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
-#'   Any records with a different adduct (\code{Precursor_type}) are not considered.
+#'   Any records with a different adduct (\code{Precursor_type}) are not considered. Alternatively, \code{adduct} can be
+#'   set to \code{NULL} to not filter out any records. However, in this case \emph{no} MS/MS fragments will be added to
+#'   the returned suspect list.
 #' @param avgSpecParams A \code{list} with parameters used for averaging spectra. See \code{\link{getDefAvgPListParams}}
 #'   for more details.
 #' @param collapse Whether records with the same first-block \acronym{InChIKey} should be collapsed. See the
 #'   \verb{Suspect conversion} section for details.
 #' @param suspects If not \code{NULL} then this should be a suspect list (see \code{\link{screenSuspects}}) which will
 #'   be amended with spectra data. See the \verb{Suspect conversion} section for details.
-#'   
+#'
 #' @template spectrumType-arg
-#' 
+#'
 #' @return \code{convertToSuspects} return a suspect list (\code{data.table}), which can be used with
 #'   \code{\link{screenSuspects}}.
 #'
@@ -327,7 +329,8 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                                                                                           topMost = 10),
                                                      collapse = TRUE, suspects = NULL, prefCalcChemProps = TRUE)
 {
-    adduct <- checkAndToAdduct(adduct)
+    if (!is.null(adduct))
+        adduct <- checkAndToAdduct(adduct)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
@@ -339,6 +342,13 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     
     if (length(obj) == 0)
         stop("Cannot create suspect list: no data", call. = FALSE)
+    
+    calcMSMS <- !is.null(adduct)
+    if (!is.null(suspects) && !calcMSMS)
+    {
+        warning("No adduct specified, nothing to do...", call. = FALSE)
+        return(suspects)
+    }
 
     hash <- makeHash(obj, adduct, spectrumType, avgSpecParams, collapse, suspects, prefCalcChemProps)
     cd <- loadCacheData("convertToSuspectsMSLibrary", hash)
@@ -346,7 +356,9 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         return(cd)
     
     libRecs <- records(obj)
-    libRecs <- libRecs[Precursor_type == as.character(adduct)]
+    
+    if (!is.null(adduct))
+        libRecs <- libRecs[Precursor_type == as.character(adduct)]
     if (!is.null(spectrumType))
         libRecs <- libRecs[Spectrum_type %chin% spectrumType]
     if (nrow(libRecs) == 0)
@@ -368,11 +380,14 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         doProgress()
         paste0(avgPL$mz, collapse = ";")
     }
-        
-    printf("Calculating MS/MS fragments...\n")
+
+    if (calcMSMS)   
+        printf("Calculating MS/MS fragments...\n")
     
     if (!is.null(suspects))
     {
+        # NOTE: we always calculate MS/MS fragments here, since an early exit is done above if calcMSMS==FALSE
+        
         ret <- if (is.data.table(suspects)) copy(suspects) else as.data.table(suspects)
         # checkDesc = TRUE: we want to be able to calculate InChIKey1 values
         ret <- prepareSuspectList(ret, NULL, FALSE, checkDesc = TRUE, prefCalcChemProps = prefCalcChemProps,
@@ -408,15 +423,20 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         {
             ret <- ret[!is.na(InChIKey) & !is.na(PrecursorMZ)]
             ret[, InChIKey1 := getIKBlock1(InChIKey)]
-
-            frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(libSpecs[DB_ID], PrecursorMZ),
-                                                                by = "InChIKey1"])
-            setnames(frMZ, "V1", "fragments_mz")
-
-            ret <- unique(ret, by = "InChIKey1")
-            ret <- merge(ret, frMZ, by = "InChIKey1")
+            
+            if (calcMSMS)
+            {
+                frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(libSpecs[DB_ID], PrecursorMZ),
+                                                                    by = "InChIKey1"])
+                setnames(frMZ, "V1", "fragments_mz")
+                
+                ret <- unique(ret, by = "InChIKey1")
+                ret <- merge(ret, frMZ, by = "InChIKey1")
+            }
+            else
+                ret <- unique(ret, by = "InChIKey1")
         }
-        else
+        else if (calcMSMS)
         {
             withProg(nrow(ret), FALSE, ret[, fragments_mz := sapply(libSpecs[ret$DB_ID], function(spec)
             {
@@ -430,9 +450,10 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                      InChI = "InChI",
                      InChIKey = "InChIKey",
                      formula = "formula",
-                     Precursor_type = "adduct",
                      neutralMass = "neutralMass",
                      fragments_mz = "fragments_mz")
+        if (!is.null(adduct))
+            mapCols <- c(mapCols, Precursor_type = "adduct")
         mapCols <- mapCols[names(mapCols) %in% names(ret)]
         setnames(ret, names(mapCols), mapCols)
         ret <- ret[, mapCols, with = FALSE]

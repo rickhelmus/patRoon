@@ -1,1 +1,1 @@
-A MSLibrary objectHierarchy:workflowStep    |-- MSLibrary---Algorithm: jsonTotal records: 622
+A MSLibrary objectHierarchy:workflowStep    |-- MSLibrary---Algorithm: jsonTotal records: 622Total peaks: 14872Total annotated peaks: 14872 (100.00%)

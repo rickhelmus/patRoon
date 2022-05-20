@@ -115,20 +115,10 @@ MS peak lists.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object from which MS peak lists should be extracted.</p></dd>
-<dt>minMSIntensity</dt>
+<dt>minMSIntensity, minMSMSIntensity</dt>
 <dd><p>Minimum intensity for peak lists obtained with DataAnalysis. Highly
 recommended to set <samp>&gt;0</samp> as DA tends to report many very low intensity peaks.</p></dd>
-<dt>minMSMSIntensity</dt>
-<dd><p>Minimum intensity for peak lists obtained with DataAnalysis. Highly
-recommended to set <samp>&gt;0</samp> as DA tends to report many very low intensity peaks.</p></dd>
-<dt>close</dt>
-<dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
-processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
-prevents that many analyses might be opened simultaneously in DataAnalysis,
-which otherwise may use excessive memory or become slow. By default
-<code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
-likely what you want as otherwise any processed data is lost.</p></dd>
-<dt>save</dt>
+<dt>close, save</dt>
 <dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
 prevents that many analyses might be opened simultaneously in DataAnalysis,

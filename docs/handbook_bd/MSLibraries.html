@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>patRoon handbook</title>
-  <meta name="description" content="patRoon handbook" />
+  <title>8.7 MS libraries | patRoon handbook</title>
+  <meta name="description" content="8.7 MS libraries | patRoon handbook" />
   <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="patRoon handbook" />
+  <meta property="og:title" content="8.7 MS libraries | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="patRoon handbook" />
+  <meta name="twitter:title" content="8.7 MS libraries | patRoon handbook" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="installation.html"/>
+<link rel="prev" href="consensus.html"/>
+<link rel="next" href="compclust.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -341,47 +341,123 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">patRoon handbook</h1>
-<p class="author"><em>Rick Helmus</em></p>
-<p class="date"><em>2022-05-20</em></p>
-</div>
-<div id="introduction" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Introduction<a href="index.html#introduction" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Nowadays there are various software tools available to process data from non-target analysis (NTA) experiments. Individual tools such as <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a>, <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a>, <a href="http://openms.de/">OpenMS</a>, <a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a> and mass spectrometry vendor tools are often combined to perform a complete data processing workflow. During this workflow, raw data files may undergo pre-treatment (e.g. conversion), chromatographic and mass spectral data are combined to extract so called <em>features</em> (or ‘peaks’) and finally annotation is performed to elucidate chemical identities. The aim of <code>patRoon</code> is to harmonize the many available tools in order to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. The name is derived from a Dutch word that means <em>pattern</em> and may also be an acronym for <em>hyPhenated mAss specTROmetry nOn-target aNalysis</em>. The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, <code>patRoon</code> does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined. Furthermore, <code>patRoon</code> supplies a straightforward interface to easily inspect, select, visualize and report all data that is generated during the workflow.</p>
-<p>The documentation of <code>patRoon</code> consists of three parts:</p>
-<ol style="list-style-type: decimal">
-<li>A tutorial (accessible at <a href="https://rickhelmus.github.io/patRoon/articles/tutorial.html">here</a>)</li>
-<li>This handbook</li>
-<li>The reference manual (accessible in <code>R</code> with <code>?`patRoon-package`</code> or online <a href="https://rickhelmus.github.io/patRoon/reference/index.html">here</a>)</li>
-</ol>
-<p>New users are highly recommended to start with the tutorial: this document provides an interactive introduction in performing a basic NTA processing workflow with <code>patRoon</code>. The handbook provides a more thorough overview of all concepts, functionalities and provides instructions and many examples on working with <code>patRoon</code>. Finally, the reference manual provides all the gritty details for all functionalities, and is meant if you want to know more details or need a quick reminder how a function should be used.</p>
-<style type="text/css">
-pre, code {
-    white-space: pre !important;
-    overflow-x: auto !important;
-    max-height: 275px;
-    overflow-y: auto;
-}
-
-blockquote {
-    background-color: aliceblue;
-    padding: 0.25em 0.75em;
-}
-
-p.caption {
-  font-size: 0.8em;
-}
-</style>
-
+<div id="MSLibraries" class="section level2 hasAnchor" number="8.7">
+<h2><span class="header-section-number">8.7</span> MS libraries<a href="MSLibraries.html#MSLibraries" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>loadMSLibraries()</code> function is used to load MS spectral libraries, and was already briefly introduced for <a href="annotation.html#compAnnLib">compound annotation</a>. Currently, loading of MSP files and <a href="https://mona.fiehnlab.ucdavis.edu/">MoNA</a> JSON files is supported, while loading of formula annotations for MS peaks is currently only supported for the latter. The underlying algorithms implement several optimizations to efficiently load large number of records. Furthermore, <code>loadMSLibraries()</code> automatically verifies record data such as formulas, adducts and masses, and automatically calculates missing or invalid data where possible.</p>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="MSLibraries.html#cb241-1" aria-hidden="true" tabindex="-1"></a>mslibraryMSP <span class="ot">&lt;-</span> <span class="fu">loadMSLibrary</span>(<span class="st">&quot;MoNA-export-CASMI_2016.msp&quot;</span>, <span class="st">&quot;msp&quot;</span>)</span>
+<span id="cb241-2"><a href="MSLibraries.html#cb241-2" aria-hidden="true" tabindex="-1"></a>mslibraryJSON <span class="ot">&lt;-</span> <span class="fu">loadMSLibrary</span>(<span class="st">&quot;MoNA-export-CASMI_2016.json&quot;</span>, <span class="st">&quot;json&quot;</span>)</span></code></pre></div>
+<p>Several advanced parameters are available that influence the loading of MS library data, see the reference manual (<code>?loadMSLibrary</code>) for details.</p>
+<p>Once loaded, the usual methods are available to inspect its data:</p>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="MSLibraries.html#cb242-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(mslibraryMSP)</span></code></pre></div>
+<pre><code>#&gt; A MSLibrary object
+#&gt; Hierarchy:
+#&gt; workflowStep
+#&gt;     |-- MSLibrary
+#&gt; ---
+#&gt; Object size (indication): 101.6 kB
+#&gt; Algorithm: msp
+#&gt; Total records: 26
+#&gt; Total peaks: 318
+#&gt; Total annotated peaks: 0 (0.00%)</code></pre>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="MSLibraries.html#cb244-1" aria-hidden="true" tabindex="-1"></a>mslibraryMSP[[<span class="dv">1</span>]] <span class="co"># MS/MS spectrum for first candidate</span></span></code></pre></div>
+<pre><code>#&gt;           mz  intensity
+#&gt;  1: 135.0441   1.001001
+#&gt;  2: 161.0594   0.500501
+#&gt;  3: 163.0379   0.600601
+#&gt;  4: 173.0590   0.200200
+#&gt;  5: 176.0699   0.200200
+#&gt; ---                    
+#&gt; 44: 353.1191   1.201201
+#&gt; 45: 354.1323 100.000000
+#&gt; 46: 355.1351  20.820821
+#&gt; 47: 356.1374   2.702703
+#&gt; 48: 357.1401   0.300300</code></pre>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="MSLibraries.html#cb246-1" aria-hidden="true" tabindex="-1"></a>mslibraryJSON[[<span class="st">&quot;SM801601&quot;</span>]] <span class="co"># a record with annotations</span></span></code></pre></div>
+<pre><code>#&gt;          mz  intensity annotation
+#&gt; 1:  65.0388   0.100228       C5H5
+#&gt; 2:  91.0541   0.922448       C7H7
+#&gt; 3:  93.0573   5.489900      C6H7N
+#&gt; 4: 106.0651   0.101855      C7H8N
+#&gt; 5: 108.0807 100.000000     C7H10N
+#&gt; 6: 109.0648   2.004170      C7H9O
+#&gt; 7: 132.0807   0.926004     C9H10N
+#&gt; 8: 150.0913  76.554515    C9H12NO</code></pre>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="MSLibraries.html#cb248-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># overview of all metadata (select few columns for readability)</span></span>
+<span id="cb248-2"><a href="MSLibraries.html#cb248-2" aria-hidden="true" tabindex="-1"></a><span class="fu">records</span>(mslibraryJSON)[, .(DB_ID, Name, InChIKey, formula)]</span></code></pre></div>
+<pre><code>#&gt;         DB_ID                              Name                    InChIKey         formula
+#&gt;   1: SM800003                    1,2,3-Triazole QWENRTYMTSOGBR-UHFFFAOYSA-N          C2H3N3
+#&gt;   2: SM800201                   1-Naphthylamine RUFPHBVGCFYCNW-UHFFFAOYSA-N          C10H9N
+#&gt;   3: SM800553             2,3-Dihydroxybiphenyl YKOQAAJBYBTSBS-UHFFFAOYSA-N        C12H10O2
+#&gt;   4: SM800653                  2,4-Dibromphenol FAXWFCTVSHEODL-UHFFFAOYSA-N        C6H4Br2O
+#&gt;   5: SM800802                 2-Aminoanthracene YCSBALJAGZKWFF-UHFFFAOYSA-N         C14H11N
+#&gt;  ---                                                                                       
+#&gt; 618: SM884401                  Anthranilic acid RWZYAGGXGHYGMB-UHFFFAOYSA-N         C7H7NO2
+#&gt; 619: SM884552                  Fipronil sulfide FQXWEKADCSXYOC-UHFFFAOYSA-N   C12H4Cl2F6N4S
+#&gt; 620: SM884652                  Fipronil sulfone LGHZJDKSVUTELU-UHFFFAOYSA-N C12H4Cl2F6N4O2S
+#&gt; 621: SM884701 N-Cyclohexyl-2-benzothiazol-amine UPWPIFMHSFSVLE-UHFFFAOYSA-N       C13H16N2S
+#&gt; 622: SM884952               Fipronil desulfinyl JWKXVHLIRTVXLD-UHFFFAOYSA-N    C12H4Cl2F6N4</code></pre>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="MSLibraries.html#cb250-1" aria-hidden="true" tabindex="-1"></a><span class="co"># convert all data to a data.table (may be huge!)</span></span>
+<span id="cb250-2"><a href="MSLibraries.html#cb250-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(mslibraryMSP)[, .(DB_ID, SMILES, formula, mz, intensity)]</span></code></pre></div>
+<pre><code>#&gt;         DB_ID                                                         SMILES   formula       mz intensity
+#&gt;   1: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 135.0441  1.001001
+#&gt;   2: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 161.0594  0.500501
+#&gt;   3: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 163.0379  0.600601
+#&gt;   4: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 173.0590  0.200200
+#&gt;   5: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 176.0699  0.200200
+#&gt;  ---                                                                                                     
+#&gt; 314: SMI00172                                  C1=CC=C(C=C1)NN=CC2=CC=CC=C2N  C13H13N3 120.0678 22.170483
+#&gt; 315: SMI00172                                  C1=CC=C(C=C1)NN=CC2=CC=CC=C2N  C13H13N3 121.0756  6.520678
+#&gt; 316: SMI00172                                  C1=CC=C(C=C1)NN=CC2=CC=CC=C2N  C13H13N3 167.0729 28.015663
+#&gt; 317: SMI00172                                  C1=CC=C(C=C1)NN=CC2=CC=CC=C2N  C13H13N3 168.0810 13.500651
+#&gt; 318: SMI00172                                  C1=CC=C(C=C1)NN=CC2=CC=CC=C2N  C13H13N3 195.0917  8.223496</code></pre>
+<p>Furthermore, like many other objects in <code>patRoon</code>, the MS library objects can be subset and filtered:</p>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="MSLibraries.html#cb252-1" aria-hidden="true" tabindex="-1"></a>mslibrarySub <span class="ot">&lt;-</span> mslibrary[<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>] <span class="co"># only keep first 100 records</span></span>
+<span id="cb252-2"><a href="MSLibraries.html#cb252-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb252-3"><a href="MSLibraries.html#cb252-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep records a neutral mass of 100-200</span></span>
+<span id="cb252-4"><a href="MSLibraries.html#cb252-4" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">massRange =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">200</span>))</span>
+<span id="cb252-5"><a href="MSLibraries.html#cb252-5" aria-hidden="true" tabindex="-1"></a><span class="co"># remove records with neutral mass below 100</span></span>
+<span id="cb252-6"><a href="MSLibraries.html#cb252-6" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">massRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb252-7"><a href="MSLibraries.html#cb252-7" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep mass peaks with m/z 100-500</span></span>
+<span id="cb252-8"><a href="MSLibraries.html#cb252-8" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">mzRangeSpec =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">500</span>))</span>
+<span id="cb252-9"><a href="MSLibraries.html#cb252-9" aria-hidden="true" tabindex="-1"></a><span class="co"># remove low intensity peaks (&lt;1%) and only keep top 10</span></span>
+<span id="cb252-10"><a href="MSLibraries.html#cb252-10" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">relMinIntensity =</span> <span class="fl">0.01</span>, <span class="at">topMost =</span> <span class="dv">10</span>)</span>
+<span id="cb252-11"><a href="MSLibraries.html#cb252-11" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep mass peak with annotations</span></span>
+<span id="cb252-12"><a href="MSLibraries.html#cb252-12" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibraryJSON, <span class="at">onlyAnnotated =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>In addition, the <code>properties</code> filter may be useful to tailor the library data. The library properties can be obtained as following:</p>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="MSLibraries.html#cb253-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">records</span>(mslibrary)) <span class="co"># get all property names</span></span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;Name&quot;             &quot;Synon&quot;            &quot;DB_ID&quot;            &quot;InChIKey&quot;        
+#&gt;  [5] &quot;InChI&quot;            &quot;Precursor_type&quot;   &quot;Spectrum_type&quot;    &quot;PrecursorMZ&quot;     
+#&gt;  [9] &quot;Instrument_type&quot;  &quot;Instrument&quot;       &quot;Ion_mode&quot;         &quot;Collision_energy&quot;
+#&gt; [13] &quot;formula&quot;          &quot;MW&quot;               &quot;neutralMass&quot;      &quot;Comments&quot;        
+#&gt; [17] &quot;SMILES&quot;           &quot;SPLASH&quot;           &quot;CAS&quot;              &quot;PubChemCID&quot;      
+#&gt; [21] &quot;ChemSpiderID&quot;     &quot;Ionization&quot;       &quot;Resolution&quot;</code></pre>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="MSLibraries.html#cb255-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(<span class="fu">records</span>(mslibrary)[[<span class="st">&quot;Instrument_type&quot;</span>]]) <span class="co"># Get the available instrument types</span></span></code></pre></div>
+<pre><code>#&gt; [1] &quot;LC-ESI-QTOF&quot;  &quot;LC-APCI-ITFT&quot; &quot;APCI-ITFT&quot;</code></pre>
+<p>Then to filter the MS library:</p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="MSLibraries.html#cb257-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep APCI instrument types</span></span>
+<span id="cb257-2"><a href="MSLibraries.html#cb257-2" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">properties =</span> <span class="fu">list</span>(<span class="at">Instrument_type =</span> <span class="fu">c</span>(<span class="st">&quot;LC-APCI-ITFT&quot;</span>, <span class="st">&quot;APCI-ITFT&quot;</span>)))</span>
+<span id="cb257-3"><a href="MSLibraries.html#cb257-3" aria-hidden="true" tabindex="-1"></a><span class="co"># remove Q-TOF by negation</span></span>
+<span id="cb257-4"><a href="MSLibraries.html#cb257-4" aria-hidden="true" tabindex="-1"></a>mslibraryF <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslibrary, <span class="at">properties =</span> <span class="fu">list</span>(<span class="at">Instrument_type =</span> <span class="st">&quot;LC-ESI-QTOF&quot;</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>More advanced filtering can be performed with the <code>delete()</code> generic function, see the reference manual for details (<code>?MSLibrary</code>).</p>
+<p>Finally, functionality exists to convert, export and merge MS libraries:</p>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="MSLibraries.html#cb258-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the MS library to a suspect list.</span></span>
+<span id="cb258-2"><a href="MSLibraries.html#cb258-2" aria-hidden="true" tabindex="-1"></a><span class="co"># By setting collapse to TRUE, all records with the same first block InChIKey</span></span>
+<span id="cb258-3"><a href="MSLibraries.html#cb258-3" aria-hidden="true" tabindex="-1"></a><span class="co"># are collapsed and mass peaks are averaged.</span></span>
+<span id="cb258-4"><a href="MSLibraries.html#cb258-4" aria-hidden="true" tabindex="-1"></a>suspL <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(mslibrary, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">collapse =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb258-5"><a href="MSLibraries.html#cb258-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Amend custom suspect list with library data (fragments_mz column)</span></span>
+<span id="cb258-6"><a href="MSLibraries.html#cb258-6" aria-hidden="true" tabindex="-1"></a>suspL <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(mslibrary, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">suspects =</span> patRoonData<span class="sc">::</span>suspectsPos)</span>
+<span id="cb258-7"><a href="MSLibraries.html#cb258-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb258-8"><a href="MSLibraries.html#cb258-8" aria-hidden="true" tabindex="-1"></a><span class="fu">export</span>(mslibrary, <span class="at">out =</span> <span class="st">&quot;myMSLib.msp&quot;</span>) <span class="co"># export to a new MSP library</span></span>
+<span id="cb258-9"><a href="MSLibraries.html#cb258-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb258-10"><a href="MSLibraries.html#cb258-10" aria-hidden="true" tabindex="-1"></a>mslibraryM <span class="ot">&lt;-</span> <span class="fu">merge</span>(mslibraryMSP, mslibraryJSON) <span class="co"># merge two libraries</span></span></code></pre></div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="installation.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="consensus.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="compclust.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

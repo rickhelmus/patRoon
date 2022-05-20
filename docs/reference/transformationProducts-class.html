@@ -123,12 +123,15 @@ $(x, name)
 as.data.table(x)
 
 # S4 method for transformationProducts
-convertToSuspects(TPs, includeParents = FALSE)</code></pre></div>
+convertToSuspects(obj, includeParents = FALSE)
+
+# S4 method for transformationProducts
+filter(obj, properties = NULL, verbose = TRUE, negate = FALSE)</code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>TPs, x, object</dt>
+    <dl><dt>TPs, x, obj, object</dt>
 <dd><p><code>transformationProducts</code> object to be accessed</p></dd>
 <dt>i</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select parents by
@@ -142,7 +145,19 @@ their index or name, respectively (for the order/names see <code><a href="generi
 <dd><p>The parent name (partially matched).</p></dd>
 <dt>includeParents</dt>
 <dd><p>If <code>TRUE</code> then parents are also included in the returned suspect list.</p></dd>
+<dt>properties</dt>
+<dd><p>A named <code>list</code> with properties to be filtered. Each item in the <code>list</code> should be named
+with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
+<em>e.g.</em> <code>names(TPs)[[1]]</code>. Example: <code>properties=list(likelihood=c("LIKELY","PROBABLE"))</code>. Set to <code>NULL</code> to ignore.</p></dd>
+<dt>verbose</dt>
+<dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+<dt>negate</dt>
+<dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    <p><code>filter</code> returns a filtered <code>transformationProducts</code> object.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>This class holds all generated data for transformation products for a set of parents. The class is <code>virtual</code> and
@@ -150,9 +165,9 @@ derived objects are created by <a href="generateTPs.html">TP generators</a>.</p>
 <p>The TP data in objects from this class include a <code>retDir</code> column. These are <code>numeric</code> values that hint what
 the the chromatographic retention order of a TP might be compared to its parent: a value of <samp>-1</samp> means it will
 elute earlier, <samp>1</samp> it will elute later and <samp>0</samp> that there is no significant difference or the direction is
-unknown. These values are based on a typical reversed phase separation. When <code><a href="generateTPsBioTransformer.html">generateTPsBioTransformer</a></code>
-or <code><a href="generateTPsLibrary.html">generateTPsLibrary</a></code> was used to generate the data, the <code>retDir</code> values are based on calculated
-<code>log P</code> values of the parent and its TPs.</p>
+unknown. These values are based on a typical reversed phase separation. When structural information is available
+(<em>e.g.</em> when <code><a href="generateTPsBioTransformer.html">generateTPsBioTransformer</a></code> or <code><a href="generateTPsLibrary.html">generateTPsLibrary</a></code> was used to generate
+the data), the <code>retDir</code> values are based on calculated <code>log P</code> values of the parent and its TPs.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
@@ -169,6 +184,7 @@ or <code><a href="generateTPsLibrary.html">generateTPsLibrary</a></code> was use
 <li><p><code>as.data.table</code>: Returns all TP data in a table.</p></li>
 <li><p><code>convertToSuspects</code>: Converts this object to a suspect list that can be used as input for
 <code><a href="suspect-screening.html">screenSuspects</a></code>.</p></li>
+<li><p><code>filter</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -187,16 +203,19 @@ or <code><a href="generateTPsLibrary.html">generateTPsLibrary</a></code> was use
 </dl></div>
     <div id="s-class-hierarchy">
     <h2>S4 class hierarchy</h2>
-    <p></p><ul><li><p><code><a href="workflowStep-class.html">workflowStep</a></code></p><ul><li><p><strong><code>transformationProducts</code></strong></p><ul><li><p><code><a href="transformationProductsBT-class.html">transformationProductsBT</a></code></p></li>
-<li><p><code><a href="transformationProductsLibrary-class.html">transformationProductsLibrary</a></code></p></li>
+    <p></p><ul><li><p><code><a href="workflowStep-class.html">workflowStep</a></code></p><ul><li><p><strong><code>transformationProducts</code></strong></p><ul><li><p><code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code></p><ul><li><p><code><a href="transformationProductsStructure-class.html">transformationProductsStructureConsensus</a></code></p></li>
+<li><p><code><a href="transformationProductsStructure-class.html">transformationProductsCTS</a></code></p></li>
+<li><p><code><a href="transformationProductsStructure-class.html">transformationProductsBT</a></code></p></li>
+<li><p><code><a href="transformationProductsStructure-class.html">transformationProductsLibrary</a></code></p></li>
+</ul></li>
 <li><p><code>transformationProductsLogic</code></p></li>
 </ul></li>
 </ul></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>Derived classes <code><a href="transformationProductsBT-class.html">transformationProductsBT</a></code> and <code><a href="transformationProductsLibrary-class.html">transformationProductsLibrary</a></code> for
-  specific algorithm methods and <code><a href="generateTPs.html">generateTPs</a></code></p></div>
+    <div class="dont-index"><p>The derived <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class for more methods and
+  <code><a href="generateTPs.html">generateTPs</a></code></p></div>
     </div>
 
   </div>

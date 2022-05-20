@@ -103,19 +103,20 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
   <span class="va">MSPeakLists</span>,
   relMzDev <span class="op">=</span> <span class="fl">5</span>,
   adduct <span class="op">=</span> <span class="cn">NULL</span>,
+  projectPath <span class="op">=</span> <span class="cn">NULL</span>,
   elements <span class="op">=</span> <span class="st">"CHNOP"</span>,
   profile <span class="op">=</span> <span class="st">"qtof"</span>,
   formulaDatabase <span class="op">=</span> <span class="cn">NULL</span>,
   fingerIDDatabase <span class="op">=</span> <span class="st">"pubchem"</span>,
   noise <span class="op">=</span> <span class="cn">NULL</span>,
-  errorRetries <span class="op">=</span> <span class="fl">2</span>,
   cores <span class="op">=</span> <span class="cn">NULL</span>,
   topMost <span class="op">=</span> <span class="fl">100</span>,
   topMostFormulas <span class="op">=</span> <span class="fl">5</span>,
   extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,
   extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,
   verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>
+  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,
+  dryRun <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
 
 <span class="co"># S4 method for featureGroupsSet</span>
@@ -124,6 +125,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
   <span class="va">MSPeakLists</span>,
   relMzDev <span class="op">=</span> <span class="fl">5</span>,
   adduct <span class="op">=</span> <span class="cn">NULL</span>,
+  projectPath <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>,
   setThreshold <span class="op">=</span> <span class="fl">0</span>,
   setThresholdAnn <span class="op">=</span> <span class="fl">0</span>
@@ -147,6 +149,11 @@ Sets the <span class="option">--ppm-max</span> command line option.</p></dd>
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
 <p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
   adduct annotations will then always be used.</p></dd>
+<dt>projectPath, dryRun</dt>
+<dd><p>These are mainly for internal purposes. <code>projectPath</code> sets the output directory for
+the <code class="command">SIRIUS</code> output (a temporary directory if <code>NULL</code>). If <code>dryRun</code> is <code>TRUE</code> then no
+computations are done and only the results from <code>projectPath</code> are processed.</p>
+<p>(<strong>sets workflow</strong>) <code>projectPath</code> should be a <code>character</code> specifying the paths for each set.</p></dd>
 <dt>elements</dt>
 <dd><p>Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum
@@ -167,9 +174,6 @@ candidates. Possible values are: <span class="option">"pubchem"</span>, <span cl
 <dt>noise</dt>
 <dd><p>Median intensity of the noise (<code>NULL</code> ignores this parameter). Sets the <span class="option">--noise</span>
 commandline option.</p></dd>
-<dt>errorRetries</dt>
-<dd><p>Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
-errors.</p></dd>
 <dt>cores</dt>
 <dd><p>The number of cores <code class="command">SIRIUS</code> will use. If <code>NULL</code> then the default of all cores will be
 used.</p></dd>

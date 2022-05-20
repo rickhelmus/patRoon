@@ -100,7 +100,7 @@
   <span class="va">fGroups</span>,
   method <span class="op">=</span> <span class="st">"complete"</span>,
   metric <span class="op">=</span> <span class="st">"euclidean"</span>,
-  normFunc <span class="op">=</span> <span class="va">max</span>,
+  normalized <span class="op">=</span> <span class="cn">TRUE</span>,
   average <span class="op">=</span> <span class="cn">TRUE</span>,
   maxTreeHeight <span class="op">=</span> <span class="fl">1</span>,
   deepSplit <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -117,7 +117,7 @@
 <code><a href="https://rdrr.io/pkg/fastcluster/man/hclust.html" class="external-link">fastcluster::hclust</a></code>).</p></dd>
 <dt>metric</dt>
 <dd><p>Distance metric used to calculate the distance matrix (passed to <code>daisy</code>).</p></dd>
-<dt>normFunc, average</dt>
+<dt>normalized, average</dt>
 <dd><p>Passed to <code><a href="featureGroups-class.html">as.data.table</a></code> to perform
 normalization and averaging of data.</p></dd>
 <dt>maxTreeHeight, deepSplit, minModuleSize</dt>

@@ -109,7 +109,8 @@ identified compounds.</p>
   formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,
   compounds <span class="op">=</span> <span class="cn">NULL</span>,
   compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span><span class="op">)</span>,
+  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
+    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
   compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
   components <span class="op">=</span> <span class="cn">NULL</span>,
   retMin <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -128,7 +129,8 @@ identified compounds.</p>
   reportFormulaSpectra <span class="op">=</span> <span class="cn">TRUE</span>,
   compounds <span class="op">=</span> <span class="cn">NULL</span>,
   compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span><span class="op">)</span>,
+  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
+    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
   compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,
   compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,
   compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
@@ -155,7 +157,8 @@ identified compounds.</p>
   formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,
   compounds <span class="op">=</span> <span class="cn">NULL</span>,
   compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span><span class="op">)</span>,
+  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
+    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
   compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,
   compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,
   compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
@@ -164,12 +167,14 @@ identified compounds.</p>
   interactiveHeat <span class="op">=</span> <span class="cn">FALSE</span>,
   MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,
   specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,
+  TPs <span class="op">=</span> <span class="cn">NULL</span>,
   retMin <span class="op">=</span> <span class="cn">TRUE</span>,
   EICRtWindow <span class="op">=</span> <span class="fl">20</span>,
   EICMzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,
   EICTopMost <span class="op">=</span> <span class="fl">1</span>,
   EICTopMostByRGroup <span class="op">=</span> <span class="cn">TRUE</span>,
   EICOnlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,
+  TPGraphStructuresMax <span class="op">=</span> <span class="fl">25</span>,
   selfContained <span class="op">=</span> <span class="cn">TRUE</span>,
   optimizePng <span class="op">=</span> <span class="cn">FALSE</span>,
   clearPath <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -249,48 +254,44 @@ used to determine the plotting grid when reporting EICs in PDF files.</p></dd>
 <code>rtWindow</code>, <code>mzExpWindow</code>, <code>topMost</code>, <code>topMostByRGroup</code>
 and <code>onlyPresent</code> arguments).</p></dd>
 <dt>reportPlots</dt>
-<dd><p>A character vector specifying what should be plotted.
-Valid options are: <code>"chord"</code>, <code>"venn"</code>, <code>"upset"</code> (plot a
-chord, Venn and UpSet diagram, respectively), <code>"eics"</code> (plot EICs for
-individual feature groups) and <code>"formulas"</code> (plot annotated formula
-spectra). Set to <code>"none"</code> to plot none of these.</p></dd>
+<dd><p>A character vector specifying what should be plotted. Valid options are: <code>"chord"</code>,
+<code>"venn"</code>, <code>"upset"</code> (plot a chord, Venn and UpSet diagram, respectively), <code>"eics"</code> (plot EICs for
+individual feature groups) and <code>"formulas"</code> (plot annotated formula spectra). Set to <code>"none"</code> to plot
+none of these.</p></dd>
 <dt>includeMFWebLinks</dt>
-<dd><p>A <code>character</code> specifying to which feature
-groups a web link should be added in the annotation page to
-<a href="https://msbi.ipb-halle.de/MetFragBeta/index.xhtml" class="external-link">MetFragWeb</a>.
-Options are: <code>"compounds"</code> (only to those with compounds results),
-<code>"MSMS"</code> (only to those with MSMS peak lists) or <code>"none"</code>.</p></dd>
+<dd><p>A <code>character</code> specifying to which feature groups a web link should be added in the
+annotation page to <a href="https://msbi.ipb-halle.de/MetFragBeta/index.xhtml" class="external-link">MetFragWeb</a>. Options are:
+<code>"compounds"</code> (only to those with compounds results), <code>"MSMS"</code> (only to those with MSMS peak lists) or
+<code>"none"</code>.</p></dd>
 <dt>interactiveHeat</dt>
-<dd><p>If <code>TRUE</code> an interactive heatmap HTML widget will
-be generated to display hierarchical clustering results. Set to
-<code>FALSE</code> for a 'regular' static plot.</p></dd>
+<dd><p>If <code>TRUE</code> an interactive heatmap HTML widget will be generated to display hierarchical
+clustering results. Set to <code>FALSE</code> for a 'regular' static plot.</p></dd>
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+<dt>TPs</dt>
+<dd><p>A <code><a href="transformationProducts-class.html">transformationProducts</a></code> object that should used for plotting hierarchies. Ignored if
+<code>TPs=NULL</code> or <code>components</code> is not a <code>componentsTPs</code> object.</p></dd>
+<dt>TPGraphStructuresMax</dt>
+<dd><p>Maximum number of TP structures to plot in TP hierarchies, see the <code>TPs</code> argument.
+Sets the <code>structuresMax</code> argument to <code><a href="feature-plotting.html">plotGraph</a></code>.</p></dd>
 <dt>selfContained</dt>
-<dd><p>If <code>TRUE</code> the output will be a standalone HTML file
-which contains all graphics and script dependencies. When <code>FALSE</code>, the
-latter will be placed in an additional directory (<code class="file">report_files</code>)
-which should remain present when viewing the output file. Especially on
-Windows, a non-self contained output might be desirable when reporting
-large amounts of data to prevent <code class="command">pandoc</code> from running out of
-memory.</p></dd>
+<dd><p>If <code>TRUE</code> the output will be a standalone HTML file which contains all graphics and script
+dependencies. When <code>FALSE</code>, the latter will be placed in an additional directory (<code class="file">report_files</code>) which
+should remain present when viewing the output file. Especially on Windows, a non-self contained output might be
+desirable when reporting large amounts of data to prevent <code class="command">pandoc</code> from running out of memory.</p></dd>
 <dt>optimizePng</dt>
-<dd><p>If <code>TRUE</code> then <code class="command">pngquant</code> is used to reduce
-the size of generated graphics. A significant reduction in disk space usage
-may be seen, however, at the cost additional processing time. Multiple
-<code class="command">pngquant</code> processes will be executed in parallel, which can be
-configured with <span class="option">patRoon.MP.maxProcs</span> (parallelization will always
-happen with the <code>"classic"</code> method, see
+<dd><p>If <code>TRUE</code> then <code class="command">pngquant</code> is used to reduce the size of generated graphics. A
+significant reduction in disk space usage may be seen, however, at the cost additional processing time. Multiple
+<code class="command">pngquant</code> processes will be executed in parallel, which can be configured with
+<span class="option">patRoon.MP.maxProcs</span> (parallelization will always happen with the <code>"classic"</code> method, see
 <a href="patRoon-package.html">patRoon options</a>).</p></dd>
 <dt>openReport</dt>
-<dd><p>If set to <code>TRUE</code> then the output report file will be
-opened with the system browser.</p></dd>
+<dd><p>If set to <code>TRUE</code> then the output report file will be opened with the system browser.</p></dd>
 <dt>noDate</dt>
-<dd><p>If <code>TRUE</code> then the current date is not added to the
-report. This is mainly used for testing and its main purpose is to
-guarentees equal report files when `reportHTML()` is called multiple times
-with equal arguments.</p></dd>
+<dd><p>If <code>TRUE</code> then the current date is not added to the report. This is mainly used for testing and
+its main purpose is to guarentees equal report files when `reportHTML()` is called multiple times with equal
+arguments.</p></dd>
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -314,10 +315,8 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
   to <code>reportHTML</code> this function may be faster and yield smaller report
   files, however, its functionality is a bit more basic and generated data is
   more 'scattered' around.</p>
-<p><code>reportHTML</code> will report graphical data (<em>e.g.</em>
-  chromatograms and mass spectra) and summary information in an easy
-  browsable <code>HTML</code> file using rmarkdown, flexdashboard and
-  knitr.</p>
+<p><code>reportHTML</code> will report graphical data (<em>e.g.</em> chromatograms and mass spectra) and summary
+  information in an easy browsable <code>HTML</code> file using rmarkdown, flexdashboard and knitr.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -331,15 +330,14 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
   computations. Please see the parallelization section in the handbook for
   more details and <a href="patRoon-package.html">patRoon options</a> for configuration
   options.</p>
-<p>Currently, <code>reportHTML</code> only uses
-  <code>"classic"</code> multiprocessing, regardless of the
+<p>Currently, <code>reportHTML</code> only uses <code>"classic"</code> multiprocessing, regardless of the
   <span class="option">patRoon.MP.method</span> option.</p>
     </div>
     <div id="references">
     <h2>References</h2>
     <p>Creating MetFrag landing page URLs based on code from
-  <a href="https://github.com/Treutler/MetFamily" class="external-link">MetFamily</a> R package. <br><br>
-  Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and Hall/CRC. ISBN 978-1498716963 <br><br> Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
+  <a href="https://github.com/Treutler/MetFamily" class="external-link">MetFamily</a> R package. <br><br> Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and Hall/CRC. ISBN 978-1498716963 <br><br>
+  Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
     </div>
 
   </div>

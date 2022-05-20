@@ -121,6 +121,7 @@
   rGroups <span class="op">=</span> <span class="cn">NULL</span>,
   results <span class="op">=</span> <span class="cn">NULL</span>,
   removeBlanks <span class="op">=</span> <span class="cn">FALSE</span>,
+  removeISTDs <span class="op">=</span> <span class="cn">FALSE</span>,
   checkFeaturesSession <span class="op">=</span> <span class="cn">NULL</span>,
   negate <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
@@ -199,6 +200,9 @@ of the objects. Set to <code>NULL</code> to ignore.</p></dd>
 blank in the <a href="analysis-information.html">analysis-information</a>. This is useful to simplify the analyses in the specified
 <code><a href="featureGroups-class.html">featureGroups</a></code> object after blank subtraction. When both <code>blankThreshold</code> and this argument are
 set, blank subtraction is performed prior to removing any analyses.</p></dd>
+<dt>removeISTDs</dt>
+<dd><p>If <code>TRUE</code> then all feature groups marked as internal standard (IS) are removed. This requires
+IS assignments done by <code><a href="featureGroups-class.html">normInts</a></code>, see its documentation for more details.</p></dd>
 <dt>checkFeaturesSession</dt>
 <dd><p>If set then features and/or feature groups are removed that were selected for removal
 (see <a href="check-GUI.html">check-GUI</a>). The session files are typically generated with the <code><a href="check-GUI.html">checkFeatures</a></code> and
@@ -262,7 +266,7 @@ the given replicate groups.</p></dd>
 <li><p>General abundance filters (<em>i.e.</em> <code>absMinAnalyses</code>, <code>relMinAnalyses</code>, <code>absMinReplicates</code>,
   <code>relMinReplicates</code>, <code>absMinFeatures</code> and <code>relMinFeatures</code>).</p></li>
 <li><p>Replicate group filter (<em>i.e.</em> <code>rGroups</code>), results filter (<em>i.e.</em> <code>results</code>) and blank
-  analyses removal (<em>i.e.</em> if <code>removeBlanks=TRUE</code>).</p></li>
+  analyses / internal standard removal (<em>i.e.</em> <code>removeBlanks=TRUE</code> / <code>removeISTDs=TRUE</code>).</p></li>
 </ol><p>If another filtering order is desired then <code>filter</code> should be called multiple times with only one filter
   argument at a time.</p>
     </div>

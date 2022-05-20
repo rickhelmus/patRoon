@@ -114,7 +114,7 @@ length(x)
 show(object)
 
 # S4 method for featureGroups
-groupTable(object, areas = FALSE)
+groupTable(object, areas = FALSE, normalized = FALSE)
 
 # S4 method for featureGroups
 analysisInfo(obj)
@@ -139,6 +139,12 @@ groupScores(fGroups)
 
 # S4 method for featureGroups
 annotations(obj)
+
+# S4 method for featureGroups
+internalStandards(fGroups)
+
+# S4 method for featureGroups
+internalStandardAssignments(fGroups)
 
 # S4 method for featureGroups
 adducts(obj)
@@ -170,7 +176,7 @@ as.data.table(
   qualities = FALSE,
   regression = FALSE,
   averageFunc = mean,
-  normFunc = NULL,
+  normalized = FALSE,
   FCParams = NULL
 )
 
@@ -198,8 +204,24 @@ selectIons(
   chargeMismatch = "adduct"
 )
 
+# S4 method for featureGroups
+normInts(
+  fGroups,
+  featNorm = "none",
+  groupNorm = FALSE,
+  normFunc = max,
+  standards = NULL,
+  ISTDRTWindow = 120,
+  ISTDMZWindow = 300,
+  minISTDs = 3,
+  ...
+)
+
 # S4 method for featureGroupsSet
 sets(obj)
+
+# S4 method for featureGroupsSet
+internalStandardAssignments(fGroups, set = NULL)
 
 # S4 method for featureGroupsSet
 adducts(obj, set, ...)
@@ -231,7 +253,7 @@ as.data.table(
   qualities = FALSE,
   regression = FALSE,
   averageFunc = mean,
-  normFunc = NULL,
+  normalized = FALSE,
   FCParams = NULL
 )
 
@@ -243,6 +265,19 @@ overlap(fGroups, which, exclusive, sets = FALSE)
 
 # S4 method for featureGroupsSet
 selectIons(fGroups, components, prefAdduct, ...)
+
+# S4 method for featureGroupsSet
+normInts(
+  fGroups,
+  featNorm = "none",
+  groupNorm = FALSE,
+  normFunc = max,
+  standards = NULL,
+  ISTDRTWindow = 120,
+  ISTDMZWindow = 300,
+  minISTDs = 3,
+  ...
+)
 
 # S4 method for featureGroupsSet
 unset(obj, set)
@@ -262,6 +297,11 @@ delete(obj, ...)</code></pre></div>
     <dl><dt>areas</dt>
 <dd><p>If set to <code>TRUE</code> then areas are considered instead of peak intensities.</p>
 <p>For <code>as.data.table</code>: ignored if <code>features=TRUE</code>, as areas of features are always reported.</p></dd>
+<dt>normalized</dt>
+<dd><p>If <code>TRUE</code> then normalized intensity data is used (see the <code>Feature intensity
+  normalization</code> section.</p>
+<p>For <code>as.data.table</code>: if no normalization data is available (<em>e.g.</em> because <code>normInts</code> was not used)
+  then an automatic group normalization is performed.</p></dd>
 <dt>fGroups, obj, x, object</dt>
 <dd><p><code>featureGroups</code> object to be accessed.</p></dd>
 <dt>value</dt>
@@ -279,6 +319,7 @@ feature group, with a vector of the group intensities as first argument, the gro
 <dt>...</dt>
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
+<p>For <code>normInts</code>: passed to <code><a href="suspect-screening.html">screenSuspects</a></code> if <code>featNorm="istd"</code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>featureGroups</code> method.</p></dd>
 <dt>rGroups</dt>
 <dd><p>For <code>[</code>: An optional <code>character</code> vector: if specified only keep results for the given
@@ -317,11 +358,6 @@ no <code>conc</code> column is present in the analysis information or when less 
 (<em>i.e.</em> the minimum amount).</p></dd>
 <dt>averageFunc</dt>
 <dd><p>Function used for averaging. Only used when <code>average=TRUE</code> or <code>FCParams != NULL</code>.</p></dd>
-<dt>normFunc</dt>
-<dd><p>Function that should be used for normalization of data. The function is called for all
-intensities/areas of a feature group and these quantities are divided by the result of the function call. For
-example, when <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></code> is used normalized intensities will be between zero and one. If all quantities are
-zero then the function will not be called. Set to <code>NULL</code> to perform no normalization.</p></dd>
 <dt>FCParams</dt>
 <dd><p>A parameter list to calculate Fold change data. See <code>getFCParams</code> for more details. Set to
 <code>NULL</code> to not perform FC calculations.</p></dd>
@@ -366,6 +402,27 @@ values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</
 (ignore both annotations) and <code>"ignore"</code> (don't check for charge mismatches). <em>Important</em>: when
 <code class="command">OpenMS</code> is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropriate.</p></dd>
+<dt>featNorm</dt>
+<dd><p>The method applied for feature normalization: <code>"istd"</code>, <code>"tic"</code>, <code>"conc"</code> or
+<code>"none"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
+<dt>groupNorm</dt>
+<dd><p>If <code>TRUE</code> then group normalization is performed. See the <code>Feature intensity normalization</code>
+section for details.</p></dd>
+<dt>normFunc</dt>
+<dd><p>A <code>function</code> to combine data for normalization. See the <code>Feature intensity normalization</code>
+section for details.</p></dd>
+<dt>standards</dt>
+<dd><p>A <code>data.table</code> (or <code>data.frame</code>) with all internal standards. Should follow the format of
+  a <a href="suspect-screening.html">suspect list</a>. Only used if <code>featNorm="istd"</code>. See the <code>Feature intensity
+  normalization</code> section for details.</p>
+<p>(<strong>sets workflow</strong>) Can also be a <code>list</code> with internal standard lists.</p>
+<p>See the <code>suspects</code> argument to <code><a href="suspect-screening.html">screenSuspects</a></code> for more details.</p></dd>
+<dt>ISTDRTWindow, ISTDMZWindow</dt>
+<dd><p>The retention time and <em>m/z</em> windows for IS selection. Only used if
+<code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
+<dt>minISTDs</dt>
+<dd><p>The minimum number of IS that should be assigned to each feature (if possible). Only used if
+<code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 <dt>reGroup</dt>
@@ -381,7 +438,9 @@ Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropr
     <p><code>delete</code> returns the object for which the specified data was removed.
 <code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.
 <code>selectIons</code> returns a <code>featureGroups</code> object with only the selected feature groups and amended
-  with adduct annotations.</p>
+  with adduct annotations.
+<code>normInts</code> returns a <code>featureGroups</code> object, amended with data in the <code>ISTDs</code> and
+<code>ISTDAssignments</code> slots if <code>featNorm="istd"</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -411,6 +470,8 @@ replicate groups for which data is present in this object.</p></li>
 <li><p><code>groupQualities</code>: Accessor for <code>groupQualities</code> slot.</p></li>
 <li><p><code>groupScores</code>: Accessor for <code>groupScores</code> slot.</p></li>
 <li><p><code>annotations</code>: Accessor for <code>annotations</code> slot.</p></li>
+<li><p><code>internalStandards</code>: Accessor for <code>ISTDs</code> slot.</p></li>
+<li><p><code>internalStandardAssignments</code>: Accessor for <code>ISTDAssignments</code> slot.</p></li>
 <li><p><code>adducts</code>: Returns a named <code>character</code> with adduct annotations assigned to each feature group (if
 available).</p></li>
 <li><p><code>adducts&lt;-</code>: Sets adduct annotations for feature groups.</p></li>
@@ -449,6 +510,8 @@ annotation accuracy. On the other hand, it is important the componentization res
 highly recommended that, prior to calling <code>selectIons</code>, the settings to <code><a href="generateComponents.html">generateComponents</a></code> are
 optimized and its results are reviewed with <code><a href="check-GUI.html">checkComponents</a></code>. Finally, the <code>adducts&lt;-</code> method can
 be used to manually correct adduct assignments afterwards if necessary.</p></li>
+<li><p><code>normInts</code>: Provides various methods to normalizes feature intensities for each sample analysis or of
+all features within a feature group. See the <code>Feature intensity normalization</code> section below.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -485,13 +548,23 @@ column) for each feature group. Access with <code>groupInfo</code> method.</p></
 method).</p></dd>
 
 
+<dt><code>ISTDs</code></dt>
+<dd><p>A <code>data.table</code> with screening results for internal standards (filled in by the <code>normInts</code>
+method).</p></dd>
+
+
+<dt><code>ISTDAssignments</code></dt>
+<dd><p>A <code>list</code>, where each item is named by a feature group and consists of a vector with
+feature group names of the internal standards assigned to it (filled in by the <code>normInts</code> method).</p></dd>
+
+
 <dt><code>groupAlgo,groupArgs,groupVerbose</code></dt>
 <dd><p>(<strong>sets workflow</strong>) Grouping parameters that were used when this object was created. Used
 by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perform a re-grouping of features.</p></dd>
 
 
-<dt><code>annotations</code></dt>
-<dd><p>(<strong>sets workflow</strong>) As the <code>featureGroups</code> slot, but contains the annotation data per set.</p></dd>
+<dt><code>annotations,ISTDAssignments</code></dt>
+<dd><p>(<strong>sets workflow</strong>) As the <code>featureGroups</code> slots, but contains the data per set.</p></dd>
 
 
 </dl></div>
@@ -514,6 +587,50 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </ul></li>
 </ul></li>
 </ul></div>
+    <div id="feature-intensity-normalization">
+    <h2>Feature intensity normalization</h2>
+    <p>The <code>normInts</code> method performs normalization of feature intensities
+  (and areas). These values are amended in the <code>features</code> slot, while the original intensities/areas are kept.
+  To use the normalized intensities set <code>normalized=TRUE</code> to methods such as <code><a href="generics.html">plotInt</a></code>,
+  <code><a href="generateComponentsIntClust.html">generateComponentsIntClust</a></code> and <code>as.data.table</code>. Please see the <code>normalized</code> argument
+  documentation for these methods for more details.</p>
+<p>The <code>normInts</code> method supports several methods to normalize intensities/areas of features within the same
+  analysis. Most methods are influenced by the <em>normalization concentration</em> (<code>norm_conc</code> in the
+  <a href="analysis-information.html">analysis information</a>) set for each sample analysis. For <code>NA</code> or zero values the
+  output will be zero. If the <code>norm_conc</code> is completely absent from the analysis information, the normalization
+  concentration is defaulted to one.</p>
+<p>The different normalization methods are:</p>
+<p></p><ol><li><p><code>featNorm="istd"</code> Uses <em>internal standards</em> (IS) for normalization. The IS are screened internally
+  by the <code><a href="suspect-screening.html">screenSuspects</a></code> function. Hence, the IS specified by the <code>standards</code> argument should
+  follow the format of a <a href="suspect-screening.html">suspect list</a>. Note that labelled elements in IS formulae should
+  be specified with the <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> format, <em>e.g.</em> <code>"[13]C"</code> for 13C, <code>"[2]H"</code> for a deuterium etc.
+  Example IS lists are provided with the <span class="pkg">patRoonData</span> package.</p>
+<p>The assignment of IS to features is automatically performed, using the following criteria:</p><ol><li><p>Only analyses are considered with a defined normalization concentration.</p></li>
+<li><p>The IS must be detected in all of the analyses in which the feature was detected.</p></li>
+<li><p>The retention time and <em>m/z</em> are reasonably close (<code>ISTDRTWindow</code>/<code>ISTDMZWindow</code> arguments).
+  However, additional IS candidates outside these windows will be chosen if the number of candidates is less than the
+  <code>minISTDs</code> argument. In this case the next close(st) candidate(s) will be chosen.</p></li>
+</ol><p>Normalization of features within the same feature group always occur with the same IS. If multiple IS are assigned
+  to a feature then normalization occurs with the combined intensity (area), which is calculated with the function
+  defined by the <code>normFunc</code> argument. The (combined) IS intensity is then normalized by the normalization
+  concentration, and finally used for feature normalization.</p></li>
+<li><p><code>featNorm="tic"</code> Uses the Total Ion Current (TIC) to normalize intensities. The TIC is calculated by
+  combining all intensities with the function defined by the <code>normFunc</code> argument. For this reason, you may need
+  to take care to perform normalization before <em>e.g.</em> suspect screening or other prioritization techniques. The
+  TIC normalized intensities are finally divided by the normalization concentration.</p></li>
+<li><p><code>featNorm="conc"</code> Simply divides all intensities (areas) with the normalization concentration defined
+  for the sample.</p></li>
+<li><p><code>featNorm="none"</code> Performs no normalization. The raw intensity values are simply copied. This is mainly
+  useful if you only want to do group normalization (described below).</p></li>
+</ol><p>The meaning of the normalization concentration differs for each method: for <code>"istd"</code> it resembles the IS
+  concentration of a sample analysis, whereas for <code>"tic"</code> and <code>"conc"</code> it is used to normalize different
+  sample amounts (<em>e.g.</em> injection volume).</p>
+<p>If <code>groupNorm=TRUE</code> then feature intensities (areas) will be normalized by the combined values for its feature
+  group (again, combination occurs with <code>normFunc</code>). This <em>group normalization</em> always occurs <em>after</em>
+  aforementioned normalization methods. Group normalization was the only method with <span class="pkg">patRoon</span> <samp>&lt;2.1</samp>, and
+  still occurs automatically if <code>normInts</code> was not called when a method is executed that requests normalized
+  data.</p>
+    </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
     <p>The <code>featureGroupsSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>featureGroups</code> and therefore largely follows the same user interface.</p>
@@ -531,6 +648,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
   data.</p></li>
 <li><p><code>overlap</code> and <code>unique</code> allow to handle data per set. See the <code>sets</code> argument description.</p></li>
 <li><p><code>selectIons</code> Will perform a re-grouping of features. The implications of this are discussed below.</p></li>
+<li><p><code>normInts</code> Performs normalization for each set <em>independently</em>.</p></li>
 </ul><p>A re-grouping of features occurs if <code>selectIons</code> is called or <code>adducts&lt;-</code> is used with
   <code>reGroup=TRUE</code>. Afterwards, it is very likely that feature group names are changed. Since data generated later
   in the workflow (<em>e.g.</em> annotation steps) rely on feature group names, these objects are <strong>not valid</strong>

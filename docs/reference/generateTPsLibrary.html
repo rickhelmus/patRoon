@@ -98,8 +98,13 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">generateTPsLibrary</span><span class="op">(</span>
   parents <span class="op">=</span> <span class="cn">NULL</span>,
   TPLibrary <span class="op">=</span> <span class="cn">NULL</span>,
+  generations <span class="op">=</span> <span class="fl">1</span>,
   skipInvalid <span class="op">=</span> <span class="cn">TRUE</span>,
-  matchParentsBy <span class="op">=</span> <span class="st">"InChIKey"</span>
+  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,
+  matchParentsBy <span class="op">=</span> <span class="st">"InChIKey"</span>,
+  calcSims <span class="op">=</span> <span class="cn">FALSE</span>,
+  fpType <span class="op">=</span> <span class="st">"extended"</span>,
+  fpSimMethod <span class="op">=</span> <span class="st">"tanimoto"</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -114,16 +119,37 @@ If <code>NULL</code> then TPs for all parents in the library are obtained.</p></
 <dt>TPLibrary</dt>
 <dd><p>If <code>NULL</code>, a default <a href="https://doi.org/10.5281/zenodo.5644560" class="external-link">PubChem</a> based library is
 used. Otherwise, <code>TPLibrary</code> should be a <code>data.frame</code>. See the details below.</p></dd>
+<dt>generations</dt>
+<dd><p>An <code>integer</code> that specifies the number of transformation generations. TPs for subsequent
+iterations obtained by repeating the library search where the TPs from the previous generation are considered
+parents.</p></dd>
 <dt>skipInvalid</dt>
 <dd><p>If set to <code>TRUE</code> then the parents will be skipped (with a warning) for which insufficient
 information (<em>e.g.</em> SMILES) is available.</p></dd>
+<dt>prefCalcChemProps</dt>
+<dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
+<acronym>InChIKey</acronym> are preferred over what is already present in the parent suspect list. For efficiency reasons it is
+recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
+more details.</p></dd>
 <dt>matchParentsBy</dt>
 <dd><p>A <code>character</code> that specifies how the input parents are matched with the data from the TP
 library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <code>"InChI"</code>, <code>"SMILES"</code>.</p></dd>
+<dt>calcSims</dt>
+<dd><p>If set to <code>TRUE</code> then structural similarities between the parent and its TPs are calculated. A
+minimum similarity can be obtained by using the <a href="transformationProductsStructure-class.html">filter
+method</a>. May be useful under the assumption that parents and TPs who have a high structural similarity, also likely
+have a high MS/MS spectral similarity (which can be evaluated after componentization with
+<code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code>).</p></dd>
+<dt>fpType</dt>
+<dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
+<code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
+<dt>fpSimMethod</dt>
+<dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
+of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The TPs are stored in an object from the <code><a href="transformationProductsLibrary-class.html">transformationProductsLibrary</a></code> class.</p>
+    <p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -140,6 +166,24 @@ library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <
     <p>When the <code>parents</code> argument is a <code><a href="compounds-class.html">compounds</a></code> object, the candidate library <code>identifier</code>
   is used in case the candidate has no defined <code>compoundName</code>.</p>
     </div>
+    <div id="validating-and-calculating-chemical-properties">
+    <h2>Validating and calculating chemical properties</h2>
+    <p>Chemical properties such as <acronym>SMILES</acronym>,
+  <acronym>InChIKey</acronym> and formula in the parent suspect list are automatically validated and calculated if missing/invalid.</p>
+<p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
+  entries will be set to <code>NA</code>.</p></li>
+<li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
+  <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data. If <code>prefCalcChemProps=TRUE</code> then existing
+  <acronym>InChIKey</acronym> and formula data is overwritten by calculated values whenever possible.</p></li>
+<li><p>The chemical formulae which were <em>not</em> calculated are verified and normalized. This process may be time
+  consuming, and is potentially largely avoided by setting <code>prefCalcChemProps=TRUE</code>.</p></li>
+<li><p>Neutral masses are calculated for missing values (<code>prefCalcChemProps=FALSE</code>) or whenever possible
+  (<code>prefCalcChemProps=TRUE</code>).</p></li>
+</ul><p>Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
+  deuterium (2H) elements.</p>
+<p>This functionality relies heavily on <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a>, please make sure it is
+  installed.</p>
+    </div>
     <div id="custom-tp-libraries">
     <h2>Custom TP libraries</h2>
     <p>The <code>TPLibrary</code> argument is used to specify a custom TP library. This should be a
@@ -150,6 +194,15 @@ library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <
   <code>parent_LogP</code> and <code>TP_LogP</code> are specified. (<strong>optional</strong>)</p></li>
 </ul><p>Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
   by repeating the value within <code>parent_</code> columns.</p>
+    </div>
+    <div id="references">
+    <h2>References</h2>
+    <p>Guha, R. (2007). 'Chemical Informatics Functionality in R'. Journal of Statistical Software 6(18)</p>
+<p>OBoyle NM, Banck M, James CA, Morley C, Vandermeersch T, Hutchison GR (2011).
+“Open Babel: An open chemical toolbox.”
+<em>Journal of Cheminformatics</em>, <b>3</b>(1).
+<a href="https://doi.org/10.1186/1758-2946-3-33" class="external-link">doi:10.1186/1758-2946-3-33</a>
+.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

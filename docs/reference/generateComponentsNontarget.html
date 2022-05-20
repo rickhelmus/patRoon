@@ -129,26 +129,26 @@ components by unsupervised detection of homologous series.</p>
 <dd><p>A numeric vector containing the minimum and maximum retention time (in seconds) between homologues.
 Series are always considered from low to high <em>m/z</em>, thus, a negative minimum retention time allows detection
 of homologous series with increasing <em>m/z</em> and decreasing retention times. These values set the <code>minrt</code>
-and <code>maxrt</code> arguments of <code>homol.search</code>.</p></dd>
+and <code>maxrt</code> arguments of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
 <dt>mzRange</dt>
 <dd><p>A numeric vector specifying the minimum and maximum <em>m/z</em> increment of a homologous series. Sets
-the <code>minmz</code> and <code>maxmz</code> arguments of <code>homol.search</code>.</p></dd>
+the <code>minmz</code> and <code>maxmz</code> arguments of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
 <dt>elements</dt>
 <dd><p>A character vector with elements to be considered for detection of repeating units. Sets the
-<code>elements</code> argument of <code>homol.search</code> function.</p></dd>
+<code>elements</code> argument of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> function.</p></dd>
 <dt>rtDev</dt>
-<dd><p>Maximum retention time deviation. Sets the <code>rttol</code> to <code>homol.search</code>.</p></dd>
+<dd><p>Maximum retention time deviation. Sets the <code>rttol</code> to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
 <dt>absMzDev</dt>
-<dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code>mztol</code> argument to <code>homol.search</code></p></dd>
+<dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code>mztol</code> argument to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code></p></dd>
 <dt>absMzDevLink</dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation when linking series. This should usually be a bit higher
 than <code>absMzDev</code> to ensure proper linkage.</p></dd>
 <dt>traceHack</dt>
-<dd><p>Currently <code>homol.search</code> does not work with <span style="R">R</span> <samp>&gt;3.3.3</samp>. This flag, which is
+<dd><p>Currently <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> does not work with <span style="R">R</span> <samp>&gt;3.3.3</samp>. This flag, which is
 enabled by default on these R versions, implements a (messy) workaround
 (<a href="https://github.com/blosloos/nontarget/issues/6" class="external-link">more details here</a>).</p></dd>
 <dt>...</dt>
-<dd><p>Any further arguments passed to <code>homol.search</code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+<dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -158,10 +158,10 @@ enabled by default on these R versions, implements a (messy) workaround
     <h2>Details</h2>
     <p>This function uses nontarget to generate components. This function is called when calling <code>generateComponents</code> with
   <code>algorithm="nontarget"</code>.</p>
-<p>In the first step the <code>homol.search</code> function is used to detect all homologous series within
-  each replicate group (analyses within each replicate group are averaged prior to detection). Then, homologous
-  series across replicate groups are merged in case of full overlap or when merging of partial overlapping series
-  causes no conflicts.</p>
+<p>In the first step the <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> function is used to detect all homologous series
+  within each replicate group (analyses within each replicate group are averaged prior to detection). Then,
+  homologous series across replicate groups are merged in case of full overlap or when merging of partial overlapping
+  series causes no conflicts.</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>

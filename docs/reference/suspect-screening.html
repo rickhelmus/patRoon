@@ -103,6 +103,7 @@
   <span class="va">mzWindow</span>,
   <span class="va">adduct</span>,
   <span class="va">skipInvalid</span>,
+  <span class="va">prefCalcChemProps</span>,
   <span class="va">onlyHits</span>
 <span class="op">)</span>
 
@@ -130,6 +131,7 @@
   <span class="va">mzWindow</span>,
   <span class="va">adduct</span>,
   <span class="va">skipInvalid</span>,
+  <span class="va">prefCalcChemProps</span>,
   <span class="va">onlyHits</span>
 <span class="op">)</span>
 
@@ -141,6 +143,7 @@
   <span class="va">mzWindow</span>,
   <span class="va">adduct</span>,
   <span class="va">skipInvalid</span>,
+  <span class="va">prefCalcChemProps</span>,
   <span class="va">onlyHits</span>,
   amend <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
@@ -166,6 +169,11 @@ of suspect masses</code> sections below.</p></dd>
 <dd><p>If set to <code>TRUE</code> then suspects with invalid data (<em>e.g.</em> missing names or other missing
 data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no <code>mz</code>
 column is present in the suspect list), for instance, due to invalid <code>SMILES</code>, will be ignored with a warning.</p></dd>
+<dt>prefCalcChemProps</dt>
+<dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
+<acronym>InChIKey</acronym> are preferred over what is already present in the suspect list. For efficiency reasons it is
+recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
+more details.</p></dd>
 <dt>onlyHits</dt>
 <dd><p>If <code>TRUE</code> then all feature groups not matched by any of the suspects will be removed.</p></dd>
 <dt>amend</dt>
@@ -205,9 +213,6 @@ possible, as it can significantly reduce the load on data interpretation.</p>
     <p>Both <code>screenSuspects</code> may use the suspect names to base file names used for reporting, logging etc.
   Therefore, it is important that these are file-compatible names. For this purpose, <code>screenSuspects</code> will
   automatically try to convert long, non-unique and/or otherwise incompatible suspect names.</p>
-<p>For <code>screenSuspects</code> in some cases you may need to install
-  <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a> (<em>e.g.</em> when only InChI data is available for mass
-  calculation).</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
@@ -247,6 +252,24 @@ possible, as it can significantly reduce the load on data interpretation.</p>
   either the <code>adduct</code> argument needs to be specified, or the <code>featureGroups</code> input object must have adduct
   annotations.</p></li>
 </ul></div>
+    <div id="validating-and-calculating-chemical-properties">
+    <h2>Validating and calculating chemical properties</h2>
+    <p>Chemical properties such as <acronym>SMILES</acronym>,
+  <acronym>InChIKey</acronym> and formula in the suspect list are automatically validated and calculated if missing/invalid.</p>
+<p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
+  entries will be set to <code>NA</code>.</p></li>
+<li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
+  <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data. If <code>prefCalcChemProps=TRUE</code> then existing
+  <acronym>InChIKey</acronym> and formula data is overwritten by calculated values whenever possible.</p></li>
+<li><p>The chemical formulae which were <em>not</em> calculated are verified and normalized. This process may be time
+  consuming, and is potentially largely avoided by setting <code>prefCalcChemProps=TRUE</code>.</p></li>
+<li><p>Neutral masses are calculated for missing values (<code>prefCalcChemProps=FALSE</code>) or whenever possible
+  (<code>prefCalcChemProps=TRUE</code>).</p></li>
+</ul><p>Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
+  deuterium (2H) elements.</p>
+<p>This functionality relies heavily on <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a>, please make sure it is
+  installed.</p>
+    </div>
     <div id="references">
     <h2>References</h2>
     <p>OBoyle NM, Banck M, James CA, Morley C, Vandermeersch T, Hutchison GR (2011).

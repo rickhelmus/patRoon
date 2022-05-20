@@ -99,7 +99,7 @@
 
 <span class="fu">MetFragAdducts</span><span class="op">(</span><span class="op">)</span>
 
-<span class="fu">as.adduct</span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, isPositive <span class="op">=</span> <span class="cn">NULL</span>, charge <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
+<span class="fu">as.adduct</span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, isPositive <span class="op">=</span> <span class="cn">NULL</span>, charge <span class="op">=</span> <span class="cn">NULL</span>, err <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="fu">calculateIonFormula</span><span class="op">(</span><span class="va">formula</span>, <span class="va">adduct</span><span class="op">)</span>
 
@@ -132,6 +132,9 @@ positive. Should only be set when <code>format="metfrag"</code> and <code>x</cod
 <code>numeric</code> identifier.</p></dd>
 <dt>charge</dt>
 <dd><p>The final charge. Only needs to be set when <code>format="openms"</code>.</p></dd>
+<dt>err</dt>
+<dd><p>If <code>TRUE</code> then an error will be thrown if conversion fails,
+otherwise returns without data.</p></dd>
 <dt>formula</dt>
 <dd><p>A <code>character</code> vector with formulae to convert.</p></dd>
 <dt>adduct</dt>

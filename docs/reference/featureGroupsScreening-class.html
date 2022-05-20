@@ -352,7 +352,10 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
   peaks were annotated. If both formula and compound annotations are available then <code>annSimBoth</code> is calculated
   after combining all the annotated peaks, otherwise <code>annSimBoth</code> equals the available value for
   <code>annSimForm</code> or <code>annSimComp</code>. The similarity calculation can be configured with the
-  <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments to <code>annotateSuspects</code>.</p></li>
+  <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments to <code>annotateSuspects</code>. Note for annotation with
+  <code>generateCompoundsLibrary</code> results: the method and default parameters for <code>annSimComp</code> calculation
+  slightly differs to those from the spectral similarity calculated with compound annotation (<code>libMatch</code> score),
+  hence small differences in results are typically observed.</p></li>
 <li><p><code>maxFrags</code> The maximum number of MS/MS fragments that can be matched for this suspect (based on the
   <code>fragments_*</code> columns from the suspect list).</p></li>
 <li><p><code>maxFragMatches</code>,<code>maxFragMatchesRel</code> The absolute and relative amount of experimental MS/MS peaks
@@ -374,14 +377,20 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
     suspectFragments: 3
     retention: 12
 2a:
-    individualMoNAScore:
-        min: 0.9
-        higherThanNext: .inf
+    or:
+        - individualMoNAScore:
+            min: 0.9
+            higherThanNext: .inf
+        - libMatch:
+            min: 0.9
+            higherThanNext: .inf
     rank:
         max: 1
         type: compound
 3a:
-    individualMoNAScore: 0.4
+    or:
+        - individualMoNAScore: 0.4
+        - libMatch: 0.4
 3b:
     suspectFragments: 3
 3c:

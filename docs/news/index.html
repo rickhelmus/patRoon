@@ -91,10 +91,100 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1" id="patroon-21">patRoon 2.1<a class="anchor" aria-label="anchor" href="#patroon-21"></a></h2>
-<ul><li>More consistent installation suggestion message when an R package from GitHub is found missing</li>
-<li>Optimized <code>topMost</code> filter applied during MS peak list averaging</li>
-<li>OpenBabel conversions are now done with multiprocessing to speed up calculations with large inputs</li>
+<p>This release extends the <code>2.0</code> release with new functionality, several important changes and bug fixes. The <code><a href="../reference/newProject.html">newProject()</a></code> function was updated for the new functionality. Please see the updated Handbook and sections below for more information.</p>
+<p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
+<div class="section level3">
+<h3 id="important-new-functionality-and-changes-2-1">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-1"></a></h3>
+<ul><li>Transformation product (TP) screening
+<ul><li>The <code><a href="../reference/generateTPs.html">generateTPs()</a></code> function now supports an additional algorithm that interfaces with the <a href="https://qed.epa.gov/cts" class="external-link">Chemical Transformation Simulator</a> (CTS). An important advantage of this algorithm is that it supports several abiotic transformation pathway libraries.</li>
+<li>Functionality was added to generate interactive plots of transformation pathways using the <code><a href="../reference/generics.html">plotGraph()</a></code> generic function. Furthermore, this function can incorporate componentization results to easily display which TPs are present in the screening results.</li>
+<li>A new class, <code>transformationProductsStructure</code>, is now used to store results for algorithms that provide structural information (<code>biotransformer</code>, <code>library</code> and <code>cts</code>). This better harmonizes the functionality between algorithms (e.g. <code><a href="../reference/generics.html">filter()</a></code>)</li>
+<li>
+<code><a href="../reference/generics.html">plotVenn()</a></code>, <code><a href="../reference/generics.html">plotUpSet()</a></code> and <code><a href="../reference/generics.html">consensus()</a></code> methods are now available to compare and combine TP data.</li>
+<li>TPs with equal structures but originating from different pathways are now handled differently to easy data interpretation
+<ul><li>The names for these TPs are now the same (but still unique per parent).</li>
+<li>These TPs are only included once in components, reports, suspect list conversion etc. to simplify data processing.</li>
+<li>For this reason <code><a href="../reference/generics.html">convertToMFDB()</a></code>/<code><a href="../reference/generateComponentsTPs.html">generateComponentsTPs()</a></code> don’t include any columns anymore that are specific to the transformation pathway.</li>
+</ul></li>
+</ul></li>
+<li>Feature intensity normalization
+<ul><li>The functionality to normalize feature intensities was significantly extended in this release of <code>patRoon</code>. A new method function, <code><a href="../reference/featureGroups-class.html">normInts()</a></code> now supports various normalization methods, such as normalization by internal standards and the TIC. With internal standard normalization, the <code><a href="../reference/generics.html">plotGraph()</a></code> function can be used to interactively evaluate which internal standards were automatically assigned to each feature group.</li>
+<li>Major changes
+<ul><li>The <code><a href="../reference/featureGroups-class.html">normInts()</a></code> function now handles all normalization and stores normalized intensities/areas in the feature data.</li>
+<li>Functions that can use normalized data (<code><a href="../reference/generics.html">as.data.table()</a></code>, <code><a href="../reference/generics.html">plotInt()</a></code> etc) now have a new <code>normalized</code> argument, which should be <code>TRUE</code> to use normalized data. The <code>normFunc</code> argument to these functions was removed since it is not necessary anymore.</li>
+<li>If <code>normalized=TRUE</code> and <code><a href="../reference/featureGroups-class.html">normInts()</a></code> was not called on the feature data, a simple automatic default normalization is done. This is primarily for backwards compatibility.</li>
+</ul></li>
+<li>Minor changes/additions
+<ul><li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> can now report normalized values for averaged feature data (if (<code>features</code> &amp;&amp; <code>average</code> &amp;&amp; <code>normalized</code>) == TRUE)</li>
+<li>
+<code>removeISTDs</code> argument for <code><a href="../reference/generics.html">filter()</a></code> to remove feature groups that are assigned as internal standards.</li>
+<li>The analysis information can contain a normalization concentration column (<code>norm_conc</code>) that influences normalization calculations. The <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function can now initialize this data.</li>
+<li>
+<code>ISTDs</code> and <code>ISTDAssignments</code> slots and their accessor methods <code><a href="../reference/featureGroups-class.html">internalStandards()</a></code> and <code><a href="../reference/featureGroups-class.html">internalStandardAssignments()</a></code> to store/access the internal standard assignment data.</li>
+</ul></li>
+</ul></li>
+<li>MS libraries
+<ul><li>This release adds support for loading and post-processing MS libraries (e.g. MSP or JSON files from MassBank) and using them for compound annotation. An important advantage is that annotation may be more reliable since experimental spectra are matched, and the process is much faster since no online database search or in-silico annotation need to be performed. The rules for identification level estimation were updated accordingly to support the new spectral match score (<code>libMatch</code>).</li>
+</ul></li>
+<li>The functionality to automatically curate and calculate chemical properties such as <code>SMILES</code>, <code>InChI</code> and formulas for e.g. suspect lists was significantly changed. More data is now verified, and several optimizations were implemented to better handle large suspect lists or MS libraries. Note that minor changes in <code>neutralMass</code> values may be observed. For more details please see the reference manual (e.g. <code><a href="../reference/suspect-screening.html">?screenSuspects</a></code>).</li>
 </ul></div>
+<div class="section level3">
+<h3 id="other-new-functionality-2-1">Other new functionality<a class="anchor" aria-label="anchor" href="#other-new-functionality-2-1"></a></h3>
+<ul><li>Transformation products (TPs)
+<ul><li>The <code><a href="../reference/generics.html">filter()</a></code> method new base class for storing TP data (<code>transformationProducts</code>)</li>
+<li>New <code>calcSims</code> argument: if <code>TRUE</code> then structural similarities will be calculated between parents/TPs.</li>
+<li>The <code>library</code> algorithm now caches its results and multiple transformation generations (<code>generations</code> argument)</li>
+</ul></li>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code>
+<ul><li>Improved layout for TP reporting</li>
+<li>Plotting of transformation hierarchies (requires setting the new <code>TPs</code> argument).</li>
+<li>All reported feature information (chromatograms etc) are now placed inside a new menu</li>
+</ul></li>
+<li>
+<code><a href="../reference/generateFormulasSIRIUS.html">generateFormulasSIRIUS()</a></code>/<code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code>: <code>projectPath</code> and <code>dryRun</code> arguments. These are mainly for internal use.</li>
+<li>
+<code><a href="../reference/getEICs.html">getEICs()</a></code> utility to obtain raw EIC data (suggested by Ricardo Cunha).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-changes-2-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-2-1"></a></h3>
+<ul><li>Transformation products (TPs)
+<ul><li>
+<code>biotransformer</code>
+<ul><li>Does not automatically calculate structural similarities anymore. This now requires setting the <code>calcSims</code> argument to <code>TRUE</code> (see above).</li>
+<li>Simplified/Harmonized several column names</li>
+<li>Converted ID and parent IDs to integer values. This was primarily done for consistency with other algorithms.</li>
+<li>Removed several unnecessary <code>parent_</code> columns (parent_SMILES, etc)</li>
+<li>The <code>steps</code> argument was renamed to <code>generations</code> for consistency with other algorithms.</li>
+</ul></li>
+<li>
+<code>library</code> algorithm: naming of TPs is similarly done as other algorithms. The library TP names are now stored in the <code>name_lib</code> column.</li>
+</ul></li>
+<li>Removed the <code>onlyLinked</code> argument from the <code><a href="../reference/generics.html">plotGraph()</a></code> generic. This was done as the new <code><a href="../reference/generics.html">plotGraph()</a></code> methods don’t support this argument. Note that the argument was only removed from the generic, the original <code><a href="../reference/generics.html">plotGraph()</a></code> methods still support the argument.</li>
+<li>
+<code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code>: removed unused <code>errorRetries</code> argument</li>
+<li>Updated used versions of PubChemLite, MetFrag and pugixml</li>
+<li>Support for the MetFrag OECD PFAS compound database (<a href="https://zenodo.org/record/6385954" class="external-link uri">https://zenodo.org/record/6385954</a>). Should be configured like PubChemLite.</li>
+<li>More consistent installation suggestion message when an R package from GitHub is found missing</li>
+<li>Optimized <code>topMost</code> filter applied during MS peak list averaging</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixes-2-1">Fixes<a class="anchor" aria-label="anchor" href="#fixes-2-1"></a></h3>
+<ul><li>Transformation products (TPs)
+<ul><li>Fixed: <code>convertMFDB()</code> now always collapses duplicates, not just for <code>biotransformer</code> results.</li>
+<li>Fixed: <code>biotransformer</code>: <code>retDir</code> is now derived from the <em>original</em> parent, i.e. not its direct parent</li>
+</ul></li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> now properly subscripts negative element counts in formulas</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> improve handling of missing or split compound identifiers when generating URL links</li>
+<li>Fixed: annotatedPeakList() for <code>compounds</code>: avoid _unset suffixes in mergedBy column from data of sets workflows</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: loading analysis info from CSV now works again on Windows</li>
+<li>More workarounds to avoid <code>NA</code> exit codes on Linux systems</li>
+<li>Fixed: <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code>: <code>topMost</code> argument was used where <code>topMostFormulas</code> was supposed to be used</li>
+<li>Fixed: <code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>featureAnnotations</code> would throw an error for empty results with <code>OM=TRUE</code>
+</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0.2" id="patroon-202">patRoon 2.0.2<a class="anchor" aria-label="anchor" href="#patroon-202"></a></h2>
 <ul><li>Fixed: <code>removeBlanks</code> feature groups filter would not handle analyses with multiple blanks.</li>

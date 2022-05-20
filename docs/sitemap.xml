@@ -28,6 +28,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSLibrary-class.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
   </url>
   <url>
@@ -187,6 +190,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/generateCompounds.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsLibrary.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.html</loc>
   </url>
   <url>
@@ -223,6 +229,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsBioTransformer.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsCTS.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.html</loc>
   </url>
   <url>
@@ -233,6 +242,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/getEICs.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/getFCParams.html</loc>
@@ -298,6 +310,15 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/kpic2-conv.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibrary.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMSP.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMoNAJSON.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/makeSet.html</loc>
   </url>
   <url>
@@ -334,10 +355,7 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/transformationProducts-class.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsBT-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsLibrary-class.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsStructure-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc>

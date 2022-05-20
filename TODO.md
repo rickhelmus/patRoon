@@ -52,9 +52,7 @@
         - yes for now, as e.g. sets and consensus expects this (UID column)
 - prepareChemTable()
     - more status messages/progress bars?
-    - skip/warn if obabel is not available
-- merge --> consensus? or c()?
-- other generic name for spectra()?
+    - skip/warn if obabel is not available?
 
 
 

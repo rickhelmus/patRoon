@@ -27,7 +27,7 @@ ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/rickhelmus/patRoonDeps/raw/master/ext/MetFrag2.4.5-CL.jar && \
     wget --progress=dot:mega https://github.com/boecker-lab/sirius/releases/download/v4.9.15/sirius-4.9.15-linux64-headless.zip && \
-    wget --progress=dot:mega https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv && \
+    wget --progress=dot:mega https://zenodo.org/record/6503754/files/PubChemLite_exposomics_20220429.csv && \
     wget --progress=dot:mega https://zenodo.org/record/3472781/files/CompTox_07March19_WWMetaData.csv && \
     unzip sirius-4.9.12-linux64-headless.zip && rm sirius-4.9.12-linux64-headless.zip && \
     git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && \
@@ -35,7 +35,7 @@ RUN  mkdir deps && cd deps && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_07March19_WWMetaData.csv")' >> .Rprofile && \
-    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_01Jan2021_exposomics.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_exposomics_20220429.csv")' >> .Rprofile && \
     echo 'options(patRoon.path.BioTransformer = "/home/rstudio/deps/biotransformer/biotransformer-3.0.0.jar")' >> .Rprofile && \
     echo 'options(java.parameters = "-Djava.awt.headless=true")' >> .Rprofile
 

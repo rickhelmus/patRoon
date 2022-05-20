@@ -120,7 +120,7 @@ options(patRoon.path.OpenMS = "/usr/local/bin") # directory with the OpenMS bina
 options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant binary
 options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar") # full location to the jar file
 options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
-options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_14Jan2020_tier0.csv") # full location to desired PubChemLite CSV file
+options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv") # full location to desired PubChemLite CSV file
 options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
 options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
 ```

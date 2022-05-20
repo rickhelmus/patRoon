@@ -16,7 +16,7 @@
 [CompTox-dl]: ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files
 [CompTox-smoke]: https://zenodo.org/record/3364464#.XnjM-XLvKUk
 [CompTox-WW]: https://zenodo.org/record/3472781#.XnjMAHLvKUk
-[PCLite-dl]: https://zenodo.org/record/4432124/
+[PCLite-dl]: https://zenodo.org/record/6503754
 [PCLite-paper]: https://doi.org/10.1186/s13321-021-00489-0
 [csvDB-ex]: https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/

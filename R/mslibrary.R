@@ -58,8 +58,20 @@ setMethod("show", "MSLibrary", function(object)
 {
     callNextMethod()
     
-    # UNDONE: more?
     printf("Total records: %d\n", length(object))
+    
+    totPeaks <- if (length(object) > 0) sum(sapply(spectra(object), nrow)) else 0
+    totPeaksAnn <- if (length(object) > 0) sum(sapply(spectra(object), function(sp)
+    {
+        if (is.null(sp[["annotation"]]))
+            return(0)
+        return(sp[!is.na(annotation) & nzchar(annotation), .N])
+    }))
+    else
+        0
+    
+    printf("Total peaks: %d\n", totPeaks)
+    printf("Total annotated peaks: %d (%.2f%%)\n", totPeaksAnn, if (totPeaks > 0) totPeaksAnn * 100 / totPeaks else 0)
 })
 
 #' @describeIn MSLibrary Subset on records.

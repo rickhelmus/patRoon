@@ -388,7 +388,7 @@ MFMPPrepareHandler <- function(cmd)
 {
     mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
     if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-        stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
+        stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFragCommandLine-2.4.8.jar\")")
     
     if (!nzchar(Sys.which("java")))
         stop("Please make sure that java is installed and its location is correctly set in PATH.")

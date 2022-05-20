@@ -229,7 +229,7 @@ verifyDependencies <- function()
     if (!OK)
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",
             "For instance, run the following to set the location of MetFragCL:",
-            sprintf("options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")"),
+            sprintf("options(patRoon.path.MetFragCL = \"C:/MetFragCommandLine-2.4.8.jar\")"),
             "\nPlease see ?patRoon for more information on how to configure patRoon options.",
             sep = "\n")
     

@@ -119,7 +119,7 @@
 - generateCompoundsSIRIUS(): removed unused errorRetries argument
 - Fixed: generateCompoundsSIRIUS(): `topMost` was used where `topMostFormulas` was supposed to be used
 - Fixed: as.data.table() method for featureAnnotations would throw an error for empty results with OM=TRUE
-- Updated PubChemLite, MetFrag
+- Updated PubChemLite, MetFrag, pugixml
 - Support for MF OECD PFAS DB
 
 

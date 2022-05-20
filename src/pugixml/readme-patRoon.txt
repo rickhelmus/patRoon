@@ -1,1 +1,1 @@
-This directory contains a stripped version of pugixml (1.9, retrieved at 10 Aug 2018).
+This directory contains a stripped version of pugixml (1.12, retrieved at 20 May 2022).

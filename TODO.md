@@ -45,7 +45,6 @@
             - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
     - future
         - plotSpectrum, plotVenn, same data format for MSPeakLists
-    - sanitizeMSLibrary(): converts formula ion species format twice?
     - More printing for show(): number of spectra, annotations
     - convertToSuspects(): caching
     - convertToSuspects: check if suspect list has InChIKey column

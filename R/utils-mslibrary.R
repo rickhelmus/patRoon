@@ -80,9 +80,6 @@ sanitizeMSLibrary <- function(lib, prefCalcChemProps, potAdducts, potAdductsLib,
     printf("Clean up formulas... ")
     # remove ion species format ([formula]+/-)
     lib$records[!is.na(formula), formula := gsub("^\\[(.+)\\][[:digit:]]*[\\+\\-]+", "\\1", formula)]
-    # remove trailing charges
-    lib$records[!is.na(formula), formula := gsub("\\+|\\-$", "", formula)]
-    lib$records[!is.na(formula), formula := gsub("\\[|\\]|\\+|\\-", "", formula)] # remove ion species format ([formula]+/-)
     printf("Done!\n")
     
     lib$records <- prepareChemTable(lib$records, prefCalcChemProps = prefCalcChemProps)

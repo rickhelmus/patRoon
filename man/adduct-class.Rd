@@ -36,7 +36,7 @@ adduct(...)
   \code{"cliquems"} is the format used by \pkg{cliqueMS}.}
 
 \item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
-otherwise returns \code{NA}.}
+otherwise returns without data.}
 
 \item{\dots}{Any of \code{add}, \code{sub}, \code{molMult} and/or \code{charge}. See \verb{Slots}.}
 }

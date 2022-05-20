@@ -223,7 +223,8 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   disorderDisease      \tab DisorderDisease                                  \tab pubchemlite       \cr
   identification       \tab Identification                                   \tab pubchemlite       \cr
   annoTypeCount        \tab FPSum                                            \tab pubchemlite       \cr
-  annoTypeCount        \tab AnnoTypeCount                                    \tab pubchemlite       
+  annoTypeCount        \tab AnnoTypeCount                                    \tab pubchemlite       \cr
+  annotHitCount        \tab AnnotHitCount                                    \tab pubchemlite       
 }
 
  In addition, the \code{\link{compoundScorings}} function is also useful to programmatically
@@ -250,11 +251,11 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
 
   For \code{database="comptox"} the files can be obtained from
   \href{ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files}{here}.
-  Furthermore, the files with additions for \href{smoking}{https://zenodo.org/record/3364464#.XnjM-XLvKUk} and
-  \href{wastewater}{https://zenodo.org/record/3472781#.XnjMAHLvKUk} metadata are also supported. For
+  Furthermore, the files with additions for \href{https://zenodo.org/record/3364464#.XnjM-XLvKUk}{smoking} and
+  \href{https://zenodo.org/record/3472781#.XnjMAHLvKUk}{wastewater} metadata are also supported. For
   \code{database="pubchemlite"} the \file{.csv} database can be downloaded from
-  \href{https://zenodo.org/record/4432124/files/PubChemLite_01Jan2021_exposomics.csv}{here}. Note that only recent
-  \command{MetFrag} versions (>= \samp{2.4.5}) support these libraries.
+  \href{https://zenodo.org/record/6503754}{here} or from \href{https://zenodo.org/record/6385954}{here} for the OECD
+  PFAS database. Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support these libraries.
 }
 
 \section{Parallelization}{

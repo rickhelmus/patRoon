@@ -11,6 +11,7 @@
   MSPeakLists,
   relMzDev = 5,
   adduct = NULL,
+  projectPath = NULL,
   elements = "CHNOP",
   profile = "qtof",
   database = NULL,
@@ -24,7 +25,8 @@
   featThresholdAnn = 0.75,
   absAlignMzDev = 0.002,
   verbose = TRUE,
-  splitBatches = FALSE
+  splitBatches = FALSE,
+  dryRun = FALSE
 )
 
 \S4method{generateFormulasSIRIUS}{featureGroupsSet}(
@@ -32,6 +34,7 @@
   MSPeakLists,
   relMzDev = 5,
   adduct = NULL,
+  projectPath = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0
@@ -53,6 +56,12 @@ Sets the \option{--ppm-max} command line option.}
 
   \setsWF The \code{adduct} argument is not supported for sets workflows, since the
   adduct annotations will then always be used.}
+
+\item{projectPath, dryRun}{These are mainly for internal purposes. \code{projectPath} sets the output directory for
+the \command{SIRIUS} output (a temporary directory if \code{NULL}). If \code{dryRun} is \code{TRUE} then no
+computations are done and only the results from \code{projectPath} are processed.
+
+\setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.}
 
 \item{elements}{Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum

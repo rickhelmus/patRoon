@@ -282,7 +282,10 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the
-  \code{relMinMSMSIntensity} and \code{simMSMSMethod} arguments to \code{annotateSuspects}.
+  \code{relMinMSMSIntensity} and \code{simMSMSMethod} arguments to \code{annotateSuspects}. Note for annotation with
+  \code{generateCompoundsLibrary} results: the method and default parameters for \code{annSimComp} calculation
+  slightly differs to those from the spectral similarity calculated with compound annotation (\code{libMatch} score),
+  hence small differences in results are typically observed.
 
   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
   \code{fragments_*} columns from the suspect list).
@@ -310,14 +313,20 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
     suspectFragments: 3
     retention: 12
 2a:
-    individualMoNAScore:
-        min: 0.9
-        higherThanNext: .inf
+    or:
+        - individualMoNAScore:
+            min: 0.9
+            higherThanNext: .inf
+        - libMatch:
+            min: 0.9
+            higherThanNext: .inf
     rank:
         max: 1
         type: compound
 3a:
-    individualMoNAScore: 0.4
+    or:
+        - individualMoNAScore: 0.4
+        - libMatch: 0.4
 3b:
     suspectFragments: 3
 3c:

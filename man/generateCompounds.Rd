@@ -15,7 +15,7 @@ feature groups in the subset are considered.}
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
 
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"metfrag"}, \code{"sirius"}}
+used: \code{"metfrag"}, \code{"sirius"}, \code{"library"}}
 
 \item{\dots}{Any parameters to be passed to the selected compound generation algorithm.}
 }
@@ -71,5 +71,5 @@ workflow and not performed before feature groups have been prioritized.
 
 \seealso{
 The \code{\link{compounds}} output class and its methods and the algorithm specific functions:
-  \code{\link{generateCompoundsMetFrag}}, \code{\link{generateCompoundsSIRIUS}}
+  \code{\link{generateCompoundsMetFrag}}, \code{\link{generateCompoundsSIRIUS}}, \code{\link{generateCompoundsLibrary}}
 }

@@ -11,6 +11,8 @@
 \alias{plotVenn,featureGroupsSet-method}
 \alias{plotUpSet,featureGroups-method}
 \alias{plotVolcano,featureGroups-method}
+\alias{plotGraph,featureGroups-method}
+\alias{plotGraph,featureGroupsSet-method}
 \title{Plotting of grouped features}
 \usage{
 \S4method{plot}{featureGroups,missing}(
@@ -27,7 +29,7 @@
 \S4method{plotInt}{featureGroups}(
   obj,
   average = FALSE,
-  normFunc = NULL,
+  normalized = FALSE,
   xnames = TRUE,
   showLegend = FALSE,
   pch = 20,
@@ -40,7 +42,7 @@
 \S4method{plotInt}{featureGroupsSet}(
   obj,
   average = FALSE,
-  normFunc = NULL,
+  normalized = FALSE,
   xnames = !sets,
   showLegend = sets,
   pch = 20,
@@ -93,14 +95,17 @@
   FCParams,
   showLegend = TRUE,
   averageFunc = mean,
+  normalized = FALSE,
   col = NULL,
   pch = 19,
   ...
 )
+
+\S4method{plotGraph}{featureGroups}(obj, onlyPresent = TRUE)
+
+\S4method{plotGraph}{featureGroupsSet}(obj, onlyPresent = TRUE, set)
 }
 \arguments{
-\item{x}{\code{featureGroups} object to be accessed.}
-
 \item{colourBy}{Sets the automatic colour selection: \code{"none"} for a single colour or
 \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.}
 
@@ -120,16 +125,9 @@ if \code{pch=NULL} then values are automatically assigned.}
 (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
 
-\item{obj}{\code{featureGroups} object to be accessed.}
-
 \item{average}{If \code{TRUE} then data within replicate groups are averaged.
 
   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.}
-
-\item{normFunc}{Function that should be used for normalization of data. The function is called for all
-intensities/areas of a feature group and these quantities are divided by the result of the function call. For
-example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
-zero then the function will not be called. Set to \code{NULL} to perform no normalization.}
 
 \item{xnames}{Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.}
 
@@ -181,8 +179,9 @@ group by drawing a rectangle around it.}
 
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{onlyPresent}{If \code{TRUE} then EICs will only be generated for analyses in which a particular feature group
-was detected. Disabling this option might be useful to see if any features were 'missed'.}
+\item{onlyPresent}{Only plot feature groups of internal standards that are still present in the \code{featureGroups}
+input object (which may be otherwise be removed by \emph{e.g.} subsetting or
+\code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{annotate}{If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
 each plotted feature group.}
@@ -205,7 +204,10 @@ to \code{"none"} to disable any annotation.}
 
 \item{FCParams}{A parameter list to calculate Fold change data. See \code{getFCParams} for more details.}
 
-\item{averageFunc}{Function used for averaging.}
+\item{averageFunc, normalized}{Used for intensity data treatment, see the documentation for the
+\code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.}
+
+\item{set}{\setsWF The set for which data must be plotted.}
 }
 \value{
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
@@ -218,6 +220,8 @@ to \code{"none"} to disable any annotation.}
 The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
+
+\code{plotGraph} returns the result of \code{\link{visNetwork}}.
 }
 \description{
 Various plotting functions for feature group data.
@@ -245,11 +249,17 @@ Various plotting functions for feature group data.
   and shared feature groups between given replicate groups.
 
 \code{plotVolcano} Plots Fold change data in a 'Volcano plot'.
+
+\code{plotGraph} generates an interactive network plot which is used to explore internal standard (IS)
+  assignments to each feature group. This requires the availability of IS assignments, see the documentation for
+  \code{\link{normInts}} for details. The graph is rendered with \pkg{\link{visNetwork}}.
 }
 \section{Sets workflows}{
  \setsWFChangedMethods{
 
   \item \code{plotVenn} and \code{plotInt} allow to handle data per set. See the \code{sets} argument description.
+  
+  \item \code{plotGraph} only plots data per set, and requires the \code{set} argument to be set.
 
   }
 }

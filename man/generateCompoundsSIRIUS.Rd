@@ -11,19 +11,20 @@
   MSPeakLists,
   relMzDev = 5,
   adduct = NULL,
+  projectPath = NULL,
   elements = "CHNOP",
   profile = "qtof",
   formulaDatabase = NULL,
   fingerIDDatabase = "pubchem",
   noise = NULL,
-  errorRetries = 2,
   cores = NULL,
   topMost = 100,
   topMostFormulas = 5,
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
   verbose = TRUE,
-  splitBatches = FALSE
+  splitBatches = FALSE,
+  dryRun = FALSE
 )
 
 \S4method{generateCompoundsSIRIUS}{featureGroupsSet}(
@@ -31,6 +32,7 @@
   MSPeakLists,
   relMzDev = 5,
   adduct = NULL,
+  projectPath = NULL,
   ...,
   setThreshold = 0,
   setThresholdAnn = 0
@@ -53,6 +55,12 @@ Sets the \option{--ppm-max} command line option.}
   \setsWF The \code{adduct} argument is not supported for sets workflows, since the
   adduct annotations will then always be used.}
 
+\item{projectPath, dryRun}{These are mainly for internal purposes. \code{projectPath} sets the output directory for
+the \command{SIRIUS} output (a temporary directory if \code{NULL}). If \code{dryRun} is \code{TRUE} then no
+computations are done and only the results from \code{projectPath} are processed.
+
+\setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.}
+
 \item{elements}{Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum
 number of elements can also be specified, for example: a value of \code{"C[5]H[10-15]O"} will only consider
@@ -72,9 +80,6 @@ candidates. Possible values are: \option{"pubchem"}, \option{"bio"}, \option{"ke
 
 \item{noise}{Median intensity of the noise (\code{NULL} ignores this parameter). Sets the \option{--noise}
 commandline option.}
-
-\item{errorRetries}{Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
-errors.}
 
 \item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
 used.}

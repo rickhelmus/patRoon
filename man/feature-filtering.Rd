@@ -33,6 +33,7 @@
   rGroups = NULL,
   results = NULL,
   removeBlanks = FALSE,
+  removeISTDs = FALSE,
   checkFeaturesSession = NULL,
   negate = FALSE
 )
@@ -106,6 +107,9 @@ of the objects. Set to \code{NULL} to ignore.}
 blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
 \code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
 set, blank subtraction is performed prior to removing any analyses.}
+
+\item{removeISTDs}{If \code{TRUE} then all feature groups marked as internal standard (IS) are removed. This requires
+IS assignments done by \code{\link{normInts}}, see its documentation for more details.}
 
 \item{checkFeaturesSession}{If set then features and/or feature groups are removed that were selected for removal
 (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
@@ -186,7 +190,7 @@ Basic rule based filtering of feature groups.
   \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
 
   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
-  analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
+  analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).
 
   }
 

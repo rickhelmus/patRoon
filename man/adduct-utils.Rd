@@ -13,7 +13,7 @@ GenFormAdducts()
 
 MetFragAdducts()
 
-as.adduct(x, format = "generic", isPositive = NULL, charge = NULL)
+as.adduct(x, format = "generic", isPositive = NULL, charge = NULL, err = TRUE)
 
 calculateIonFormula(formula, adduct)
 
@@ -48,6 +48,9 @@ positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 \code{numeric} identifier.}
 
 \item{charge}{The final charge. Only needs to be set when \code{format="openms"}.}
+
+\item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
+otherwise returns without data.}
 
 \item{formula}{A \code{character} vector with formulae to convert.}
 

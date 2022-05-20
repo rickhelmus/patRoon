@@ -14,9 +14,9 @@
 \alias{unset,componentsNTSet-method}
 \title{Components class for homologous series.}
 \usage{
-\S4method{plotGraph}{componentsNT}(obj, onlyLinked)
+\S4method{plotGraph}{componentsNT}(obj, onlyLinked = TRUE)
 
-\S4method{plotGraph}{componentsNTSet}(obj, onlyLinked, set)
+\S4method{plotGraph}{componentsNTSet}(obj, onlyLinked = TRUE, set)
 
 \S4method{unset}{componentsNTSet}(obj, set)
 }
@@ -32,7 +32,7 @@
 }
 \description{
 This class is derived from \code{\link{components}} and is used to store
-results from unsupervised homolog detection with the \pkg{\link{nontarget}}
+results from unsupervised homolog detection with the \pkg{nontarget}
 package.
 }
 \details{
@@ -53,7 +53,7 @@ with the \pkg{\link{igraph}} package and rendered with
 
 \describe{
 \item{\code{homol}}{A \code{list} with \code{homol} objects for each replicate group
-as returned by \code{\link{homol.search}}}
+as returned by \code{\link[nontarget]{homol.search}}}
 }}
 
 \section{Sets workflows}{
@@ -76,7 +76,7 @@ as returned by \code{\link{homol.search}}}
 \references{
 \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 
-\addCitations{igraph}{1} \cr \cr \addCitations{visNetwork}{1}
+\addCitations{igraph}{1}
 }
 \seealso{
 \code{\link{components}} and \code{\link{generateComponents}}

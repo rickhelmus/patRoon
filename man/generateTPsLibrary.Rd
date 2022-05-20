@@ -7,8 +7,13 @@
 generateTPsLibrary(
   parents = NULL,
   TPLibrary = NULL,
+  generations = 1,
   skipInvalid = TRUE,
-  matchParentsBy = "InChIKey"
+  prefCalcChemProps = TRUE,
+  matchParentsBy = "InChIKey",
+  calcSims = FALSE,
+  fpType = "extended",
+  fpSimMethod = "tanimoto"
 )
 }
 \arguments{
@@ -21,14 +26,35 @@ If \code{NULL} then TPs for all parents in the library are obtained.}
 \item{TPLibrary}{If \code{NULL}, a default \href{https://doi.org/10.5281/zenodo.5644560}{PubChem} based library is
 used. Otherwise, \code{TPLibrary} should be a \code{data.frame}. See the details below.}
 
+\item{generations}{An \code{integer} that specifies the number of transformation generations. TPs for subsequent
+iterations obtained by repeating the library search where the TPs from the previous generation are considered
+parents.}
+
 \item{skipInvalid}{If set to \code{TRUE} then the parents will be skipped (with a warning) for which insufficient
 information (\emph{e.g.} SMILES) is available.}
 
+\item{prefCalcChemProps}{If \code{TRUE} then calculated chemical properties such as the formula and
+\acronym{InChIKey} are preferred over what is already present in the parent suspect list. For efficiency reasons it is
+recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
+more details.}
+
 \item{matchParentsBy}{A \code{character} that specifies how the input parents are matched with the data from the TP
 library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.}
+
+\item{calcSims}{If set to \code{TRUE} then structural similarities between the parent and its TPs are calculated. A
+minimum similarity can be obtained by using the \link[=filter,transformationProductsStructure-method]{filter
+method}. May be useful under the assumption that parents and TPs who have a high structural similarity, also likely
+have a high MS/MS spectral similarity (which can be evaluated after componentization with
+\code{\link{generateComponentsTPs}}).}
+
+\item{fpType}{The type of structural fingerprint that should be calculated. See the \code{type} argument of the
+\code{\link{get.fingerprint}} function of \CRANpkg{rcdk}.}
+
+\item{fpSimMethod}{The method for calculating similarities (i.e. not dissimilarity!). See the \code{method} argument
+of the \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.}
 }
 \value{
-The TPs are stored in an object from the \code{\link{transformationProductsLibrary}} class.
+The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 }
 \description{
 Automatically obtains transformation products from a library.
@@ -48,6 +74,34 @@ An important advantage of this algorithm is that it provides structural informat
 When the \code{parents} argument is a \code{\link{compounds}} object, the candidate library \code{identifier}
   is used in case the candidate has no defined \code{compoundName}.
 }
+\section{Validating and calculating chemical properties}{
+ Chemical properties such as \acronym{SMILES},
+  \acronym{InChIKey} and formula in the parent suspect list are automatically validated and calculated if missing/invalid.
+
+  The internal validation/calculation process performs the following steps: \itemize{
+
+  \item Validation of \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey} and formula data (if present). Invalid
+  entries will be set to \code{NA}.
+
+  \item The \acronym{SMILES} and \acronym{InChI} data are used to calculate missing or invalid \acronym{SMILES},
+  \acronym{InChI}, \acronym{InChIKey} and formula data. If \code{prefCalcChemProps=TRUE} then existing
+  \acronym{InChIKey} and formula data is overwritten by calculated values whenever possible.
+
+  \item The chemical formulae which were \emph{not} calculated are verified and normalized. This process may be time
+  consuming, and is potentially largely avoided by setting \code{prefCalcChemProps=TRUE}.
+
+  \item Neutral masses are calculated for missing values (\code{prefCalcChemProps=FALSE}) or whenever possible
+  (\code{prefCalcChemProps=TRUE}).
+
+  }
+
+  Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
+  deuterium (2H) elements.
+
+  This functionality relies heavily on \href{http://openbabel.org/wiki/Main_Page}{OpenBabel}, please make sure it is
+  installed.
+}
+
 \section{Custom TP libraries}{
  The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
@@ -67,6 +121,11 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
   by repeating the value within \code{parent_} columns.
 }
 
+\references{
+\addCitations{rcdk}{1}
+
+\insertRef{OBoyle2011}{patRoon}
+}
 \seealso{
 \code{\link{generateTPs}} for more details and other algorithms.
 }

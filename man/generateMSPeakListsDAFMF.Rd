@@ -20,20 +20,10 @@
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object from which MS peak lists should be extracted.}
 
-\item{minMSIntensity}{Minimum intensity for peak lists obtained with DataAnalysis. Highly
+\item{minMSIntensity, minMSMSIntensity}{Minimum intensity for peak lists obtained with DataAnalysis. Highly
 recommended to set \samp{>0} as DA tends to report many very low intensity peaks.}
 
-\item{minMSMSIntensity}{Minimum intensity for peak lists obtained with DataAnalysis. Highly
-recommended to set \samp{>0} as DA tends to report many very low intensity peaks.}
-
-\item{close}{If \code{TRUE} then Bruker files are closed and saved after
-processing with DataAnalysis, respectively. Setting \code{close=TRUE}
-prevents that many analyses might be opened simultaneously in DataAnalysis,
-which otherwise may use excessive memory or become slow. By default
-\code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
-likely what you want as otherwise any processed data is lost.}
-
-\item{save}{If \code{TRUE} then Bruker files are closed and saved after
+\item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting \code{close=TRUE}
 prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default

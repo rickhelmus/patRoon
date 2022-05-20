@@ -24,6 +24,7 @@
   mzWindow,
   adduct,
   skipInvalid,
+  prefCalcChemProps,
   onlyHits
 )
 
@@ -49,6 +50,7 @@ genIDLevelRulesFile(out, inLevels = NULL, exLevels = NULL)
   mzWindow,
   adduct,
   skipInvalid,
+  prefCalcChemProps,
   onlyHits
 )
 
@@ -59,6 +61,7 @@ genIDLevelRulesFile(out, inLevels = NULL, exLevels = NULL)
   mzWindow,
   adduct,
   skipInvalid,
+  prefCalcChemProps,
   onlyHits,
   amend = FALSE
 )
@@ -82,6 +85,11 @@ of suspect masses} sections below.}
 \item{skipInvalid}{If set to \code{TRUE} then suspects with invalid data (\emph{e.g.} missing names or other missing
 data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no \code{mz}
 column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.}
+
+\item{prefCalcChemProps}{If \code{TRUE} then calculated chemical properties such as the formula and
+\acronym{InChIKey} are preferred over what is already present in the suspect list. For efficiency reasons it is
+recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
+more details.}
 
 \item{onlyHits}{If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.}
 
@@ -124,10 +132,6 @@ possible, as it can significantly reduce the load on data interpretation.
 Both \code{screenSuspects} may use the suspect names to base file names used for reporting, logging etc.
   Therefore, it is important that these are file-compatible names. For this purpose, \code{screenSuspects} will
   automatically try to convert long, non-unique and/or otherwise incompatible suspect names.
-
-For \code{screenSuspects} in some cases you may need to install
-  \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when only InChI data is available for mass
-  calculation).
 }
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow}, \code{screenSuspects} performs suspect screening
@@ -181,6 +185,34 @@ For \code{screenSuspects} in some cases you may need to install
   annotations.
 
   }
+}
+
+\section{Validating and calculating chemical properties}{
+ Chemical properties such as \acronym{SMILES},
+  \acronym{InChIKey} and formula in the suspect list are automatically validated and calculated if missing/invalid.
+
+  The internal validation/calculation process performs the following steps: \itemize{
+
+  \item Validation of \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey} and formula data (if present). Invalid
+  entries will be set to \code{NA}.
+
+  \item The \acronym{SMILES} and \acronym{InChI} data are used to calculate missing or invalid \acronym{SMILES},
+  \acronym{InChI}, \acronym{InChIKey} and formula data. If \code{prefCalcChemProps=TRUE} then existing
+  \acronym{InChIKey} and formula data is overwritten by calculated values whenever possible.
+
+  \item The chemical formulae which were \emph{not} calculated are verified and normalized. This process may be time
+  consuming, and is potentially largely avoided by setting \code{prefCalcChemProps=TRUE}.
+
+  \item Neutral masses are calculated for missing values (\code{prefCalcChemProps=FALSE}) or whenever possible
+  (\code{prefCalcChemProps=TRUE}).
+
+  }
+
+  Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
+  deuterium (2H) elements.
+
+  This functionality relies heavily on \href{http://openbabel.org/wiki/Main_Page}{OpenBabel}, please make sure it is
+  installed.
 }
 
 \references{

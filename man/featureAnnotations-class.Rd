@@ -169,8 +169,8 @@ used format.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 
-\item{upsetArgs}{A list with any further arguments to be passed to \code{\link[UpSetR]{upset}}. Set to \code{NULL} to
-ignore.}
+\item{upsetArgs}{A list with any further arguments to be passed to
+\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
 }
 \value{
 \code{as.data.table} returns a \code{\link{data.table}}.
@@ -225,7 +225,7 @@ unlikely candidates and speed up further processing.
 candidates of up to five different \code{featureAnnotations} objects.
 
 \item \code{plotUpSet}: plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining
-unique and shared formula candidates between different \code{featureAnnotations} objects.
+unique and shared candidates between different \code{featureAnnotations} objects.
 }}
 
 \section{Slots}{

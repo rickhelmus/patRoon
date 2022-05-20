@@ -25,7 +25,7 @@
   negate = FALSE
 )
 
-\S4method{plotGraph}{componentsTPs}(obj, onlyLinked)
+\S4method{plotGraph}{componentsTPs}(obj, onlyLinked = TRUE)
 }
 \arguments{
 \item{x, obj}{A \code{componentsTPs} object.}
@@ -87,7 +87,9 @@ The intensity values for components (used by \code{plotSpectrum}) are set
 }
 
 \references{
-\addCitations{igraph}{1} \cr \cr \addCitations{visNetwork}{1}
+\addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
+
+\addCitations{igraph}{1}
 }
 \seealso{
 \code{\link{components}} for other relevant methods and \code{\link{generateComponents}}

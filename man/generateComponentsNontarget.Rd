@@ -34,26 +34,26 @@
 \item{rtRange}{A numeric vector containing the minimum and maximum retention time (in seconds) between homologues.
 Series are always considered from low to high \emph{m/z}, thus, a negative minimum retention time allows detection
 of homologous series with increasing \emph{m/z} and decreasing retention times. These values set the \code{minrt}
-and \code{maxrt} arguments of \code{\link{homol.search}}.}
+and \code{maxrt} arguments of \code{\link[nontarget]{homol.search}}.}
 
 \item{mzRange}{A numeric vector specifying the minimum and maximum \emph{m/z} increment of a homologous series. Sets
-the \code{minmz} and \code{maxmz} arguments of \code{\link{homol.search}}.}
+the \code{minmz} and \code{maxmz} arguments of \code{\link[nontarget]{homol.search}}.}
 
 \item{elements}{A character vector with elements to be considered for detection of repeating units. Sets the
-\code{elements} argument of \code{\link{homol.search}} function.}
+\code{elements} argument of \code{\link[nontarget]{homol.search}} function.}
 
-\item{rtDev}{Maximum retention time deviation. Sets the \code{rttol} to \code{\link{homol.search}}.}
+\item{rtDev}{Maximum retention time deviation. Sets the \code{rttol} to \code{\link[nontarget]{homol.search}}.}
 
-\item{absMzDev}{Maximum absolute \emph{m/z} deviation. Sets the \code{mztol} argument to \code{\link{homol.search}}}
+\item{absMzDev}{Maximum absolute \emph{m/z} deviation. Sets the \code{mztol} argument to \code{\link[nontarget]{homol.search}}}
 
 \item{absMzDevLink}{Maximum absolute \emph{m/z} deviation when linking series. This should usually be a bit higher
 than \code{absMzDev} to ensure proper linkage.}
 
-\item{traceHack}{Currently \code{\link{homol.search}} does not work with \R \samp{>3.3.3}. This flag, which is
+\item{traceHack}{Currently \code{\link[nontarget]{homol.search}} does not work with \R \samp{>3.3.3}. This flag, which is
 enabled by default on these R versions, implements a (messy) workaround
 (\href{https://github.com/blosloos/nontarget/issues/6}{more details here}).}
 
-\item{\dots}{Any further arguments passed to \code{\link{homol.search}}.\cr\cr \setsWF Further arguments passed to the non-sets workflow method.}
+\item{\dots}{Any further arguments passed to \code{\link[nontarget]{homol.search}}.\cr\cr \setsWF Further arguments passed to the non-sets workflow method.}
 }
 \value{
 The generated comnponents are returned as an object from the \code{\link{componentsNT}} class.
@@ -66,10 +66,10 @@ components by unsupervised detection of homologous series.
 This function uses nontarget to generate components. This function is called when calling \code{generateComponents} with
   \code{algorithm="nontarget"}.
 
-In the first step the \code{\link{homol.search}} function is used to detect all homologous series within
-  each replicate group (analyses within each replicate group are averaged prior to detection). Then, homologous
-  series across replicate groups are merged in case of full overlap or when merging of partial overlapping series
-  causes no conflicts.
+In the first step the \code{\link[nontarget]{homol.search}} function is used to detect all homologous series
+  within each replicate group (analyses within each replicate group are averaged prior to detection). Then,
+  homologous series across replicate groups are merged in case of full overlap or when merging of partial overlapping
+  series causes no conflicts.
 }
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow} the componentization is first performed for each

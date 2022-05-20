@@ -9,7 +9,7 @@
   fGroups,
   method = "complete",
   metric = "euclidean",
-  normFunc = max,
+  normalized = TRUE,
   average = TRUE,
   maxTreeHeight = 1,
   deepSplit = TRUE,
@@ -24,7 +24,7 @@
 
 \item{metric}{Distance metric used to calculate the distance matrix (passed to \code{\link{daisy}}).}
 
-\item{normFunc, average}{Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
+\item{normalized, average}{Passed to \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
 normalization and averaging of data.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by

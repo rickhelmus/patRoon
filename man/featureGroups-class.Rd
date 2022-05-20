@@ -27,6 +27,10 @@
 \alias{groupScores,featureGroups-method}
 \alias{groupScores}
 \alias{annotations,featureGroups-method}
+\alias{internalStandards,featureGroups-method}
+\alias{internalStandards}
+\alias{internalStandardAssignments,featureGroups-method}
+\alias{internalStandardAssignments}
 \alias{adducts,featureGroups-method}
 \alias{adducts<-,featureGroups-method}
 \alias{[,featureGroups,ANY,ANY,missing-method}
@@ -41,9 +45,12 @@
 \alias{calculatePeakQualities,featureGroups-method}
 \alias{selectIons,featureGroups-method}
 \alias{selectIons}
+\alias{normInts,featureGroups-method}
+\alias{normInts}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
+\alias{internalStandardAssignments,featureGroupsSet-method}
 \alias{adducts,featureGroupsSet-method}
 \alias{adducts<-,featureGroupsSet-method}
 \alias{delete,featureGroupsSet-method}
@@ -55,6 +62,7 @@
 \alias{unique,featureGroupsSet-method}
 \alias{overlap,featureGroupsSet-method}
 \alias{selectIons,featureGroupsSet-method}
+\alias{normInts,featureGroupsSet-method}
 \alias{featureGroupsUnset-class}
 \alias{featureGroupsUnset}
 \alias{unset,featureGroupsSet-method}
@@ -89,7 +97,7 @@
 
 \S4method{show}{featureGroups}(object)
 
-\S4method{groupTable}{featureGroups}(object, areas = FALSE)
+\S4method{groupTable}{featureGroups}(object, areas = FALSE, normalized = FALSE)
 
 \S4method{analysisInfo}{featureGroups}(obj)
 
@@ -106,6 +114,10 @@
 \S4method{groupScores}{featureGroups}(fGroups)
 
 \S4method{annotations}{featureGroups}(obj)
+
+\S4method{internalStandards}{featureGroups}(fGroups)
+
+\S4method{internalStandardAssignments}{featureGroups}(fGroups)
 
 \S4method{adducts}{featureGroups}(obj)
 
@@ -129,7 +141,7 @@
   qualities = FALSE,
   regression = FALSE,
   averageFunc = mean,
-  normFunc = NULL,
+  normalized = FALSE,
   FCParams = NULL
 )
 
@@ -153,7 +165,21 @@
   chargeMismatch = "adduct"
 )
 
+\S4method{normInts}{featureGroups}(
+  fGroups,
+  featNorm = "none",
+  groupNorm = FALSE,
+  normFunc = max,
+  standards = NULL,
+  ISTDRTWindow = 120,
+  ISTDMZWindow = 300,
+  minISTDs = 3,
+  ...
+)
+
 \S4method{sets}{featureGroupsSet}(obj)
+
+\S4method{internalStandardAssignments}{featureGroupsSet}(fGroups, set = NULL)
 
 \S4method{adducts}{featureGroupsSet}(obj, set, ...)
 
@@ -177,7 +203,7 @@
   qualities = FALSE,
   regression = FALSE,
   averageFunc = mean,
-  normFunc = NULL,
+  normalized = FALSE,
   FCParams = NULL
 )
 
@@ -186,6 +212,18 @@
 \S4method{overlap}{featureGroupsSet}(fGroups, which, exclusive, sets = FALSE)
 
 \S4method{selectIons}{featureGroupsSet}(fGroups, components, prefAdduct, ...)
+
+\S4method{normInts}{featureGroupsSet}(
+  fGroups,
+  featNorm = "none",
+  groupNorm = FALSE,
+  normFunc = max,
+  standards = NULL,
+  ISTDRTWindow = 120,
+  ISTDMZWindow = 300,
+  minISTDs = 3,
+  ...
+)
 
 \S4method{unset}{featureGroupsSet}(obj, set)
 
@@ -199,6 +237,12 @@
 \item{areas}{If set to \code{TRUE} then areas are considered instead of peak intensities.
 
   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.}
+
+\item{normalized}{If \code{TRUE} then normalized intensity data is used (see the \verb{Feature intensity
+  normalization} section.
+
+  For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
+  then an automatic group normalization is performed.}
 
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
@@ -217,6 +261,8 @@ feature group, with a vector of the group intensities as first argument, the gro
 \item{\dots}{For the \code{"["} operator: ignored.
 
   For \code{delete}: passed to the function specified as \code{j}.
+
+  For \code{normInts}: passed to \code{\link{screenSuspects}} if \code{featNorm="istd"}.
 
   \setsPassedArgs1{featureGroups}}
 
@@ -257,11 +303,6 @@ no \code{conc} column is present in the analysis information or when less than t
 (\emph{i.e.} the minimum amount).}
 
 \item{averageFunc}{Function used for averaging. Only used when \code{average=TRUE} or \code{FCParams != NULL}.}
-
-\item{normFunc}{Function that should be used for normalization of data. The function is called for all
-intensities/areas of a feature group and these quantities are divided by the result of the function call. For
-example, when \code{\link{max}} is used normalized intensities will be between zero and one. If all quantities are
-zero then the function will not be called. Set to \code{NULL} to perform no normalization.}
 
 \item{FCParams}{A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 \code{NULL} to not perform FC calculations.}
@@ -307,6 +348,29 @@ values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignor
 \command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
+\item{featNorm}{The method applied for feature normalization: \code{"istd"}, \code{"tic"}, \code{"conc"} or
+\code{"none"}. See the \verb{Feature intensity normalization} section for details.}
+
+\item{groupNorm}{If \code{TRUE} then group normalization is performed. See the \verb{Feature intensity normalization}
+section for details.}
+
+\item{normFunc}{A \code{function} to combine data for normalization. See the \verb{Feature intensity normalization}
+section for details.}
+
+\item{standards}{A \code{data.table} (or \code{data.frame}) with all internal standards. Should follow the format of
+  a \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
+  normalization} section for details.
+
+  \setsWF Can also be a \code{list} with internal standard lists.
+
+  See the \code{suspects} argument to \code{\link{screenSuspects}} for more details.}
+
+\item{ISTDRTWindow, ISTDMZWindow}{The retention time and \emph{m/z} windows for IS selection. Only used if
+\code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.}
+
+\item{minISTDs}{The minimum number of IS that should be assigned to each feature (if possible). Only used if
+\code{featNorm="istd"}. See the \verb{Feature intensity normalization} section for details.}
+
 \item{set}{\setsWF The name of the set.}
 
 \item{reGroup}{\setsWF Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
@@ -324,6 +388,9 @@ Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
 \code{selectIons} returns a \code{featureGroups} object with only the selected feature groups and amended
   with adduct annotations.
+
+\code{normInts} returns a \code{featureGroups} object, amended with data in the \code{ISTDs} and
+  \code{ISTDAssignments} slots if \code{featNorm="istd"}.
 }
 \description{
 This class holds all the information for grouped features.
@@ -368,6 +435,10 @@ replicate groups for which data is present in this object.
 \item \code{groupScores}: Accessor for \code{groupScores} slot.
 
 \item \code{annotations}: Accessor for \code{annotations} slot.
+
+\item \code{internalStandards}: Accessor for \code{ISTDs} slot.
+
+\item \code{internalStandardAssignments}: Accessor for \code{ISTDAssignments} slot.
 
 \item \code{adducts}: Returns a named \code{character} with adduct annotations assigned to each feature group (if
 available).
@@ -418,6 +489,9 @@ annotation accuracy. On the other hand, it is important the componentization res
 highly recommended that, prior to calling \code{selectIons}, the settings to \code{\link{generateComponents}} are
 optimized and its results are reviewed with \code{\link{checkComponents}}. Finally, the \code{adducts<-} method can
 be used to manually correct adduct assignments afterwards if necessary.
+
+\item \code{normInts}: Provides various methods to normalizes feature intensities for each sample analysis or of
+all features within a feature group. See the \verb{Feature intensity normalization} section below.
 }}
 
 \section{Slots}{
@@ -442,14 +516,84 @@ column) for each feature group. Access with \code{groupInfo} method.}
 \item{\code{annotations}}{A \code{\link{data.table}} with adduct annotations for each group (see the \code{selectIons}
 method).}
 
+\item{\code{ISTDs}}{A \code{data.table} with screening results for internal standards (filled in by the \code{normInts}
+method).}
+
+\item{\code{ISTDAssignments}}{A \code{list}, where each item is named by a feature group and consists of a vector with
+feature group names of the internal standards assigned to it (filled in by the \code{normInts} method).}
+
 \item{\code{groupAlgo,groupArgs,groupVerbose}}{\setsWF Grouping parameters that were used when this object was created. Used
 by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.}
 
-\item{\code{annotations}}{\setsWF As the \code{featureGroups} slot, but contains the annotation data per set.}
+\item{\code{annotations,ISTDAssignments}}{\setsWF As the \code{featureGroups} slots, but contains the data per set.}
 }}
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \itemize{         \item{\code{\link{featureGroupsScreeningSet}}}       }       \item{\code{\link{featureGroupsUnset}}}       \item{\code{\link{featureGroupsScreening}}}       \itemize{         \item{\code{\link{featureGroupsSetScreeningUnset}}}       }       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsKPIC2}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsSIRIUS}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
+}
+
+\section{Feature intensity normalization}{
+ The \code{normInts} method performs normalization of feature intensities
+  (and areas). These values are amended in the \code{features} slot, while the original intensities/areas are kept.
+  To use the normalized intensities set \code{normalized=TRUE} to methods such as \code{\link{plotInt}},
+  \code{\link{generateComponentsIntClust}} and \code{as.data.table}. Please see the \code{normalized} argument
+  documentation for these methods for more details.
+
+  The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
+  analysis. Most methods are influenced by the \emph{normalization concentration} (\code{norm_conc} in the
+  \link[=analysis-information]{analysis information}) set for each sample analysis. For \code{NA} or zero values the
+  output will be zero. If the \code{norm_conc} is completely absent from the analysis information, the normalization
+  concentration is defaulted to one.
+
+  The different normalization methods are:
+
+  \enumerate{
+
+  \item \code{featNorm="istd"} Uses \emph{internal standards} (IS) for normalization. The IS are screened internally
+  by the \code{\link{screenSuspects}} function. Hence, the IS specified by the \code{standards} argument should
+  follow the format of a \link[=suspect-screening]{suspect list}. Note that labelled elements in IS formulae should
+  be specified with the \CRANpkg{rcdk} format, \emph{e.g.} \code{"[13]C"} for 13C, \code{"[2]H"} for a deuterium etc.
+  Example IS lists are provided with the \pkg{patRoonData} package.
+
+  The assignment of IS to features is automatically performed, using the following criteria: \enumerate{
+
+  \item Only analyses are considered with a defined normalization concentration.
+
+  \item The IS must be detected in all of the analyses in which the feature was detected.
+
+  \item The retention time and \emph{m/z} are reasonably close (\code{ISTDRTWindow}/\code{ISTDMZWindow} arguments).
+  However, additional IS candidates outside these windows will be chosen if the number of candidates is less than the
+  \code{minISTDs} argument. In this case the next close(st) candidate(s) will be chosen.
+
+  }
+
+  Normalization of features within the same feature group always occur with the same IS. If multiple IS are assigned
+  to a feature then normalization occurs with the combined intensity (area), which is calculated with the function
+  defined by the \code{normFunc} argument. The (combined) IS intensity is then normalized by the normalization
+  concentration, and finally used for feature normalization.
+
+  \item \code{featNorm="tic"} Uses the Total Ion Current (TIC) to normalize intensities. The TIC is calculated by
+  combining all intensities with the function defined by the \code{normFunc} argument. For this reason, you may need
+  to take care to perform normalization before \emph{e.g.} suspect screening or other prioritization techniques. The
+  TIC normalized intensities are finally divided by the normalization concentration.
+
+  \item \code{featNorm="conc"} Simply divides all intensities (areas) with the normalization concentration defined
+  for the sample.
+
+  \item \code{featNorm="none"} Performs no normalization. The raw intensity values are simply copied. This is mainly
+  useful if you only want to do group normalization (described below).
+
+  }
+
+  The meaning of the normalization concentration differs for each method: for \code{"istd"} it resembles the IS
+  concentration of a sample analysis, whereas for \code{"tic"} and \code{"conc"} it is used to normalize different
+  sample amounts (\emph{e.g.} injection volume).
+
+  If \code{groupNorm=TRUE} then feature intensities (areas) will be normalized by the combined values for its feature
+  group (again, combination occurs with \code{normFunc}). This \emph{group normalization} always occurs \emph{after}
+  aforementioned normalization methods. Group normalization was the only method with \pkg{patRoon} \samp{<2.1}, and
+  still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
+  data.
 }
 
 \section{Sets workflows}{
@@ -476,6 +620,8 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
   \item \code{overlap} and \code{unique} allow to handle data per set. See the \code{sets} argument description.
 
   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
+  
+  \item \code{normInts} Performs normalization for each set \emph{independently}.
 
   }
 

@@ -119,6 +119,8 @@
 - getEICs() utility (suggested by Ricardo Cunha)
 - generateCompoundsSIRIUS(): removed unused errorRetries argument
 - Fixed: generateCompoundsSIRIUS(): `topMost` was used where `topMostFormulas` was supposed to be used
+- Fixed: as.data.table() method for featureAnnotations would throw an error for empty results with OM=TRUE
+
 
 # Lower priority
 

@@ -19,6 +19,9 @@ normalizeAnnScores <- function(res, scoreCols, scoreRanges, mConsNames, minMaxNo
 
 addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, classify)
 {
+    if (nrow(annTable) == 0)
+        return(annTable)
+    
     annTable <- copy(annTable)
     
     # ensure CHNOPS counts are present

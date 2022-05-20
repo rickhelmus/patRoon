@@ -29,7 +29,7 @@ RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/boecker-lab/sirius/releases/download/v4.9.15/sirius-4.9.15-linux64-headless.zip && \
     wget --progress=dot:mega https://zenodo.org/record/6503754/files/PubChemLite_exposomics_20220429.csv && \
     wget --progress=dot:mega https://zenodo.org/record/3472781/files/CompTox_07March19_WWMetaData.csv && \
-    unzip sirius-4.9.12-linux64-headless.zip && rm sirius-4.9.12-linux64-headless.zip && \
+    unzip sirius-4.9.15-linux64-headless.zip && rm sirius-4.9.15-linux64-headless.zip && \
     git clone --depth 1 https://bitbucket.org/djoumbou/biotransformer.git && cd biotransformer && \
     wget --progress=dot:mega https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFragCommandLine-2.4.8.jar")' >> .Rprofile && \

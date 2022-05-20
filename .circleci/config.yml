@@ -85,6 +85,23 @@ jobs:
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
                     git push origin ${CIRCLE_BRANCH}
+    cov:
+        machine:
+            image: ubuntu-2004:202111-02
+        resource_class: large
+        <<: *set_dock_env
+        steps:
+            - checkout
+            - add_ssh_keys:
+                fingerprints:
+                    - "9a:18:88:f8:04:fe:25:3b:8f:6e:23:d7:fd:d4:46:b8"
+            - run:
+                name: Run coverage
+                no_output_timeout: 60m
+                command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" -e CODECOV_TOKEN="${CODECOV_TOKEN}" /bin/bash -c "cd patRoon; Rscript -e \"install.packages('covr'); options(covr.flags = list(CXXFLAGS = '', LDFLAGS = '')); covr::codecov()\""
     deps:
         machine:
             image: ubuntu-2004:202111-02
@@ -144,5 +161,8 @@ workflows:
                 requires:
                     - build
             - docs:
+                requires:
+                    - build
+            - cov:
                 requires:
                     - build

@@ -26,5 +26,5 @@ if (!nzchar(Sys.getenv("PATROON_NOTESTS")))
     if (nzchar(ju))
         test_check("patRoon", reporter = JunitReporter$new(file = ju))
     else
-        test_check("patRoon")
+        test_check("patRoon", reporter = "summary")
 }

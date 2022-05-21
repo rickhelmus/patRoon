@@ -21,6 +21,7 @@
 !NAMESPACE
 !docker/make_docs.R
 !docker/run_tests.R
+!docker/run_covr.R
 !NEWS.md
 !LICENSE
 !README.md

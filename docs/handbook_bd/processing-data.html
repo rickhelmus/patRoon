@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-05-20" />
+<meta name="date" content="2022-05-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -347,10 +347,10 @@ div.csl-indent {
 <div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="processing-data.html#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group    score                                     compoundName               set
 #&gt; 1: M198_R317_272 4.025217              3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 2: M198_R317_272 1.946688              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 3: M198_R317_272 1.745251                   1-(4-chlorophenyl)-3-ethylurea positive,negative
-#&gt; 4: M198_R317_272 1.838637           3-amino-5-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 5: M198_R317_272 2.366149 5-[[(2R)-azetidin-2-yl]methoxy]-2-chloropyridine positive,negative</code></pre>
+#&gt; 2: M198_R317_272 1.946950              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 3: M198_R317_272 2.315853 5-[[(2R)-azetidin-2-yl]methoxy]-2-chloropyridine positive,negative
+#&gt; 4: M198_R317_272 1.743037                   1-(2-chlorophenyl)-3-ethylurea positive,negative
+#&gt; 5: M198_R317_272 1.838637           3-amino-5-chloro-N,N-dimethylbenzamide positive,negative</code></pre>
 <p>In addition, some the data processing functionality contains additional functionality for a sets workflow:</p>
 <div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="processing-data.html#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
 <span id="cb156-2"><a href="processing-data.html#cb156-2" aria-hidden="true" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>

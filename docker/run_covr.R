@@ -6,5 +6,6 @@ install.packages("covr")
 
 withr::with_envvar(c(PATROON_METFRAG = getOption("patRoon.path.MetFragCL"),
                      PATROON_SIRIUS = getOption("patRoon.path.SIRIUS"),
-                     PATROON_BIOTRANSFORMER = getOption("patRoon.path.BioTransformer")),
+                     PATROON_BIOTRANSFORMER = getOption("patRoon.path.BioTransformer"),
+                     NOT_CRAN = "true"),
                    covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE))

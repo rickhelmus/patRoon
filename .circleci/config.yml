@@ -101,7 +101,7 @@ jobs:
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                    docker run -e CODECOV_TOKEN -e CIRCLE_BRANCH -e CIRCLE_BUILD_NUM -e CIRCLE_PROJECT_USERNAME -e CIRCLE_PROJECT_REPONAME -e CIRCLE_PR_NUMBER -e CIRCLE_SHA1 --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_covr.R"
+                    docker run -e CODECOV_TOKEN -e CI -e CIRCLECI -e CIRCLE_BRANCH -e CIRCLE_BUILD_NUM -e CIRCLE_PROJECT_USERNAME -e CIRCLE_PROJECT_REPONAME -e CIRCLE_PR_NUMBER -e CIRCLE_SHA1 --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_covr.R"
     deps:
         machine:
             image: ubuntu-2004:202111-02

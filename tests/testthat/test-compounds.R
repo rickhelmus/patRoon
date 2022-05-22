@@ -383,6 +383,7 @@ test_that("plotting works", {
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[1]))
     expect_plot(plotStructure(compsMFIso, 1, anPLGroup))
+    expect_plot(plotStructure(compsMFIso, 1:2, anPLGroup))
     expect_doppel("scores", function() plotScores(compsMFIso, 1, anPLGroup))
 
     skip_if_not(doSIRIUS)

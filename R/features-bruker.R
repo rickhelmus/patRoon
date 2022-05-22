@@ -3,6 +3,9 @@
 #' @include utils-bruker.R
 NULL
 
+# NOTE: No coverage calculation for Bruker tools as they cannot be run on CI
+# nocov start
+
 #' @rdname features-class
 #' @export
 featuresBruker <- setClass("featuresBruker", contains = "features")
@@ -157,3 +160,5 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close
 
     return(ret)
 }
+
+# nocov end

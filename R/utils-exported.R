@@ -1,6 +1,8 @@
 #' @include main.R
 NULL
 
+# nocov start
+
 # Fix from R DescTools
 #' Internal fix for \pkg{RDCOMClient}, ignore.
 #' @param ref,className ignore
@@ -19,6 +21,8 @@ COMStop <- function(...)
 {
     RDCOMClient::COMStop(...)
 }
+
+# nocov end
 
 #' @details \code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
 #'   analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this

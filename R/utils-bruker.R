@@ -1,3 +1,6 @@
+# NOTE: No coverage calculation for Bruker tools as they cannot be run on CI
+# nocov start
+
 # haven't found a way to access constants via RCOM, so just list them here (obtained with visual studio)
 DAConstants <- list(
     daMzXML = 8, daMzData = 9, daMzML = 10,
@@ -633,3 +636,5 @@ checkDAFMFCompounds <- function(DA, featTable, analysisInd, verify)
 
     return(isTRUE(ret))
 }
+
+# nocov end

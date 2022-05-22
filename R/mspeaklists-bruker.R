@@ -3,6 +3,9 @@
 #' @include utils-bruker.R
 NULL
 
+# NOTE: No coverage calculation for Bruker tools as they cannot be run on CI
+# nocov start
+
 #' Generate peak lists with Bruker DataAnalysis
 #'
 #' Uses Bruker DataAnalysis to read the data needed to generate MS peak lists.
@@ -295,3 +298,5 @@ setMethod("generateMSPeakListsDAFMF", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakListsDAFMF, ...)
 })
+
+# nocov end

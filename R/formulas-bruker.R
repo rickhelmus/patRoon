@@ -2,6 +2,9 @@
 #' @include utils-bruker.R
 NULL
 
+# NOTE: No coverage calculation for Bruker tools as they cannot be run on CI
+# nocov start
+
 simplifyDAFormula <- function(formula)
 {
     # Remove spaces
@@ -311,3 +314,5 @@ setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakList
                         precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
 })
+
+# nocov end

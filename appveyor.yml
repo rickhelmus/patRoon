@@ -105,7 +105,8 @@ on_failure:
 
 on_success:
   # NOTE: disable coverage compiler flags as they don't work with GenForm
-  - Rscript -e "options(covr.flags = list(CXXFLAGS = '', LDFLAGS = '')); covr::codecov()"
+  # --> Leave coverage calculation to CircleCI for now as it is difficult to parallelize with AppVeyor.
+  # - Rscript -e "options(covr.flags = list(CXXFLAGS = '', LDFLAGS = '')); covr::codecov()"
   - ps: if ($env:APPVEYOR_REPO_BRANCH -eq "master") { .\av_trigger_deps.ps1 }
 
 on_finish:

@@ -120,7 +120,8 @@ suspect (hits) are used as parents, whereas in the latter case all candidates ar
 <dd><p>The type of prediction. Valid values are: <code>"env"</code>, <code>"ecbased"</code>, <code>"cyp450"</code>,
 <code>"phaseII"</code>, <code>"hgut"</code>, <code>"superbio"</code>, <code>"allHuman"</code>. Sets the <code class="command">-b</code> command line option.</p></dd>
 <dt>generations</dt>
-<dd><p>The number of generations (steps) for the predictions. Sets the <code class="command">-s</code> command line option.</p></dd>
+<dd><p>The number of generations (steps) for the predictions. Sets the <code class="command">-s</code> command line option.
+More generations may be reported, see the <code>Hierarchy expansion</code> section below.</p></dd>
 <dt>extraOpts</dt>
 <dd><p>A <code>character</code> with extra command line options passed to the <code class="command">biotransformer.jar</code> tool.</p></dd>
 <dt>skipInvalid</dt>
@@ -167,6 +168,31 @@ Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.</p></
     <h2>Note</h2>
     <p>When the <code>parents</code> argument is a <code><a href="compounds-class.html">compounds</a></code> object, the candidate library <code>identifier</code>
   is used in case the candidate has no defined <code>compoundName</code>.</p>
+    </div>
+    <div id="hierarchy-expansion">
+    <h2>Hierarchy expansion</h2>
+    <p><code class="command">BioTransformer</code> only reports the direct parent for a TP, not
+  the complete pathway. For instance, consider the following results:</p><ul><li><p>parent --&gt; TP1</p></li>
+<li><p>parent --&gt; TP2</p></li>
+<li><p>TP1 --&gt; TP2</p></li>
+<li><p>TP2 --&gt; TP3</p></li>
+</ul><p>In this case, TP3 may be formed either as:</p><ul><li><p>parent --&gt; TP1 --&gt; TP2 --&gt; TP3</p></li>
+<li><p>parent --&gt; TP2 --&gt; TP3</p></li>
+</ul><p>For this reason, <span class="pkg">patRoon</span> simply expands the hierarchy and assumes that all routes are possible. For instance,
+  <code>
+     Parent    
+     /-  -\    
+   /-      -\  
+  -          - 
+ TP1        TP2
+  |          | 
+  |          | 
+ TP2        TP3
+  |            
+  |            
+ TP3
+  </code></p>  
+<p>Note that this may result in pathways with more generations than defined by the <code>generations</code> argument.</p>
     </div>
     <div id="validating-and-calculating-chemical-properties">
     <h2>Validating and calculating chemical properties</h2>

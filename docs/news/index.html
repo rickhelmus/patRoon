@@ -91,21 +91,22 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1" id="patroon-21">patRoon 2.1<a class="anchor" aria-label="anchor" href="#patroon-21"></a></h2>
-<p>This release extends the <code>2.0</code> release with new functionality, several important changes and bug fixes. The <code><a href="../reference/newProject.html">newProject()</a></code> function was updated for the new functionality. Please see the updated Handbook and sections below for more information.</p>
+<p>This release extends version <code>2.0</code> with new functionality, several important changes and bug fixes. The <code><a href="../reference/newProject.html">newProject()</a></code> function was updated for the new functionality. Please see the updated Handbook and sections below for more information.</p>
 <p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
 <div class="section level3">
 <h3 id="important-new-functionality-and-changes-2-1">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-1"></a></h3>
 <ul><li>Transformation product (TP) screening
 <ul><li>The <code><a href="../reference/generateTPs.html">generateTPs()</a></code> function now supports an additional algorithm that interfaces with the <a href="https://qed.epa.gov/cts" class="external-link">Chemical Transformation Simulator</a> (CTS). An important advantage of this algorithm is that it supports several abiotic transformation pathway libraries.</li>
 <li>Functionality was added to generate interactive plots of transformation pathways using the <code><a href="../reference/generics.html">plotGraph()</a></code> generic function. Furthermore, this function can incorporate componentization results to easily display which TPs are present in the screening results.</li>
-<li>A new class, <code>transformationProductsStructure</code>, is now used to store results for algorithms that provide structural information (<code>biotransformer</code>, <code>library</code> and <code>cts</code>). This better harmonizes the functionality between algorithms (e.g. <code><a href="../reference/generics.html">filter()</a></code>)</li>
+<li>A new class, <code>transformationProductsStructure</code>, is now used to store results for algorithms that provide structural information (<code>biotransformer</code>, <code>library</code> and <code>cts</code>). This better harmonizes the functionality between algorithms (e.g. with the <code><a href="../reference/generics.html">filter()</a></code> method function).</li>
 <li>
 <code><a href="../reference/generics.html">plotVenn()</a></code>, <code><a href="../reference/generics.html">plotUpSet()</a></code> and <code><a href="../reference/generics.html">consensus()</a></code> methods are now available to compare and combine TP data.</li>
-<li>TPs with equal structures but originating from different pathways are now handled differently to easy data interpretation
+<li>TPs with equal structures but originating from different pathways are now handled differently to ease data interpretation
 <ul><li>The names for these TPs are now the same (but still unique per parent).</li>
 <li>These TPs are only included once in components, reports, suspect list conversion etc. to simplify data processing.</li>
 <li>For this reason <code><a href="../reference/generics.html">convertToMFDB()</a></code>/<code><a href="../reference/generateComponentsTPs.html">generateComponentsTPs()</a></code> don’t include any columns anymore that are specific to the transformation pathway.</li>
 </ul></li>
+<li>Hierarchy expansion takes place for BioTransformer results to estimate full pathways. Please see the reference manual (<code>?generateTPsBiotransformer()</code>) for details.</li>
 </ul></li>
 <li>Feature intensity normalization
 <ul><li>The functionality to normalize feature intensities was significantly extended in this release of <code>patRoon</code>. A new method function, <code><a href="../reference/featureGroups-class.html">normInts()</a></code> now supports various normalization methods, such as normalization by internal standards and the TIC. With internal standard normalization, the <code><a href="../reference/generics.html">plotGraph()</a></code> function can be used to interactively evaluate which internal standards were automatically assigned to each feature group.</li>
@@ -132,9 +133,9 @@
 <div class="section level3">
 <h3 id="other-new-functionality-2-1">Other new functionality<a class="anchor" aria-label="anchor" href="#other-new-functionality-2-1"></a></h3>
 <ul><li>Transformation products (TPs)
-<ul><li>The <code><a href="../reference/generics.html">filter()</a></code> method new base class for storing TP data (<code>transformationProducts</code>)</li>
-<li>New <code>calcSims</code> argument: if <code>TRUE</code> then structural similarities will be calculated between parents/TPs.</li>
-<li>The <code>library</code> algorithm now caches its results and multiple transformation generations (<code>generations</code> argument)</li>
+<ul><li>A new <code><a href="../reference/generics.html">filter()</a></code> method was defined for the <code>transformationProducts</code> class to filter generic properties.</li>
+<li>New <code>calcSims</code> argument to the <code>generateTPs</code> functions: if <code>TRUE</code> then structural similarities will be calculated between parents/TPs.</li>
+<li>The <code>library</code> algorithm now caches its results and supports multiple transformation generations (<code>generations</code> argument).</li>
 </ul></li>
 <li>
 <code><a href="../reference/reporting.html">reportHTML()</a></code>

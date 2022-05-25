@@ -54,17 +54,6 @@
     - more status messages/progress bars?
     - skip/warn if obabel is not available?
 
-## DOCS
-
-- BT TP parent expansion
-
-## NEWS
-
-- TPs
-    - BT
-        - TP parent expansion
-    - additional args for generateTPs()
-
 
 # Lower priority
 

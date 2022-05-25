@@ -26,7 +26,8 @@ suspect (hits) are used as parents, whereas in the latter case all candidates ar
 \item{type}{The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
 \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.}
 
-\item{generations}{The number of generations (steps) for the predictions. Sets the \command{-s} command line option.}
+\item{generations}{The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
+More generations may be reported, see the \verb{Hierarchy expansion} section below.}
 
 \item{extraOpts}{A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.}
 
@@ -76,6 +77,46 @@ An important advantage of this algorithm is that it provides structural informat
 When the \code{parents} argument is a \code{\link{compounds}} object, the candidate library \code{identifier}
   is used in case the candidate has no defined \code{compoundName}.
 }
+\section{Hierarchy expansion}{
+ \command{BioTransformer} only reports the direct parent for a TP, not
+  the complete pathway. For instance, consider the following results: \itemize{
+
+  \item parent --> TP1
+
+  \item parent --> TP2
+
+  \item TP1 --> TP2
+
+  \item TP2 --> TP3
+
+  }
+  
+  In this case, TP3 may be formed either as: \itemize{
+  
+  \item parent --> TP1 --> TP2 --> TP3
+  
+  \item parent --> TP2 --> TP3
+  
+  }
+  
+  For this reason, \pkg{patRoon} simply expands the hierarchy and assumes that all routes are possible. For instance,
+  \verb{
+     Parent    
+     /-  -\    
+   /-      -\  
+  -          - 
+ TP1        TP2
+  |          | 
+  |          | 
+ TP2        TP3
+  |            
+  |            
+ TP3
+  }
+  
+  Note that this may result in pathways with more generations than defined by the \code{generations} argument.
+}
+
 \section{Validating and calculating chemical properties}{
  Chemical properties such as \acronym{SMILES},
   \acronym{InChIKey} and formula in the parent suspect list are automatically validated and calculated if missing/invalid.

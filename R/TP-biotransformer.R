@@ -113,13 +113,52 @@ BTMPPrepareHandler <- function(cmd)
 #' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
 #' @param generations The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
+#'   More generations may be reported, see the \verb{Hierarchy expansion} section below.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
 #' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
 #'   Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
-#' 
+#'
+#' @section Hierarchy expansion: \command{BioTransformer} only reports the direct parent for a TP, not
+#'   the complete pathway. For instance, consider the following results: \itemize{
+#'
+#'   \item parent --> TP1
+#'
+#'   \item parent --> TP2
+#'
+#'   \item TP1 --> TP2
+#'
+#'   \item TP2 --> TP3
+#'
+#'   }
+#'   
+#'   In this case, TP3 may be formed either as: \itemize{
+#'   
+#'   \item parent --> TP1 --> TP2 --> TP3
+#'   
+#'   \item parent --> TP2 --> TP3
+#'   
+#'   }
+#'   
+#'   For this reason, \pkg{patRoon} simply expands the hierarchy and assumes that all routes are possible. For instance,
+#'   \verb{
+#'      Parent    
+#'      /-  -\    
+#'    /-      -\  
+#'   -          - 
+#'  TP1        TP2
+#'   |          | 
+#'   |          | 
+#'  TP2        TP3
+#'   |            
+#'   |            
+#'  TP3
+#'   }
+#'   
+#'   Note that this may result in pathways with more generations than defined by the \code{generations} argument.
+#'
 #' @template tp_gen-scr
 #' @template tp_gen-sim
 #' @template fp-args

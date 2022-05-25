@@ -1,6 +1,6 @@
 # patRoon 2.1
 
-This release extends the `2.0` release with new functionality, several important changes and bug fixes. The `newProject()` function was updated for the new functionality. Please see the updated Handbook and sections below for more information.
+This release extends version `2.0` with new functionality, several important changes and bug fixes. The `newProject()` function was updated for the new functionality. Please see the updated Handbook and sections below for more information.
 
 Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
 
@@ -9,12 +9,13 @@ Users of previous `patRoon` versions should inform themselves with the important
 - Transformation product (TP) screening
     - The `generateTPs()` function now supports an additional algorithm that interfaces with the [Chemical Transformation Simulator](https://qed.epa.gov/cts) (CTS). An important advantage of this algorithm is that it supports several abiotic transformation pathway libraries.
     - Functionality was added to generate interactive plots of transformation pathways using the `plotGraph()` generic function. Furthermore, this function can incorporate componentization results to easily display which TPs are present in the screening results.
-    - A new class, `transformationProductsStructure`, is now used to store results for algorithms that provide structural information (`biotransformer`, `library` and `cts`). This better harmonizes the functionality between algorithms (e.g. `filter()`)
+    - A new class, `transformationProductsStructure`, is now used to store results for algorithms that provide structural information (`biotransformer`, `library` and `cts`). This better harmonizes the functionality between algorithms (e.g. with the `filter()` method function).
     - `plotVenn()`, `plotUpSet()` and `consensus()` methods are now available to compare and combine TP data.
-    - TPs with equal structures but originating from different pathways are now handled differently to easy data interpretation
+    - TPs with equal structures but originating from different pathways are now handled differently to ease data interpretation
         - The names for these TPs are now the same (but still unique per parent).
         - These TPs are only included once in components, reports, suspect list conversion etc. to simplify data processing.
         - For this reason `convertToMFDB()`/`generateComponentsTPs()` don't include any columns anymore that are specific to the transformation pathway.
+    - Hierarchy expansion takes place for BioTransformer results to estimate full pathways. Please see the reference manual (`?generateTPsBiotransformer()`) for details.
 - Feature intensity normalization
     - The functionality to normalize feature intensities was significantly extended in this release of `patRoon`. A new method function, `normInts()` now supports various normalization methods, such as normalization by internal standards and the TIC. With internal standard normalization, the `plotGraph()` function can be used to interactively evaluate which internal standards were automatically assigned to each feature group.
     - Major changes
@@ -34,9 +35,9 @@ Users of previous `patRoon` versions should inform themselves with the important
 ## Other new functionality
 
 - Transformation products (TPs)
-    - The `filter()` method new  base class for storing TP data (`transformationProducts`)
-    - New `calcSims` argument: if `TRUE` then structural similarities will be calculated between parents/TPs. 
-    -  The `library` algorithm now caches its results and multiple transformation generations (`generations` argument)
+    - A new `filter()` method was defined for the `transformationProducts` class to filter generic properties.
+    - New `calcSims` argument to the `generateTPs` functions: if `TRUE` then structural similarities will be calculated between parents/TPs.
+    -  The `library` algorithm now caches its results and supports multiple transformation generations (`generations` argument).
 - `reportHTML()`
     - Improved layout for TP reporting
     - Plotting of transformation hierarchies (requires setting the new `TPs` argument).

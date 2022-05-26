@@ -12,7 +12,7 @@ BiocManager::install(c("mzR", "xcms", "CAMERA",
                        "ropls", # for KPIC2
                        "BiocStyle", "Rgraphviz")) # for MetaClean
 
-remotes::install_github(c("rickhelmus/patRoonData@version21",
+remotes::install_github(c("rickhelmus/patRoonData",
                           "thomasp85/farver",
                           "cbroeckl/RAMClustR",
                           "blosloos/enviPick",

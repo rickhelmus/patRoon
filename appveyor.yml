@@ -73,7 +73,7 @@ build_script:
     - travis-tool.sh install_r tibble # workaround for MSnbase
     - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop ropls BiocStyle Rgraphviz InterpretMSSpectrum
     - travis-tool.sh install_github blosloos/enviPick
-    - travis-tool.sh install_github rickhelmus/patRoonData@version21
+    - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontargetData
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github cbroeckl/RAMClustR

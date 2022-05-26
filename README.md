@@ -13,9 +13,9 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
-**December 2021** `patRoon 2.0` is now available. This major new release adds functionality to automatically screen and
-identify transformation products, process positive and negative ionization MS data simultaneously and combine the
-results, new algorithms for feature and adduct detection, interactive data curation and more. Please see the [Project
+**May 2022** `patRoon 2.1` is now available. This new release integrates prediction of transformation products with
+[CTS], adds several feature intensity normalization methods, adds new functionality and improvements for reporting TP
+data and supports loading, processing and annotation with MS libraries such as MassBank. Please see the [Project
 NEWS][NEWS] for details.
 
 ## Introduction
@@ -148,3 +148,4 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [patRoonDeps]: https://github.com/rickhelmus/patRoonDeps
 [miniCRAN]: https://cran.r-project.org/web/packages/miniCRAN/index.html
 [DockerImg]: https://hub.docker.com/r/patroonorg/patroonrs
+[CTS]: https://qed.epa.gov/cts/

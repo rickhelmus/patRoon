@@ -12,9 +12,6 @@
     - maybe: allow usage of normalized intensities with filter()?
     - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
     - reportHTML: report normalized intensities in featInfo?
-    - Example ISTD lists in patRoonData
-        - merge into master
-        - and then switch CI back
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
 
@@ -51,7 +48,6 @@
     - collapse with IK1?
         - yes for now, as e.g. sets and consensus expects this (UID column)
 - prepareChemTable()
-    - more status messages/progress bars?
     - skip/warn if obabel is not available?
 
 

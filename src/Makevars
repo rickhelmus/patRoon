@@ -4,7 +4,7 @@ SRC=$(wildcard GenForm-svn/*.cpp)
 OBJECTS_GF=$(SRC:.cpp=.o)
 DEST_GF=GenForm
 
-CXX_STD = CXX11
+CXX_STD = CXX14
 
 .PHONY: all clean inst
 

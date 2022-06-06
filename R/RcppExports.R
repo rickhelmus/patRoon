@@ -45,6 +45,10 @@ getTIMSFrame <- function(file, frameID) {
     .Call(`_patRoon_getTIMSFrame`, file, frameID)
 }
 
+collapseTIMSFrames <- function(file, retMin, retMax) {
+    .Call(`_patRoon_collapseTIMSFrames`, file, retMin, retMax)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

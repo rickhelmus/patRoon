@@ -34,3 +34,35 @@ Rcpp::List getTIMSFrame(const std::string &file, size_t frameID)
     }
     return Rcpp::List();
 }
+
+// [[Rcpp::export]]
+Rcpp::List collapseTIMSFrames(const std::string &file, double retMin, double retMax)
+{
+    /// UNDONE: double comparisons?
+    
+    TimsDataHandle TDH(file);
+    auto &frameDescs = TDH.get_frame_descs();
+    auto it = std::lower_bound(frameDescs.begin(), frameDescs.end(), retMin,
+                               [&](const auto &pair, double value) { return pair.second.time < value; });
+    
+    struct MSFrame
+    {
+        uint32_t ID;
+        double retentionTime;
+        std::vector<uint32_t> scanIDs, intensities;
+        std::vector<double> mzs, invIonMobilities;
+        MSFrame(uint32_t i, double rt, const size_t peaks) : ID(i), retentionTime(rt), scanIDs(peaks),
+                                                             intensities(peaks), mzs(peaks), invIonMobilities(peaks) {};
+    };
+    
+    std::vector<MSFrame> MSFrames;
+    for (; it != frameDescs.end() && it->second.time < retMax; ++it)
+    {
+        MSFrame frame(it->second.id, it->second.time, it->second.num_peaks);
+        it->second.save_to_buffs(nullptr, frame.scanIDs.data(), nullptr, frame.intensities.data(), frame.mzs.data(),
+                                 frame.invIonMobilities.data(), nullptr);
+        MSFrames.push_back(std::move(frame));
+    }
+    
+    return Rcpp::List();
+}

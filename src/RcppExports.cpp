@@ -150,6 +150,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// collapseTIMSFrames
+Rcpp::List collapseTIMSFrames(const std::string& file, double retMin, double retMax);
+RcppExport SEXP _patRoon_collapseTIMSFrames(SEXP fileSEXP, SEXP retMinSEXP, SEXP retMaxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< double >::type retMin(retMinSEXP);
+    Rcpp::traits::input_parameter< double >::type retMax(retMaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrames(file, retMin, retMax));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -248,6 +261,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_getTIMSFrame", (DL_FUNC) &_patRoon_getTIMSFrame, 2},
+    {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 3},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

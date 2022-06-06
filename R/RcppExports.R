@@ -37,6 +37,14 @@ specDistRect <- function(specList1, specList2, method, shift, precMZs1, precMZs2
     .Call(`_patRoon_specDistRect`, specList1, specList2, method, shift, precMZs1, precMZs2, mzWeight, intWeight, mzWindow)
 }
 
+initBrukerLibrary <- function(path) {
+    invisible(.Call(`_patRoon_initBrukerLibrary`, path))
+}
+
+getTIMSFrame <- function(file, frameID) {
+    .Call(`_patRoon_getTIMSFrame`, file, frameID)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

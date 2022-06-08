@@ -163,6 +163,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// clusterTIMSFrame
+Rcpp::List clusterTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_clusterTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame(file, frameID, method, mzWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
+// clusterTIMSFrame2
+Rcpp::List clusterTIMSFrame2(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_clusterTIMSFrame2(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame2(file, frameID, method, mzWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -262,6 +290,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_getTIMSFrame", (DL_FUNC) &_patRoon_getTIMSFrame, 2},
     {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 3},
+    {"_patRoon_clusterTIMSFrame", (DL_FUNC) &_patRoon_clusterTIMSFrame, 4},
+    {"_patRoon_clusterTIMSFrame2", (DL_FUNC) &_patRoon_clusterTIMSFrame2, 4},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

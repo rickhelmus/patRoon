@@ -49,6 +49,14 @@ collapseTIMSFrames <- function(file, retMin, retMax) {
     .Call(`_patRoon_collapseTIMSFrames`, file, retMin, retMax)
 }
 
+clusterTIMSFrame <- function(file, frameID, method, mzWindow) {
+    .Call(`_patRoon_clusterTIMSFrame`, file, frameID, method, mzWindow)
+}
+
+clusterTIMSFrame2 <- function(file, frameID, method, mzWindow) {
+    .Call(`_patRoon_clusterTIMSFrame2`, file, frameID, method, mzWindow)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

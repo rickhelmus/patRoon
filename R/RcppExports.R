@@ -49,6 +49,10 @@ collapseTIMSFrames <- function(file, frameIDs, method, mzWindow) {
     .Call(`_patRoon_collapseTIMSFrames`, file, frameIDs, method, mzWindow)
 }
 
+getTIMSEIC <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds) {
+    .Call(`_patRoon_getTIMSEIC`, file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

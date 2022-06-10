@@ -138,62 +138,23 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// getTIMSFrame
-Rcpp::List getTIMSFrame(const std::string& file, size_t frameID);
-RcppExport SEXP _patRoon_getTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP) {
+// collapseTIMSFrame
+Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
     Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
-    rcpp_result_gen = Rcpp::wrap(getTIMSFrame(file, frameID));
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame(file, frameID, method, mzWindow));
     return rcpp_result_gen;
 END_RCPP
 }
 // collapseTIMSFrames
-Rcpp::List collapseTIMSFrames(const std::string& file, double retMin, double retMax);
-RcppExport SEXP _patRoon_collapseTIMSFrames(SEXP fileSEXP, SEXP retMinSEXP, SEXP retMaxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
-    Rcpp::traits::input_parameter< double >::type retMin(retMinSEXP);
-    Rcpp::traits::input_parameter< double >::type retMax(retMaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrames(file, retMin, retMax));
-    return rcpp_result_gen;
-END_RCPP
-}
-// clusterTIMSFrame
-Rcpp::List clusterTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_clusterTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
-    Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame(file, frameID, method, mzWindow));
-    return rcpp_result_gen;
-END_RCPP
-}
-// clusterTIMSFrame2
-Rcpp::List clusterTIMSFrame2(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_clusterTIMSFrame2(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
-    Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame2(file, frameID, method, mzWindow));
-    return rcpp_result_gen;
-END_RCPP
-}
-// clusterTIMSFrame3
-Rcpp::List clusterTIMSFrame3(const std::string& file, const std::vector<unsigned>& frameIDs, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_clusterTIMSFrame3(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+Rcpp::DataFrame collapseTIMSFrames(const std::string& file, const std::vector<unsigned>& frameIDs, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_collapseTIMSFrames(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -201,7 +162,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame3(file, frameIDs, method, mzWindow));
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrames(file, frameIDs, method, mzWindow));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -302,11 +263,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
-    {"_patRoon_getTIMSFrame", (DL_FUNC) &_patRoon_getTIMSFrame, 2},
-    {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 3},
-    {"_patRoon_clusterTIMSFrame", (DL_FUNC) &_patRoon_clusterTIMSFrame, 4},
-    {"_patRoon_clusterTIMSFrame2", (DL_FUNC) &_patRoon_clusterTIMSFrame2, 4},
-    {"_patRoon_clusterTIMSFrame3", (DL_FUNC) &_patRoon_clusterTIMSFrame3, 4},
+    {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 4},
+    {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 4},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

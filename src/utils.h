@@ -28,5 +28,6 @@ template <typename C> std::vector<size_t> getSortedInds(const C &cont)
 
 enum class clusterMethod { BIN, DIFF, HCLUST };
 std::vector<int> clusterNums(const std::vector<double> &nums, clusterMethod method, double window);
+clusterMethod clustMethodFromStr(const std::string &str);
 
 #endif

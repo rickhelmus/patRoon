@@ -136,3 +136,15 @@ std::vector<int> clusterNums(const std::vector<double> &nums, clusterMethod meth
     return ret;
 }
 
+clusterMethod clustMethodFromStr(const std::string &str)
+{
+    if (str == "bin")
+        return clusterMethod::BIN;
+    else if (str == "diff")
+        return clusterMethod::DIFF;
+    else if (str == "hclust")
+        return clusterMethod::HCLUST;
+    
+    Rcpp::stop("Unknown cluster method.");
+    return clusterMethod::BIN; // avoid warning
+}

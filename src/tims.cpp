@@ -42,16 +42,21 @@ struct SpectrumIMS // UNDONE: merge with other struct(s)
 };
 
     
-SpectrumIMS getIMSFrame(TimsFrame &frame, unsigned scanBegin = 0, unsigned scanEnd = 0,
-                        double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
-                        double mobilityEnd = 0.0)
+SpectrumIMS getIMSFrame(TimsFrame &frame)
 {
     SpectrumIMS spec(frame.num_peaks);
     frame.save_to_buffs(nullptr, spec.IDs.data(), nullptr, spec.intensities.data(), spec.mzs.data(),
                         spec.mobilities.data(), nullptr);
-    
-    if (scanBegin == 0 && scanEnd == 0 && mzStart == 0.0 && mzEnd == 0.0 && mobilityStart == 0.0 && mobilityEnd == 0.0)
-        return(spec); // no need to filter
+    return spec;
+}
+
+SpectrumIMS filterSpectrum(const SpectrumIMS &spec, unsigned scanBegin = 0, unsigned scanEnd = 0,
+                           double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
+                           double mobilityEnd = 0.0)
+{
+    if (scanBegin == 0 && scanEnd == 0 && mzStart == 0.0 && mzEnd == 0.0 && mobilityStart == 0.0 &&
+        mobilityEnd == 0.0)
+        return spec;
     
     SpectrumIMS specFiltered;
     for (size_t i=0; i<spec.size(); ++i)
@@ -73,7 +78,6 @@ SpectrumIMS getIMSFrame(TimsFrame &frame, unsigned scanBegin = 0, unsigned scanE
     }
     return specFiltered;
 }
-
 
 SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, double mzWindow)
 {

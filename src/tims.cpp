@@ -170,3 +170,37 @@ Rcpp::DataFrame collapseTIMSFrames(const std::string &file, const std::vector<un
                                    Rcpp::Named("intensity") = spec.intensities,
                                    Rcpp::Named("mobility") = spec.mobilities);
 }
+
+// [[Rcpp::export]]
+Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &frameIDs,
+                           std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts,
+                           std::vector<double> mobilityEnds)
+{
+    TimsDataHandle TDH(file);
+    struct EIC // UNDONE?
+    {
+        std::vector<double> times, intensities;
+    };
+    std::vector<EIC> EICs(mzStarts.size());
+
+    for (auto i : frameIDs)
+    {
+        auto &fr = TDH.get_frame(i);
+        if (fr.msms_type != 0)
+            continue; // UNDONE?
+        const SpectrumIMS spec = getIMSFrame(fr);
+        for (size_t j=0; j<EICs.size(); ++j)
+        {
+            const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
+                                                      mobilityEnds[j]);
+            EICs[j].times.push_back(fr.time);
+            EICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(), frameF.intensities.end(), 0));
+        }
+    }
+    
+    Rcpp::List ret(EICs.size());
+    for (size_t i=0; i<EICs.size(); ++i)
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = EICs[i].times,
+                                         Rcpp::Named("intensity") = EICs[i].intensities);
+    return ret;
+}

@@ -166,6 +166,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getTIMSEIC
+Rcpp::List getTIMSEIC(const std::string& file, const std::vector<unsigned>& frameIDs, std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts, std::vector<double> mobilityEnds);
+RcppExport SEXP _patRoon_getTIMSEIC(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type mzStarts(mzStartsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type mzEnds(mzEndsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type mobilityStarts(mobilityStartsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type mobilityEnds(mobilityEndsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTIMSEIC(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -265,6 +281,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 4},
     {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 4},
+    {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

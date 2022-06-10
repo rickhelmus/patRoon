@@ -57,6 +57,10 @@ clusterTIMSFrame2 <- function(file, frameID, method, mzWindow) {
     .Call(`_patRoon_clusterTIMSFrame2`, file, frameID, method, mzWindow)
 }
 
+clusterTIMSFrame3 <- function(file, frameIDs, method, mzWindow) {
+    .Call(`_patRoon_clusterTIMSFrame3`, file, frameIDs, method, mzWindow)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

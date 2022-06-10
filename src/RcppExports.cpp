@@ -191,6 +191,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// clusterTIMSFrame3
+Rcpp::List clusterTIMSFrame3(const std::string& file, const std::vector<unsigned>& frameIDs, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_clusterTIMSFrame3(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(clusterTIMSFrame3(file, frameIDs, method, mzWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -292,6 +306,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 3},
     {"_patRoon_clusterTIMSFrame", (DL_FUNC) &_patRoon_clusterTIMSFrame, 4},
     {"_patRoon_clusterTIMSFrame2", (DL_FUNC) &_patRoon_clusterTIMSFrame2, 4},
+    {"_patRoon_clusterTIMSFrame3", (DL_FUNC) &_patRoon_clusterTIMSFrame3, 4},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

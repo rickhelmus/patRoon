@@ -41,24 +41,12 @@ initBrukerLibrary <- function(path) {
     invisible(.Call(`_patRoon_initBrukerLibrary`, path))
 }
 
-getTIMSFrame <- function(file, frameID) {
-    .Call(`_patRoon_getTIMSFrame`, file, frameID)
+collapseTIMSFrame <- function(file, frameID, method, mzWindow) {
+    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow)
 }
 
-collapseTIMSFrames <- function(file, retMin, retMax) {
-    .Call(`_patRoon_collapseTIMSFrames`, file, retMin, retMax)
-}
-
-clusterTIMSFrame <- function(file, frameID, method, mzWindow) {
-    .Call(`_patRoon_clusterTIMSFrame`, file, frameID, method, mzWindow)
-}
-
-clusterTIMSFrame2 <- function(file, frameID, method, mzWindow) {
-    .Call(`_patRoon_clusterTIMSFrame2`, file, frameID, method, mzWindow)
-}
-
-clusterTIMSFrame3 <- function(file, frameIDs, method, mzWindow) {
-    .Call(`_patRoon_clusterTIMSFrame3`, file, frameIDs, method, mzWindow)
+collapseTIMSFrames <- function(file, frameIDs, method, mzWindow) {
+    .Call(`_patRoon_collapseTIMSFrames`, file, frameIDs, method, mzWindow)
 }
 
 loadEICIntensities <- function(spectra, featList, rtWindow) {

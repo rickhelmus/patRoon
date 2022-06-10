@@ -24,6 +24,13 @@ struct SpectrumIMS // UNDONE: merge with other struct(s)
         intensities.push_back(inten);
         mobilities.push_back(mob);
     }
+    void addData(const SpectrumIMS &sp)
+    {
+        IDs.insert(IDs.end(), sp.IDs.begin(), sp.IDs.end());
+        mzs.insert(mzs.end(), sp.mzs.begin(), sp.mzs.end());
+        intensities.insert(intensities.end(), sp.intensities.begin(), sp.intensities.end());
+        mobilities.insert(mobilities.end(), sp.mobilities.begin(), sp.mobilities.end());
+    }
     void resize(size_t s)
     {
         IDs.resize(s);
@@ -97,6 +104,31 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, dou
     }
 
     return binnedSpectrum;
+}
+
+SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs, clusterMethod method,
+                              double mzWindow)
+{
+    SpectrumIMS ret;
+    int specN = 0;
+    
+    for (auto i : frameIDs)
+    {
+        if (!TDH.has_frame(i))
+            continue;
+        auto &fr = TDH.get_frame(i);
+        const SpectrumIMS spec = getIMSFrame(fr); // UNDONE: filter args
+        ret.addData(collapseIMSFrame(spec, method, mzWindow));
+        ++specN;
+    }
+    
+    // collapse result
+    ret = collapseIMSFrame(ret, method, mzWindow);
+    // average intensities
+    for (auto &inten : ret.intensities)
+        inten /= specN;
+    
+    return ret;
 }
 
 }
@@ -210,6 +242,28 @@ Rcpp::List clusterTIMSFrame2(const std::string &file, size_t frameID, const std:
         clMethod = clusterMethod::HCLUST;
     
     auto spec = collapseIMSFrame(frame, clMethod, mzWindow);
+    
+    return Rcpp::List::create(Rcpp::Named("ID") = spec.IDs,
+                              Rcpp::Named("mz") = spec.mzs,
+                              Rcpp::Named("intensity") = spec.intensities,
+                              Rcpp::Named("mobility") = spec.mobilities);
+}
+
+// [[Rcpp::export]]
+Rcpp::List clusterTIMSFrame3(const std::string &file, const std::vector<unsigned> &frameIDs, const std::string &method,
+                             double mzWindow)
+{
+    TimsDataHandle TDH(file);
+    
+    clusterMethod clMethod;
+    if (method == "bin")
+        clMethod = clusterMethod::BIN;
+    else if (method == "diff")
+        clMethod = clusterMethod::DIFF;
+    else // if (method == "hclust")
+        clMethod = clusterMethod::HCLUST;
+    
+    auto spec = collapseIMSFrames(TDH, frameIDs, clMethod, mzWindow);
     
     return Rcpp::List::create(Rcpp::Named("ID") = spec.IDs,
                               Rcpp::Named("mz") = spec.mzs,

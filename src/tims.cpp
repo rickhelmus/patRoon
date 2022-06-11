@@ -173,8 +173,8 @@ Rcpp::DataFrame collapseTIMSFrames(const std::string &file, const std::vector<un
 
 // [[Rcpp::export]]
 Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &frameIDs,
-                           std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts,
-                           std::vector<double> mobilityEnds)
+                      std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts,
+                      std::vector<double> mobilityEnds)
 {
     TimsDataHandle TDH(file);
     struct EIC // UNDONE?
@@ -182,7 +182,9 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
         std::vector<double> times, intensities;
     };
     std::vector<EIC> EICs(mzStarts.size());
-
+    // ThreadingManager::get_instance().set_num_threads(1);
+    
+#if 1
     for (auto i : frameIDs)
     {
         auto &fr = TDH.get_frame(i);
@@ -197,7 +199,41 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
             EICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(), frameF.intensities.end(), 0));
         }
     }
+#else
+    const auto maxPeaks = TDH.max_peaks_in_frame();
+    // NOTE: tofs not used, but will otherwise be allocated in save_to_buffs()
+    std::vector<uint32_t> IDs(maxPeaks), intensities(maxPeaks), tofs(maxPeaks);
+    std::vector<double> mzs(maxPeaks), mobilities(maxPeaks);
     
+    for (auto i : frameIDs)
+    {
+        auto &fr = TDH.get_frame(i);
+        if (fr.msms_type != 0)
+            continue; // UNDONE?
+        
+        fr.save_to_buffs(nullptr, IDs.data(), tofs.data(), intensities.data(), mzs.data(),
+                         mobilities.data(), nullptr);
+        
+        for (size_t j=0; j<EICs.size(); ++j)
+        {
+            EICs[j].times.push_back(fr.time);
+            EICs[j].intensities.push_back(0);
+            for (size_t k=0; k<fr.num_peaks; ++k)
+            {
+                if (mzStarts[j] != 0.0 && mzs[k] < mzStarts[j])
+                    continue;
+                if (mzEnds[j] != 0.0 && mzs[k] > mzEnds[j])
+                    continue;
+                if (mobilityStarts[j] != 0.0 && mobilities[k] < mobilityStarts[j])
+                    continue;
+                if (mobilityEnds[j] != 0.0 && mobilities[k] > mobilityEnds[j])
+                    continue;
+                
+                EICs[j].intensities.back() += intensities[k];
+            }
+        }
+    }
+#endif
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = EICs[i].times,

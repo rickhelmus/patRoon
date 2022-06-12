@@ -1,6 +1,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <omp.h>
+
 #include "opentims++/opentims_all.h"
 
 #include <Rcpp.h>
@@ -185,18 +187,46 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
     // ThreadingManager::get_instance().set_num_threads(1);
     
 #if 1
-    for (auto i : frameIDs)
+    
+    #pragma omp parallel num_threads(1)
     {
-        auto &fr = TDH.get_frame(i);
-        if (fr.msms_type != 0)
-            continue; // UNDONE?
-        const SpectrumIMS spec = getIMSFrame(fr);
-        for (size_t j=0; j<EICs.size(); ++j)
+        // get buffers for decompression (see TimsDataHandle::extract_frames()) 
+        std::unique_ptr<ZSTD_DCtx, decltype(&ZSTD_freeDCtx)> zstd(ZSTD_createDCtx(), &ZSTD_freeDCtx);
+        std::unique_ptr<char[]> decompBuffer = std::make_unique<char[]>(TDH.get_decomp_buffer_size());
+        std::vector<EIC> threadEICs(mzStarts.size());
+        
+        //Rcpp::Rcout << "thr: " << omp_get_thread_num() << "/" << omp_get_num_threads() << "\n";
+        
+        #pragma omp for nowait
+        for (size_t i=0; i<frameIDs.size(); ++i)
         {
-            const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
-                                                      mobilityEnds[j]);
-            EICs[j].times.push_back(fr.time);
-            EICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(), frameF.intensities.end(), 0));
+            auto &fr = TDH.get_frame(frameIDs[i]);
+            if (fr.msms_type != 0)
+                continue; // UNDONE?
+            fr.decompress(decompBuffer.get(), zstd.get());
+            const SpectrumIMS spec = getIMSFrame(fr);
+            fr.close();
+            
+            for (size_t j=0; j<EICs.size(); ++j)
+            {
+                const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
+                                                          mobilityEnds[j]);
+                threadEICs[j].times.push_back(fr.time);
+                threadEICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(), frameF.intensities.end(), 0));
+                // UNDONE: clear zeros intensities if neighbours are? And always add times to avoid gaps?
+            }
+        }
+        
+        #pragma omp critical
+        {
+            for (size_t i=0; i<EICs.size(); ++i)
+            {
+                EICs[i].times.insert(EICs[i].times.end(), std::make_move_iterator(threadEICs[i].times.begin()),
+                                     std::make_move_iterator(threadEICs[i].times.end()));
+                EICs[i].intensities.insert(EICs[i].intensities.end(),
+                                           std::make_move_iterator(threadEICs[i].intensities.begin()),
+                                           std::make_move_iterator(threadEICs[i].intensities.end()));
+            }
         }
     }
 #else

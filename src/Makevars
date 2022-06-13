@@ -5,8 +5,8 @@ OBJECTS_GF=$(SRC:.cpp=.o)
 DEST_GF=GenForm
 
 CXX_STD = CXX14
-PKG_LIBS = -lgomp
-PKG_CXXFLAGS = -fopenmp
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 
 .PHONY: all clean inst
 

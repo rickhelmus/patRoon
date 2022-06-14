@@ -1,5 +1,10 @@
 # Priority
 
+## IMS
+
+- Disable opentims threading when using OpenMP?
+
+
 ## Ext
 
 - R bundle

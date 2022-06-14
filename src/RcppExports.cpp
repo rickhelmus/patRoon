@@ -139,8 +139,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // collapseTIMSFrame
-Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow, unsigned topMost, unsigned minIntensity);
+RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -148,13 +148,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame(file, frameID, method, mzWindow));
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minIntensity(minIntensitySEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame(file, frameID, method, mzWindow, topMost, minIntensity));
     return rcpp_result_gen;
 END_RCPP
 }
 // getTIMSPeakLists
-Rcpp::List getTIMSPeakLists(const std::string& file, Rcpp::List frameIDsList, Rcpp::List scanStartsList, Rcpp::List scanEndsList, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_getTIMSPeakLists(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP scanStartsListSEXP, SEXP scanEndsListSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+Rcpp::List getTIMSPeakLists(const std::string& file, Rcpp::List frameIDsList, Rcpp::List scanStartsList, Rcpp::List scanEndsList, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, const std::string& method, double mzWindow, unsigned topMost, unsigned minIntensityPre, unsigned minIntensityPost);
+RcppExport SEXP _patRoon_getTIMSPeakLists(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP scanStartsListSEXP, SEXP scanEndsListSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -166,7 +168,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityEnds(mobilityEndsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(getTIMSPeakLists(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow));
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minIntensityPre(minIntensityPreSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minIntensityPost(minIntensityPostSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTIMSPeakLists(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow, topMost, minIntensityPre, minIntensityPost));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -283,8 +288,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
-    {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 4},
-    {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 8},
+    {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 6},
+    {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 11},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},

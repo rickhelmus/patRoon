@@ -3,6 +3,7 @@
 ## IMS
 
 - Disable opentims threading when using OpenMP?
+- Mark precursor, make sure it's not filtered away
 
 
 ## Ext

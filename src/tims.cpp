@@ -43,15 +43,34 @@ struct SpectrumIMS // UNDONE: merge with other struct(s)
         mobilities.resize(s);
     }
     size_t size(void) const { return IDs.size(); }
+    bool empty(void) const {return IDs.empty(); }
 };
 
-    
+auto getTIMSDecompBuffers(size_t size)
+{
+    // get buffers for decompression (see TimsDataHandle::extract_frames())
+    return std::make_pair(std::unique_ptr<ZSTD_DCtx, decltype(&ZSTD_freeDCtx)>(ZSTD_createDCtx(), &ZSTD_freeDCtx),
+                          std::make_unique<char[]>(size));
+}
+
+// From http://mochan.info/c++/2019/06/12/returntype-deduction.html
+using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
+
+
 SpectrumIMS getIMSFrame(TimsFrame &frame)
 {
     SpectrumIMS spec(frame.num_peaks);
     frame.save_to_buffs(nullptr, spec.IDs.data(), nullptr, spec.intensities.data(), spec.mzs.data(),
                         spec.mobilities.data(), nullptr);
     return spec;
+}
+
+SpectrumIMS getIMSFrame(TimsFrame &frame, const TIMSDecompBufferPair &bufs)
+{
+    frame.decompress(bufs.second.get(), bufs.first.get());
+    SpectrumIMS ret = getIMSFrame(frame);
+    frame.close();
+    return ret;
 }
 
 SpectrumIMS filterSpectrum(const SpectrumIMS &spec, unsigned scanBegin = 0, unsigned scanEnd = 0,
@@ -114,29 +133,47 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, dou
     return binnedSpectrum;
 }
 
-SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs, clusterMethod method,
-                              double mzWindow)
+SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs,
+                              const std::vector<unsigned> &scanStarts, const std::vector<unsigned> &scanEnds,
+                              double mobilityStart, double mobilityEnd, clusterMethod method, double mzWindow)
 {
-    SpectrumIMS ret;
-    int specN = 0;
+    SpectrumIMS sumSpec;
     
-    for (auto i : frameIDs)
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(8)
     {
-        if (!TDH.has_frame(i))
-            continue;
-        auto &fr = TDH.get_frame(i);
-        const SpectrumIMS spec = getIMSFrame(fr); // UNDONE: filter args
-        ret.addData(collapseIMSFrame(spec, method, mzWindow));
-        ++specN;
+        auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
+        SpectrumIMS threadSumSpec;
+    
+        #pragma omp for nowait
+        for (size_t i=0; i<frameIDs.size(); ++i)
+        {
+            const auto fri = frameIDs[i];
+            if (!TDH.has_frame(fri))
+                continue;
+            auto &fr = TDH.get_frame(fri);
+            const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
+            const auto specF = filterSpectrum(spec, scanStarts[i], scanEnds[i], 0.0, 0.0, mobilityStart, mobilityEnd);
+            threadSumSpec.addData(collapseIMSFrame(specF, method, mzWindow));
+        }
+        
+        #pragma omp critical
+        {
+            sumSpec.addData(threadSumSpec);
+        }
     }
     
-    // collapse result
-    ret = collapseIMSFrame(ret, method, mzWindow);
-    // average intensities
-    for (auto &inten : ret.intensities)
-        inten /= specN;
     
-    return ret;
+    // collapse result
+    if (!sumSpec.empty())
+    {
+        sumSpec = collapseIMSFrame(sumSpec, method, mzWindow);
+        // average intensities
+        for (auto &inten : sumSpec.intensities)
+            inten /= frameIDs.size();
+    }
+    
+    return sumSpec;
 }
 
 }
@@ -164,15 +201,31 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame collapseTIMSFrames(const std::string &file, const std::vector<unsigned> &frameIDs,
-                                   const std::string &method, double mzWindow)
+Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList, Rcpp::List scanStartsList,
+                            Rcpp::List scanEndsList, const std::vector<double> &mobilityStarts,
+                            const std::vector<double> &mobilityEnds, const std::string &method, double mzWindow)
 {
+    const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);
-    const auto spec = collapseIMSFrames(TDH, frameIDs, clustMethodFromStr(method), mzWindow);
-    return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
-                                   Rcpp::Named("mz") = spec.mzs,
-                                   Rcpp::Named("intensity") = spec.intensities,
-                                   Rcpp::Named("mobility") = spec.mobilities);
+    std::vector<SpectrumIMS> peakLists(count);
+    const auto clMethod = clustMethodFromStr(method);
+    
+    for (int i=0; i<count; ++i)
+    {
+        const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);
+        const auto scanStarts = Rcpp::as<std::vector<unsigned>>(scanStartsList[i]);
+        const auto scanEnds = Rcpp::as<std::vector<unsigned>>(scanEndsList[i]);
+        peakLists[i] = std::move(collapseIMSFrames(TDH, frameIDs, scanStarts, scanEnds, mobilityStarts[i],
+                                                   mobilityEnds[i], clMethod, mzWindow));
+    }
+    
+    Rcpp::List ret(peakLists.size());
+    for (size_t i=0; i<peakLists.size(); ++i)
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("ID") = peakLists[i].IDs,
+                                         Rcpp::Named("mz") = peakLists[i].mzs,
+                                         Rcpp::Named("intensity") = peakLists[i].intensities,
+                                         Rcpp::Named("mobility") = peakLists[i].mobilities);
+    return ret;
 }
 
 // [[Rcpp::export]]
@@ -191,9 +244,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
     {
-        // get buffers for decompression (see TimsDataHandle::extract_frames()) 
-        std::unique_ptr<ZSTD_DCtx, decltype(&ZSTD_freeDCtx)> zstd(ZSTD_createDCtx(), &ZSTD_freeDCtx);
-        std::unique_ptr<char[]> decompBuffer = std::make_unique<char[]>(TDH.get_decomp_buffer_size());
+        auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
         std::vector<EIC> threadEICs(mzStarts.size());
         
         #pragma omp for nowait
@@ -201,10 +252,8 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
         {
             auto &fr = TDH.get_frame(frameIDs[i]);
             if (fr.msms_type != 0)
-                continue; // UNDONE? Always add times to avoid gaps?
-            fr.decompress(decompBuffer.get(), zstd.get());
-            const SpectrumIMS spec = getIMSFrame(fr);
-            fr.close();
+                continue; // UNDONE: needed?
+            const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
             
             for (size_t j=0; j<EICs.size(); ++j)
             {
@@ -241,7 +290,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
             {
                 const auto prevInt = EICs[i].intensities[ord[j-1]], nextInt = EICs[i].intensities[ord[j+1]];
                 if (prevInt == 0 && nextInt == 0)
-                    continue; // skip zero intensities that are neighbored by others.
+                    continue; // skip points with zero intensities that are neighbored by others.
                 
             }
             ef.times.push_back(EICs[i].times[ordInd]);

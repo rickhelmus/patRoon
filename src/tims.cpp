@@ -15,7 +15,7 @@ namespace {
 
 struct SpectrumIMS // UNDONE: merge with other struct(s)
 {
-    std::vector<unsigned> IDs, intensities;
+    std::vector<uint32_t> IDs, intensities;
     std::vector<double> mzs, mobilities;
     
     SpectrumIMS(size_t size) : IDs(size), intensities(size), mzs(size), mobilities(size) { }
@@ -183,28 +183,25 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
     TimsDataHandle TDH(file);
     struct EIC // UNDONE?
     {
-        std::vector<double> times, intensities;
+        std::vector<double> times;
+        std::vector<uint32_t> intensities;
     };
     std::vector<EIC> EICs(mzStarts.size());
-    // ThreadingManager::get_instance().set_num_threads(1);
     
-#if 1
-    
-    #pragma omp parallel num_threads(1)
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(8)
     {
         // get buffers for decompression (see TimsDataHandle::extract_frames()) 
         std::unique_ptr<ZSTD_DCtx, decltype(&ZSTD_freeDCtx)> zstd(ZSTD_createDCtx(), &ZSTD_freeDCtx);
         std::unique_ptr<char[]> decompBuffer = std::make_unique<char[]>(TDH.get_decomp_buffer_size());
         std::vector<EIC> threadEICs(mzStarts.size());
         
-        //Rcpp::Rcout << "thr: " << omp_get_thread_num() << "/" << omp_get_num_threads() << "\n";
-        
         #pragma omp for nowait
         for (size_t i=0; i<frameIDs.size(); ++i)
         {
             auto &fr = TDH.get_frame(frameIDs[i]);
             if (fr.msms_type != 0)
-                continue; // UNDONE?
+                continue; // UNDONE? Always add times to avoid gaps?
             fr.decompress(decompBuffer.get(), zstd.get());
             const SpectrumIMS spec = getIMSFrame(fr);
             fr.close();
@@ -214,8 +211,8 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                 const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
                                                           mobilityEnds[j]);
                 threadEICs[j].times.push_back(fr.time);
-                threadEICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(), frameF.intensities.end(), 0));
-                // UNDONE: clear zeros intensities if neighbours are? And always add times to avoid gaps?
+                threadEICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(),
+                                                                    frameF.intensities.end(), 0));
             }
         }
         
@@ -223,49 +220,36 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
         {
             for (size_t i=0; i<EICs.size(); ++i)
             {
-                EICs[i].times.insert(EICs[i].times.end(), std::make_move_iterator(threadEICs[i].times.begin()),
-                                     std::make_move_iterator(threadEICs[i].times.end()));
-                EICs[i].intensities.insert(EICs[i].intensities.end(),
-                                           std::make_move_iterator(threadEICs[i].intensities.begin()),
-                                           std::make_move_iterator(threadEICs[i].intensities.end()));
+                EICs[i].times.insert(EICs[i].times.end(), threadEICs[i].times.begin(), threadEICs[i].times.end());
+                EICs[i].intensities.insert(EICs[i].intensities.end(), threadEICs[i].intensities.begin(),
+                                           threadEICs[i].intensities.end());
             }
         }
     }
-#else
-    const auto maxPeaks = TDH.max_peaks_in_frame();
-    // NOTE: tofs not used, but will otherwise be allocated in save_to_buffs()
-    std::vector<uint32_t> IDs(maxPeaks), intensities(maxPeaks), tofs(maxPeaks);
-    std::vector<double> mzs(maxPeaks), mobilities(maxPeaks);
     
-    for (auto i : frameIDs)
+    // sort and compress
+    for (size_t i=0; i<EICs.size(); ++i)
     {
-        auto &fr = TDH.get_frame(i);
-        if (fr.msms_type != 0)
-            continue; // UNDONE?
+        const auto ord = getSortedInds(EICs[i].times);
+        const auto len = ord.size();
+        EIC ef;
         
-        fr.save_to_buffs(nullptr, IDs.data(), tofs.data(), intensities.data(), mzs.data(),
-                         mobilities.data(), nullptr);
-        
-        for (size_t j=0; j<EICs.size(); ++j)
+        for (size_t j=0; j<len; ++j)
         {
-            EICs[j].times.push_back(fr.time);
-            EICs[j].intensities.push_back(0);
-            for (size_t k=0; k<fr.num_peaks; ++k)
+            const auto ordInd = ord[j];
+            if (j > 0 && j < (len-1) && EICs[i].intensities[ordInd] == 0)
             {
-                if (mzStarts[j] != 0.0 && mzs[k] < mzStarts[j])
-                    continue;
-                if (mzEnds[j] != 0.0 && mzs[k] > mzEnds[j])
-                    continue;
-                if (mobilityStarts[j] != 0.0 && mobilities[k] < mobilityStarts[j])
-                    continue;
-                if (mobilityEnds[j] != 0.0 && mobilities[k] > mobilityEnds[j])
-                    continue;
+                const auto prevInt = EICs[i].intensities[ord[j-1]], nextInt = EICs[i].intensities[ord[j+1]];
+                if (prevInt == 0 && nextInt == 0)
+                    continue; // skip zero intensities that are neighbored by others.
                 
-                EICs[j].intensities.back() += intensities[k];
             }
+            ef.times.push_back(EICs[i].times[ordInd]);
+            ef.intensities.push_back(EICs[i].intensities[ordInd]);
         }
+        EICs[i] = std::move(ef);
     }
-#endif
+    
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = EICs[i].times,

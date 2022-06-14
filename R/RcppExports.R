@@ -41,12 +41,12 @@ initBrukerLibrary <- function(path) {
     invisible(.Call(`_patRoon_initBrukerLibrary`, path))
 }
 
-collapseTIMSFrame <- function(file, frameID, method, mzWindow) {
-    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow)
+collapseTIMSFrame <- function(file, frameID, method, mzWindow, topMost = 0L, minIntensity = 0L) {
+    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, topMost, minIntensity)
 }
 
-getTIMSPeakLists <- function(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow) {
-    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow)
+getTIMSPeakLists <- function(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L) {
+    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow, topMost, minIntensityPre, minIntensityPost)
 }
 
 getTIMSEIC <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds) {

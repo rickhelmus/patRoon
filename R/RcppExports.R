@@ -45,8 +45,8 @@ collapseTIMSFrame <- function(file, frameID, method, mzWindow) {
     .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow)
 }
 
-collapseTIMSFrames <- function(file, frameIDs, method, mzWindow) {
-    .Call(`_patRoon_collapseTIMSFrames`, file, frameIDs, method, mzWindow)
+getTIMSPeakLists <- function(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow) {
+    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow)
 }
 
 getTIMSEIC <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds) {

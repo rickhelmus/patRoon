@@ -152,17 +152,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// collapseTIMSFrames
-Rcpp::DataFrame collapseTIMSFrames(const std::string& file, const std::vector<unsigned>& frameIDs, const std::string& method, double mzWindow);
-RcppExport SEXP _patRoon_collapseTIMSFrames(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
+// getTIMSPeakLists
+Rcpp::List getTIMSPeakLists(const std::string& file, Rcpp::List frameIDsList, Rcpp::List scanStartsList, Rcpp::List scanEndsList, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, const std::string& method, double mzWindow);
+RcppExport SEXP _patRoon_getTIMSPeakLists(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP scanStartsListSEXP, SEXP scanEndsListSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
-    Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type frameIDsList(frameIDsListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type scanStartsList(scanStartsListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type scanEndsList(scanEndsListSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityStarts(mobilityStartsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityEnds(mobilityEndsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
-    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrames(file, frameIDs, method, mzWindow));
+    rcpp_result_gen = Rcpp::wrap(getTIMSPeakLists(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -280,7 +284,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 4},
-    {"_patRoon_collapseTIMSFrames", (DL_FUNC) &_patRoon_collapseTIMSFrames, 4},
+    {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 8},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},

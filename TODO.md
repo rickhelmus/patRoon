@@ -189,6 +189,11 @@
     - report()
         - fixed: TP graphs were generated for components with absent (parent) fGroups
 
+## IMS
+
+- Disable opentims threading when using OpenMP?
+
+
 ## Ext
 
 - R bundle

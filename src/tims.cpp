@@ -266,8 +266,8 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList, Rc
 
 // [[Rcpp::export]]
 Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &frameIDs,
-                      std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts,
-                      std::vector<double> mobilityEnds)
+                      const std::vector<double> &mzStarts, const std::vector<double> &mzEnds,
+                      const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds)
 {
     TimsDataHandle TDH(file);
     struct EIC // UNDONE?

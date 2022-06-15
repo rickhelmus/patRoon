@@ -176,17 +176,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // getTIMSEIC
-Rcpp::List getTIMSEIC(const std::string& file, const std::vector<unsigned>& frameIDs, std::vector<double> mzStarts, std::vector<double> mzEnds, std::vector<double> mobilityStarts, std::vector<double> mobilityEnds);
+Rcpp::List getTIMSEIC(const std::string& file, const std::vector<unsigned>& frameIDs, const std::vector<double>& mzStarts, const std::vector<double>& mzEnds, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds);
 RcppExport SEXP _patRoon_getTIMSEIC(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
     Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
-    Rcpp::traits::input_parameter< std::vector<double> >::type mzStarts(mzStartsSEXP);
-    Rcpp::traits::input_parameter< std::vector<double> >::type mzEnds(mzEndsSEXP);
-    Rcpp::traits::input_parameter< std::vector<double> >::type mobilityStarts(mobilityStartsSEXP);
-    Rcpp::traits::input_parameter< std::vector<double> >::type mobilityEnds(mobilityEndsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mzStarts(mzStartsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mzEnds(mzEndsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityStarts(mobilityStartsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityEnds(mobilityEndsSEXP);
     rcpp_result_gen = Rcpp::wrap(getTIMSEIC(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds));
     return rcpp_result_gen;
 END_RCPP

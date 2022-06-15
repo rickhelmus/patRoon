@@ -13,6 +13,7 @@ doc
 # Output files from R CMD check
 /*.Rcheck/
 # RStudio files
+patRoon.Rproj
 .Rproj.user/
 # produced vignettes
 vignettes/*.html
@@ -31,3 +32,4 @@ vignettes/*.pdf
 **/GenForm
 **/GenForm.exe
 inst/doc
+src/patRoon.dll

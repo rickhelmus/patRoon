@@ -139,8 +139,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // collapseTIMSFrame
-Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow, unsigned topMost, unsigned minIntensity);
-RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP) {
+Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow, unsigned topMost, unsigned minIntensity, unsigned scanStart, unsigned scanEnd);
+RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP scanStartSEXP, SEXP scanEndSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -150,7 +150,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minIntensity(minIntensitySEXP);
-    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame(file, frameID, method, mzWindow, topMost, minIntensity));
+    Rcpp::traits::input_parameter< unsigned >::type scanStart(scanStartSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type scanEnd(scanEndSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame(file, frameID, method, mzWindow, topMost, minIntensity, scanStart, scanEnd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -288,7 +290,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
-    {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 6},
+    {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 8},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 11},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},

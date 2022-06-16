@@ -276,6 +276,7 @@ Collate:
     'utils-plot.R'
     'utils-progress.R'
     'utils-sets.R'
+    'utils-tims.R'
     'utils-xcms.R'
     'zzz.R'
 VignetteBuilder: knitr

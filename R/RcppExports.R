@@ -57,6 +57,10 @@ getTIMSMobilogram <- function(file, frameIDsList, mzStarts, mzEnds, method, IMSW
     .Call(`_patRoon_getTIMSMobilogram`, file, frameIDsList, mzStarts, mzEnds, method, IMSWindow, topMost, minIntensityPre, minIntensityPost)
 }
 
+collapseTIMSSpectra <- function(file, frameIDs, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, topMost, minIntensityPre, minIntensityPost) {
+    .Call(`_patRoon_collapseTIMSSpectra`, file, frameIDs, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, topMost, minIntensityPre, minIntensityPost)
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

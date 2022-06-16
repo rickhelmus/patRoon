@@ -216,7 +216,7 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
-        if (binSizes[j] <= minAbundance)
+        if (binSizes[j] < minAbundance)
             continue; // UNDONE
         sortedSpectrum.addData(i+1, binnedSpectrum.mzs[j], binnedSpectrum.intensities[j],
                                binnedSpectrum.mobilities[j]);
@@ -420,7 +420,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
 // [[Rcpp::export]]
 Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
                              const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
-                             unsigned minAbundance = 0, unsigned topMost = 0, unsigned minIntensityPre = 0,
+                             unsigned minAbundance = 1, unsigned topMost = 0, unsigned minIntensityPre = 0,
                              unsigned minIntensityPost = 0)
 {
     const auto count = frameIDsList.size();

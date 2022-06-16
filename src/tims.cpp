@@ -423,7 +423,7 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
     
     SpectrumFilterParams postFilter;
     postFilter.minIntensity = minIntensityPost;
-    
+        
     std::vector<EIX> mobilograms(count);
     
     for (int i=0; i<count; ++i)
@@ -439,5 +439,45 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
     for (size_t i=0; i<mobilograms.size(); ++i)
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mobility") = mobilograms[i].first,
                                          Rcpp::Named("intensity") = mobilograms[i].second);
+    return ret;
+}
+
+// [[Rcpp::export]]
+Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsigned> &frameIDs, double mzStart,
+                               double mzEnd, double mobilityStart, double mobilityEnd, const std::string &method,
+                               double mzWindow, unsigned topMost, unsigned minIntensityPre, unsigned minIntensityPost)
+{
+    TimsDataHandle TDH(file);
+    const auto clMethod = clustMethodFromStr(method);
+    const SpectrumFilterParams filterPre(minIntensityPre, mzStart, mzEnd, mobilityStart, mobilityEnd);
+    const SpectrumFilterParams filterPost(minIntensityPost, 0.0, 0.0, 0.0, 0.0);
+
+    std::vector<SpectrumIMS> spectra(frameIDs.size());
+
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(8)
+    {
+        auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
+        #pragma omp for
+        for (size_t i=0; i<frameIDs.size(); ++i)
+        {
+            auto &fr = TDH.get_frame(frameIDs[i]);
+            SpectrumIMS spec = getIMSFrame(fr, TBuffers);
+            spec = filterSpectrum(spec, filterPre);
+            spec = spectrumTopMost(spec, topMost);
+            spectra[i] = filterSpectrum(collapseIMSFrame(spec, clMethod, clusterDataType::MZ, mzWindow), filterPost);
+        }
+    }
+
+    Rcpp::List ret(spectra.size());
+    const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
+    for (size_t i=0; i<spectra.size(); ++i)
+    {
+        Rcpp::NumericMatrix m(spectra[i].size(), 2);
+        Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].mzs), ints = Rcpp::wrap(spectra[i].intensities);
+        m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
+        Rcpp::colnames(m) = coln;
+        ret[i] = m;
+    }
     return ret;
 }

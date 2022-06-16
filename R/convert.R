@@ -218,8 +218,10 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 }
 
 convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NULL, clMethod = "bin", mzWindow = 0.005,
-                               topMost = NULL, minIntensityPre = NULL, minIntensityPost = NULL)
+                               minAbundance = 1, topMost = NULL, minIntensityPre = NULL, minIntensityPost = NULL)
 {
+    # UNDONE: checkmate
+    
     fCount <- length(inFiles)
     prog <- openProgBar(0, fCount)
 
@@ -231,7 +233,7 @@ convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NUL
         globalMD <- getTIMSMetaTable(db, "GlobalMetaData", c("Key", "Value"))
         
         specs <- collapseTIMSSpectra(inFiles[i], frames$Id, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
-                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), "bin", mzWindow,
+                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), "bin", mzWindow, minAbundance,
                                      NULLToZero(topMost), NULLToZero(minIntensityPre), NULLToZero(minIntensityPost))
         
         header <- data.frame(seqNum = seq_along(specs),

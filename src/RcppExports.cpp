@@ -212,6 +212,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// collapseTIMSSpectra
+Rcpp::List collapseTIMSSpectra(const std::string& file, const std::vector<unsigned>& frameIDs, double mzStart, double mzEnd, double mobilityStart, double mobilityEnd, const std::string& method, double mzWindow, unsigned topMost, unsigned minIntensityPre, unsigned minIntensityPost);
+RcppExport SEXP _patRoon_collapseTIMSSpectra(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type frameIDs(frameIDsSEXP);
+    Rcpp::traits::input_parameter< double >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< double >::type mzEnd(mzEndSEXP);
+    Rcpp::traits::input_parameter< double >::type mobilityStart(mobilityStartSEXP);
+    Rcpp::traits::input_parameter< double >::type mobilityEnd(mobilityEndSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minIntensityPre(minIntensityPreSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minIntensityPost(minIntensityPostSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSSpectra(file, frameIDs, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, topMost, minIntensityPre, minIntensityPost));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -313,6 +334,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 11},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_getTIMSMobilogram", (DL_FUNC) &_patRoon_getTIMSMobilogram, 9},
+    {"_patRoon_collapseTIMSSpectra", (DL_FUNC) &_patRoon_collapseTIMSSpectra, 11},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

@@ -270,6 +270,29 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
     return sumSpec;
 }
 
+using EIX = std::pair<std::vector<double>, std::vector<unsigned>>; // used for EIC/EIM data
+
+EIX sortCompressEIX(const EIX &eix)
+{
+    const auto ord = getSortedInds(eix.first);
+    const auto len = ord.size();
+    EIX ret;
+    
+    for (size_t j=0; j<len; ++j)
+    {
+        const auto ordInd = ord[j];
+        if (j > 0 && j < (len-1) && eix.second[ordInd] == 0)
+        {
+            const auto prevInt = eix.second[ord[j-1]], nextInt = eix.second[ord[j+1]];
+            if (prevInt == 0 && nextInt == 0)
+                continue; // skip points with zero intensities that are neighbored by others.
+            
+        }
+        ret.first.push_back(eix.first[ordInd]);
+        ret.second.push_back(eix.second[ordInd]);
+    }
+    return ret;
+}
 
 
 }
@@ -343,18 +366,13 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                       const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds)
 {
     TimsDataHandle TDH(file);
-    struct EIC // UNDONE?
-    {
-        std::vector<double> times;
-        std::vector<uint32_t> intensities;
-    };
-    std::vector<EIC> EICs(mzStarts.size());
+    std::vector<EIX> EICs(mzStarts.size());
     
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
     {
         auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
-        std::vector<EIC> threadEICs(mzStarts.size());
+        std::vector<EIX> threadEICs(mzStarts.size());
         
         #pragma omp for nowait
         for (size_t i=0; i<frameIDs.size(); ++i)
@@ -368,9 +386,9 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
             {
                 const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
                                                           mobilityEnds[j]);
-                threadEICs[j].times.push_back(fr.time);
-                threadEICs[j].intensities.push_back(std::accumulate(frameF.intensities.begin(),
-                                                                    frameF.intensities.end(), 0));
+                threadEICs[j].first.push_back(fr.time);
+                threadEICs[j].second.push_back(std::accumulate(frameF.intensities.begin(),
+                                                               frameF.intensities.end(), 0));
             }
         }
         
@@ -378,40 +396,19 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
         {
             for (size_t i=0; i<EICs.size(); ++i)
             {
-                EICs[i].times.insert(EICs[i].times.end(), threadEICs[i].times.begin(), threadEICs[i].times.end());
-                EICs[i].intensities.insert(EICs[i].intensities.end(), threadEICs[i].intensities.begin(),
-                                           threadEICs[i].intensities.end());
+                EICs[i].first.insert(EICs[i].first.end(), threadEICs[i].first.begin(), threadEICs[i].first.end());
+                EICs[i].second.insert(EICs[i].second.end(), threadEICs[i].second.begin(), threadEICs[i].second.end());
             }
         }
-    }
-    
-    // sort and compress
-    for (size_t i=0; i<EICs.size(); ++i)
-    {
-        const auto ord = getSortedInds(EICs[i].times);
-        const auto len = ord.size();
-        EIC ef;
-        
-        for (size_t j=0; j<len; ++j)
-        {
-            const auto ordInd = ord[j];
-            if (j > 0 && j < (len-1) && EICs[i].intensities[ordInd] == 0)
-            {
-                const auto prevInt = EICs[i].intensities[ord[j-1]], nextInt = EICs[i].intensities[ord[j+1]];
-                if (prevInt == 0 && nextInt == 0)
-                    continue; // skip points with zero intensities that are neighbored by others.
-                
-            }
-            ef.times.push_back(EICs[i].times[ordInd]);
-            ef.intensities.push_back(EICs[i].intensities[ordInd]);
-        }
-        EICs[i] = std::move(ef);
     }
     
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = EICs[i].times,
-                                         Rcpp::Named("intensity") = EICs[i].intensities);
+    {
+        EIX eic = sortCompressEIX(EICs[i]);
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = eic.first,
+                                         Rcpp::Named("intensity") = eic.second);
+    }
     return ret;
 }
 
@@ -422,23 +419,25 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
 {
     const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);
-    std::vector<SpectrumIMS> peakLists(count);
     const auto clMethod = clustMethodFromStr(method);
+    
     SpectrumFilterParams postFilter;
     postFilter.minIntensity = minIntensityPost;
+    
+    std::vector<EIX> mobilograms(count);
     
     for (int i=0; i<count; ++i)
     {
         const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);
         const SpectrumFilterParams preFilter(minIntensityPre, mzStarts[i], mzEnds[i], 0.0, 0.0);
-        
-        peakLists[i] = std::move(collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
-                                                   clusterDataType::MOBILITY, IMSWindow));
+        const auto spec = collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
+                                            clusterDataType::MOBILITY, IMSWindow);
+        mobilograms[i] = sortCompressEIX(EIX(spec.mobilities, spec.intensities));
     }
     
-    Rcpp::List ret(peakLists.size());
-    for (size_t i=0; i<peakLists.size(); ++i)
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mobility") = peakLists[i].mobilities,
-                                         Rcpp::Named("intensity") = peakLists[i].intensities);
+    Rcpp::List ret(mobilograms.size());
+    for (size_t i=0; i<mobilograms.size(); ++i)
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mobility") = mobilograms[i].first,
+                                         Rcpp::Named("intensity") = mobilograms[i].second);
     return ret;
 }

@@ -217,6 +217,64 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
     invisible(NULL)
 }
 
+convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NULL, clMethod = "bin", mzWindow = 0.005,
+                               topMost = NULL, minIntensityPre = NULL, minIntensityPost = NULL)
+{
+    fCount <- length(inFiles)
+    prog <- openProgBar(0, fCount)
+
+    for (i in seq_len(fCount))
+    {
+        db <- openTIMSMetaDBScope(f = inFiles[i])
+        frames <- getTIMSMetaTable(db, "Frames", c("Id", "Time", "MsMsType", "Polarity"))
+        frames <- frames[MsMsType == 0]
+        globalMD <- getTIMSMetaTable(db, "GlobalMetaData", c("Key", "Value"))
+        
+        specs <- collapseTIMSSpectra(inFiles[i], frames$Id, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
+                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), "bin", mzWindow,
+                                     NULLToZero(topMost), NULLToZero(minIntensityPre), NULLToZero(minIntensityPost))
+        
+        header <- data.frame(seqNum = seq_along(specs),
+                             msLevel = 1,
+                             polarity = fifelse(frames$Polarity == "+", 1, 0),
+                             peaksCount = sapply(specs, nrow), # UNDONE: correct?
+                             totIonCurrent = sapply(specs, function(sp) sum(sp[, "intensity"])),
+                             retentionTime = frames$Time,
+                             basePeakMZ = sapply(specs, function(sp) sp[which.max(sp[, "intensity"]), "mz"]),
+                             basePeakIntensity = sapply(specs, function(sp) max(sp[, "intensity"])),
+                             collisionEnergy = NA_real_,
+                             ionisationEnergy = 0,
+                             lowMZ = 0,
+                             highMZ = 0,
+                             precursorScanNum = NA_integer_,
+                             precursorMZ = NA_real_,
+                             precursorCharge = NA_integer_,
+                             precursorIntensity = NA_real_,
+                             mergedScan = NA_integer_,
+                             mergedResultScanNum = NA_integer_,
+                             mergedResultStartScanNum = NA_integer_,
+                             mergedResultEndScanNum = NA_integer_,
+                             injectionTime = 0,
+                             filterString = NA_character_,
+                             centroided = TRUE,
+                             ionMobilityDriftTime = NA_real_,
+                             isolationWindowLowerOffset = NA_real_,
+                             isolationWindowUpperOffset = NA_real_,
+                             scanWindowLowerLimit = as.numeric(globalMD[Key == "MzAcqRangeLower"]$Value),
+                             scanWindowUpperLimit = as.numeric(globalMD[Key == "MzAcqRangeUpper"]$Value))
+        header$acquisitionNum <- header$seqNum
+        header$spectrumId <- paste0("scan=", header$seqNum)
+        
+        mzR::writeMSData(specs, outFiles[i], header)
+        
+        setTxtProgressBar(prog, i)
+    }
+    
+    setTxtProgressBar(prog, fCount)
+    
+    invisible(NULL)
+}
+
 #' @details \code{convertMSFiles} converts the data format of an analysis to
 #'   another. It uses tools from
 #'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}

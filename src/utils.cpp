@@ -82,7 +82,7 @@ std::vector<int> clusterNums(const std::vector<double> &nums, clusterMethod meth
     {
         const auto sortedNumInds = getSortedInds(nums);
         
-        size_t curCluster = 0;
+        int curCluster = 0;
         if (method == clusterMethod::BIN)
         {
             int curBin = -1;
@@ -98,19 +98,22 @@ std::vector<int> clusterNums(const std::vector<double> &nums, clusterMethod meth
                 ret[i] = curCluster;
             }
         }
-        else // clusterMethod::DIST
+        else // clusterMethod::DIFF
         {
-            double prevNum = -1.0;
+            int curBinSize = 0;
+            double binSum = 0;
             for (auto i : sortedNumInds)
             {
-                const double diff = nums[i] - prevNum;
-                if (prevNum < 0.0 || diff > window)
+                if (curBinSize == 0 || (nums[i] - (binSum / static_cast<double>(curBinSize))) > window)
                 {
-                    if (prevNum >= 0.0)
+                    if (curBinSize > 0)
                         ++curCluster;
-                    prevNum = nums[i];
+                    curBinSize = 1;
+                    binSum = nums[i];
                 }
                 ret[i] = curCluster;
+                binSum += nums[i];
+                ++curBinSize;
             }
         }
     }

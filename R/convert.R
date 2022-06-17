@@ -233,7 +233,7 @@ convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NUL
         globalMD <- getTIMSMetaTable(db, "GlobalMetaData", c("Key", "Value"))
         
         specs <- collapseTIMSSpectra(inFiles[i], frames$Id, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
-                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), "bin", mzWindow, minAbundance,
+                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), clMethod, mzWindow, minAbundance,
                                      NULLToZero(topMost), NULLToZero(minIntensityPre), NULLToZero(minIntensityPost))
         
         header <- data.frame(seqNum = seq_along(specs),

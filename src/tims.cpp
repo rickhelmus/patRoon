@@ -197,6 +197,7 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
     {
         const size_t cl = clusts[i];
         binnedSpectrum.mzs[cl] += frame.mzs[i];
+        //binnedSpectrum.mzs[cl] += (frame.mzs[i] * static_cast<double>(frame.intensities[i])); UNDONE
         binnedSpectrum.intensities[cl] += frame.intensities[i];
         binnedSpectrum.mobilities[cl] += frame.mobilities[i];
         ++binSizes[cl];
@@ -207,6 +208,7 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
     {
         const double len = static_cast<double>(binSizes[i]);
         binnedSpectrum.mzs[i] /= len;
+        //binnedSpectrum.mzs[i] /= binnedSpectrum.intensities[i]; # UNDONE
         binnedSpectrum.mobilities[i] /= len;
     }
 

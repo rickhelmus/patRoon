@@ -264,8 +264,8 @@ convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NUL
                              isolationWindowUpperOffset = NA_real_,
                              scanWindowLowerLimit = as.numeric(globalMD[Key == "MzAcqRangeLower"]$Value),
                              scanWindowUpperLimit = as.numeric(globalMD[Key == "MzAcqRangeUpper"]$Value))
-        header$acquisitionNum <- header$seqNum
-        header$spectrumId <- paste0("scan=", header$seqNum)
+        header$acquisitionNum <- frames$Id
+        header$spectrumId <- paste0("scan=", frames$Id)
         
         mzR::writeMSData(specs, outFiles[i], header)
         

@@ -196,20 +196,19 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
     for (size_t i=0; i<clusts.size(); ++i)
     {
         const size_t cl = clusts[i];
-        binnedSpectrum.mzs[cl] += frame.mzs[i];
-        //binnedSpectrum.mzs[cl] += (frame.mzs[i] * static_cast<double>(frame.intensities[i])); UNDONE
+        const double inten = static_cast<double>(frame.intensities[i]);
+        binnedSpectrum.mzs[cl] += (frame.mzs[i] * inten);
+        binnedSpectrum.mobilities[cl] += (frame.mobilities[i] * inten);
         binnedSpectrum.intensities[cl] += frame.intensities[i];
-        binnedSpectrum.mobilities[cl] += frame.mobilities[i];
         ++binSizes[cl];
     }
 
     // average data
     for (size_t i=0; i<binnedSpectrum.size(); ++i)
     {
-        const double len = static_cast<double>(binSizes[i]);
-        binnedSpectrum.mzs[i] /= len;
-        //binnedSpectrum.mzs[i] /= binnedSpectrum.intensities[i]; # UNDONE
-        binnedSpectrum.mobilities[i] /= len;
+        const double inten = static_cast<double>(binnedSpectrum.intensities[i]);
+        binnedSpectrum.mzs[i] /= inten;
+        binnedSpectrum.mobilities[i] /= inten;
     }
 
     // sort spectrum && remove outliers
@@ -219,7 +218,7 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
     {
         const auto j = sortedInds[i];
         if (binSizes[j] < minAbundance)
-            continue; // UNDONE
+            continue;
         sortedSpectrum.addData(i+1, binnedSpectrum.mzs[j], binnedSpectrum.intensities[j],
                                binnedSpectrum.mobilities[j]);
     }

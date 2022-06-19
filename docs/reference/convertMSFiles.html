@@ -119,40 +119,60 @@
 <dd><p>Either <code>"pwiz"</code> (implemented by <code class="command">msConvert</code> of
 ProteoWizard), <code>"openms"</code> (implemented by <code class="command">FileConverter</code> of
 OpenMS) or <code>"bruker"</code> (implemented by DataAnalysis).</p></dd>
+
+
 <dt>vendor</dt>
 <dd><p>If <code>TRUE</code> only vendor formats are returned.</p></dd>
+
+
 <dt>files, dirs</dt>
 <dd><p>The <code>files</code> argument should be a <code>character</code>
 vector with input files. If <code>files</code> contains directories and
 <code>dirs=TRUE</code> then files from these directories are also considered. An
 alternative method to specify input files is by the <code>anaInfo</code>
 argument. If the latter is specified <code>files</code> may be <code>NULL</code>.</p></dd>
+
+
 <dt>outPath</dt>
 <dd><p>A character vector specifying directories that should be used
 for the output. Will be re-cycled if necessary. If <code>NULL</code>, output
 directories will be kept the same as the input directories.</p></dd>
+
+
 <dt>anaInfo</dt>
 <dd><p>An <a href="analysis-information.html">analysis info table</a> used to
 retrieve input files. Either this argument or <code>files</code> (or both) should
 be set (<em>i.e.</em> not <code>NULL</code>).</p></dd>
+
+
 <dt>from</dt>
 <dd><p>Input format (see below). These are used to find analyses when
 <code>dirs=TRUE</code> or <code>anaInfo</code> is set.</p></dd>
+
+
 <dt>to</dt>
 <dd><p>Output format: <code>"mzXML"</code> or <code>"mzML"</code>.</p></dd>
+
+
 <dt>overWrite</dt>
 <dd><p>Should existing destination file be overwritten
 (<code>TRUE</code>) or not (<code>FALSE</code>)?</p></dd>
+
+
 <dt>centroid</dt>
 <dd><p>Set to <code>TRUE</code> to enable centroiding (not supported if
 <code>algorithm="openms"</code>). In addition, when <code>algorithm="pwiz"</code> the
 value may be <code>"vendor"</code> to perform centroiding with the vendor
 algorithm or <code>"cwt"</code> to use ProteoWizard's wavelet algorithm.</p></dd>
+
+
 <dt>filters</dt>
 <dd><p>When <code>algorithm="pwiz"</code>: a <code>character</code> vector
 specifying one or more filters. The elements of the specified vector are
 directly passed to the <code>--filter</code> option (see
 <a href="http://proteowizard.sourceforge.net/tools/filters.html" class="external-link">here</a>)</p></dd>
+
+
 <dt>extraOpts</dt>
 <dd><p>A <code>character</code> vector specifying any extra commandline
 parameters passed to <code class="command">msConvert</code> or <code class="command">FileConverter</code>. Set to
@@ -160,11 +180,14 @@ parameters passed to <code class="command">msConvert</code> or <code class="comm
 <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html" class="external-link">FileConverter</a>
  and
 <a href="http://proteowizard.sourceforge.net/tools/msconvert.html" class="external-link">msConvert</a>.</p></dd>
+
+
 <dt>PWizBatchSize</dt>
 <dd><p>When <code>algorithm="pwiz"</code>: the number of analyses to
 process by a single call to <code class="command">msConvert</code>. Usually a value of one is
 most efficient. Set to zero to run all analyses all at once from a single
 call.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -251,7 +274,7 @@ call.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -232,107 +232,174 @@ getDefIsolatePrecParams(...)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>obj, x, object</dt>
 <dd><p>The <code>MSPeakLists</code> object to access.</p></dd>
+
+
 <dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>MSPeakLists</code> method.</p></dd>
+
+
 <dt>reAverage</dt>
 <dd><p>Set to <code>TRUE</code> to regenerate group averaged MS peak lists. <strong>NOTE</strong> it is very important
 that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
 likely that <em>e.g.</em> plotting methods will use wrong MS/MS data.</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>If set to <code>TRUE</code> and if the comparison is made between two spectra then <code><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></code> is used
 to reduce the <code>matrix</code> return value to a <code>numeric</code> vector.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The feature group name (partially matched).</p></dd>
+
+
 <dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
 generate this object. If not <code>NULL</code> it is used to add feature group
 information (retention and <em>m/z</em> values).</p></dd>
+
+
 <dt>averaged</dt>
 <dd><p>If <code>TRUE</code> then feature group averaged peak list data is
 used.</p></dd>
+
+
 <dt>absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr</dt>
 <dd><p>Absolute/relative intensity threshold for MS or MS/MS peak
 lists. <code>NULL</code> for none.</p></dd>
+
+
 <dt>topMSPeaks, topMSMSPeaks</dt>
 <dd><p>Only consider this amount of MS or MS/MS peaks with highest intensity. <code>NULL</code> to
 consider all.</p></dd>
+
+
 <dt>minMSMSPeaks</dt>
 <dd><p>If the number of peaks in an MS/MS peak list (<strong>excluding</strong> the precursor peak) is lower
 than this it will be completely removed. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>isolatePrec</dt>
 <dd><p>If not <code>NULL</code> then value should be a <code>list</code> with parameters used for isolating the
 precursor and its isotopes in MS peak lists (see <code>Isolating precursor data</code>). Alternatively, <code>TRUE</code> to
 apply the filter with default settings (as given with <code>getDefIsolatePrecParams</code>).</p></dd>
+
+
 <dt>deIsotopeMS, deIsotopeMSMS</dt>
 <dd><p>Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
 processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 <code>getMzRPeakLists</code> does not (yet) support flagging of isotopes.</p></dd>
+
+
 <dt>withMSMS</dt>
 <dd><p>If set to <code>TRUE</code> then only results will be retained for which MS/MS data is available. if
 <code>negate=TRUE</code> then only results <em>without</em> MS/MS data will be retained.</p></dd>
+
+
 <dt>annotatedBy</dt>
 <dd><p>Either a <code><a href="formulas-class.html">formulas</a></code> or <code><a href="compounds-class.html">compounds</a></code> object, or a <code>list</code> with both. Any
 MS/MS peaks that are <em>not</em> annotated by any of the candidates in the specified objects are removed.</p></dd>
+
+
 <dt>retainPrecursorMSMS</dt>
 <dd><p>If <code>TRUE</code> then precursor peaks will never be filtered out from MS/MS peak lists (note
 that precursors are never removed from MS peak lists). The <code>negate</code> argument does not affect this setting.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
+
+
 <dt>groupName</dt>
 <dd><p>The name of the feature group for which a plot should be made. To compare spectra, two group names
 can be specified.</p></dd>
+
+
 <dt>analysis</dt>
 <dd><p>The name of the analysis for which a plot should be made. If <code>NULL</code> then data from the feature
 group averaged peak list is used. When comparing spectra, either <code>NULL</code> or the analyses for both spectra
 should be specified.</p></dd>
+
+
 <dt>MSLevel</dt>
 <dd><p>The MS level: <samp>1</samp> for regular MS, <samp>2</samp> for MSMS.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>The title of the plot. If <code>NULL</code> a title will be automatically made.</p></dd>
+
+
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>groupName1, groupName2</dt>
 <dd><p>The names of the feature groups for which the comparison should be made. If both
 arguments are specified then a comparison is made with the spectra specified by <code>groupName1</code> <em>vs</em> those
 specified by <code>groupName2</code>. The length of either can be <samp>&gt;1</samp> to generate a comparison matrix.
 Alternatively, if <code>groupName2</code> is <code>NULL</code> then all the spectra specified in <code>groupName1</code> will be
 compared with eachother, <em>i.e.</em> resulting in a square similarity matrix.</p></dd>
+
+
 <dt>analysis1, analysis2</dt>
 <dd><p>The name of the analysis (analyses) for the comparison. If <code>NULL</code> then data from the
 feature group averaged peak list is used. Otherwise, should be the same length as
 <code>groupName1</code>/<code>groupName2</code>.</p></dd>
+
+
 <dt>NAToZero</dt>
 <dd><p>Set to <code>TRUE</code> to convert <code>NA</code> similarities (<em>i.e.</em> when no similarity could be
 calculated) to zero values.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
+
+
 <dt>perSet, mirror</dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
 Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>peakLists</code> returns a nested list containing MS (and MS/MS where
-  available) peak lists per feature group and per analysis. The format is:
-<code>[[analysis]][[featureGroupName]][[MSType]][[PeakLists]]</code> where
-<code>MSType</code> is either <code>"MS"</code> or <code>"MSMS"</code> and <code>PeakLists</code> a
-<code>data.table</code> containing all <em>m/z</em> values (<code>mz</code>  column) and their intensities (<code>intensity</code> column). In addition, the
+    
+
+<p><code>peakLists</code> returns a nested list containing MS (and MS/MS where
+  available) peak lists per feature group and per analysis. The format is:</p>
+<p></p>
+<p><code>[[analysis]][[featureGroupName]][[MSType]][[PeakLists]]</code> where</p>
+<p></p>
+<p><code>MSType</code> is either <code>"MS"</code> or <code>"MSMS"</code> and <code>PeakLists</code> a</p>
+<p></p>
+<p><code>data.table</code> containing all <em>m/z</em> values (<code>mz</code></p>
+
+
+<p>column) and their intensities (<code>intensity</code> column). In addition, the
   peak list tables may contain a <code>cmp</code> column which contains an unique
   alphabetical identifier to which isotopic cluster (or "compound") a mass
   belongs (only supported by MS peak lists generated by Bruker tools at the
-  moment).
-<code>averagedPeakLists</code> returns a nested list of feature group
+  moment).</p>
+
+
+<p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
     </div>
     <div id="details">
@@ -477,7 +544,7 @@ for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

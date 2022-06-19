@@ -134,49 +134,77 @@
     <dl><dt>features</dt>
 <dd><p>A <code><a href="features-class.html">features</a></code> object with the features that should
 be used to optimize grouping.</p></dd>
+
+
 <dt>algorithm</dt>
 <dd><p>The algorithm used for finding or grouping features (see <code><a href="findFeatures.html">findFeatures</a></code> and
 <code><a href="groupFeatures.html">groupFeatures</a></code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>One or more lists with parameter sets (see below) (for <code>optimizeFeatureFinding</code> and
 <code>optimizeFeatureGrouping</code>). Alternatively, named arguments that set (and possibly override) the parameters
 that should be returned from <code>generateFeatureOptPSet</code> or <code>generateFGroupsOptPSet</code>.</p></dd>
+
+
 <dt>templateParams</dt>
 <dd><p>Template parameter set (see below).</p></dd>
+
+
 <dt>paramRanges</dt>
 <dd><p>A list with vectors containing absolute parameter ranges (minimum/maximum) that constrain numeric
 parameters choosen during experiments. See the <code>getDefFeaturesOptParamRanges</code> and
 <code>getDefFGroupsOptParamRanges</code> functions for defaults. Values should be <code>Inf</code> when no limit should
 be used.</p></dd>
+
+
 <dt>maxIterations</dt>
 <dd><p>Maximum number of iterations that may be performed to find optimimum values. Used to restrict
 neededless long optimization procedures. In IPO this was fixed to <samp>50</samp>.</p></dd>
+
+
 <dt>maxModelDeviation</dt>
 <dd><p>See the <code>Potential suboptimal results by optimization model</code> section below.</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
+
+
 <dt>anaInfo</dt>
 <dd><p><a href="analysis-information.html">Analysis info table</a> (passed to <code><a href="findFeatures.html">findFeatures</a></code>).</p></dd>
+
+
 <dt>isoIdent</dt>
 <dd><p>Sets the algorithm used to identify isotopes. Valid values
 are: <code>"IPO"</code>, <code>"CAMERA"</code> and <code>"OpenMS"</code>. The latter can only
 be used when OpenMS is used to find features, and is highly recommended in
 this situation.</p></dd>
+
+
 <dt>checkPeakShape</dt>
 <dd><p>Additional peak shape checking of isotopes. Only used
 if <code>isoIdent="IPO"</code>. Valid values: <code>"none"</code>,
 <code>"borderIntensity"</code>, <code>"sinusCurve"</code> or <code>"normalDistr"</code>.</p></dd>
+
+
 <dt>CAMERAOpts</dt>
 <dd><p>A <code>list</code> with additional arguments passed to
 <code><a href="https://rdrr.io/pkg/CAMERA/man/findIsotopes-methods.html" class="external-link">CAMERA::findIsotopes</a></code> when <code>isoIdent="CAMERA"</code>.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>Method used by XCMS to find features (only if <code>algorithm="xcms"</code>).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>optimizeFeatureFinding</code> and <code>optimizeFeatureGrouping</code> return their results in a
-<code><a href="optimizationResult-class.html">optimizationResult</a></code> object.</p>
+    
+
+<p>The <code>optimizeFeatureFinding</code> and <code>optimizeFeatureGrouping</code> return their results in a</p>
+<p></p>
+<p><code><a href="optimizationResult-class.html">optimizationResult</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -331,7 +359,7 @@ paremeters more easily (see <code>examples</code>).</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

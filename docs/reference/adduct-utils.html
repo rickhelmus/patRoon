@@ -113,6 +113,8 @@
 string, a <code>numeric</code> <code class="command">MetFrag</code> adduct identifier
 (<code>adduct_mode</code> column obtained with <code>MetFragAdducts</code>) or an
 <code><a href="adduct-class.html">adduct</a></code> object (in which case no conversion occurs).</p></dd>
+
+
 <dt>format</dt>
 <dd><p>A <code>character</code> that specifies the source format.</p>
 <p><code>"generic"</code> is an internally used generic format that supports full
@@ -126,20 +128,31 @@ string, a <code>numeric</code> <code class="command">MetFrag</code> adduct ident
   <code>MetFragAdducts</code> functions, respectively.</p>  
 <p><code>"openms"</code> is the format used by the <code class="command">MetaboliteAdductDecharger</code> tool.</p>  
 <p><code>"cliquems"</code> is the format used by <span class="pkg">cliqueMS</span>.</p></dd>
+
+
 <dt>isPositive</dt>
 <dd><p>A logical that specifies whether the adduct should be
 positive. Should only be set when <code>format="metfrag"</code> and <code>x</code> is a
 <code>numeric</code> identifier.</p></dd>
+
+
 <dt>charge</dt>
 <dd><p>The final charge. Only needs to be set when <code>format="openms"</code>.</p></dd>
+
+
 <dt>err</dt>
 <dd><p>If <code>TRUE</code> then an error will be thrown if conversion fails,
 otherwise returns without data.</p></dd>
+
+
 <dt>formula</dt>
 <dd><p>A <code>character</code> vector with formulae to convert.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code>as.adduct</code>).
 Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -181,7 +194,7 @@ Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

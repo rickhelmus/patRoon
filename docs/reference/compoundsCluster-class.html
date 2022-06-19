@@ -158,56 +158,92 @@ plotSilhouettes(obj, kSeq, groupName, pch = 16, type = "b", ...)</code></pre></d
     <h2>Arguments</h2>
     <dl><dt>obj, x, object</dt>
 <dd><p>A <code>compoundsCluster</code> object.</p></dd>
+
+
 <dt>use.names</dt>
 <dd><p>A logical value specifying whether the returned vector
 should be named with the feature group names.</p></dd>
+
+
 <dt>i</dt>
 <dd><p>For <code>[</code>: A numeric or character value which is used to select feature groups by
 their index or name, respectively (for the order/names see <code><a href="generics.html">groupNames()</a></code>). Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed directly to the plotting function
 (<code>plot</code> or <code><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">plot.dendrogram</a></code>).</p></dd>
+
+
 <dt>drop, j</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>k, h</dt>
 <dd><p>Desired number of clusters or tree height to be used for cutting
 the dendrogram, respecitively. One or the other must be specified.
 Analogous to <code><a href="https://rdrr.io/r/stats/cutree.html" class="external-link">cutree</a></code>.</p></dd>
+
+
 <dt>groupName</dt>
 <dd><p>A character specifying the feature group name.</p></dd>
+
+
 <dt>maxTreeHeight, deepSplit, minModuleSize</dt>
 <dd><p>Arguments used by
 <code>cutreeDynamicTree</code>.</p></dd>
+
+
 <dt>pal</dt>
 <dd><p>Colour palette to be used from <span class="pkg">RColorBrewer</span>.</p></dd>
+
+
 <dt>colourBranches</dt>
 <dd><p>Whether branches from cut clusters (and their labels)
 should be coloured. Might be slow with large numbers of clusters, hence,
 the default is only <code>TRUE</code> when this is not the case.</p></dd>
+
+
 <dt>showLegend</dt>
 <dd><p>If <code>TRUE</code> and <code>colourBranches</code> is also
 <code>TRUE</code> then a legend will be shown which outlines cluster numbers and
 their colours. By default <code>TRUE</code> for small amount of clusters to avoid
 overflowing the plot.</p></dd>
+
+
 <dt>cluster</dt>
 <dd><p>A numeric value specifying the cluster.</p></dd>
+
+
 <dt>width, height</dt>
 <dd><p>The dimensions (in pixels) of the raster image that
 should be plotted.</p></dd>
+
+
 <dt>withTitle</dt>
 <dd><p>A logical value specifying whether a title should be added.</p></dd>
+
+
 <dt>kSeq</dt>
 <dd><p>An integer vector containing the sequence that should be used for
 average silhouette width calculation.</p></dd>
+
+
 <dt>pch, type</dt>
 <dd><p>Passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>cutTree</code> and <code>cutTreeDynamic</code> return the modified
-<code>compoundsCluster</code> object.
-<code>getMCS</code> returns an <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> molecule object
+    
+
+<p><code>cutTree</code> and <code>cutTreeDynamic</code> return the modified</p>
+<p></p>
+<p><code>compoundsCluster</code> object.</p>
+
+
+<p><code>getMCS</code> returns an <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> molecule object
   (<code>IAtomContainer</code>).</p>
     </div>
     <div id="details">
@@ -292,7 +328,7 @@ clustering.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

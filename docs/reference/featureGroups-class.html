@@ -297,17 +297,25 @@ delete(obj, ...)</code></pre></div>
     <dl><dt>areas</dt>
 <dd><p>If set to <code>TRUE</code> then areas are considered instead of peak intensities.</p>
 <p>For <code>as.data.table</code>: ignored if <code>features=TRUE</code>, as areas of features are always reported.</p></dd>
+
+
 <dt>normalized</dt>
 <dd><p>If <code>TRUE</code> then normalized intensity data is used (see the <code>Feature intensity
   normalization</code> section.</p>
 <p>For <code>as.data.table</code>: if no normalization data is available (<em>e.g.</em> because <code>normInts</code> was not used)
   then an automatic group normalization is performed.</p></dd>
+
+
 <dt>fGroups, obj, x, object</dt>
 <dd><p><code>featureGroups</code> object to be accessed.</p></dd>
+
+
 <dt>value</dt>
 <dd><p>For <code>adducts&lt;-</code>: A <code>character</code> with adduct annotations assigned to each feature group. The
 length should equal the number of feature groups. Can be named with feature group names to customize the assignment
 order.</p></dd>
+
+
 <dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
@@ -316,38 +324,60 @@ analyses as numeric index, logical or character, <code>j</code> the feature grou
 <code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
 feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
 <code>...</code> to <code>delete</code>. The return value of this function specifies the analyses of the features in the group to be removed (same format as <code>i</code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>normInts</code>: passed to <code><a href="suspect-screening.html">screenSuspects</a></code> if <code>featNorm="istd"</code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>featureGroups</code> method.</p></dd>
+
+
 <dt>rGroups</dt>
 <dd><p>For <code>[</code>: An optional <code>character</code> vector: if specified only keep results for the given
 replicate groups (equivalent to the <code>rGroups</code> argument to <code><a href="feature-filtering.html">filter</a></code>).</p></dd>
+
+
 <dt>results</dt>
 <dd><p>Optional argument. If specified only feature groups with results in the specified object are kept. The
 class of <code>results</code> should be <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> or <code><a href="components-class.html">components</a></code>. Multiple objects
 can be specified in a <code>list</code>: in this case a feature group is kept if it has a result in <em>any</em> of the
 objects (equivalent to the <code>results</code> argument to <code><a href="feature-filtering.html">filter</a></code>).</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The feature group name (partially matched).</p></dd>
+
+
 <dt>type</dt>
 <dd><p>The export type: <code>"brukerpa"</code> (Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or
 <code>"mzmine"</code> (MZmine).</p></dd>
+
+
 <dt>out</dt>
 <dd><p>The destination file for the exported data.</p></dd>
+
+
 <dt>average</dt>
 <dd><p>If <code>TRUE</code> then data within replicate groups are averaged.</p>
 <p>For <code>as.data.table</code>: if <code>features=TRUE</code> other feature properties are also averaged.</p></dd>
+
+
 <dt>features</dt>
 <dd><p>If <code>TRUE</code> then feature specific data will be added. If <code>average=TRUE</code> this data will be
 averaged for each feature group.</p></dd>
+
+
 <dt>qualities</dt>
 <dd><p>Adds feature (group) qualities (<code>qualities="quality"</code>), scores (<code>qualities="score"</code>) or
 both (<code>qualities="both"</code>), if this data is available (<em>i.e.</em> from <code>calculatePeakQualities</code>). If
 <code>qualities=FALSE</code> then nothing is reported.</p></dd>
+
+
 <dt>regression</dt>
 <dd><p>Set to <code>TRUE</code> to add regression data for each feature group. For this a linear model is
 created (intensity/area [depending on <code>areas</code> argument] <em>vs</em> concentration). The model concentrations
@@ -356,91 +386,147 @@ information</a>. From this model the intercept, slope and R2 is added to the out
 <code>features=TRUE</code>, concentrations for each feature are added. Note that no regression information is added when
 no <code>conc</code> column is present in the analysis information or when less than two concentrations are specified
 (<em>i.e.</em> the minimum amount).</p></dd>
+
+
 <dt>averageFunc</dt>
 <dd><p>Function used for averaging. Only used when <code>average=TRUE</code> or <code>FCParams != NULL</code>.</p></dd>
+
+
 <dt>FCParams</dt>
 <dd><p>A parameter list to calculate Fold change data. See <code>getFCParams</code> for more details. Set to
 <code>NULL</code> to not perform FC calculations.</p></dd>
+
+
 <dt>which</dt>
 <dd><p>A character vector with replicate groups used for comparison.</p></dd>
+
+
 <dt>relativeTo</dt>
 <dd><p>A character vector with replicate groups that should be
 used for unique comparison. If <code>NULL</code> then all replicate groups are
 used for comparison. Replicate groups specified in <code>which</code> are
 ignored.</p></dd>
+
+
 <dt>outer</dt>
 <dd><p>If <code>TRUE</code> then only feature groups are kept which do not
 overlap between the specified replicate groups for the <code>which</code>
 parameter.</p></dd>
+
+
 <dt>exclusive</dt>
 <dd><p>If <code>TRUE</code> then all feature groups are removed that are
 not unique to the given replicate groups.</p></dd>
+
+
 <dt>weights</dt>
 <dd><p>A named <code>numeric</code> vector that defines the weight for each score to calculate the
 <code>totalScore</code>. The names of the vector follow the score names. Unspecified weights are defaulted to <samp>1</samp>.
 Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)</code>.</p></dd>
+
+
 <dt>flatnessFactor</dt>
 <dd><p>Passed to <span class="pkg">MetaClean</span> as the <code>flatness.factor</code> argument to
 <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html" class="external-link">calculateJaggedness</a></code> and <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateModality.html" class="external-link">calculateModality</a></code>.</p></dd>
+
+
 <dt>avgFunc</dt>
 <dd><p>The function used to average the peak qualities and scores for each feature group.</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
+
+
 <dt>components</dt>
 <dd><p>The <code>components</code> object that was generated for the given <code>featureGroups</code> object.
 Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
 from <span class="pkg">RAMClustR</span> and <span class="pkg">cliqueMS</span>.</p></dd>
+
+
 <dt>prefAdduct</dt>
 <dd><p>The 'preferred adduct' (see method description). This is often <code>"[M+H]+"</code> or <code>"[M-H]-"</code>.</p></dd>
+
+
 <dt>onlyMonoIso</dt>
 <dd><p>Set to <code>TRUE</code> to only keep feature groups that were annotated as monoisotopic. Feature groups
 are never removed by this setting if no isotope annotations are available.</p></dd>
+
+
 <dt>chargeMismatch</dt>
 <dd><p>Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
 values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</code> (ignore adduct annotation), <code>"none"</code>
 (ignore both annotations) and <code>"ignore"</code> (don't check for charge mismatches). <em>Important</em>: when
 <code class="command">OpenMS</code> is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropriate.</p></dd>
+
+
 <dt>featNorm</dt>
 <dd><p>The method applied for feature normalization: <code>"istd"</code>, <code>"tic"</code>, <code>"conc"</code> or
 <code>"none"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
+
+
 <dt>groupNorm</dt>
 <dd><p>If <code>TRUE</code> then group normalization is performed. See the <code>Feature intensity normalization</code>
 section for details.</p></dd>
+
+
 <dt>normFunc</dt>
 <dd><p>A <code>function</code> to combine data for normalization. See the <code>Feature intensity normalization</code>
 section for details.</p></dd>
+
+
 <dt>standards</dt>
 <dd><p>A <code>data.table</code> (or <code>data.frame</code>) with all internal standards. Should follow the format of
   a <a href="suspect-screening.html">suspect list</a>. Only used if <code>featNorm="istd"</code>. See the <code>Feature intensity
   normalization</code> section for details.</p>
 <p>(<strong>sets workflow</strong>) Can also be a <code>list</code> with internal standard lists.</p>
 <p>See the <code>suspects</code> argument to <code><a href="suspect-screening.html">screenSuspects</a></code> for more details.</p></dd>
+
+
 <dt>ISTDRTWindow, ISTDMZWindow</dt>
 <dd><p>The retention time and <em>m/z</em> windows for IS selection. Only used if
 <code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
+
+
 <dt>minISTDs</dt>
 <dd><p>The minimum number of IS that should be assigned to each feature (if possible). Only used if
 <code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
+
 <dt>reGroup</dt>
 <dd><p>(<strong>sets workflow</strong>) Set to <code>TRUE</code> to re-group the features after the adduct annotations are changed. See the
 <code>Sets workflow</code> section for more details.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) For <code>[</code>: a <code>character</code> with name(s) of the sets to keep.</p>
 <p>For <code>overlap</code> and <code>unique</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used
   to specify the names of the sets to be compared.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>delete</code> returns the object for which the specified data was removed.
-<code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.
-<code>selectIons</code> returns a <code>featureGroups</code> object with only the selected feature groups and amended
-  with adduct annotations.
-<code>normInts</code> returns a <code>featureGroups</code> object, amended with data in the <code>ISTDs</code> and
-<code>ISTDAssignments</code> slots if <code>featNorm="istd"</code>.</p>
+    
+
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+
+
+<p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
+
+
+<p><code>selectIons</code> returns a <code>featureGroups</code> object with only the selected feature groups and amended
+  with adduct annotations.</p>
+
+
+<p><code>normInts</code> returns a <code>featureGroups</code> object, amended with data in the <code>ISTDs</code> and</p>
+<p></p>
+<p><code>ISTDAssignments</code> slots if <code>featNorm="istd"</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -680,7 +766,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

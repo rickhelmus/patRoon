@@ -181,6 +181,8 @@ unset(obj, set)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>obj, object, x</dt>
 <dd><p>The <code>component</code> object.</p></dd>
+
+
 <dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
@@ -189,6 +191,8 @@ components as numeric index, logical or character, <code>j</code> the feature gr
 <code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
 component, with the component (a <code>data.table</code>) as first argument, the component name as second argument, and any other arguments passed as
 <code>...</code> to <code>delete</code>. The return value of this function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>plotChroms</code>: Further (optional) arguments passed to the
@@ -200,64 +204,103 @@ component, with the component (a <code>data.table</code>) as first argument, the
 <p>For <code>consensus</code>: <code>components</code> objects that should be used to
   generate the consensus.</p>  
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>components</code> method.</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The component name (partially matched).</p></dd>
+
+
 <dt>size</dt>
 <dd><p>Should be a two sized vector with the minimum/maximum size of a component. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>adducts</dt>
 <dd><p>Remove any feature groups within components that do not match given adduct rules. If <code>adducts</code> is
 a logical then only results are kept when an adduct is assigned (<code>adducts=TRUE</code>) or not assigned
 (<code>adducts=FALSE</code>). Otherwise, if <code>adducts</code> contains one or more <code><a href="adduct-class.html">adduct</a></code> objects (or
 something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>) then only results are kept that match the given
 adducts. Set to <code>NULL</code> to ignore this filter.</p></dd>
+
+
 <dt>isotopes</dt>
 <dd><p>Only keep results that match a given isotope rule. If <code>isotopes</code> is a logical then only results
 are kept with (<code>isotopes=TRUE</code>) or without (<code>isotopes=FALSE</code>) isotope assignment. Otherwise
 <code>isotopes</code> should be a numeric vector with isotope identifiers to keep (<em>e.g.</em> <samp>0</samp> for monoisotopic
 results, <samp>1</samp> for <samp>M+1</samp> results etc.). Set to <code>NULL</code> to ignore this filter.</p></dd>
+
+
 <dt>rtIncrement, mzIncrement</dt>
 <dd><p>Should be a two sized vector with the minimum/maximum retention or mz increment of a
 homologous series. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>checkComponentsSession</dt>
 <dd><p>If set then components and/or feature groups are removed that were selected for removal
 (see <a href="check-GUI.html">check-GUI</a> and the <code><a href="check-GUI.html">checkComponents</a></code> function). The value of <code>checkComponentsSession</code>
 should either by a path to the session file or <code>TRUE</code>, in which case the default session file name is used. If
 <code>negate=TRUE</code> then all non-selected data is removed instead.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+
+
 <dt>fGroup</dt>
 <dd><p>The name (thus a character) of the feature group that should be
 searched for.</p></dd>
+
+
 <dt>index</dt>
 <dd><p>The index of the component. Can be a numeric index or a
 character with its name.</p></dd>
+
+
 <dt>markFGroup</dt>
 <dd><p>If specified (<em>i.e.</em> not <code>NULL</code>) this argument
 can be used to mark a feature group in the plotted spectrum. The value
 should be a character with the name of the feature group. Setting this to
 <code>NULL</code> will not mark any peak.</p></dd>
+
+
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
 generate the components.</p></dd>
+
+
 <dt>rtWindow</dt>
 <dd><p>Retention window: see the <code>plotChroms</code> method for the
 <code><a href="featureGroups-class.html">featureGroups</a></code> class.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>delete</code> returns the object for which the specified data was removed.
-<code>consensus</code> returns a <code>components</code> object that is produced
+    
+
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+
+
+<p><code>consensus</code> returns a <code>components</code> object that is produced
   by merging multiple specified <code>components</code> objects.</p>
     </div>
     <div id="details">
@@ -356,7 +399,7 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

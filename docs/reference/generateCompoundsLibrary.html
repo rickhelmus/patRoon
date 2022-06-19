@@ -131,45 +131,72 @@
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
 <dt>MSLibrary</dt>
 <dd><p>The <code><a href="MSLibrary-class.html">MSLibrary</a></code> object that should be used to find candidates.</p></dd>
+
+
 <dt>minSim</dt>
 <dd><p>The minimum spectral similarity for candidate records.</p></dd>
+
+
 <dt>minAnnSim</dt>
 <dd><p>The minimum spectral similarity of a record for it to be used to find annotations (see the
 <code>Details</code> section).</p></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>The maximum absolute <em>m/z</em> deviation between the feature group and library record <em>m/z</em>
 values for candidate selection.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
 <p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
   adduct annotations will then always be used.</p></dd>
+
+
 <dt>checkIons</dt>
 <dd><p>A <code>character</code> that excludes library records with different adduct (<code>checkIons="adduct"</code>)
 or MS ionization polarity (<code>checkIons="polarity"</code>). If <code>checkIons="none"</code> then these filters are not
 applied.</p></dd>
+
+
 <dt>spectrumType</dt>
 <dd><p>A <code>character</code> vector which limits library records to the given spectrum types
 (<code>Spectrum_type</code> field, <em>e.g.</em> <code>"MS2"</code>). Set to <code>NULL</code> to allow all spectrum types.</p></dd>
+
+
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
 <dt>specSimParamsLib</dt>
 <dd><p>Like <code>specSimParams</code>, but these parameters <em>only</em> influence pre-treatment of
 library spectra (only the <code>removePrecursor</code>, <code>relMinIntensity</code> and <code>minPeaks</code> parameters are used).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
+
 <dt>setThreshold</dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
+
+
 <dt>setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -210,7 +237,7 @@ annotations for the feature group of the candidate.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

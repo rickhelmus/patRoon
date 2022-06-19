@@ -115,21 +115,32 @@ common structure (MCS).</p>
     <h2>Arguments</h2>
     <dl><dt>obj</dt>
 <dd><p>The <code><a href="compounds-class.html">compounds</a></code> object to be clustered.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>The clustering method passed to <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></code>.</p></dd>
+
+
 <dt>fpType</dt>
 <dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
 <code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
+
+
 <dt>fpSimMethod</dt>
 <dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
 of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
+
+
 <dt>maxTreeHeight, deepSplit, minModuleSize</dt>
 <dd><p>Arguments used by
 <code>cutreeDynamicTree</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>makeHCluster</code> returns an <code><a href="compoundsCluster-class.html">compoundsCluster</a></code> object.</p>
+    
+
+<p><code>makeHCluster</code> returns an <code><a href="compoundsCluster-class.html">compoundsCluster</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -176,7 +187,7 @@ resulting clusters can then be characterized by evaluating their
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

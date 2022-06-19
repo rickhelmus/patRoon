@@ -146,89 +146,134 @@
 <dd><p>Minimum absolute/relative intensity for features to be kept. The relative
 intensity is determined from the feature with highest intensity (of
 all features from all groups). Set to <samp>0</samp> or <code>NULL</code> to skip this step.</p></dd>
+
+
 <dt>preAbsMinIntensity, preRelMinIntensity</dt>
 <dd><p>As <code>absMinIntensity</code>/<code>relMinIntensity</code>, but applied
 <em>before</em> any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
 taken that a sufficiently low value is chosen that is not expected to affect subsequent filtering steps. See below
 why this may be important.</p></dd>
+
+
 <dt>absMinAnalyses, relMinAnalyses</dt>
 <dd><p>Feature groups are only kept when they contain data for at least this (absolute
 or relative) amount of analyses. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>absMinReplicates, relMinReplicates</dt>
 <dd><p>Feature groups are only kept when they contain data for at least this
 (absolute or relative) amount of replicates. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>absMinFeatures, relMinFeatures</dt>
 <dd><p>Analyses are only kept when they contain at least this (absolute or relative)
 amount of features. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>absMinReplicateAbundance, relMinReplicateAbundance</dt>
 <dd><p>Minimum absolute/relative abundance that a grouped feature
 should be present within a replicate group. If this minimum is not met all features within the replicate group are
 removed. Set to <code>NULL</code> to skip this step.</p></dd>
+
+
 <dt>maxReplicateIntRSD</dt>
 <dd><p>Maximum relative standard deviation (RSD) of intensity values for features within a
 replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>blankThreshold</dt>
 <dd><p>Feature groups that are also present in blank analyses (see
 <a href="analysis-information.html">analysis info</a>) are filtered out unless their relative intensity is above this
 threshold. For instance, a value of <samp>5</samp> means that only features with an intensity five times higher than that
 of the blank are kept. The relative intensity values between blanks and non-blanks are determined from the mean of
 all non-zero blank intensities. Set to <code>NULL</code> to skip this step.</p></dd>
+
+
 <dt>retentionRange, mzRange, mzDefectRange, chromWidthRange</dt>
 <dd><p>Range of retention time (in seconds), <em>m/z</em>, mass
 defect (defined as the decimal part of <em>m/z</em> values) or chromatographic peak width (in seconds), respectively.
 Features outside this range will be removed. Should be a numeric vector with length of two containing the min/max
 values. The maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code> to skip this step.</p></dd>
+
+
 <dt>featQualityRange</dt>
 <dd><p>Used to filter features by their peak qualities/scores
 (see <code><a href="generics.html">calculatePeakQualities</a></code>). Should be a named <code>list</code> with min/max ranges for each
 quality/score to be filtered (the <code><a href="featureQualityNames.html">featureQualityNames</a></code> function can be used to obtain valid names).
 Example: <code>featQualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>groupQualityRange</dt>
 <dd><p>Like <code>featQualityRange</code>, but filters on group specific or averaged qualities/scores.</p></dd>
+
+
 <dt>rGroups</dt>
 <dd><p>A character vector of replicate groups that should be kept (<code>filter</code>) or subtracted from
 (<code>replicateGroupSubtract</code>).</p></dd>
+
+
 <dt>results</dt>
 <dd><p>Only keep feature groups that have results in the object specified by <code>results</code>. Valid classes
 are <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> (<em>e.g.</em> formula/compound annotations) and <code><a href="components-class.html">components</a></code>. Can
 also be a <code>list</code> with multiple objects: in this case a feature group is kept if it has a result in <em>any</em>
 of the objects. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>removeBlanks</dt>
 <dd><p>Set to <code>TRUE</code> to remove all analyses that belong to replicate groups that are specified as a
 blank in the <a href="analysis-information.html">analysis-information</a>. This is useful to simplify the analyses in the specified
 <code><a href="featureGroups-class.html">featureGroups</a></code> object after blank subtraction. When both <code>blankThreshold</code> and this argument are
 set, blank subtraction is performed prior to removing any analyses.</p></dd>
+
+
 <dt>removeISTDs</dt>
 <dd><p>If <code>TRUE</code> then all feature groups marked as internal standard (IS) are removed. This requires
 IS assignments done by <code><a href="featureGroups-class.html">normInts</a></code>, see its documentation for more details.</p></dd>
+
+
 <dt>checkFeaturesSession</dt>
 <dd><p>If set then features and/or feature groups are removed that were selected for removal
 (see <a href="check-GUI.html">check-GUI</a>). The session files are typically generated with the <code><a href="check-GUI.html">checkFeatures</a></code> and
 <code><a href="check-GUI.html">predictCheckFeaturesSession</a></code> functions. The value of <code>checkFeaturesSession</code> should either by a
 path to the session file or <code>TRUE</code>, in which case the default session file name is used. If <code>negate=TRUE</code>
 then all non-selected features/feature groups are removed instead.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code><a href="featureGroups-class.html">featureGroups</a></code> method.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
+
+
 <dt>absMinSets, relMinSets</dt>
 <dd><p>(<strong>sets workflow</strong>) Feature groups are only kept when they contain data for at least this (absolute
 or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>fGroups, obj</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object to which the filter is applied.</p></dd>
+
+
 <dt>threshold</dt>
 <dd><p>Minimum relative threshold (compared to mean intensity of
 replicate group being subtracted) for a feature group to be <em>not</em>
 removed. When <samp>0</samp> a feature group is always removed when present in
 the given replicate groups.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A filtered <code><a href="featureGroups-class.html">featureGroups</a></code> object. Feature groups that are filtered away have their intensity set
+    
+
+<p>A filtered <code><a href="featureGroups-class.html">featureGroups</a></code> object. Feature groups that are filtered away have their intensity set
   to zero. In case a feature group is not present in any of the analyses anymore it will be removed completely.</p>
     </div>
     <div id="details">
@@ -287,7 +332,7 @@ the given replicate groups.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

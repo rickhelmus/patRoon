@@ -116,40 +116,59 @@
 <code><a href="suspect-screening.html">screenSuspects</a></code> or (3) a <code><a href="compounds-class.html">compounds</a></code> annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.
 If <code>NULL</code> then TPs for all parents in the library are obtained.</p></dd>
+
+
 <dt>TPLibrary</dt>
 <dd><p>If <code>NULL</code>, a default <a href="https://doi.org/10.5281/zenodo.5644560" class="external-link">PubChem</a> based library is
 used. Otherwise, <code>TPLibrary</code> should be a <code>data.frame</code>. See the details below.</p></dd>
+
+
 <dt>generations</dt>
 <dd><p>An <code>integer</code> that specifies the number of transformation generations. TPs for subsequent
 iterations obtained by repeating the library search where the TPs from the previous generation are considered
 parents.</p></dd>
+
+
 <dt>skipInvalid</dt>
 <dd><p>If set to <code>TRUE</code> then the parents will be skipped (with a warning) for which insufficient
 information (<em>e.g.</em> SMILES) is available.</p></dd>
+
+
 <dt>prefCalcChemProps</dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
 <dt>matchParentsBy</dt>
 <dd><p>A <code>character</code> that specifies how the input parents are matched with the data from the TP
 library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <code>"InChI"</code>, <code>"SMILES"</code>.</p></dd>
+
+
 <dt>calcSims</dt>
 <dd><p>If set to <code>TRUE</code> then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the <a href="transformationProductsStructure-class.html">filter
 method</a>. May be useful under the assumption that parents and TPs who have a high structural similarity, also likely
 have a high MS/MS spectral similarity (which can be evaluated after componentization with
 <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code>).</p></dd>
+
+
 <dt>fpType</dt>
 <dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
 <code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
+
+
 <dt>fpSimMethod</dt>
 <dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
 of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
+    
+
+<p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -221,7 +240,7 @@ of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-projec
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

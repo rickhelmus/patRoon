@@ -159,6 +159,8 @@ plotUpSet(
     <h2>Arguments</h2>
     <dl><dt>obj, x</dt>
 <dd><p><code>featureAnnotations</code> object to be accessed</p></dd>
+
+
 <dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select feature groups by
 their index or name, respectively (for the order/names see <code><a href="generics.html">groupNames()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
@@ -167,33 +169,49 @@ feature groups as numeric index, logical or character, <code>j</code> the candid
 <code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
 feature group, with the annotation table (a <code>data.table</code>) as first argument, the feature group name as second argument, and any other arguments passed as
 <code>...</code> to <code>delete</code>. The return value of this function specifies the candidate indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>  
 <p>Others: Any further (and unique) <code>featureAnnotations</code> objects.</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The feature group name (partially matched).</p></dd>
+
+
 <dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
 generate this object. If not <code>NULL</code> it is used to add feature group
 information (retention and <em>m/z</em> values).</p></dd>
+
+
 <dt>fragments</dt>
 <dd><p>If <code>TRUE</code> then information on annotated fragments will be included. Automatically set to
 <code>TRUE</code> if <code>countFragElements</code> is set.</p></dd>
+
+
 <dt>countElements, countFragElements</dt>
 <dd><p>A <code>character</code> vector with elements that should be counted for each
 candidate's formula. For instance, <code>c("C", "H")</code> adds columns for both carbon and hydrogen amounts of each
 formula. Note that the neutral formula (<code>neutral_formula</code> column) is used to count elements of non-fragmented
 formulae, whereas the charged formula of fragments (<code>ion_formula</code> column in <code>fragInfo</code> data) is used for
 fragments. Set to <code>NULL</code> to not count any elements.</p></dd>
+
+
 <dt>OM</dt>
 <dd><p>For <code>as.data.table</code>: if set to <code>TRUE</code> several columns with information relevant for organic
   matter (OM) characterization will be added (e.g. elemental ratios, classification). This will also make sure that
   <code>countElements</code> contains at least C, H, N, O, P and S.</p>
 <p>For <code>filter</code>: If <code>TRUE</code> then several filters are applied to exclude unlikely formula candidates present
   in organic matter (OM). See Source section for details.</p></dd>
+
+
 <dt>normalizeScores</dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
@@ -206,6 +224,8 @@ values into account when candidates were generated. Thus, for
 <code>compounds</code> scoring, normalization is not affected when candidate
 results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
+
+
 <dt>excludeNormScores</dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
@@ -215,8 +235,12 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behavior of the
   <code class="command">MetFrag</code> web interface.</p></dd>
+
+
 <dt>minExplainedPeaks</dt>
 <dd><p>Minimum number of explained peaks. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>scoreLimits</dt>
 <dd><p>Filter results by their scores. Should be a named <code>list</code> that contains two-sized numeric
 vectors with the minimum/maximum value of a score (use <code>-Inf</code>/<code>Inf</code> for no limits). The names of each
@@ -225,6 +249,8 @@ element should follow the name column of the table returned by <code><a href="fo
 that <code>numberPatents</code> should be at least <samp>10</samp>. Note that a result without a specified scoring is never
 removed. If a score term exists multiple times, <em>i.e.</em> due to a consensus, then a candidate is kept if at
 least one of the terms falls within the range. Set to <code>NULL</code> to skip this filter.</p></dd>
+
+
 <dt>elements</dt>
 <dd><p>Only retain candidate formulae (neutral form) that match a
 given elemental restriction. The format of <code>elements</code> is a
@@ -238,39 +264,64 @@ are tested to follow at least one of the given elemental restrictions. For
 instance, <code>elements=c("P", "S")</code> specifies that either one phosphorus
 or one sulfur atom should be present. Set to <code>NULL</code> to ignore this
 filter.</p></dd>
+
+
 <dt>fragElements, lossElements</dt>
 <dd><p>Specifies elemental restrictions for
 fragment or neutral loss formulae (charged form). Candidates are retained
 if at least one of the fragment formulae follow (or not follow if
 <code>negate=TRUE</code>) the given restrictions. See <code>elements</code> for the
 used format.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only keep a maximum of <code>topMost</code> candidates with highest score (or least highest if
 <code>negate=TRUE</code>). Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
+
+
 <dt>vennArgs</dt>
 <dd><p>A <code>list</code> with further arguments passed to <span class="pkg">VennDiagram</span> plotting functions. Set to
 <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>nsets, nintersects</dt>
 <dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+
+
 <dt>upsetArgs</dt>
 <dd><p>A list with any further arguments to be passed to
 <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>as.data.table</code> returns a <code>data.table</code>.
-<code>delete</code> returns the object for which the specified data was removed.
-<code>filter</code> returns a filtered <code>featureAnnotations</code> object.
-<code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
+    
+
+<p><code>as.data.table</code> returns a <code>data.table</code>.</p>
+
+
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+
+
+<p><code>filter</code> returns a filtered <code>featureAnnotations</code> object.</p>
+
+
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em><code>draw.pairwise.venn</code> and
+from the used plotting function (see <em>e.g.</em></p>
+<p></p>
+<p><code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
     </div>
     <div id="details">
@@ -390,7 +441,7 @@ normalization.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

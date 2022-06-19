@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.1 Initiating a sets workflow | patRoon handbook</title>
   <meta name="description" content="6.1 Initiating a sets workflow | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.1 Initiating a sets workflow | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-05-26" />
+<meta name="date" content="2022-06-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -373,8 +373,8 @@ div.csl-indent {
 <span id="cb149-14"><a href="initiating-a-sets-workflow.html#cb149-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb149-15"><a href="initiating-a-sets-workflow.html#cb149-15" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <p>This workflow will do all the steps for positive <em>and</em> negative data.</p>
-<div id="htmlwidget-db061c3fa789c410e7ff" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-db061c3fa789c410e7ff">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-91a4240e1dc57270a07b" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-91a4240e1dc57270a07b">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Only a few modifications were necessary:</p>
 <ul>
 <li>The <a href="preparations.html#anaInfo">analysis information</a> is obtained for positive and negative data (i.e. per set)</li>

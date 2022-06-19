@@ -139,37 +139,56 @@ experiment (DoE).</p>
     <h2>Arguments</h2>
     <dl><dt>obj, x, object</dt>
 <dd><p>An <code>optimizationResult</code> object.</p></dd>
+
+
 <dt>use.names</dt>
 <dd><p>Ignored.</p></dd>
+
+
 <dt>paramSet</dt>
 <dd><p>Numeric index of the parameter set (<em>i.e.</em> the first
 parameter set gets index <samp>1</samp>). For some methods optional: if
 <code>NULL</code> the best will be selected.</p></dd>
+
+
 <dt>DoEIteration</dt>
 <dd><p>Numeric index specifying the DoE iteration within the
 specified <code>paramSet</code>. For some methods optional: if <code>NULL</code> the
 best will be selected.</p></dd>
+
+
 <dt>paramsToPlot</dt>
 <dd><p>Which parameters relations should be plot. If <code>NULL</code>
 all will be plot. Alternatively, a <code>list</code> containing one or more
 <code>character</code> vectors specifying each two parameters that should be
 plotted. Finally, if only one pair should be plotted, can be a
 <code>character</code> vector specifying both parameters.</p></dd>
+
+
 <dt>maxCols</dt>
 <dd><p>Multiple parameter pairs are plotted in a grid. The maximum
 number of columns can be set with this argument. Set to <code>NULL</code> for no
 limit.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>The type of plots to be generated: <code>"contour"</code>,
 <code>"image"</code> or <code>"persp"</code>. The equally named functions will be
 called for plotting.</p></dd>
+
+
 <dt>image</dt>
 <dd><p>Passed to <code><a href="https://rdrr.io/r/graphics/contour.html" class="external-link">contour</a></code> (if <code>type="contour"</code>).</p></dd>
+
+
 <dt>contours</dt>
 <dd><p>Passed to <code><a href="https://rdrr.io/r/graphics/persp.html" class="external-link">persp</a></code> (if <code>type="persp"</code>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed to <code><a href="https://rdrr.io/r/graphics/contour.html" class="external-link">contour</a></code>,
 <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></code> or <code><a href="https://rdrr.io/r/graphics/persp.html" class="external-link">persp</a></code> (depending on <code>type</code>).</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -247,7 +266,7 @@ response.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

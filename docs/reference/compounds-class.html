@@ -248,30 +248,44 @@ unset(obj, set)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>obj, object, compounds, x</dt>
 <dd><p>The <code>compound</code> object.</p></dd>
+
+
 <dt>minExplainedPeaks, scoreLimits</dt>
 <dd><p>Passed to the
 <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>minScore, minFragScore, minFormulaScore</dt>
 <dd><p>Minimum overall score, in-silico fragmentation score and formula score,
 respectively. Set to <code>NULL</code> to ignore. The <code>scoreLimits</code> argument allows for more advanced score
 filtering.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>plotSpectrum</code>: Further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>for <code>filter</code>: passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p>
 <p>For <code>consensus</code>: any further (and unique) <code>compounds</code> objects.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>compounds</code> method.</p></dd>
+
+
 <dt>formulas</dt>
 <dd><p>The <code><a href="formulas-class.html">formulas</a></code> object that should be used for scoring/annotation. For <code>plotSpectrum</code>
 and <code>annotatedPeakList</code>: set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>updateScore</dt>
 <dd><p>If set to <code>TRUE</code> then the <code>score</code> column is
 updated by adding the normalized <span class="option">formulaScore</span> (weighted by
 <span class="option">formulaScoreWeight</span>). Currently, this <strong>only</strong> makes sense for
 <code class="command">MetFrag</code> results!</p></dd>
+
+
 <dt>formulaScoreWeight</dt>
 <dd><p>Weight used to update scoring (see
 <code>updateScore</code> parameter).</p></dd>
+
+
 <dt>index</dt>
 <dd><p>The numeric index of the candidate structure.</p>
 <p>For <code>plotStructure</code> and <code>getMCS</code>: multiple indices (<em>i.e.</em> vector with length &gt;=2) should be
@@ -279,12 +293,18 @@ updated by adding the normalized <span class="option">formulaScore</span> (weigh
   all candidates.</p>
 <p>For <code>plotSpectrum</code>: two indices can be specified to compare spectra. In this case <code>groupName</code> should
   specify values for the spectra to compare.</p></dd>
+
+
 <dt>groupName</dt>
 <dd><p>The name of the feature group (or feature groups when comparing spectra) to which the candidate
 belongs.</p></dd>
+
+
 <dt>width, height</dt>
 <dd><p>The dimensions (in pixels) of the raster image that
 should be plotted.</p></dd>
+
+
 <dt>normalizeScores</dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
@@ -297,6 +317,8 @@ values into account when candidates were generated. Thus, for
 <code>compounds</code> scoring, normalization is not affected when candidate
 results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
+
+
 <dt>excludeNormScores</dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
@@ -306,34 +328,56 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behavior of the
   <code class="command">MetFrag</code> web interface.</p></dd>
+
+
 <dt>onlyUsed</dt>
 <dd><p>If <code>TRUE</code> then only scorings are plotted that actually
 have been used to rank data (see the <code>scoreTypes</code> argument to
 <code><a href="generateCompoundsMetFrag.html">generateCompoundsMetFrag</a></code> for more details).</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>The <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was used to generate the candidate</p></dd>
+
+
 <dt>onlyAnnotated</dt>
 <dd><p>Set to <code>TRUE</code> to filter out any peaks that could
 not be annotated.</p></dd>
+
+
 <dt>plotStruct</dt>
 <dd><p>If <code>TRUE</code> then the candidate structure is drawn in the spectrum. Currently not supported when
 comparing spectra.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>The title of the plot. If <code>NULL</code> a title will be automatically made.</p></dd>
+
+
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
 <dt>mincex</dt>
 <dd><p>The formula annotation labels are automatically scaled. The <code>mincex</code> argument forces a minimum
 <code>cex</code> value for readability.</p></dd>
+
+
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>maxMolSize</dt>
 <dd><p>Numeric vector of size two with the maximum width/height of the candidate structure (relative to
 the plot size).</p></dd>
+
+
 <dt>molRes</dt>
 <dd><p>Numeric vector of size two with the resolution of the candidate structure (in pixels).</p></dd>
+
+
 <dt>absMinAbundance, relMinAbundance</dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
@@ -341,6 +385,8 @@ instance, <code>relMinAbundance=0.5</code> means that a result should be present
 in at least half of the number of compared objects. Set to <samp>NULL</samp> to
 ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> is
 not <code>NULL</code>.</p></dd>
+
+
 <dt>uniqueFrom</dt>
 <dd><p>Set this argument to only retain compounds that are unique
 within one or more of the objects for which the consensus is made.
@@ -349,48 +395,78 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 <code>character</code> (as obtained with <code>algorithm(obj)</code>). For
 <code>logical</code> and <code>numeric</code> values the order corresponds to the order
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>uniqueOuter</dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
+
+
 <dt>rankWeights</dt>
 <dd><p>A numeric vector with weights of to calculate the mean
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of <samp>1</samp> means equal weights for all considered
 objects.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
+
+
 <dt>i, j, drop</dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>
 method.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>). Note: if
 <code>updateConsensus=FALSE</code> then the <code>setCoverage</code> column of the annotation results is not updated.</p></dd>
+
+
 <dt>updateConsensus</dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then the annonation consensus among set results is updated. See the
 <code>Sets workflows</code> section for more details.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>perSet, mirror</dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
 Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></dd>
+
+
 <dt>filterSets</dt>
 <dd><p>(<strong>sets workflow</strong>) Controls how algorithms concensus abundance filters are applied. See the <code>Sets
 workflows</code> section below.</p></dd>
+
+
 <dt>setThreshold, setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) Thresholds used to create the annotation set consensus. See
 <code><a href="generateCompounds.html">generateCompounds</a></code>.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>addFormulaScoring</code> returns a <code>compounds</code> object updated
-  with formula scoring.
-<code>getMCS</code> returns an <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> molecule object
-  (<code>IAtomContainer</code>).
-<code>consensus</code> returns a <code>compounds</code> object that is produced by merging multiple specified
-<code>compounds</code> objects.</p>
+    
+
+<p><code>addFormulaScoring</code> returns a <code>compounds</code> object updated
+  with formula scoring.</p>
+
+
+<p><code>getMCS</code> returns an <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> molecule object
+  (<code>IAtomContainer</code>).</p>
+
+
+<p><code>consensus</code> returns a <code>compounds</code> object that is produced by merging multiple specified</p>
+<p></p>
+<p><code>compounds</code> objects.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -532,7 +608,7 @@ create this object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

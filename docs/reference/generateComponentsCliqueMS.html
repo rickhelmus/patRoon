@@ -125,52 +125,79 @@ cliqueMS::getCliques function."><!-- mathjax --><script src="https://cdnjs.cloud
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
 <dt>ionization</dt>
 <dd><p>Which ionization polarity was used to generate the data: should be <code>"positive"</code>
   or <code>"negative"</code>. If the <code>featureGroups</code> object has adduct annotations, and <code>ionization=NULL</code>, the
   ionization will be detected automatically.</p>
 <p>(<strong>sets workflow</strong>) This parameter is not supported for sets workflows, as the ionization will always be detected
   automatically.</p></dd>
+
+
 <dt>maxCharge, maxGrade, ppm</dt>
 <dd><p>Arguments passed to <code><a href="https://rdrr.io/pkg/cliqueMS/man/getIsotopes.html" class="external-link">cliqueMS::getIsotopes</a></code> and/or
 <code><a href="https://rdrr.io/pkg/cliqueMS/man/getAnnotation.html" class="external-link">cliqueMS::getAnnotation</a></code>.</p></dd>
+
+
 <dt>adductInfo</dt>
 <dd><p>Sets the <code>adinfo</code> argument to <code><a href="https://rdrr.io/pkg/cliqueMS/man/getAnnotation.html" class="external-link">cliqueMS::getAnnotation</a></code>.
 If <code>NULL</code> then the default adduct information from <span class="pkg">cliqueMS</span> is used (<em>i.e.</em> the
 <code>positive.adinfo</code>/<code>negative.adinfo</code> package datasets).</p></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>Maximum absolute \emphm/z deviation.</p></dd>
+
+
 <dt>minSize</dt>
 <dd><p>The minimum size of a component. Smaller components than this size will be removed. See note below.</p></dd>
+
+
 <dt>relMinAdductAbundance</dt>
 <dd><p>The minimum relative abundance (<samp>0-1</samp>) that an adduct should be assigned to
 features within the same feature group. See the <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>adductConflictsUsePref</dt>
 <dd><p>If set to <code>TRUE</code>, and not all adduct assigments to the features within a feature
 group are equal and at least one of those adducts is a preferential adduct (<code>prefAdducts</code> argument), then only
 the features with (the lowest ranked) preferential adduct are considered. In all other cases or when
 <code>adductConflictsUsePref=FALSE</code> only features with the most frequently assigned adduct is considered. See the
 <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>NMConflicts</dt>
 <dd><p>The strategies to employ when not all neutral masses within a component are equal. Valid options
 are: <code>"preferential"</code>, <code>"mostAbundant"</code> and <code>"mostIntense"</code>. Multiple strategies are possible, and
 will be executed in the given order until one succeeds. See the <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>prefAdducts</dt>
 <dd><p>A <code>character</code> vector with one or more <em>preferential adducts</em>. See the <code>Feature
 components</code> section for more details.</p></dd>
+
+
 <dt>extraOptsCli, extraOptsIso, extraOptsAnn</dt>
 <dd><p>Named <code>list</code> with further arguments to be passed to
 <code><a href="https://rdrr.io/pkg/cliqueMS/man/getCliques.html" class="external-link">cliqueMS::getCliques</a></code>, <code><a href="https://rdrr.io/pkg/cliqueMS/man/getIsotopes.html" class="external-link">cliqueMS::getIsotopes</a></code>
 and <code><a href="https://rdrr.io/pkg/cliqueMS/man/getAnnotation.html" class="external-link">cliqueMS::getAnnotation</a></code>, respectively. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="components-class.html">componentsFeatures</a></code> derived object.</p>
+    
+
+<p>A <code><a href="components-class.html">componentsFeatures</a></code> derived object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -236,7 +263,7 @@ see the parallelization section in the handbook for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

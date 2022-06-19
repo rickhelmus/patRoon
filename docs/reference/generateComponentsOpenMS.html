@@ -136,23 +136,33 @@ utility (see <a href="http://www.openms.de" class="external-link">http://www.ope
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
 <dt>ionization</dt>
 <dd><p>Which ionization polarity was used to generate the data: should be <code>"positive"</code>
   or <code>"negative"</code>. If the <code>featureGroups</code> object has adduct annotations, and <code>ionization=NULL</code>, the
   ionization will be detected automatically.</p>
 <p>(<strong>sets workflow</strong>) This parameter is not supported for sets workflows, as the ionization will always be detected
   automatically.</p></dd>
+
+
 <dt>chargeMin, chargeMax</dt>
 <dd><p>The minimum/maximum charge to consider. Corresponds to the
 <code class="command">algorithm:MetaboliteFeatureDeconvolution:charge_min</code>/<code class="command">algorithm:MetaboliteFeatureDeconvolution:charge_min</code>
  options.</p></dd>
+
+
 <dt>chargeSpan</dt>
 <dd><p>The maximum charge span for a single analyte. Corresponds to
 <code class="command">algorithm:MetaboliteFeatureDeconvolution:charge_span_max</code>.</p></dd>
+
+
 <dt>qTry</dt>
 <dd><p>Sets how charges are determined. Corresponds to <code class="command">algorithm:MetaboliteFeatureDeconvolution:q_try</code>.
 Valid options are <code>"heuristic"</code> and <code>"all"</code> (the <code>"feature"</code> option from <code class="command">OpenMS</code> is
 currently not supported).</p></dd>
+
+
 <dt>potentialAdducts</dt>
 <dd><p>The adducts to consider. Should be a <code>numeric</code> vector with probabilities for each
   adduct, <em>e.g.</em> <code>potentialAdducts=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2)</code>. Note that the sum of probabilities
@@ -167,39 +177,60 @@ currently not supported).</p></dd>
   with the sets names or follow the same order as <code>sets(fGroups)</code>. Example:
   <code>potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" =
   0.2))</code></p></dd>
+
+
 <dt>minRTOverlap, retWindow</dt>
 <dd><p>Sets feature retention tolerances when grouping features. Sets the
 <code class="command">"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"</code> and
 <code class="command">algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap</code> options.</p></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code class="command">algorithm:MetaboliteFeatureDeconvolution:mass_max_diff</code> option</p></dd>
+
+
 <dt>minSize</dt>
 <dd><p>The minimum size of a component. Smaller components than this size will be removed. See note below.</p></dd>
+
+
 <dt>relMinAdductAbundance</dt>
 <dd><p>The minimum relative abundance (<samp>0-1</samp>) that an adduct should be assigned to
 features within the same feature group. See the <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>adductConflictsUsePref</dt>
 <dd><p>If set to <code>TRUE</code>, and not all adduct assigments to the features within a feature
 group are equal and at least one of those adducts is a preferential adduct (<code>prefAdducts</code> argument), then only
 the features with (the lowest ranked) preferential adduct are considered. In all other cases or when
 <code>adductConflictsUsePref=FALSE</code> only features with the most frequently assigned adduct is considered. See the
 <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>NMConflicts</dt>
 <dd><p>The strategies to employ when not all neutral masses within a component are equal. Valid options
 are: <code>"preferential"</code>, <code>"mostAbundant"</code> and <code>"mostIntense"</code>. Multiple strategies are possible, and
 will be executed in the given order until one succeeds. See the <code>Feature components</code> section for more details.</p></dd>
+
+
 <dt>prefAdducts</dt>
 <dd><p>A <code>character</code> vector with one or more <em>preferential adducts</em>. See the <code>Feature
 components</code> section for more details.</p></dd>
+
+
 <dt>extraOpts</dt>
 <dd><p>Named character vector with extra command line parameters directly passed to
 <code class="command">MetaboliteAdductDecharger</code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="components-class.html">componentsFeatures</a></code> derived object.</p>
+    
+
+<p>A <code><a href="components-class.html">componentsFeatures</a></code> derived object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -270,7 +301,7 @@ components</code> section for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

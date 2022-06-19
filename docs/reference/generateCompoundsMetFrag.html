@@ -147,60 +147,92 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>Which method should be used for MetFrag execution: <code>"CL"</code> for <code class="command">MetFragCL</code> and <code>"R"</code>
 for <code class="command">MetFragR</code>. The former is usually much faster and recommended.</p></dd>
+
+
 <dt>timeout</dt>
 <dd><p>Maximum time (in seconds) before a metFrag query for a feature group is stopped. Also see
 <code>timeoutRetries</code> argument.</p></dd>
+
+
 <dt>timeoutRetries</dt>
 <dd><p>Maximum number of retries after reaching a timeout before completely skipping the metFrag query
 for a feature group. Also see <code>timeout</code> argument.</p></dd>
+
+
 <dt>errorRetries</dt>
 <dd><p>Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
 errors.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest score. Set to <code>NULL</code> to
 always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
 large numbers of candidates.</p></dd>
+
+
 <dt>dbRelMzDev</dt>
 <dd><p>Relative mass deviation (in ppm) for database search. Sets the
 <span class="option">DatabaseSearchRelativeMassDeviation</span> option.</p></dd>
+
+
 <dt>fragRelMzDev</dt>
 <dd><p>Relative mass deviation (in ppm) for fragment matching. Sets the
 <span class="option">FragmentPeakMatchRelativeMassDeviation</span> option.</p></dd>
+
+
 <dt>fragAbsMzDev</dt>
 <dd><p>Absolute mass deviation (in Da) for fragment matching. Sets the
 <span class="option">FragmentPeakMatchAbsoluteMassDeviation</span> option.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
 <p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
   adduct annotations will then always be used.</p></dd>
+
+
 <dt>database</dt>
 <dd><p>Compound database to use. Valid values are: <code>"pubchem"</code>, <code>"chemspider"</code>,
 <code>"for-ident"</code>, <code>"comptox"</code>, <code>"pubchemlite"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
 <code>"csv"</code>. See section below for more information. Sets the <code>MetFragDatabaseType</code> option.</p></dd>
+
+
 <dt>extendedPubChem</dt>
 <dd><p>If <code>database="pubchem"</code>: whether to use the <em>extended</em> database that includes
 information for compound scoring (<em>i.e.</em> number of patents/PubMed references). Note that downloading
 candidates from this database might take extra time. Valid values are: <code>FALSE</code> (never use it), <code>TRUE</code>
 (always use it) or <code>"auto"</code> (default, use if specified scorings demand it).</p></dd>
+
+
 <dt>chemSpiderToken</dt>
 <dd><p>A character string with the <a href="http://www.chemspider.com/AboutServices.aspx" class="external-link">ChemSpider
 security token</a> that should be set when the ChemSpider database is used. Sets the <span class="option">ChemSpiderToken</span> option.</p></dd>
+
+
 <dt>scoreTypes</dt>
 <dd><p>A character vector defining the scoring types. See the <code>Scorings</code> section below for more
 information. Note that both generic and <code class="command">MetFrag</code> specific names are accepted (<em>i.e.</em> <code>name</code> and
 <code>metfrag</code> columns returned by <code><a href="compoundScorings.html">compoundScorings</a></code>). When a local database is used, the name should
 match what is given there (<code>e.g</code> column names when <code>database=csv</code>). Note that MetFrag may still report
 other scoring data, however, these are not used for ranking. Sets the <span class="option">MetFragScoreTypes</span> option.</p></dd>
+
+
 <dt>scoreWeights</dt>
 <dd><p>Numeric vector containing weights of the used scoring types. Order is the same as set in
 <code>scoreTypes</code>. Values are recycled if necessary. Sets the <span class="option">MetFragScoreWeights</span> option.</p></dd>
+
+
 <dt>preProcessingFilters, postProcessingFilters</dt>
 <dd><p>A character vector defining pre/post filters applied before/after
 fragmentation and scoring (<em>e.g.</em> <code>"UnconnectedCompoundFilter"</code>, <code>"IsotopeFilter"</code>,
@@ -208,11 +240,15 @@ fragmentation and scoring (<em>e.g.</em> <code>"UnconnectedCompoundFilter"</code
 information refer to the <code>Candidate Filters</code> section on the
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR homepage</a>. Sets the
 <span class="option">MetFragPreProcessingCandidateFilter</span> and <code>MetFragPostProcessingCandidateFilter</code> options.</p></dd>
+
+
 <dt>maxCandidatesToStop</dt>
 <dd><p>If more than this number of candidate structures are found then processing will be aborted
 and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
 high values will use too much computer resources and signficantly slowdown the process. Sets the
 <span class="option">MaxCandidateLimitToStop</span> option.</p></dd>
+
+
 <dt>identifiers</dt>
 <dd><p>A <code>list</code> containing for each feature group a character vector with database identifiers that
 should be used to find candidates for a feature group (the list should be named by feature group names). If
@@ -221,23 +257,34 @@ obtain the list of candidate identifiers from a <code><a href="compounds-class.h
 <code><a href="generateCompoundsSIRIUS.html">generateCompoundsSIRIUS</a></code> using the <code><a href="compounds-class.html">identifiers</a></code> method. This way, only those candidates
 will be searched by MetFrag that were generated by SIRIUS+CSI:FingerID. Sets the <span class="option">PrecursorCompoundIDs</span>
 option.</p></dd>
+
+
 <dt>extraOpts</dt>
 <dd><p>A named <code>list</code> containing further settings <code class="command">MetFrag</code>. See the
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR</a> and
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag CL</a> homepages for all available options. Set
 to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
+
 <dt>setThreshold</dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
+
+
 <dt>setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>generateCompoundsMetFrag</code> returns a <code><a href="compoundsMF-class.html">compoundsMF</a></code> object.</p>
+    
+
+<p><code>generateCompoundsMetFrag</code> returns a <code><a href="compoundsMF-class.html">compoundsMF</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -317,7 +364,7 @@ annotations for the feature group of the candidate.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

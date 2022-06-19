@@ -160,72 +160,122 @@ merge(x, y, ...)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>x, obj, object</dt>
 <dd><p><code>MSLibrary</code> object to be accessed.</p></dd>
+
+
 <dt>i</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select records by
 their index or name, respectively (for the order/names see <code><a href="generics.html">names()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all records are selected.<br><br> For <code>[[</code>: should be a scalar value.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Unused.</p></dd>
+
+
 <dt>drop, j</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The record name (partially matched).</p></dd>
+
+
 <dt>properties</dt>
 <dd><p>A named <code>list</code> with properties to be filtered. Each item in the <code>list</code> should be named
 with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
 <em>e.g.</em> <code>names(records)</code>. Example: <code>properties=list(Instrument_type=c("LC-ESI-QTOF","LC-ESI-TOF"))</code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>massRange</dt>
 <dd><p>Records with a neutral mass outside this range will be removed. Should be a two-sized <code>numeric</code>
 vector with the lower and upper mass range. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>mzRangeSpec</dt>
 <dd><p>Similar to the <code>massRange</code> argument, but removes any peaks from recorded mass spectra outside
 the given <em>m/z</em> range.</p></dd>
+
+
 <dt>relMinIntensity</dt>
 <dd><p>The minimum relative intensity (<samp>0-1</samp>) of a mass peak to be kept. Set to <code>NULL</code> to
 ignore.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only keep <code>topMost</code> number of mass peaks for each spectrum. This filter is applied after others.
 Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>onlyAnnotated</dt>
 <dd><p>If <code>TRUE</code> then only recorded spectra that are formula annotated are kept.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
 Any records with a different adduct (<code>Precursor_type</code>) are not considered. Alternatively, <code>adduct</code> can be
 set to <code>NULL</code> to not filter out any records. However, in this case <em>no</em> MS/MS fragments will be added to
 the returned suspect list.</p></dd>
+
+
 <dt>spectrumType</dt>
 <dd><p>A <code>character</code> vector which limits library records to the given spectrum types
 (<code>Spectrum_type</code> field, <em>e.g.</em> <code>"MS2"</code>). Set to <code>NULL</code> to allow all spectrum types.</p></dd>
+
+
 <dt>avgSpecParams</dt>
 <dd><p>A <code>list</code> with parameters used for averaging spectra. See <code><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></code>
 for more details.</p></dd>
+
+
 <dt>collapse</dt>
 <dd><p>Whether records with the same first-block <acronym>InChIKey</acronym> should be collapsed. See the
 <code>Suspect conversion</code> section for details.</p></dd>
+
+
 <dt>suspects</dt>
 <dd><p>If not <code>NULL</code> then this should be a suspect list (see <code><a href="suspect-screening.html">screenSuspects</a></code>) which will
 be amended with spectra data. See the <code>Suspect conversion</code> section for details.</p></dd>
+
+
 <dt>prefCalcChemProps</dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the input suspect list to <code>convertToSuspects</code>. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>The export type. Currently just <code>"msp"</code>.</p></dd>
+
+
 <dt>out</dt>
 <dd><p>The file path to the output library file.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>The <code>MSLibrary</code> to be merged with <code>x</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>delete</code> returns the object for which the specified data was removed.
-<code>filter</code> returns a filtered <code>MSLibrary</code> object.
-<code>convertToSuspects</code> return a suspect list (<code>data.table</code>), which can be used with
-<code><a href="suspect-screening.html">screenSuspects</a></code>.
-<code>merge</code> returns a merged <code>MSLibrary</code> object.</p>
+    
+
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+
+
+<p><code>filter</code> returns a filtered <code>MSLibrary</code> object.</p>
+
+
+<p><code>convertToSuspects</code> return a suspect list (<code>data.table</code>), which can be used with</p>
+<p></p>
+<p><code><a href="suspect-screening.html">screenSuspects</a></code>.</p>
+
+
+<p><code>merge</code> returns a merged <code>MSLibrary</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -346,7 +396,7 @@ the <code>spectra</code> method for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

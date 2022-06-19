@@ -133,30 +133,49 @@ filter(obj, properties = NULL, verbose = TRUE, negate = FALSE)</code></pre></div
     <h2>Arguments</h2>
     <dl><dt>TPs, x, obj, object</dt>
 <dd><p><code>transformationProducts</code> object to be accessed</p></dd>
+
+
 <dt>i</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select parents by
 their index or name, respectively (for the order/names see <code><a href="generics.html">names()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all parents are selected.<br><br> For <code>[[</code>: should be a scalar value.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Unused.</p></dd>
+
+
 <dt>drop, j</dt>
 <dd><p>ignored.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>The parent name (partially matched).</p></dd>
+
+
 <dt>includeParents</dt>
 <dd><p>If <code>TRUE</code> then parents are also included in the returned suspect list.</p></dd>
+
+
 <dt>properties</dt>
 <dd><p>A named <code>list</code> with properties to be filtered. Each item in the <code>list</code> should be named
 with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
 <em>e.g.</em> <code>names(TPs)[[1]]</code>. Example: <code>properties=list(likelihood=c("LIKELY","PROBABLE"))</code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>filter</code> returns a filtered <code>transformationProducts</code> object.</p>
+    
+
+<p><code>filter</code> returns a filtered <code>transformationProducts</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -230,7 +249,7 @@ the data), the <code>retDir</code> values are based on calculated <code>log P</c
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

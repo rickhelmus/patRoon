@@ -117,49 +117,72 @@
 <a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output
 <code><a href="suspect-screening.html">screenSuspects</a></code> or (3) a <code><a href="compounds-class.html">compounds</a></code> annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.</p></dd>
+
+
 <dt>transLibrary</dt>
 <dd><p>A <code>character</code> specifying which transformation library should be used. Currently supported
 are: <code>"hydrolysis"</code>, <code>"abiotic_reduction"</code>, <code>"photolysis_unranked"</code>, <code>"photolysis_ranked"</code>,
 <code>"mammalian_metabolism"</code>, <code>"combined_abioticreduction_hydrolysis"</code>,
 <code>"combined_photolysis_abiotic_hydrolysis"</code>.</p></dd>
+
+
 <dt>generations</dt>
 <dd><p>An <code>integer</code> that specifies the number of transformation generations to predict.</p></dd>
+
+
 <dt>errorRetries</dt>
 <dd><p>The maximum number of connection retries. Sets the <code>times</code> argument to the
 <code><a href="https://httr.r-lib.org/reference/RETRY.html" class="external-link">http::RETRY</a></code> function.</p></dd>
+
+
 <dt>skipInvalid</dt>
 <dd><p>If set to <code>TRUE</code> then the parents will be skipped (with a warning) for which insufficient
 information (<em>e.g.</em> SMILES) is available.</p></dd>
+
+
 <dt>prefCalcChemProps</dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
 <dt>calcLogP</dt>
 <dd><p>A <code>character</code> specifying whether <code>Log P</code> values should be calculated with
 <code><a href="https://rdrr.io/pkg/rcdk/man/get.xlogp.html" class="external-link">rcdk::get.xlogp</a></code> (<code>calcLogP="rcdk"</code>),
 <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a> (<code>calcLogP="obabel"</code>) or not at all
 (<code>calcLogP="none"</code>). The <code>log P</code> values will be calculated of parent and TPs to predict their retention
 order (<code>retDir</code>).</p></dd>
+
+
 <dt>calcSims</dt>
 <dd><p>If set to <code>TRUE</code> then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the <a href="transformationProductsStructure-class.html">filter
 method</a>. May be useful under the assumption that parents and TPs who have a high structural similarity, also likely
 have a high MS/MS spectral similarity (which can be evaluated after componentization with
 <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code>).</p></dd>
+
+
 <dt>fpType</dt>
 <dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
 <code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
+
+
 <dt>fpSimMethod</dt>
 <dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
 of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
+    
+
+<p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -247,7 +270,7 @@ see the parallelization section in the handbook for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

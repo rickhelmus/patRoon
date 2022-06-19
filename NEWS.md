@@ -1,3 +1,8 @@
+# patRoon 2.1.1
+
+- Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
+
+
 # patRoon 2.1
 
 This release extends version `2.0` with new functionality, several important changes and bug fixes. The `newProject()` function was updated for the new functionality. Please see the updated Handbook and sections below for more information.

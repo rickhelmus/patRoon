@@ -4,7 +4,6 @@
 
 - Disable opentims threading when using OpenMP?
 - Mark precursor, make sure it's not filtered away
-- subsetSpectrum() should accept vectors of ranges
 - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 
 ## Ext

@@ -88,38 +88,6 @@ SpectrumIMS getIMSFrame(TimsFrame &frame, const TIMSDecompBufferPair &bufs)
     return ret;
 }
 
-SpectrumIMS filterSpectrum(const SpectrumIMS &spec, unsigned scanBegin = 0, unsigned scanEnd = 0,
-                           double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
-                           double mobilityEnd = 0.0, unsigned minIntensity = 0)
-{
-    if (scanBegin == 0 && scanEnd == 0 && mzStart == 0.0 && mzEnd == 0.0 && mobilityStart == 0.0 &&
-        mobilityEnd == 0.0 && minIntensity == 0)
-        return spec;
-    
-    SpectrumIMS specFiltered;
-    for (size_t i=0; i<spec.size(); ++i)
-    {
-        if (scanBegin != 0 && spec.IDs[i] < scanBegin)
-            continue;
-        if (scanEnd != 0 && spec.IDs[i] > scanEnd)
-            continue;
-        if (mzStart != 0.0 && spec.mzs[i] < mzStart)
-            continue;
-        if (mzEnd != 0.0 && spec.mzs[i] > mzEnd)
-            continue;
-        if (mobilityStart != 0.0 && spec.mobilities[i] < mobilityStart)
-            continue;
-        if (mobilityEnd != 0.0 && spec.mobilities[i] > mobilityEnd)
-            continue;
-        if (minIntensity != 0 && spec.intensities[i] < minIntensity)
-            continue;
-        
-        specFiltered.addData(spec.IDs[i], spec.mzs[i], spec.intensities[i], spec.mobilities[i]);
-    }
-    
-    return specFiltered;
-}
-
 SpectrumIMS filterSpectrum(const SpectrumIMS &spec, const SpectrumFilterParams &params)
 {
     if (params.unset())
@@ -397,8 +365,8 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                 
                 for (size_t j=0; j<EICs.size(); ++j)
                 {
-                    const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
-                                                              mobilityEnds[j]);
+                    const SpectrumFilterParams filterP(0, mzStarts[j], mzEnds[j], mobilityStarts[j], mobilityEnds[j]);
+                    const SpectrumIMS frameF = filterSpectrum(spec, filterP);
                     threadEICs[j].first.push_back(fr.time);
                     threadEICs[j].second.push_back(std::accumulate(frameF.intensities.begin(),
                                                                    frameF.intensities.end(), 0));

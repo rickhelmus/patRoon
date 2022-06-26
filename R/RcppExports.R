@@ -41,12 +41,12 @@ initBrukerLibrary <- function(path) {
     invisible(.Call(`_patRoon_initBrukerLibrary`, path))
 }
 
-collapseTIMSFrame <- function(file, frameID, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensity = 0L, scanStart = 0L, scanEnd = 0L) {
-    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, minAbundance, topMost, minIntensity, scanStart, scanEnd)
+collapseTIMSFrame <- function(file, frameID, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensity = 0L, scanStarts = NULL, scanEnds = NULL) {
+    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, minAbundance, topMost, minIntensity, scanStarts, scanEnds)
 }
 
-getTIMSPeakLists <- function(file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L) {
-    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, scanStartsList, scanEndsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost)
+getTIMSPeakLists <- function(file, frameIDsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L, scanStartsListN = NULL, scanEndsListN = NULL) {
+    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, scanStartsListN, scanEndsListN)
 }
 
 getTIMSEIC <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds) {

@@ -30,4 +30,47 @@ enum class clusterMethod { BIN, DIFF, HCLUST };
 std::vector<int> clusterNums(const std::vector<double> &nums, clusterMethod method, double window);
 clusterMethod clustMethodFromStr(const std::string &str);
 
+// inspired from eg https://stackoverflow.com/questions/11828539/elegant-exceptionhandling-in-openmp
+class ThreadExceptionHandler
+{
+    std::exception_ptr exPtr = nullptr;
+    bool gotEx = false; // use separate bool flag which can be used with OpenMP atomic
+    
+    bool gotException(void) const
+    {
+        bool ret;
+        #pragma omp atomic read
+        ret = gotEx;
+        return ret;
+    }
+    
+public:
+    template <typename F> void run(F func)
+    {
+        if (gotException())
+            return;
+        
+        try
+        {
+            func();
+        }
+        catch (...)
+        {
+            #pragma omp critical
+            {
+                if (!exPtr)
+                {
+                    exPtr = std::current_exception();
+                    gotEx = true;
+                }
+            }
+        }
+    }
+    void reThrow(void) const
+    {
+        if (exPtr)
+            std::rethrow_exception(exPtr);
+    }
+};
+
 #endif

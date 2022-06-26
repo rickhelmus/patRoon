@@ -233,6 +233,7 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
                               const std::vector<unsigned> &scanEnds = { })
 {
     SpectrumIMS sumSpec;
+    ThreadExceptionHandler exHandler;
     
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
@@ -243,16 +244,19 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
         #pragma omp for nowait
         for (size_t i=0; i<frameIDs.size(); ++i)
         {
-            const auto fri = frameIDs[i];
-            if (!TDH.has_frame(fri))
-                continue;
-            auto &fr = TDH.get_frame(fri);
-            const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-            auto specF = filterSpectrum(spec, preFilterParams);
-            if (!scanStarts.empty())
-                specF = subsetSpectrum(specF, scanStarts[i], scanEnds[i]);
-            specF = spectrumTopMost(specF, topMost);
-            threadSumSpec.addData(collapseIMSFrame(specF, method, clusterOn, window, minAbundance));
+            exHandler.run([&]
+            {
+                const auto fri = frameIDs[i];
+                if (!TDH.has_frame(fri))
+                    return;
+                auto &fr = TDH.get_frame(fri);
+                const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
+                auto specF = filterSpectrum(spec, preFilterParams);
+                if (!scanStarts.empty())
+                    specF = subsetSpectrum(specF, scanStarts[i], scanEnds[i]);
+                specF = spectrumTopMost(specF, topMost);
+                threadSumSpec.addData(collapseIMSFrame(specF, method, clusterOn, window, minAbundance));
+            });
         }
         
         #pragma omp critical
@@ -260,7 +264,7 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
             sumSpec.addData(threadSumSpec);
         }
     }
-    
+    exHandler.reThrow();
     
     // collapse result
     if (!sumSpec.empty())
@@ -373,6 +377,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
 {
     TimsDataHandle TDH(file);
     std::vector<EIX> EICs(mzStarts.size());
+    ThreadExceptionHandler exHandler;
     
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
@@ -383,19 +388,22 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
         #pragma omp for nowait
         for (size_t i=0; i<frameIDs.size(); ++i)
         {
-            auto &fr = TDH.get_frame(frameIDs[i]);
-            if (fr.msms_type != 0)
-                continue; // UNDONE: needed?
-            const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-            
-            for (size_t j=0; j<EICs.size(); ++j)
+            exHandler.run([&]
             {
-                const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
-                                                          mobilityEnds[j]);
-                threadEICs[j].first.push_back(fr.time);
-                threadEICs[j].second.push_back(std::accumulate(frameF.intensities.begin(),
-                                                               frameF.intensities.end(), 0));
-            }
+                auto &fr = TDH.get_frame(frameIDs[i]);
+                if (fr.msms_type != 0)
+                    return; // UNDONE: needed?
+                const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
+                
+                for (size_t j=0; j<EICs.size(); ++j)
+                {
+                    const SpectrumIMS frameF = filterSpectrum(spec, 0, 0, mzStarts[j], mzEnds[j], mobilityStarts[j],
+                                                              mobilityEnds[j]);
+                    threadEICs[j].first.push_back(fr.time);
+                    threadEICs[j].second.push_back(std::accumulate(frameF.intensities.begin(),
+                                                                   frameF.intensities.end(), 0));
+                }
+            });
         }
         
         #pragma omp critical
@@ -407,6 +415,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
             }
         }
     }
+    exHandler.reThrow();
     
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
@@ -461,7 +470,8 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
     const SpectrumFilterParams filterPost(minIntensityPost, 0.0, 0.0, 0.0, 0.0);
 
     std::vector<SpectrumIMS> spectra(frameIDs.size());
-
+    ThreadExceptionHandler exHandler;
+    
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
     {
@@ -469,15 +479,19 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
         #pragma omp for
         for (size_t i=0; i<frameIDs.size(); ++i)
         {
-            auto &fr = TDH.get_frame(frameIDs[i]);
-            SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-            spec = filterSpectrum(spec, filterPre);
-            spec = spectrumTopMost(spec, topMost);
-            spectra[i] = filterSpectrum(collapseIMSFrame(spec, clMethod, clusterDataType::MZ, mzWindow, minAbundance),
-                                        filterPost);
+            exHandler.run([&]
+            {
+                auto &fr = TDH.get_frame(frameIDs[i]);
+                SpectrumIMS spec = getIMSFrame(fr, TBuffers);
+                spec = filterSpectrum(spec, filterPre);
+                spec = spectrumTopMost(spec, topMost);
+                spectra[i] = filterSpectrum(collapseIMSFrame(spec, clMethod, clusterDataType::MZ, mzWindow, minAbundance),
+                                            filterPost);
+            });
         }
     }
-
+    exHandler.reThrow();
+    
     Rcpp::List ret(spectra.size());
     const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
     for (size_t i=0; i<spectra.size(); ++i)

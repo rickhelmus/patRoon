@@ -29,6 +29,10 @@ struct SpectrumIMS // UNDONE: merge with other struct(s)
         intensities.push_back(inten);
         mobilities.push_back(mob);
     }
+    void addData(double mz, unsigned inten, double mob)
+    {
+        addData(IDs.size(), mz, inten, mob);
+    }
     void addData(const SpectrumIMS &sp)
     {
         IDs.insert(IDs.end(), sp.IDs.begin(), sp.IDs.end());
@@ -47,6 +51,23 @@ struct SpectrumIMS // UNDONE: merge with other struct(s)
     }
     size_t size(void) const { return IDs.size(); }
     bool empty(void) const {return IDs.empty(); }
+};
+
+class IMSFrame
+{
+    std::vector<SpectrumIMS> spectra;
+    std::vector<unsigned> scanIDs;
+    std::vector<double> mobilities;
+    
+public:
+    IMSFrame(size_t size) : spectra(size), scanIDs(size), mobilities(size) { }
+    IMSFrame() = default;
+    
+    SpectrumIMS &operator[](size_t i) { return spectra[i]; }
+    const SpectrumIMS &operator[](size_t i) const { return spectra[i]; }
+    auto &getSpectra(void) { return spectra; }
+    
+    void setMeta(unsigned i, unsigned ID, double mob) { scanIDs[i] = ID; mobilities[i] = mob; }
 };
 
 struct SpectrumFilterParams
@@ -79,6 +100,29 @@ SpectrumIMS getIMSFrame(TimsFrame &frame)
     frame.save_to_buffs(nullptr, spec.IDs.data(), nullptr, spec.intensities.data(), spec.mzs.data(),
                         spec.mobilities.data(), nullptr);
     return spec;
+}
+
+IMSFrame getIMSFrame2(TimsFrame &tframe)
+{
+    std::vector<uint32_t> IDs(tframe.num_peaks), intensities(tframe.num_peaks);
+    std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
+    tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
+    
+    IMSFrame ret(tframe.num_scans);
+    unsigned curScanID = 0, curScanNum = 0;
+    for (size_t i=0; i<IDs.size(); ++i)
+    {
+        if (curScanID == 0 || curScanID != IDs[i])
+        {
+            if (curScanID != 0)
+                ++curScanNum;
+            curScanID = IDs[i];
+            ret.setMeta(curScanNum, IDs[i], mobilities[i]);
+        }
+        ret[curScanNum].addData(mzs[i], intensities[i], mobilities[i]);
+    }
+    
+    return ret;
 }
 
 SpectrumIMS getIMSFrame(TimsFrame &frame, const TIMSDecompBufferPair &bufs)

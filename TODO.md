@@ -4,6 +4,7 @@
 
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
+- FIX: MetaClean is not an optional dependency --> featureQualities()
 
 
 ## Features

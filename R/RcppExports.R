@@ -45,6 +45,10 @@ collapseTIMSFrame <- function(file, frameID, method, mzWindow, minAbundance = 1L
     .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, minAbundance, topMost, minIntensity, scanStarts, scanEnds)
 }
 
+collapseTIMSFrame2 <- function(file, frameID, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensity = 0L, scanStartsN = NULL, scanEndsN = NULL) {
+    .Call(`_patRoon_collapseTIMSFrame2`, file, frameID, method, mzWindow, minAbundance, topMost, minIntensity, scanStartsN, scanEndsN)
+}
+
 getTIMSPeakLists <- function(file, frameIDsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L, scanStartsListN = NULL, scanEndsListN = NULL) {
     .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, scanStartsListN, scanEndsListN)
 }

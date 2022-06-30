@@ -82,6 +82,7 @@ public:
 
     void addSpectrum(unsigned sID, double mob, SpectrumIMS &&spec)
     {
+        Rcpp::Rcout << "Add spec: " << sID << "/" << mob << "/" << spec.size() << "\n";
         scanIDs.push_back(sID);
         mobilities.push_back(sID);
         spectra.push_back(spec);
@@ -100,6 +101,44 @@ struct SpectrumFilterParams
         return (minIntensity == 0 && mzRange == std::make_pair(0.0, 0.0) && mobilityRange == std::make_pair(0.0, 0.0));
     }
 };
+
+SpectrumIMS spectrumTopMost(const SpectrumIMS &spec, unsigned topMost, double precursorMZ = 0.0)
+{
+    if (topMost == 0 || spec.size() <= topMost)
+        return spec;
+    
+    SpectrumIMS specFiltered(topMost);
+    const auto inds = getSortedInds(spec.intensities);
+    //auto indsSet = std::set<size_t>(std::advance(inds.begin(), inds.size() - topMost), inds.end());
+    for (size_t i=0; i<topMost; ++i)
+    {
+        const auto j = inds[(inds.size()-1) - i];
+        specFiltered.setData(i, spec.IDs[j], spec.mzs[j], spec.intensities[j], spec.mobilities[j]);
+    }
+
+    if (precursorMZ != 0.0) // make sure precursor is also in there
+    {
+        double closestDiff = -1.0;
+        size_t closestInd;
+        for (size_t i = 0; i < spec.mzs.size(); ++i)
+        {
+            const double d = std::abs(spec.mzs[i] - precursorMZ);
+            // UNDONE: configrable range? (same for R's getMZIndexFromMSPeakList())
+            if ((closestDiff < 0.0 || d < closestDiff) && numberLTE(spec.mzs[i], precursorMZ, 0.01))
+            {
+                closestDiff = d;
+                closestInd = i;
+            }
+        }
+        if (closestDiff >= 0.0) // found precursor?
+        {
+            if (std::find(std::next(inds.cbegin(), inds.size() - topMost), inds.cend(), closestInd) == inds.cend())
+                specFiltered.addData(spec.mzs[closestInd], spec.intensities[closestInd], spec.mobilities[closestInd]);
+        }
+    }
+
+    return specFiltered;
+}
 
 auto getTIMSDecompBuffers(size_t size)
 {
@@ -121,50 +160,75 @@ SpectrumIMS getIMSFrame(TimsFrame &frame)
 }
 
 IMSFrame getIMSFrame2(TimsFrame &tframe, const SpectrumFilterParams &filtParams,
-                      const std::vector<unsigned> &scanStarts, const std::vector<unsigned> &scanEnds)
+                      const std::vector<unsigned> &scanStarts, const std::vector<unsigned> &scanEnds,
+                      unsigned topMost = 0,  double precursorMZ = -1.0, bool onlyWithPrecursor = false)
 {
     if (tframe.num_peaks == 0)
         return IMSFrame();
     
+    /* The following assumptions are made:
+        1. scans are sorted from low to high
+        2. mobilities are equal for each scan and sorted from high to low
+        3. m/z values are sorted from low to high in each scan (not used atm)
+    */
+
     std::vector<uint32_t> IDs(tframe.num_peaks), intensities(tframe.num_peaks);
     std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
-    
+
     IMSFrame ret;
     SpectrumIMS curSpec;
     unsigned curScanID = 0;
+    double curMob;
     const auto len = IDs.size();
-    for (size_t i=0; i<len; ++i)
+    const bool subsetScans = !scanStarts.empty();
+    const auto latestScan = (subsetScans) ? *(std::max_element(scanEnds.begin(), scanEnds.end())) : 0;
+
+    for (size_t i=0; ; ++i)
     {
-        // new scan?
-        if (curScanID != IDs[i])
+        // new/last scan or m/z is already out of upper range?
+        if (i >= len || curScanID != IDs[i])
         {
-            curScanID = IDs[i];
-
-            if (!curSpec.empty())
+            bool doAddSpec = !curSpec.empty();
+            if (doAddSpec && onlyWithPrecursor && precursorMZ >= 0.0)
+                doAddSpec = std::any_of(curSpec.mzs.begin(), curSpec.mzs.end(), [&](double mz)
+                                    { return compareTol(mz, precursorMZ, 0.01); });
+            if (doAddSpec && topMost != 0)
             {
-                ret.addSpectrum(curScanID, mobilities[i], std::move(curSpec));
-                curSpec.clear();
+                curSpec = spectrumTopMost(curSpec, topMost, precursorMZ);
+                doAddSpec = !curSpec.empty();
             }
+            if (doAddSpec)
+                ret.addSpectrum(curScanID, curMob, std::move(curSpec));
 
-            if (!scanStarts.empty() && !scanEnds.empty())
+            if (i >= len)
+                break; // done
+
+            curSpec.clear();
+            curScanID = IDs[i];
+            curMob = mobilities[i];
+
+            if (filtParams.mobilityRange.first != 0.0 && curMob < filtParams.mobilityRange.first)
+                break; // no need to go further, next scans all have lower mobility
+            if (subsetScans && curScanID > latestScan)
+                break; // no need to go further, next scans all have higher IDs
+
+            bool inrange = true;
+            if (subsetScans)
             {
-                bool inrange = false;
-                for (size_t j = 0; j < scanStarts.size(); ++j)
-                {
-                    if (curScanID >= scanStarts[j] && curScanID <= scanEnds[j])
-                    {
-                        inrange = true;
-                        break;
-                    }
-                }
-                if (!inrange)
-                {
-                    // try again with next scan
-                    for (++i; i<len && IDs[i]==curScanID; ++i)
-                        ;
-                    continue;
-                }
+                inrange = false;
+                for (size_t j = 0; j < scanStarts.size() && !inrange; ++j)
+                    inrange = (curScanID >= scanStarts[j] && curScanID <= scanEnds[j]);
+            }
+            if (inrange && filtParams.mobilityRange.second != 0.0)
+                inrange = numberLTE(curMob, filtParams.mobilityRange.second, 1E-8);
+            if (!inrange)
+            {
+                // try again with next scan: increment until last element (i will be incremented again in main for loop)
+                for (; i < (len-1) && IDs[i+1] == curScanID; ++i)
+                    ;
+                // Rcpp::Rcout << "i: " << i << "/" << len << "\n";
+                continue;
             }
         }
 
@@ -172,19 +236,12 @@ IMSFrame getIMSFrame2(TimsFrame &tframe, const SpectrumFilterParams &filtParams,
             continue;
         if (filtParams.mzRange.second != 0.0 && mzs[i] > filtParams.mzRange.second)
             continue;
-        if (filtParams.mobilityRange.first != 0.0 && mobilities[i] < filtParams.mobilityRange.first)
-            continue;
-        if (filtParams.mobilityRange.second != 0.0 && mobilities[i] > filtParams.mobilityRange.second)
-            continue;
         if (filtParams.minIntensity != 0 && intensities[i] < filtParams.minIntensity)
             continue;
         
         curSpec.addData(mzs[i], intensities[i], mobilities[i]);
     }
 
-    if (!curSpec.empty())
-        ret.addSpectrum(IDs.back(), mobilities.back(), std::move(curSpec)); // also add final spectrum
-    
     return ret;
 }
 
@@ -237,21 +294,6 @@ SpectrumIMS subsetSpectrum(const SpectrumIMS &spec, const std::vector<unsigned> 
         }
     }
     
-    return specFiltered;
-}
-
-SpectrumIMS spectrumTopMost(const SpectrumIMS &spec, unsigned topMost)
-{
-    if (topMost == 0 || spec.size() <= topMost)
-        return spec;
-    
-    SpectrumIMS specFiltered(topMost);
-    const auto inds = getSortedInds(spec.intensities);
-    for (size_t i=0; i<topMost; ++i)
-    {
-        const auto j = inds[(inds.size()-1) - i];
-        specFiltered.setData(i, spec.IDs[j], spec.mzs[j], spec.intensities[j], spec.mobilities[j]);
-    }
     return specFiltered;
 }
 
@@ -320,7 +362,10 @@ SpectrumIMS collapseIMSFrame(const IMSFrame &frame, clusterMethod method, double
     const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
     SpectrumIMS binnedSpectrum(maxClust + 1);
     std::vector<unsigned> binSizes(maxClust + 1);
-    
+
+    Rcpp::Rcout << "flFrame: " << flFrame.size() << "\n";
+    Rcpp::Rcout << "maxClust: " << maxClust << "\n";
+
     // sum data for each cluster
     for (size_t i=0; i<clusts.size(); ++i)
     {
@@ -340,6 +385,8 @@ SpectrumIMS collapseIMSFrame(const IMSFrame &frame, clusterMethod method, double
         binnedSpectrum.mobilities[i] /= inten;
     }
 
+    Rcpp::Rcout << "binnedSpectrum: " << binnedSpectrum.size() << "\n";
+
     // sort spectrum && remove outliers
     const auto sortedInds = getSortedInds(binnedSpectrum.mzs);
     SpectrumIMS sortedSpectrum;
@@ -352,6 +399,8 @@ SpectrumIMS collapseIMSFrame(const IMSFrame &frame, clusterMethod method, double
                                binnedSpectrum.mobilities[j]);
     }
     
+    Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
+
     return sortedSpectrum;
 }
 
@@ -468,16 +517,18 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
 
 // [[Rcpp::export]]
 Rcpp::DataFrame collapseTIMSFrame2(const std::string &file, size_t frameID, const std::string &method, double mzWindow,
-                                  unsigned minAbundance = 1, unsigned topMost = 0, unsigned minIntensity = 0,
-                                  Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN = R_NilValue,
-                                  Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN = R_NilValue)
+                                   double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
+                                   double mobilityEnd = 0.0, unsigned minAbundance = 1, unsigned topMost = 0,
+                                   unsigned minIntensity = 0,
+                                   Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN = R_NilValue,
+                                   Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN = R_NilValue, double precursorMZ = 0.0,
+                                   bool onlyWithPrecursor = false, bool flatten = false)
 {
     TimsDataHandle TDH(file);
     if (!TDH.has_frame(frameID))
         Rcpp::stop("Frame doesn't exist.");
 
-    SpectrumFilterParams filterP;
-    filterP.minIntensity = minIntensity;
+    SpectrumFilterParams filterP(minIntensity, mzStart, mzEnd, mobilityStart, mobilityEnd);
 
     std::vector<unsigned> scanStarts, scanEnds;
     if (scanStartsN.isUsable())
@@ -485,9 +536,9 @@ Rcpp::DataFrame collapseTIMSFrame2(const std::string &file, size_t frameID, cons
     if (scanEndsN.isUsable())
         scanEnds = Rcpp::as<std::vector<unsigned>>(scanEndsN);
 
-    auto frame = getIMSFrame2(TDH.get_frame(frameID), filterP, scanStarts, scanEnds);
-    //frame = spectrumTopMost(frame, topMost);
-    const auto spec = collapseIMSFrame(frame, clustMethodFromStr(method), mzWindow, minAbundance);
+    auto frame = getIMSFrame2(TDH.get_frame(frameID), filterP, scanStarts, scanEnds, topMost,
+                              precursorMZ, onlyWithPrecursor);
+    const auto spec = (flatten) ? flattenFrame(frame) : collapseIMSFrame(frame, clustMethodFromStr(method), mzWindow, minAbundance);
     
     return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
                                    Rcpp::Named("mz") = spec.mzs,

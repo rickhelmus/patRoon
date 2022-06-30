@@ -158,8 +158,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // collapseTIMSFrame2
-Rcpp::DataFrame collapseTIMSFrame2(const std::string& file, size_t frameID, const std::string& method, double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensity, Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN, Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN);
-RcppExport SEXP _patRoon_collapseTIMSFrame2(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP scanStartsNSEXP, SEXP scanEndsNSEXP) {
+Rcpp::DataFrame collapseTIMSFrame2(const std::string& file, size_t frameID, const std::string& method, double mzWindow, double mzStart, double mzEnd, double mobilityStart, double mobilityEnd, unsigned minAbundance, unsigned topMost, unsigned minIntensity, Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN, Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN, double precursorMZ, bool onlyWithPrecursor, bool flatten);
+RcppExport SEXP _patRoon_collapseTIMSFrame2(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP scanStartsNSEXP, SEXP scanEndsNSEXP, SEXP precursorMZSEXP, SEXP onlyWithPrecursorSEXP, SEXP flattenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -167,12 +167,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type frameID(frameIDSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< double >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< double >::type mzEnd(mzEndSEXP);
+    Rcpp::traits::input_parameter< double >::type mobilityStart(mobilityStartSEXP);
+    Rcpp::traits::input_parameter< double >::type mobilityEnd(mobilityEndSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minAbundance(minAbundanceSEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minIntensity(minIntensitySEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type scanStartsN(scanStartsNSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type scanEndsN(scanEndsNSEXP);
-    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame2(file, frameID, method, mzWindow, minAbundance, topMost, minIntensity, scanStartsN, scanEndsN));
+    Rcpp::traits::input_parameter< double >::type precursorMZ(precursorMZSEXP);
+    Rcpp::traits::input_parameter< bool >::type onlyWithPrecursor(onlyWithPrecursorSEXP);
+    Rcpp::traits::input_parameter< bool >::type flatten(flattenSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseTIMSFrame2(file, frameID, method, mzWindow, mzStart, mzEnd, mobilityStart, mobilityEnd, minAbundance, topMost, minIntensity, scanStartsN, scanEndsN, precursorMZ, onlyWithPrecursor, flatten));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -354,7 +361,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 9},
-    {"_patRoon_collapseTIMSFrame2", (DL_FUNC) &_patRoon_collapseTIMSFrame2, 9},
+    {"_patRoon_collapseTIMSFrame2", (DL_FUNC) &_patRoon_collapseTIMSFrame2, 16},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 12},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_getTIMSMobilogram", (DL_FUNC) &_patRoon_getTIMSMobilogram, 10},

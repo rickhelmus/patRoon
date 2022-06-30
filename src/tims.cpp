@@ -77,14 +77,14 @@ public:
     const SpectrumIMS &operator[](size_t i) const { return spectra[i]; }
     auto &getSpectra(void) { return spectra; }
     const auto &getSpectra(void) const { return spectra; }
-    
-    void setMeta(unsigned i, unsigned ID, double mob) { scanIDs[i] = ID; mobilities[i] = mob; }
+
+    const auto &getMobilities(void) const { return mobilities; }
 
     void addSpectrum(unsigned sID, double mob, SpectrumIMS &&spec)
     {
-        Rcpp::Rcout << "Add spec: " << sID << "/" << mob << "/" << spec.size() << "\n";
+        // Rcpp::Rcout << "Add spec: " << sID << "/" << mob << "/" << spec.size() << "\n";
         scanIDs.push_back(sID);
-        mobilities.push_back(sID);
+        mobilities.push_back(mob);
         spectra.push_back(spec);
     }
 };
@@ -93,6 +93,7 @@ struct SpectrumFilterParams
 {
     unsigned minIntensity;
     std::pair<double, double> mzRange, mobilityRange;
+
     SpectrumFilterParams(unsigned minInt, double mzStart, double mzEnd, double mobStart, double mobEnd) :
         minIntensity(minInt), mzRange(mzStart, mzEnd), mobilityRange(mobStart, mobEnd) { }
     SpectrumFilterParams() = default;
@@ -150,18 +151,9 @@ auto getTIMSDecompBuffers(size_t size)
 // From http://mochan.info/c++/2019/06/12/returntype-deduction.html
 using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
 
-
-SpectrumIMS getIMSFrame(TimsFrame &frame)
-{
-    SpectrumIMS spec(frame.num_peaks);
-    frame.save_to_buffs(nullptr, spec.IDs.data(), nullptr, spec.intensities.data(), spec.mzs.data(),
-                        spec.mobilities.data(), nullptr);
-    return spec;
-}
-
-IMSFrame getIMSFrame2(TimsFrame &tframe, const SpectrumFilterParams &filtParams,
-                      const std::vector<unsigned> &scanStarts, const std::vector<unsigned> &scanEnds,
-                      unsigned topMost = 0,  double precursorMZ = -1.0, bool onlyWithPrecursor = false)
+IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const SpectrumFilterParams &filtParams = { },
+                     const std::vector<unsigned> &scanStarts = { }, const std::vector<unsigned> &scanEnds = { },
+                     unsigned topMost = 0,  double precursorMZ = -1.0, bool onlyWithPrecursor = false)
 {
     if (tframe.num_peaks == 0)
         return IMSFrame();
@@ -172,14 +164,16 @@ IMSFrame getIMSFrame2(TimsFrame &tframe, const SpectrumFilterParams &filtParams,
         3. m/z values are sorted from low to high in each scan (not used atm)
     */
 
+    tframe.decompress(bufs.second.get(), bufs.first.get());
     std::vector<uint32_t> IDs(tframe.num_peaks), intensities(tframe.num_peaks);
     std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
+    tframe.close();
 
     IMSFrame ret;
     SpectrumIMS curSpec;
     unsigned curScanID = 0;
-    double curMob;
+    double curMob = 0.0;
     const auto len = IDs.size();
     const bool subsetScans = !scanStarts.empty();
     const auto latestScan = (subsetScans) ? *(std::max_element(scanEnds.begin(), scanEnds.end())) : 0;
@@ -245,13 +239,35 @@ IMSFrame getIMSFrame2(TimsFrame &tframe, const SpectrumFilterParams &filtParams,
     return ret;
 }
 
-SpectrumIMS getIMSFrame(TimsFrame &frame, const TIMSDecompBufferPair &bufs)
+template <typename... Args>
+std::vector<IMSFrame> getTIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs,
+                                    Args... args)
 {
-    frame.decompress(bufs.second.get(), bufs.first.get());
-    SpectrumIMS ret = getIMSFrame(frame);
-    frame.close();
+    std::vector<IMSFrame> ret(frameIDs.size());
+    ThreadExceptionHandler exHandler;
+
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(8)
+    {
+        auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
+    
+        #pragma omp for
+        for (size_t i=0; i<frameIDs.size(); ++i)
+        {
+            exHandler.run([&]
+            {
+                const auto fri = frameIDs[i];
+                if (!TDH.has_frame(fri))
+                    return;
+                ret[i] = getIMSFrame(TDH.get_frame(fri), TBuffers, args...);
+            });
+        }
+    }
+    exHandler.reThrow();
+
     return ret;
 }
+
 
 SpectrumIMS filterSpectrum(const SpectrumIMS &spec, const SpectrumFilterParams &params)
 {
@@ -305,27 +321,28 @@ SpectrumIMS flattenFrame(const IMSFrame &frame)
     return ret;
 }
 
-enum class clusterDataType { MZ, MOBILITY };
-SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clusterDataType clusterOn, double window,
+SpectrumIMS collapseIMSFrame(const SpectrumIMS &flattenedSpecs, clusterMethod method, double window,
                              unsigned minAbundance)
 {
-    if (frame.empty())
-        return frame;
-    
-    const std::vector<int> clusts = clusterNums((clusterOn == clusterDataType::MZ) ? frame.mzs : frame.mobilities,
-                                                method, window);
+    if (flattenedSpecs.empty())
+        return flattenedSpecs;
+
+    const std::vector<int> clusts = clusterNums(flattenedSpecs.mzs, method, window);
     const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
     SpectrumIMS binnedSpectrum(maxClust + 1);
     std::vector<unsigned> binSizes(maxClust + 1);
-    
+
+    // Rcpp::Rcout << "flattenedSpecs: " << flattenedSpecs.size() << "\n";
+    // Rcpp::Rcout << "maxClust: " << maxClust << "\n";
+
     // sum data for each cluster
     for (size_t i=0; i<clusts.size(); ++i)
     {
         const size_t cl = clusts[i];
-        const double inten = static_cast<double>(frame.intensities[i]);
-        binnedSpectrum.mzs[cl] += (frame.mzs[i] * inten);
-        binnedSpectrum.mobilities[cl] += (frame.mobilities[i] * inten);
-        binnedSpectrum.intensities[cl] += frame.intensities[i];
+        const double inten = static_cast<double>(flattenedSpecs.intensities[i]);
+        binnedSpectrum.mzs[cl] += (flattenedSpecs.mzs[i] * inten);
+        binnedSpectrum.mobilities[cl] += (flattenedSpecs.mobilities[i] * inten);
+        binnedSpectrum.intensities[cl] += flattenedSpecs.intensities[i];
         ++binSizes[cl];
     }
 
@@ -336,6 +353,8 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
         binnedSpectrum.mzs[i] /= inten;
         binnedSpectrum.mobilities[i] /= inten;
     }
+
+    // Rcpp::Rcout << "binnedSpectrum: " << binnedSpectrum.size() << "\n";
 
     // sort spectrum && remove outliers
     const auto sortedInds = getSortedInds(binnedSpectrum.mzs);
@@ -349,70 +368,21 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &frame, clusterMethod method, clu
                                binnedSpectrum.mobilities[j]);
     }
     
-    return sortedSpectrum;
-}
-
-SpectrumIMS collapseIMSFrame(const IMSFrame &frame, clusterMethod method, double window, unsigned minAbundance)
-{
-    if (frame.empty())
-        return SpectrumIMS();
-
-    const SpectrumIMS flFrame = flattenFrame(frame);
-    const std::vector<int> clusts = clusterNums(flFrame.mzs, method, window);
-    const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
-    SpectrumIMS binnedSpectrum(maxClust + 1);
-    std::vector<unsigned> binSizes(maxClust + 1);
-
-    Rcpp::Rcout << "flFrame: " << flFrame.size() << "\n";
-    Rcpp::Rcout << "maxClust: " << maxClust << "\n";
-
-    // sum data for each cluster
-    for (size_t i=0; i<clusts.size(); ++i)
-    {
-        const size_t cl = clusts[i];
-        const double inten = static_cast<double>(flFrame.intensities[i]);
-        binnedSpectrum.mzs[cl] += (flFrame.mzs[i] * inten);
-        binnedSpectrum.mobilities[cl] += (flFrame.mobilities[i] * inten);
-        binnedSpectrum.intensities[cl] += flFrame.intensities[i];
-        ++binSizes[cl];
-    }
-
-    // average data
-    for (size_t i=0; i<binnedSpectrum.size(); ++i)
-    {
-        const double inten = static_cast<double>(binnedSpectrum.intensities[i]);
-        binnedSpectrum.mzs[i] /= inten;
-        binnedSpectrum.mobilities[i] /= inten;
-    }
-
-    Rcpp::Rcout << "binnedSpectrum: " << binnedSpectrum.size() << "\n";
-
-    // sort spectrum && remove outliers
-    const auto sortedInds = getSortedInds(binnedSpectrum.mzs);
-    SpectrumIMS sortedSpectrum;
-    for (size_t i=0; i<sortedInds.size(); ++i)
-    {
-        const auto j = sortedInds[i];
-        if (binSizes[j] < minAbundance)
-            continue;
-        sortedSpectrum.addData(i+1, binnedSpectrum.mzs[j], binnedSpectrum.intensities[j],
-                               binnedSpectrum.mobilities[j]);
-    }
-    
-    Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
+    // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
 
     return sortedSpectrum;
 }
 
 SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs,
                               const SpectrumFilterParams &preFilterParams, const SpectrumFilterParams &postFilterParams,
-                              unsigned topMost, clusterMethod method, clusterDataType clusterOn, double window,
+                              unsigned topMost, clusterMethod method, double window,
                               unsigned minAbundance, const std::vector<std::vector<unsigned>> &scanStarts = { },
                               const std::vector<std::vector<unsigned>> &scanEnds = { })
 {
     SpectrumIMS sumSpec;
     ThreadExceptionHandler exHandler;
-    
+    const std::vector<unsigned> emptyScanRange;
+
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
     {
@@ -427,13 +397,11 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
                 const auto fri = frameIDs[i];
                 if (!TDH.has_frame(fri))
                     return;
-                auto &fr = TDH.get_frame(fri);
-                const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-                auto specF = filterSpectrum(spec, preFilterParams);
-                if (!scanStarts.empty())
-                    specF = subsetSpectrum(specF, scanStarts[i], scanEnds[i]);
-                specF = spectrumTopMost(specF, topMost);
-                threadSumSpec.addData(collapseIMSFrame(specF, method, clusterOn, window, minAbundance));
+                const IMSFrame fr = getIMSFrame(TDH.get_frame(fri), TBuffers, preFilterParams,
+                                                (scanStarts.empty()) ? emptyScanRange : scanStarts[i],
+                                                (scanEnds.empty()) ? emptyScanRange : scanEnds[i],
+                                                topMost);
+                threadSumSpec.addData(collapseIMSFrame(flattenFrame(fr), method, window, minAbundance));
             });
         }
         
@@ -447,7 +415,7 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
     // collapse result
     if (!sumSpec.empty())
     {
-        sumSpec = collapseIMSFrame(sumSpec, method, clusterOn, window, minAbundance);
+        sumSpec = collapseIMSFrame(sumSpec, method, window, minAbundance);
         // average intensities
         for (auto &inten : sumSpec.intensities)
             inten /= frameIDs.size();
@@ -492,37 +460,12 @@ void initBrukerLibrary(const std::string &path)
 
 // [[Rcpp::export]]
 Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const std::string &method, double mzWindow,
-                                  unsigned minAbundance = 1, unsigned topMost = 0, unsigned minIntensity = 0,
-                                  Rcpp::Nullable<Rcpp::IntegerVector> scanStarts = R_NilValue,
-                                  Rcpp::Nullable<Rcpp::IntegerVector> scanEnds = R_NilValue)
-{
-    TimsDataHandle TDH(file);
-    if (!TDH.has_frame(frameID))
-        Rcpp::stop("Frame doesn't exist.");
-    
-    SpectrumIMS frame = getIMSFrame(TDH.get_frame(frameID));
-    SpectrumFilterParams filterP;
-    filterP.minIntensity = minIntensity;
-    frame = filterSpectrum(frame, filterP);
-    if (scanStarts.isUsable() && scanEnds.isUsable())
-        frame = subsetSpectrum(frame, Rcpp::as<std::vector<unsigned>>(scanStarts), Rcpp::as<std::vector<unsigned>>(scanEnds));
-    frame = spectrumTopMost(frame, topMost);
-    const auto spec = collapseIMSFrame(frame, clustMethodFromStr(method), clusterDataType::MZ, mzWindow, minAbundance);
-    
-    return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
-                                   Rcpp::Named("mz") = spec.mzs,
-                                   Rcpp::Named("intensity") = spec.intensities,
-                                   Rcpp::Named("mobility") = spec.mobilities);
-}
-
-// [[Rcpp::export]]
-Rcpp::DataFrame collapseTIMSFrame2(const std::string &file, size_t frameID, const std::string &method, double mzWindow,
-                                   double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
-                                   double mobilityEnd = 0.0, unsigned minAbundance = 1, unsigned topMost = 0,
-                                   unsigned minIntensity = 0,
-                                   Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN = R_NilValue,
-                                   Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN = R_NilValue, double precursorMZ = 0.0,
-                                   bool onlyWithPrecursor = false, bool flatten = false)
+                                  double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
+                                  double mobilityEnd = 0.0, unsigned minAbundance = 1, unsigned topMost = 0,
+                                  unsigned minIntensity = 0,
+                                  Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN = R_NilValue,
+                                  Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN = R_NilValue, double precursorMZ = 0.0,
+                                  bool onlyWithPrecursor = false, bool flatten = false)
 {
     TimsDataHandle TDH(file);
     if (!TDH.has_frame(frameID))
@@ -536,9 +479,10 @@ Rcpp::DataFrame collapseTIMSFrame2(const std::string &file, size_t frameID, cons
     if (scanEndsN.isUsable())
         scanEnds = Rcpp::as<std::vector<unsigned>>(scanEndsN);
 
-    auto frame = getIMSFrame2(TDH.get_frame(frameID), filterP, scanStarts, scanEnds, topMost,
+    auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
+    auto frame = getIMSFrame(TDH.get_frame(frameID), TBuffers, filterP, scanStarts, scanEnds, topMost,
                               precursorMZ, onlyWithPrecursor);
-    const auto spec = (flatten) ? flattenFrame(frame) : collapseIMSFrame(frame, clustMethodFromStr(method), mzWindow, minAbundance);
+    const auto spec = (flatten) ? flattenFrame(frame) : collapseIMSFrame(flattenFrame(frame), clustMethodFromStr(method), mzWindow, minAbundance);
     
     return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
                                    Rcpp::Named("mz") = spec.mzs,
@@ -576,7 +520,7 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
         
         if (!subScans)
             peakLists[i] = collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
-                                             clusterDataType::MZ, mzWindow, minAbundance);
+                                             mzWindow, minAbundance);
         else
         {
             Rcpp::List scanStartsItem = scanStartsList[i], scanEndsItem = scanEndsList[i];
@@ -587,7 +531,7 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                 scanEnds.push_back(Rcpp::as<std::vector<unsigned>>(scanEndsItem[j]));
             }
             peakLists[i] = collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
-                                             clusterDataType::MZ, mzWindow, minAbundance, scanStarts, scanEnds);
+                                             mzWindow, minAbundance, scanStarts, scanEnds);
         }
     }
 
@@ -623,15 +567,29 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                 auto &fr = TDH.get_frame(frameIDs[i]);
                 if (fr.msms_type != 0)
                     return; // UNDONE: needed?
-                const SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-                
-                for (size_t j=0; j<EICs.size(); ++j)
+                const IMSFrame frame = getIMSFrame(fr, TBuffers);
+                const auto &mobs = frame.getMobilities();
+
+                for (size_t j = 0; j < EICs.size(); ++j)
                 {
-                    const SpectrumFilterParams filterP(0, mzStarts[j], mzEnds[j], mobilityStarts[j], mobilityEnds[j]);
-                    const SpectrumIMS frameF = filterSpectrum(spec, filterP);
+                    unsigned inten = 0;
+                    for (size_t k = 0; k < frame.size(); ++k)
+                    {
+                        // Rcpp::Rcout << "mob: " << mobs[k] << "/" << mobilityStarts[j] << "/" << mobilityEnds[j] << "\n";
+                        if (mobilityStarts[j] != 0 && mobs[k] < mobilityStarts[j])
+                            continue;
+                        if (mobilityEnds[j] != 0 && mobs[k] > mobilityEnds[j])
+                            continue;
+
+                        const auto &sp = frame[k];
+                        for (size_t l = 0; l < sp.size(); ++l)
+                        {
+                            if (numberGTE(sp.mzs[l], mzStarts[j], 10E-8) && numberLTE(sp.mzs[l], mzEnds[j], 10E-8))
+                                inten += sp.intensities[l];
+                        }
+                    }
                     threadEICs[j].first.push_back(fr.time);
-                    threadEICs[j].second.push_back(std::accumulate(frameF.intensities.begin(),
-                                                                   frameF.intensities.end(), 0));
+                    threadEICs[j].second.push_back(inten);
                 }
             });
         }
@@ -666,19 +624,22 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
     const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);
     const auto clMethod = clustMethodFromStr(method);
-    
     SpectrumFilterParams postFilter;
     postFilter.minIntensity = minIntensityPost;
-        
     std::vector<EIX> mobilograms(count);
     
     for (int i=0; i<count; ++i)
     {
         const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);
         const SpectrumFilterParams preFilter(minIntensityPre, mzStarts[i], mzEnds[i], 0.0, 0.0);
-        const auto spec = collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
-                                            clusterDataType::MOBILITY, IMSWindow, minAbundance);
-        mobilograms[i] = sortCompressEIX(EIX(spec.mobilities, spec.intensities));
+        const auto frames = getTIMSFrames(TDH, frameIDs, preFilter);
+        // UNDONE: more args for ^, use getTIMSFrames for frame collapsing too
+
+        
+        /*for (size_t j = 0; j < frameIDs.size(); ++j)
+            const auto spec = collapseIMSFrames(TDH, frameIDs, preFilter, postFilter, topMost, clMethod,
+                                                IMSWindow, minAbundance);
+        mobilograms[i] = sortCompressEIX(EIX(spec.mobilities, spec.intensities));*/
     }
     
     Rcpp::List ret(mobilograms.size());
@@ -694,6 +655,7 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
                                double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensityPre,
                                unsigned minIntensityPost)
 {
+#if 0
     TimsDataHandle TDH(file);
     const auto clMethod = clustMethodFromStr(method);
     const SpectrumFilterParams filterPre(minIntensityPre, mzStart, mzEnd, mobilityStart, mobilityEnd);
@@ -733,4 +695,5 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
         ret[i] = m;
     }
     return ret;
+#endif
 }

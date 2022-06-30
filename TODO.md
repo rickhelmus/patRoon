@@ -14,6 +14,7 @@
         - first calculate tot intensity for all spectra in a frame
         - cluster IMS values of each frame
         - output is averaged IMS data per cluster + sum intensities
+- get rid of spectrum IDs? Doesn't seem necessary anymore
 
 ## Ext
 

@@ -103,6 +103,15 @@ struct SpectrumFilterParams
     }
 };
 
+struct SpectrumScanRanges
+{
+    std::vector<double> scanStarts, scanEnds;
+    SpectrumScanRanges(const std::vector<double> &ss, const std::vector<double> &se) : scanStarts(ss), scanEnds(se) { }
+    SpectrumScanRanges() = default;
+    bool empty(void) const { return (scanStarts.empty()); }
+}
+
+
 SpectrumIMS spectrumTopMost(const SpectrumIMS &spec, unsigned topMost, double precursorMZ = 0.0)
 {
     if (topMost == 0 || spec.size() <= topMost)
@@ -151,11 +160,11 @@ auto getTIMSDecompBuffers(size_t size)
 // From http://mochan.info/c++/2019/06/12/returntype-deduction.html
 using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
 
-IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const SpectrumFilterParams &filtParams = { },
-                     unsigned topMost = 0,  double precursorMZ = -1.0, bool onlyWithPrecursor = false,
-                     bool pruneEmptySpectra = false,
-                     const std::vector<unsigned> &scanStarts = { }, const std::vector<unsigned> &scanEnds = { })
-                     
+IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const SpectrumFilterParams &filtParams = {},
+                     const SpectrumScanRanges &scanRanges = { },
+                     unsigned topMost = 0, double precursorMZ = -1.0, bool onlyWithPrecursor = false,
+                     bool pruneEmptySpectra = false)
+
 {
     if (tframe.num_peaks == 0)
         return IMSFrame();
@@ -177,8 +186,8 @@ IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const 
     unsigned curScanID = 0;
     double curMob = 0.0;
     const auto len = IDs.size();
-    const bool subsetScans = !scanStarts.empty();
-    const auto latestScan = (subsetScans) ? *(std::max_element(scanEnds.begin(), scanEnds.end())) : 0;
+    const bool subsetScans = !scanRanges.empty();
+    const auto latestScan = (subsetScans) ? *(std::max_element(scanRanges.scanEnds.begin(), scanRanges.scanEnds.end())) : 0;
 
     for (size_t i=0; ; ++i)
     {
@@ -217,8 +226,8 @@ IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const 
             if (subsetScans)
             {
                 inrange = false;
-                for (size_t j = 0; j < scanStarts.size() && !inrange; ++j)
-                    inrange = (curScanID >= scanStarts[j] && curScanID <= scanEnds[j]);
+                for (size_t j = 0; j < scanRanges.scanStarts.size() && !inrange; ++j)
+                    inrange = (curScanID >= scanRanges.scanStarts[j] && curScanID <= scanRanges.scanEnds[j]);
             }
             if (inrange && filtParams.mobilityRange.second != 0.0)
                 inrange = numberLTE(curMob, filtParams.mobilityRange.second, 1E-8);
@@ -247,10 +256,12 @@ IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const 
 
 template <typename... Args>
 std::vector<IMSFrame> getTIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs,
-                                    Args... args)
+                                    const SpectrumFilterParams &filtParams,
+                                    const std::vector<SpectrumScanRanges> &scanRangesList, Args... args)
 {
     std::vector<IMSFrame> ret(frameIDs.size());
     ThreadExceptionHandler exHandler;
+    const std::vector<unsigned> emptyScanRange;
 
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
@@ -265,7 +276,10 @@ std::vector<IMSFrame> getTIMSFrames(TimsDataHandle &TDH, const std::vector<unsig
                 const auto fri = frameIDs[i];
                 if (!TDH.has_frame(fri))
                     return;
-                ret[i] = getIMSFrame(TDH.get_frame(fri), TBuffers, args...);
+                if (!scanRangesList.empty())
+                    ret[i] = getIMSFrame(TDH.get_frame(fri), TBuffers, filtParams, scanRangesList[i], args...);
+                else
+                    ret[i] = getIMSFrame(TDH.get_frame(fri), TBuffers, filtParams, SpectrumScanRanges(), args...);
             });
         }
     }
@@ -385,50 +399,29 @@ SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &
                               unsigned minAbundance, const std::vector<std::vector<unsigned>> &scanStarts = { },
                               const std::vector<std::vector<unsigned>> &scanEnds = { })
 {
-    SpectrumIMS sumSpec;
-    ThreadExceptionHandler exHandler;
-    const std::vector<unsigned> emptyScanRange;
-
+    if (frameIDs.empty())
+        return SpectrumIMS();
+        
+    const auto frames = getTIMSFrames(TDH, frameIDs, preFilterParams, topMost, -1.0, false, false, scanStarts, scanEnds);
+    std::vector<SpectrumIMS> collapsedSpectra(frameIDs.size());
+    
     // UNDONE: make num_threads configurable
     #pragma omp parallel num_threads(8)
     {
-        auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
-        SpectrumIMS threadSumSpec;
-    
-        #pragma omp for nowait
+        #pragma omp for
         for (size_t i=0; i<frameIDs.size(); ++i)
-        {
-            exHandler.run([&]
-            {
-                const auto fri = frameIDs[i];
-                if (!TDH.has_frame(fri))
-                    return;
-                const IMSFrame fr = getIMSFrame(TDH.get_frame(fri), TBuffers, preFilterParams,
-                                                (scanStarts.empty()) ? emptyScanRange : scanStarts[i],
-                                                (scanEnds.empty()) ? emptyScanRange : scanEnds[i],
-                                                topMost);
-                threadSumSpec.addData(collapseIMSFrame(flattenFrame(fr), method, window, minAbundance));
-            });
-        }
-        
-        #pragma omp critical
-        {
-            sumSpec.addData(threadSumSpec);
-        }
+            collapsedSpectra[i] = collapseIMSFrame(flattenSpectra(frames[i].getSpectra()), method, window, minAbundance));
     }
-    exHandler.reThrow();
     
     // collapse result
-    if (!sumSpec.empty())
-    {
-        sumSpec = collapseIMSFrame(sumSpec, method, window, minAbundance);
-        // average intensities
-        for (auto &inten : sumSpec.intensities)
-            inten /= frameIDs.size();
-        sumSpec = filterSpectrum(sumSpec, postFilterParams);
-    }
+    SpectrumIMS ret = collapseIMSFrame(flattenSpectra(collapsedSpectra), method, window, minAbundance);
+    // average intensities
+    for (auto &inten : ret.intensities)
+        inten /= frameIDs.size();
     
-    return sumSpec;
+    ret = filterSpectrum(ret, postFilterParams);
+    
+    return ret;
 }
 
 using EIX = std::pair<std::vector<double>, std::vector<unsigned>>; // used for EIC/EIM data
@@ -486,8 +479,8 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
         scanEnds = Rcpp::as<std::vector<unsigned>>(scanEndsN);
 
     auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
-    auto frame = getIMSFrame(TDH.get_frame(frameID), TBuffers, filterP, topMost, precursorMZ, onlyWithPrecursor,
-                             false, scanStarts, scanEnds);
+    auto frame = getIMSFrame(TDH.get_frame(frameID), TBuffers, filterP, SpectrumScanRanges(scanStarts, scanEnds),
+                             topMost, precursorMZ, onlyWithPrecursor, false);
     const auto flsp = flattenSpectra(frame.getSpectra());
     const auto spec = (flatten) ? flsp : collapseIMSFrame(fpsp, clustMethodFromStr(method), mzWindow, minAbundance);
     
@@ -574,7 +567,8 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                 auto &fr = TDH.get_frame(frameIDs[i]);
                 if (fr.msms_type != 0)
                     return; // UNDONE: needed?
-                const IMSFrame frame = getIMSFrame(fr, TBuffers, SpectrumFilterParams(), 0, -1.0, false, false);
+                const IMSFrame frame = getIMSFrame(fr, TBuffers, SpectrumFilterParams(), SpectrumScanRanges(), 0, -1.0,
+                                                   false, false);
                 const auto &mobs = frame.getMobilities();
 
                 for (size_t j = 0; j < EICs.size(); ++j)

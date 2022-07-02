@@ -312,12 +312,13 @@ SpectrumIMS flattenSpectra(const std::vector<SpectrumIMS> &spectra)
     return ret;
 }
 
-SpectrumIMS averageSpectra(const SpectrumIMS &flattenedSpecs, clusterMethod method, double window,
+SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMethod method, double window,
                            bool averageIntensities, unsigned minIntensity, unsigned minAbundance)
 {
-    if (flattenedSpecs.empty())
-        return flattenedSpecs;
+    if (spectra.empty())
+        return SpectrumIMS();
 
+    const auto flattenedSpecs = flattenSpectra(spectra);
     const std::vector<int> clusts = clusterNums(flattenedSpecs.mzs, method, window);
     const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
     SpectrumIMS binnedSpectrum(maxClust + 1);
@@ -344,7 +345,7 @@ SpectrumIMS averageSpectra(const SpectrumIMS &flattenedSpecs, clusterMethod meth
         binnedSpectrum.mzs[i] /= inten;
         binnedSpectrum.mobilities[i] /= inten;
         if (averageIntensities)
-            binnedSpectrum.intensities[i] /= flattenedSpecs.size();
+            binnedSpectrum.intensities[i] /= spectra.size();
     }
 
     // Rcpp::Rcout << "binnedSpectrum: " << binnedSpectrum.size() << "\n";
@@ -425,9 +426,8 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
     
     auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
     const auto frame = getIMSFrame(TDH.get_frame(frameID), TBuffers, filterP, precursorMZ, onlyWithPrecursor, true);
-    const auto flsp = flattenSpectra(frame.getSpectra());
-    const auto spec = (flatten) ? flsp :
-        averageSpectra(flsp, clustMethodFromStr(method), mzWindow, false, minIntensityPost, minAbundance);
+    const auto spec = (flatten) ? flattenSpectra(frame.getSpectra()) :
+        averageSpectra(frame.getSpectra(), clustMethodFromStr(method), mzWindow, false, minIntensityPost, minAbundance);
     
     return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
                                    Rcpp::Named("mz") = spec.mzs,
@@ -438,8 +438,9 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
 // [[Rcpp::export]]
 Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                             const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
-                            const std::string &method, double mzWindow, unsigned minAbundance = 1, unsigned topMost = 0,
-                            unsigned minIntensityPre = 0, unsigned minIntensityPost = 0, unsigned minIntensityFinal = 0,
+                            const std::vector<double> precursorMZs, const std::string &method, double mzWindow,
+                            unsigned minAbundance = 1, unsigned topMost = 0, unsigned minIntensityPre = 0,
+                            unsigned minIntensityPost = 0, unsigned minIntensityFinal = 0,
                             Rcpp::Nullable<Rcpp::List> scanStartsListN = R_NilValue,
                             Rcpp::Nullable<Rcpp::List> scanEndsListN = R_NilValue)
 {
@@ -473,7 +474,7 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                                              Rcpp::as<std::vector<unsigned>>(scanEndsItem[j]));
         }
 
-        const auto frames = getTIMSFrames(TDH, frameIDs, mainFilterP, preFilterPs, -1.0, false, true);
+        const auto frames = getTIMSFrames(TDH, frameIDs, mainFilterP, preFilterPs, precursorMZs[i], true, true);
         std::vector<SpectrumIMS> collapsedSpectra(frameIDs.size());
         
         // UNDONE: make num_threads configurable
@@ -481,13 +482,12 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
         {
             #pragma omp for
             for (size_t j=0; j<frameIDs.size(); ++j)
-                collapsedSpectra[j] = averageSpectra(flattenSpectra(frames[j].getSpectra()), clMethod, mzWindow,
-                                                     false, minIntensityPost, minAbundance);
+                collapsedSpectra[j] = averageSpectra(frames[j].getSpectra(), clMethod, mzWindow, false,
+                                                     minIntensityPost, minAbundance);
         }
 
         // collapse result
-        peakLists[i] = averageSpectra(flattenSpectra(collapsedSpectra), clMethod, mzWindow, true, minIntensityFinal,
-                                      minAbundance);
+        peakLists[i] = averageSpectra(collapsedSpectra, clMethod, mzWindow, true, minIntensityFinal, minAbundance);
     }
 
     Rcpp::List ret(peakLists.size());
@@ -656,8 +656,8 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
             {
                 auto &fr = TDH.get_frame(frameIDs[i]);
                 const auto frame = getIMSFrame(fr, TBuffers, filterP);
-                spectra[i] = averageSpectra(flattenSpectra(frame.getSpectra()), clMethod, mzWindow, false,
-                                            minIntensityPost, minAbundance);
+                spectra[i] = averageSpectra(frame.getSpectra(), clMethod, mzWindow, false, minIntensityPost,
+                                            minAbundance);
             });
         }
     }

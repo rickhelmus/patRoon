@@ -304,51 +304,6 @@ std::vector<IMSFrame> getTIMSFrames(TimsDataHandle &TDH, const std::vector<unsig
     return ret;
 }
 
-
-SpectrumIMS filterSpectrum(const SpectrumIMS &spec, const SpectrumFilterParams &params)
-{
-    if (params.unset())
-        return spec;
-    
-    SpectrumIMS specFiltered;
-    for (size_t i=0; i<spec.size(); ++i)
-    {
-        if (params.mzRange.first != 0.0 && spec.mzs[i] < params.mzRange.first)
-            continue;
-        if (params.mzRange.second != 0.0 && spec.mzs[i] > params.mzRange.second)
-            continue;
-        if (params.mobilityRange.first != 0.0 && spec.mobilities[i] < params.mobilityRange.first)
-            continue;
-        if (params.mobilityRange.second != 0.0 && spec.mobilities[i] > params.mobilityRange.second)
-            continue;
-        if (params.minIntensity != 0 && spec.intensities[i] < params.minIntensity)
-            continue;
-        
-        specFiltered.addData(spec.IDs[i], spec.mzs[i], spec.intensities[i], spec.mobilities[i]);
-    }
-    
-    return specFiltered;
-}
-
-SpectrumIMS subsetSpectrum(const SpectrumIMS &spec, const std::vector<unsigned> &scanStarts,
-                           const std::vector<unsigned> &scanEnds)
-{
-    SpectrumIMS specFiltered;
-    for (size_t i=0; i<spec.size(); ++i)
-    {
-        for (size_t j=0; j<scanStarts.size(); ++j)
-        {
-            if (spec.IDs[i] >= scanStarts[j] && spec.IDs[i] <= scanEnds[j])
-            {
-                specFiltered.addData(spec.IDs[i], spec.mzs[i], spec.intensities[i], spec.mobilities[i]);
-                break;
-            }
-        }
-    }
-    
-    return specFiltered;
-}
-
 SpectrumIMS flattenSpectra(const std::vector<SpectrumIMS> &spectra)
 {
     SpectrumIMS ret;
@@ -412,39 +367,6 @@ SpectrumIMS collapseIMSFrame(const SpectrumIMS &flattenedSpecs, clusterMethod me
 
     return sortedSpectrum;
 }
-
-#if 0
-SpectrumIMS collapseIMSFrames(TimsDataHandle &TDH, const std::vector<unsigned> &frameIDs,
-                              const SpectrumFilterParams &preFilterParams, const SpectrumFilterParams &postFilterParams,
-                              unsigned topMost, clusterMethod method, double window,
-                              unsigned minAbundance, const std::vector<std::vector<unsigned>> &scanStarts = { },
-                              const std::vector<std::vector<unsigned>> &scanEnds = { })
-{
-    if (frameIDs.empty())
-        return SpectrumIMS();
-        
-    const auto frames = getTIMSFrames(TDH, frameIDs, preFilterParams, topMost, -1.0, false, false, scanStarts, scanEnds);
-    std::vector<SpectrumIMS> collapsedSpectra(frameIDs.size());
-    
-    // UNDONE: make num_threads configurable
-    #pragma omp parallel num_threads(8)
-    {
-        #pragma omp for
-        for (size_t i=0; i<frameIDs.size(); ++i)
-            collapsedSpectra[i] = collapseIMSFrame(flattenSpectra(frames[i].getSpectra()), method, window, minAbundance));
-    }
-    
-    // collapse result
-    SpectrumIMS ret = collapseIMSFrame(flattenSpectra(collapsedSpectra), method, window, minAbundance);
-    // average intensities
-    for (auto &inten : ret.intensities)
-        inten /= frameIDs.size();
-    
-    ret = filterSpectrum(ret, postFilterParams);
-    
-    return ret;
-}
-#endif
 
 using EIX = std::pair<std::vector<double>, std::vector<unsigned>>; // used for EIC/EIM data
 

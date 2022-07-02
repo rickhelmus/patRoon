@@ -634,11 +634,13 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
                                double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensityPre,
                                unsigned minIntensityPost)
 {
-#if 0
     TimsDataHandle TDH(file);
     const auto clMethod = clustMethodFromStr(method);
-    const SpectrumFilterParams filterPre(minIntensityPre, mzStart, mzEnd, mobilityStart, mobilityEnd);
-    const SpectrumFilterParams filterPost(minIntensityPost, 0.0, 0.0, 0.0, 0.0);
+    const auto filterP = SpectrumFilterParams().
+        setMinIntensity(minIntensityPre).
+        setMZRange(mzStart, mzEnd).
+        setMobilityRange(mobilityStart, mobilityEnd).
+        setTopMost(topMost);
 
     std::vector<SpectrumIMS> spectra(frameIDs.size());
     ThreadExceptionHandler exHandler;
@@ -653,11 +655,9 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
             exHandler.run([&]
             {
                 auto &fr = TDH.get_frame(frameIDs[i]);
-                SpectrumIMS spec = getIMSFrame(fr, TBuffers);
-                spec = filterSpectrum(spec, filterPre);
-                spec = spectrumTopMost(spec, topMost);
-                spectra[i] = filterSpectrum(collapseIMSFrame(spec, clMethod, clusterDataType::MZ, mzWindow, minAbundance),
-                                            filterPost);
+                const auto frame = getIMSFrame(fr, TBuffers, filterP);
+                spectra[i] = collapseIMSFrame(flattenSpectra(frame.getSpectra()), clMethod, mzWindow, false,
+                                              minIntensityPost, minAbundance);
             });
         }
     }
@@ -674,5 +674,4 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
         ret[i] = m;
     }
     return ret;
-#endif
 }

@@ -166,8 +166,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getTIMSPeakLists
-Rcpp::List getTIMSPeakLists(const std::string& file, Rcpp::List frameIDsList, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, const std::string& method, double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensityPre, unsigned minIntensityPost, unsigned minIntensityFinal, Rcpp::Nullable<Rcpp::List> scanStartsListN, Rcpp::Nullable<Rcpp::List> scanEndsListN);
-RcppExport SEXP _patRoon_getTIMSPeakLists(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP, SEXP minIntensityFinalSEXP, SEXP scanStartsListNSEXP, SEXP scanEndsListNSEXP) {
+Rcpp::List getTIMSPeakLists(const std::string& file, Rcpp::List frameIDsList, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, const std::vector<double> precursorMZs, const std::string& method, double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensityPre, unsigned minIntensityPost, unsigned minIntensityFinal, Rcpp::Nullable<Rcpp::List> scanStartsListN, Rcpp::Nullable<Rcpp::List> scanEndsListN);
+RcppExport SEXP _patRoon_getTIMSPeakLists(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP precursorMZsSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP, SEXP minIntensityFinalSEXP, SEXP scanStartsListNSEXP, SEXP scanEndsListNSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -175,6 +175,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type frameIDsList(frameIDsListSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityStarts(mobilityStartsSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityEnds(mobilityEndsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double> >::type precursorMZs(precursorMZsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minAbundance(minAbundanceSEXP);
@@ -184,7 +185,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned >::type minIntensityFinal(minIntensityFinalSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::List> >::type scanStartsListN(scanStartsListNSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::List> >::type scanEndsListN(scanEndsListNSEXP);
-    rcpp_result_gen = Rcpp::wrap(getTIMSPeakLists(file, frameIDsList, mobilityStarts, mobilityEnds, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, minIntensityFinal, scanStartsListN, scanEndsListN));
+    rcpp_result_gen = Rcpp::wrap(getTIMSPeakLists(file, frameIDsList, mobilityStarts, mobilityEnds, precursorMZs, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, minIntensityFinal, scanStartsListN, scanEndsListN));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -342,7 +343,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
-    {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 13},
+    {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 14},
     {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
     {"_patRoon_getTIMSMobilogram", (DL_FUNC) &_patRoon_getTIMSMobilogram, 8},
     {"_patRoon_collapseTIMSSpectra", (DL_FUNC) &_patRoon_collapseTIMSSpectra, 12},

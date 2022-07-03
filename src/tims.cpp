@@ -447,7 +447,7 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
     
     for (int i=0; i<count; ++i)
     {
-        auto mainFilterP = SpectrumFilterParams().setMinIntensity(minIntensityPre);
+        auto mainFilterP = SpectrumFilterParams().setMinIntensity(minIntensityPre).setTopMost(topMost);
         if (filterMobs)
             mainFilterP.setMobilityRange(mobStarts[i], mobEnds[i]);
         const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);

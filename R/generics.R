@@ -153,6 +153,9 @@ setGeneric("generateMSPeakListsDA", function(fGroups, ...) standardGeneric("gene
 #' @rdname generateMSPeakListsDAFMF
 setGeneric("generateMSPeakListsDAFMF", function(fGroups, ...) standardGeneric("generateMSPeakListsDAFMF"))
 
+#' @rdname generateMSPeakListsTIMS
+setGeneric("generateMSPeakListsTIMS", function(fGroups, ...) standardGeneric("generateMSPeakListsTIMS"))
+
 ### Components
 
 #' @rdname components-class

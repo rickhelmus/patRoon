@@ -251,6 +251,7 @@ Collate:
     'utils-mzr.R'
     'mspeaklists-mzr.R'
     'mspeaklists-set.R'
+    'mspeaklists-tims.R'
     'multi-process-classic.R'
     'multi-process-future.R'
     'multi-process.R'

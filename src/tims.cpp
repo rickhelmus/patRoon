@@ -416,10 +416,11 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
 
 // [[Rcpp::export]]
 Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
-                            const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
                             const std::vector<double> precursorMZs, bool onlyWithPrecursor,
                             const std::string &method, double mzWindow, unsigned minAbundance = 1, unsigned topMost = 0,
                             unsigned minIntensityPre = 0, unsigned minIntensityPost = 0, unsigned minIntensityFinal = 0,
+                            Rcpp::Nullable<Rcpp::NumericVector> mobilityStartsN = R_NilValue,
+                            Rcpp::Nullable<Rcpp::NumericVector> mobilityEndsN = R_NilValue,
                             Rcpp::Nullable<Rcpp::List> scanStartsListN = R_NilValue,
                             Rcpp::Nullable<Rcpp::List> scanEndsListN = R_NilValue)
 {
@@ -429,6 +430,13 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
     const auto clMethod = clustMethodFromStr(method);
     const auto postFilter = SpectrumFilterParams().setMinIntensity(minIntensityPost);
 
+    const bool filterMobs = mobilityStartsN.isUsable() && mobilityEndsN.isUsable();
+    Rcpp::NumericVector mobStarts, mobEnds;
+    if (filterMobs)
+    {
+        mobStarts = mobilityStartsN;
+        mobEnds = mobilityEndsN;
+    }
     const bool subScans = scanStartsListN.isUsable() && scanEndsListN.isUsable();
     Rcpp::List scanStartsList, scanEndsList;
     if (subScans)
@@ -439,9 +447,9 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
     
     for (int i=0; i<count; ++i)
     {
-        const auto mainFilterP = SpectrumFilterParams().
-            setMinIntensity(minIntensityPre).
-            setMobilityRange(mobilityStarts[i], mobilityEnds[i]);
+        auto mainFilterP = SpectrumFilterParams().setMinIntensity(minIntensityPre);
+        if (filterMobs)
+            mainFilterP.setMobilityRange(mobStarts[i], mobEnds[i]);
         const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);
         std::vector<SpectrumFilterParams> preFilterPs((subScans) ? frameIDs.size() : 0);
         

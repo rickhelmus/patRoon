@@ -45,8 +45,8 @@ collapseTIMSFrame <- function(file, frameID, method, mzWindow, mzStart = 0.0, mz
     .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, mzStart, mzEnd, mobilityStart, mobilityEnd, minAbundance, topMost, minIntensity, minIntensityPost, scanStartsN, scanEndsN, precursorMZ, onlyWithPrecursor, flatten)
 }
 
-getTIMSPeakLists <- function(file, frameIDsList, mobilityStarts, mobilityEnds, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L, minIntensityFinal = 0L, scanStartsListN = NULL, scanEndsListN = NULL) {
-    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, mobilityStarts, mobilityEnds, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, minIntensityFinal, scanStartsListN, scanEndsListN)
+getTIMSPeakLists <- function(file, frameIDsList, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L, minIntensityFinal = 0L, mobilityStartsN = NULL, mobilityEndsN = NULL, scanStartsListN = NULL, scanEndsListN = NULL) {
+    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, minIntensityFinal, mobilityStartsN, mobilityEndsN, scanStartsListN, scanEndsListN)
 }
 
 getTIMSEIC <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds) {

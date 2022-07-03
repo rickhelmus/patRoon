@@ -2,8 +2,23 @@
 #' @include mspeaklists.R
 NULL
 
+# UNDONE: merge with regular function
+getDefAvgPListParamsTIMS <- function(...)
+{
+    def <- list(clusterMzWindow = 0.01,
+                topMost = 50,
+                minIntensityPre = 50,
+                minIntensityPost = 500,
+                minIntensityFinal = 500,
+                minAbundance = 2,
+                method = "dist",
+                pruneMissingPrecursorMS = TRUE,
+                retainPrecursorMSMS = TRUE)
+    return(modifyList(def, list(...)))
+}
+
 setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtWindow = 5, topMost = NULL,
-                                                               avgFeatParams = getDefAvgPListParams(),
+                                                               avgFeatParams = getDefAvgPListParamsTIMS(),
                                                                avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()

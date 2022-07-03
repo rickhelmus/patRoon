@@ -2,19 +2,11 @@
 
 ## IMS
 
-- Disable opentims threading when using OpenMP?
-- Function to set thread count used by patRoon and opentims
-- Mark precursor, make sure it's not filtered away
-- test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
+- MT
+    - Disable opentims threading when using OpenMP?
+    - Function to set thread count used by patRoon and opentims
+    - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - get tims dll from options()
-- IMSFrame
-    - use deque instead of vector to store spectra?
-    - remove mobility from spectrum table? Or set as metadata? (latter would also work for other IMS formats)
-    - change mobilogram generation
-        - first calculate tot intensity for all spectra in a frame
-        - cluster IMS values of each frame
-        - output is averaged IMS data per cluster + sum intensities
-- get rid of spectrum IDs? Doesn't seem necessary anymore
 
 ## Ext
 

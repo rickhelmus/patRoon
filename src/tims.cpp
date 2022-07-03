@@ -438,9 +438,9 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
 // [[Rcpp::export]]
 Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                             const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
-                            const std::vector<double> precursorMZs, const std::string &method, double mzWindow,
-                            unsigned minAbundance = 1, unsigned topMost = 0, unsigned minIntensityPre = 0,
-                            unsigned minIntensityPost = 0, unsigned minIntensityFinal = 0,
+                            const std::vector<double> precursorMZs, bool onlyWithPrecursor,
+                            const std::string &method, double mzWindow, unsigned minAbundance = 1, unsigned topMost = 0,
+                            unsigned minIntensityPre = 0, unsigned minIntensityPost = 0, unsigned minIntensityFinal = 0,
                             Rcpp::Nullable<Rcpp::List> scanStartsListN = R_NilValue,
                             Rcpp::Nullable<Rcpp::List> scanEndsListN = R_NilValue)
 {
@@ -474,7 +474,8 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                                              Rcpp::as<std::vector<unsigned>>(scanEndsItem[j]));
         }
 
-        const auto frames = getTIMSFrames(TDH, frameIDs, mainFilterP, preFilterPs, precursorMZs[i], true, true);
+        const auto frames = getTIMSFrames(TDH, frameIDs, mainFilterP, preFilterPs, precursorMZs[i], onlyWithPrecursor,
+                                          true);
         std::vector<SpectrumIMS> collapsedSpectra(frameIDs.size());
         
         // UNDONE: make num_threads configurable

@@ -15,48 +15,34 @@ namespace {
 
 struct SpectrumIMS // UNDONE: merge with other struct(s)
 {
-    // NOTE: IDs is scan ID for frame data or unique peak identifier for (collapsed) spectra
-    std::vector<uint32_t> IDs, intensities;
-    std::vector<double> mzs, mobilities;
+    std::vector<double> mzs;
+    std::vector<unsigned> intensities;
     
-    SpectrumIMS(size_t size) : IDs(size), intensities(size), mzs(size), mobilities(size) { }
+    SpectrumIMS(size_t size) : mzs(size), intensities(size) { }
     SpectrumIMS() = default;
     
-    void addData(unsigned id, double mz, unsigned inten, double mob)
+    void addData(double mz, unsigned inten)
     {
-        IDs.push_back(id);
         mzs.push_back(mz);
         intensities.push_back(inten);
-        mobilities.push_back(mob);
-    }
-    void addData(double mz, unsigned inten, double mob)
-    {
-        addData(IDs.size(), mz, inten, mob);
     }
     void addData(const SpectrumIMS &sp)
     {
-        IDs.insert(IDs.end(), sp.IDs.begin(), sp.IDs.end());
         mzs.insert(mzs.end(), sp.mzs.begin(), sp.mzs.end());
         intensities.insert(intensities.end(), sp.intensities.begin(), sp.intensities.end());
-        mobilities.insert(mobilities.end(), sp.mobilities.begin(), sp.mobilities.end());
     }
-    void setData(size_t i, unsigned id, double mz, unsigned inten, double mob)
-    { IDs[i] = id; mzs[i] = mz; intensities[i] = inten; mobilities[i] = mob; }
+    void setData(size_t i, double mz, unsigned inten) { mzs[i] = mz; intensities[i] = inten; }
     void resize(size_t s)
     {
-        IDs.resize(s);
         mzs.resize(s);
         intensities.resize(s);
-        mobilities.resize(s);
     }
-    size_t size(void) const { return IDs.size(); }
-    bool empty(void) const {return IDs.empty(); }
+    size_t size(void) const { return mzs.size(); }
+    bool empty(void) const {return mzs.empty(); }
     void clear(void)
     {
-        IDs.clear();
-        intensities.clear();
         mzs.clear();
-        mobilities.clear();
+        intensities.clear();
     }
 };
 
@@ -140,7 +126,7 @@ SpectrumIMS spectrumTopMost(const SpectrumIMS &spec, unsigned topMost, double pr
     for (size_t i=0; i<topMost; ++i)
     {
         const auto j = inds[(inds.size()-1) - i];
-        specFiltered.setData(i, spec.IDs[j], spec.mzs[j], spec.intensities[j], spec.mobilities[j]);
+        specFiltered.setData(i, spec.mzs[j], spec.intensities[j]);
     }
 
     if (precursorMZ != 0.0) // make sure precursor is also in there
@@ -160,7 +146,7 @@ SpectrumIMS spectrumTopMost(const SpectrumIMS &spec, unsigned topMost, double pr
         if (closestDiff >= 0.0) // found precursor?
         {
             if (std::find(std::next(inds.cbegin(), inds.size() - topMost), inds.cend(), closestInd) == inds.cend())
-                specFiltered.addData(spec.mzs[closestInd], spec.intensities[closestInd], spec.mobilities[closestInd]);
+                specFiltered.addData(spec.mzs[closestInd], spec.intensities[closestInd]);
         }
     }
 
@@ -263,7 +249,7 @@ IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const 
         if (filtParams.minIntensity != 0 && intensities[i] < filtParams.minIntensity)
             continue;
         
-        curSpec.addData(mzs[i], intensities[i], mobilities[i]);
+        curSpec.addData(mzs[i], intensities[i]);
     }
 
     return ret;
@@ -331,9 +317,7 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
     for (size_t i=0; i<clusts.size(); ++i)
     {
         const size_t cl = clusts[i];
-        const double inten = static_cast<double>(flattenedSpecs.intensities[i]);
-        binnedSpectrum.mzs[cl] += (flattenedSpecs.mzs[i] * inten);
-        binnedSpectrum.mobilities[cl] += (flattenedSpecs.mobilities[i] * inten);
+        binnedSpectrum.mzs[cl] += (flattenedSpecs.mzs[i] * static_cast<double>(flattenedSpecs.intensities[i]));
         binnedSpectrum.intensities[cl] += flattenedSpecs.intensities[i];
         ++binSizes[cl];
     }
@@ -341,9 +325,7 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
     // average data
     for (size_t i=0; i<binnedSpectrum.size(); ++i)
     {
-        const double inten = static_cast<double>(binnedSpectrum.intensities[i]);
-        binnedSpectrum.mzs[i] /= inten;
-        binnedSpectrum.mobilities[i] /= inten;
+        binnedSpectrum.mzs[i] /= static_cast<double>(binnedSpectrum.intensities[i]);
         if (averageIntensities)
             binnedSpectrum.intensities[i] /= spectra.size();
     }
@@ -360,8 +342,7 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
             continue;
         if (binSizes[j] < minAbundance)
             continue;
-        sortedSpectrum.addData(i+1, binnedSpectrum.mzs[j], binnedSpectrum.intensities[j],
-                               binnedSpectrum.mobilities[j]);
+        sortedSpectrum.addData(binnedSpectrum.mzs[j], binnedSpectrum.intensities[j]);
     }
     
     // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
@@ -429,10 +410,8 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
     const auto spec = (flatten) ? flattenSpectra(frame.getSpectra()) :
         averageSpectra(frame.getSpectra(), clustMethodFromStr(method), mzWindow, false, minIntensityPost, minAbundance);
     
-    return Rcpp::DataFrame::create(Rcpp::Named("ID") = spec.IDs,
-                                   Rcpp::Named("mz") = spec.mzs,
-                                   Rcpp::Named("intensity") = spec.intensities,
-                                   Rcpp::Named("mobility") = spec.mobilities);
+    return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.mzs,
+                                   Rcpp::Named("intensity") = spec.intensities);
 }
 
 // [[Rcpp::export]]
@@ -493,10 +472,8 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
 
     Rcpp::List ret(peakLists.size());
     for (size_t i=0; i<peakLists.size(); ++i)
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("ID") = peakLists[i].IDs,
-                                         Rcpp::Named("mz") = peakLists[i].mzs,
-                                         Rcpp::Named("intensity") = peakLists[i].intensities,
-                                         Rcpp::Named("mobility") = peakLists[i].mobilities);
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = peakLists[i].mzs,
+                                         Rcpp::Named("intensity") = peakLists[i].intensities);
     return ret;
 }
 

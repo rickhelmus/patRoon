@@ -178,7 +178,7 @@ auto getTIMSDecompBuffers(size_t size)
 using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
 
 IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const SpectrumFilterParams &filtParams = {},
-                     double precursorMZ = -1.0, bool onlyWithPrecursor = false, bool pruneEmptySpectra = true)
+                     double precursorMZ = 0.0, bool onlyWithPrecursor = false, bool pruneEmptySpectra = true)
 
 {
     if (tframe.num_peaks == 0)
@@ -210,7 +210,7 @@ IMSFrame getIMSFrame(TimsFrame &tframe, const TIMSDecompBufferPair &bufs, const 
         if (i >= len || curScanID != IDs[i])
         {
             bool doAddSpec = !curSpec.empty();
-            if (doAddSpec && onlyWithPrecursor && precursorMZ >= 0.0)
+            if (doAddSpec && onlyWithPrecursor && precursorMZ != 0.0)
                 doAddSpec = std::any_of(curSpec.mzs.begin(), curSpec.mzs.end(), [&](double mz)
                                     { return compareTol(mz, precursorMZ, 0.01); });
             if (doAddSpec && filtParams.topMost != 0)
@@ -522,7 +522,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
                 auto &fr = TDH.get_frame(frameIDs[i]);
                 if (fr.msms_type != 0)
                     return; // UNDONE: needed?
-                const IMSFrame frame = getIMSFrame(fr, TBuffers, SpectrumFilterParams(), -1.0, false, false);
+                const IMSFrame frame = getIMSFrame(fr, TBuffers, SpectrumFilterParams(), 0.0, false, false);
                 const auto &mobs = frame.getMobilities();
 
                 for (size_t j = 0; j < EICs.size(); ++j)
@@ -585,7 +585,7 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
         const auto frameIDs = Rcpp::as<std::vector<unsigned>>(frameIDsList[i]);
         const auto filterP = SpectrumFilterParams().setMinIntensity(minIntensity).setMZRange(mzStarts[i], mzEnds[i]);
         const auto frames = getTIMSFrames(TDH, frameIDs, filterP, std::vector<SpectrumFilterParams>(),
-                                          -1.0, false, false);
+                                          0.0, false, false);
 
         EIX flatEIM;
         for (size_t j = 0; j < frames.size(); ++j)

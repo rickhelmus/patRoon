@@ -305,6 +305,9 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
         return SpectrumIMS();
 
     const auto flattenedSpecs = flattenSpectra(spectra);
+    if (flattenedSpecs.empty()) // all spectra are empty
+        return flattenedSpecs;
+    
     const std::vector<int> clusts = clusterNums(flattenedSpecs.mzs, method, window);
     const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
     SpectrumIMS binnedSpectrum(maxClust + 1);

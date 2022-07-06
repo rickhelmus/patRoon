@@ -11,7 +11,7 @@ getDefAvgPListParamsTIMS <- function(...)
                 minIntensityPost = 500,
                 minIntensityFinal = 500,
                 minAbundance = 2,
-                method = "dist",
+                method = "diff",
                 pruneMissingPrecursorMS = TRUE,
                 retainPrecursorMSMS = TRUE)
     return(modifyList(def, list(...)))

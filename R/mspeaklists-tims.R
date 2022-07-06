@@ -54,9 +54,6 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
     avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
 
-    # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
-    plists <- list()
-
     # UNDONE: make filter?
     if (!is.null(topMost) && topMost < anaCount)
     {
@@ -70,7 +67,9 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     printf("Loading all MS peak lists for %d feature groups in %d analyses...\n", gCount, anaCount)
     prog <- openProgBar(0, anaCount)
     
-    for (anai in seq_len(anaCount))
+    # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
+    
+    plists <- lapply(seq_len(anaCount), function(anai)
     {
         ana <- anaInfo$analysis[anai]
         fp <- getBrukerAnalysisPath(ana, anaInfo$path[anai]) # UNDONE: streamline this function mz(X)ML versions (also for DA algos)
@@ -85,8 +84,11 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
         baseHash <- makeHash(ana, maxMSRtWindow, topMost, avgFeatParams)
         
         fTableAna <- copy(fTable[[ana]])
-        fTableAna[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTableAna))]
-        fTableAna[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTableAna))]
+        if (!is.null(maxMSRtWindow))
+        {
+            fTableAna[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTableAna))]
+            fTableAna[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTableAna))]
+        }
         fTableAna[, frameIDsMS := list(list(framesMS[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
         
         # UNDONE: more args, currently missing in PListParams
@@ -99,25 +101,63 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
                                    topMost = avgFeatParamsMS$topMost,
                                    mzWindow = avgFeatParamsMS$clusterMzWindow,
                                    minAbundance = avgFeatParamsMS$minAbundance)
-        names(mspl) <- fTableAna$group
+        names(msplMS) <- fTableAna$group
+        msplMS <- lapply(msplMS, as.data.table)
+        msplMS <- Map(msplMS, fTableAna$mz, f = assignPrecursorToMSPeakList)
+        mspl <- sapply(msplMS, function(x) list(MS = x), simplify = FALSE)  # move to MS sub fields
         
         if (nrow(pasefInfo) > 0)
         {
-            fTableAna[, frameIDsMSMS := {
+            fTableAna[, c("frameIDsMSMS", "scanStarts", "scanEnds") := {
                 # UNDONE: window needs to be halved?
-                framesPASEF <- pasefInfo[mz %between% ((IsolationMz + c(-IsolationWidth, IsolationWidth))/2)]$Frame
-                intersect(framesPASEF, framesMS[[1]])
+                pinf <- pasefInfo[numGTE(mz, IsolationMz - (IsolationWidth/2)) &
+                                      numLTE(mz, IsolationMz + (IsolationWidth/2))]
+                pinf <- pinf[Frame %in% frames[Time %between% c(retmin, retmax)]$Id]
+                
+                # NOTE: lots of nested lists to store list data in DTs...
+                list(
+                    list(pinf$Frame), # relevant MS/MS frame IDs
+                    list(pinf[, list(list(ScanNumBegin)), by = Frame][[2]]), # scanStarts/frame
+                    list(pinf[, list(list(ScanNumEnd)), by = Frame][[2]]) # scanEnds/frame
+                )
             }, by = seq_len(nrow(fTableAna))]
             fTableAnaMSMS <- fTableAna[lengths(frameIDsMSMS) > 0]
+
+            msplMSMS <- getTIMSPeakLists(fp, fTableAnaMSMS$frameIDsMSMS, precursorMZs = fTableAnaMSMS$mz,
+                                         minIntensityPre = avgFeatParamsMSMS$minIntensityPre,
+                                         minIntensityPost = avgFeatParamsMSMS$minIntensityPost,
+                                         minIntensityFinal = avgFeatParamsMSMS$minIntensityFinal,
+                                         onlyWithPrecursor = avgFeatParamsMSMS$pruneMissingPrecursor,
+                                         method = avgFeatParamsMSMS$method,
+                                         topMost = avgFeatParamsMSMS$topMost,
+                                         mzWindow = avgFeatParamsMSMS$clusterMzWindow,
+                                         minAbundance = avgFeatParamsMSMS$minAbundance,
+                                         scanStartsListN = fTableAnaMSMS$scanStarts,
+                                         scanEndsListN = fTableAnaMSMS$scanEnds)
+            names(msplMSMS) <- fTableAnaMSMS$group
+            msplMSMS <- lapply(msplMSMS, as.data.table)
+            msplMSMS <- Map(msplMSMS, fTableAnaMSMS$mz, f = assignPrecursorToMSPeakList)
+
+            # merge with MS data: combine data for overlapping fGroups
+            mspl <- sapply(union(names(mspl), names(msplMSMS)), function(fg) list(MS = mspl[[fg]]$MS,
+                                                                                  MSMS = msplMSMS[[fg]]),
+                           simplify = FALSE)
+            # add missing data
+            unFGMSMS <- setdiff(names(msplMSMS), names(mspl))
+            mspl[unFGMSMS] <- lapply(msplMSMS[unFGMSMS], function(x) list(MSMS = x))
         }
         
+        mspl <- mspl[intersect(gNames, names(mspl))] # sync fg order
+        
         setTxtProgressBar(prog, anai)
-    }
+        return(mspl)
+    })
+    names(plists) <- anaInfo$analysis
     
     close(prog)
 
-    if (is.null(cachedSet))
-        saveCacheSet("MSPeakListsTIMS", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
+    # if (is.null(cachedSet))
+    #     saveCacheSet("MSPeakListsTIMS", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
 
     return(MSPeakLists(peakLists = plists, metadata = list(), avgPeakListArgs = avgFGroupParams,
                        origFGNames = gNames, algorithm = "tims"))

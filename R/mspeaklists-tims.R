@@ -28,8 +28,6 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
 
-    # UNDONE: check validity input data
-    
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -45,7 +43,7 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
 
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
-    avgFeatParamsMS$retainPrecursor <- TRUE;
+    avgFeatParamsMS$retainPrecursor <- TRUE
     avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
     avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
     avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
@@ -107,7 +105,6 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
             
             fTableAna[, frameIDsMS := list(list(framesMS[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
             
-            # UNDONE: more args, currently missing in PListParams
             msplMS <- getTIMSPeakLists(fp, fTableAna$frameIDsMS, precursorMZs = fTableAna$mz,
                                        minIntensityPre = avgFeatParamsMS$minIntensityPre,
                                        minIntensityPost = avgFeatParamsMS$minIntensityPost,
@@ -118,13 +115,12 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
                                        mzWindow = avgFeatParamsMS$clusterMzWindow,
                                        minAbundance = avgFeatParamsMS$minAbundance)
             names(msplMS) <- fTableAna$group
-            msplMS <- lapply(msplMS, as.data.table)
+            msplMS <- lapply(msplMS, setDT)
             msplMS <- Map(msplMS, fTableAna$mz, f = assignPrecursorToMSPeakList)
             mspl <- sapply(msplMS, function(x) list(MS = x), simplify = FALSE)  # move to MS sub fields
             
             if (nrow(pasefInfo) > 0)
             {
-                # UNDONE: window needs to be halved?
                 pasefInfo[, c("isomz_min", "isomz_max") := .(IsolationMz - (IsolationWidth/2),
                                                              IsolationMz + (IsolationWidth/2))]
                 # reduce frame search range a bit to optimize below
@@ -165,7 +161,7 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
                                              scanStartsListN = fTableAnaMSMS$scanStarts,
                                              scanEndsListN = fTableAnaMSMS$scanEnds)
                 names(msplMSMS) <- fTableAnaMSMS$group
-                msplMSMS <- lapply(msplMSMS, as.data.table)
+                msplMSMS <- lapply(msplMSMS, setDT)
                 msplMSMS <- Map(msplMSMS, fTableAnaMSMS$mz, f = assignPrecursorToMSPeakList)
                 
                 # merge with MS data: combine data for overlapping fGroups

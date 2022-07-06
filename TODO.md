@@ -7,6 +7,10 @@
     - Function to set thread count used by patRoon and opentims
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - get tims dll from options()
+- MSPL
+    - tweak getDefAvgPListParamsTIMS(), possibly merge with getDefAvgPListParams() and make/use arg assertion
+    - Does the PASEF isolation window needs to be halved to find ranges?
+    - store metadata?
 
 ## Ext
 

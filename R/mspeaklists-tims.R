@@ -108,21 +108,35 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
         
         if (nrow(pasefInfo) > 0)
         {
-            fTableAna[, c("frameIDsMSMS", "scanStarts", "scanEnds") := {
-                # UNDONE: window needs to be halved?
-                pinf <- pasefInfo[numGTE(mz, IsolationMz - (IsolationWidth/2)) &
-                                      numLTE(mz, IsolationMz + (IsolationWidth/2))]
-                pinf <- pinf[Frame %in% frames[Time %between% c(retmin, retmax)]$Id]
-                
-                # NOTE: lots of nested lists to store list data in DTs...
-                list(
-                    list(pinf$Frame), # relevant MS/MS frame IDs
-                    list(pinf[, list(list(ScanNumBegin)), by = Frame][[2]]), # scanStarts/frame
-                    list(pinf[, list(list(ScanNumEnd)), by = Frame][[2]]) # scanEnds/frame
-                )
-            }, by = seq_len(nrow(fTableAna))]
-            fTableAnaMSMS <- fTableAna[lengths(frameIDsMSMS) > 0]
+            # UNDONE: window needs to be halved?
+            pasefInfo[, c("isomz_min", "isomz_max") := .(IsolationMz - (IsolationWidth/2),
+                                                         IsolationMz + (IsolationWidth/2))]
+            # reduce frame search range a bit to optimize below
+            framesMSMS <- frames[MsMsType != 0] # UNDONE: check how different types need to be supported
+            framesMSMS <- framesMSMS[Time %between% c(min(fTableAna$retmin), max(fTableAna$retmax))]
+            
+            # only consider PASEF frames of interest
+            pasefInfo <- pasefInfo[Frame %in% framesMSMS$Id & isomz_min < max(fTableAna$mz) & isomz_max > min(fTableAna$mz)]
+            pasefInfo[, retFrame := framesMSMS[match(Frame, Id)]$Time]
 
+            # split all relevant PASEF info rows for each feature, which makes further processing much faster
+            frameSubTabs <- Map(fTableAna$mz, fTableAna$retmin, fTableAna$retmax, f = function(m, rmin, rmax)
+            {
+                return(pasefInfo[retFrame %between% c(rmin, rmax) & numGTE(m, isomz_min) & numLTE(m, isomz_max)])
+            })
+            
+            fTableAna[, frameIDsMSMS := lapply(frameSubTabs, function(tab) unique(tab$Frame))]
+            
+            # omit without MSMS to speedup
+            withMSMS <- lengths(fTableAna$frameIDsMSMS) > 0
+            frameSubTabs <- frameSubTabs[withMSMS]
+            fTableAnaMSMS <- fTableAna[withMSMS]
+            
+            fTableAnaMSMS[, scanStarts := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumBegin)),
+                                                                                 by = "Frame"][[2]])]
+            fTableAnaMSMS[, scanEnds := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumEnd)),
+                                                                               by = "Frame"][[2]])]
+            
             msplMSMS <- getTIMSPeakLists(fp, fTableAnaMSMS$frameIDsMSMS, precursorMZs = fTableAnaMSMS$mz,
                                          minIntensityPre = avgFeatParamsMSMS$minIntensityPre,
                                          minIntensityPost = avgFeatParamsMSMS$minIntensityPost,

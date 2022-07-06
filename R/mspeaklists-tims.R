@@ -24,7 +24,7 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
-    assertAvgPListParams(avgFeatParams, add = ac)
+    # UNDONE: update assertAvgPListParams(avgFeatParams, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -77,25 +77,39 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
         
         TIMSDB <- openTIMSMetaDBScope(f = fp)
         frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
-        frames <- frames[MsMsType == 0]
+        framesMS <- frames[MsMsType == 0]
+        pasefInfo <- getTIMSMetaTable(TIMSDB, "PasefFrameMsMsInfo", c("Frame", "ScanNumBegin", "ScanNumEnd",
+                                                                      "IsolationMz", "isolationWidth"))
 
         # UNDONE: file hash? (also for DA)
         baseHash <- makeHash(ana, maxMSRtWindow, topMost, avgFeatParams)
+        
         fTableAna <- copy(fTable[[ana]])
         fTableAna[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTableAna))]
         fTableAna[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTableAna))]
-        fTableAna[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
+        fTableAna[, frameIDsMS := list(list(framesMS[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
         
         # UNDONE: more args, currently missing in PListParams
-        mspl <- getTIMSPeakLists(fp, fTableAna$frameIDs, precursorMZs = fTableAna$mz,
-                                 minIntensityPre = avgFeatParamsMS$minIntensityPre,
-                                 minIntensityPost = avgFeatParamsMS$minIntensityPost,
-                                 minIntensityFinal = avgFeatParamsMS$minIntensityPost, # UNDONE
-                                 onlyWithPrecursor = avgFeatParamsMS$pruneMissingPrecursor,
-                                 method = "diff", # UNDONE avgFeatParamsMS$method,
-                                 topMost = avgFeatParamsMS$topMost,
-                                 mzWindow = avgFeatParamsMS$clusterMzWindow)
+        msplMS <- getTIMSPeakLists(fp, fTableAna$frameIDsMS, precursorMZs = fTableAna$mz,
+                                   minIntensityPre = avgFeatParamsMS$minIntensityPre,
+                                   minIntensityPost = avgFeatParamsMS$minIntensityPost,
+                                   minIntensityFinal = avgFeatParamsMS$minIntensityFinal,
+                                   onlyWithPrecursor = avgFeatParamsMS$pruneMissingPrecursor,
+                                   method = avgFeatParamsMS$method,
+                                   topMost = avgFeatParamsMS$topMost,
+                                   mzWindow = avgFeatParamsMS$clusterMzWindow,
+                                   minAbundance = avgFeatParamsMS$minAbundance)
         names(mspl) <- fTableAna$group
+        
+        if (nrow(pasefInfo) > 0)
+        {
+            fTableAna[, frameIDsMSMS := {
+                # UNDONE: window needs to be halved?
+                framesPASEF <- pasefInfo[mz %between% ((IsolationMz + c(-IsolationWidth, IsolationWidth))/2)]$Frame
+                intersect(framesPASEF, framesMS[[1]])
+            }, by = seq_len(nrow(fTableAna))]
+            fTableAnaMSMS <- fTableAna[lengths(frameIDsMSMS) > 0]
+        }
         
         setTxtProgressBar(prog, anai)
     }

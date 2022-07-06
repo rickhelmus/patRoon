@@ -42,10 +42,6 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
         return(MSPeakLists(algorithm = "tims"))
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, maxMSRtWindow, topMost, avgFeatParams)
-    cachedSet <- loadCacheSet("MSPeakListsTIMS", setHash, cacheDB)
-    resultHashes <- vector("character", anaCount * gCount)
-    resultHashCount <- 0
 
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
@@ -73,6 +69,7 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     {
         ana <- anaInfo$analysis[anai]
         fp <- getBrukerAnalysisPath(ana, anaInfo$path[anai]) # UNDONE: streamline this function mz(X)ML versions (also for DA algos)
+        fTableAna <- copy(fTable[[ana]])
         
         TIMSDB <- openTIMSMetaDBScope(f = fp)
         frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
@@ -80,88 +77,117 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
         pasefInfo <- getTIMSMetaTable(TIMSDB, "PasefFrameMsMsInfo", c("Frame", "ScanNumBegin", "ScanNumEnd",
                                                                       "IsolationMz", "isolationWidth"))
 
-        # UNDONE: file hash? (also for DA)
-        baseHash <- makeHash(ana, maxMSRtWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(ana, frames, pasefInfo, maxMSRtWindow, topMost, avgFeatParams)
+        setHash <- makeHash(fTableAna, baseHash)
+        cachedSet <- loadCacheSet("MSPeakListsTIMS", setHash, cacheDB)
         
-        fTableAna <- copy(fTable[[ana]])
-        if (!is.null(maxMSRtWindow))
+        # UNDONE: file hash? (also for other algos) Or is frames/pasefInfo enough in this case?
+        baseHash <- makeHash(ana, frames, pasefInfo, maxMSRtWindow, topMost, avgFeatParams)
+        
+        fTableAna[, hash := makeHash(baseHash, .SD), by = seq_len(nrow(fTableAna)), .SDcols = c("mz", "ret", "retmin",
+                                                                                                "retmax")]
+        cachedData <- setNames(lapply(fTableAna$hash, function(h)
         {
-            fTableAna[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTableAna))]
-            fTableAna[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTableAna))]
-        }
-        fTableAna[, frameIDsMS := list(list(framesMS[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
+            if (!is.null(cachedSet) && !is.null(cachedSet[[h]]))
+                return(cachedSet[[h]])
+            return(loadCacheData("MSPeakListsTIMS", h, cacheDB))
+        }), fTableAna$group)
+        cachedData <- pruneList(cachedData)
         
-        # UNDONE: more args, currently missing in PListParams
-        msplMS <- getTIMSPeakLists(fp, fTableAna$frameIDsMS, precursorMZs = fTableAna$mz,
-                                   minIntensityPre = avgFeatParamsMS$minIntensityPre,
-                                   minIntensityPost = avgFeatParamsMS$minIntensityPost,
-                                   minIntensityFinal = avgFeatParamsMS$minIntensityFinal,
-                                   onlyWithPrecursor = avgFeatParamsMS$pruneMissingPrecursor,
-                                   method = avgFeatParamsMS$method,
-                                   topMost = avgFeatParamsMS$topMost,
-                                   mzWindow = avgFeatParamsMS$clusterMzWindow,
-                                   minAbundance = avgFeatParamsMS$minAbundance)
-        names(msplMS) <- fTableAna$group
-        msplMS <- lapply(msplMS, as.data.table)
-        msplMS <- Map(msplMS, fTableAna$mz, f = assignPrecursorToMSPeakList)
-        mspl <- sapply(msplMS, function(x) list(MS = x), simplify = FALSE)  # move to MS sub fields
+        fTableAna <- fTableAna[!group %chin% names(cachedData)]
         
-        if (nrow(pasefInfo) > 0)
+        if (nrow(fTableAna) > 0) # still work to do?
         {
-            # UNDONE: window needs to be halved?
-            pasefInfo[, c("isomz_min", "isomz_max") := .(IsolationMz - (IsolationWidth/2),
-                                                         IsolationMz + (IsolationWidth/2))]
-            # reduce frame search range a bit to optimize below
-            framesMSMS <- frames[MsMsType != 0] # UNDONE: check how different types need to be supported
-            framesMSMS <- framesMSMS[Time %between% c(min(fTableAna$retmin), max(fTableAna$retmax))]
-            
-            # only consider PASEF frames of interest
-            pasefInfo <- pasefInfo[Frame %in% framesMSMS$Id & isomz_min < max(fTableAna$mz) & isomz_max > min(fTableAna$mz)]
-            pasefInfo[, retFrame := framesMSMS[match(Frame, Id)]$Time]
-
-            # split all relevant PASEF info rows for each feature, which makes further processing much faster
-            frameSubTabs <- Map(fTableAna$mz, fTableAna$retmin, fTableAna$retmax, f = function(m, rmin, rmax)
+            if (!is.null(maxMSRtWindow))
             {
-                return(pasefInfo[retFrame %between% c(rmin, rmax) & numGTE(m, isomz_min) & numLTE(m, isomz_max)])
-            })
+                fTableAna[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTableAna))]
+                fTableAna[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTableAna))]
+            }
             
-            fTableAna[, frameIDsMSMS := lapply(frameSubTabs, function(tab) unique(tab$Frame))]
             
-            # omit without MSMS to speedup
-            withMSMS <- lengths(fTableAna$frameIDsMSMS) > 0
-            frameSubTabs <- frameSubTabs[withMSMS]
-            fTableAnaMSMS <- fTableAna[withMSMS]
+            fTableAna[, frameIDsMS := list(list(framesMS[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTableAna))]
             
-            fTableAnaMSMS[, scanStarts := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumBegin)),
-                                                                                 by = "Frame"][[2]])]
-            fTableAnaMSMS[, scanEnds := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumEnd)),
-                                                                               by = "Frame"][[2]])]
+            # UNDONE: more args, currently missing in PListParams
+            msplMS <- getTIMSPeakLists(fp, fTableAna$frameIDsMS, precursorMZs = fTableAna$mz,
+                                       minIntensityPre = avgFeatParamsMS$minIntensityPre,
+                                       minIntensityPost = avgFeatParamsMS$minIntensityPost,
+                                       minIntensityFinal = avgFeatParamsMS$minIntensityFinal,
+                                       onlyWithPrecursor = avgFeatParamsMS$pruneMissingPrecursor,
+                                       method = avgFeatParamsMS$method,
+                                       topMost = avgFeatParamsMS$topMost,
+                                       mzWindow = avgFeatParamsMS$clusterMzWindow,
+                                       minAbundance = avgFeatParamsMS$minAbundance)
+            names(msplMS) <- fTableAna$group
+            msplMS <- lapply(msplMS, as.data.table)
+            msplMS <- Map(msplMS, fTableAna$mz, f = assignPrecursorToMSPeakList)
+            mspl <- sapply(msplMS, function(x) list(MS = x), simplify = FALSE)  # move to MS sub fields
             
-            msplMSMS <- getTIMSPeakLists(fp, fTableAnaMSMS$frameIDsMSMS, precursorMZs = fTableAnaMSMS$mz,
-                                         minIntensityPre = avgFeatParamsMSMS$minIntensityPre,
-                                         minIntensityPost = avgFeatParamsMSMS$minIntensityPost,
-                                         minIntensityFinal = avgFeatParamsMSMS$minIntensityFinal,
-                                         onlyWithPrecursor = avgFeatParamsMSMS$pruneMissingPrecursor,
-                                         method = avgFeatParamsMSMS$method,
-                                         topMost = avgFeatParamsMSMS$topMost,
-                                         mzWindow = avgFeatParamsMSMS$clusterMzWindow,
-                                         minAbundance = avgFeatParamsMSMS$minAbundance,
-                                         scanStartsListN = fTableAnaMSMS$scanStarts,
-                                         scanEndsListN = fTableAnaMSMS$scanEnds)
-            names(msplMSMS) <- fTableAnaMSMS$group
-            msplMSMS <- lapply(msplMSMS, as.data.table)
-            msplMSMS <- Map(msplMSMS, fTableAnaMSMS$mz, f = assignPrecursorToMSPeakList)
-
-            # merge with MS data: combine data for overlapping fGroups
-            mspl <- sapply(union(names(mspl), names(msplMSMS)), function(fg) list(MS = mspl[[fg]]$MS,
-                                                                                  MSMS = msplMSMS[[fg]]),
-                           simplify = FALSE)
-            # add missing data
-            unFGMSMS <- setdiff(names(msplMSMS), names(mspl))
-            mspl[unFGMSMS] <- lapply(msplMSMS[unFGMSMS], function(x) list(MSMS = x))
+            if (nrow(pasefInfo) > 0)
+            {
+                # UNDONE: window needs to be halved?
+                pasefInfo[, c("isomz_min", "isomz_max") := .(IsolationMz - (IsolationWidth/2),
+                                                             IsolationMz + (IsolationWidth/2))]
+                # reduce frame search range a bit to optimize below
+                framesMSMS <- frames[MsMsType != 0] # UNDONE: check how different types need to be supported
+                framesMSMS <- framesMSMS[Time %between% c(min(fTableAna$retmin), max(fTableAna$retmax))]
+                
+                # only consider PASEF frames of interest
+                pasefInfo <- pasefInfo[Frame %in% framesMSMS$Id & isomz_min < max(fTableAna$mz) & isomz_max > min(fTableAna$mz)]
+                pasefInfo[, retFrame := framesMSMS[match(Frame, Id)]$Time]
+                
+                # split all relevant PASEF info rows for each feature, which makes further processing much faster
+                frameSubTabs <- Map(fTableAna$mz, fTableAna$retmin, fTableAna$retmax, f = function(m, rmin, rmax)
+                {
+                    return(pasefInfo[retFrame %between% c(rmin, rmax) & numGTE(m, isomz_min) & numLTE(m, isomz_max)])
+                })
+                
+                fTableAna[, frameIDsMSMS := lapply(frameSubTabs, function(tab) unique(tab$Frame))]
+                
+                # omit without MSMS to speedup
+                withMSMS <- lengths(fTableAna$frameIDsMSMS) > 0
+                frameSubTabs <- frameSubTabs[withMSMS]
+                fTableAnaMSMS <- fTableAna[withMSMS]
+                
+                fTableAnaMSMS[, scanStarts := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumBegin)),
+                                                                                     by = "Frame"][[2]])]
+                fTableAnaMSMS[, scanEnds := lapply(frameSubTabs, function(tab) tab[, list(list(ScanNumEnd)),
+                                                                                   by = "Frame"][[2]])]
+                
+                msplMSMS <- getTIMSPeakLists(fp, fTableAnaMSMS$frameIDsMSMS, precursorMZs = fTableAnaMSMS$mz,
+                                             minIntensityPre = avgFeatParamsMSMS$minIntensityPre,
+                                             minIntensityPost = avgFeatParamsMSMS$minIntensityPost,
+                                             minIntensityFinal = avgFeatParamsMSMS$minIntensityFinal,
+                                             onlyWithPrecursor = avgFeatParamsMSMS$pruneMissingPrecursor,
+                                             method = avgFeatParamsMSMS$method,
+                                             topMost = avgFeatParamsMSMS$topMost,
+                                             mzWindow = avgFeatParamsMSMS$clusterMzWindow,
+                                             minAbundance = avgFeatParamsMSMS$minAbundance,
+                                             scanStartsListN = fTableAnaMSMS$scanStarts,
+                                             scanEndsListN = fTableAnaMSMS$scanEnds)
+                names(msplMSMS) <- fTableAnaMSMS$group
+                msplMSMS <- lapply(msplMSMS, as.data.table)
+                msplMSMS <- Map(msplMSMS, fTableAnaMSMS$mz, f = assignPrecursorToMSPeakList)
+                
+                # merge with MS data: combine data for overlapping fGroups
+                mspl <- sapply(union(names(mspl), names(msplMSMS)), function(fg) list(MS = mspl[[fg]]$MS,
+                                                                                      MSMS = msplMSMS[[fg]]),
+                               simplify = FALSE)
+                # add missing data
+                unFGMSMS <- setdiff(names(msplMSMS), names(mspl))
+                mspl[unFGMSMS] <- lapply(msplMSMS[unFGMSMS], function(x) list(MSMS = x))
+            }
+            
+            for (fg in names(mspl))
+                saveCacheData("MSPeakListsTIMS", mspl[[fg]], fTableAna[group == fg]$hash, cacheDB)
         }
+        
+        if (length(cachedData) > 0)
+            mspl <- c(mspl, cachedData)
         
         mspl <- mspl[intersect(gNames, names(mspl))] # sync fg order
+        
+        if (is.null(cachedSet))
+            saveCacheSet("MSPeakListsTIMS", fTableAna$hash, setHash, cacheDB)
         
         setTxtProgressBar(prog, anai)
         return(mspl)
@@ -169,9 +195,6 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     names(plists) <- anaInfo$analysis
     
     close(prog)
-
-    # if (is.null(cachedSet))
-    #     saveCacheSet("MSPeakListsTIMS", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
 
     return(MSPeakLists(peakLists = plists, metadata = list(), avgPeakListArgs = avgFGroupParams,
                        origFGNames = gNames, algorithm = "tims"))

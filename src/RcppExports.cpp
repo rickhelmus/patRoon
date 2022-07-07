@@ -10,6 +10,17 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// writeChromsToMzML
+void writeChromsToMzML(Rcpp::List EICs, const std::string& out);
+RcppExport SEXP _patRoon_writeChromsToMzML(SEXP EICsSEXP, SEXP outSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type EICs(EICsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type out(outSEXP);
+    writeChromsToMzML(EICs, out);
+    return R_NilValue;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -335,6 +346,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

@@ -355,7 +355,7 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
 
 using EIX = std::pair<std::vector<double>, std::vector<unsigned>>; // used for EIC/EIM data
 
-EIX sortCompressEIX(const EIX &eix)
+EIX sortCompressEIX(const EIX &eix, bool compress)
 {
     const auto ord = getSortedInds(eix.first);
     const auto len = ord.size();
@@ -364,7 +364,7 @@ EIX sortCompressEIX(const EIX &eix)
     for (size_t j=0; j<len; ++j)
     {
         const auto ordInd = ord[j];
-        if (j > 0 && j < (len-1) && eix.second[ordInd] == 0)
+        if (compress && j > 0 && j < (len-1) && eix.second[ordInd] == 0)
         {
             const auto prevInt = eix.second[ord[j-1]], nextInt = eix.second[ord[j+1]];
             if (prevInt == 0 && nextInt == 0)
@@ -491,7 +491,8 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
 // [[Rcpp::export]]
 Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &frameIDs,
                       const std::vector<double> &mzStarts, const std::vector<double> &mzEnds,
-                      const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds)
+                      const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
+                      bool compress)
 {
     TimsDataHandle TDH(file);
     std::vector<EIX> EICs(mzStarts.size());
@@ -552,7 +553,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
     {
-        EIX eic = sortCompressEIX(EICs[i]);
+        EIX eic = sortCompressEIX(EICs[i], compress);
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = eic.first,
                                          Rcpp::Named("intensity") = eic.second);
     }
@@ -562,7 +563,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
 // [[Rcpp::export]]
 Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
                              const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
-                             unsigned topMost = 0, unsigned minIntensity = 0)
+                             unsigned topMost = 0, unsigned minIntensity = 0, bool compress = true)
 {
     const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);
@@ -607,7 +608,7 @@ Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, c
             EIM.second[i] /= frameIDs.size(); // mean of values (including frames without this cluster)
         }
 
-        mobilograms[i] = sortCompressEIX(EIM);
+        mobilograms[i] = sortCompressEIX(EIM, compress);
     }
     
     Rcpp::List ret(mobilograms.size());

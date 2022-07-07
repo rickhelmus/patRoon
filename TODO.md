@@ -11,6 +11,10 @@
     - tweak getDefAvgPListParamsTIMS(), possibly merge with getDefAvgPListParams() and make/use arg assertion
     - Does the PASEF isolation window needs to be halved to find ranges?
     - store metadata?
+- findPeaks()
+    - export? If yes, add checkmate's, documentation etc
+    - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
+        - might also be nice for plotting chroms?
 
 ## Ext
 

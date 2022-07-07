@@ -191,8 +191,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getTIMSEIC
-Rcpp::List getTIMSEIC(const std::string& file, const std::vector<unsigned>& frameIDs, const std::vector<double>& mzStarts, const std::vector<double>& mzEnds, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds);
-RcppExport SEXP _patRoon_getTIMSEIC(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP) {
+Rcpp::List getTIMSEIC(const std::string& file, const std::vector<unsigned>& frameIDs, const std::vector<double>& mzStarts, const std::vector<double>& mzEnds, const std::vector<double>& mobilityStarts, const std::vector<double>& mobilityEnds, bool compress);
+RcppExport SEXP _patRoon_getTIMSEIC(SEXP fileSEXP, SEXP frameIDsSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP mobilityStartsSEXP, SEXP mobilityEndsSEXP, SEXP compressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -202,13 +202,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mzEnds(mzEndsSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityStarts(mobilityStartsSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type mobilityEnds(mobilityEndsSEXP);
-    rcpp_result_gen = Rcpp::wrap(getTIMSEIC(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds));
+    Rcpp::traits::input_parameter< bool >::type compress(compressSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTIMSEIC(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds, compress));
     return rcpp_result_gen;
 END_RCPP
 }
 // getTIMSMobilogram
-Rcpp::List getTIMSMobilogram(const std::string& file, Rcpp::List frameIDsList, const std::vector<double>& mzStarts, const std::vector<double>& mzEnds, const std::string& method, double IMSWindow, unsigned topMost, unsigned minIntensity);
-RcppExport SEXP _patRoon_getTIMSMobilogram(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP methodSEXP, SEXP IMSWindowSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP) {
+Rcpp::List getTIMSMobilogram(const std::string& file, Rcpp::List frameIDsList, const std::vector<double>& mzStarts, const std::vector<double>& mzEnds, const std::string& method, double IMSWindow, unsigned topMost, unsigned minIntensity, bool compress);
+RcppExport SEXP _patRoon_getTIMSMobilogram(SEXP fileSEXP, SEXP frameIDsListSEXP, SEXP mzStartsSEXP, SEXP mzEndsSEXP, SEXP methodSEXP, SEXP IMSWindowSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP compressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -220,7 +221,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type IMSWindow(IMSWindowSEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minIntensity(minIntensitySEXP);
-    rcpp_result_gen = Rcpp::wrap(getTIMSMobilogram(file, frameIDsList, mzStarts, mzEnds, method, IMSWindow, topMost, minIntensity));
+    Rcpp::traits::input_parameter< bool >::type compress(compressSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTIMSMobilogram(file, frameIDsList, mzStarts, mzEnds, method, IMSWindow, topMost, minIntensity, compress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -345,8 +347,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 15},
-    {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 6},
-    {"_patRoon_getTIMSMobilogram", (DL_FUNC) &_patRoon_getTIMSMobilogram, 8},
+    {"_patRoon_getTIMSEIC", (DL_FUNC) &_patRoon_getTIMSEIC, 7},
+    {"_patRoon_getTIMSMobilogram", (DL_FUNC) &_patRoon_getTIMSMobilogram, 9},
     {"_patRoon_collapseTIMSSpectra", (DL_FUNC) &_patRoon_collapseTIMSSpectra, 12},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},

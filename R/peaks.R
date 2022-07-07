@@ -73,3 +73,43 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     
     return(ret)
 }
+
+findPeaksEnviPick <- function(EICs, ...)
+{
+    checkPackage("enviPick", "blosloos/enviPick")
+    
+    # make a dummy input list for enviPick::mzpick()
+    dummyPL <- list(State = data.frame("Raw?" = TRUE, "Partioned?" = TRUE, "Clustered?" = TRUE, "Filtered?" = FALSE,
+                                       "Picked?" = FALSE),
+                    Parameters = data.frame(parameters = character(34), value = character(34)),
+                    Results = numeric(5),
+                    Scans = list(), # filled in later
+                    Partition_index = matrix(),
+                    EIC_index = matrix(), # filled in later
+                    Peak_index = 0,
+                    Peaklist = 0)
+    
+    # UNDONE: this could probably be faster if called with all EICs at once?
+    ret <- sapply(EICs, function(eic)
+    {
+        dummyPL$Scans[[1]] <- eic$time
+        sc <- copy(eic)
+        setnames(sc, "time", "RT")
+        sc[, "m/z" := 100] # dummy, no need for this
+        sc[, measureID := seq_len(.N)]
+        sc[, c("partID", "clustID") := 1] # fake that this trace was partitioned & clustered
+        sc[, peakID := 0]
+        setcolorder(sc, c("m/z", "intensity", "RT"))
+        # setorderv(sc, "m/z") # needs to be ordered by mz (but we are using a single dummy value, so no need)
+        dummyPL$Scans[[2]] <- as.matrix(sc)
+        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(EIC), number_peaks = nrow(EIC)))
+        
+        p <- as.data.table(enviPick::mzpick(dummyPL, ...)$Peaklist[, c("RT", "minRT", "maxRT", "sum_int", "max_int")])
+        setnames(p, c("ret", "retmin", "retmax", "area", "intensity"))
+        return(p)
+    }, simplify = FALSE)
+    names(ret) <- names(EICs)
+    ret <- pruneList(ret, checkZeroRows = TRUE)
+    
+    return(ret)
+}

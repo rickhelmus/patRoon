@@ -74,6 +74,19 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     return(ret)
 }
 
+findPeaksXCMS3 <- function(EICs, ...)
+{
+    ret <- sapply(EICs, function(eic)
+    {
+        p <- as.data.table(xcms::peaksWithCentWave(eic$intensity, eic$time, ...))
+        cols <- c("ret", "retmin", "retmax", "area", "intensity")
+        setnames(p, c("rt", "rtmin", "rtmax", "into", "maxo"), cols)
+        setcolorder(p, cols)
+        return(p)
+    }, simplify = FALSE)
+    ret <- pruneList(ret, checkZeroRows = TRUE)
+}
+
 findPeaksEnviPick <- function(EICs, ...)
 {
     checkPackage("enviPick", "blosloos/enviPick")

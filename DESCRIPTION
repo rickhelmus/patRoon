@@ -255,6 +255,7 @@ Collate:
     'multi-process-classic.R'
     'multi-process-future.R'
     'multi-process.R'
+    'peaks.R'
     'project-tool.R'
     'report-html.R'
     'report-html-TPs.R'

@@ -121,7 +121,6 @@ findPeaksEnviPick <- function(EICs, ...)
         setnames(p, c("ret", "retmin", "retmax", "area", "intensity"))
         return(p)
     }, simplify = FALSE)
-    names(ret) <- names(EICs)
     ret <- pruneList(ret, checkZeroRows = TRUE)
     
     return(ret)

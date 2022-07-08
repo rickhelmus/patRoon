@@ -115,9 +115,13 @@ findPeaksEnviPick <- function(EICs, ...)
         setcolorder(sc, c("m/z", "intensity", "RT"))
         # setorderv(sc, "m/z") # needs to be ordered by mz (but we are using a single dummy value, so no need)
         dummyPL$Scans[[2]] <- as.matrix(sc)
-        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(EIC), number_peaks = nrow(EIC)))
+        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(eic), number_peaks = nrow(eic)))
         
-        p <- as.data.table(enviPick::mzpick(dummyPL, ...)$Peaklist[, c("RT", "minRT", "maxRT", "sum_int", "max_int")])
+        p <- enviPick::mzpick(dummyPL, ...)$Peaklist
+        if (isTRUE(all.equal(p, 0))) # no results
+            return(data.table(ret = numeric(), retmin = numeric(), retmax = numeric(), area = numeric(),
+                              intensity = numeric()))
+        p <- as.data.table(p)[, c("RT", "minRT", "maxRT", "sum_int", "max_int"), with = FALSE]
         setnames(p, c("ret", "retmin", "retmax", "area", "intensity"))
         return(p)
     }, simplify = FALSE)

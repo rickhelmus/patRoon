@@ -420,6 +420,56 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     return(obj)
 })
 
+#' @export
+setMethod("findMobilities", "features", function(obj, peaksAlgorithm, clusterIMSWindow = 0.01, clusterMethod = "diff",
+                                                 minIntensity = 0, maxMSRtWindow = 2, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ clusterIMSWindow + minIntensity, finite = TRUE, fixed = list (add = ac))
+    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj) # nothing to do...
+    
+    anaInfo <- analysisInfo(obj)
+    
+    mobilities <- Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    {
+        TIMSDB <- openTIMSMetaDBScope(f = fp)
+        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
+        frames <- frames[MsMsType == 0]
+        
+        fTable <- copy(fTable)
+        if (!is.null(maxMSRtWindow))
+        {
+            fTable[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTable))]
+            fTable[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTable))]
+        }
+        
+        fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
+        
+        EIMs <- getTIMSMobilogram(fp, fTable$frameIDs, fTable$mz - 0.01, fTable$mz + 0.01, clusterMethod, clusterIMSWindow,
+                                  minIntensity, FALSE)
+        names(EIMs) <- fTable$ID
+        EIMs <- lapply(EIMs, setDT)
+        
+        # pretend we have EICs so we can find peaks
+        EICs <- lapply(EIMs, copy)
+        EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
+        peaksList <- findPeaks(EICs, peaksAlgorithm, ...)
+        
+        peaksTable <- rbindlist(peaksList, idcol = "ID")
+        setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)
+        
+        return(peaksTable)
+    })
+    
+    browser()
+    
+    return(obj)
+})
 
 #' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 

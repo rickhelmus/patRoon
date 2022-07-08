@@ -7,6 +7,7 @@
     - Function to set thread count used by patRoon and opentims
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - get tims dll from options()
+- Streamline getBrukerAnalysisPath() with mz(X)ML versions (also for DA algos)
 - MSPL
     - tweak getDefAvgPListParamsTIMS(), possibly merge with getDefAvgPListParams() and make/use arg assertion
     - Does the PASEF isolation window needs to be halved to find ranges?
@@ -15,6 +16,10 @@
     - export? If yes, add checkmate's, documentation etc
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
+- findMobilities()
+    - store data in features slot
+    - fGroups method
+    - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
 
 ## Ext
 

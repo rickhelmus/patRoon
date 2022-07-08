@@ -563,7 +563,7 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
 // [[Rcpp::export]]
 Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
                              const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
-                             unsigned topMost = 0, unsigned minIntensity = 0, bool compress = true)
+                             unsigned minIntensity = 0, bool compress = true)
 {
     const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);

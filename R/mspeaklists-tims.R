@@ -66,7 +66,7 @@ setMethod("generateMSPeakListsTIMS", "featureGroups", function(fGroups, maxMSRtW
     plists <- lapply(seq_len(anaCount), function(anai)
     {
         ana <- anaInfo$analysis[anai]
-        fp <- getBrukerAnalysisPath(ana, anaInfo$path[anai]) # UNDONE: streamline this function mz(X)ML versions (also for DA algos)
+        fp <- getBrukerAnalysisPath(ana, anaInfo$path[anai])
         fTableAna <- copy(fTable[[ana]])
         
         TIMSDB <- openTIMSMetaDBScope(f = fp)

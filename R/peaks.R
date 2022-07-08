@@ -13,9 +13,18 @@ findPeaks <- function(EICs, algorithm, ...)
 }
 
 findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
-                            extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3)
+                            extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3, scaleTimeFactor = NULL)
 {
     # EICs should be a named list of data.tables
+    
+    # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
+    # with findMobilities() --> just multiply everything 'time' related with 100 for now.
+    if (!is.null(scaleTimeFactor))
+    {
+        EICs <- lapply(EICs, function(eic) copy(eic)[, time := time * scaleTimeFactor])
+        minRTDistance <- minRTDistance * scaleTimeFactor
+        intSearchRTWindow <- intSearchRTWindow * scaleTimeFactor
+    }
     
     chromFile <- tempfile(fileext = ".mzML")
     featsFile <- tempfile(fileext = ".featureXML")
@@ -52,12 +61,13 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     printf("Done!\n")
     
     # NOTE: the mz parameter is (ab)used to set the EIC index
-    ret <- split(peaks, by = "mz", keep.by = FALSE)
-    names(ret) <- names(EICs)
+    peaks[, name := names(EICs)[mz]][, mz := NULL]
+    ret <- split(peaks, by = "name", keep.by = FALSE)
     
     ret <- pruneList(ret, checkZeroRows = TRUE)
     
-    printf("Filling in intensities... ")
+    printf("Post-processing... ")
+    
     # subset columns, convert to data.tables & fill in intensities (not reported by OpenMS)
     ret <- Map(ret, EICs[names(ret)], f = function(p, eic)
     {
@@ -67,6 +77,14 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
             e <- eic[time %between% c(r - intSearchRTWindow, r + intSearchRTWindow)]
             return(max(e$intensity))
         })]
+        
+        if (!is.null(scaleTimeFactor))
+        {
+            p[, c("ret", "retmin", "retmax") := .(ret / scaleTimeFactor,
+                                                  retmin / scaleTimeFactor,
+                                                  retmax / scaleTimeFactor)]
+        }
+        
         return(p)
     })
     printf("Done!\n")

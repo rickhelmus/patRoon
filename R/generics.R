@@ -459,6 +459,11 @@ setGeneric("featureTable", function(obj, ...) standardGeneric("featureTable"))
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 
+#' @templateVar func findMobilities
+#' @templateVar desc finds ion mobilities for all features.
+#' @template generics
+setGeneric("findMobilities", function(obj, ...) standardGeneric("findMobilities"))
+
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics

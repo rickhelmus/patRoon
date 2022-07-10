@@ -72,6 +72,7 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     ret <- Map(ret, EICs[names(ret)], f = function(p, eic)
     {
         p <- setDT(p[, c("ret", "retmin", "retmax", "area")])
+        # UNDONE: fix "Warning message: In max(e$intensity) : no non-missing arguments to max; returning -Inf"
         p[, intensity := sapply(ret, function(r)
         {
             e <- eic[time %between% c(r - intSearchRTWindow, r + intSearchRTWindow)]

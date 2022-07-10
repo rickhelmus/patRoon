@@ -1357,6 +1357,13 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
     return(fGroups)
 })
 
+#' @export
+setMethod("findMobilities", "featureGroups", function(obj, ...)
+{
+    obj@features <- findMobilities(getFeatures(obj), ...)
+    return(obj)
+})
+
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))

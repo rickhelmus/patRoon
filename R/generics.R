@@ -46,6 +46,9 @@ setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 
 #' @param incomparables Ignored.
 #' @rdname featureGroups-class
+setGeneric("mobilities", function(obj) standardGeneric("mobilities"))
+
+#' @rdname featureGroups-class
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 
 #' @rdname featureGroups-class

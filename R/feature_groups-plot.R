@@ -622,6 +622,87 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
              analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])
 })
 
+#' @export
+setMethod("plotMobilogram", "featureGroups", function(obj, IMSWindow = 0.2, maxMSRtWindow = 2, mzWindow = 0.005,
+                                                      clusterIMSWindow = 0.01, clusterMethod = "diff", minIntensity = 0,
+                                                      xlim = NULL, ylim = NULL, ...)
+{
+    # UNDONE: more feature parity with plotChroms()
+    # UNDONE: assert util for common parameters with findMobilities()
+
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
+    assertXYLim(xlim, ylim, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    fTable <- featureTable(obj)
+    anaInfo <- analysisInfo(obj)
+    mobs <- mobilities(getFeatures(obj))
+
+    EIMs <- Map(fTable, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    {
+        # UNDONE: c/p from findMobilities() --> make util function
+        TIMSDB <- openTIMSMetaDBScope(f = fp)
+        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
+        frames <- frames[MsMsType == 0]
+        
+        fTable <- copy(fTable)
+        if (!is.null(maxMSRtWindow))
+        {
+            fTable[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTable))]
+            fTable[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTable))]
+        }
+        
+        fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
+        
+        # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
+        m <- getTIMSMobilogram(fp, fTable$frameIDs, fTable$mz - mzWindow, fTable$mz + mzWindow, clusterMethod,
+                               clusterIMSWindow, minIntensity, FALSE)
+        names(m) <- fTable$ID
+        return(lapply(m, setDT))
+    })
+    
+    if (is.null(xlim))
+    {
+        # UNDONE: use mobmin/mobmax values of mobilities slot instead?
+        minMob <- min(sapply(EIMs, sapply, function(eim) min(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
+        maxMob <- max(sapply(EIMs, sapply, function(eim) max(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
+        xlim <- c(minMob, maxMob) + c(-IMSWindow, IMSWindow)
+    }
+    if (is.null(ylim))
+    {
+        maxInt <- max(sapply(EIMs, sapply, function(eim) max(eim$intensity)))
+        ylim <- c(0, maxInt) # UNDONE: extra spacing like plotChroms?
+    }
+    
+    # UNDONE: unit for IMS?
+    plot(0, type = "n", xlab = "Mobility", ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+    
+    for (ana in names(EIMs))
+    {
+        for (fID in names(EIMs[[ana]]))
+        {
+            points(EIMs[[ana]][[fID]]$mobility, EIMs[[ana]][[fID]]$intensity, type = "l")
+            
+            if (length(mobs) > 0)
+            {
+                m <- mobs[[ana]][ID == fID]
+                for (i in seq_len(nrow(m)))
+                    segments(m$mobility[i], 0, m$mobility[i], m$intensity[i], col = "red", lty = "dotted")
+            }
+        }
+    }
+})
+
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature
 #'   groups between up to five replicate groups.
 #' @template plotvenn-ret

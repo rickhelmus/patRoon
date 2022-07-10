@@ -1351,6 +1351,13 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
     return(fGroups)
 })
 
+#' @export
+setMethod("findMobilities", "featureGroups", function(obj, ...)
+{
+    obj@features <- findMobilities(getFeatures(obj), ...)
+    return(obj)
+})
+
 
 #' Grouping of features
 #'

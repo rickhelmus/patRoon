@@ -209,6 +209,10 @@
     - store data in features slot
     - fGroups method
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
+- Docs
+    - mobilities slot in features
+
+
 
 ## Ext
 

@@ -62,7 +62,7 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.table"),
+                     slots = c(features = "list", analysisInfo = "data.table", mobilities = "list"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
@@ -169,6 +169,10 @@ setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 #' @template strmethod
 #' @export
 setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$group))
+
+#' @export
+setMethod("mobilities", "features", function(obj) obj@mobilities)
+
 
 #' @describeIn features Returns all feature data in a table.
 #' @export
@@ -458,11 +462,12 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 #' @export
-setMethod("findMobilities", "features", function(obj, peaksAlgorithm, clusterIMSWindow = 0.01, clusterMethod = "diff",
-                                                 minIntensity = 0, maxMSRtWindow = 2, ...)
+setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 0.005, clusterIMSWindow = 0.01,
+                                                 clusterMethod = "diff", minIntensity = 0, maxMSRtWindow = 2, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertNumber, . ~ clusterIMSWindow + minIntensity, finite = TRUE, fixed = list (add = ac))
+    aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensity, finite = TRUE,
+           fixed = list (add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
     checkmate::reportAssertions(ac)
@@ -472,7 +477,7 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, clusterIMS
     
     anaInfo <- analysisInfo(obj)
     
-    mobilities <- Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    obj@mobilities <- Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
     {
         TIMSDB <- openTIMSMetaDBScope(f = fp)
         frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
@@ -487,8 +492,9 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, clusterIMS
         
         fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
         
-        EIMs <- getTIMSMobilogram(fp, fTable$frameIDs, fTable$mz - 0.01, fTable$mz + 0.01, clusterMethod, clusterIMSWindow,
-                                  minIntensity, FALSE)
+        # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
+        EIMs <- getTIMSMobilogram(fp, fTable$frameIDs, fTable$mz - mzRange, fTable$mz + mzRange, clusterMethod,
+                                  clusterIMSWindow, minIntensity, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)
         
@@ -502,8 +508,6 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, clusterIMS
         
         return(peaksTable)
     })
-    
-    browser()
     
     return(obj)
 })

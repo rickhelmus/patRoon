@@ -62,17 +62,20 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     
     # NOTE: the mz parameter is (ab)used to set the EIC index
     peaks[, name := names(EICs)[mz]][, mz := NULL]
-    ret <- split(peaks, by = "name", keep.by = FALSE)
+
+    # BUG: sometimes RT reported is wrong (https://github.com/OpenMS/OpenMS/issues/6239). For now simply omit the
+    # results...
+    peaks <- peaks[ret %between% list(retmin, retmax)]
     
-    ret <- pruneList(ret, checkZeroRows = TRUE)
+    peaksList <- split(peaks, by = "name", keep.by = FALSE)
+    peaksList <- pruneList(peaksList, checkZeroRows = TRUE)
     
     printf("Post-processing... ")
     
     # subset columns, convert to data.tables & fill in intensities (not reported by OpenMS)
-    ret <- Map(ret, EICs[names(ret)], f = function(p, eic)
+    peaksList <- Map(peaksList, EICs[names(peaksList)], f = function(p, eic)
     {
         p <- setDT(p[, c("ret", "retmin", "retmax", "area")])
-        # UNDONE: fix "Warning message: In max(e$intensity) : no non-missing arguments to max; returning -Inf"
         p[, intensity := sapply(ret, function(r)
         {
             e <- eic[time %between% c(r - intSearchRTWindow, r + intSearchRTWindow)]
@@ -90,7 +93,7 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     })
     printf("Done!\n")
     
-    return(ret)
+    return(peaksList)
 }
 
 findPeaksXCMS3 <- function(EICs, ...)

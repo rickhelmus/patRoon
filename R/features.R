@@ -456,8 +456,8 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        EIMs <- getTIMSMobilogram(fp, fTable$frameIDs, fTable$mz - mzRange, fTable$mz + mzRange, clusterMethod,
-                                  clusterIMSWindow, minIntensity, FALSE)
+        EIMs <- getTIMSMobilograms(fp, fTable$frameIDs, fTable$mz - mzRange, fTable$mz + mzRange, clusterMethod,
+                                   clusterIMSWindow, minIntensity, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)
         

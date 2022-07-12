@@ -489,10 +489,10 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
 }
 
 // [[Rcpp::export]]
-Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &frameIDs,
-                      const std::vector<double> &mzStarts, const std::vector<double> &mzEnds,
-                      const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
-                      bool compress)
+Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &frameIDs,
+                       const std::vector<double> &mzStarts, const std::vector<double> &mzEnds,
+                       const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
+                       bool compress)
 {
     TimsDataHandle TDH(file);
     std::vector<EIX> EICs(mzStarts.size());
@@ -561,9 +561,9 @@ Rcpp::List getTIMSEIC(const std::string &file, const std::vector<unsigned> &fram
 }
 
 // [[Rcpp::export]]
-Rcpp::List getTIMSMobilogram(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
-                             const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
-                             unsigned minIntensity = 0, bool compress = true)
+Rcpp::List getTIMSMobilograms(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
+                              const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
+                              unsigned minIntensity = 0, bool compress = true)
 {
     const auto count = frameIDsList.size();
     TimsDataHandle TDH(file);

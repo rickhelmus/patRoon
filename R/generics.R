@@ -601,6 +601,11 @@ setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 #' @template generics
 setGeneric("sets", function(obj) standardGeneric("sets"))
 
+#' @templateVar func splitMobilities
+#' @templateVar desc splits features on their mobility.
+#' @template generics
+setGeneric("splitMobilities", function(obj, ...) standardGeneric("splitMobilities"))
+
 #' @templateVar func treeCut
 #' @templateVar desc Manually cut a cluster.
 #' @template generics

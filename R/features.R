@@ -430,7 +430,7 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensity, finite = TRUE,
-           fixed = list (add = ac))
+           fixed = list(add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
     checkmate::reportAssertions(ac)
@@ -470,6 +470,78 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)
         
         return(peaksTable)
+    })
+    
+    return(obj)
+})
+
+#' @export
+setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWindow = 0.01, intSearchRTWindow = 3,
+                                                  calcArea = "integrate", findPeaksAlgo = "none", ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(intSearchRTWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
+    checkmate::assertString(findPeaksAlgo, min.chars = 1, add = ac) # UNDONE check algo choice if findPeaks() will not be exported
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0 || length(mobilities(obj)) == 0)
+        return(obj) # nothing to do...
+    
+    anaInfo <- analysisInfo(obj)
+    filePaths <- getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path)
+    
+    obj@features <- Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
+    {
+        TIMSDB <- openTIMSMetaDBScope(f = fp)
+        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
+        frames <- frames[MsMsType == 0]
+        
+        fTable <- copy(fTable)
+        
+        fTable <- fTable[ID %chin% mobs$ID] # UNDONE: always remove unassigned features? Also take care to update fGroups!
+        
+        # Split features by their mobility
+        fTable <- merge(fTable, mobs[, c("ID", "mobility"), with = FALSE], by = "ID", sort = FALSE)
+        fTable[, ID := paste0(ID, "_", signif(mobility, 3))] # make sure IDs remain unique
+        
+        # Update quantities from EICs
+        EICs <- getTIMSEICs(fp, frames$Id, fTable$mz - mzWindow, fTable$mz + mzWindow, fTable$mobility - IMSWindow,
+                            fTable$mobility + IMSWindow, FALSE)
+        
+        whUpdateQuant <- rep(TRUE, nrow(fTable))
+        if (findPeaksAlgo != "none")
+        {
+            # prepare EICs for findPeaks()
+            EICsPeaks <- setNames(Map(EICs, fTable$retmin, fTable$retmax, f = function(eic, rmin, rmax)
+            {
+                eic <- setDT(eic)
+                eic <- eic[time %between% c(rmin, rmax)]
+                return(eic)
+            }), fTable$ID)
+            peaks <- findPeaks(EICsPeaks, findPeaksAlgo, ...)
+            peaks <- peaks[sapply(peaks, nrow) == 1] # only consider results where exactly one peak is found
+            peaksAll <- rbindlist(peaks, idcol = "ID")
+            copyCols <- c("ret", "retmin", "retmax", "area", "intensity")
+            fTable[peaksAll, (copyCols) := mget(paste0("i.", copyCols)), on = "ID"]
+            whUpdateQuant <- !fTable$ID %chin% names(peaks) # fall-back to simple quantity update for others
+        }
+        
+        fTable[whUpdateQuant, intensity := mapply(ret, EICs[whUpdateQuant], FUN = function(r, eic)
+        {
+            max(eic[eic$time %between% c(r - intSearchRTWindow, r + intSearchRTWindow), "intensity"])
+        })]
+        fTable[whUpdateQuant, area := mapply(retmin, retmax, EICs[whUpdateQuant], FUN = function(rmin, rmax, eic)
+        {
+            wh <- eic$time %between% c(rmin, rmax)
+            a <- sum(eic$intensity[wh])
+            if (calcArea == "integrate")
+                a <- a * ((rmax - rmin) / sum(wh))
+            return(a)
+        })]
+        
+        return(fTable)
     })
     
     return(obj)

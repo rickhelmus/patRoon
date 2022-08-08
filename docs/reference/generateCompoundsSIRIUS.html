@@ -138,77 +138,116 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
 <dt>relMzDev</dt>
 <dd><p>Maximum relative deviation between the measured and candidate formula <em>m/z</em> values (in ppm).
 Sets the <span class="option">--ppm-max</span> command line option.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
 <p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
   adduct annotations will then always be used.</p></dd>
+
+
 <dt>projectPath, dryRun</dt>
 <dd><p>These are mainly for internal purposes. <code>projectPath</code> sets the output directory for
 the <code class="command">SIRIUS</code> output (a temporary directory if <code>NULL</code>). If <code>dryRun</code> is <code>TRUE</code> then no
 computations are done and only the results from <code>projectPath</code> are processed.</p>
 <p>(<strong>sets workflow</strong>) <code>projectPath</code> should be a <code>character</code> specifying the paths for each set.</p></dd>
+
+
 <dt>elements</dt>
 <dd><p>Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum
 number of elements can also be specified, for example: a value of <code>"C[5]H[10-15]O"</code> will only consider
 formulae with up to five carbon atoms, between ten and fifteen hydrogen atoms and any amount of oxygen atoms. Sets
 the <span class="option">--elements</span> command line  option.</p></dd>
+
+
 <dt>profile</dt>
 <dd><p>Name of the configuration profile, for example: <span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>,
 <span class="option">"fticr"</span>. Sets the <span class="option">--profile</span> commandline option.</p></dd>
+
+
 <dt>formulaDatabase</dt>
 <dd><p>If not <code>NULL</code>, use a database for retrieval of formula
 candidates. Possible values are: <span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets the
 <span class="option">--database</span> commandline option.</p></dd>
+
+
 <dt>fingerIDDatabase</dt>
 <dd><p>Database specifically used for <code class="command">CSI:FingerID</code>. If <code>NULL</code>, the value of the
 <code>formulaDatabase</code> parameter will be used or <code>"pubchem"</code> when that is also <code>NULL</code>. Sets the
 <span class="option">--fingerid-db</span> option.</p></dd>
+
+
 <dt>noise</dt>
 <dd><p>Median intensity of the noise (<code>NULL</code> ignores this parameter). Sets the <span class="option">--noise</span>
 commandline option.</p></dd>
+
+
 <dt>cores</dt>
 <dd><p>The number of cores <code class="command">SIRIUS</code> will use. If <code>NULL</code> then the default of all cores will be
 used.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest score. Set to <code>NULL</code> to
 always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
 large numbers of candidates.</p></dd>
+
+
 <dt>topMostFormulas</dt>
 <dd><p>Do not return more than this number of candidate formulae. Note that only compounds for these
 formulae will be searched. Sets the <span class="option">--candidates</span> commandline option.</p></dd>
+
+
 <dt>extraOptsGeneral, extraOptsFormula</dt>
 <dd><p>a <code>character</code> vector with any extra commandline parameters for
 <code class="command">SIRIUS</code>. For <code class="command">SIRIUS</code> versions <code>&lt;4.4</code> there is no distinction between general and formula
 options. Otherwise commandline options specified in <code>extraOptsGeneral</code> are added prior to the <code>formula</code>
 command, while options specified in <code>extraOptsFormula</code> are added in afterwards. See the <code class="command">SIRIUS</code>
 manual for more details. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If <code>TRUE</code> then more output is shown in the terminal.</p></dd>
+
+
 <dt>splitBatches</dt>
 <dd><p>If <code>TRUE</code> then the calculations done by <code class="command">SIRIUS</code> will be evenly split over multiple
 <code class="command">SIRIUS</code> calls (which may be run in parallel depending on the <a href="patRoon-package.html">set package
 options</a>). If <code>splitBatches=FALSE</code> then all feature calculations are performed from a single <code class="command">SIRIUS</code>
 execution, which is often the fastest if calculations are performed on a single computer.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
+
 <dt>setThreshold</dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
+
+
 <dt>setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="compounds-class.html">compounds</a></code> derived object containing all compound annotations.</p>
+    
+
+<p>A <code><a href="compounds-class.html">compounds</a></code> derived object containing all compound annotations.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -272,7 +311,7 @@ ISBN 978-3-319-16706-0.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -110,14 +110,20 @@
     <h2>Arguments</h2>
     <dl><dt>analysisInfo</dt>
 <dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+
+
 <dt>doFMF</dt>
 <dd><p>Run the 'Find Molecular Features' algorithm before loading compounds. Valid options are: <code>"auto"</code>
 (run FMF automatically if current results indicate it is necessary) and <code>"force"</code> (run FMF <em>always</em>, even
 if cached results exist). Note that checks done if <code>doFMF="auto"</code> are fairly simplistic, hence set
 <code>doFMF="force"</code> if feature data needs to be updated.</p></dd>
+
+
 <dt>startRange, endRange</dt>
 <dd><p>Start/End retention range (seconds) from which to collect features. A 0 (zero) for
 <code>endRange</code> marks the end of the analysis.</p></dd>
+
+
 <dt>close, save</dt>
 <dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
@@ -125,12 +131,17 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 <code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
 likely what you want as otherwise any processed data is lost.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of a class which is derived from <code><a href="features-class.html">features</a></code>.</p>
+    
+
+<p>An object of a class which is derived from <code><a href="features-class.html">features</a></code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -166,7 +177,7 @@ likely what you want as otherwise any processed data is lost.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -231,23 +231,33 @@ unset(obj, set)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>obj, x, object</dt>
 <dd><p>The <code>formulas</code> object.</p></dd>
+
+
 <dt>features</dt>
 <dd><p>If <code>TRUE</code> returns formula data for features, otherwise
 for feature groups.</p></dd>
+
+
 <dt>i, j</dt>
 <dd><p>For <code>[[</code>: If both <code>i</code> and <code>j</code> are specified then <code>i</code> specifies the analysis and
   <code>j</code> the feature group of the feature for which annotations should be returned. Otherwise <code>i</code> specifies
   the feature group for which group annotations should be returned. <code>i</code>/<code>j</code> can be specified as
   <code>integer</code> index or as a <code>character</code> name.</p>
 <p>Otherwise passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>plotSpectrum</code>: Further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>consensus</code>: Any further (and unique) <code>formulas</code> objects.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>formulas</code> method.</p></dd>
+
+
 <dt>fGroups, fragments, countElements, countFragElements, OM</dt>
 <dd><p>Passed to the
 <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>normalizeScores</dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
@@ -260,6 +270,8 @@ values into account when candidates were generated. Thus, for
 <code>compounds</code> scoring, normalization is not affected when candidate
 results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
+
+
 <dt>excludeNormScores</dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
@@ -269,38 +281,60 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behavior of the
   <code class="command">MetFrag</code> web interface.</p></dd>
+
+
 <dt>average</dt>
 <dd><p>If set to <code>TRUE</code> an 'average formula' is generated for each feature group by combining all
 elements from all candidates and averaging their amounts. This obviously leads to non-existing formulae, however,
 this data may be useful to deal with multiple candidate formulae per feature group when performing elemental
 characterization. Setting this to <code>TRUE</code> disables reporting of most other data.</p></dd>
+
+
 <dt>index</dt>
 <dd><p>The candidate index (row). For <code>plotSpectrum</code> two indices can be specified to compare spectra. In
 this case <code>groupName</code> and <code>analysis</code> (if not <code>NULL</code>) should specify values for the spectra to
 compare.</p></dd>
+
+
 <dt>groupName</dt>
 <dd><p>The name of the feature group (or feature groups when comparing spectra) to which the candidate
 belongs.</p></dd>
+
+
 <dt>analysis</dt>
 <dd><p>A <code>character</code> specifying the analysis (or analyses when comparing spectra) for which the
 annotated spectrum should be plotted. If <code>NULL</code> then annotation results for the complete feature group will be
 plotted.</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>The <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was used to generate the candidate</p></dd>
+
+
 <dt>onlyAnnotated</dt>
 <dd><p>Set to <code>TRUE</code> to filter out any peaks that could
 not be annotated.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>The title of the plot. Set to <code>NULL</code> for an automatically generated title.</p></dd>
+
+
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
 <dt>mincex</dt>
 <dd><p>The formula annotation labels are automatically scaled. The <code>mincex</code> argument forces a minimum
 <code>cex</code> value for readability.</p></dd>
+
+
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>absMinAbundance, relMinAbundance</dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
@@ -308,6 +342,8 @@ instance, <code>relMinAbundance=0.5</code> means that a result should be present
 in at least half of the number of compared objects. Set to <samp>NULL</samp> to
 ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> is
 not <code>NULL</code>.</p></dd>
+
+
 <dt>uniqueFrom</dt>
 <dd><p>Set this argument to only retain formulas that are unique
 within one or more of the objects for which the consensus is made.
@@ -316,45 +352,75 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 <code>character</code> (as obtained with <code>algorithm(obj)</code>). For
 <code>logical</code> and <code>numeric</code> values the order corresponds to the order
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>uniqueOuter</dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
+
+
 <dt>rankWeights</dt>
 <dd><p>A numeric vector with weights of to calculate the mean
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of <samp>1</samp> means equal weights for all considered
 objects.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>). Note: if
 <code>updateConsensus=FALSE</code> then the <code>setCoverage</code> column of the annotation results is not updated.</p></dd>
+
+
 <dt>updateConsensus</dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then the annonation consensus among set results is updated. See the
 <code>Sets workflows</code> section for more details.</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
+
+
 <dt>perSet, mirror</dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
 Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></dd>
+
+
 <dt>filterSets</dt>
 <dd><p>(<strong>sets workflow</strong>) Controls how algorithms concensus abundance filters are applied. See the <code>Sets
 workflows</code> section below.</p></dd>
+
+
 <dt>setThreshold, setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) Thresholds used to create the annotation set consensus. See
 <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>annotations</code> returns a <code>list</code> containing for each feature
-  group (or feature if <code>features=TRUE</code>) a <code>data.table</code>  with an overview of all generated formulae and other data such as candidate
-  scoring and MS/MS fragments.
-<code>consensus</code> returns a <code>formulas</code> object that is produced by
+    
+
+<p><code>annotations</code> returns a <code>list</code> containing for each feature
+  group (or feature if <code>features=TRUE</code>) a <code>data.table</code></p>
+
+
+<p>with an overview of all generated formulae and other data such as candidate
+  scoring and MS/MS fragments.</p>
+
+
+<p><code>consensus</code> returns a <code>formulas</code> object that is produced by
   merging results from multiple <code>formulas</code> objects.</p>
     </div>
     <div id="details">
@@ -478,7 +544,7 @@ create this object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

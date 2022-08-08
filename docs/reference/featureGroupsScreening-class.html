@@ -194,17 +194,27 @@ unset(obj, set)</code></pre></div>
     <h2>Arguments</h2>
     <dl><dt>obj, object, x, fGroups</dt>
 <dd><p>The <code>featureGroupsScreening</code> object.</p></dd>
+
+
 <dt>i, j, rGroups</dt>
 <dd><p>Used for subsetting data analyses, feature groups and
 replicate groups, see <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed to the base method.</p></dd>
+
+
 <dt>suspects</dt>
 <dd><p>An optional <code>character</code> vector with suspect names. If
 specified, only <code>featureGroups</code> will be kept that are assigned to
 these suspects.</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>Ignored.</p></dd>
+
+
 <dt>collapseSuspects</dt>
 <dd><p>If a <code>character</code> then any suspects that were
 matched to the same feature group are collapsed to a single row and suspect
@@ -212,6 +222,8 @@ names are separated by the value of <code>collapseSuspects</code>. If <code>NULL
 then no collapsing occurs, and each suspect match is reported on a single
 row. Note that some columns will not be reported when collapsing is
 enabled.</p></dd>
+
+
 <dt>onlyHits</dt>
 <dd><p>For <code>as.data.table</code>: if <code>TRUE</code> then only feature groups with suspect hits are reported.</p>
 <p>For <code>filter</code></p><ul><li><p>if <code>negate=FALSE</code> and <code>onlyHits=TRUE</code> then all feature groups without suspect hits will be removed.
@@ -220,18 +232,28 @@ enabled.</p></dd>
   <code>onlyHits=FALSE</code> will only retain feature groups with suspect matches and this filter is ignored if
   <code>onlyHits=NULL</code>.</p></li>
 </ul></dd>
+
+
 <dt>MSPeakLists, formulas, compounds</dt>
 <dd><p>Annotation data (<code><a href="MSPeakLists-class.html">MSPeakLists</a></code>, <code><a href="formulas-class.html">formulas</a></code> and
 <code><a href="compounds-class.html">compounds</a></code>) obtained for this <code>featureGroupsScreening</code> object. All arguments can be <code>NULL</code>
 to exclude it from the annotation.</p></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation.</p></dd>
+
+
 <dt>relMinMSMSIntensity</dt>
 <dd><p>Minimum relative intensity (<samp>0-1</samp>) threshold applied when calculating annotation
 similarities.</p></dd>
+
+
 <dt>simMSMSMethod</dt>
 <dd><p>Either <code>"cosine"</code> or <code>"jaccard"</code>: used to compare MS/MS peak lists for annotation
 similarity calculation.</p></dd>
+
+
 <dt>checkFragments</dt>
 <dd><p>Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
 suspect fragment matches (<em>i.e.</em> from the <code>fragments_mz</code>/<code>fragments_formula</code> columns in the suspect
@@ -239,6 +261,8 @@ list). Valid values are: <code>"mz"</code>, <code>"formula"</code>, <code>"compo
 the specified <code>MSPeakLists</code> object, whereas the others use the formulae that were annotated to MS/MS peaks in
 the given <code>formulas</code> or <code>compounds</code> objects. Multiple values are possible: in this case the maximum
 number of fragment matches will be reported.</p></dd>
+
+
 <dt>compoundsNormalizeScores, formulasNormalizeScores</dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either</p>
@@ -250,11 +274,17 @@ values into account when candidates were generated. Thus, for
 <code>compounds</code> scoring, normalization is not affected when candidate
 results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
+
+
 <dt>IDFile</dt>
 <dd><p>A file path to a YAML file with rules used for estimation of identification levels. See the
 <code>Suspect annotation</code> section for more details. If not specified then a default rules file will be used.</p></dd>
+
+
 <dt>logPath</dt>
 <dd><p>A directory path to store logging information. If <code>NULL</code> then logging is disabled.</p></dd>
+
+
 <dt>selectHitsBy</dt>
 <dd><p>Should be <code>"intensity"</code> or <code>"level"</code>. For cases
 where the same suspect is matched to multiple feature groups, only the
@@ -264,15 +294,21 @@ suspect to the feature group with highest mean intensity
 is kept. Set to <code>NULL</code> to ignore this filter. If <code>negate=TRUE</code>
 then only those hits with lowest mean intensity/poorest identification
 level are kept.</p></dd>
+
+
 <dt>selectBestFGroups</dt>
 <dd><p>If <code>TRUE</code> then for any cases where a single
 feature group is matched to several suspects only the suspect assigned to
 the feature group with best identification score is kept. In case of ties
 only the first is kept.</p></dd>
+
+
 <dt>maxLevel, maxFormRank, maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth</dt>
 <dd><p>Filter suspects by maximum identification level (<em>e.g.</em> <code>"3a"</code>),
 formula/compound rank or with minimum formula/compound/combined annotation
 similarity. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>absMinFragMatches, relMinFragMatches</dt>
 <dd><p>Only retain suspects with this
 minimum number MS/MS matches with the fragments specified in the suspect
@@ -280,19 +316,34 @@ list (<em>i.e.</em> <code>fragments_mz</code>/<code>fragments_formula</code>).
 <code>relMinFragMatches</code> sets the minimum that is relative (<samp>0-1</samp>) to
 the maximum number of MS/MS fragments specified in the <code>fragments_*</code>
 columns of the suspect list. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed
 in opposite manner.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code> object, which is a
-<code><a href="featureGroups-class.html">featureGroups</a></code> object amended with annotation data.
-<code>filter</code> returns a filtered <code>featureGroupsScreening</code>  object.</p>
+    
+
+<p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code> object, which is a</p>
+<p></p>
+<p><code><a href="featureGroups-class.html">featureGroups</a></code> object amended with annotation data.</p>
+
+
+<p><code>filter</code> returns a filtered <code>featureGroupsScreening</code></p>
+
+
+<p>object.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
@@ -500,7 +551,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -138,8 +138,12 @@
     <h2>Arguments</h2>
     <dl><dt>anaInfo</dt>
 <dd><p><a href="analysis-information.html">Analysis info table</a></p></dd>
+
+
 <dt>method</dt>
 <dd><p>The full path of the DataAnalysis method.</p></dd>
+
+
 <dt>close, save</dt>
 <dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
@@ -147,52 +151,82 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 <code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
 likely what you want as otherwise any processed data is lost.</p></dd>
+
+
 <dt>analysis</dt>
 <dd><p>Analysis name (without file extension).</p></dd>
+
+
 <dt>path</dt>
 <dd><p>path of the analysis.</p></dd>
+
+
 <dt>mz</dt>
 <dd><p><em>m/z</em> (Da) value used for the chromatographic trace (if
 applicable).</p></dd>
+
+
 <dt>mzWindow</dt>
 <dd><p><em>m/z</em> window (in Da) used for the chromatographic trace
 (if applicable).</p></dd>
+
+
 <dt>ctype</dt>
 <dd><p>Type of the chromatographic trace. Valid options are:
 <code>"EIC"</code> (extracted ion chromatogram), <code>"TIC"</code> (total ion
 chromatogram, only for <code>addDAEIC</code>) and <code>"BPC"</code> (Base Peak
 Chromatogram).</p></dd>
+
+
 <dt>mtype</dt>
 <dd><p>MS filter for chromatographic trace. Valid values are:
 <code>"all"</code>, <code>"MS"</code>, <code>"MSMS"</code>, <code>"allMSMS"</code> and
 <code>"BBCID"</code>.</p></dd>
+
+
 <dt>polarity</dt>
 <dd><p>Polarity filter for chromatographic trace. Valid values:
 <code>"both"</code>, <code>"positive"</code> and <code>"negative"</code>.</p></dd>
+
+
 <dt>bgsubtr</dt>
 <dd><p>If <code>TRUE</code> then background subtraction ('Spectral'
 algorithm) will be performed.</p></dd>
+
+
 <dt>fragpath</dt>
 <dd><p>Precursor <em>m/z</em> used for MS/MS traces (<code>""</code> for
 none).</p></dd>
+
+
 <dt>name</dt>
 <dd><p>For <code>addDAEIC</code>: the name for the chromatographic trace. For
 <code>addAllEICs</code>: <code>TRUE</code> to automatically set EIC names. Set to
 <code>NULL</code> for none.</p></dd>
+
+
 <dt>hideDA</dt>
 <dd><p>Hides DataAnalysis while adding the chromatographic trace
 (faster).</p></dd>
+
+
 <dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object for which EICs should be made.</p></dd>
+
+
 <dt>onlyPresent</dt>
 <dd><p>If <code>TRUE</code> then EICs are only generated for analyses
 where the feature was detected.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>getDACalibrationError</code> returns a <code>data.frame</code> with a
-  column of all analyses (named <code>analysis</code>) and their mass error (named
-<code>error</code>).</p>
+    
+
+<p><code>getDACalibrationError</code> returns a <code>data.frame</code> with a
+  column of all analyses (named <code>analysis</code>) and their mass error (named</p>
+<p></p>
+<p><code>error</code>).</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -242,7 +276,7 @@ required to be installed.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

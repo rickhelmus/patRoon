@@ -150,25 +150,39 @@
     <h2>Arguments</h2>
     <dl><dt>out</dt>
 <dd><p>The file name of the the output <code class="command">MetFrag</code> database.</p></dd>
+
+
 <dt>includeParents</dt>
 <dd><p>Set to <code>TRUE</code> to include the parents in the database.</p></dd>
+
+
 <dt>obj, TPs</dt>
 <dd><p><code>transformationProductsStructure</code> derived object to be accessed</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>filter</code>: Further argument passed to the base
   <code><a href="transformationProducts-class.html">filter method</a></code>.</p>
 <p>For <code>plotVenn</code>, <code>plotUpSet</code> and <code>consensus</code>: further (unique) <code>transformationProductsStructure</code>
   objects.</p></dd>
+
+
 <dt>removeParentIsomers</dt>
 <dd><p>If <code>TRUE</code> then TPs with an equal formula as their parent (isomers) are removed.</p></dd>
+
+
 <dt>removeTPIsomers</dt>
 <dd><p>If <code>TRUE</code> then all TPs with equal formula as any sibling TPs (isomers) are removed.
 Unlike <code>removeDuplicates</code>, <em>all</em> TP candidates are removed (including the first match). This filter
 automatically sets <code>removeDuplicates=TRUE</code> to avoid complete removal of TPs with equal structure.</p></dd>
+
+
 <dt>removeDuplicates</dt>
 <dd><p>If <code>TRUE</code> then the TPs of a parent with duplicate structures (<acronym>SMILES</acronym>) are
 removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP
 candidate with duplicate structure will be kept.</p></dd>
+
+
 <dt>minSimilarity</dt>
 <dd><p>Minimum structure similarity (<samp>0-1</samp>) that a TP should have relative to its parent. This
 data is only available if the <code>calcSims</code> argument to <code><a href="generateTPs.html">generateTPs</a></code> was set to <code>TRUE</code>. May be
@@ -176,38 +190,64 @@ useful under the assumption that parents and TPs who have a high structural simi
 MS/MS spectral similarity (which can be evaluated after componentization with <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code>.
 Any values that are <code>NA</code> are removed (which only occur when a consensus was made from objects that not all
 have similarity information).</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
+
+
 <dt>which</dt>
 <dd><p>Either a <code>character</code> or <code>integer</code> vector with one or more names/indices of the parents to
 plot.</p></dd>
+
+
 <dt>components</dt>
 <dd><p>If specified (<em>i.e.</em> not <code>NULL</code>), a <code><a href="componentsTPs-class.html">componentsTPs</a></code> object that is used for
 matching the graph with screening results. The TPs that were found will be marked. See also the <code>prune</code> and
 <code>onlyCompletePaths</code> arguments.</p></dd>
+
+
 <dt>structuresMax</dt>
 <dd><p>An <code>integer</code> with the maximum number of structures to plot. Setting a maximum is mainly
 done to avoid long times needed to construct the graph.</p></dd>
+
+
 <dt>prune</dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then pathways without <em>any</em> detected TPs are not shown
 (pruned). See also the <code>onlyCompletePaths</code> and <code>components</code> arguments.</p></dd>
+
+
 <dt>onlyCompletePaths</dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then only pathways are shown for which
 <em>all</em> TPs were detected. See also the <code>prune</code> and <code>components</code> arguments.</p></dd>
+
+
 <dt>commonParents</dt>
 <dd><p>Only consider TPs from parents that are common to all compared objects.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
+
+
 <dt>vennArgs</dt>
 <dd><p>A <code>list</code> with further arguments passed to <span class="pkg">VennDiagram</span> plotting functions. Set to
 <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>nsets, nintersects</dt>
 <dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+
+
 <dt>upsetArgs</dt>
 <dd><p>A list with any further arguments to be passed to
 <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>absMinAbundance, relMinAbundance</dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
@@ -215,6 +255,8 @@ instance, <code>relMinAbundance=0.5</code> means that a result should be present
 in at least half of the number of compared objects. Set to <samp>NULL</samp> to
 ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> is
 not <code>NULL</code>.</p></dd>
+
+
 <dt>uniqueFrom</dt>
 <dd><p>Set this argument to only retain TPs that are unique
 within one or more of the objects for which the consensus is made.
@@ -223,23 +265,36 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 <code>character</code> (as obtained with <code>algorithm(obj)</code>). For
 <code>logical</code> and <code>numeric</code> values the order corresponds to the order
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>uniqueOuter</dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>filter</code> returns a filtered <code>transformationProductsStructure</code> object.
-<code>plotGraph</code> returns the result of <code>visNetwork</code>.
-<code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
+    
+
+<p><code>filter</code> returns a filtered <code>transformationProductsStructure</code> object.</p>
+
+
+<p><code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
+
+
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em><code>draw.pairwise.venn</code> and
-<code>draw.triple.venn</code>).
-<code>consensus</code> returns a <code>transformationProductsStructure</code> object that is produced by merging results
+from the used plotting function (see <em>e.g.</em></p>
+<p></p>
+<p><code>draw.pairwise.venn</code> and
+<code>draw.triple.venn</code>).</p>
+
+
+<p><code>consensus</code> returns a <code>transformationProductsStructure</code> object that is produced by merging results
   from multiple <code>transformationProductsStructure</code> objects.</p>
     </div>
     <div id="details">
@@ -321,7 +376,7 @@ considered to originate from the same (original) parent.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

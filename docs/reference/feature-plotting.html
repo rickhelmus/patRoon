@@ -202,38 +202,62 @@
     <dl><dt>colourBy</dt>
 <dd><p>Sets the automatic colour selection: <code>"none"</code> for a single colour or
 <code>"rGroups"</code>/<code>"fGroups"</code> for a distinct colour per replicate/feature group.</p></dd>
+
+
 <dt>onlyUnique</dt>
 <dd><p>If <code>TRUE</code> and <code>colourBy="rGroups"</code> then only
 feature groups that are unique to a replicate group are plotted.</p></dd>
+
+
 <dt>retMin</dt>
 <dd><p>Plot retention time in minutes (instead of seconds).</p></dd>
+
+
 <dt>showLegend</dt>
 <dd><p>Plot a legend if <code>TRUE</code>.</p></dd>
+
+
 <dt>col</dt>
 <dd><p>Colour(s) used. If <code>col=NULL</code> then colours are automatically generated.</p></dd>
+
+
 <dt>pch, type, lty</dt>
 <dd><p>Common plotting parameters passed to <em>e.g.</em> <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. For <code>plot</code>:
 if <code>pch=NULL</code> then values are automatically assigned.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> (<code>plot</code> and <code>plotChroms</code>), <code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>
 (<code>plotInt</code>), <span class="pkg">VennDiagram</span> plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
 (<code>plotChord</code>) or <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> (<code>plotUpSet</code>).</p></dd>
+
+
 <dt>average</dt>
 <dd><p>If <code>TRUE</code> then data within replicate groups are averaged.</p>
 <p>For <code>as.data.table</code>: if <code>features=TRUE</code> other feature properties are also averaged.</p></dd>
+
+
 <dt>xnames</dt>
 <dd><p>Plot analysis (or replicate group if <code>average=TRUE</code>) names on the x axis.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) For <code>plotInt</code>: if <code>TRUE</code> then feature intensities are plot per set (order follows the
   <a href="analysis-information.html">analysis information</a>).</p>
 <p>For <code>plotVenn</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used to specify the
   names of the sets to be compared.</p></dd>
+
+
 <dt>addSelfLinks</dt>
 <dd><p>If <code>TRUE</code> then 'self-links' are added which
 represent non-shared data.</p></dd>
+
+
 <dt>addRetMzPlots</dt>
 <dd><p>Set to <code>TRUE</code> to enable <em>m/z</em> <em>vs</em>
 retention time scatter plots.</p></dd>
+
+
 <dt>outerGroups</dt>
 <dd><p>Character vector of names to be used as outer groups. The
 values in the specified vector should be named by analysis names
@@ -241,48 +265,76 @@ values in the specified vector should be named by analysis names
 (<code>average</code> set to <code>TRUE</code>), for instance: <code>c(analysis1 =
 "group1", analysis2 = "group1", analysis3 = "group2")</code>. Set to <code>NULL</code>
 to disable outer groups.</p></dd>
+
+
 <dt>addIntraOuterGroupLinks</dt>
 <dd><p>If <code>TRUE</code> then links will be added within
 outer groups.</p></dd>
+
+
 <dt>rtWindow</dt>
 <dd><p>Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
 retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
 retention time axis.</p></dd>
+
+
 <dt>mzExpWindow</dt>
 <dd><p>In case the <em>m/z</em> window to plot an EIC for a particular analysis is not known (<em>i.e.</em>
 no feature was detected of the feature group to be plot and <code>onlyPresent=FALSE</code>) then the EIC <em>m/z</em> range
 is estimated from the range for the complete feature group and expanded by the offset defined by
 <code>mzExpWindow</code>.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only plot EICs from features within this number of top most intense analyses. If <code>NULL</code> then all
 analyses are used for plotted.</p></dd>
+
+
 <dt>topMostByRGroup</dt>
 <dd><p>If set to <code>TRUE</code> and <code>topMost</code> is set: only plot EICs for the top most features in
 each replicate group. For instance, when <code>topMost=1</code> and <code>topMostByRGroup=TRUE</code>, then EICs will be
 plotted for the most intense feature of each replicate group.</p></dd>
+
+
 <dt>EICs</dt>
 <dd><p>Internal parameter for now and should be kept at <code>NULL</code> (default).</p></dd>
+
+
 <dt>showPeakArea</dt>
 <dd><p>Set to <code>TRUE</code> to display integrated chromatographic peak ranges by filling (shading) their
 areas.</p></dd>
+
+
 <dt>showFGroupRect</dt>
 <dd><p>Set to <code>TRUE</code> to mark the full retention/intensity range of all features within a feature
 group by drawing a rectangle around it.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
+
+
 <dt>onlyPresent</dt>
 <dd><p>Only plot feature groups of internal standards that are still present in the <code>featureGroups</code>
 input object (which may be otherwise be removed by <em>e.g.</em> subsetting or
 <code><a href="feature-filtering.html">filter</a></code>).</p></dd>
+
+
 <dt>annotate</dt>
 <dd><p>If set to <code>"ret"</code> and/or <code>"mz"</code> then retention and/or <em>m/z</em> values will be drawn for
 each plotted feature group.</p></dd>
+
+
 <dt>showProgress</dt>
 <dd><p>if set to <code>TRUE</code> then a text progressbar will be displayed when all EICs are being plot. Set
 to <code>"none"</code> to disable any annotation.</p></dd>
+
+
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>which</dt>
 <dd><p>A character vector with replicate groups used for comparison. Set to <code>NULL</code> to ignore.</p>
 <p>For <code>plotVenn</code>: alternatively a named <code>list</code> containing elements of <code>character</code> vectors with
@@ -290,26 +342,41 @@ to <code>"none"</code> to disable any annotation.</p></dd>
   c("effluent-A", "effluent-B"))</code>, will compare the features in replicate groups <samp>"influent-A/B"</samp> against those
   in <samp>"effluent-A/B"</samp>. The names of the list are used for labelling in the plot, and will be made automatically
   if not specified.</p></dd>
+
+
 <dt>nsets, nintersects</dt>
 <dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+
+
 <dt>FCParams</dt>
 <dd><p>A parameter list to calculate Fold change data. See <code>getFCParams</code> for more details.</p></dd>
+
+
 <dt>averageFunc, normalized</dt>
 <dd><p>Used for intensity data treatment, see the documentation for the
 <code><a href="featureGroups-class.html">as.data.table method</a></code>.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The set for which data must be plotted.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
+    
+
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em><code>draw.pairwise.venn</code> and
-<code>draw.triple.venn</code>).
-<code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
+from the used plotting function (see <em>e.g.</em></p>
+<p></p>
+<p><code>draw.pairwise.venn</code> and
+<code>draw.triple.venn</code>).</p>
+
+
+<p><code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -369,7 +436,7 @@ from the used plotting function (see <em>e.g.</em><code>draw.pairwise.venn</code
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

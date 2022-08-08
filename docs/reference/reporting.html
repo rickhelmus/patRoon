@@ -188,18 +188,26 @@ identified compounds.</p>
     <dl><dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that should be used for
 reporting data.</p></dd>
+
+
 <dt>path</dt>
 <dd><p>The destination file path for files generated during reporting.
 Will be generated if needed.</p></dd>
+
+
 <dt>reportFeatures</dt>
 <dd><p>If set to <code>TRUE</code> then for each analysis a
 <code class="file">.csv</code> file will be generated with information about its detected
 features.</p></dd>
+
+
 <dt>formulas, compounds, compsCluster, components</dt>
 <dd><p>Further objects
 (<code><a href="formulas-class.html">formulas</a></code>, <code><a href="compounds-class.html">compounds</a></code>,
 <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>, <code><a href="components-class.html">components</a></code>) that should be
 reported. Specify <code>NULL</code> to skip reporting a particular object.</p></dd>
+
+
 <dt>compoundsNormalizeScores, formulasNormalizeScores</dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
@@ -212,6 +220,8 @@ values into account when candidates were generated. Thus, for
 <code>compounds</code> scoring, normalization is not affected when candidate
 results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
+
+
 <dt>compoundsExclNormScores, formulasExclNormScores</dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
@@ -221,77 +231,116 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behavior of the
   <code class="command">MetFrag</code> web interface.</p></dd>
+
+
 <dt>retMin</dt>
 <dd><p>If <code>TRUE</code> then report retention times in minutes
 (otherwise seconds).</p></dd>
+
+
 <dt>clearPath</dt>
 <dd><p>If <code>TRUE</code> then the destination path will be
 (recursively) removed prior to reporting.</p></dd>
+
+
 <dt>reportFGroups</dt>
 <dd><p>If <code>TRUE</code> then feature group data will be reported.</p></dd>
+
+
 <dt>formulasTopMost, compoundsTopMost</dt>
 <dd><p>Only this amount of top ranked
 candidate formulae/compounds are reported. Lower values may significantly
 speed up reporting. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>reportFormulaSpectra</dt>
 <dd><p>If <code>TRUE</code> then explained MS/MS spectra (if
 available) for candidate formulae will be reported. Specifying
 <code>formulas</code> and setting this argument to <code>FALSE</code> still allows
 further annotation of compound MS/MS spectra.</p></dd>
+
+
 <dt>compoundsOnlyUsedScorings</dt>
 <dd><p>If <code>TRUE</code> then only scorings are plotted
 that actually have been used to rank data (see the <code>scoreTypes</code>
 argument to <code><a href="generateCompoundsMetFrag.html">generateCompoundsMetFrag</a></code> for more details).</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that is
 <em>mandatory</em> when spectra for formulae and/or compounds will be
 reported.</p></dd>
+
+
 <dt>EICGrid</dt>
 <dd><p>An integer vector in the form <code>c(columns, rows)</code> that is
 used to determine the plotting grid when reporting EICs in PDF files.</p></dd>
+
+
 <dt>EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent</dt>
 <dd><p>Plotting parameters passed to <code><a href="generics.html">plotChroms</a></code> (<em>i.e.</em>
 <code>rtWindow</code>, <code>mzExpWindow</code>, <code>topMost</code>, <code>topMostByRGroup</code>
 and <code>onlyPresent</code> arguments).</p></dd>
+
+
 <dt>reportPlots</dt>
 <dd><p>A character vector specifying what should be plotted. Valid options are: <code>"chord"</code>,
 <code>"venn"</code>, <code>"upset"</code> (plot a chord, Venn and UpSet diagram, respectively), <code>"eics"</code> (plot EICs for
 individual feature groups) and <code>"formulas"</code> (plot annotated formula spectra). Set to <code>"none"</code> to plot
 none of these.</p></dd>
+
+
 <dt>includeMFWebLinks</dt>
 <dd><p>A <code>character</code> specifying to which feature groups a web link should be added in the
 annotation page to <a href="https://msbi.ipb-halle.de/MetFragBeta/index.xhtml" class="external-link">MetFragWeb</a>. Options are:
 <code>"compounds"</code> (only to those with compounds results), <code>"MSMS"</code> (only to those with MSMS peak lists) or
 <code>"none"</code>.</p></dd>
+
+
 <dt>interactiveHeat</dt>
 <dd><p>If <code>TRUE</code> an interactive heatmap HTML widget will be generated to display hierarchical
 clustering results. Set to <code>FALSE</code> for a 'regular' static plot.</p></dd>
+
+
 <dt>specSimParams</dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
 <dt>TPs</dt>
 <dd><p>A <code><a href="transformationProducts-class.html">transformationProducts</a></code> object that should used for plotting hierarchies. Ignored if
 <code>TPs=NULL</code> or <code>components</code> is not a <code>componentsTPs</code> object.</p></dd>
+
+
 <dt>TPGraphStructuresMax</dt>
 <dd><p>Maximum number of TP structures to plot in TP hierarchies, see the <code>TPs</code> argument.
 Sets the <code>structuresMax</code> argument to <code><a href="feature-plotting.html">plotGraph</a></code>.</p></dd>
+
+
 <dt>selfContained</dt>
 <dd><p>If <code>TRUE</code> the output will be a standalone HTML file which contains all graphics and script
 dependencies. When <code>FALSE</code>, the latter will be placed in an additional directory (<code class="file">report_files</code>) which
 should remain present when viewing the output file. Especially on Windows, a non-self contained output might be
 desirable when reporting large amounts of data to prevent <code class="command">pandoc</code> from running out of memory.</p></dd>
+
+
 <dt>optimizePng</dt>
 <dd><p>If <code>TRUE</code> then <code class="command">pngquant</code> is used to reduce the size of generated graphics. A
 significant reduction in disk space usage may be seen, however, at the cost additional processing time. Multiple
 <code class="command">pngquant</code> processes will be executed in parallel, which can be configured with
 <span class="option">patRoon.MP.maxProcs</span> (parallelization will always happen with the <code>"classic"</code> method, see
 <a href="patRoon-package.html">patRoon options</a>).</p></dd>
+
+
 <dt>openReport</dt>
 <dd><p>If set to <code>TRUE</code> then the output report file will be opened with the system browser.</p></dd>
+
+
 <dt>noDate</dt>
 <dd><p>If <code>TRUE</code> then the current date is not added to the report. This is mainly used for testing and
 its main purpose is to guarentees equal report files when `reportHTML()` is called multiple times with equal
 arguments.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -352,7 +401,7 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

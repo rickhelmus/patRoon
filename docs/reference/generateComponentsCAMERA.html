@@ -115,31 +115,46 @@ from known adducts, isotopes and in-source fragments.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
 <dt>ionization</dt>
 <dd><p>Which ionization polarity was used to generate the data: should be <code>"positive"</code>
   or <code>"negative"</code>. If the <code>featureGroups</code> object has adduct annotations, and <code>ionization=NULL</code>, the
   ionization will be detected automatically.</p>
 <p>(<strong>sets workflow</strong>) This parameter is not supported for sets workflows, as the ionization will always be detected
   automatically.</p></dd>
+
+
 <dt>onlyIsotopes</dt>
 <dd><p>Logical value. If <code>TRUE</code> only isotopes are considered when generating components (faster).
 Corresponds to <code>quick</code> argument of <code><a href="https://rdrr.io/pkg/CAMERA/man/annotate-methods.html" class="external-link">CAMERA::annotate</a></code>.</p></dd>
+
+
 <dt>minSize</dt>
 <dd><p>The minimum size of a component. Smaller components than this size will be removed. See note below.</p></dd>
+
+
 <dt>relMinReplicates</dt>
 <dd><p>Feature groups within a component are only kept when they contain data for at least this
 (relative) amount of replicate analyses. For instance, <samp>0.5</samp> means that at least half of the replicates should
 contain data for a particular feature group in a component. In this calculation replicates that are fully absent
 within a component are not taken in to account. See note below.</p></dd>
+
+
 <dt>extraOpts</dt>
 <dd><p>Named character vector with extra arguments directly passed to
 <code><a href="https://rdrr.io/pkg/CAMERA/man/annotate-methods.html" class="external-link">CAMERA::annotate</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="components-class.html">components</a></code> (derived) object containing all generated components.</p>
+    
+
+<p>A <code><a href="components-class.html">components</a></code> (derived) object containing all generated components.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -181,7 +196,7 @@ within a component are not taken in to account. See note below.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

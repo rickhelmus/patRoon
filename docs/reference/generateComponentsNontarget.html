@@ -119,40 +119,61 @@ components by unsupervised detection of homologous series.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
 <dt>ionization</dt>
 <dd><p>Which ionization polarity was used to generate the data: should be <code>"positive"</code>
   or <code>"negative"</code>. If the <code>featureGroups</code> object has adduct annotations, and <code>ionization=NULL</code>, the
   ionization will be detected automatically.</p>
 <p>(<strong>sets workflow</strong>) This parameter is not supported for sets workflows, as the ionization will always be detected
   automatically.</p></dd>
+
+
 <dt>rtRange</dt>
 <dd><p>A numeric vector containing the minimum and maximum retention time (in seconds) between homologues.
 Series are always considered from low to high <em>m/z</em>, thus, a negative minimum retention time allows detection
 of homologous series with increasing <em>m/z</em> and decreasing retention times. These values set the <code>minrt</code>
 and <code>maxrt</code> arguments of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
+
+
 <dt>mzRange</dt>
 <dd><p>A numeric vector specifying the minimum and maximum <em>m/z</em> increment of a homologous series. Sets
 the <code>minmz</code> and <code>maxmz</code> arguments of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
+
+
 <dt>elements</dt>
 <dd><p>A character vector with elements to be considered for detection of repeating units. Sets the
 <code>elements</code> argument of <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> function.</p></dd>
+
+
 <dt>rtDev</dt>
 <dd><p>Maximum retention time deviation. Sets the <code>rttol</code> to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.</p></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code>mztol</code> argument to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code></p></dd>
+
+
 <dt>absMzDevLink</dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation when linking series. This should usually be a bit higher
 than <code>absMzDev</code> to ensure proper linkage.</p></dd>
+
+
 <dt>traceHack</dt>
 <dd><p>Currently <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> does not work with <span style="R">R</span> <samp>&gt;3.3.3</samp>. This flag, which is
 enabled by default on these R versions, implements a (messy) workaround
 (<a href="https://github.com/blosloos/nontarget/issues/6" class="external-link">more details here</a>).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The generated comnponents are returned as an object from the <code><a href="componentsNT-class.html">componentsNT</a></code> class.</p>
+    
+
+<p>The generated comnponents are returned as an object from the <code><a href="componentsNT-class.html">componentsNT</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -196,7 +217,7 @@ enabled by default on these R versions, implements a (messy) workaround
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -139,27 +139,43 @@
   respectively.</p>
 <p>For <code>plotUpSet</code>: any further arguments passed to the <code>plotUpSet</code>
   method defined for <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></dd>
+
+
 <dt>groupAlgo</dt>
 <dd><p>The <code><a href="groupFeatures.html">feature grouping
 algorithm</a></code> that should be used for grouping <em>pseudo</em> features (see
 details). Valid values are: <code>"xcms"</code>, <code>xcms3</code>, <code>kpic2</code> or <code>"openms"</code>.</p></dd>
+
+
 <dt>groupArgs</dt>
 <dd><p>A <code>list</code> containing further parameters for
 <code><a href="groupFeatures.html">feature grouping</a></code>.</p></dd>
+
+
 <dt>x, obj</dt>
 <dd><p>The <code>featureGroupsComparison</code> object.</p></dd>
+
+
 <dt>retMin</dt>
 <dd><p>If <code>TRUE</code> retention times are plotted as minutes (seconds otherwise).</p></dd>
+
+
 <dt>which</dt>
 <dd><p>A character vector specifying one or more labels of compared
 feature groups. For <code>plotVenn</code>: if <code>NULL</code> then all compared
 groups are used.</p></dd>
+
+
 <dt>addSelfLinks</dt>
 <dd><p>If <code>TRUE</code> then 'self-links' are added which
 represent non-shared data.</p></dd>
+
+
 <dt>addRetMzPlots</dt>
 <dd><p>Set to <code>TRUE</code> to enable <em>m/z</em> <em>vs</em>
 retention time scatter plots.</p></dd>
+
+
 <dt>absMinAbundance, relMinAbundance</dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
@@ -167,6 +183,8 @@ instance, <code>relMinAbundance=0.5</code> means that a result should be present
 in at least half of the number of compared objects. Set to <samp>NULL</samp> to
 ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> is
 not <code>NULL</code>.</p></dd>
+
+
 <dt>uniqueFrom</dt>
 <dd><p>Set this argument to only retain feature groups that are unique
 within one or more of the objects for which the consensus is made.
@@ -175,22 +193,36 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 <code>character</code> (as obtained with <code>algorithm(obj)</code>). For
 <code>logical</code> and <code>numeric</code> values the order corresponds to the order
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>uniqueOuter</dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>comparison</code> returns a <code><a href="featureGroupsComparison-class.html">featureGroupsComparison</a></code>  object.
-<code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
+    
+
+<p><code>comparison</code> returns a <code><a href="featureGroupsComparison-class.html">featureGroupsComparison</a></code></p>
+
+
+<p>object.</p>
+
+
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em><code>draw.pairwise.venn</code> and
-<code>draw.triple.venn</code>).
-<code>consensus</code> returns a <code><a href="featureGroups-class.html">featureGroups</a></code> object with a consensus from the compared feature
+from the used plotting function (see <em>e.g.</em></p>
+<p></p>
+<p><code>draw.pairwise.venn</code> and
+<code>draw.triple.venn</code>).</p>
+
+
+<p><code>consensus</code> returns a <code><a href="featureGroups-class.html">featureGroups</a></code> object with a consensus from the compared feature
   groups.</p>
     </div>
     <div id="details">
@@ -231,7 +263,7 @@ output and generate a consensus.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

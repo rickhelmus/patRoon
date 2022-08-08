@@ -125,21 +125,31 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
     <h2>Arguments</h2>
     <dl><dt>x, obj</dt>
 <dd><p>A <code>componentsTPs</code> object.</p></dd>
+
+
 <dt>..., verbose</dt>
 <dd><p>Further arguments passed to the base <code><a href="components-class.html">filter method</a></code>.</p></dd>
+
+
 <dt>retDirMatch</dt>
 <dd><p>If set to <code>TRUE</code>, only keep TPs for which the retention time direction (<code>retDir</code>, see
 Details in componentsTPs) matches with the observed direction. TPs will never be removed if the
 expected/observed direction is <samp>0</samp> (<em>i.e.</em> unknown or not significantly different than the parent).</p></dd>
+
+
 <dt>minSpecSim, minSpecSimPrec, minSpecSimBoth</dt>
 <dd><p>The minimum spectral similarity of a TP compared to its parent
 (<samp>0-1</samp>). The <code>minSpecSimPrec</code> and <code>minSpecSimBoth</code> apply to binned data that is shifted with the
 <code>"precursor"</code> and <code>"both"</code> method, respectively (see <a href="specSimParams.html">MS spectral similarity
 parameters</a> for more details). Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>minFragMatches, minNLMatches</dt>
 <dd><p>Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
 to <code>NULL</code> to ignore. See the <code>Linking parents and transformation products</code> section in
 <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code> for more details.</p></dd>
+
+
 <dt>formulas</dt>
 <dd><p>A <code><a href="formulas-class.html">formulas</a></code> object. The formula annotation data in this object is to verify if elemental
 additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
@@ -147,15 +157,24 @@ additions/subtractions from metabolic logic reactions are possible (hence, it on
 has these elements are kept. Similarly, for elemental subtractions, any of the parent candidate formulae must
 contain the subtraction elements. Note that TPs are currently not filtered if either the parent or the TP has no
 formula annotations. Set to <code>NULL</code> to ignore.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
+
+
 <dt>onlyLinked</dt>
 <dd><p>If <code>TRUE</code> then only components with links are plotted.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>filter</code> returns a filtered <code>componentsTPs</code> object.
-<code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
+    
+
+<p><code>filter</code> returns a filtered <code>componentsTPs</code> object.</p>
+
+
+<p><code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
@@ -203,7 +222,7 @@ and rendered with <span class="pkg">visNetwork</span>.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

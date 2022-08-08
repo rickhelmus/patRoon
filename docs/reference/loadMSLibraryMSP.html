@@ -115,16 +115,22 @@
     <h2>Arguments</h2>
     <dl><dt>file</dt>
 <dd><p>A <code>character</code> string that specifies the file path to the MSP library.</p></dd>
+
+
 <dt>parseComments</dt>
 <dd><p>If <code>TRUE</code> then comments in the file are parsed to obtain additional fields, such as
 <acronym>SMILES</acronym>, <code>PubChemCID</code> and <code>Resolution</code>. Note that some records specify this data either in the
 comments or as a regular field, hence, to ensure that loaded data is most complete it is recommend to set
 <code>parseComments=TRUE</code>.</p></dd>
+
+
 <dt>prefCalcChemProps</dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the MS library. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
 <dt>potAdducts, potAdductsLib</dt>
 <dd><p>If and how missing adducts (<code>Precursor_type</code> data) are guessed,
   <code>potAdducts</code> should be either:</p><ul><li><p><code>FALSE</code>: do not perform adduct guessing.</p></li>
@@ -134,14 +140,21 @@ more details.</p></dd>
 <li><p>A <code>list</code> with <code><a href="adduct-class.html">adduct</a></code> objects or <code>character</code> vector that can be converted with
   <code><a href="adduct-utils.html">as.adduct</a></code>. Only the specified adducts will be used for guessing missing values.</p></li>
 </ul></dd>
+
+
 <dt>absMzDev</dt>
 <dd><p>The maximum absolute <em>m/z</em> deviation when guessing missing adducts.</p></dd>
+
+
 <dt>calcSPLASH</dt>
 <dd><p>If set to <code>TRUE</code> then missing <acronym>SPLASH</acronym> values will be calculated (see below).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The loaded data is returned in an <code><a href="MSLibrary-class.html">MSLibrary</a></code> object.</p>
+    
+
+<p>The loaded data is returned in an <code><a href="MSLibrary-class.html">MSLibrary</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -243,7 +256,7 @@ more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

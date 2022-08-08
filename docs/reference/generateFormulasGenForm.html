@@ -134,49 +134,75 @@
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which formulae should be generated. This should be the same or
 a subset of the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the
 remaining feature groups in the subset are considered.</p></dd>
+
+
 <dt>MSPeakLists</dt>
 <dd><p>An <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
 <dt>relMzDev</dt>
 <dd><p>Maximum relative deviation between the measured and candidate formula <em>m/z</em> values (in ppm).
 Sets the <span class="option">ppm</span> command line option.</p></dd>
+
+
 <dt>adduct</dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
 <p>(<strong>sets workflow</strong>) The <code>adduct</code> argument is not supported for sets workflows, since the
   adduct annotations will then always be used.</p></dd>
+
+
 <dt>elements</dt>
 <dd><p>Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. Sets the <span class="option">el</span>
 command line option.</p></dd>
+
+
 <dt>hetero</dt>
 <dd><p>Only consider formulae with at least one hetero atom. Sets the <span class="option">het</span> commandline option.</p></dd>
+
+
 <dt>oc</dt>
 <dd><p>Only consider organic formulae (<em>i.e.</em> with at least one carbon atom). Sets the <span class="option">oc</span>
 commandline option.</p></dd>
+
+
 <dt>extraOpts</dt>
 <dd><p>An optional character vector with any other command line options that will be passed to
 <code class="command">GenForm</code>. See the <code>GenForm options</code> section for all available command line options.</p></dd>
+
+
 <dt>calculateFeatures</dt>
 <dd><p>If <code>TRUE</code> fomulae are first calculated for all features
 prior to feature group assignment (see <code>Candidate assignment</code> in <code><a href="generateFormulas.html">generateFormulas</a></code>).</p></dd>
+
+
 <dt>featThreshold</dt>
 <dd><p>If <code>calculateFeatures=TRUE</code>: minimum presence (<samp>0-1</samp>) of a formula in all features
 before it is considered as a candidate for a feature group. For instance, <code>featThreshold=0.75</code> dictates that a
 formula should be present in at least 75% of the features inside a feature group.</p></dd>
+
+
 <dt>featThresholdAnn</dt>
 <dd><p>As <code>featThreshold</code>, but only considers features with annotations. For instance,
 <code>featThresholdAnn=0.75</code> dictates that a formula should be present in at least 75% of the features with
 annotations inside a feature group. @param topMost Only keep this number of candidates
 (per feature group) with highest score.</p></dd>
+
+
 <dt>absAlignMzDev</dt>
 <dd><p>When the group formula annotation consensus is made from feature annotations, the <em>m/z</em>
 values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
 <code>absAlignMzDev</code> argument specifies the maximum <em>m/z</em> window used to re-align the mass peaks.</p></dd>
+
+
 <dt>MSMode</dt>
 <dd><p>Whether formulae should be generated only from MS data (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or
 both (<code>"both"</code>). Selecting <code>"both"</code> will fall back to formula calculation with only MS data in case no
 MS/MS data is available.</p></dd>
+
+
 <dt>isolatePrec</dt>
 <dd><p>Settings used for isolation of precursor mass peaks and their isotopes. This isolation is highly
 important for accurate isotope scoring of candidates, as non-relevant mass peaks will dramatically decrease the
@@ -185,30 +211,45 @@ score. The value of <code>isolatePrec</code> should either be a <code>list</code
 default parameters or <code>FALSE</code> for no isolation (<em>e.g.</em> when you already performed isolation with the
 <code>filter</code> method). The <code>z</code> parameter (charge) is automatically deduced from the adduct used for annotation
 (unless <code>isolatePrec=FALSE</code>), hence any custom <code>z</code> setting is ignored.</p></dd>
+
+
 <dt>timeout</dt>
 <dd><p>Maximum time (in seconds) that a <code class="command">GenForm</code> command is allowed to execute. If this time is
 exceeded a warning is emitted and the command is terminated. See the notes section for more information on the need
 of timeouts.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest
 score.</p></dd>
+
+
 <dt>batchSize</dt>
 <dd><p>Maximum number of <code class="command">GenForm</code> commands that should be run sequentially in each parallel
 process. Combining commands with short runtimes (such as <code class="command">GenForm</code>) can significantly increase parallel
 performance. For more information see <code><a href="executeMultiProcess.html">executeMultiProcess</a></code>. Note that this is ignored if
 <span class="option">patRoon.MP.method="future"</span>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
+
 <dt>setThreshold</dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
+
+
 <dt>setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="formulas-class.html">formulas</a></code> object containing all generated formulae.</p>
+    
+
+<p>A <code><a href="formulas-class.html">formulas</a></code> object containing all generated formulae.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -328,7 +369,7 @@ Explanation:
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

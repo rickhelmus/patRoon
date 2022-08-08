@@ -212,16 +212,19 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
         oldFFM <- utils::compareVersion(FFMVer, "2.5") == -1
     }
     
-    if (oldFFM)
+    if (oldFFM) # otherwise set below
         settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering))
-    else if (traceSNRFiltering) # changed from boolean value to just be there or not...
-        settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = "")
     
     if (!is.null(extraOpts))
         settings <- modifyList(settings, extraOpts)
 
+    args <- OpenMSArgListToOpts(settings)
+    
+    if (traceSNRFiltering)
+        args <- c(args, "-algorithm:epd:masstrace_snr_filtering")
+    
     return(list(command = getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"),
-                args = c(OpenMSArgListToOpts(settings), "-in", datafile, "-out", out)))
+                args = c(args, "-in", datafile, "-out", out)))
 }
 
 importFeatureXML <- function(ffile)

@@ -121,27 +121,40 @@
     <dl><dt>obj, ...</dt>
 <dd><p><code><a href="features-class.html">features</a></code> or <code><a href="featureGroups-class.html">featureGroups</a></code> objects that should be used for the
 <a href="sets-workflow.html">sets workflow</a>.</p></dd>
+
+
 <dt>adducts</dt>
 <dd><p>The adduct assignments to each set. Should either be a <code>list</code> with <code><a href="adduct-class.html">adduct</a></code> objects
   or a <code>character</code> vector (<em>e.g.</em> <code>"[M+H]+"</code>). The order should follow that of the objects given to
   the <code>obj</code> and <code>...</code> arguments.</p>
 <p>For the <code><a href="featureGroups-class.html">featureGroups</a></code> method: if <code>NULL</code> then adduct annotations are used.</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>The labels, or <em>set names</em>, for each set to be created. The order should follow that of the
 objects given to the <code>obj</code> and <code>...</code> arguments. If <code>NULL</code>, then labels are automatically generated
 from the polarity of the specified <code>adducts</code> argument (<em>e.g.</em> <code>"positive"</code>, <code>"negative"</code>).</p></dd>
+
+
 <dt>groupAlgo</dt>
 <dd><p>groupAlgo The name of the feature grouping algorithm. See the <code>algorithm</code> argument of
 <code><a href="groupFeatures.html">groupFeatures</a></code> for details.</p></dd>
+
+
 <dt>groupArgs</dt>
 <dd><p>A <code>list</code> with arguments directly passed to <code>groupFeatures</code> (can be named). Example:
 <code>groupArgs=list(maxAlignMZ=0.002)</code>.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Either a <code><a href="features-class.html">featuresSet</a></code> object (<code>features</code> method) or <code><a href="featureGroups-class.html">featureGroupsSet</a></code> object
+    
+
+<p>Either a <code><a href="features-class.html">featuresSet</a></code> object (<code>features</code> method) or <code><a href="featureGroups-class.html">featureGroupsSet</a></code> object
   (<code>featureGroups</code> method).</p>
     </div>
     <div id="details">
@@ -186,7 +199,7 @@ add adduct annotations to the output of <code>makeSet</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

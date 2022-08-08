@@ -113,30 +113,45 @@
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object from which MS peak lists should be extracted.</p></dd>
+
+
 <dt>maxMSRtWindow</dt>
 <dd><p>Maximum chromatographic peak window used for spectrum averaging (in seconds, +/- retention
 time). If <code>NULL</code> all spectra from a feature will be taken into account. Lower to decrease processing time.</p></dd>
+
+
 <dt>precursorMzWindow</dt>
 <dd><p>The <em>m/z</em> window (in Da) to find MS/MS spectra of a precursor. This is typically used
 for Data-Dependent like MS/MS data and should correspond to the isolation <em>m/z</em> window (<em>i.e.</em> +/- the
 precursor <em>m/z</em>) that was used to collect the data. For Data-Independent MS/MS experiments, where precursor
 ions are not isolated prior to fragmentation (<em>e.g.</em> bbCID, MSe, all-ion, ...) the value should be
 <code>NULL</code>.</p></dd>
+
+
 <dt>topMost</dt>
 <dd><p>Only extract MS peak lists from a maximum of <code>topMost</code> analyses with highest intensity. If
 <code>NULL</code> all analyses will be used.</p></dd>
+
+
 <dt>avgFeatParams</dt>
 <dd><p>Parameters used for averaging MS peak lists of individual features. Analogous to
 <code>avgFGroupParams</code>.</p></dd>
+
+
 <dt>avgFGroupParams</dt>
 <dd><p>A <code>list</code> with parameters used for averaging of peak lists for feature groups. See
 <code><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></code> for more details.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object.</p>
+    
+
+<p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -182,7 +197,7 @@ ions are not isolated prior to fragmentation (<em>e.g.</em> bbCID, MSe, all-ion,
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

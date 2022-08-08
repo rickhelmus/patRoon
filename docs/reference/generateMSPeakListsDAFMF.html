@@ -115,9 +115,13 @@ MS peak lists.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object from which MS peak lists should be extracted.</p></dd>
+
+
 <dt>minMSIntensity, minMSMSIntensity</dt>
 <dd><p>Minimum intensity for peak lists obtained with DataAnalysis. Highly
 recommended to set <samp>&gt;0</samp> as DA tends to report many very low intensity peaks.</p></dd>
+
+
 <dt>close, save</dt>
 <dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
@@ -125,15 +129,22 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 <code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
 likely what you want as otherwise any processed data is lost.</p></dd>
+
+
 <dt>avgFGroupParams</dt>
 <dd><p>A <code>list</code> with parameters used for averaging of peak lists for feature groups. See
 <code><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></code> for more details.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object.</p>
+    
+
+<p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -168,7 +179,7 @@ likely what you want as otherwise any processed data is lost.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

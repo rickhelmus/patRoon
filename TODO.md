@@ -17,9 +17,14 @@
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
 - findMobilities()
-    - store data in features slot
     - fGroups method
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
+- splitMobilities()
+    - verify that mobility data is present
+    - update mobilities slot(?)
+    - fGroups method
+        - support updating screenInfo?
+        - sets methods? or simply not possible?
 - Docs
     - mobilities slot in features
 

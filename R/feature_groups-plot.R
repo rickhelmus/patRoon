@@ -623,14 +623,15 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 })
 
 #' @export
-setMethod("plotMobilogram", "featureGroups", function(obj, IMSWindow = 0.2, maxMSRtWindow = 2, mzWindow = 0.005,
-                                                      clusterIMSWindow = 0.01, clusterMethod = "diff", minIntensity = 0,
-                                                      xlim = NULL, ylim = NULL, ...)
+setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWindow = 0.2, maxMSRtWindow = 2,
+                                                      mzWindow = 0.005, clusterIMSWindow = 0.01, clusterMethod = "diff",
+                                                      minIntensity = 0, xlim = NULL, ylim = NULL, ...)
 {
     # UNDONE: more feature parity with plotChroms()
     # UNDONE: assert util for common parameters with findMobilities()
 
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(markMob, add = ac)
     aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
@@ -693,7 +694,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, IMSWindow = 0.2, maxM
         {
             points(EIMs[[ana]][[fID]]$mobility, EIMs[[ana]][[fID]]$intensity, type = "l")
             
-            if (length(mobs) > 0)
+            if (markMob && length(mobs) > 0)
             {
                 m <- mobs[[ana]][ID == fID]
                 for (i in seq_len(nrow(m)))

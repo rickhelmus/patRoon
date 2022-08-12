@@ -1,5 +1,7 @@
 makeFGroupName <- function(id, ret, mz) sprintf("M%.0f_R%.0f_%d", mz, ret, id)
 
+appendMobToName <- function(n, mob) sprintf("%s_I%.2f", n, mob) # UNDONE: does this scale well for non-Bruker data?
+
 showAnaInfo <- function(anaInfo)
 {
     rGroups <- unique(anaInfo$group)

@@ -1364,6 +1364,64 @@ setMethod("findMobilities", "featureGroups", function(obj, ...)
     return(obj)
 })
 
+#' @export
+setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ...)
+{
+    checkmate::assertNumber(IMSWindow, finite = TRUE)
+    
+    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
+    
+    fTable <- featureTable(obj)
+    
+    fTableAll <- rbindlist(fTable, idcol = "analysis")
+    fTableAll[, gClust := {
+        hc <- fastcluster::hclust(dist(mobility))
+        cutree(hc, h = IMSWindow)
+    }, by = "group"]
+    
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
+    setnames(gMobInfo, "group", "group_orig")
+    gMobInfo[, group := appendMobToName(group_orig, mobility)]
+    
+    # update feature group names
+    fTableAll[gMobInfo, group := i.group, on = c(group = "group_orig", "gClust")]
+    featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
+    
+    # update gInfo
+    gInfoDT <- as.data.table(groupInfo(obj)) # UNDONE: someday the groupInfo slot should be a DT...
+    gInfoDT[, group_orig := names(obj)]
+    gInfoDT <- merge(gInfoDT, gMobInfo, by = "group_orig")
+    obj@groupInfo <- as.data.frame(gInfoDT[, -(c("group_orig", "gClust", "group"))])
+    rownames(obj@groupInfo) <- gInfoDT$group
+    
+    # update group table
+    fTablePerGroup <- split(fTableAll, by = "group")
+    anaInfo <- analysisInfo(obj)
+    gTable <- data.table()
+    gTable[, (gInfoDT$group) := lapply(fTablePerGroup, function(ft)
+    {
+        ints <- numeric(nrow(anaInfo))
+        ints[match(ft$analysis, anaInfo$analysis)] <- ft$intensity
+        return(ints)
+    })]
+    obj@groups <- gTable
+    
+    # update ftindex
+    obj <- reGenerateFTIndex(obj)
+    
+    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments"))
+    {
+        d <- slot(obj, sl)
+        if (length(d) > 0)
+        {
+            warning("Clearing all data from ", sl, call. = FALSE)
+            slot(obj, sl) <- d[0]
+        }
+    }
+    
+    return(obj)
+}
+
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))

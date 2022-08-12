@@ -504,7 +504,7 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
         
         # Split features by their mobility
         fTable <- merge(fTable, mobs[, c("ID", "mobility"), with = FALSE], by = "ID", sort = FALSE)
-        fTable[, ID := paste0(ID, "_", signif(mobility, 3))] # make sure IDs remain unique
+        fTable[, ID := appendMobToName(ID, mobility)] # make sure IDs remain unique
         
         # Update quantities from EICs
         EICs <- getTIMSEICs(fp, frames$Id, fTable$mz - mzWindow, fTable$mz + mzWindow, fTable$mobility - IMSWindow,

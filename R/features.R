@@ -502,8 +502,11 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
     checkmate::assertString(findPeaksAlgo, min.chars = 1, add = ac) # UNDONE check algo choice if findPeaks() will not be exported
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0 || length(mobilities(obj)) == 0)
+    if (length(obj) == 0)
         return(obj) # nothing to do...
+    
+    if (length(obj@mobilities) == 0)
+        stop("No mobilities are assigned. Did you run findMobilities()?", call. = FALSE)
     
     hash <- makeHash(obj, mzWindow, IMSWindow, intSearchRTWindow, calcArea, findPeaksAlgo, ...)
     cd <- loadCacheData("splitMobilities", hash)

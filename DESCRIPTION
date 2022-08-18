@@ -227,6 +227,7 @@ Collate:
     'feature_groups-xcms3.R'
     'utils-bruker.R'
     'features-bruker.R'
+    'features-eic.R'
     'features-envipick.R'
     'features-kpic2.R'
     'features-openms.R'

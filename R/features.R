@@ -440,7 +440,10 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
     
     anaInfo <- analysisInfo(obj)
     
-    obj@mobilities <- Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    printf("Finding mobilities for all features...\n")
+    
+    obj@mobilities <- withProg(nrow(anaInfo), FALSE,
+                               Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
     {
         TIMSDB <- openTIMSMetaDBScope(f = fp)
         frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
@@ -469,8 +472,14 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         peaksTable <- rbindlist(peaksList, idcol = "ID")
         setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)
         
+        doProgress()
+        
         return(peaksTable)
-    })
+    }))
+    
+    assignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(f$ID %in% m$ID)))
+    printf("Assigned %d mobilities to %d features (%.2f%% assigned)\n", sum(sapply(obj@mobilities, nrow)), assignedN,
+           assignedN * 100 / length(obj))
     
     return(obj)
 })
@@ -491,7 +500,11 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
     
     anaInfo <- analysisInfo(obj)
     filePaths <- getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path)
-    
+
+    # for printing below
+    oldN <- length(obj)
+    unassignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(!f$ID %in% m$ID)))
+
     # first generate new IDs so that split features are unique
     obj@mobilities <- lapply(mobilities(obj), function(mobs)
     {
@@ -501,7 +514,10 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
         return(mobs)
     })
     
-    obj@features <- Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
+    printf("Splitting features with multiple mobilities...\n")
+    
+    obj@features <- withProg(nrow(anaInfo), FALSE,
+                             Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
     {
         TIMSDB <- openTIMSMetaDBScope(f = fp)
         frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
@@ -509,7 +525,7 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
         
         fTable <- copy(fTable)
         
-        fTable <- fTable[ID %chin% mobs$ID_orig] # UNDONE: always remove unassigned features? Also take care to update fGroups!
+        fTable <- fTable[ID %chin% mobs$ID_orig]
         
         # Split features by their mobility
         setnames(fTable, "ID", "ID_orig")
@@ -552,8 +568,17 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
             return(a)
         })]
         
+        doProgress()
+        
         return(fTable)
-    })
+    }))
+    
+    splitMobs <- lapply(obj@mobilities, function(mobs) mobs[duplicated(mobs, by = "ID_orig")])
+    splitN <- sum(sapply(splitMobs, function(m) uniqueN(m, by = "ID_orig")))
+    printf("Split %d features with multiple mobilities (%.2f%%) into %d features.\nRemoved %d features without assignment (%.2f%%).\n",
+           splitN, splitN * 100 / oldN,
+           sum(sapply(obj@mobilities, function(m) sum(m[, if (.N > 1) .N else 0L, by = "ID_orig"][[2]]))),
+           unassignedN, unassignedN * 100 / oldN)
     
     return(obj)
 })

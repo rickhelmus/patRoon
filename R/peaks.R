@@ -1,7 +1,7 @@
 #' @include main.R
 NULL
 
-findPeaks <- function(EICs, algorithm, ...)
+findPeaks <- function(EICs, algorithm, ..., verbose = TRUE)
 {
     # UNDONE: export? If yes, add checkmate's
     
@@ -9,11 +9,12 @@ findPeaks <- function(EICs, algorithm, ...)
                 openms = findPeaksOpenMS,
                 xcms3 = findPeaksXCMS3,
                 envipick = findPeaksEnviPick)
-    f(EICs, ...)
+    f(EICs, ..., verbose = verbose)
 }
 
 findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
-                            extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3, scaleTimeFactor = NULL)
+                            extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3, scaleTimeFactor = NULL,
+                            verbose = TRUE)
 {
     # EICs should be a named list of data.tables
     
@@ -29,21 +30,24 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     chromFile <- tempfile(fileext = ".mzML")
     featsFile <- tempfile(fileext = ".featureXML")
     
-    printf("Exporting EICs... ")
+    maybePrintf <- if (verbose) printf else function(...) NULL
+    
+    maybePrintf("Exporting EICs... ")
     writeChromsToMzML(EICs, chromFile)
-    printf("Done!\n")
+    maybePrintf("Done!\n")
     
     if (!is.null(smoothWidth))
     {
-        printf("Smoothing traces with OpenMS...\n-----------\n")
+        maybePrintf("Smoothing traces with OpenMS...\n-----------\n")
         executeCommand(getCommandWithOptPath("NoiseFilterGaussian", "OpenMS"),
                        OpenMSArgListToOpts(c("-in" = chromFile,
                                              "-out" = chromFile,
-                                             "-algorithm:gaussian_width" = smoothWidth)))
-        printf("\n-----------\n")
+                                             "-algorithm:gaussian_width" = smoothWidth)),
+                       stdout = if (verbose) "" else FALSE)
+        maybePrintf("\n-----------\n")
     }
     
-    printf("Finding peaks with OpenMS...\n-----------\n")
+    maybePrintf("Finding peaks with OpenMS...\n-----------\n")
     settings <- c("-in" = chromFile,
                   "-out" = featsFile,
                   "-algorithm:min_rt_distance" = minRTDistance,
@@ -53,12 +57,13 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
         settings <- c(settings, "-algorithm:resample_traces")
     if (!is.null(extraOpts))
         settings <- modifyList(settings, extraOpts)
-    executeCommand(getCommandWithOptPath("FeatureFinderMRM", "OpenMS"), OpenMSArgListToOpts(settings))
-    printf("\n-----------\n")
+    executeCommand(getCommandWithOptPath("FeatureFinderMRM", "OpenMS"), OpenMSArgListToOpts(settings),
+                   stdout = if (verbose) "" else FALSE)
+    maybePrintf("\n-----------\n")
     
-    printf("Importing peaks... ")
+    maybePrintf("Importing peaks... ")
     peaks <- setDT(parseFeatureXMLFile(featsFile))
-    printf("Done!\n")
+    maybePrintf("Done!\n")
     
     # NOTE: the mz parameter is (ab)used to set the EIC index
     peaks[, name := names(EICs)[mz]][, mz := NULL]
@@ -70,7 +75,7 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
     peaksList <- split(peaks, by = "name", keep.by = FALSE)
     peaksList <- pruneList(peaksList, checkZeroRows = TRUE)
     
-    printf("Post-processing... ")
+    maybePrintf("Post-processing... ")
     
     # subset columns, convert to data.tables & fill in intensities (not reported by OpenMS)
     peaksList <- Map(peaksList, EICs[names(peaksList)], f = function(p, eic)
@@ -91,12 +96,12 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
         
         return(p)
     })
-    printf("Done!\n")
+    maybePrintf("Done!\n")
     
     return(peaksList)
 }
 
-findPeaksXCMS3 <- function(EICs, ...)
+findPeaksXCMS3 <- function(EICs, ..., verbose = TRUE)
 {
     ret <- sapply(EICs, function(eic)
     {
@@ -109,7 +114,7 @@ findPeaksXCMS3 <- function(EICs, ...)
     ret <- pruneList(ret, checkZeroRows = TRUE)
 }
 
-findPeaksEnviPick <- function(EICs, ...)
+findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
 {
     checkPackage("enviPick", "blosloos/enviPick")
     

@@ -1435,7 +1435,7 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
         if (length(d) > 0)
         {
             warning("Clearing all data from ", sl, call. = FALSE)
-            slot(obj, sl) <- d[0]
+            slot(obj, sl) <- if (is.data.table(d)) data.table() else list()
         }
     }
     

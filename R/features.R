@@ -492,6 +492,15 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
     anaInfo <- analysisInfo(obj)
     filePaths <- getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path)
     
+    # first generate new IDs so that split features are unique
+    obj@mobilities <- lapply(mobilities(obj), function(mobs)
+    {
+        mobs <- copy(mobs)
+        setnames(mobs, "ID", "ID_orig")
+        mobs[, ID := appendMobToName(ID_orig, mobility)]
+        return(mobs)
+    })
+    
     obj@features <- Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
     {
         TIMSDB <- openTIMSMetaDBScope(f = fp)
@@ -500,12 +509,14 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
         
         fTable <- copy(fTable)
         
-        fTable <- fTable[ID %chin% mobs$ID] # UNDONE: always remove unassigned features? Also take care to update fGroups!
+        fTable <- fTable[ID %chin% mobs$ID_orig] # UNDONE: always remove unassigned features? Also take care to update fGroups!
         
         # Split features by their mobility
-        fTable <- merge(fTable, mobs[, c("ID", "mobility"), with = FALSE], by = "ID", sort = FALSE)
-        fTable[, ID := appendMobToName(ID, mobility)] # make sure IDs remain unique
-        
+        setnames(fTable, "ID", "ID_orig")
+        fTable <- merge(fTable, mobs[, c("ID", "mobility", "ID_orig"), with = FALSE], by = "ID_orig", sort = FALSE)
+        setcolorder(fTable, "ID")
+        fTable[, ID_orig := NULL]
+
         # Update quantities from EICs
         EICs <- getTIMSEICs(fp, frames$Id, fTable$mz - mzWindow, fTable$mz + mzWindow, fTable$mobility - IMSWindow,
                             fTable$mobility + IMSWindow, FALSE)

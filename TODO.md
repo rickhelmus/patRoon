@@ -21,7 +21,6 @@
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
 - splitMobilities()
     - verify that mobility data is present
-    - update mobilities slot(?)
     - fGroups method
         - support updating screenInfo?
         - sets methods? or simply not possible?

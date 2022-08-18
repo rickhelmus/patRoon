@@ -19,8 +19,10 @@
 - findMobilities()
     - fGroups method --> finished?
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
+    - suppress XCMS warnings (or at least if no peaks are found)
 - splitMobilities()
     - always remove unassigned features? Currently yes.
+    - ID re-assignment works with e.g. XCMS IDs that may be numeric?
     - fGroups method
         - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations?
             - currently cleared with a warning

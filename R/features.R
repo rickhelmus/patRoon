@@ -438,6 +438,11 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
+    hash <- makeHash(obj, peaksAlgorithm, mzRange, clusterIMSWindow, clusterMethod, minIntensity, maxMSRtWindow, ...)
+    cd <- loadCacheData("findMobilities", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     anaInfo <- analysisInfo(obj)
     
     printf("Finding mobilities for all features...\n")
@@ -478,8 +483,10 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
     }))
     
     assignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(f$ID %in% m$ID)))
-    printf("Assigned %d mobilities to %d features (%.2f%% assigned)\n", sum(sapply(obj@mobilities, nrow)), assignedN,
+    printf("Assigned %d mobilities to %d features (%.2f%% assigned).\n", sum(sapply(obj@mobilities, nrow)), assignedN,
            assignedN * 100 / length(obj))
+    
+    saveCacheData("findMobilities", obj, hash)
     
     return(obj)
 })
@@ -497,6 +504,11 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
     
     if (length(obj) == 0 || length(mobilities(obj)) == 0)
         return(obj) # nothing to do...
+    
+    hash <- makeHash(obj, mzWindow, IMSWindow, intSearchRTWindow, calcArea, findPeaksAlgo, ...)
+    cd <- loadCacheData("splitMobilities", hash)
+    if (!is.null(cd))
+        return(cd)
     
     anaInfo <- analysisInfo(obj)
     filePaths <- getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path)
@@ -579,6 +591,8 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
            splitN, splitN * 100 / oldN,
            sum(sapply(obj@mobilities, function(m) sum(m[, if (.N > 1) .N else 0L, by = "ID_orig"][[2]]))),
            unassignedN, unassignedN * 100 / oldN)
+    
+    saveCacheData("splitMobilities", obj, hash)
     
     return(obj)
 })

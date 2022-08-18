@@ -472,7 +472,7 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         # pretend we have EICs so we can find peaks
         EICs <- lapply(EIMs, copy)
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
-        peaksList <- findPeaks(EICs, peaksAlgorithm, ...)
+        peaksList <- findPeaks(EICs, peaksAlgorithm, ..., verbose = FALSE)
         
         peaksTable <- rbindlist(peaksList, idcol = "ID")
         setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)
@@ -559,7 +559,7 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
                 eic <- eic[time %between% c(rmin, rmax)]
                 return(eic)
             }), fTable$ID)
-            peaks <- findPeaks(EICsPeaks, findPeaksAlgo, ...)
+            peaks <- findPeaks(EICsPeaks, findPeaksAlgo, ..., verbose = FALSE)
             peaks <- peaks[sapply(peaks, nrow) == 1] # only consider results where exactly one peak is found
             peaksAll <- rbindlist(peaks, idcol = "ID")
             copyCols <- c("ret", "retmin", "retmax", "area", "intensity")

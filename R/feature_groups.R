@@ -1372,18 +1372,33 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
     obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
     
     fTable <- featureTable(obj)
+    hash <- makeHash(obj, IMSWindow, ...)
+    cd <- loadCacheData("splitMobilities", hash)
+    if (!is.null(cd))
+        return(cd)
     
+    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
+    
+    fTable <- featureTable(obj)
+
+    printf("Clustering mobilities... ")
+    
+    # cluster features within original fGroups with similar mobilities together    
     fTableAll <- rbindlist(fTable, idcol = "analysis")
     fTableAll[, gClust := {
         hc <- fastcluster::hclust(dist(mobility))
         cutree(hc, h = IMSWindow)
     }, by = "group"]
+    printf("Done!\n")
+
+    printf("Updating feature group data... ")
     
+    # prepare group info
     gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
     setnames(gMobInfo, "group", "group_orig")
     gMobInfo[, group := appendMobToName(group_orig, mobility)]
     
-    # update feature group names
+    # update features
     fTableAll[gMobInfo, group := i.group, on = c(group = "group_orig", "gClust")]
     featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
     
@@ -1409,7 +1424,7 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
     # update ftindex
     obj <- reGenerateFTIndex(obj)
     
-    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments"))
+    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations"))
     {
         d <- slot(obj, sl)
         if (length(d) > 0)
@@ -1419,8 +1434,12 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
         }
     }
     
+    printf("Done!\n")
+    
+    saveCacheData("splitMobilities", obj, hash)
+
     return(obj)
-}
+})
 
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export

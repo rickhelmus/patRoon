@@ -17,13 +17,18 @@
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
 - findMobilities()
-    - fGroups method
+    - fGroups method --> finished?
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
 - splitMobilities()
-    - verify that mobility data is present
+    - always remove unassigned features? Currently yes.
     - fGroups method
+        - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations?
+            - currently cleared with a warning
         - support updating screenInfo?
+            - if not implement method that throws error
         - sets methods? or simply not possible?
+            - if not implement method that throws error
+- combine find/splitMobilities()?
 - Docs
     - mobilities slot in features
 

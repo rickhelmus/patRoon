@@ -216,6 +216,59 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     return(ret[])
 }
 
+# used by groupFeatures methods for featuresSuspects
+doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
+{
+    anaInfo <- analysisInfo(feat)
+    fTable <- featureTable(feat)
+    detectedSusps <- unique(unlist(lapply(fTable, "[[", "suspect")))
+    
+    fgSusps <- sapply(detectedSusps, function(susp)
+    {
+        featSub <- delete(feat, j = function(ft, ...) ft$suspect != susp)
+        return(groupFunc(featSub, ..., verbose = FALSE))
+    }, simplify = FALSE)
+    
+    fgInfoAll <- rbindlist(lapply(fgSusps, function(fg)
+    {
+        gi <- as.data.table(groupInfo(fg))
+        gi[, group := names(fg)]
+        return(gi)
+    }), idcol = "suspect")
+    fgInfoAll[, group_susp := {
+        if (.N > 1)
+            paste0(suspect, "-", seq_len(.N))
+        else
+            suspect
+    }, by = "suspect"]
+    
+    gTable <- data.table()
+    gTable[, (fgInfoAll$group_susp) := Map(fgInfoAll$suspect, fgInfoAll$group, f = function(s, g)
+    {
+        ints <- numeric(length(fTable))
+        fg <- fgSusps[[s]][, g]
+        ints[match(analyses(fg), anaInfo$analysis)] <- fg[[1]]
+        return(ints)
+    })]
+    
+    ftind <- data.table()
+    ftind[, (fgInfoAll$group_susp) := Map(fgInfoAll$suspect, fgInfoAll$group, f = function(s, g)
+    {
+        inds <- integer(length(fTable))
+        fg <- removeEmptyAnalyses(fgSusps[[s]][, g])
+        anaInds <- match(analyses(fg), anaInfo$analysis)
+        inds[anaInds] <- mapply(featureTable(fg), anaInds, FUN = function(ft, ai) match(ft$ID, fTable[[ai]]$ID))
+        return(inds)
+    })]
+
+    gInfo <- as.data.frame(fgInfoAll[, c("rts", "mzs"), with = FALSE])
+    rownames(gInfo) <- fgInfoAll$group_susp
+    
+    # UNDONE: set screenInfo
+    return(featureGroupsScreening(screenInfo = data.table(), groups = gTable, groupInfo = gInfo, analysisInfo = anaInfo,
+                                  features = feat, ftindex = ftind))
+}
+
 doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                             minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
                             maxLC50, negate)

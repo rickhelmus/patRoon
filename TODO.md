@@ -20,6 +20,7 @@
     - fGroups method --> finished?
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
     - suppress XCMS warnings (or at least if no peaks are found)
+    - update mobilities slot from delete()
 - splitMobilities()
     - always remove unassigned features? Currently yes.
     - ID re-assignment works with e.g. XCMS IDs that may be numeric?
@@ -31,6 +32,8 @@
         - sets methods? or simply not possible?
             - if not implement method that throws error
 - combine find/splitMobilities()?
+- Suspect features
+    - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
 - Docs
     - mobilities slot in features
 

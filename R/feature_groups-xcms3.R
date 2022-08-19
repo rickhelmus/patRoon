@@ -152,15 +152,27 @@ getFeatIndicesFromXCMSnExp <- function(xdata)
 importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
 {
     xcginfo <- xcms::featureDefinitions(xdata)
-    gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
-    gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
-
-    groups <- data.table(t(xcms::featureValues(xdata, value = "maxo")))
-    setnames(groups, gNames)
-    groups[is.na(groups)] <- 0
-
-    ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
-                              ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames))
+    
+    if (nrow(xcginfo) == 0)
+    {
+        # no results (e.g. due to minFraction>0)
+        groups <- ftindex <- data.table()
+        gInfo <- data.frame(rts = numeric(), mzs = numeric())
+    }
+    else
+    {
+        gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
+        gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
+        
+        groups <- data.table(t(xcms::featureValues(xdata, value = "maxo")))
+        setnames(groups, gNames)
+        groups[is.na(groups)] <- 0
+        
+        ftindex <- setnames(getFeatIndicesFromXCMSnExp(xdata), gNames)
+    }
+    
+    ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo,
+                              features = feat, ftindex = ftindex)
     
     # synchronize features: any that were without group have been removed
     ret@xdata <- xcms::filterChromPeaks(ret@xdata, getKeptXCMSPeakInds(feat, ret@features))

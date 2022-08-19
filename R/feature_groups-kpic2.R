@@ -117,33 +117,41 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
 {
     # NOTE: the group.info from KPIC2 is not used since retention times and m/zs are rounded...
     
-    peakMat <- copy(picsSetGrouped$peakmat)
-    
-    gInfo <- peakMat[, .(rts = mean(rt), mzs = mean(mz)), by = "group"]
-    setorderv(gInfo, "mzs")
-    gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
-    
-    # NOTE: KPIC2 group ID may not be continuous
-    peakMat[, groupName := gNames[match(group, gInfo$group)]]
-    peakMatSplit <- split(peakMat, by = "groupName")[gNames] # sync order after split
-    groups <- data.table()
-    groups[, (gNames) := lapply(peakMatSplit, function(grpTab)
+    if (is.null(picsSetGrouped$peakmat)) # no results (eg filtered out due to frac argument)
     {
-        ints <- numeric(nrow(analysisInfo))
-        ints[grpTab$sample] <- grpTab$maxo
-        return(ints)
-    })]
-    
-    ftindex <- data.table()
-    ftindex[, (gNames) := lapply(peakMatSplit, function(grpTab)
+        groups <- ftindex <- data.table()
+        gInfo <- data.frame(rts = numeric(), mzs = numeric())
+    }
+    else
     {
-        inds <- integer(nrow(analysisInfo))
-        inds[grpTab$sample] <- grpTab$index
-        return(inds)
-    })]
-
-    gInfo <- as.data.frame(gInfo[, -"group"])
-    rownames(gInfo) <- gNames
+        peakMat <- copy(picsSetGrouped$peakmat)
+        
+        gInfo <- peakMat[, .(rts = mean(rt), mzs = mean(mz)), by = "group"]
+        setorderv(gInfo, "mzs")
+        gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
+        
+        # NOTE: KPIC2 group ID may not be continuous
+        peakMat[, groupName := gNames[match(group, gInfo$group)]]
+        peakMatSplit <- split(peakMat, by = "groupName")[gNames] # sync order after split
+        groups <- data.table()
+        groups[, (gNames) := lapply(peakMatSplit, function(grpTab)
+        {
+            ints <- numeric(nrow(analysisInfo))
+            ints[grpTab$sample] <- grpTab$maxo
+            return(ints)
+        })]
+        
+        ftindex <- data.table()
+        ftindex[, (gNames) := lapply(peakMatSplit, function(grpTab)
+        {
+            inds <- integer(nrow(analysisInfo))
+            inds[grpTab$sample] <- grpTab$index
+            return(inds)
+        })]
+        
+        gInfo <- as.data.frame(gInfo[, -"group"])
+        rownames(gInfo) <- gNames
+    }
     
     return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo,
                               analysisInfo = analysisInfo, features = feat,

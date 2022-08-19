@@ -1,7 +1,13 @@
+# patRoon 3.0
+
+- Fixed: KPIC2 grouping would error when there are no results
+
+
 # DEVEL
 
 * Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)
 * Various reporting fixes for screening results from suspect lists without formula/SMILES data.
+
 
 # patRoon 2.3.1
 

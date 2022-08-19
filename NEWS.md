@@ -18,6 +18,9 @@
 * Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 * Fixed: `as.data.table()` method for `features`: properly handle empty objects
 * Fixed: `filter()` method for `MSPeakListsSet`: properly handle case where `sets` argument is combined with other filters.
+* Fixed: KPIC2 grouping would error when there are no results
+* Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
+* Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
 
 
 # patRoon 2.3.4
@@ -28,7 +31,6 @@
 
 ## Other changes and fixes:
 
-- Fixed: KPIC2 grouping would error when there are no results
 * Fixed: `reAverage = TRUE` was not handled correctly for the `delete()` method for `MSPeakListsSet`
 * Speed up 'unsetting' of large formulas/compounds objects, which affects eg plotting TP similarities, annotatedPeakList() etc (reported by Alessia Ore)
 * `report()`: correctly handle removed suspect hits while reporting TP similarities (reported by Alessia Ore)

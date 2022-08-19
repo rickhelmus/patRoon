@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include features.R
+#' @include features-suspects.R
 #' @include feature_groups.R
 NULL
 

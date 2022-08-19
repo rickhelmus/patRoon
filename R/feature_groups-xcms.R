@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include main.R
+#' @include features-suspects.R
 #' @include feature_groups.R
 NULL
 
@@ -62,6 +63,15 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
 
     xs <- getXCMSSet(feat, verbose = verbose, loadRawData = loadRawData)
     return(doGroupFeaturesXCMS(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose))
+})
+
+#' @rdname groupFeaturesXCMS
+#' @export
+setMethod("groupFeaturesXCMS", "featuresSuspects", function(feat, loadRawData = TRUE, groupArgs = list(mzwid = 0.015),
+                                                            verbose = TRUE)
+{
+    return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS", "features"), rtalign = FALSE,
+                           loadRawData = loadRawData, groupArgs = groupArgs, retcorArgs = list(), verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS

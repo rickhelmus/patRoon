@@ -143,15 +143,27 @@ getFeatIndicesFromXS <- function(xs)
 importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 {
     xcginfo <- xcms::groups(xs)
-    gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
-    gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
-
-    groups <- data.table(t(xcms::groupval(xs, value = "maxo")))
-    setnames(groups, gNames)
-    groups[is.na(groups)] <- 0
-
+    
+    if (nrow(xcginfo) == 0)
+    {
+        # no results (e.g. due to minfrac>0)
+        groups <- ftindex <- data.table()
+        gInfo <- data.frame(rts = numeric(), mzs = numeric())
+    }
+    else
+    {
+        gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
+        gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
+        
+        groups <- data.table(t(xcms::groupval(xs, value = "maxo")))
+        setnames(groups, gNames)
+        groups[is.na(groups)] <- 0
+        
+        ftindex <- setnames(getFeatIndicesFromXS(xs), gNames)
+    }
+    
     return(featureGroupsXCMS(xs = xs, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
-                             ftindex = setnames(getFeatIndicesFromXS(xs), gNames)))
+                             ftindex = ftindex))
 }
 
 #' Imports feature groups from XCMS (old interface)

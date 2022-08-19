@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include main.R
+#' @include features-suspects.R
 #' @include feature_groups.R
 NULL
 
@@ -66,6 +67,16 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
 
     xdata <- getXCMSnExp(feat, verbose = verbose, loadRawData = loadRawData)
     return(doGroupFeaturesXCMS3(xdata, feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose))
+})
+
+#' @rdname groupFeaturesXCMS3
+#' @export
+setMethod("groupFeaturesXCMS3", "featuresSuspects", function(feat, loadRawData = TRUE,
+                                                             groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                             verbose = TRUE)
+{
+    return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS3", "features"), rtalign = FALSE,
+                           loadRawData = loadRawData, groupParam = groupParam, verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS3

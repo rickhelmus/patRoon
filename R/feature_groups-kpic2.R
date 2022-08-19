@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include features-suspects.R
 #' @include feature_groups.R
 NULL
 
@@ -57,6 +58,15 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     
     picsSet <- getPICSet(feat, loadRawData = loadRawData)
     return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose))
+})
+
+#' @rdname groupFeaturesKPIC2
+#' @export
+setMethod("groupFeaturesKPIC2", "featuresSuspects", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
+                                                             verbose = TRUE)
+{
+    return(doGroupSuspects(feat, selectMethod("groupFeaturesKPIC2", "features"), rtalign = FALSE, loadRawData = FALSE,
+                           groupArgs = groupArgs, alignArgs = list(), verbose = verbose))
 })
 
 #' @rdname groupFeaturesKPIC2

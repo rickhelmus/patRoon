@@ -115,7 +115,7 @@ doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, loadRawData, groupArgs,
 
 importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
 {
-    # NOTE: the group.info from KPCI2 is not used since retention times and m/zs are rounded...
+    # NOTE: the group.info from KPIC2 is not used since retention times and m/zs are rounded...
     
     peakMat <- copy(picsSetGrouped$peakmat)
     

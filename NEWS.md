@@ -1,6 +1,5 @@
 # patRoon 3.0
 
-- Fixed: KPIC2 grouping would error when there are no results
 * Fixed: `reAverage = TRUE` was not handled correctly for the `delete()` method for `MSPeakListsSet`
 * Speed up 'unsetting' of large formulas/compounds objects, which affects eg plotting TP similarities, annotatedPeakList() etc (reported by Alessia Ore)
 * `report()`: correctly handle removed suspect hits while reporting TP similarities (reported by Alessia Ore)
@@ -12,6 +11,9 @@
 * MSP MS libraries: don't be case sensitive when checking the "Num Peaks" field (Bas van de Velde)
 * Small fixes in example code from the Handbook (reported by Boris Droz and Jan Specker)
 * Changed cache for filtering of feature groups to reduce cache size (#98)
+* Fixed: KPIC2 grouping would error when there are no results
+* Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
+* Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
 * Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 * Fixed: `as.data.table()` method for `features`: properly handle empty objects

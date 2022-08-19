@@ -3,11 +3,11 @@ NULL
 
 #' @rdname features-class
 #' @export
-featuresEIC <- setClass("featuresEIC", contains = "features")
+featuresSuspects <- setClass("featuresSuspects", contains = "features")
 
 #' @export
-findFeaturesEIC <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                            skipInvalid = TRUE, prefCalcChemProps = TRUE, ..., parallel = TRUE, verbose = TRUE)
+findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                 skipInvalid = TRUE, prefCalcChemProps = TRUE, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: doc that feature RT is used for checking, instead of group RT for screenSuspects()
     # UNDONE: test with large suspect lists
@@ -85,5 +85,5 @@ findFeaturesEIC <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow = 12
         printFeatStats(fList)
     }
     
-    return(featuresEIC(analysisInfo = analysisInfo, features = fList, algorithm = paste0("eic-", findPeaksAlgo)))
+    return(featuresSuspects(analysisInfo = analysisInfo, features = fList, algorithm = paste0("eic-", findPeaksAlgo)))
 }

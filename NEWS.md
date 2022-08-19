@@ -1,3 +1,8 @@
+# patRoon 3.0
+
+- Fixed: KPIC2 grouping would error when there are no results
+
+
 # DEVEL
 
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
@@ -15,6 +20,7 @@
 * Fix: improve handling SIRIUS results for features with non-standard adduct assignments (issue #111)
 * Store individual plots in `MS2QuantMeta` slots
 * force rJava GC to improve stability with MS2Quant predictions
+
 
 
 # patRoon 2.3.1

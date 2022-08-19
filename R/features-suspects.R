@@ -33,7 +33,7 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
                                    prefCalcChemProps = prefCalcChemProps)
     
     if (verbose)
-        printf("Finding features from EICs for %d analyses ...\n", anaCount)
+        printf("Finding features from suspects for %d analyses ...\n", anaCount)
     
     doFindFeats <- function(ana, path)
     {
@@ -85,5 +85,5 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
         printFeatStats(fList)
     }
     
-    return(featuresSuspects(analysisInfo = analysisInfo, features = fList, algorithm = paste0("eic-", findPeaksAlgo)))
+    return(featuresSuspects(analysisInfo = analysisInfo, features = fList, algorithm = paste0("suspects-", findPeaksAlgo)))
 }

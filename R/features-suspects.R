@@ -3,7 +3,7 @@ NULL
 
 #' @rdname features-class
 #' @export
-featuresSuspects <- setClass("featuresSuspects", contains = "features")
+featuresSuspects <- setClass("featuresSuspects", slots = c(suspects = "data.table"), contains = "features")
 
 #' @export
 findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
@@ -11,8 +11,6 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
 {
     # UNDONE: doc that feature RT is used for checking, instead of group RT for screenSuspects()
     # UNDONE: test with large suspect lists
-    # UNDONE: export? or just internal function?
-    # UNDONE: store suspect list in slot? Probably yes, to make screenInfo
     
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     
@@ -86,5 +84,6 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
         printFeatStats(fList)
     }
     
-    return(featuresSuspects(analysisInfo = analysisInfo, features = fList, algorithm = paste0("suspects-", findPeaksAlgo)))
+    return(featuresSuspects(analysisInfo = analysisInfo, features = fList, suspects = suspects,
+                            algorithm = paste0("suspects-", findPeaksAlgo)))
 }

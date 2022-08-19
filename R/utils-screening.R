@@ -264,8 +264,19 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
     gInfo <- as.data.frame(fgInfoAll[, c("rts", "mzs"), with = FALSE])
     rownames(gInfo) <- fgInfoAll$group_susp
     
-    # UNDONE: set screenInfo
-    return(featureGroupsScreening(screenInfo = data.table(), groups = gTable, groupInfo = gInfo, analysisInfo = anaInfo,
+    # set screenInfo
+    sInfo <- fgInfoAll[, c("suspect", "group_susp"), with = FALSE]
+    setnames(sInfo, c("suspect", "group_susp"),  c("name", "group"))
+    
+    metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(feat@suspects)))
+    susp <- copy(feat@suspects)
+    if (is.null(susp[["rt"]]))
+        susp[, rt := NA_real_]
+    sInfo <- merge(sInfo, susp[, metaDataCols, with = FALSE], by = "name")
+    sInfo[, d_rt := gInfo[group, "rts"] - rt]
+    sInfo[, d_mz := gInfo[group, "mzs"] - mz] # NOTE: this is always ~0 since featuresSuspects doesn't m/z determination (yet)
+    
+    return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, analysisInfo = anaInfo,
                                   features = feat, ftindex = ftind))
 }
 

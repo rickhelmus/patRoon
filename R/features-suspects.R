@@ -12,6 +12,7 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     # UNDONE: doc that feature RT is used for checking, instead of group RT for screenSuspects()
     # UNDONE: test with large suspect lists
     # UNDONE: export? or just internal function?
+    # UNDONE: store suspect list in slot? Probably yes, to make screenInfo
     
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     
@@ -53,21 +54,21 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
         # UNDONE: limit RT range if suspect rt is given?
         
         peaks <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
-        peaks <- rbindlist(peaks, idcol = "ID")
+        peaks <- rbindlist(peaks, idcol = "suspect")
         
         if (!is.null(suspects[["rt"]]))
         {
-            peaks[, susp_rt := suspects[match(ID, name)]$rt]
+            peaks[, susp_rt := suspects[match(suspect, name)]$rt]
             peaks <- peaks[is.na(susp_rt) | numLTE(abs(ret - susp_rt), rtWindow)][, susp_rt := NULL]
         }
         
-        peaks[, mz := suspects[match(ID, name)]$mz]
+        peaks[, mz := suspects[match(suspect, name)]$mz]
         peaks[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
         
         # UNDONE: also assign mobility
         
-        # make unique IDs --> NOTE: do after original suspect name is not needed anymore
-        peaks[, ID := make.unique(ID)]
+        # make unique IDs
+        peaks[, ID := make.unique(suspect)]
         
         return(peaks)
     }

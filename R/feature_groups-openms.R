@@ -1,4 +1,5 @@
 #' @include features.R
+#' @include features-suspects.R
 #' @include feature_groups.R
 NULL
 
@@ -95,6 +96,18 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
 
     return(ret)
 })
+
+#' @rdname groupFeaturesOpenMS
+#' @export
+setMethod("groupFeaturesOpenMS", "featuresSuspects", function(feat, rtalign = FALSE, ..., verbose = TRUE)
+{
+    aapply(checkmate::assertFlag, . ~ rtalign + verbose)
+    if (rtalign)
+        warning("Setting rtalign=TRUE most likely doesn't make sense for features from suspects.", call. = FALSE)
+    return(doGroupSuspects(feat, selectMethod("groupFeaturesOpenMS", "features"), rtalign = rtalign, ...,
+                           verbose = verbose))
+})
+
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                                  maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)

@@ -94,7 +94,7 @@ doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, 
     anaInfo <- analysisInfo(feat)
     
     if (length(feat) == 0)
-        return(featureGroupsXCMS(features = feat))
+        return(featureGroupsXCMS3(features = feat))
     
     hash <- makeHash(feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)

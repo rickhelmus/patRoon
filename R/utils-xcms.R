@@ -233,9 +233,17 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
         rownames(dummySpecs) <- character()
         
         anaInfo <- analysisInfo(obj)
+        anaN <- nrow(anaInfo)
         rawData <- new("OnDiskMSnExp", processingData = new("MSnProcess",
                                                             files = anaInfo$analysis),
-                       featureData = new("AnnotatedDataFrame", data = dummySpecs))
+                       featureData = new("AnnotatedDataFrame", data = dummySpecs),
+                       experimentData = new("MIAPE",
+                                            instrumentManufacturer = rep("vendor", anaN),
+                                            instrumentModel = rep("MS", anaN),
+                                            ionSource = rep("ESI", anaN),
+                                            analyser = rep("analyzer", anaN),
+                                            detectorType = rep("detector", anaN)),
+        )
         xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
                                         data.frame(sample_name = anaInfo$analysis,
                                                    sample_group = anaInfo$group,

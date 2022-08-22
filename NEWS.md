@@ -1,6 +1,7 @@
 # patRoon 3.0
 
 - Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
+- Fixed: getXCMSnExp with loadRawData=FALSE set additional metadata so that e.g. analysis subsetting works
 
 
 # DEVEL

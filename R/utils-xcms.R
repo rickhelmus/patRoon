@@ -227,12 +227,26 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
         # create a dummy MSnExp object
         
         anaInfo <- analysisInfo(obj)
+        anaN <- nrow(anaInfo)
         rawData <- new("OnDiskMSnExp", processingData = new("MSnProcess",
-                                                            files = anaInfo$analysis))
-        xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
-                                        data.frame(sample_name = anaInfo$analysis,
-                                                   sample_group = anaInfo$group,
-                                                   stringsAsFactors = FALSE))
+                                                            files = getMzMLAnalysisPath(anaInfo$analysis, anaInfo$path,
+                                                                                        mustExist = FALSE)),
+                       phenoData = new("NAnnotatedDataFrame",
+                                       data.frame(sample_name = anaInfo$analysis,
+                                                  sample_group = anaInfo$group,
+                                                  stringsAsFactors = FALSE)),
+                       experimentData = new("MIAPE",
+                                            instrumentManufacturer = rep("vendor", anaN),
+                                            instrumentModel = rep("MS", anaN),
+                                            ionSource = rep("ESI", anaN),
+                                            analyser = rep("analyzer", anaN),
+                                            detectorType = rep("detector", anaN)),
+                       featureData = Biobase::AnnotatedDataFrame(data.frame(fileIdx = seq_len(anaN),
+                                                                            spIdx = 1,
+                                                                            acquisitionNum = 1,
+                                                                            retentionTime = 0,
+                                                                            msLevel = 1,
+                                                                            precursorScanNum = 0)))
     }
 
     msLevel = 1L # UNDONE?

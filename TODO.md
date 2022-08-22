@@ -40,8 +40,6 @@
 
 ## Features
 
-- XCMS3 fGroups: Bug: subsetting analyses doesn't work if loadRawData was set to FALSE --> MSnbase fails on missing feature data (scans)
-    - if a workaround is there enable fileFilter() again in delete()
 
 ## Ext
 

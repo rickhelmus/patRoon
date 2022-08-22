@@ -355,7 +355,7 @@ SpectrumIMS averageSpectra(const std::vector<SpectrumIMS> &spectra, clusterMetho
 
 using EIX = std::pair<std::vector<double>, std::vector<unsigned>>; // used for EIC/EIM data
 
-EIX sortCompressEIX(const EIX &eix, bool compress)
+EIX sortCompressEIX(const EIX &eix, bool compress, std::vector<size_t> *indOrder = nullptr)
 {
     const auto ord = getSortedInds(eix.first);
     const auto len = ord.size();
@@ -373,6 +373,8 @@ EIX sortCompressEIX(const EIX &eix, bool compress)
         }
         ret.first.push_back(eix.first[ordInd]);
         ret.second.push_back(eix.second[ordInd]);
+        if (indOrder != nullptr)
+            indOrder->push_back(ordInd);
     }
     return ret;
 }
@@ -496,6 +498,7 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
 {
     TimsDataHandle TDH(file);
     std::vector<EIX> EICs(mzStarts.size());
+    std::vector<std::vector<double>> EICMzs(mzStarts.size()), EICIMs(mzStarts.size());
     ThreadExceptionHandler exHandler;
     
     // UNDONE: make num_threads configurable
@@ -503,6 +506,7 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
     {
         auto TBuffers = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
         std::vector<EIX> threadEICs(mzStarts.size());
+        std::vector<std::vector<double>> threadEICMzs(mzStarts.size()), threadEICIMs(mzStarts.size());
         
         #pragma omp for nowait
         for (size_t i=0; i<frameIDs.size(); ++i)
@@ -518,6 +522,7 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
                 for (size_t j = 0; j < EICs.size(); ++j)
                 {
                     unsigned inten = 0;
+                    double totMz = 0.0, totIMS = 0.0;
                     for (size_t k = 0; k < frame.size(); ++k)
                     {
                         // Rcpp::Rcout << "mob: " << mobs[k] << "/" << mobilityStarts[j] << "/" << mobilityEnds[j] << "\n";
@@ -527,14 +532,31 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
                             continue;
 
                         const auto &sp = frame[k];
+                        unsigned frameInt = 0;
                         for (size_t l = 0; l < sp.size(); ++l)
                         {
                             if (numberGTE(sp.mzs[l], mzStarts[j], 10E-8) && numberLTE(sp.mzs[l], mzEnds[j], 10E-8))
-                                inten += sp.intensities[l];
+                            {
+                                frameInt += sp.intensities[l];
+                                totMz += (sp.mzs[l] * static_cast<double>(sp.intensities[l]));
+                            }
                         }
+                        
+                        inten += frameInt;
+                        totIMS += (mobs[k] * static_cast<double>(frameInt));
                     }
                     threadEICs[j].first.push_back(fr.time);
                     threadEICs[j].second.push_back(inten);
+                    if (inten != 0)
+                    {
+                        threadEICMzs[j].push_back(totMz / static_cast<double>(inten));
+                        threadEICIMs[j].push_back(totIMS / static_cast<double>(inten));
+                    }
+                    else
+                    {
+                        threadEICMzs[j].push_back(-1.0);
+                        threadEICIMs[j].push_back(-1.0);
+                    }
                 }
             });
         }
@@ -545,6 +567,8 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
             {
                 EICs[i].first.insert(EICs[i].first.end(), threadEICs[i].first.begin(), threadEICs[i].first.end());
                 EICs[i].second.insert(EICs[i].second.end(), threadEICs[i].second.begin(), threadEICs[i].second.end());
+                EICMzs[i].insert(EICMzs[i].end(), threadEICMzs[i].begin(), threadEICMzs[i].end());
+                EICIMs[i].insert(EICIMs[i].end(), threadEICIMs[i].begin(), threadEICIMs[i].end());
             }
         }
     }
@@ -553,9 +577,19 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
     Rcpp::List ret(EICs.size());
     for (size_t i=0; i<EICs.size(); ++i)
     {
-        EIX eic = sortCompressEIX(EICs[i], compress);
+        std::vector<size_t> finalInds;
+        EIX eic = sortCompressEIX(EICs[i], compress, &finalInds);
+        std::vector<double> mzs(finalInds.size()), ims(finalInds.size());
+        for (size_t j=0; j<finalInds.size(); ++j)
+        {
+            const size_t fi = finalInds[j];
+            mzs[j] = EICMzs[i][fi];
+            ims[j] = EICIMs[i][fi];
+        }
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = eic.first,
-                                         Rcpp::Named("intensity") = eic.second);
+                                         Rcpp::Named("intensity") = eic.second,
+                                         Rcpp::Named("mz") = mzs,
+                                         Rcpp::Named("mobility") = ims);
     }
     return ret;
 }

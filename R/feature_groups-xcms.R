@@ -63,11 +63,10 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
 
 #' @rdname groupFeaturesXCMS
 #' @export
-setMethod("groupFeaturesXCMS", "featuresSuspects", function(feat, loadRawData = TRUE, groupArgs = list(mzwid = 0.015),
-                                                            verbose = TRUE)
+setMethod("groupFeaturesXCMS", "featuresSuspects", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {
     return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS", "features"), rtalign = FALSE,
-                           loadRawData = loadRawData, groupArgs = groupArgs, retcorArgs = list(), verbose = verbose))
+                           loadRawData = FALSE, groupArgs = groupArgs, retcorArgs = list(), verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS

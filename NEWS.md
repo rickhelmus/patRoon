@@ -21,6 +21,7 @@
 * Fixed: KPIC2 grouping would error when there are no results
 * Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
+* Fixed: getXCMSnExp with loadRawData=FALSE set additional metadata so that e.g. analysis subsetting works
 
 
 # patRoon 2.3.4

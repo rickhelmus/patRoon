@@ -59,11 +59,13 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
             peaks[, susp_rt := suspects[match(suspect, name)]$rt]
             peaks <- peaks[is.na(susp_rt) | numLTE(abs(ret - susp_rt), rtWindow)][, susp_rt := NULL]
         }
-        
-        peaks[, mz := suspects[match(suspect, name)]$mz]
-        peaks[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
-        
-        # UNDONE: also assign mobility
+
+        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
+            eic <- EICs[[suspect]][intensity != 0 & time %between% c(retmin, retmax)]
+            list(min(eic$mz), max(eic$mz), weighted.mean(eic$mz, eic$intensity),
+                 min(eic$mobility), max(eic$mobility), weighted.mean(eic$mobility, eic$intensity))
+            
+        }, by = seq_len(nrow(peaks))]
         
         # make unique IDs
         peaks[, ID := make.unique(suspect)]

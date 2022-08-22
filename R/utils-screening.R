@@ -274,7 +274,7 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
         susp[, rt := NA_real_]
     sInfo <- merge(sInfo, susp[, metaDataCols, with = FALSE], by = "name")
     sInfo[, d_rt := gInfo[group, "rts"] - rt]
-    sInfo[, d_mz := gInfo[group, "mzs"] - mz] # NOTE: this is always ~0 since featuresSuspects doesn't m/z determination (yet)
+    sInfo[, d_mz := gInfo[group, "mzs"] - mz]
     
     return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, analysisInfo = anaInfo,
                                   features = feat, ftindex = ftind))

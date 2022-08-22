@@ -13,6 +13,7 @@
 * Changed cache for filtering of feature groups to reduce cache size (#98)
 * Fixed: KPIC2 grouping would error when there are no results
 * Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
+* Fixed: getXCMSnExp with loadRawData=FALSE set additional metadata so that e.g. analysis subsetting works
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
 * Fixed: featureGroups annotations slot is properly updated if all features are removed from a set

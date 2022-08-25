@@ -6,6 +6,13 @@ getSiriusBin <- function()
     return("sirius")
 }
 
+isSIRIUS5 <- function()
+{
+    out <- executeCommand(patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS"), "--version",
+                          stdout = TRUE)
+    return(any(grepl("^(SIRIUS 5\\.)", out)))
+}
+
 getSIRIUSCmpName <- function() "unknownCompound"
 
 getSiriusResultPath <- function(outPath, msFName)
@@ -15,10 +22,19 @@ getSiriusResultPath <- function(outPath, msFName)
     return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
-getSiriusFragFiles <- function(resultPath)
+getAndPrepareSIRIUSFragFiles <- function(resultPath)
 {
+    # NOTE: SIRIUS 5 packs spectra --> unzip them
+    spPath <- file.path(resultPath, "spectra")
+    if (file.exists(spPath) && !file.info(spPath, extra_cols = FALSE)$isdir)
+    {
+        exDir <- paste0(spPath, "-unz")
+        unzip(spPath, exdir = exDir)
+        spPath <- exDir
+    }
+    
     pat <- "([A-Za-z0-9]+).*\\.tsv"
-    return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
+    return(list.files(spPath, full.names = TRUE, pattern = pat))
 }
 
 getFormulaFromSiriusFragFile <- function(ffile)
@@ -143,8 +159,14 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     if (!is.null(extraOptsFormula))
         formArgs <- c(formArgs, extraOptsFormula)
 
-    cmpArgs <- if (withFingerID) c("structure", "--database", fingerIDDatabase) else character()
-
+    isV5 <- isSIRIUS5() # UNDONE: what if SIRUS is only available on the workers?
+    cmpArgs <- if (withFingerID && isV5)
+        c("fingerprint", "structure", "--database", fingerIDDatabase)
+    else if (withFingerID)
+        c("structure", "--database", fingerIDDatabase)
+    else
+        character()
+    
     batchn <- 1
     if (splitBatches) 
     {
@@ -165,7 +187,10 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         {
             batch <- batches[[bi]]
             fArgs <- c(formArgs, "-i", addChr)
-            return(list(args = c(mainArgs, fArgs, cmpArgs), precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
+            allArgs <- c(mainArgs, fArgs, cmpArgs)
+            if (isV5)
+                allArgs <- c(allArgs, "write-summaries")
+            return(list(args = allArgs, precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
                         MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, resNames = resNames[batch],
                         processFunc = processFunc, processArgs = processArgs, dryRun = dryRun,
                         logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))

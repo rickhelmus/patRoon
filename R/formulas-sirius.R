@@ -21,7 +21,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     else
     {
         forms <- fread(summary)
-        fragFiles <- patRoon:::getSiriusFragFiles(resultPath)
+        fragFiles <- patRoon:::getAndPrepareSIRIUSFragFiles(resultPath)
         
         if (nrow(forms) == 0 || length(fragFiles) == 0)
             forms <- noResult

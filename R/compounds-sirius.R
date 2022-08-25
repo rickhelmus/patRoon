@@ -35,7 +35,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for
         # candidates with the same formula.
-        fragFiles <- getSiriusFragFiles(resultPath)
+        fragFiles <- patRoon:::getAndPrepareSIRIUSFragFiles(resultPath)
         for (ff in fragFiles)
         {
             fragInfo <- fread(ff)

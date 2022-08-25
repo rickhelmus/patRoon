@@ -7,10 +7,17 @@ loadSIRFeat <- function(json, fileIndex)
     
     iso <- json[["traceSets"]][[fileIndex]][["ionTrace"]][["isotopes"]][[1]]
     
+    featOffset <- iso$detectedFeatureOffset
+    featLen <- iso$detectedFeatureLength
+    
+    # NOTE: +1 to make it 1 based for R vectors
+    featRange <- seq(featOffset + 1, featOffset + featLen)
+    rawRange <- seq(iso$indexOffset + featOffset + 1, iso$indexOffset + featOffset + featLen)
+    
     # NOTE: SIRIUS retention times are in milliseconds
-    eic <- data.table(time = unlist(json[["traceSets"]][[fileIndex]][["retentionTimes"]]) / 1000,
-                      intensity = unlist(iso[["intensities"]]))
-    mzs <- unlist(iso[["masses"]])
+    eic <- data.table(time = unlist(json[["traceSets"]][[fileIndex]][["retentionTimes"]])[rawRange] / 1000,
+                      intensity = unlist(iso[["intensities"]])[featRange])
+    mzs <- unlist(iso[["masses"]])[featRange]
     area <- json[["abundance"]][[fileIndex]]
     ret <- eic$time[which.max(eic$intensity)] # UNDONE: verify
     

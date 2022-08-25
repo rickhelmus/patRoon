@@ -2,6 +2,8 @@
 
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
 - Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
+- SIRUS:
+    - Fixed: Features with data offsets are now properly loaded.
 
 
 # patRoon 2.1

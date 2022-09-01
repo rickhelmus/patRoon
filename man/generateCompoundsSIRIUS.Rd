@@ -20,6 +20,7 @@
   cores = NULL,
   topMost = 100,
   topMostFormulas = 5,
+  token = NULL,
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
   verbose = TRUE,
@@ -90,6 +91,12 @@ large numbers of candidates.}
 
 \item{topMostFormulas}{Do not return more than this number of candidate formulae. Note that only compounds for these
 formulae will be searched. Sets the \option{--candidates} commandline option.}
+
+\item{token}{A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
+version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
+\command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
+\href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
+information. If \code{NULL} then the log in is skipped.}
 
 \item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any extra commandline parameters for
 \command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula

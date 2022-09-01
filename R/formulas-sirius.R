@@ -175,7 +175,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
-                          database, noise, cores, FALSE, NULL, topMost, projectPath, extraOptsGeneral,
+                          database, noise, cores, FALSE, NULL, topMost, projectPath, NULL, extraOptsGeneral,
                           extraOptsFormula, verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
                           splitBatches, dryRun)
         

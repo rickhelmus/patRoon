@@ -105,6 +105,11 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #'   \option{--fingerid-db} option.
 #' @param topMostFormulas Do not return more than this number of candidate formulae. Note that only compounds for these
 #'   formulae will be searched. Sets the \option{--candidates} commandline option.
+#' @param token A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
+#'   version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
+#'   \command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
+#'   \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
+#'   information. If \code{NULL} then the log in is skipped.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @templateVar ident TRUE
@@ -112,11 +117,11 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #' @template sirius_form-args
 #' @template adduct-arg
 #' @template comp_algo-args
-#' 
+#'
 #' @inheritParams generateCompounds
 #'
 #' @inherit generateCompounds return
-#' 
+#'
 #' @templateVar what \code{generateCompoundsSIRIUS}
 #' @template uses-multiProc
 #'
@@ -128,8 +133,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL,
                                                                cores = NULL, topMost = 100, topMostFormulas = 5,
-                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL,
-                                                               verbose = TRUE, splitBatches = FALSE, dryRun = FALSE)
+                                                               token = NULL, extraOptsGeneral = NULL,
+                                                               extraOptsFormula = NULL, verbose = TRUE,
+                                                               splitBatches = FALSE, dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -141,6 +147,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
+    checkmate::assertString(token, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
@@ -162,7 +169,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMostFormulas, projectPath,
-                        extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
+                        token, extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
                         patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
                         splitBatches, dryRun)
     

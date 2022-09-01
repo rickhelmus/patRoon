@@ -106,7 +106,8 @@ Imports:
     yaml,
     keys,
     backports,
-    httr
+    httr,
+    getPass
 Suggests: 
     RDCOMClient,
     metfRag,

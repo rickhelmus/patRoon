@@ -4,6 +4,8 @@
 - Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
 - SIRUS:
     - Fixed: Features with data offsets are now properly loaded.
+    - Compatibility fixes for SIRIUS v5
+        - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token. Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/
 
 
 # patRoon 2.1

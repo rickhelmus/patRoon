@@ -1,6 +1,7 @@
 # patRoon 2.1.1
 
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
+- Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
 
 
 # patRoon 2.1

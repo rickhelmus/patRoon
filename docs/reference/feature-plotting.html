@@ -95,106 +95,106 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups,missing</span>
-<span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span>
-  <span class="va">x</span>,
-  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,
-  onlyUnique <span class="op">=</span> <span class="cn">FALSE</span>,
-  retMin <span class="op">=</span> <span class="cn">FALSE</span>,
-  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,
-  col <span class="op">=</span> <span class="cn">NULL</span>,
-  pch <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  average <span class="op">=</span> <span class="cn">FALSE</span>,
-  normalized <span class="op">=</span> <span class="cn">FALSE</span>,
-  xnames <span class="op">=</span> <span class="cn">TRUE</span>,
-  showLegend <span class="op">=</span> <span class="cn">FALSE</span>,
-  pch <span class="op">=</span> <span class="fl">20</span>,
-  type <span class="op">=</span> <span class="st">"b"</span>,
-  lty <span class="op">=</span> <span class="fl">3</span>,
-  col <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  average <span class="op">=</span> <span class="cn">FALSE</span>,
-  normalized <span class="op">=</span> <span class="cn">FALSE</span>,
-  xnames <span class="op">=</span> <span class="op">!</span><span class="va">sets</span>,
-  showLegend <span class="op">=</span> <span class="va">sets</span>,
-  pch <span class="op">=</span> <span class="fl">20</span>,
-  type <span class="op">=</span> <span class="st">"b"</span>,
-  lty <span class="op">=</span> <span class="fl">3</span>,
-  col <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>,
-  sets <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotChord</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>,
-  addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>,
-  average <span class="op">=</span> <span class="cn">FALSE</span>,
-  outerGroups <span class="op">=</span> <span class="cn">NULL</span>,
-  addIntraOuterGroupLinks <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotChroms</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  rtWindow <span class="op">=</span> <span class="fl">30</span>,
-  mzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,
-  retMin <span class="op">=</span> <span class="cn">FALSE</span>,
-  topMost <span class="op">=</span> <span class="cn">NULL</span>,
-  topMostByRGroup <span class="op">=</span> <span class="cn">FALSE</span>,
-  EICs <span class="op">=</span> <span class="cn">NULL</span>,
-  showPeakArea <span class="op">=</span> <span class="cn">FALSE</span>,
-  showFGroupRect <span class="op">=</span> <span class="cn">TRUE</span>,
-  title <span class="op">=</span> <span class="cn">NULL</span>,
-  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,
-  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,
-  onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,
-  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span><span class="op">)</span>,
-  showProgress <span class="op">=</span> <span class="cn">FALSE</span>,
-  xlim <span class="op">=</span> <span class="cn">NULL</span>,
-  ylim <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">which</span><span class="op">)</span>, nintersects <span class="op">=</span> <span class="cn">NA</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotVolcano</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">FCParams</span>,
-  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,
-  averageFunc <span class="op">=</span> <span class="va">mean</span>,
-  normalized <span class="op">=</span> <span class="cn">FALSE</span>,
-  col <span class="op">=</span> <span class="cn">NULL</span>,
-  pch <span class="op">=</span> <span class="fl">19</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups,missing</span></span>
+<span><span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,</span>
+<span>  onlyUnique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pch <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xnames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  pch <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xnames <span class="op">=</span> <span class="op">!</span><span class="va">sets</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="va">sets</span>,</span>
+<span>  pch <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  sets <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotChord</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  outerGroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  addIntraOuterGroupLinks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotChroms</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>  mzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  topMostByRGroup <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  EICs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showPeakArea <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showFGroupRect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span><span class="op">)</span>,</span>
+<span>  showProgress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">which</span><span class="op">)</span>, nintersects <span class="op">=</span> <span class="cn">NA</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotVolcano</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">FCParams</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  averageFunc <span class="op">=</span> <span class="va">mean</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pch <span class="op">=</span> <span class="fl">19</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -436,7 +436,7 @@ from the used plotting function (see <em>e.g.</em></p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

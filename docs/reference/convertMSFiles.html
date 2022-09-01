@@ -95,22 +95,22 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">MSFileFormats</span><span class="op">(</span>algorithm <span class="op">=</span> <span class="st">"pwiz"</span>, vendor <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">convertMSFiles</span><span class="op">(</span>
-  files <span class="op">=</span> <span class="cn">NULL</span>,
-  outPath <span class="op">=</span> <span class="cn">NULL</span>,
-  dirs <span class="op">=</span> <span class="cn">TRUE</span>,
-  anaInfo <span class="op">=</span> <span class="cn">NULL</span>,
-  from <span class="op">=</span> <span class="cn">NULL</span>,
-  to <span class="op">=</span> <span class="st">"mzML"</span>,
-  overWrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  algorithm <span class="op">=</span> <span class="st">"pwiz"</span>,
-  centroid <span class="op">=</span> <span class="va">algorithm</span> <span class="op">!=</span> <span class="st">"openms"</span>,
-  filters <span class="op">=</span> <span class="cn">NULL</span>,
-  extraOpts <span class="op">=</span> <span class="cn">NULL</span>,
-  PWizBatchSize <span class="op">=</span> <span class="fl">1</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">MSFileFormats</span><span class="op">(</span>algorithm <span class="op">=</span> <span class="st">"pwiz"</span>, vendor <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">convertMSFiles</span><span class="op">(</span></span>
+<span>  files <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  outPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dirs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  anaInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="st">"mzML"</span>,</span>
+<span>  overWrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  algorithm <span class="op">=</span> <span class="st">"pwiz"</span>,</span>
+<span>  centroid <span class="op">=</span> <span class="va">algorithm</span> <span class="op">!=</span> <span class="st">"openms"</span>,</span>
+<span>  filters <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  PWizBatchSize <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -249,18 +249,17 @@ call.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span>
-<span class="co"># Use FileConverter of OpenMS to convert between open mzXML/mzML format</span>
-<span class="fu">convertMSFiles</span><span class="op">(</span><span class="st">"standard-1.mzXML"</span>, to <span class="op">=</span> <span class="st">"mzML"</span>, algorithm <span class="op">=</span> <span class="st">"openms"</span><span class="op">)</span>
-
-<span class="co"># Convert all Thermo .RAW files in the analyses/raw directory to mzML and</span>
-<span class="co"># store the files in analyses/mzml. During conversion files are centroided by</span>
-<span class="co"># the peakPicking filter and only MS 1 data is kept.</span>
-<span class="fu">convertMSFiles</span><span class="op">(</span><span class="st">"analyses/raw"</span>, <span class="st">"analyses/mzml"</span>, dirs <span class="op">=</span> <span class="cn">TRUE</span>, from <span class="op">=</span> <span class="st">"thermo"</span>,
-               centroid <span class="op">=</span> <span class="st">"vendor"</span>, filters <span class="op">=</span> <span class="st">"msLevel 1"</span><span class="op">)</span>
-<span class="op">}</span>
-
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="co"># Use FileConverter of OpenMS to convert between open mzXML/mzML format</span></span>
+<span><span class="fu">convertMSFiles</span><span class="op">(</span><span class="st">"standard-1.mzXML"</span>, to <span class="op">=</span> <span class="st">"mzML"</span>, algorithm <span class="op">=</span> <span class="st">"openms"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert all Thermo .RAW files in the analyses/raw directory to mzML and</span></span>
+<span><span class="co"># store the files in analyses/mzml. During conversion files are centroided by</span></span>
+<span><span class="co"># the peakPicking filter and only MS 1 data is kept.</span></span>
+<span><span class="fu">convertMSFiles</span><span class="op">(</span><span class="st">"analyses/raw"</span>, <span class="st">"analyses/mzml"</span>, dirs <span class="op">=</span> <span class="cn">TRUE</span>, from <span class="op">=</span> <span class="st">"thermo"</span>,</span>
+<span>               centroid <span class="op">=</span> <span class="st">"vendor"</span>, filters <span class="op">=</span> <span class="st">"msLevel 1"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -274,7 +273,7 @@ call.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

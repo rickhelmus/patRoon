@@ -97,27 +97,27 @@ similar chromatographic retention profiles and annotate their relationships (<em
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">generateComponentsRAMClustR</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  ionization <span class="op">=</span> <span class="cn">NULL</span>,
-  st <span class="op">=</span> <span class="cn">NULL</span>,
-  sr <span class="op">=</span> <span class="cn">NULL</span>,
-  maxt <span class="op">=</span> <span class="fl">12</span>,
-  hmax <span class="op">=</span> <span class="fl">0.3</span>,
-  normalize <span class="op">=</span> <span class="st">"TIC"</span>,
-  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,
-  relMzDev <span class="op">=</span> <span class="fl">5</span>,
-  minSize <span class="op">=</span> <span class="fl">2</span>,
-  relMinReplicates <span class="op">=</span> <span class="fl">0.5</span>,
-  RCExperimentVals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>platform <span class="op">=</span> <span class="st">"LC-MS"</span><span class="op">)</span>, instrument <span class="op">=</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ionization <span class="op">=</span> <span class="va">ionization</span>, MSlevs <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,
-  extraOptsRC <span class="op">=</span> <span class="cn">NULL</span>,
-  extraOptsFM <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">generateComponentsRAMClustR</span><span class="op">(</span><span class="va">fGroups</span>, ionization <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">generateComponentsRAMClustR</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  st <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxt <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  hmax <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="st">"TIC"</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  relMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  minSize <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  relMinReplicates <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  RCExperimentVals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>platform <span class="op">=</span> <span class="st">"LC-MS"</span><span class="op">)</span>, instrument <span class="op">=</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ionization <span class="op">=</span> <span class="va">ionization</span>, MSlevs <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  extraOptsRC <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extraOptsFM <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">generateComponentsRAMClustR</span><span class="op">(</span><span class="va">fGroups</span>, ionization <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -225,7 +225,7 @@ These are used to construct the <code>ExpDes</code> argument passed to <code><a 
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

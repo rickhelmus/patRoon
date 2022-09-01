@@ -97,48 +97,48 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">generateCompoundsMetFrag</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">MSPeakLists</span>,
-  method <span class="op">=</span> <span class="st">"CL"</span>,
-  timeout <span class="op">=</span> <span class="fl">300</span>,
-  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,
-  errorRetries <span class="op">=</span> <span class="fl">2</span>,
-  topMost <span class="op">=</span> <span class="fl">100</span>,
-  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,
-  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,
-  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,
-  adduct <span class="op">=</span> <span class="cn">NULL</span>,
-  database <span class="op">=</span> <span class="st">"pubchem"</span>,
-  extendedPubChem <span class="op">=</span> <span class="st">"auto"</span>,
-  chemSpiderToken <span class="op">=</span> <span class="st">""</span>,
-  scoreTypes <span class="op">=</span> <span class="fu"><a href="compoundScorings.html">compoundScorings</a></span><span class="op">(</span><span class="st">"metfrag"</span>, <span class="va">database</span>, onlyDefault <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">name</span>,
-  scoreWeights <span class="op">=</span> <span class="fl">1</span>,
-  preProcessingFilters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UnconnectedCompoundFilter"</span>, <span class="st">"IsotopeFilter"</span><span class="op">)</span>,
-  postProcessingFilters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InChIKeyFilter"</span><span class="op">)</span>,
-  maxCandidatesToStop <span class="op">=</span> <span class="fl">2500</span>,
-  identifiers <span class="op">=</span> <span class="cn">NULL</span>,
-  extraOpts <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">generateCompoundsMetFrag</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">MSPeakLists</span>,
-  method <span class="op">=</span> <span class="st">"CL"</span>,
-  timeout <span class="op">=</span> <span class="fl">300</span>,
-  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,
-  errorRetries <span class="op">=</span> <span class="fl">2</span>,
-  topMost <span class="op">=</span> <span class="fl">100</span>,
-  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,
-  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,
-  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,
-  adduct <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>,
-  setThreshold <span class="op">=</span> <span class="fl">0</span>,
-  setThresholdAnn <span class="op">=</span> <span class="fl">0</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"CL"</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  errorRetries <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  database <span class="op">=</span> <span class="st">"pubchem"</span>,</span>
+<span>  extendedPubChem <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  chemSpiderToken <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  scoreTypes <span class="op">=</span> <span class="fu"><a href="compoundScorings.html">compoundScorings</a></span><span class="op">(</span><span class="st">"metfrag"</span>, <span class="va">database</span>, onlyDefault <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">name</span>,</span>
+<span>  scoreWeights <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  preProcessingFilters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UnconnectedCompoundFilter"</span>, <span class="st">"IsotopeFilter"</span><span class="op">)</span>,</span>
+<span>  postProcessingFilters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InChIKeyFilter"</span><span class="op">)</span>,</span>
+<span>  maxCandidatesToStop <span class="op">=</span> <span class="fl">2500</span>,</span>
+<span>  identifiers <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"CL"</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  errorRetries <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -364,7 +364,7 @@ annotations for the feature group of the candidate.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

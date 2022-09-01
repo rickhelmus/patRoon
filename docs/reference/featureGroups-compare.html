@@ -95,35 +95,35 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparison,missing</span>
-<span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span><span class="va">x</span>, retMin <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparison</span>
-<span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparison</span>
-<span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparison</span>
-<span class="fu"><a href="generics.html">plotChord</a></span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparison</span>
-<span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,
-  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,
-  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,
-  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsComparisonSet</span>
-<span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparison,missing</span></span>
+<span><span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span><span class="va">x</span>, retMin <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="fu"><a href="generics.html">plotChord</a></span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsComparisonSet</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -263,7 +263,7 @@ output and generate a consensus.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

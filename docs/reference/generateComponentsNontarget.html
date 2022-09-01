@@ -97,22 +97,22 @@ components by unsupervised detection of homologous series.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">generateComponentsNontarget</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  ionization <span class="op">=</span> <span class="cn">NULL</span>,
-  rtRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">120</span>, <span class="fl">120</span><span class="op">)</span>,
-  mzRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">120</span><span class="op">)</span>,
-  elements <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"H"</span>, <span class="st">"O"</span><span class="op">)</span>,
-  rtDev <span class="op">=</span> <span class="fl">30</span>,
-  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,
-  absMzDevLink <span class="op">=</span> <span class="va">absMzDev</span> <span class="op">*</span> <span class="fl">2</span>,
-  traceHack <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Version.html" class="external-link">R.Version</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"major"</span>, <span class="st">"minor"</span><span class="op">)</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">generateComponentsNontarget</span><span class="op">(</span><span class="va">fGroups</span>, ionization <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">generateComponentsNontarget</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rtRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">120</span>, <span class="fl">120</span><span class="op">)</span>,</span>
+<span>  mzRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">120</span><span class="op">)</span>,</span>
+<span>  elements <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"H"</span>, <span class="st">"O"</span><span class="op">)</span>,</span>
+<span>  rtDev <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  absMzDevLink <span class="op">=</span> <span class="va">absMzDev</span> <span class="op">*</span> <span class="fl">2</span>,</span>
+<span>  traceHack <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Version.html" class="external-link">R.Version</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"major"</span>, <span class="st">"minor"</span><span class="op">)</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">generateComponentsNontarget</span><span class="op">(</span><span class="va">fGroups</span>, ionization <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -217,7 +217,7 @@ enabled by default on these R versions, implements a (messy) workaround
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -99,88 +99,88 @@ identified compounds.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">reportCSV</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  path <span class="op">=</span> <span class="st">"report"</span>,
-  reportFeatures <span class="op">=</span> <span class="cn">FALSE</span>,
-  formulas <span class="op">=</span> <span class="cn">NULL</span>,
-  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,
-  compounds <span class="op">=</span> <span class="cn">NULL</span>,
-  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
-    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
-  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
-  components <span class="op">=</span> <span class="cn">NULL</span>,
-  retMin <span class="op">=</span> <span class="cn">TRUE</span>,
-  clearPath <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu">reportPDF</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  path <span class="op">=</span> <span class="st">"report"</span>,
-  reportFGroups <span class="op">=</span> <span class="cn">TRUE</span>,
-  formulas <span class="op">=</span> <span class="cn">NULL</span>,
-  formulasTopMost <span class="op">=</span> <span class="fl">5</span>,
-  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,
-  reportFormulaSpectra <span class="op">=</span> <span class="cn">TRUE</span>,
-  compounds <span class="op">=</span> <span class="cn">NULL</span>,
-  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
-    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
-  compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,
-  compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,
-  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
-  components <span class="op">=</span> <span class="cn">NULL</span>,
-  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,
-  retMin <span class="op">=</span> <span class="cn">TRUE</span>,
-  EICGrid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>,
-  EICRtWindow <span class="op">=</span> <span class="fl">20</span>,
-  EICMzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,
-  EICTopMost <span class="op">=</span> <span class="fl">1</span>,
-  EICTopMostByRGroup <span class="op">=</span> <span class="cn">TRUE</span>,
-  EICOnlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,
-  clearPath <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu">reportHTML</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  path <span class="op">=</span> <span class="st">"report"</span>,
-  reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,
-  formulas <span class="op">=</span> <span class="cn">NULL</span>,
-  formulasTopMost <span class="op">=</span> <span class="fl">5</span>,
-  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,
-  compounds <span class="op">=</span> <span class="cn">NULL</span>,
-  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,
-  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,
-    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,
-  compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,
-  compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,
-  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,
-  includeMFWebLinks <span class="op">=</span> <span class="st">"compounds"</span>,
-  components <span class="op">=</span> <span class="cn">NULL</span>,
-  interactiveHeat <span class="op">=</span> <span class="cn">FALSE</span>,
-  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,
-  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,
-  TPs <span class="op">=</span> <span class="cn">NULL</span>,
-  retMin <span class="op">=</span> <span class="cn">TRUE</span>,
-  EICRtWindow <span class="op">=</span> <span class="fl">20</span>,
-  EICMzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,
-  EICTopMost <span class="op">=</span> <span class="fl">1</span>,
-  EICTopMostByRGroup <span class="op">=</span> <span class="cn">TRUE</span>,
-  EICOnlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,
-  TPGraphStructuresMax <span class="op">=</span> <span class="fl">25</span>,
-  selfContained <span class="op">=</span> <span class="cn">TRUE</span>,
-  optimizePng <span class="op">=</span> <span class="cn">FALSE</span>,
-  clearPath <span class="op">=</span> <span class="cn">FALSE</span>,
-  openReport <span class="op">=</span> <span class="cn">TRUE</span>,
-  noDate <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">reportCSV</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
+<span>  reportFeatures <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,</span>
+<span>    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,</span>
+<span>  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">reportPDF</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
+<span>  reportFGroups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formulasTopMost <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  reportFormulaSpectra <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,</span>
+<span>    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,</span>
+<span>  compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  EICGrid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  EICRtWindow <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  EICMzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  EICTopMost <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  EICTopMostByRGroup <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  EICOnlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">reportHTML</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
+<span>  reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,</span>
+<span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formulasTopMost <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  formulasExclNormScores <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  compoundsExclNormScores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"score"</span>, <span class="st">"individualMoNAScore"</span>, <span class="st">"annoTypeCount"</span>,</span>
+<span>    <span class="st">"annotHitCount"</span>, <span class="st">"libMatch"</span><span class="op">)</span>,</span>
+<span>  compoundsOnlyUsedScorings <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  compoundsTopMost <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  compsCluster <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  includeMFWebLinks <span class="op">=</span> <span class="st">"compounds"</span>,</span>
+<span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interactiveHeat <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  TPs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  EICRtWindow <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  EICMzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  EICTopMost <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  EICTopMostByRGroup <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  EICOnlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  TPGraphStructuresMax <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  selfContained <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  optimizePng <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  openReport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  noDate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -401,7 +401,7 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

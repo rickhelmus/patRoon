@@ -101,89 +101,89 @@ please refer to the linked method documentation for each generic.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adducts</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">adducts</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="fu">algorithm</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">analysisInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">analyses</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">annotatedPeakList</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">annotations</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">calculatePeakQualities</span><span class="op">(</span><span class="va">obj</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, flatnessFactor <span class="op">=</span> <span class="fl">0.05</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">clusterProperties</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">clusters</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">consensus</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">convertToMFDB</span><span class="op">(</span><span class="va">TPs</span>, <span class="va">out</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">convertToSuspects</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">cutClusters</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">defaultExclNormScores</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">export</span><span class="op">(</span><span class="va">obj</span>, <span class="va">type</span>, <span class="va">out</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">featureTable</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">filter</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">getFeatures</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">getMCS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">groupNames</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">plotChord</span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotChroms</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotGraph</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotInt</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotScores</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotSilhouettes</span><span class="op">(</span><span class="va">obj</span>, <span class="va">kSeq</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotSpectrum</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotStructure</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotVenn</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotUpSet</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">delete</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">plotVolcano</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">replicateGroups</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">setObjects</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">sets</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="fu">treeCut</span><span class="op">(</span><span class="va">obj</span>, k <span class="op">=</span> <span class="cn">NULL</span>, h <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">treeCutDynamic</span><span class="op">(</span>
-  <span class="va">obj</span>,
-  maxTreeHeight <span class="op">=</span> <span class="fl">1</span>,
-  deepSplit <span class="op">=</span> <span class="cn">TRUE</span>,
-  minModuleSize <span class="op">=</span> <span class="fl">1</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="fu">unset</span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adducts</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">adducts</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">algorithm</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">analysisInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">analyses</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">annotatedPeakList</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">annotations</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">calculatePeakQualities</span><span class="op">(</span><span class="va">obj</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, flatnessFactor <span class="op">=</span> <span class="fl">0.05</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">clusterProperties</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">clusters</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">consensus</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">convertToMFDB</span><span class="op">(</span><span class="va">TPs</span>, <span class="va">out</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">convertToSuspects</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cutClusters</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">defaultExclNormScores</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">export</span><span class="op">(</span><span class="va">obj</span>, <span class="va">type</span>, <span class="va">out</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">featureTable</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">filter</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getFeatures</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getMCS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">groupNames</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotChord</span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotChroms</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotGraph</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotInt</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotScores</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotSilhouettes</span><span class="op">(</span><span class="va">obj</span>, <span class="va">kSeq</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotSpectrum</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotStructure</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotVenn</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotUpSet</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">delete</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plotVolcano</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">replicateGroups</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">setObjects</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sets</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">treeCut</span><span class="op">(</span><span class="va">obj</span>, k <span class="op">=</span> <span class="cn">NULL</span>, h <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">treeCutDynamic</span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  maxTreeHeight <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  deepSplit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  minModuleSize <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">unset</span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -365,7 +365,7 @@ average silhouette width calculation.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

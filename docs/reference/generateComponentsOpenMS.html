@@ -99,37 +99,37 @@ utility (see <a href="http://www.openms.de" class="external-link">http://www.ope
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">generateComponentsOpenMS</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  ionization <span class="op">=</span> <span class="cn">NULL</span>,
-  chargeMin <span class="op">=</span> <span class="fl">1</span>,
-  chargeMax <span class="op">=</span> <span class="fl">1</span>,
-  chargeSpan <span class="op">=</span> <span class="fl">3</span>,
-  qTry <span class="op">=</span> <span class="st">"heuristic"</span>,
-  potentialAdducts <span class="op">=</span> <span class="cn">NULL</span>,
-  minRTOverlap <span class="op">=</span> <span class="fl">0.66</span>,
-  retWindow <span class="op">=</span> <span class="fl">1</span>,
-  absMzDev <span class="op">=</span> <span class="fl">0.005</span>,
-  minSize <span class="op">=</span> <span class="fl">2</span>,
-  relMinAdductAbundance <span class="op">=</span> <span class="fl">0.75</span>,
-  adductConflictsUsePref <span class="op">=</span> <span class="cn">TRUE</span>,
-  NMConflicts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"preferential"</span>, <span class="st">"mostAbundant"</span>, <span class="st">"mostIntense"</span><span class="op">)</span>,
-  prefAdducts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M+H]+"</span>, <span class="st">"[M-H]-"</span><span class="op">)</span>,
-  extraOpts <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">generateComponentsOpenMS</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  ionization <span class="op">=</span> <span class="cn">NULL</span>,
-  chargeMin <span class="op">=</span> <span class="fl">1</span>,
-  chargeMax <span class="op">=</span> <span class="fl">1</span>,
-  chargeSpan <span class="op">=</span> <span class="fl">3</span>,
-  qTry <span class="op">=</span> <span class="st">"heuristic"</span>,
-  potentialAdducts <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">generateComponentsOpenMS</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chargeMin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  chargeMax <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  chargeSpan <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  qTry <span class="op">=</span> <span class="st">"heuristic"</span>,</span>
+<span>  potentialAdducts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minRTOverlap <span class="op">=</span> <span class="fl">0.66</span>,</span>
+<span>  retWindow <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  minSize <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  relMinAdductAbundance <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  adductConflictsUsePref <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  NMConflicts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"preferential"</span>, <span class="st">"mostAbundant"</span>, <span class="st">"mostIntense"</span><span class="op">)</span>,</span>
+<span>  prefAdducts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M+H]+"</span>, <span class="st">"[M-H]-"</span><span class="op">)</span>,</span>
+<span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">generateComponentsOpenMS</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chargeMin <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  chargeMax <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  chargeSpan <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  qTry <span class="op">=</span> <span class="st">"heuristic"</span>,</span>
+<span>  potentialAdducts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -301,7 +301,7 @@ components</code> section for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

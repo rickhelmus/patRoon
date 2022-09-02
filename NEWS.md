@@ -4,6 +4,8 @@
 
 Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/ This release of `patRoon` adds support to make logging in more easy and adds several compability fixes for the latest `SIRIUS` version.
 
+## Changes
+
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
 - Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
 - SIRUS:
@@ -11,6 +13,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
     - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
     - code generation to obtain SIRIUS reference token with `newProject()`
+- Updated PubChem transformations to September release (0.1.3)
 
 
 # patRoon 2.1

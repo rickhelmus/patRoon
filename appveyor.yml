@@ -19,7 +19,7 @@ install:
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\openms27.exe)) {
-            Invoke-WebRequest https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.7.0/OpenMS-2.7.0-Win64.exe -OutFile "C:\deps\openms27.exe"
+            Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.7.0/OpenMS-2.7.0-Win64.exe -OutFile "C:\deps\openms27.exe"
         }
         C:\deps\openms27.exe /S
     - ps: >-

@@ -94,15 +94,22 @@
 <div class="section level3">
 <h3 id="note-usage-of-sirius-version-2-1-1">NOTE Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#note-usage-of-sirius-version-2-1-1"></a></h3>
 <p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compability fixes for the latest <code>SIRIUS</code> version.</p>
+</div>
+<div class="section level3">
+<h3 id="changes-2-1-1">Changes<a class="anchor" aria-label="anchor" href="#changes-2-1-1"></a></h3>
 <ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
+<li>Fixes for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> with consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
 <li>SIRUS:
 <ul><li>Fixed: Features with data offsets are now properly loaded.</li>
 <li>
 <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> to interactively obtain a SIRIUS login refresh token.</li>
 <li>
 <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> to log in using the given refresh token.</li>
+<li>code generation to obtain SIRIUS reference token with <code><a href="../reference/newProject.html">newProject()</a></code>
+</li>
 </ul></li>
+<li>Updated PubChem transformations to September release (0.1.3)</li>
 </ul></div>
 </div>
     <div class="section level2">

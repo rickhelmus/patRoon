@@ -10,6 +10,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - Fixed: Features with data offsets are now properly loaded.
     - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
     - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
+    - code generation to obtain SIRIUS reference token with `newProject()`
 
 
 # patRoon 2.1

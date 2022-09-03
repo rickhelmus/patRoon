@@ -108,8 +108,10 @@
 <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> to log in using the given refresh token.</li>
 <li>code generation to obtain SIRIUS reference token with <code><a href="../reference/newProject.html">newProject()</a></code>
 </li>
+<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>).</li>
 </ul></li>
 <li>Updated PubChem transformations to September release (0.1.3)</li>
+<li>Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">

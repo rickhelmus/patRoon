@@ -15,7 +15,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - code generation to obtain SIRIUS reference token with `newProject()`
     - Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with `annotateSuspects()` (issue #54).
 - Updated PubChem transformations to September release (0.1.3)
-
+- Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue #54) 
 
 # patRoon 2.1
 

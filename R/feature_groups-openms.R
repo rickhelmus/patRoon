@@ -107,7 +107,7 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
     for (datafile in sGroup$analysis)
     {
         featFiles[[datafile]] <- tempfile(datafile, fileext = ".featureXML")
-        writeFeatureXML(fts[[datafile]], featFiles[[datafile]], FALSE)
+        writeFeatureXML(fts[[datafile]], datafile, featFiles[[datafile]], FALSE)
     }
 
     if (rtalign)

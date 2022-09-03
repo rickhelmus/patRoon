@@ -25,8 +25,8 @@ parseFeatConsXMLFile <- function(file, anaCount) {
     .Call(`_patRoon_parseFeatConsXMLFile`, file, anaCount)
 }
 
-writeFeatureXML <- function(featList, out, hulls) {
-    invisible(.Call(`_patRoon_writeFeatureXML`, featList, out, hulls))
+writeFeatureXML <- function(featList, fPath, out, hulls) {
+    invisible(.Call(`_patRoon_writeFeatureXML`, featList, fPath, out, hulls))
 }
 
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {

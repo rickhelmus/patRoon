@@ -18,6 +18,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue #54) 
 - Updated MetFrag to 2.5.0
 - Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
+- Fix: multiprocessing with classic: don't try to capture output when logging is disabled
 
 
 # patRoon 2.1

@@ -59,14 +59,12 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
             ret$command <- "/bin/sh"
             ret$args <- c("-c", paste(quoteCmd(commandQueue[[1]]), ANDMarkSucceed, ORDoExit))
         }
-        if (!is.null(commandQueue[[1]]$logFile))
-            ret[c("stdout", "stderr")] <- "|"
     }
     
     return(ret)
 }
 
-initCommand <- function(commandQueue, cmdInds, workDir, sucDir, printOutput, printError)
+initCommand <- function(commandQueue, cmdInds, workDir, sucDir, doLog, printOutput, printError)
 {
     procArgs <- makeCommandList(commandQueue, cmdInds, sucDir)
     procArgs <- c(procArgs, list(cleanup_tree = TRUE, supervise = TRUE))
@@ -80,6 +78,9 @@ initCommand <- function(commandQueue, cmdInds, workDir, sucDir, printOutput, pri
         procArgs[["stderr"]] <- "|"
     
     ncmd <- length(commandQueue)
+    
+    if (ncmd == 1 && doLog && !is.null(commandQueue[[1]]$logFile))
+        procArgs[c("stdout", "stderr")] <- "|"
     
     ret <- list()
     ret$procArgs <- procArgs
@@ -334,7 +335,7 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
                     }
                     
                     cs <- seq(nextCommand, nextCommand + (ncmd - 1))
-                    runningProcInfo[[pi]] <- initCommand(commandQueue[cs], cs, workDir, sucDir, printOutput, printError)
+                    runningProcInfo[[pi]] <- initCommand(commandQueue[cs], cs, workDir, sucDir, doLog, printOutput, printError)
                     runningProcs[[pi]] <- do.call(processx::process$new, runningProcInfo[[pi]]$procArgs)
                     
                     # printf("started %d-%d on slot %d\n", nextCommand, runningProcInfo[[pi]]$cmdIndRange[2], pi)

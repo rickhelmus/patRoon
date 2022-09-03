@@ -39,13 +39,17 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         for (ff in fragFiles)
         {
             fragInfo <- fread(ff)
-            fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
             fragInfo[, ionization := gsub(" ", "", ionization)]
             fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
 
             # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
             # candidate(s) it belongs to
             wh <- which(results$neutral_formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
+            
+            # Remove zero intensity precursor peak since it wasn't actually present in the peak list
+            fragInfo <- fragInfo[intensity != 0 | formula != results$neutral_formula[wh[1]]]
+            
+            fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
             
             if (length(wh) > 0)
             {

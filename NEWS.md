@@ -13,6 +13,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
     - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
     - code generation to obtain SIRIUS reference token with `newProject()`
+    - Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with `annotateSuspects()` (issue #54).
 - Updated PubChem transformations to September release (0.1.3)
 
 

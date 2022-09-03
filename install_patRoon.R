@@ -519,7 +519,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("MetFrag CL" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag CL", "https://github.com/ipb-halle/MetFragRelaunched/releases/download/v2.4.8/MetFragCommandLine-2.4.8.jar", FALSE)
+                down <- downloadFile(instPath, "MetFrag CL", "https://github.com/ipb-halle/MetFragRelaunched/releases/download/v.2.5.0/MetFragCommandLine-2.5.0.jar", FALSE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.MetFragCL = down))
             }

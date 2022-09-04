@@ -119,7 +119,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2022-09-03</h4>
+            <h4 data-toc-skip class="date">2022-09-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -154,8 +154,8 @@ detailed overview of <code>patRoon</code>. Instead, it serves as a quick
 introduction on how to use <code>patRoon</code> to setup and perform a
 full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-2dcfe8df9340925dbd77" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2dcfe8df9340925dbd77">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-63717a708ab9d33700a0" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-63717a708ab9d33700a0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -832,17 +832,17 @@ data from the previous step.</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span></span>
-<span><span class="co">#&gt;   1:  M109_R192_158              1 4.200977    108.0687       C1=CC=C(C(=C1)N)N</span></span>
-<span><span class="co">#&gt;   2:  M109_R192_158              1 4.069343    108.0687         C1=CC(=CC=C1N)N</span></span>
-<span><span class="co">#&gt;   3:  M109_R192_158              1 4.065540    108.0687         C1=CC=C(C=C1)NN</span></span>
-<span><span class="co">#&gt;   4:  M109_R192_158              1 3.605987    108.0687       C1=CC(=CC(=C1)N)N</span></span>
-<span><span class="co">#&gt;   5:  M109_R192_158              1 3.066375    108.0687           CNC1=CC=CC=N1</span></span>
+<span><span class="co">#&gt;   1:  M109_R192_158              1 4.001793    108.0687       C1=CC=C(C(=C1)N)N</span></span>
+<span><span class="co">#&gt;   2:  M109_R192_158              1 3.902882    108.0687         C1=CC(=CC=C1N)N</span></span>
+<span><span class="co">#&gt;   3:  M109_R192_158              1 3.882023    108.0687         C1=CC=C(C=C1)NN</span></span>
+<span><span class="co">#&gt;   4:  M109_R192_158              1 3.444008    108.0687       C1=CC(=CC(=C1)N)N</span></span>
+<span><span class="co">#&gt;   5:  M109_R192_158              1 2.989338    108.0687         CC1=CN=C(C=C1)N</span></span>
 <span><span class="co">#&gt;  ---                                                                           </span></span>
-<span><span class="co">#&gt; 741: M186_R293_1559              3 2.885516    185.2143     CCCC(CCC)(CC(C)C)NC</span></span>
-<span><span class="co">#&gt; 742: M186_R293_1559              3 2.885000    185.2143       CCCC(CCC)(CCC)NCC</span></span>
-<span><span class="co">#&gt; 743: M186_R293_1559              3 2.875603    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span>
-<span><span class="co">#&gt; 744: M186_R293_1559              3 2.875178    185.2143     CCCC(CCC)(CCC)N(C)C</span></span>
-<span><span class="co">#&gt; 745: M186_R293_1559              3 2.855822    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span></code></pre>
+<span><span class="co">#&gt; 741: M186_R293_1559              3 2.864588    185.2143     CCCC(CCC)(CCC)N(C)C</span></span>
+<span><span class="co">#&gt; 742: M186_R293_1559              3 2.854834    185.2143     CCCC(CCC)(CC(C)C)NC</span></span>
+<span><span class="co">#&gt; 743: M186_R293_1559              3 2.843538    185.2143       CCCC(CCC)(CCC)NCC</span></span>
+<span><span class="co">#&gt; 744: M186_R293_1559              3 2.840132    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span>
+<span><span class="co">#&gt; 745: M186_R293_1559              3 2.826290    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M215_R333_2275"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; NULL</span></span></code></pre>

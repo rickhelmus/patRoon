@@ -54,7 +54,10 @@ class BrukerTof2MzConverter final : public Tof2MzConverter
     const LoadedLibraryHandle lib_handle;
     uint64_t bruker_file_handle;
 
-    tims_open_fun_t* tims_open;
+    // Changed by Rick Helmus
+    // tims_open_fun_t* tims_open;
+    tims_open_v2_fun_t* tims_open;
+    // end change
     tims_get_last_error_string_fun_t* tims_get_last_error_string;
     tims_close_fun_t* tims_close;
     tims_convert_fun_t* tims_index_to_mz;

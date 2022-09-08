@@ -60,13 +60,19 @@ std::string BrukerTof2MzConverter::get_tims_error()
 
 BrukerTof2MzConverter::BrukerTof2MzConverter(TimsDataHandle& TDH, const std::string& lib_path) : lib_handle(lib_path), bruker_file_handle(0)
 {
-    tims_open = lib_handle.symbol_lookup<tims_open_fun_t>("tims_open");
+    // Changed by Rick Helmus
+    // tims_open = lib_handle.symbol_lookup<tims_open_fun_t>("tims_open");
+    tims_open = lib_handle.symbol_lookup<tims_open_v2_fun_t>("tims_open_v2");
+    // end change
     tims_get_last_error_string = lib_handle.symbol_lookup<tims_get_last_error_string_fun_t>("tims_get_last_error_string");
     tims_close = lib_handle.symbol_lookup<tims_close_fun_t>("tims_close");
     tims_index_to_mz = lib_handle.symbol_lookup<tims_convert_fun_t>("tims_index_to_mz");
     tims_mz_to_index = lib_handle.symbol_lookup<tims_convert_fun_t>("tims_mz_to_index");
 
-    bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 0); // Recalibrated states not supported
+    // Changed by Rick Helmus
+    // bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 0); // Recalibrated states not supported
+    bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 1, AnalyisGlobalPressureCompensation);
+    // End change
 
     if(bruker_file_handle == 0)
         throw std::runtime_error("tims_open(" + TDH.tims_dir_path + ") failed. Reason: " + get_tims_error());

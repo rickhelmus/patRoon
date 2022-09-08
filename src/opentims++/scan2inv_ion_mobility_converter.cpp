@@ -67,13 +67,19 @@ std::string BrukerScan2InvIonMobilityConverter::get_tims_error()
 
 BrukerScan2InvIonMobilityConverter::BrukerScan2InvIonMobilityConverter(TimsDataHandle& TDH, const std::string& lib_path) : lib_handle(lib_path), bruker_file_handle(0)
 {
-    tims_open = lib_handle.symbol_lookup<tims_open_fun_t>("tims_open");
+    // Changed by Rick Helmus
+    // tims_open = lib_handle.symbol_lookup<tims_open_fun_t>("tims_open");
+    tims_open = lib_handle.symbol_lookup<tims_open_v2_fun_t>("tims_open_v2");
+    // end change
     tims_get_last_error_string = lib_handle.symbol_lookup<tims_get_last_error_string_fun_t>("tims_get_last_error_string");
     tims_close = lib_handle.symbol_lookup<tims_close_fun_t>("tims_close");
     tims_scannum_to_inv_ion_mobility = lib_handle.symbol_lookup<tims_convert_fun_t>("tims_scannum_to_oneoverk0");
     tims_inv_ion_mobility_to_scannum = lib_handle.symbol_lookup<tims_convert_fun_t>("tims_oneoverk0_to_scannum");
 
-    bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 0); // Recalibrated states not supported
+    // Changed by Rick Helmus
+    // bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 0); // Recalibrated states not supported
+    bruker_file_handle = (*tims_open)(TDH.tims_dir_path.c_str(), 1, AnalyisGlobalPressureCompensation);
+    // End change
 
     if(bruker_file_handle == 0)
         throw std::runtime_error("tims_open(" + TDH.tims_dir_path + ") failed. Reason: " + get_tims_error());

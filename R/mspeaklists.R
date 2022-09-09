@@ -35,7 +35,7 @@ NULL
 #' @templateVar delj MS peaks
 #' @templateVar deljtype numeric indices (rows)
 #' @templateVar delfwhat feature group
-#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if \code{k=NULL}), type (\code{"MS"} or \code{"MSMS"})
+#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged peak list), type (\code{"MS"} or \code{"MSMS"})
 #' @templateVar delfr the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args
@@ -272,26 +272,16 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
 {
     checkmate::assertFlag(reAverage)
 
-    # non-existing indices result in NULL values --> prune
-
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))
-        x@peakLists <- pruneList(x@peakLists[i])
-
-        # update group averaged peak lists
-        if (reAverage)
-            x@averagedPeakLists <- averageMSPeakLists(x)
+        x <- delete(x, k = setdiff(analyses(x), i), reAverage = reAverage)
     }
 
     if (!missing(j))
     {
         j <- assertSubsetArgAndToChr(j, groupNames(x))
-        x@peakLists <- sapply(x@peakLists, function(a) return(pruneList(a[j])),
-                              simplify = FALSE)
-        x@peakLists <- pruneList(x@peakLists, TRUE)
-
-        x@averagedPeakLists <- pruneList(x@averagedPeakLists[j], TRUE)
+        x <- delete(x, i = setdiff(groupNames(x), j), reAverage = reAverage)
     }
 
     return(x)
@@ -378,8 +368,6 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #' @export
 setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
 {
-    # NOTE: this is ~ a c/p from the featureAnnotations method
-
     doAnaOnly <- !is.null(k)
     
     ac <- checkmate::makeAssertCollection()
@@ -523,118 +511,81 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     if (length(obj) == 0)
         return(obj)
 
-    hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
-                     topMSPeaks, topMSMSPeaks, minMSMSPeaks, isolatePrec, deIsotopeMS, deIsotopeMSMS,
-                     withMSMS, annotatedBy, retainPrecursorMSMS, negate)
+    hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr, topMSPeaks, topMSMSPeaks, minMSMSPeaks,
+                     isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy, retainPrecursorMSMS, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
     
     if (!is.null(annotatedBy) && !is.list(annotatedBy))
         annotatedBy <- list(annotatedBy)
-
-    doFilterGroups <- function(pl, onAvg)
-    {
-        # onAvg: skip some filters unneeded for averaged peak lists
-        
-        gCount <- length(pl)
-        if (gCount == 0)
-            return(pl)
-
-        prog <- openProgBar(0, gCount)
-
-        pln <- names(pl)
-        pl <- lapply(seq_along(pl), function(grpi)
-        {
-            ret <- list()
-            if (!is.null(pl[[grpi]][["MS"]]))
-                ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, NULL,
-                                             deIsotopeMS, TRUE, negate)
-            if (!is.null(pl[[grpi]][["MSMS"]]))
-            {
-                ret$MSMS <- copy(pl[[grpi]]$MSMS)
-                
-                if (!onAvg && !is.null(annotatedBy))
-                {
-                    grp <- pln[grpi]
-                    
-                    allAnnPLIDs <- unique(unlist(lapply(annotatedBy, function(ab)
-                    {
-                        if (is.null(ab[[grp]]))
-                            return(integer())
-                        return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "PLID")))
-                    })))
-                    
-                    if (length(allAnnPLIDs) == 0)
-                    {
-                        if (!negate)
-                            ret$MSMS <- ret$MSMS[retainPrecursorMSMS & precursor == TRUE]
-                    }
-                    else
-                    {
-                        if (negate)
-                            ret$MSMS <- ret$MSMS[, keep := !ID %in% allAnnPLIDs]
-                        else
-                            ret$MSMS <- ret$MSMS[, keep := ID %in% allAnnPLIDs]
-                        
-                        if (retainPrecursorMSMS)
-                            ret$MSMS[precursor == TRUE, keep := TRUE]
-                        
-                        ret$MSMS <- ret$MSMS[keep == TRUE][, -"keep"]
-                    }
-                }
-                
-                ret$MSMS <- doMSPeakListFilter(ret$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
-                                               minMSMSPeaks, deIsotopeMSMS, retainPrecursorMSMS, negate)
-            }
-
-            if (!is.null(isolatePrec))
-                ret$MS <- isolatePrecInMSPeakList(ret$MS, isolatePrec, negate)
-
-            ret <- pruneList(ret, checkZeroRows = TRUE)
-            
-            # apply after other filters as these may have removed all MSMS peaks
-            if (!onAvg && withMSMS)
-            {
-                if (!negate && is.null(ret[["MSMS"]]))
-                    return(list())
-                if (negate && !is.null(ret[["MSMS"]]))
-                    return(list())
-            }
-            
-            setTxtProgressBar(prog, grpi)
-
-            return(ret)
-        })
-        names(pl) <- pln
-
-        pl <- pl[sapply(pl, function(p) !is.null(p[["MS"]]) || !is.null(p[["MSMS"]]))]
-
-        setTxtProgressBar(prog, gCount)
-        close(prog)
-
-        return(pl)
-    }
-
-    pLists <- peakLists(obj)
+    
     oldn <- length(obj)
-
-    for (anai in seq_along(pLists))
+    
+    obj <- delete(obj, j = function(pl, grp, ana, type)
     {
-        printf("Filtering MS peak lists for %d feature groups in analysis '%s'...\n", length(pLists[[anai]]),
-               names(pLists)[anai])
-        pLists[[anai]] <- doFilterGroups(pLists[[anai]], FALSE)
+        plF <- copy(pl)
+        
+        isReAveraged <- is.null(ana) && reAverage
+        
+        if (type == "MS")
+            plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, deIsotopeMS, TRUE, negate)
+        else
+        {
+            if (!isReAveraged && !is.null(annotatedBy))
+            {
+                allAnnPLIDs <- unique(unlist(lapply(annotatedBy, function(ab)
+                {
+                    if (is.null(ab[[grp]]))
+                        return(integer())
+                    return(unlist(lapply(ab[[grp]]$fragInfo, "[[", "PLID")))
+                })))
+                
+                if (length(allAnnPLIDs) == 0)
+                {
+                    if (!negate)
+                        plF <- plF[retainPrecursorMSMS & precursor]
+                }
+                else
+                {
+                    if (negate)
+                        plF <- plF[!ID %in% allAnnPLIDs]
+                    else
+                        plF <- plF[ID %in% allAnnPLIDs]
+                    
+                    if (retainPrecursorMSMS)
+                        plF[precursor == TRUE, keep := TRUE]
+                }
+            }
+
+            plF <- doMSPeakListFilter(pl, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, deIsotopeMSMS,
+                                      retainPrecursorMSMS, negate)
+        }
+        
+        if (!is.null(isolatePrec))
+            plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
+        
+        return(!pl$ID %in% plF$ID)
+    }, reAverage = reAverage)
+
+    # apply after other filters as these may have removed all MSMS peaks
+    if (withMSMS)
+    {
+        obj <- delete(obj, j = function(pl, grp, ana, type)
+        {
+            keep <- if (type == "MSMS")
+                TRUE
+            else if (!is.null(ana))
+                !is.null(obj[[ana, grp]][["MSMS"]])
+            else
+                !is.null(obj[[grp]][["MSMS"]])
+            
+            if (negate)
+                keep <- !keep
+            
+            return(if (keep) integer() else seq_len(nrow(pl)))
+        }, reAverage = reAverage)
     }
-
-    obj@peakLists <- pLists
-    
-    # update group averaged peak lists
-    
-    if (reAverage)
-        obj@averagedPeakLists <- averageMSPeakLists(obj)
-
-    printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
-    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists, reAverage)
     
     saveCacheData("filterMSPeakLists", obj, hash)
 

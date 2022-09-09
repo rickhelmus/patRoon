@@ -16,9 +16,9 @@
 #' 
 #' <% if (exists("del")) fmt <- paste0(fmt, "\\cr\\cr For \\code{{delete}}: The data to remove from. \\code{{i}} are the
 #' { deli } as numeric index, logical or character, \\code{{j}} the { delj } as { deljtype }. If either is
-#' \\code{{NULL}} then data for all is removed. \\code{{j}} may also be a function: it will be called for each 
-#' { delfwhat }, with { delfa1 } as first argument, { delfa2 } as second argument, and any other arguments passed as
-#' \\code{{\\dots}} to \\code{{delete}}. The return value of this function specifies { delfr }.") %>
+#' \\code{{NULL}} then data for all is removed. \\code{{j}} may also be a function: it will be called for each { delfwhat },
+#' with { delfa } and any other arguments passed as \\code{{\\dots}} to \\code{{delete}}. The return value of this
+#' function specifies { delfr }.") %>
 #'
 #' <% vars <- if (exists("selj") || exists("del")) "i,j" else "i" %>
 #' <% allsel <- if (exists("selj")) paste(seli, selj, sep = "/") else seli %>

@@ -128,9 +128,9 @@ SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a scalar value.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 analyses as numeric index, logical or character, \code{j} the features as numeric index (row) of the feature. If either is
-\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
-analysis, with the feature table (a \code{data.table}) as first argument, the analysis name as second argument, and any other arguments passed as
-\code{\dots} to \code{delete}. The return value of this function specifies the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each analysis,
+with the feature table (a \code{data.table}), the analysis name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
 \item{\dots}{For \code{delete}: passed to the function specified as \code{j}.
 

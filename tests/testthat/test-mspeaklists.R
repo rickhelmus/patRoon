@@ -116,7 +116,21 @@ checkPeaksLimit <- function(plists, doMin, doMSMS)
 
 isoTestBy <- if (testWithSets()) c("group", "set") else "group"
 
-test_that("filtering", {
+test_that("delete and filter", {
+    checkmate::expect_names(groupNames(delete(plists, i = 1)), disjunct.from = groupNames(plists)[1])
+    checkmate::expect_names(groupNames(delete(plists, i = groupNames(plists)[1])), disjunct.from = groupNames(plists)[1])
+    checkmate::expect_names(analyses(delete(plists, k = 1)), disjunct.from = analyses(plists)[1])
+    checkmate::expect_names(analyses(delete(plists, k = analyses(plists)[1])), disjunct.from = analyses(plists)[1])
+    expect_length(delete(plists, i = groupNames(plists)), 0)
+    expect_length(delete(plists, k = analyses(plists)), 0)
+    expect_equal(delete(plists, j = 1)[[1]]$MS$ID[1], plists[[1]]$MS$ID[2])
+    expect_equal(delete(plists, j = function(...) 1)[[1]]$MS$ID[1], plists[[1]]$MS$ID[2])
+    expect_length(delete(plists, j = function(...) TRUE), 0)
+    expect_equal(delete(plists, i = character()), plists)
+    expect_equal(delete(plists, j = integer()), plists)
+    expect_equal(delete(plists, k = character()), plists)
+    expect_length(delete(plists), 0)
+    
     expect_gte(checkIntLimit(filter(plists, absMSIntThr = 2500), FALSE, TRUE, FALSE), 2500)
     expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 2500), FALSE, TRUE, TRUE), 2500)
     expect_lte(checkIntLimit(filter(plists, absMSIntThr = 2500, negate = TRUE), FALSE, FALSE, FALSE), 2500)
@@ -154,6 +168,7 @@ plistsEmptyMS <- removePrecursors(filter(plists, absMSIntThr = 1E9))
 
 test_that("empty object", {
     expect_length(plistsEmpty, 0)
+    expect_length(delete(plistsEmpty), 0)
     expect_length(filter(plistsEmpty, relMSIntThr = 0.2, relMSMSIntThr = 0.2, topMSPeaks = 10,
                          topMSMSPeaks = 10), 0)
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)

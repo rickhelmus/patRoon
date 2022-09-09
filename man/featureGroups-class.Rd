@@ -254,9 +254,9 @@ order.}
 their index or name, respectively (for the order/names see \code{analyses()/names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 analyses as numeric index, logical or character, \code{j} the feature groups as numeric index, logical or character. If either is
-\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
-feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
-\code{\dots} to \code{delete}. The return value of this function specifies the analyses of the features in the group to be removed (same format as \code{i}).}
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
+with a vector of the group intensities, the group name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the analyses of the features in the group to be removed (same format as \code{i}).}
 
 \item{\dots}{For the \code{"["} operator: ignored.
 

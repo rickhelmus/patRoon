@@ -1,4 +1,4 @@
-# patRoon 2.1.1
+# patRoon 2.2
 
 ## NOTE Usage of SIRIUS version 5
 
@@ -19,6 +19,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Updated MetFrag to 2.5.0
 - Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
 - Fix: multiprocessing with classic: don't try to capture output when logging is disabled
+- `delete()` function for MS peak lists
 
 
 # patRoon 2.1

@@ -111,9 +111,9 @@
 their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 components as numeric index, logical or character, \code{j} the feature groups as numeric index/logical (relative to component) or character. If either is
-\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
-component, with the component (a \code{data.table}) as first argument, the component name as second argument, and any other arguments passed as
-\code{\dots} to \code{delete}. The return value of this function specifies the feature groups to be removed (same format as \code{j}).}
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each component,
+with the component (a \code{data.table}), the component name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the feature groups to be removed (same format as \code{j}).}
 
 \item{\dots}{For \code{delete}: passed to the function specified as \code{j}.
 

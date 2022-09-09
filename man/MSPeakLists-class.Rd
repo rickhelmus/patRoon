@@ -17,6 +17,7 @@
 \alias{[[,MSPeakLists,ANY,ANY-method}
 \alias{$,MSPeakLists-method}
 \alias{as.data.table,MSPeakLists-method}
+\alias{delete,MSPeakLists-method}
 \alias{filter,MSPeakLists-method}
 \alias{plotSpectrum,MSPeakLists-method}
 \alias{spectrumSimilarity,MSPeakLists-method}
@@ -55,6 +56,8 @@
 \S4method{$}{MSPeakLists}(x, name)
 
 \S4method{as.data.table}{MSPeakLists}(x, fGroups = NULL, averaged = TRUE)
+
+\S4method{delete}{MSPeakLists}(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
 
 \S4method{filter}{MSPeakLists}(
   obj,
@@ -152,7 +155,11 @@ getDefIsolatePrecParams(...)
 
 \item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
+feature groups as numeric index, logical or character, \code{j} the MS peaks as numeric indices (rows). If either is
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
+with the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if \code{k=NULL}), type (\code{"MS"} or \code{"MSMS"}) and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
 \item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.
 
@@ -253,6 +260,8 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
 
 \code{averagedPeakLists} returns a nested list of feature group
   averaged peak lists in a similar format as \code{peakLists}.
+
+\code{delete} returns the object for which the specified data was removed.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.
@@ -290,6 +299,8 @@ returned.
 \item \code{$}: Extract group averaged MS peaklists for a feature group.
 
 \item \code{as.data.table}: Returns all MS peak list data in a table.
+
+\item \code{delete}: Completely deletes specified peaks from MS peak lists.
 
 \item \code{filter}: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (\emph{e.g.} formulae calculation and compounds identification) and/or speed up these

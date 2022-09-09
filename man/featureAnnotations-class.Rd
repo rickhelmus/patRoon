@@ -72,9 +72,9 @@
 their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a scalar value.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 feature groups as numeric index, logical or character, \code{j} the candidates as numeric indices (rows). If either is
-\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
-feature group, with the annotation table (a \code{data.table}) as first argument, the feature group name as second argument, and any other arguments passed as
-\code{\dots} to \code{delete}. The return value of this function specifies the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
+with the annotation table (a \code{data.table}), the feature group name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
 \item{\dots}{For the \code{"["} operator: ignored.
 

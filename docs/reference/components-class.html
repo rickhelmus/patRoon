@@ -188,9 +188,9 @@ unset(obj, set)</code></pre></div>
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. <code>j</code> is optional.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 components as numeric index, logical or character, <code>j</code> the feature groups as numeric index/logical (relative to component) or character. If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-component, with the component (a <code>data.table</code>) as first argument, the component name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each component,
+with the component (a <code>data.table</code>), the component name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
 
 
 <dt>...</dt>

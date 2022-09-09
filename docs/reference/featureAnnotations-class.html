@@ -166,9 +166,9 @@ plotUpSet(
 their index or name, respectively (for the order/names see <code><a href="generics.html">groupNames()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 feature groups as numeric index, logical or character, <code>j</code> the candidates as numeric indices (rows). If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-feature group, with the annotation table (a <code>data.table</code>) as first argument, the feature group name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the candidate indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each feature group,
+with the annotation table (a <code>data.table</code>), the feature group name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the candidate indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
 <dt>...</dt>

@@ -126,6 +126,9 @@ $(x, name)
 as.data.table(x, fGroups = NULL, averaged = TRUE)
 
 # S4 method for MSPeakLists
+delete(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
+
+# S4 method for MSPeakLists
 filter(
   obj,
   absMSIntThr = NULL,
@@ -237,7 +240,11 @@ getDefIsolatePrecParams(...)</code></pre></div>
 <dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></dd>
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
+feature groups as numeric index, logical or character, <code>j</code> the MS peaks as numeric indices (rows). If either is
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each feature group,
+with the peak list table (a <code>data.table</code>), feature group name, analysis (<code>NULL</code> if <code>k=NULL</code>), type (<code>"MS"</code> or <code>"MSMS"</code>) and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the peak list indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
 <dt>...</dt>
@@ -401,6 +408,9 @@ Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) 
 
 <p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
+
+
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -427,6 +437,7 @@ lists for the group specified by the first argument (<code>i</code>) will be
 returned.</p></li>
 <li><p><code>$</code>: Extract group averaged MS peaklists for a feature group.</p></li>
 <li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
+<li><p><code>delete</code>: Completely deletes specified peaks from MS peak lists.</p></li>
 <li><p><code>filter</code>: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (<em>e.g.</em> formulae calculation and compounds identification) and/or speed up these
 processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged

@@ -207,9 +207,9 @@ SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 their index or name, respectively (for the order/names see <code><a href="generics.html">analyses()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses are selected.<br><br> For <code>[[</code>: should be a scalar value.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 analyses as numeric index, logical or character, <code>j</code> the features as numeric index (row) of the feature. If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-analysis, with the feature table (a <code>data.table</code>) as first argument, the analysis name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each analysis,
+with the feature table (a <code>data.table</code>), the analysis name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
 <dt>...</dt>

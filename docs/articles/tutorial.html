@@ -119,7 +119,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2022-09-04</h4>
+            <h4 data-toc-skip class="date">2022-09-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -154,8 +154,8 @@ detailed overview of <code>patRoon</code>. Instead, it serves as a quick
 introduction on how to use <code>patRoon</code> to setup and perform a
 full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-63717a708ab9d33700a0" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-63717a708ab9d33700a0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a48837daaa232715011b" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a48837daaa232715011b">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -651,15 +651,7 @@ your MS instrument, the lower the value can be set.</p>
 can be used to clean up the peak lists afterwards:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mslists</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generics.html">filter</a></span><span class="op">(</span><span class="va">mslists</span>, relMSMSIntThr <span class="op">=</span> <span class="fl">0.02</span>, topMSMSPeaks <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-1'...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-2'...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt; Filtering MS peak lists for 25 feature groups in analysis 'standard-pos-3'...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt; Filtering averaged MS peak lists for 25 feature groups...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt; Done! Filtered 1298 (15.51%) MS peaks. Remaining: 7070</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Done! Filtered 1298 (15.51%) MS peaks. Remaining: 7070</span></span></code></pre>
 <p>Here, all MS/MS mass peaks with intensities below 2% are removed and
 from the remaining peaks no more than the ten most intense are
 retained.</p>

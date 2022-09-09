@@ -21,6 +21,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fix: multiprocessing with classic: don't try to capture output when logging is disabled
 - `delete()` function for MS peak lists
 - Fixed: `EICOnlyPresent` argument to `reportHTML()` is effective again
+- Fixed: blank filter didn't properly handle differing blank assignments per analysis
 
 
 # patRoon 2.1

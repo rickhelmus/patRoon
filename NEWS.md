@@ -20,6 +20,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
 - Fix: multiprocessing with classic: don't try to capture output when logging is disabled
 - `delete()` function for MS peak lists
+- Fixed: `EICOnlyPresent` argument to `reportHTML()` is effective again
 
 
 # patRoon 2.1

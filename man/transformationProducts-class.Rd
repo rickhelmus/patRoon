@@ -85,31 +85,31 @@ the data), the \code{retDir} values are based on calculated \code{log P} values 
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{parents}: Accessor method for the \code{parents} slot of a
+\item \code{parents(transformationProducts)}: Accessor method for the \code{parents} slot of a
 \code{transformationProducts} class.
 
-\item \code{products}: Accessor method for the \code{products} slot.
+\item \code{products(transformationProducts)}: Accessor method for the \code{products} slot.
 
-\item \code{length}: Obtain total number of transformation products.
+\item \code{length(transformationProducts)}: Obtain total number of transformation products.
 
-\item \code{names}: Obtain the names of all parents in this object.
+\item \code{names(transformationProducts)}: Obtain the names of all parents in this object.
 
-\item \code{show}: Show summary information for this object.
+\item \code{show(transformationProducts)}: Show summary information for this object.
 
-\item \code{[}: Subset on parents.
+\item \code{x[i}: Subset on parents.
 
-\item \code{[[}: Extracts a table with TPs for a parent.
+\item \code{x[[i}: Extracts a table with TPs for a parent.
 
 \item \code{$}: Extracts a table with TPs for a parent.
 
-\item \code{as.data.table}: Returns all TP data in a table.
+\item \code{as.data.table(transformationProducts)}: Returns all TP data in a table.
 
-\item \code{convertToSuspects}: Converts this object to a suspect list that can be used as input for
+\item \code{convertToSuspects(transformationProducts)}: Converts this object to a suspect list that can be used as input for
 \code{\link{screenSuspects}}.
 
-\item \code{filter}: Performs rule-based filtering. Useful to simplify and clean-up the data.
-}}
+\item \code{filter(transformationProducts)}: Performs rule-based filtering. Useful to simplify and clean-up the data.
 
+}}
 \section{Slots}{
 
 \describe{
@@ -121,7 +121,7 @@ the data), the \code{retDir} values are based on calculated \code{log P} values 
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{transformationProducts}}}}     \itemize{       \item{\code{\link{transformationProductsStructure}}}       \itemize{         \item{\code{\link{transformationProductsStructureConsensus}}}         \item{\code{\link{transformationProductsCTS}}}         \item{\code{\link{transformationProductsBT}}}         \item{\code{\link{transformationProductsLibrary}}}       }       \item{\code{\link{transformationProductsLogic}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{transformationProducts}}}}     \itemize{       \item{\code{\link{transformationProductsStructure}}}       \itemize{         \item{\code{\link{transformationProductsStructureConsensus}}}         \item{\code{\link{transformationProductsCTS}}}         \item{\code{\link{transformationProductsBT}}}         \item{\code{\link{transformationProductsLibrary}}}       }       \item{\code{\link{transformationProductsFormula}}}       \itemize{         \item{\code{\link{transformationProductsLibraryFormula}}}       }       \item{\code{\link{transformationProductsLogic}}}     }   } }
 }
 
 \seealso{

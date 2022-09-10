@@ -288,30 +288,30 @@ Contains data of generated chemical formulae for given feature groups.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{annotations}: Accessor method to obtain generated formulae.
+\item \code{annotations(formulas)}: Accessor method to obtain generated formulae.
 
-\item \code{analyses}: returns a \code{character} vector with the names of the
+\item \code{analyses(formulas)}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
-\item \code{defaultExclNormScores}: Returns default scorings that are excluded from normalization.
+\item \code{defaultExclNormScores(formulas)}: Returns default scorings that are excluded from normalization.
 
-\item \code{show}: Show summary information for this object.
+\item \code{show(formulas)}: Show summary information for this object.
 
-\item \code{[[}: Extracts a formula table, either for a feature group or for features in an analysis.
+\item \code{x[[i}: Extracts a formula table, either for a feature group or for features in an analysis.
 
-\item \code{as.data.table}: Generates a table with all candidate formulae for each feature group and other information such
+\item \code{as.data.table(formulas)}: Generates a table with all candidate formulae for each feature group and other information such
 as element counts.
 
-\item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
+\item \code{annotatedPeakList(formulas)}: Returns an MS/MS peak list annotated with data from a
 given candidate formula.
 
-\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
+\item \code{plotSpectrum(formulas)}: Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
 spectra can be compared by specifying a two-sized vector for the \code{index}, \code{groupName} and (if desired)
 \code{analysis} arguments.
 
-\item \code{plotScores}: Plots a barplot with scoring of a candidate formula.
+\item \code{plotScores(formulas)}: Plots a barplot with scoring of a candidate formula.
 
-\item \code{consensus}: Generates a consensus of results from multiple
+\item \code{consensus(formulas)}: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
 (the scores are normalized and the highest ranked candidate gets value
@@ -319,8 +319,8 @@ each of the candidates are scored based on their original ranking
 candidate to derive the final ranking (if an object lacks the candidate its
 score will be \samp{0}). The original rankings for each object is stored in
 the \code{rank} columns.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

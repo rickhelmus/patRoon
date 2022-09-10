@@ -108,7 +108,7 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
 
   \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
 
-  \item \code{parent_SMILES} and \code{TP_SMILES} The \acronym{SMILES} of the parent structure.
+  \item \code{parent_SMILES} and \code{TP_SMILES} The \acronym{SMILES} of the parent/TP structure.
 
   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
 

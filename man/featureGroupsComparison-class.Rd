@@ -45,17 +45,17 @@ Objects from this class are returned by \code{\link{comparison}}.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{names}: Obtain the labels that were given to each compared feature group.
+\item \code{names(featureGroupsComparison)}: Obtain the labels that were given to each compared feature group.
 
-\item \code{length}: Number of feature groups objects that were compared.
+\item \code{length(featureGroupsComparison)}: Number of feature groups objects that were compared.
 
-\item \code{[}: Subset on labels that were assigned to compared feature groups.
+\item \code{x[i}: Subset on labels that were assigned to compared feature groups.
 
-\item \code{[[}: Extract a \code{\link{featureGroups}} object by its label.
+\item \code{x[[i}: Extract a \code{\link{featureGroups}} object by its label.
 
 \item \code{$}: Extract a compound table for a feature group.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

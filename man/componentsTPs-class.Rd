@@ -68,15 +68,15 @@ more details, see \code{\link{generateComponentsTPs}}.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{as.data.table}: Returns all component data as a \code{\link{data.table}}.
+\item \code{as.data.table(componentsTPs)}: Returns all component data as a \code{\link{data.table}}.
 
-\item \code{filter}: Provides various rule based filtering options to clean and prioritize TP data.
+\item \code{filter(componentsTPs)}: Provides various rule based filtering options to clean and prioritize TP data.
 
-\item \code{plotGraph}: Plots an interactive network graph for linked components. Components are linked with each
+\item \code{plotGraph(componentsTPs)}: Plots an interactive network graph for linked components. Components are linked with each
 other if one or more transformation products overlap. The graph is constructed with the \pkg{\link{igraph}} package
 and rendered with \pkg{\link{visNetwork}}.
-}}
 
+}}
 \note{
 The intensity values for components (used by \code{plotSpectrum}) are set
   to a dummy value (1) as no single intensity value exists for this kind of

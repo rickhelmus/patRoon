@@ -317,7 +317,7 @@ please refer to the linked method documentation for each generic.
 \code{plotGraph} Plots an interactive network graph.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotGraph,componentsNT-method]{componentsNT}}; \code{\link[=plotGraph,componentsNTSet-method]{componentsNTSet}}; \code{\link[=plotGraph,componentsTPs-method]{componentsTPs}}; \code{\link[=plotGraph,featureGroups-method]{featureGroups}}; \code{\link[=plotGraph,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=plotGraph,transformationProductsStructure-method]{transformationProductsStructure}}.
+    \item Methods are defined for: \code{\link[=plotGraph,componentsNT-method]{componentsNT}}; \code{\link[=plotGraph,componentsNTSet-method]{componentsNTSet}}; \code{\link[=plotGraph,componentsTPs-method]{componentsTPs}}; \code{\link[=plotGraph,featureGroups-method]{featureGroups}}; \code{\link[=plotGraph,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=plotGraph,transformationProductsFormula-method]{transformationProductsFormula}}; \code{\link[=plotGraph,transformationProductsStructure-method]{transformationProductsStructure}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.

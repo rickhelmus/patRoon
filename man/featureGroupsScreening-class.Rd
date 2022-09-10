@@ -221,26 +221,26 @@ This class derives from \code{\link{featureGroups}} and adds suspect screening i
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{screenInfo}: Returns a table with screening information
+\item \code{screenInfo(featureGroupsScreening)}: Returns a table with screening information
 (see \code{screenInfo} slot).
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(featureGroupsScreening)}: Shows summary information for this object.
 
-\item \code{[}: Subset on analyses, feature groups and/or
+\item \code{x[i}: Subset on analyses, feature groups and/or
 suspects.
 
-\item \code{as.data.table}: Obtain a summary table (a
+\item \code{as.data.table(featureGroupsScreening)}: Obtain a summary table (a
 \code{\link{data.table}}) with retention, \emph{m/z}, intensity and
 optionally other feature data. Furthermore, the output table will be merged
 with information from \code{screenInfo}, such as suspect names and other
 properties and annotation data.
 
-\item \code{annotateSuspects}: Incorporates annotation data obtained during the workflow to annotate suspects
+\item \code{annotateSuspects(featureGroupsScreening)}: Incorporates annotation data obtained during the workflow to annotate suspects
 with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
 the \verb{Suspect annotation} section for more details. The estimation of identification levels for each suspect is
 logged in the \code{log/ident} directory.
 
-\item \code{filter}: Performs rule based filtering. This method
+\item \code{filter(featureGroupsScreening)}: Performs rule based filtering. This method
 builds on the comprehensive filter functionality from the base
 \code{\link{filter,featureGroups-method}}. It adds several filters to
 select \emph{e.g.} the best ranked suspects or those with a minimum
@@ -248,8 +248,8 @@ estimated identification level. \strong{NOTE}: most filters \emph{only}
 affect suspect hits, not feature groups. Set \code{onlyHits=TRUE} to
 subsequently remove any feature groups that lost any suspect matches due to
 other filter steps.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

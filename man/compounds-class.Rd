@@ -327,43 +327,43 @@ the \code{\link{featureAnnotations}} class, please see its documentation for mor
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{defaultExclNormScores}: Returns default scorings that are excluded from normalization.
+\item \code{defaultExclNormScores(compounds)}: Returns default scorings that are excluded from normalization.
 
-\item \code{show}: Show summary information for this object.
+\item \code{show(compounds)}: Show summary information for this object.
 
-\item \code{identifiers}: Returns a list containing for each feature group a
+\item \code{identifiers(compounds)}: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
 \code{identifiers} option of \code{\link{generateCompoundsMetFrag}}.
 
-\item \code{filter}: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
+\item \code{filter(compounds)}: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
 and speed up further processing. Also see the \code{\link[=filter,featureAnnotations-method]{featureAnnotations}}
 method.
 
-\item \code{addFormulaScoring}: Adds formula ranking data from a \code{\link{formulas}}
+\item \code{addFormulaScoring(compounds)}: Adds formula ranking data from a \code{\link{formulas}}
 object as an extra compound candidate scoring (\code{formulaScore} column).
 The formula score for each compound candidate is between \samp{0-1}, where
 \emph{zero} means no match with any formula candidates, and \emph{one}
 means that the compound candidate's formula is the highest ranked.
 
-\item \code{getMCS}: Calculates the maximum common substructure (MCS)
+\item \code{getMCS(compounds)}: Calculates the maximum common substructure (MCS)
 for two or more candidate structures for a feature group. This method uses
 the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
 
-\item \code{plotStructure}: Plots a structure of a candidate compound using the
+\item \code{plotStructure(compounds)}: Plots a structure of a candidate compound using the
 \CRANpkg{rcdk} package. If multiple candidates are specified (\emph{i.e.}
 by specifying a \code{vector} for \code{index}) then the maximum common
 substructure (MCS) of the selected candidates is drawn.
 
-\item \code{plotScores}: Plots a barplot with scoring of a candidate compound.
+\item \code{plotScores(compounds)}: Plots a barplot with scoring of a candidate compound.
 
-\item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
+\item \code{annotatedPeakList(compounds)}: Returns an MS/MS peak list annotated with data from a
 given candidate compound for a feature group.
 
-\item \code{plotSpectrum}: Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
+\item \code{plotSpectrum(compounds)}: Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
 be compared by specifying a two-sized vector for the \code{index} and \code{groupName} arguments.
 
-\item \code{consensus}: Generates a consensus of results from multiple
+\item \code{consensus(compounds)}: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
 (the scores are normalized and the highest ranked candidate gets value
@@ -371,8 +371,8 @@ each of the candidates are scored based on their original ranking
 candidate to derive the final ranking (if an object lacks the candidate its
 score will be \samp{0}). The original rankings for each object is stored in
 the \code{rank} columns.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

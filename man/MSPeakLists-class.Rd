@@ -158,7 +158,7 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 feature groups as numeric index, logical or character, \code{j} the MS peaks as numeric indices (rows). If either is
 \code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
-with the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if \code{k=NULL}), type (\code{"MS"} or \code{"MSMS"}) and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+with the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged peak list), type (\code{"MS"} or \code{"MSMS"}) and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
 function specifies the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
 
 \item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.
@@ -274,46 +274,46 @@ The \code{getDefIsolatePrecParams} is used to create a parameter
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{peakLists}: Accessor method to obtain the MS peak lists.
+\item \code{peakLists(MSPeakLists)}: Accessor method to obtain the MS peak lists.
 
-\item \code{averagedPeakLists}: Accessor method to obtain the feature group averaged
+\item \code{averagedPeakLists(MSPeakLists)}: Accessor method to obtain the feature group averaged
 MS peak lists.
 
-\item \code{analyses}: returns a \code{character} vector with the names of the
+\item \code{analyses(MSPeakLists)}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
-\item \code{groupNames}: returns a \code{character} vector with the names of the
+\item \code{groupNames(MSPeakLists)}: returns a \code{character} vector with the names of the
 feature groups for which data is present in this object.
 
-\item \code{length}: Obtain total number of \emph{m/z} values.
+\item \code{length(MSPeakLists)}: Obtain total number of \emph{m/z} values.
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(MSPeakLists)}: Shows summary information for this object.
 
-\item \code{[}: Subset on analyses/feature groups.
+\item \code{x[i}: Subset on analyses/feature groups.
 
-\item \code{[[}: Extract a list with MS and MS/MS (if available) peak
+\item \code{x[[i}: Extract a list with MS and MS/MS (if available) peak
 lists. If the second argument (\code{j}) is not specified the averaged peak
 lists for the group specified by the first argument (\code{i}) will be
 returned.
 
 \item \code{$}: Extract group averaged MS peaklists for a feature group.
 
-\item \code{as.data.table}: Returns all MS peak list data in a table.
+\item \code{as.data.table(MSPeakLists)}: Returns all MS peak list data in a table.
 
-\item \code{delete}: Completely deletes specified peaks from MS peak lists.
+\item \code{delete(MSPeakLists)}: Completely deletes specified peaks from MS peak lists.
 
-\item \code{filter}: provides post filtering of generated MS peak lists, which may further enhance quality of
+\item \code{filter(MSPeakLists)}: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (\emph{e.g.} formulae calculation and compounds identification) and/or speed up these
 processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged
 to update group averaged peak lists. However, since version \samp{1.1}, the resulting feature group lists are
 \emph{not} filtered afterwards.
 
-\item \code{plotSpectrum}: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
+\item \code{plotSpectrum(MSPeakLists)}: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 compared when two feature groups are specified.
 
-\item \code{spectrumSimilarity}: Calculates the spectral similarity between two or more spectra.
-}}
+\item \code{spectrumSimilarity(MSPeakLists)}: Calculates the spectral similarity between two or more spectra.
 
+}}
 \section{Slots}{
 
 \describe{

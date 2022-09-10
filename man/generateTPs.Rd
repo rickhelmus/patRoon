@@ -8,7 +8,7 @@ generateTPs(algorithm, ...)
 }
 \arguments{
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}, \code{"cts"}}
+used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}, \code{"library_formula"}, \code{"cts"}}
 
 \item{\dots}{Any parameters to be passed to the selected TP generation algorithm.}
 }
@@ -25,7 +25,7 @@ Functionality to automatically obtain transformation products for a given set of
 }
 \seealso{
 The \code{\link{transformationProducts}} output class and its methods and the algorithm specific functions:
-  \code{\link{generateTPsBioTransformer}}, \code{\link{generateTPsLogic}}, \code{\link{generateTPsLibrary}}, \code{\link{generateTPsCTS}}
+  \code{\link{generateTPsBioTransformer}}, \code{\link{generateTPsLogic}}, \code{\link{generateTPsLibrary}}, \code{\link{generateTPsLibraryFormula}}, \code{\link{generateTPsCTS}}
 
 The derived class \code{\link{transformationProductsStructure}} for more specific methods to post-process TP
   data.

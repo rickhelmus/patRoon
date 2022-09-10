@@ -91,33 +91,33 @@ Objects from this class are returned by \code{\link{optimizeFeatureFinding}} and
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{algorithm}: Returns the algorithm that was used for finding features.
+\item \code{algorithm(optimizationResult)}: Returns the algorithm that was used for finding features.
 
-\item \code{length}: Obtain total number of experimental design iterations performed.
+\item \code{length(optimizationResult)}: Obtain total number of experimental design iterations performed.
 
-\item \code{lengths}: Obtain number of experimental design iterations performed for each parameter set.
+\item \code{lengths(optimizationResult)}: Obtain number of experimental design iterations performed for each parameter set.
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(optimizationResult)}: Shows summary information for this object.
 
-\item \code{plot}: Generates response plots for all or a selected
+\item \code{plot(x = optimizationResult, y = missing)}: Generates response plots for all or a selected
 set of parameters.
 
-\item \code{optimizedParameters}: Returns parameter set yielding optimal
+\item \code{optimizedParameters(optimizationResult)}: Returns parameter set yielding optimal
 results. The \code{paramSet} and \code{DoEIteration} arguments can be
 \code{NULL}.
 
-\item \code{optimizedObject}: Returns the object (\emph{i.e.} a
+\item \code{optimizedObject(optimizationResult)}: Returns the object (\emph{i.e.} a
 \code{\link{features}} or \code{\link{featureGroups}} object) that was
 generated with optimized parameters. The \code{paramSet} argument can be
 \code{NULL}.
 
-\item \code{scores}: Returns optimization scores. The
+\item \code{scores(optimizationResult)}: Returns optimization scores. The
 \code{paramSet} and \code{DoEIteration} arguments can be \code{NULL}.
 
-\item \code{experimentInfo}: Returns a \code{list} with optimization
+\item \code{experimentInfo(optimizationResult)}: Returns a \code{list} with optimization
 information from an DoE iteration.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

@@ -17,23 +17,26 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #' @templateVar algo a library
 #' @templateVar do obtain transformation products
 #' @templateVar generic generateTPs
-#' @templateVar algoParam library
+#' @templateVar algoParam library_formula
 #' @template algo_generator
 #'
-#' @param TPLibrary A \code{data.frame}. See the details below.
-#' @param generations An \code{integer} that specifies the number of transformation generations. TPs for subsequent
-#'   iterations obtained by repeating the library search where the TPs from the previous generation are considered
-#'   parents.
+#' @details This function is similar to \code{\link{generateTPsLibrary}}, however, it only require formula information
+#'   of the parent and TPs.
 #'
-#' @templateVar parNULL TRUE
-#' @template tp_gen-scr
+#' @param parents The parents for which transformation products should be obtained. This should be either a suspect list
+#'   (see \link[=suspect-screening]{suspect screening} for more information) or the resulting output
+#'   \code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
+#'   the library are obtained.
+#' @param TPLibrary A \code{data.frame}. See the details below.
+
+#' @inheritParams generateTPsLibrary
 #'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.
 #'
-#' @section Custom TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
+#' @section TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
 #'   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
 #'
 #'   \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.

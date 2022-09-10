@@ -198,48 +198,48 @@ Contains data for feature groups that are related in some way. These
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{componentTable}: Accessor method for the \code{components} slot of a
+\item \code{componentTable(components)}: Accessor method for the \code{components} slot of a
 \code{components} class. Each component is stored as a
 \code{\link{data.table}}.
 
-\item \code{componentInfo}: Accessor method for the \code{componentInfo} slot of a
+\item \code{componentInfo(components)}: Accessor method for the \code{componentInfo} slot of a
 \code{components} class.
 
-\item \code{groupNames}: returns a \code{character} vector with the names of the
+\item \code{groupNames(components)}: returns a \code{character} vector with the names of the
 feature groups for which data is present in this object.
 
-\item \code{length}: Obtain total number of components.
+\item \code{length(components)}: Obtain total number of components.
 
-\item \code{names}: Obtain the names of all components.
+\item \code{names(components)}: Obtain the names of all components.
 
-\item \code{show}: Show summary information for this object.
+\item \code{show(components)}: Show summary information for this object.
 
-\item \code{[}: Subset on components/feature groups.
+\item \code{x[i}: Subset on components/feature groups.
 
-\item \code{[[}: Extracts a component table, optionally filtered by a feature group.
+\item \code{x[[i}: Extracts a component table, optionally filtered by a feature group.
 
 \item \code{$}: Extracts a component table by component name.
 
-\item \code{delete}: Completely deletes specified (parts of) components.
+\item \code{delete(components)}: Completely deletes specified (parts of) components.
 
-\item \code{as.data.table}: Returns all component data in a table.
+\item \code{as.data.table(components)}: Returns all component data in a table.
 
-\item \code{filter}: Provides rule based filtering for components.
+\item \code{filter(components)}: Provides rule based filtering for components.
 
-\item \code{findFGroup}: Returns the component id(s) to which a feature group
+\item \code{findFGroup(components)}: Returns the component id(s) to which a feature group
 belongs.
 
-\item \code{plotSpectrum}: Plot a \emph{pseudo} mass spectrum for a single
+\item \code{plotSpectrum(components)}: Plot a \emph{pseudo} mass spectrum for a single
 component.
 
-\item \code{plotChroms}: Plot an extracted ion chromatogram (EIC) for all
+\item \code{plotChroms(components)}: Plot an extracted ion chromatogram (EIC) for all
 feature groups within a single component.
 
-\item \code{consensus}: Generates a consensus from multiple \code{components}
+\item \code{consensus(components)}: Generates a consensus from multiple \code{components}
 objects. At this point results are simply combined and no attempt is made to
 merge similar components.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

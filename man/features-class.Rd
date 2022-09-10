@@ -180,37 +180,37 @@ and derived objects are created by 'feature finders' such as
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{length}: Obtain total number of features.
+\item \code{length(features)}: Obtain total number of features.
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(features)}: Shows summary information for this object.
 
-\item \code{featureTable}: Get table with feature information
+\item \code{featureTable(features)}: Get table with feature information
 
-\item \code{analysisInfo}: Get analysis information
+\item \code{analysisInfo(features)}: Get analysis information
 
-\item \code{analyses}: returns a \code{character} vector with the names of the
+\item \code{analyses(features)}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
-\item \code{replicateGroups}: returns a \code{character} vector with the names of the
+\item \code{replicateGroups(features)}: returns a \code{character} vector with the names of the
 replicate groups for which data is present in this object.
 
-\item \code{as.data.table}: Returns all feature data in a table.
+\item \code{as.data.table(features)}: Returns all feature data in a table.
 
-\item \code{filter}: Performs common rule based filtering of features. Note
+\item \code{filter(features)}: Performs common rule based filtering of features. Note
 that this (and much more) functionality is also provided by the
 \code{filter} method defined for \code{\link{featureGroups}}. However,
 filtering a \code{features} object may be useful to avoid grouping large
 amounts of features.
 
-\item \code{[}: Subset on analyses.
+\item \code{x[i}: Subset on analyses.
 
-\item \code{[[}: Extract a feature table for an analysis.
+\item \code{x[[i}: Extract a feature table for an analysis.
 
 \item \code{$}: Extract a feature table for an analysis.
 
-\item \code{delete}: Completely deletes specified features.
+\item \code{delete(features)}: Completely deletes specified features.
 
-\item \code{calculatePeakQualities}: Calculates peak qualities for each feature. This uses
+\item \code{calculatePeakQualities(features)}: Calculates peak qualities for each feature. This uses
 \href{https://github.com/KelseyChetnik/MetaClean/}{MetaClean} \R package to calculate the following metrics:
 \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality}, \verb{Symmetry}, \verb{Gaussian
 Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \verb{Zig-Zag index}. Please see the
@@ -218,8 +218,8 @@ Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \v
 by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
 (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
 score values.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

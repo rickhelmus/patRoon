@@ -46,12 +46,12 @@ algorithm independent way.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Shows summary information for this object.
+\item \code{show(adduct)}: Shows summary information for this object.
 
-\item \code{as.character}: Converts an \code{adduct} object to a specified
+\item \code{as.character(adduct)}: Converts an \code{adduct} object to a specified
 \code{character} format.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

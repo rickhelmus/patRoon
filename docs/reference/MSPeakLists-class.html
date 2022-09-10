@@ -243,7 +243,7 @@ their index or name, respectively (for the order/names see <code>analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 feature groups as numeric index, logical or character, <code>j</code> the MS peaks as numeric indices (rows). If either is
 <code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each feature group,
-with the peak list table (a <code>data.table</code>), feature group name, analysis (<code>NULL</code> if <code>k=NULL</code>), type (<code>"MS"</code> or <code>"MSMS"</code>) and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+with the peak list table (a <code>data.table</code>), feature group name, analysis (<code>NULL</code> if averaged peak list), type (<code>"MS"</code> or <code>"MSMS"</code>) and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
 function specifies the peak list indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
@@ -421,31 +421,31 @@ Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) 
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>peakLists</code>: Accessor method to obtain the MS peak lists.</p></li>
-<li><p><code>averagedPeakLists</code>: Accessor method to obtain the feature group averaged
+<ul><li><p><code>peakLists(MSPeakLists)</code>: Accessor method to obtain the MS peak lists.</p></li>
+<li><p><code>averagedPeakLists(MSPeakLists)</code>: Accessor method to obtain the feature group averaged
 MS peak lists.</p></li>
-<li><p><code>analyses</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>analyses(MSPeakLists)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>groupNames</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>groupNames(MSPeakLists)</code>: returns a <code>character</code> vector with the names of the
 feature groups for which data is present in this object.</p></li>
-<li><p><code>length</code>: Obtain total number of <em>m/z</em> values.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on analyses/feature groups.</p></li>
-<li><p><code>[[</code>: Extract a list with MS and MS/MS (if available) peak
+<li><p><code>length(MSPeakLists)</code>: Obtain total number of <em>m/z</em> values.</p></li>
+<li><p><code>show(MSPeakLists)</code>: Shows summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on analyses/feature groups.</p></li>
+<li><p><code>x[[i</code>: Extract a list with MS and MS/MS (if available) peak
 lists. If the second argument (<code>j</code>) is not specified the averaged peak
 lists for the group specified by the first argument (<code>i</code>) will be
 returned.</p></li>
 <li><p><code>$</code>: Extract group averaged MS peaklists for a feature group.</p></li>
-<li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
-<li><p><code>delete</code>: Completely deletes specified peaks from MS peak lists.</p></li>
-<li><p><code>filter</code>: provides post filtering of generated MS peak lists, which may further enhance quality of
+<li><p><code>as.data.table(MSPeakLists)</code>: Returns all MS peak list data in a table.</p></li>
+<li><p><code>delete(MSPeakLists)</code>: Completely deletes specified peaks from MS peak lists.</p></li>
+<li><p><code>filter(MSPeakLists)</code>: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (<em>e.g.</em> formulae calculation and compounds identification) and/or speed up these
 processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged
 to update group averaged peak lists. However, since version <samp>1.1</samp>, the resulting feature group lists are
 <em>not</em> filtered afterwards.</p></li>
-<li><p><code>plotSpectrum</code>: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
+<li><p><code>plotSpectrum(MSPeakLists)</code>: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 compared when two feature groups are specified.</p></li>
-<li><p><code>spectrumSimilarity</code>: Calculates the spectral similarity between two or more spectra.</p></li>
+<li><p><code>spectrumSimilarity(MSPeakLists)</code>: Calculates the spectral similarity between two or more spectra.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>

@@ -198,22 +198,22 @@ called for plotting.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>algorithm</code>: Returns the algorithm that was used for finding features.</p></li>
-<li><p><code>length</code>: Obtain total number of experimental design iterations performed.</p></li>
-<li><p><code>lengths</code>: Obtain number of experimental design iterations performed for each parameter set.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>plot</code>: Generates response plots for all or a selected
+<ul><li><p><code>algorithm(optimizationResult)</code>: Returns the algorithm that was used for finding features.</p></li>
+<li><p><code>length(optimizationResult)</code>: Obtain total number of experimental design iterations performed.</p></li>
+<li><p><code>lengths(optimizationResult)</code>: Obtain number of experimental design iterations performed for each parameter set.</p></li>
+<li><p><code>show(optimizationResult)</code>: Shows summary information for this object.</p></li>
+<li><p><code>plot(x = optimizationResult, y = missing)</code>: Generates response plots for all or a selected
 set of parameters.</p></li>
-<li><p><code>optimizedParameters</code>: Returns parameter set yielding optimal
+<li><p><code>optimizedParameters(optimizationResult)</code>: Returns parameter set yielding optimal
 results. The <code>paramSet</code> and <code>DoEIteration</code> arguments can be
 <code>NULL</code>.</p></li>
-<li><p><code>optimizedObject</code>: Returns the object (<em>i.e.</em> a
+<li><p><code>optimizedObject(optimizationResult)</code>: Returns the object (<em>i.e.</em> a
 <code><a href="features-class.html">features</a></code> or <code><a href="featureGroups-class.html">featureGroups</a></code> object) that was
 generated with optimized parameters. The <code>paramSet</code> argument can be
 <code>NULL</code>.</p></li>
-<li><p><code>scores</code>: Returns optimization scores. The
+<li><p><code>scores(optimizationResult)</code>: Returns optimization scores. The
 <code>paramSet</code> and <code>DoEIteration</code> arguments can be <code>NULL</code>.</p></li>
-<li><p><code>experimentInfo</code>: Returns a <code>list</code> with optimization
+<li><p><code>experimentInfo(optimizationResult)</code>: Returns a <code>list</code> with optimization
 information from an DoE iteration.</p></li>
 </ul></div>
     <div id="slots">

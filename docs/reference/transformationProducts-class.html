@@ -191,19 +191,19 @@ the data), the <code>retDir</code> values are based on calculated <code>log P</c
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>parents</code>: Accessor method for the <code>parents</code> slot of a
+<ul><li><p><code>parents(transformationProducts)</code>: Accessor method for the <code>parents</code> slot of a
 <code>transformationProducts</code> class.</p></li>
-<li><p><code>products</code>: Accessor method for the <code>products</code> slot.</p></li>
-<li><p><code>length</code>: Obtain total number of transformation products.</p></li>
-<li><p><code>names</code>: Obtain the names of all parents in this object.</p></li>
-<li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on parents.</p></li>
-<li><p><code>[[</code>: Extracts a table with TPs for a parent.</p></li>
+<li><p><code>products(transformationProducts)</code>: Accessor method for the <code>products</code> slot.</p></li>
+<li><p><code>length(transformationProducts)</code>: Obtain total number of transformation products.</p></li>
+<li><p><code>names(transformationProducts)</code>: Obtain the names of all parents in this object.</p></li>
+<li><p><code>show(transformationProducts)</code>: Show summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on parents.</p></li>
+<li><p><code>x[[i</code>: Extracts a table with TPs for a parent.</p></li>
 <li><p><code>$</code>: Extracts a table with TPs for a parent.</p></li>
-<li><p><code>as.data.table</code>: Returns all TP data in a table.</p></li>
-<li><p><code>convertToSuspects</code>: Converts this object to a suspect list that can be used as input for
+<li><p><code>as.data.table(transformationProducts)</code>: Returns all TP data in a table.</p></li>
+<li><p><code>convertToSuspects(transformationProducts)</code>: Converts this object to a suspect list that can be used as input for
 <code><a href="suspect-screening.html">screenSuspects</a></code>.</p></li>
-<li><p><code>filter</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
+<li><p><code>filter(transformationProducts)</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -226,6 +226,8 @@ the data), the <code>retDir</code> values are based on calculated <code>log P</c
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsCTS</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsBT</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsLibrary</a></code></p></li>
+</ul></li>
+<li><p><code><a href="transformationProductsFormula-class.html">transformationProductsFormula</a></code></p><ul><li><p><code><a href="transformationProductsFormula-class.html">transformationProductsLibraryFormula</a></code></p></li>
 </ul></li>
 <li><p><code>transformationProductsLogic</code></p></li>
 </ul></li>

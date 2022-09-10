@@ -281,25 +281,25 @@ and derived objects are created by 'feature finders' such as
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>length</code>: Obtain total number of features.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>featureTable</code>: Get table with feature information</p></li>
-<li><p><code>analysisInfo</code>: Get analysis information</p></li>
-<li><p><code>analyses</code>: returns a <code>character</code> vector with the names of the
+<ul><li><p><code>length(features)</code>: Obtain total number of features.</p></li>
+<li><p><code>show(features)</code>: Shows summary information for this object.</p></li>
+<li><p><code>featureTable(features)</code>: Get table with feature information</p></li>
+<li><p><code>analysisInfo(features)</code>: Get analysis information</p></li>
+<li><p><code>analyses(features)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>replicateGroups</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>replicateGroups(features)</code>: returns a <code>character</code> vector with the names of the
 replicate groups for which data is present in this object.</p></li>
-<li><p><code>as.data.table</code>: Returns all feature data in a table.</p></li>
-<li><p><code>filter</code>: Performs common rule based filtering of features. Note
+<li><p><code>as.data.table(features)</code>: Returns all feature data in a table.</p></li>
+<li><p><code>filter(features)</code>: Performs common rule based filtering of features. Note
 that this (and much more) functionality is also provided by the
 <code>filter</code> method defined for <code><a href="featureGroups-class.html">featureGroups</a></code>. However,
 filtering a <code>features</code> object may be useful to avoid grouping large
 amounts of features.</p></li>
-<li><p><code>[</code>: Subset on analyses.</p></li>
-<li><p><code>[[</code>: Extract a feature table for an analysis.</p></li>
+<li><p><code>x[i</code>: Subset on analyses.</p></li>
+<li><p><code>x[[i</code>: Extract a feature table for an analysis.</p></li>
 <li><p><code>$</code>: Extract a feature table for an analysis.</p></li>
-<li><p><code>delete</code>: Completely deletes specified features.</p></li>
-<li><p><code>calculatePeakQualities</code>: Calculates peak qualities for each feature. This uses
+<li><p><code>delete(features)</code>: Completely deletes specified features.</p></li>
+<li><p><code>calculatePeakQualities(features)</code>: Calculates peak qualities for each feature. This uses
 <a href="https://github.com/KelseyChetnik/MetaClean/" class="external-link">MetaClean</a> <span style="R">R</span> package to calculate the following metrics:
 <code>Apex-Boundary Ratio</code>, <code>FWHM2Base</code>, <code>Jaggedness</code>, <code>Modality</code>, <code>Symmetry</code>, <code>Gaussian
 Similarity</code>, <code>Sharpness</code>, <code>Triangle Peak Area Similarity Ratio</code> and <code>Zig-Zag index</code>. Please see the

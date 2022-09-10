@@ -142,8 +142,8 @@ convertToSuspects(
   obj,
   adduct,
   spectrumType = "MS2",
-  avgSpecParams = getDefAvgPListParams(minIntensityPre = 0, minIntensityPost = 2,
-    topMost = 10),
+  avgSpecParams = getDefAvgPListParams(minIntensityPre = 0, minIntensityPost = 2, topMost
+    = 10),
   collapse = TRUE,
   suspects = NULL,
   prefCalcChemProps = TRUE
@@ -284,23 +284,23 @@ more details.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>records</code>: Accessor method for the <code>records</code> slot of an <code>MSLibrary</code> class.</p></li>
-<li><p><code>spectra</code>: Accessor method for the <code>spectra</code> slot of an <code>MSLibrary</code> class.</p></li>
-<li><p><code>length</code>: Obtains the total number of records stored.</p></li>
-<li><p><code>names</code>: Obtains the names of the stored records (<code>DB_ID</code> field).</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on records.</p></li>
-<li><p><code>[[</code>: Extracts a spectrum table for a record.</p></li>
+<ul><li><p><code>records(MSLibrary)</code>: Accessor method for the <code>records</code> slot of an <code>MSLibrary</code> class.</p></li>
+<li><p><code>spectra(MSLibrary)</code>: Accessor method for the <code>spectra</code> slot of an <code>MSLibrary</code> class.</p></li>
+<li><p><code>length(MSLibrary)</code>: Obtains the total number of records stored.</p></li>
+<li><p><code>names(MSLibrary)</code>: Obtains the names of the stored records (<code>DB_ID</code> field).</p></li>
+<li><p><code>show(MSLibrary)</code>: Shows summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on records.</p></li>
+<li><p><code>x[[i</code>: Extracts a spectrum table for a record.</p></li>
 <li><p><code>$</code>: Extracts a spectrum table for a record.</p></li>
-<li><p><code>as.data.table</code>: Converts all the data (spectra and metadata) to a single <code>data.table</code>.</p></li>
-<li><p><code>delete</code>: Completely deletes specified full records or spectra.</p></li>
-<li><p><code>filter</code>: Performs rule-based filtering of records and spectra. This may be especially to improve
+<li><p><code>as.data.table(MSLibrary)</code>: Converts all the data (spectra and metadata) to a single <code>data.table</code>.</p></li>
+<li><p><code>delete(MSLibrary)</code>: Completely deletes specified full records or spectra.</p></li>
+<li><p><code>filter(MSLibrary)</code>: Performs rule-based filtering of records and spectra. This may be especially to improve
 annotation with <code><a href="generateCompoundsLibrary.html">generateCompoundsLibrary</a></code>.</p></li>
-<li><p><code>convertToSuspects</code>: Converts the MS library data to a suspect list, which can be used with
+<li><p><code>convertToSuspects(MSLibrary)</code>: Converts the MS library data to a suspect list, which can be used with
 <code><a href="suspect-screening.html">screenSuspects</a></code>. See the <code>Suspect conversion</code> section for details.</p></li>
-<li><p><code>export</code>: Exports the library data to a <code class="file">.msp</code> file. The export is accelerated by an <code>C++</code>
+<li><p><code>export(MSLibrary)</code>: Exports the library data to a <code class="file">.msp</code> file. The export is accelerated by an <code>C++</code>
 interface with <a href="https://CRAN.R-project.org/package=Rcpp" class="external-link"><span class="pkg">Rcpp</span></a>.</p></li>
-<li><p><code>merge</code>: Merges two <code>MSLibrary</code> objects (<code>x</code> and <code>y</code>). The records from <code>y</code> that are
+<li><p><code>merge(x = MSLibrary, y = MSLibrary)</code>: Merges two <code>MSLibrary</code> objects (<code>x</code> and <code>y</code>). The records from <code>y</code> that are
 unique are added to <code>x</code>. Records that were already in <code>x</code> are simply ignored. The
 <a href="https://splash.fiehnlab.ucdavis.edu/" class="external-link">SPLASH</a> values are used to test equality between records, hence, the
 <code>calcSPLASH</code> argument to <code><a href="loadMSLibrary.html">loadMSLibrary</a></code> should be <code>TRUE</code>.</p></li>

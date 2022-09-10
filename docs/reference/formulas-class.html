@@ -431,21 +431,21 @@ workflows</code> section below.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>annotations</code>: Accessor method to obtain generated formulae.</p></li>
-<li><p><code>analyses</code>: returns a <code>character</code> vector with the names of the
+<ul><li><p><code>annotations(formulas)</code>: Accessor method to obtain generated formulae.</p></li>
+<li><p><code>analyses(formulas)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>defaultExclNormScores</code>: Returns default scorings that are excluded from normalization.</p></li>
-<li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>[[</code>: Extracts a formula table, either for a feature group or for features in an analysis.</p></li>
-<li><p><code>as.data.table</code>: Generates a table with all candidate formulae for each feature group and other information such
+<li><p><code>defaultExclNormScores(formulas)</code>: Returns default scorings that are excluded from normalization.</p></li>
+<li><p><code>show(formulas)</code>: Show summary information for this object.</p></li>
+<li><p><code>x[[i</code>: Extracts a formula table, either for a feature group or for features in an analysis.</p></li>
+<li><p><code>as.data.table(formulas)</code>: Generates a table with all candidate formulae for each feature group and other information such
 as element counts.</p></li>
-<li><p><code>annotatedPeakList</code>: Returns an MS/MS peak list annotated with data from a
+<li><p><code>annotatedPeakList(formulas)</code>: Returns an MS/MS peak list annotated with data from a
 given candidate formula.</p></li>
-<li><p><code>plotSpectrum</code>: Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
+<li><p><code>plotSpectrum(formulas)</code>: Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two
 spectra can be compared by specifying a two-sized vector for the <code>index</code>, <code>groupName</code> and (if desired)
 <code>analysis</code> arguments.</p></li>
-<li><p><code>plotScores</code>: Plots a barplot with scoring of a candidate formula.</p></li>
-<li><p><code>consensus</code>: Generates a consensus of results from multiple
+<li><p><code>plotScores(formulas)</code>: Plots a barplot with scoring of a candidate formula.</p></li>
+<li><p><code>consensus(formulas)</code>: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
 (the scores are normalized and the highest ranked candidate gets value

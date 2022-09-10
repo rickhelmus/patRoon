@@ -134,13 +134,13 @@ derived classes.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>algorithm</code>: Returns the algorithm that was used to generate an
+<ul><li><p><code>algorithm(workflowStep)</code>: Returns the algorithm that was used to generate an
 object.</p></li>
-<li><p><code>as.data.table</code>: Summarizes the data in this object and returns this
+<li><p><code>as.data.table(workflowStep)</code>: Summarizes the data in this object and returns this
 as a <code>data.table</code>.</p></li>
-<li><p><code>as.data.frame</code>: This method simply calls <code>as.data.table</code> and
+<li><p><code>as.data.frame(workflowStep)</code>: This method simply calls <code>as.data.table</code> and
 converts the result to a classic a <code>data.frame</code>.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
+<li><p><code>show(workflowStep)</code>: Shows summary information for this object.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -158,6 +158,8 @@ converts the result to a classic a <code>data.frame</code>.</p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsCTS</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsBT</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsLibrary</a></code></p></li>
+</ul></li>
+<li><p><code><a href="transformationProductsFormula-class.html">transformationProductsFormula</a></code></p><ul><li><p><code><a href="transformationProductsFormula-class.html">transformationProductsLibraryFormula</a></code></p></li>
 </ul></li>
 <li><p><code><a href="transformationProducts-class.html">transformationProductsLogic</a></code></p></li>
 </ul></li>

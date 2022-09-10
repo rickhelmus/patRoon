@@ -193,3 +193,74 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
                                                  values = unique(nodes$group[nodes$group != "unique"]))) %>%
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 }
+
+getProductsFromLib <- function(TPLibrary, generations)
+{
+    results <- split(TPLibrary, by = "parent_name")
+    
+    curTPIDs <- setNames(vector("integer", length = length(results)), names(results))
+    prepTPs <- function(r, pn, pid, gen, prvLogPDiff)
+    {
+        # remove parent columns
+        set(r, j = grep("^parent_", names(r), value = TRUE), value = NULL)
+        
+        # remove TP_ prefix
+        cols <- grep("^TP_", names(r), value = TRUE)
+        setnames(r, cols, sub("^TP_", "", cols))
+        setnames(r, "name", "name_lib")
+        
+        r[, retDir := 0] # may be changed below
+        r[, generation := gen]
+        
+        r[, ID := curTPIDs[pn] + seq_len(nrow(r))]
+        curTPIDs[pn] <<- curTPIDs[pn] + nrow(r)
+        r[, parent_ID := pid]
+        
+        # make it additive so LogPDiff corresponds to the original parent
+        if (!is.null(r[["LogPDiff"]]) && !is.null(prvLogPDiff))
+            r[, LogPDiff := LogPDiff + prvLogPDiff]
+        
+        return(r)
+    }
+    results <- Map(results, names(results), f = prepTPs, MoreArgs = list(pid = NA_integer_, gen = 1, prvLogPDiff = NULL))
+    
+    if (generations > 1)
+    {
+        for (gen in seq(2, generations))
+        {
+            results <- Map(results, names(results), f = function(r, pn)
+            {
+                tps <- r[generation == (gen-1)]
+                nexttps <- rbindlist(lapply(split(tps, seq_len(nrow(tps))), function(tpRow)
+                {
+                    nt <- copy(TPLibrary[parent_InChIKey == tpRow$InChIKey])
+                    return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$LogPDiff))
+                }))
+                return(rbind(r, nexttps))
+            })
+        }
+    }
+    
+    # fill in chem IDs and names now that we sorted out all TPs
+    results <- Map(results, names(results), f = function(r, pn)
+    {
+        set(r, j = "chem_ID", value = match(r$InChIKey, unique(r$InChIKey)))
+        set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
+    })
+    
+    if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
+    {
+        results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
+                       f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
+    }
+    else if (!is.null(TPLibrary[["LogPDiff"]]))
+    {
+        results <- lapply(results, function(x) set(x, j = "retDir", value = fcase(x$LogPDiff < 0, -1,
+                                                                                  x$LogPDiff > 0, 1,
+                                                                                  default = 0)))
+    }
+    
+    results <- pruneList(results, checkZeroRows = TRUE)
+
+    return(results)
+}

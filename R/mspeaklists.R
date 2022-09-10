@@ -558,7 +558,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 }
             }
 
-            plF <- doMSPeakListFilter(pl, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, deIsotopeMSMS,
+            plF <- doMSPeakListFilter(plF, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, deIsotopeMSMS,
                                       retainPrecursorMSMS, negate)
         }
         

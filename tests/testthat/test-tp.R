@@ -14,6 +14,13 @@ TPsLibScr <- generateTPs("library", fGroups)
 TPsLibCustom <- generateTPs("library",
                             TPLibrary = data.table(parent_name = "Diuron", parent_SMILES = "CN(C)C(O)=NC1C=C(Cl)C(Cl)=CC=1",
                                                    TP_name = "Linuron", TP_SMILES = "CN(C(=O)NC1=CC(=C(C=C1)Cl)Cl)OC"))
+TPFormLib <- data.table(parent_name = "Diuron", parent_formula = "C9H10Cl2N2O",
+                        TP_name = "Linuron", TP_formula = "C9H10Cl2N2O2")
+TPsLibForm <- generateTPs("library_formula", TPLibrary = TPFormLib)
+TPsLibFormGen2 <- generateTPs("library_formula", TPLibrary = TPFormLib, generations = 2)
+TPsLibFormSusp <- generateTPs("library_formula", TPLibrary = TPFormLib, suspL)
+TPsLibFormScr <- generateTPs("library_formula", TPLibrary = TPFormLib, fGroups)
+
 TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
 TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], calcSims = TRUE) # for filter tests
@@ -25,6 +32,7 @@ fGroupsEmpty <- getEmptyTestFGroups()
 fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
 TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
+TPsLibFormEmpty <- generateTPs("library_formula", TPLibrary = TPFormLib, fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
 TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
@@ -47,6 +55,10 @@ test_that("verify TP generation", {
     expect_known_value(TPsLibPC, testFile("tp-lib_pc"))
     expect_known_value(TPsLibSusp, testFile("tp-lib_susp"))
     expect_known_value(TPsLibScr, testFile("tp-lib_scr"))
+    expect_known_value(TPsLibCustom, testFile("tp-lib_custom"))
+    expect_known_value(TPsLibForm, testFile("tp-lib_form"))
+    expect_known_value(TPsLibFormSusp, testFile("tp-lib_form_susp"))
+    expect_known_value(TPsLibFormScr, testFile("tp-lib_form_scr"))
     expect_known_value(TPsBTSusp, testFile("tp-bt_susp"))
     expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
     expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
@@ -82,6 +94,7 @@ test_that("verify TP generation", {
     
     expect_length(TPsLogicEmpty, 0)
     expect_length(TPsLibEmpty, 0)
+    expect_length(TPsLibFormEmpty, 0)
     expect_length(TPsBTEmpty, 0)
     expect_length(TPsCTSEmpty, 0)
     
@@ -197,6 +210,7 @@ test_that("consensus works", {
 
 test_that("plotting works", {
     expect_HTML(plotGraph(TPsLibScr, which = 1))
+    expect_HTML(plotGraph(TPsLibFormScr, which = 1))
     
     expect_doppel("venn", function() plotVenn(TPsLibScr, TPsBTScr))
     expect_error(plotVenn(TPsLibEmpty, TPsBTEmpty))
@@ -314,6 +328,8 @@ if (doMetFrag)
 test_that("TP component usage", {
     expect_HTML(plotGraph(componTPsLogic, onlyLinked = FALSE))
     expect_HTML(plotGraph(TPsLibSusp, which = componentInfo(componTPsLib)$parent_name[1], components = componTPsLib))
+    expect_HTML(plotGraph(TPsLibFormSusp, which = componentInfo(componTPsLib)$parent_name[1],
+                          components = componTPsLib))
     
     expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetF)[, -"size"])

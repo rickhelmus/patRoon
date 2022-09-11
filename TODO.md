@@ -20,6 +20,11 @@
 
 ## TPs
 
+- TP library formula
+    - also do SMI --> InChI etc conversion (eg if matching needs it)
+    - test/finish matchGenerationsBy args
+    - always add IK1 if needed? (also for TP library)
+    - fix tests (eg plotGraph, components)
 - Reporting
     - Split formulaDiff like plotGraph()?
 - newProject()

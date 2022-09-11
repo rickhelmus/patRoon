@@ -51,6 +51,25 @@ This function uses a library to obtain transformation products. This function is
 This function is similar to \code{\link{generateTPsLibrary}}, however, it only require formula information
   of the parent and TPs.
 }
+\section{TP libraries}{
+ The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
+  \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
+
+  \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
+
+  \item \code{parent_formula} and \code{TP_formula} The formula of the parent/TP structure.
+
+  \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
+
+  \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
+  \code{parent_LogP} and \code{TP_LogP} are specified. (\strong{optional})
+
+  }
+
+  Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
+  by repeating the value within \code{parent_} columns.
+}
+
 \section{Validating and calculating chemical properties}{
  Chemical properties such as \acronym{SMILES},
   \acronym{InChIKey} and formula in the parent suspect list are automatically validated and calculated if missing/invalid.
@@ -77,20 +96,6 @@ This function is similar to \code{\link{generateTPsLibrary}}, however, it only r
 
   This functionality relies heavily on \href{http://openbabel.org/wiki/Main_Page}{OpenBabel}, please make sure it is
   installed.
-}
-
-\section{TP libraries}{
- The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
-  \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
-
-  \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
-
-  \item \code{parent_formula} and \code{TP_formula} The chemical formula of the parent/TP.
-
-  }
-
-  Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
-  by repeating the value within \code{parent_} columns.
 }
 
 \references{

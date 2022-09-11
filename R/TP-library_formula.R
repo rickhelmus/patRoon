@@ -28,25 +28,16 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'   \code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
 #'   the library are obtained.
 #' @param TPLibrary A \code{data.frame}. See the details below.
-
-#' @inheritParams generateTPsLibrary
-#'
+#' 
+#' @templateVar id formula
+#' @template tp_lib
+#' 
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
+#' 
+#' @inheritParams generateTPsLibrary
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.
-#'
-#' @section TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
-#'   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{
-#'
-#'   \item \code{parent_name} and \code{TP_name}: The name of the parent/TP.
-#'
-#'   \item \code{parent_formula} and \code{TP_formula} The chemical formula of the parent/TP.
-#'
-#'   }
-#'
-#'   Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
-#'   by repeating the value within \code{parent_} columns.
 #'
 #' @seealso \code{\link{generateTPsLibrary}} to generate TPs from a library that contains structural information.
 #'

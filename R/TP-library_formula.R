@@ -52,14 +52,13 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'
 #' @export
 generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1, skipInvalid = TRUE,
-                                      prefCalcChemProps = TRUE)
+                                      prefCalcChemProps = TRUE, matchParentsBy = "formula")
 {
     # NOTE: this is mainly a simplified version of generateTPsLibrary
     
     checkmate::assert(
         checkmate::checkNull(parents),
         checkmate::checkClass(parents, "data.frame"),
-        checkmate::checkClass(parents, "compounds"),
         checkmate::checkClass(parents, "featureGroupsScreening"),
         checkmate::checkClass(parents, "featureGroupsScreeningSet"),
         .var.name = "parents"
@@ -76,9 +75,11 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps, fixed = list(add = ac))
+    checkmate::assertChoice(matchParentsBy, c("name", "formula", "InChIKey", "InChIKey1", "InChI", "SMILES"),
+                            null.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps)
+    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, matchParentsBy)
     cd <- loadCacheData("TPsLibFormula", hash)
     if (!is.null(cd))
         return(cd)
@@ -94,26 +95,16 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     }
 
     if (!is.null(parents))
-    {
         parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
-
-        # only take data in both
-        dataInBoth <- intersect(TPLibrary$parent_name, parents$name)
-        TPLibrary <- TPLibrary[parent_name %chin% dataInBoth]
-        parents <- parents[name %chin% dataInBoth]
-    }
-    else
-    {
-        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
-        setnames(parents, sub("^parent_", "", names(parents)))
-    }
+    
+    prep <- prepareParentsForLib(parents, TPLibrary, matchParentsBy)
+    parents <- prep$parents; TPLibrary <- prep$TPLibrary
     
     results <- getProductsFromLib(TPLibrary, generations)
     parents <- parents[name %in% names(results)]
     results <- results[match(parents$name, names(results))] # sync order
     
-    ret <- transformationProductsLibraryFormula(parents
-                                                = parents, products = results)
+    ret <- transformationProductsLibraryFormula(parents = parents, products = results)
     saveCacheData("TPsLibFormula", ret, hash)
     return(ret)
 }

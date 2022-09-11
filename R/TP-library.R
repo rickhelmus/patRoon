@@ -28,14 +28,16 @@ setMethod("initialize", "transformationProductsLibrary",
 #'   iterations obtained by repeating the library search where the TPs from the previous generation are considered
 #'   parents.
 #' @param matchParentsBy A \code{character} that specifies how the input parents are matched with the data from the TP
-#'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.
+#'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
+#'   \code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
+#'   the first is considered.
 #'
 #' @templateVar parNULL TRUE
 #' @template tp_gen-scr
 #'
 #' @template tp_gen-sim
 #' @template fp-args
-#' 
+#'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
 #'
@@ -88,7 +90,8 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims, fixed = list(add = ac))
-    checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES"), null.ok = FALSE, add = ac)
+    checkmate::assertChoice(matchParentsBy, c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"),
+                            null.ok = FALSE, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
@@ -126,35 +129,10 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     }
 
     if (!is.null(parents))
-    {
         parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
-        
-        # match with library
-        if (matchParentsBy == "InChIKey1")
-        {
-            dataLib <- getIKBlock1(TPLibrary$parent_InChIKey)
-            dataSusp <- getIKBlock1(parents$InChIKey)
-        }
-        else
-        {
-            dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
-            dataSusp <- parents[[matchParentsBy]]
-        }
-        
-        # rename from suspect list
-        TPLibrary[, parent_name_lib := parent_name] # store original
-        TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
-        
-        # only take data in both
-        dataInBoth <- intersect(dataLib, dataSusp)
-        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
-        parents <- parents[dataSusp %chin% dataInBoth]
-    }
-    else
-    {
-        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
-        setnames(parents, sub("^parent_", "", names(parents)))
-    }
+    
+    prep <- prepareParentsForLib(parents, TPLibrary, matchParentsBy)
+    parents <- prep$parents; TPLibrary <- prep$TPLibrary
 
     results <- getProductsFromLib(TPLibrary, generations)
     parents <- parents[name %in% names(results)]

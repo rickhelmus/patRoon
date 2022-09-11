@@ -9,7 +9,8 @@ generateTPsLibraryFormula(
   TPLibrary,
   generations = 1,
   skipInvalid = TRUE,
-  prefCalcChemProps = TRUE
+  prefCalcChemProps = TRUE,
+  matchParentsBy = "formula"
 )
 }
 \arguments{
@@ -31,6 +32,11 @@ information (\emph{e.g.} SMILES) is available.}
 \acronym{InChIKey} are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
 more details.}
+
+\item{matchParentsBy}{A \code{character} that specifies how the input parents are matched with the data from the TP
+library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
+\code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
+the first is considered.}
 }
 \value{
 The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.

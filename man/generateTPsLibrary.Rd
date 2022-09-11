@@ -39,7 +39,9 @@ recommended to set this to \code{TRUE}. See the \verb{Validating and calculating
 more details.}
 
 \item{matchParentsBy}{A \code{character} that specifies how the input parents are matched with the data from the TP
-library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"}.}
+library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
+\code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
+the first is considered.}
 
 \item{calcSims}{If set to \code{TRUE} then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the \link[=filter,transformationProductsStructure-method]{filter

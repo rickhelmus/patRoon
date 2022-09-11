@@ -194,6 +194,43 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 }
 
+prepareParentsForLib <- function(parents, TPLibrary, matchParentsBy)
+{
+    if (!is.null(parents))
+    {
+        # match with library
+        if (matchParentsBy == "InChIKey1")
+        {
+            dataLib <- getIKBlock1(TPLibrary$parent_InChIKey)
+            dataSusp <- getIKBlock1(parents$InChIKey)
+        }
+        else
+        {
+            dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
+            dataSusp <- parents[[matchParentsBy]]
+        }
+        
+        if (matchParentsBy != "name")
+        {
+            # rename from suspect list
+            TPLibrary[, parent_name_lib := parent_name] # store original
+            TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
+        }
+        
+        # only take data in both
+        dataInBoth <- intersect(dataLib, dataSusp)
+        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
+        parents <- parents[dataSusp %chin% dataInBoth]
+    }
+    else
+    {
+        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
+        setnames(parents, sub("^parent_", "", names(parents)))
+    }
+    
+    return(list(parents = parents, TPLibrary = TPLibrary))
+}
+
 getProductsFromLib <- function(TPLibrary, generations)
 {
     results <- split(TPLibrary, by = "parent_name")

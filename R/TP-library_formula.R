@@ -43,7 +43,7 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'
 #' @export
 generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1, skipInvalid = TRUE,
-                                      prefCalcChemProps = TRUE, matchParentsBy = "formula")
+                                      prefCalcChemProps = TRUE, matchParentsBy = "formula", matchGenerationsBy = "name")
 {
     # NOTE: this is mainly a simplified version of generateTPsLibrary
     
@@ -66,11 +66,12 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps, fixed = list(add = ac))
-    checkmate::assertChoice(matchParentsBy, c("name", "formula", "InChIKey", "InChIKey1", "InChI", "SMILES"),
-                            null.ok = FALSE, add = ac)
+    aapply(checkmate::assertChoice, . ~ matchParentsBy + matchGenerationsBy, null.ok = FALSE,
+           fixed = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"), add = ac))
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, matchParentsBy)
+    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, matchParentsBy,
+                     matchGenerationsBy)
     cd <- loadCacheData("TPsLibFormula", hash)
     if (!is.null(cd))
         return(cd)
@@ -91,7 +92,7 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     prep <- prepareParentsForLib(parents, TPLibrary, matchParentsBy)
     parents <- prep$parents; TPLibrary <- prep$TPLibrary
     
-    results <- getProductsFromLib(TPLibrary, generations)
+    results <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy)
     parents <- parents[name %in% names(results)]
     results <- results[match(parents$name, names(results))] # sync order
     

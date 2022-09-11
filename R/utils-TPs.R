@@ -231,7 +231,7 @@ prepareParentsForLib <- function(parents, TPLibrary, matchParentsBy)
     return(list(parents = parents, TPLibrary = TPLibrary))
 }
 
-getProductsFromLib <- function(TPLibrary, generations)
+getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy)
 {
     results <- split(TPLibrary, by = "parent_name")
     
@@ -265,12 +265,18 @@ getProductsFromLib <- function(TPLibrary, generations)
     {
         for (gen in seq(2, generations))
         {
+            if (matchGenerationsBy == "InChIKey1")
+            {
+                TPLibrary <- copy(TPLibrary)
+                TPLibrary[, InChIKey1 := getIKBlock1(InChIKey)]
+            }
+            
             results <- Map(results, names(results), f = function(r, pn)
             {
                 tps <- r[generation == (gen-1)]
                 nexttps <- rbindlist(lapply(split(tps, seq_len(nrow(tps))), function(tpRow)
                 {
-                    nt <- copy(TPLibrary[parent_InChIKey == tpRow$InChIKey])
+                    nt <- copy(TPLibrary[get(paste0("parent_", matchGenerationsBy)) == tpRow[[matchGenerationsBy]]])
                     return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$LogPDiff))
                 }))
                 return(rbind(r, nexttps))

@@ -43,7 +43,7 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'
 #' @export
 generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1, skipInvalid = TRUE,
-                                      prefCalcChemProps = TRUE, matchParentsBy = "formula", matchGenerationsBy = "name")
+                                      prefCalcChemProps = TRUE, matchParentsBy = "name", matchGenerationsBy = "name")
 {
     # NOTE: this is mainly a simplified version of generateTPsLibrary
     
@@ -76,27 +76,12 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     if (!is.null(cd))
         return(cd)
     
-    TPLibrary <- copy(as.data.table(TPLibrary))
-    
-    # add chem infos where necessary
-    for (wh in c("parent", "TP"))
-    {
-        whmcol <- paste0(wh, "_neutralMass")
-        if (is.null(TPLibrary[[whmcol]]))
-            TPLibrary[, (whmcol) := sapply(get(paste0(wh, "_formula")), getFormulaMass)]
-    }
-
     if (!is.null(parents))
-        parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
+        parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, checkSMILES = FALSE)
     
-    prep <- prepareParentsForLib(parents, TPLibrary, matchParentsBy)
-    parents <- prep$parents; TPLibrary <- prep$TPLibrary
+    prep <- prepareDataForTPLibrary(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, "formula")
     
-    results <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy)
-    parents <- parents[name %in% names(results)]
-    results <- results[match(parents$name, names(results))] # sync order
-    
-    ret <- transformationProductsLibraryFormula(parents = parents, products = results)
+    ret <- transformationProductsLibraryFormula(parents = prep$parents, products = prep$products)
     saveCacheData("TPsLibFormula", ret, hash)
     return(ret)
 }

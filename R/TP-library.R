@@ -82,43 +82,14 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     
     if (is.null(TPLibrary))
         TPLibrary <- copy(PubChemTransformations) # default to embedded PC transformations
-    else
-    {
-        TPLibrary <- copy(as.data.table(TPLibrary))
-        
-        # add chem infos where necessary
-        for (wh in c("parent", "TP"))
-        {
-            for (col in c("formula", "InChI", "InChIKey"))
-            {
-                whcol <- paste0(wh, "_", col)
-                if (is.null(TPLibrary[[whcol]]))
-                {
-                    whSMI <- paste0(wh, "_SMILES")
-                    TPLibrary[, (whcol) := switch(col,
-                                                  formula = babelConvert(get(whSMI), "smi", "formula"),
-                                                  InChI = babelConvert(get(whSMI), "smi", "inchi"),
-                                                  InChIKey = babelConvert(get(whSMI), "smi", "inchikey"))]
-                }
-            }
-            whmcol <- paste0(wh, "_neutralMass")
-            if (is.null(TPLibrary[[whmcol]]))
-                TPLibrary[, (whmcol) := sapply(get(paste0(wh, "_formula")), getFormulaMass)]
-        }
-    }
 
     if (!is.null(parents))
         parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
     
-    prep <- prepareParentsForLib(parents, TPLibrary, matchParentsBy)
-    parents <- prep$parents; TPLibrary <- prep$TPLibrary
+    prep <- prepareDataForTPLibrary(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, "InChIKey")
 
-    results <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy)
-    parents <- parents[name %in% names(results)]
-    results <- results[match(parents$name, names(results))] # sync order
-    
     ret <- transformationProductsLibrary(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
-                                         parents = parents, products = results)
+                                         parents = prep$parents, products = prep$products)
     saveCacheData("TPsLib", ret, hash)
     return(ret)
 }

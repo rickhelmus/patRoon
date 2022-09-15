@@ -1,4 +1,4 @@
-getTPParents <- function(parents, skipInvalid, prefCalcChemProps)
+getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkSMILES = TRUE)
 {
     if (is.data.frame(parents))
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
@@ -25,15 +25,18 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps)
         parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
     
-    if (is.null(parents[["SMILES"]]))
-        stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")
-    
-    noSM <- is.na(parents$SMILES) | !nzchar(parents$SMILES)
-    if (any(noSM))
+    if (checkSMILES)
     {
-        do.call(if (skipInvalid) warning else stop,
-                list("The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ",")))
-        parents <- parents[!noSM]
+        if (is.null(parents[["SMILES"]]))
+            stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")
+        
+        noSM <- is.na(parents$SMILES) | !nzchar(parents$SMILES)
+        if (any(noSM))
+        {
+            do.call(if (skipInvalid) warning else stop,
+                    list("The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ",")))
+            parents <- parents[!noSM]
+        }
     }
     
     return(parents)
@@ -194,44 +197,7 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 }
 
-prepareParentsForLib <- function(parents, TPLibrary, matchParentsBy)
-{
-    if (!is.null(parents))
-    {
-        # match with library
-        if (matchParentsBy == "InChIKey1")
-        {
-            dataLib <- getIKBlock1(TPLibrary$parent_InChIKey)
-            dataSusp <- getIKBlock1(parents$InChIKey)
-        }
-        else
-        {
-            dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
-            dataSusp <- parents[[matchParentsBy]]
-        }
-        
-        if (matchParentsBy != "name")
-        {
-            # rename from suspect list
-            TPLibrary[, parent_name_lib := parent_name] # store original
-            TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
-        }
-        
-        # only take data in both
-        dataInBoth <- intersect(dataLib, dataSusp)
-        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
-        parents <- parents[dataSusp %chin% dataInBoth]
-    }
-    else
-    {
-        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
-        setnames(parents, sub("^parent_", "", names(parents)))
-    }
-    
-    return(list(parents = parents, TPLibrary = TPLibrary))
-}
-
-getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy)
+getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, matchIDBy)
 {
     results <- split(TPLibrary, by = "parent_name")
     
@@ -287,7 +253,7 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy)
     # fill in chem IDs and names now that we sorted out all TPs
     results <- Map(results, names(results), f = function(r, pn)
     {
-        set(r, j = "chem_ID", value = match(r$InChIKey, unique(r$InChIKey)))
+        set(r, j = "chem_ID", value = match(r[[matchIDBy]], unique(r[[matchIDBy]])))
         set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
     })
     
@@ -306,4 +272,79 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy)
     results <- pruneList(results, checkZeroRows = TRUE)
 
     return(results)
+}
+
+prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, matchIDBy)
+{
+    TPLibrary <- copy(as.data.table(TPLibrary))
+    
+    # add chem infos where necessary
+    for (wh in c("parent", "TP"))
+    {
+        if (!is.null(TPLibrary[[paste0(wh, "_SMILES")]])) # may not be there for formula library
+        {
+            for (col in c("formula", "InChI", "InChIKey"))
+            {
+                whcol <- paste0(wh, "_", col)
+                if (is.null(TPLibrary[[whcol]]))
+                {
+                    whSMI <- paste0(wh, "_SMILES")
+                    TPLibrary[, (whcol) := switch(col,
+                                                  formula = babelConvert(get(whSMI), "smi", "formula"),
+                                                  InChI = babelConvert(get(whSMI), "smi", "inchi"),
+                                                  InChIKey = babelConvert(get(whSMI), "smi", "inchikey"))]
+                }
+            }
+        }
+        
+        if ("InChIKey1" %in% c(matchParentsBy, matchGenerationsBy))
+        {
+            whcol <- paste0(wh, "_InChIKey")
+            if (is.null(TPLibrary[[whcol]]))
+                stop(sprintf("Cannot match by InChIKey1: missing %s column in the library", whcol), call. = FALSE)
+            TPLibrary[, (paste0(whcol, 1)) := getIKBlock1(get(whcol))]
+        }
+        
+        for (mb in union(matchParentsBy, matchGenerationsBy))
+        {
+            whcol <- paste0(wh, "_", mb)
+            if (is.null(TPLibrary[[whcol]]))
+                stop(sprintf("Cannot match by %s: missing %s column in the library", mb, whcol), call. = FALSE)
+        }
+        
+        whmcol <- paste0(wh, "_neutralMass")
+        if (is.null(TPLibrary[[whmcol]]))
+            TPLibrary[, (whmcol) := sapply(get(paste0(wh, "_formula")), getFormulaMass)]
+    }
+    
+    if (!is.null(parents))
+    {
+        # match with library
+        
+        dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
+        dataSusp <- parents[[matchParentsBy]]
+        
+        if (matchParentsBy != "name")
+        {
+            # rename from suspect list
+            TPLibrary[, parent_name_lib := parent_name] # store original
+            TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
+        }
+        
+        # only take data in both
+        dataInBoth <- intersect(dataLib, dataSusp)
+        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
+        parents <- parents[dataSusp %chin% dataInBoth]
+    }
+    else
+    {
+        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
+        setnames(parents, sub("^parent_", "", names(parents)))
+    }
+    
+    products <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy, matchIDBy)
+    parents <- parents[name %in% names(products)]
+    products <- products[match(parents$name, names(products))] # sync order
+    
+    return(list(parents = parents, products = products))
 }

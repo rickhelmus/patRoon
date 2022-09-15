@@ -102,6 +102,7 @@
 <span>  skipInvalid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  matchParentsBy <span class="op">=</span> <span class="st">"InChIKey"</span>,</span>
+<span>  matchGenerationsBy <span class="op">=</span> <span class="st">"InChIKey"</span>,</span>
 <span>  calcSims <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  fpType <span class="op">=</span> <span class="st">"extended"</span>,</span>
 <span>  fpSimMethod <span class="op">=</span> <span class="st">"tanimoto"</span></span>
@@ -112,7 +113,7 @@
     <h2>Arguments</h2>
     <dl><dt>parents</dt>
 <dd><p>The parents for which transformation products should be obtained. This can be (1) a suspect list (see
-<a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output
+<a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output of
 <code><a href="suspect-screening.html">screenSuspects</a></code> or (3) a <code><a href="compounds-class.html">compounds</a></code> annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.
 If <code>NULL</code> then TPs for all parents in the library are obtained.</p></dd>
@@ -143,7 +144,14 @@ more details.</p></dd>
 
 <dt>matchParentsBy</dt>
 <dd><p>A <code>character</code> that specifies how the input parents are matched with the data from the TP
-library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <code>"InChI"</code>, <code>"SMILES"</code>.</p></dd>
+library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <code>"InChI"</code>, <code>"SMILES"</code>,
+<code>"formula"</code>, <code>"name"</code>. If the parent from the TP library is matched with multiple input parents then only
+the first is considered.</p></dd>
+
+
+<dt>matchGenerationsBy</dt>
+<dd><p>Similar to <code>matchParentsBy</code>, but specifies how parents/TPs are matched when
+<code>generations&gt;1</code>.</p></dd>
 
 
 <dt>calcSims</dt>
@@ -185,6 +193,17 @@ of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-projec
     <p>When the <code>parents</code> argument is a <code><a href="compounds-class.html">compounds</a></code> object, the candidate library <code>identifier</code>
   is used in case the candidate has no defined <code>compoundName</code>.</p>
     </div>
+    <div id="tp-libraries">
+    <h2>TP libraries</h2>
+    <p>The <code>TPLibrary</code> argument is used to specify a custom TP library. This should be a
+  <code>data.frame</code> where each row specifies a TP for a parent, with the following columns:</p><ul><li><p><code>parent_name</code> and <code>TP_name</code>: The name of the parent/TP.</p></li>
+<li><p><code>parent_SMILES</code> and <code>TP_SMILES</code> The SMILES of the parent/TP structure.</p></li>
+<li><p><code>parent_LogP</code> and <code>TP_LogP</code> The <code>log P</code> values for the parent/TP. (<strong>optional</strong>)</p></li>
+<li><p><code>LogPDiff</code> The difference between parent and TP <code>Log P</code> values. Ignored if <em>both</em>
+  <code>parent_LogP</code> and <code>TP_LogP</code> are specified. (<strong>optional</strong>)</p></li>
+</ul><p>Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
+  by repeating the value within <code>parent_</code> columns.</p>
+    </div>
     <div id="validating-and-calculating-chemical-properties">
     <h2>Validating and calculating chemical properties</h2>
     <p>Chemical properties such as <acronym>SMILES</acronym>,
@@ -202,17 +221,6 @@ of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-projec
   deuterium (2H) elements.</p>
 <p>This functionality relies heavily on <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a>, please make sure it is
   installed.</p>
-    </div>
-    <div id="custom-tp-libraries">
-    <h2>Custom TP libraries</h2>
-    <p>The <code>TPLibrary</code> argument is used to specify a custom TP library. This should be a
-  <code>data.frame</code> where each row specifies a TP for a parent, with the following columns:</p><ul><li><p><code>parent_name</code> and <code>TP_name</code>: The name of the parent/TP.</p></li>
-<li><p><code>parent_SMILES</code> and <code>TP_SMILES</code> The <acronym>SMILES</acronym> of the parent/TP structure.</p></li>
-<li><p><code>parent_LogP</code> and <code>TP_LogP</code> The <code>log P</code> values for the parent/TP. (<strong>optional</strong>)</p></li>
-<li><p><code>LogPDiff</code> The difference between parent and TP <code>Log P</code> values. Ignored if <em>both</em>
-  <code>parent_LogP</code> and <code>TP_LogP</code> are specified. (<strong>optional</strong>)</p></li>
-</ul><p>Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
-  by repeating the value within <code>parent_</code> columns.</p>
     </div>
     <div id="references">
     <h2>References</h2>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.11 Caching | patRoon handbook</title>
   <meta name="description" content="8.11 Caching | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.11 Caching | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-09-10" />
+<meta name="date" content="2022-09-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -273,7 +273,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
 <li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
@@ -345,11 +345,11 @@ div.csl-indent {
 <h2><span class="header-section-number">8.11</span> Caching<a href="caching.html#caching" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
 <p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="caching.html#cb271-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="caching.html#cb272-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn’t wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>
 <p>In order to figure what is in the cache you can run <code>clearCache()</code> without any arguments:</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="caching.html#cb272-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="caching.html#cb273-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
 <pre><code>#&gt; Please specify which cache you want to remove. Available are:
 #&gt; - EICData (3 rows)
 #&gt; - MSLibraryJSON (1 rows)
@@ -390,10 +390,10 @@ div.csl-indent {
 #&gt; - specData (12 rows)
 #&gt; - all (removes complete cache database)</code></pre>
 <p>Using this output you can re-run the function again, for instance:</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="caching.html#cb274-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
-<span id="cb274-2"><a href="caching.html#cb274-2" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
-<span id="cb274-3"><a href="caching.html#cb274-3" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
-<span id="cb274-4"><a href="caching.html#cb274-4" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="caching.html#cb275-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
+<span id="cb275-2"><a href="caching.html#cb275-2" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
+<span id="cb275-3"><a href="caching.html#cb275-3" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
+<span id="cb275-4"><a href="caching.html#cb275-4" aria-hidden="true" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
 </div>
             </section>
 

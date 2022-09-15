@@ -278,6 +278,12 @@ information (retention and <em>m/z</em> values).</p></dd>
 used.</p></dd>
 
 
+<dt>k</dt>
+<dd><p>A vector with analyses (<code>character</code> with names or <code>integer</code> with indices) for which the data
+should be deleted. If <code>k!=NULL</code> then deletions will <em>not</em> occur on group averaged peak lists. Otherwise,
+if <code>k=NULL</code> then deltion occurs on <em>both</em> group averaged and analysis specific peak lists.</p></dd>
+
+
 <dt>absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr</dt>
 <dd><p>Absolute/relative intensity threshold for MS or MS/MS peak
 lists. <code>NULL</code> for none.</p></dd>

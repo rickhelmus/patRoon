@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>7 Transformation product screening | patRoon handbook</title>
   <meta name="description" content="7 Transformation product screening | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="7 Transformation product screening | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-09-10" />
+<meta name="date" content="2022-09-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -273,7 +273,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
 <li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
@@ -345,8 +345,8 @@ div.csl-indent {
 <h1><span class="header-section-number">7</span> Transformation product screening<a href="TPs.html#TPs" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>This chapter describes the various functionality for screening of <em>transformation products</em> (TPs), which are introduced since <code>patRoon</code> 2.0. Screening for TPs, i.e. chemicals that are formed from a <em>parent</em> chemical by e.g. chemical or biological processes, has broad applications. For this reason, the TP screening related functionality is designed to be flexible, thus allowing one to use a workflow that is best suited for a particular study.</p>
 <p>Regardless, the TP screening workflow in <code>patRoon</code> can be roughly summarized as follows:</p>
-<div id="htmlwidget-b38bfffebd785b84da5c" style="width:500px;height:90px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b38bfffebd785b84da5c">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Parent screening\" -> \"Obtaining TPs\" -> \"TP screening\" -> \"Linking parent/TPs\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-aaf114510fc41ae4c500" style="width:500px;height:90px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-aaf114510fc41ae4c500">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Parent screening\" -> \"Obtaining TPs\" -> \"TP screening\" -> \"Linking parent/TPs\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <ul>
 <li><strong>Parent screening</strong> During this step a common <code>patRoon</code> workflow is used to screen for the parent chemicals of interest. This could be a full non-target analysis with compound annotation or a relative simple suspect or target screening.</li>
 <li><strong>Obtaining TPs</strong> Data is obtained of potential TPs for the parents of interest. The TPs may originate from a library or predicted <em>in-silico</em>. Note that in some workflows this step is omitted (discussed later).</li>

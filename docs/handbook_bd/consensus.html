@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.6 Algorithm consensus | patRoon handbook</title>
   <meta name="description" content="8.6 Algorithm consensus | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.28 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.6 Algorithm consensus | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-09-10" />
+<meta name="date" content="2022-09-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -273,7 +273,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
 <li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
@@ -384,20 +384,20 @@ div.csl-indent {
 <p>Note that current support for generating a consensus between <code>components</code> objects is very simplistic; here results are not compared, but the consensus simply consists a combination of all the components from each object.</p>
 <p>Generating a consensus for feature groups involves first generating a <code>featureGroupsComparison</code> object. This step is necessary since (small) deviations between retention times and/or mass values reported by different feature finding/grouping algorithms complicates a direct comparison. The comparison objects are made by the <code>comparison()</code> function, and its results can be visualized by the plotting functions discussed <a href="visualization.html#visComp">in the previous chapter</a>.</p>
 <p>Some examples are shown below</p>
-<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="consensus.html#cb240-1" aria-hidden="true" tabindex="-1"></a>compoundsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(compoundsMF, compoundsSIR) <span class="co"># combine MetFrag/SIRIUS results</span></span>
-<span id="cb240-2"><a href="consensus.html#cb240-2" aria-hidden="true" tabindex="-1"></a>compoundsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(compoundsMF, compoundsSIR,</span>
-<span id="cb240-3"><a href="consensus.html#cb240-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">compThreshold =</span> <span class="dv">1</span>) <span class="co"># only keep results that overlap</span></span>
-<span id="cb240-4"><a href="consensus.html#cb240-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb240-5"><a href="consensus.html#cb240-5" aria-hidden="true" tabindex="-1"></a>TPsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(TPsLib, TPsBT) <span class="co"># combine library and BioTransformer TPs</span></span>
-<span id="cb240-6"><a href="consensus.html#cb240-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb240-7"><a href="consensus.html#cb240-7" aria-hidden="true" tabindex="-1"></a>fGroupComp <span class="ot">&lt;-</span> <span class="fu">comparison</span>(fGroupsXCMS, fGroupsOpenMS, fGroupsEnviPick,</span>
-<span id="cb240-8"><a href="consensus.html#cb240-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb240-9"><a href="consensus.html#cb240-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroupComp) <span class="co"># visualize overlap/uniqueness</span></span>
-<span id="cb240-10"><a href="consensus.html#cb240-10" aria-hidden="true" tabindex="-1"></a>fGroupsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(fGroupComp,</span>
-<span id="cb240-11"><a href="consensus.html#cb240-11" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueFrom =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="co"># only keep results unique in OpenMS+XCMS</span></span>
-<span id="cb240-12"><a href="consensus.html#cb240-12" aria-hidden="true" tabindex="-1"></a>fGroupsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(fGroupComp,</span>
-<span id="cb240-13"><a href="consensus.html#cb240-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueFrom =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
-<span id="cb240-14"><a href="consensus.html#cb240-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueOuter =</span> <span class="cn">TRUE</span>) <span class="co"># as above, but also exclude any overlap between OpenMS/XCMS</span></span></code></pre></div>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="consensus.html#cb241-1" aria-hidden="true" tabindex="-1"></a>compoundsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(compoundsMF, compoundsSIR) <span class="co"># combine MetFrag/SIRIUS results</span></span>
+<span id="cb241-2"><a href="consensus.html#cb241-2" aria-hidden="true" tabindex="-1"></a>compoundsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(compoundsMF, compoundsSIR,</span>
+<span id="cb241-3"><a href="consensus.html#cb241-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">compThreshold =</span> <span class="dv">1</span>) <span class="co"># only keep results that overlap</span></span>
+<span id="cb241-4"><a href="consensus.html#cb241-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb241-5"><a href="consensus.html#cb241-5" aria-hidden="true" tabindex="-1"></a>TPsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(TPsLib, TPsBT) <span class="co"># combine library and BioTransformer TPs</span></span>
+<span id="cb241-6"><a href="consensus.html#cb241-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb241-7"><a href="consensus.html#cb241-7" aria-hidden="true" tabindex="-1"></a>fGroupComp <span class="ot">&lt;-</span> <span class="fu">comparison</span>(fGroupsXCMS, fGroupsOpenMS, fGroupsEnviPick,</span>
+<span id="cb241-8"><a href="consensus.html#cb241-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb241-9"><a href="consensus.html#cb241-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroupComp) <span class="co"># visualize overlap/uniqueness</span></span>
+<span id="cb241-10"><a href="consensus.html#cb241-10" aria-hidden="true" tabindex="-1"></a>fGroupsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(fGroupComp,</span>
+<span id="cb241-11"><a href="consensus.html#cb241-11" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueFrom =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="co"># only keep results unique in OpenMS+XCMS</span></span>
+<span id="cb241-12"><a href="consensus.html#cb241-12" aria-hidden="true" tabindex="-1"></a>fGroupsCons <span class="ot">&lt;-</span> <span class="fu">consensus</span>(fGroupComp,</span>
+<span id="cb241-13"><a href="consensus.html#cb241-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueFrom =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb241-14"><a href="consensus.html#cb241-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">uniqueOuter =</span> <span class="cn">TRUE</span>) <span class="co"># as above, but also exclude any overlap between OpenMS/XCMS</span></span></code></pre></div>
 </div>
             </section>
 

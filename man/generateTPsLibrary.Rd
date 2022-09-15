@@ -11,6 +11,7 @@ generateTPsLibrary(
   skipInvalid = TRUE,
   prefCalcChemProps = TRUE,
   matchParentsBy = "InChIKey",
+  matchGenerationsBy = "InChIKey",
   calcSims = FALSE,
   fpType = "extended",
   fpSimMethod = "tanimoto"
@@ -42,6 +43,9 @@ more details.}
 library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
 \code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
 the first is considered.}
+
+\item{matchGenerationsBy}{Similar to \code{matchParentsBy}, but specifies how parents/TPs are matched when
+\code{generations>1}.}
 
 \item{calcSims}{If set to \code{TRUE} then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the \link[=filter,transformationProductsStructure-method]{filter

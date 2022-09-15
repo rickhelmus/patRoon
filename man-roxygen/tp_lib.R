@@ -5,6 +5,8 @@
 #'   library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
 #'   \code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
 #'   the first is considered.
+#' @param matchGenerationsBy Similar to \code{matchParentsBy}, but specifies how parents/TPs are matched when
+#'   \code{generations>1}.
 #'
 #' @section TP libraries: The \code{TPLibrary} argument is used to specify a custom TP library. This should be a
 #'   \code{data.frame} where each row specifies a TP for a parent, with the following columns: \itemize{

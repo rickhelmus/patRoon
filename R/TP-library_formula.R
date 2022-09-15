@@ -28,16 +28,22 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'   \code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
 #'   the library are obtained.
 #' @param TPLibrary A \code{data.frame}. See the details below.
-#' 
+#'
 #' @templateVar id formula
 #' @template tp_lib
-#' 
+#'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
-#' 
+#'
 #' @inheritParams generateTPsLibrary
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.
+#'
+#' @note Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchParentsBy} and
+#'   \code{matchGenerationsBy} arguments to \code{"name"}. While matching by \code{formula} is also possible, it is
+#'   likely that duplicate parent formulae (\emph{i.e.} isomers) are present in \code{parents} and/or \code{TPLibrary},
+#'   making matching by formula unsuitable. However, if you are sure that no duplicate formulae are present, it may be
+#'   better to set the matching method to \code{"formula"}.
 #'
 #' @seealso \code{\link{generateTPsLibrary}} to generate TPs from a library that contains structural information.
 #'

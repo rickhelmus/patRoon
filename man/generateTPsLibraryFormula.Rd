@@ -10,7 +10,8 @@ generateTPsLibraryFormula(
   generations = 1,
   skipInvalid = TRUE,
   prefCalcChemProps = TRUE,
-  matchParentsBy = "formula"
+  matchParentsBy = "name",
+  matchGenerationsBy = "name"
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ more details.}
 library. Valid options are: \code{"InChIKey"}, \code{"InChIKey1"}, \code{"InChI"}, \code{"SMILES"},
 \code{"formula"}, \code{"name"}. If the parent from the TP library is matched with multiple input parents then only
 the first is considered.}
+
+\item{matchGenerationsBy}{Similar to \code{matchParentsBy}, but specifies how parents/TPs are matched when
+\code{generations>1}.}
 }
 \value{
 The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.
@@ -50,6 +54,13 @@ This function uses a library to obtain transformation products. This function is
 
 This function is similar to \code{\link{generateTPsLibrary}}, however, it only require formula information
   of the parent and TPs.
+}
+\note{
+Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchParentsBy} and
+  \code{matchGenerationsBy} arguments to \code{"name"}. While matching by \code{formula} is also possible, it is
+  likely that duplicate parent formulae (\emph{i.e.} isomers) are present in \code{parents} and/or \code{TPLibrary},
+  making matching by formula unsuitable. However, if you are sure that no duplicate formulae are present, it may be
+  better to set the matching method to \code{"formula"}.
 }
 \section{TP libraries}{
  The \code{TPLibrary} argument is used to specify a custom TP library. This should be a

@@ -20,6 +20,8 @@
 
 ## TPs
 
+- TP library formula
+    - handle retDir for generate libs
 - Reporting
     - Split formulaDiff like plotGraph()?
 - newProject()

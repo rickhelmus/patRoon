@@ -96,7 +96,8 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
 #' Automatically generate a transformation product library with formula data.
 #'
 #' Functionality to automatically generate a TP library with formula data from a set of transformation rules, which can
-#' be used with \code{\link{generateTPsLibraryFormula}}.
+#' be used with \code{\link{generateTPsLibraryFormula}}. TP calculation will be skipped if the transformation involves
+#' subtraction of elements not present in the parent.
 #'
 #' @param parents The parents to which the given transformation rules should be used to generate the TP library. Should
 #'   be either a suspect list (see \link[=suspect-screening]{suspect screening} for more information) or the resulting
@@ -108,7 +109,7 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
 #' @param skipInvalid Set to \code{TRUE} to skip parents without formula information. Otherwise an error is thrown.
 #'
 #' @template tp_trans
-#' 
+#'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
 #'

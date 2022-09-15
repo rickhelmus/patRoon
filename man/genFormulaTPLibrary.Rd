@@ -40,7 +40,8 @@ A \code{data.table} that is suitable for the \code{TPLibrary} argument to
 }
 \description{
 Functionality to automatically generate a TP library with formula data from a set of transformation rules, which can
-be used with \code{\link{generateTPsLibraryFormula}}.
+be used with \code{\link{generateTPsLibraryFormula}}. TP calculation will be skipped if the transformation involves
+subtraction of elements not present in the parent.
 }
 \section{Transformation reactions}{
  The \code{transformations} argument specifies custom rules to calculate

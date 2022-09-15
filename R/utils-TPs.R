@@ -1,4 +1,4 @@
-getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkSMILES = TRUE)
+getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkWhat = "SMILES")
 {
     if (is.data.frame(parents))
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
@@ -25,18 +25,17 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkSMILES = 
         parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
     
-    if (checkSMILES)
+    if (is.null(parents[[checkWhat]]))
+        stop(sprintf("No %s information available for parents. Please include either %s columns.", checkWhat,
+                     if (checkWhat == "formula") "formula or SMILES/InChI" else "SMILES or InChI"), call. = FALSE)
+    
+    noData <- is.na(parents[[checkWhat]]) | !nzchar(parents[[checkWhat]])
+    if (any(noData))
     {
-        if (is.null(parents[["SMILES"]]))
-            stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")
-        
-        noSM <- is.na(parents$SMILES) | !nzchar(parents$SMILES)
-        if (any(noSM))
-        {
-            do.call(if (skipInvalid) warning else stop,
-                    list("The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ",")))
-            parents <- parents[!noSM]
-        }
+        do.call(if (skipInvalid) warning else stop,
+                list(sprintf("The following parents miss mandatory %s: %s", checkWhat,
+                             paste0(parents$name[noData], collapse = ","))))
+        parents <- parents[!noData]
     }
     
     return(parents)

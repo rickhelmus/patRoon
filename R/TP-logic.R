@@ -87,33 +87,12 @@ setMethod("linkParentsToFGroups", "transformationProductsLogic", function(TPs, f
 #' @param fGroups A \code{\link{featureGroups}} object for which TPs should be calculated.
 #' @param minMass A \code{numeric} that specifies the minimum mass of calculated TPs. If below this mass it will be
 #'   removed.
-#' @param transformations A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
-#'   details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).
-#'
+#'   
 #' @template adduct-arg
 #'
+#' @template tp_trans
+#'
 #' @inherit generateTPs return
-#'
-#' @section Custom transformations: The \code{transformations} argument to \code{generateTPsLogic} is used to specify
-#'   custom rules to calculate transformation products. This should be a \code{data.frame} with the following columns:
-#'   \itemize{
-#'
-#'   \item \code{transformation} The name of the chemical transformation
-#'
-#'   \item \code{add} The elements that are added by this reaction (\emph{e.g.} \code{"O"}).
-#'
-#'   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
-#'
-#'   \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
-#'   separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
-#'   (no significant change or unknown).
-#'
-#'   }
-#'
-#' @section Source: The algorithm of \code{generateTPsLogic} is directly based on the work done by Schollee \emph{et
-#'   al.} (see references).
-#'
-#' @references \insertRef{Scholle2015}{patRoon}
 #'
 #' @templateVar what generateTPsLogic
 #' @template main-rd-method

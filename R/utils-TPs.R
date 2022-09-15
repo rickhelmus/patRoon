@@ -231,12 +231,6 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, match
     {
         for (gen in seq(2, generations))
         {
-            if (matchGenerationsBy == "InChIKey1")
-            {
-                TPLibrary <- copy(TPLibrary)
-                TPLibrary[, InChIKey1 := getIKBlock1(InChIKey)]
-            }
-            
             results <- Map(results, names(results), f = function(r, pn)
             {
                 tps <- r[generation == (gen-1)]

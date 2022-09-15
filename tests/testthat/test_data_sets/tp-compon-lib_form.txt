@@ -1,1 +1,1 @@
-A componentsTPs objectHierarchy:components    |-- componentsTPs---Algorithm: tpComponents:  (0 total)Number of unique feature groups in this object: 0Size of components: 0 (total), 0.0 (mean), 0 - 0 (min - max)
+A componentsTPs objectHierarchy:components    |-- componentsTPs---Algorithm: tpComponents: CMP1 (1 total)Number of unique feature groups in this object: 1Size of components: 1 (total), 1.0 (mean), 1 - 1 (min - max)

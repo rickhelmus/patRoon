@@ -187,6 +187,19 @@ test_that("basic usage", {
     testMFDB(TPsCTSComp)
 })
 
+TPFormLib <- genFormulaTPLibrary(patRoonData::suspectsPos)
+TPFormLibG2 <- genFormulaTPLibrary(patRoonData::suspectsPos, generations = 2)
+test_that("genFormulaTPLibrary works", {
+    checkmate::expect_data_table(TPFormLib, any.missing = FALSE)
+    checkmate::expect_names(names(TPFormLib), must.include = c("parent_name", "parent_formula", "parent_neutralMass",
+                                                               "TP_name", "TP_formula", "TP_neutralMass"))
+    expect_gt(nrow(TPFormLibG2), nrow(TPFormLib))
+    expect_setequal(TPFormLibG2$generation, c(1, 2))
+    checkmate::expect_subset(TPFormLibG2[generation == 2]$parent_name, TPFormLibG2[generation == 1]$TP_name)
+    
+    expect_length(generateTPs("library_formula", TPLibrary = TPFormLib), nrow(TPFormLib))
+})
+
 TPsCons <- consensus(TPsLibScr, TPsBTScr)
 collapsedTPLen <- function(TPs) sum(sapply(products(TPs), function(x) uniqueN(x$InChIKey)))
 test_that("consensus works", {

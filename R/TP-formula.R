@@ -12,7 +12,7 @@ NULL
 #' store their results. The methods defined for this class extend the functionality for the base
 #' \code{\link{transformationProducts}} class.
 #'
-#' @param obj,TPs \code{transformationProductsFormula} derived object to be accessed
+#' @param obj \code{transformationProductsFormula} derived object to be accessed
 #'
 #' @seealso The base class \code{\link{transformationProducts}} for more relevant methods and \code{\link{generateTPs}}
 #'

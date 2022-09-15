@@ -16,7 +16,7 @@ generateTPsLibraryFormula(
 }
 \arguments{
 \item{parents}{The parents for which transformation products should be obtained. This should be either a suspect list
-(see \link[=suspect-screening]{suspect screening} for more information) or the resulting output
+(see \link[=suspect-screening]{suspect screening} for more information) or the resulting output of
 \code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
 the library are obtained.}
 
@@ -116,4 +116,6 @@ Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchP
 \code{\link{generateTPs}} for more details and other algorithms.
 
 \code{\link{generateTPsLibrary}} to generate TPs from a library that contains structural information.
+
+\code{\link{genFormulaTPLibrary}} to automatically generate formula TP libraries.
 }

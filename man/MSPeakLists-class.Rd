@@ -181,6 +181,10 @@ information (retention and \emph{m/z} values).}
 \item{averaged}{If \code{TRUE} then feature group averaged peak list data is
 used.}
 
+\item{k}{A vector with analyses (\code{character} with names or \code{integer} with indices) for which the data
+should be deleted. If \code{k!=NULL} then deletions will \emph{not} occur on group averaged peak lists. Otherwise,
+if \code{k=NULL} then deltion occurs on \emph{both} group averaged and analysis specific peak lists.}
+
 \item{absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr}{Absolute/relative intensity threshold for MS or MS/MS peak
 lists. \code{NULL} for none.}
 

@@ -18,7 +18,7 @@
 )
 }
 \arguments{
-\item{obj, TPs}{\code{transformationProductsFormula} derived object to be accessed}
+\item{obj}{\code{transformationProductsFormula} derived object to be accessed}
 
 \item{which}{Either a \code{character} or \code{integer} vector with one or more names/indices of the parents to
 plot.}

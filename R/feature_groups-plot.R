@@ -5,6 +5,7 @@ NULL
 #'
 #' Various plotting functions for feature group data.
 #'
+#' @param obj,x \code{featureGroups} object to be used for plotting.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
 #'   if \code{pch=NULL} then values are automatically assigned.

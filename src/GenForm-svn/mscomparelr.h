@@ -40,4 +40,17 @@ double CompareLeastSquares(
 	const LrMassIntensMap& mapObserved,
 	const LrMassIntensMap& mapTheoretical);
 
+double SimilarityWeightedCosine(
+	const LrMassIntensMap& mapObserved,
+	const LrMassIntensMap& mapTheoretical,
+	double dWeightMass = 1.0,
+	double dWeightIntens = 0.5);
+
+double SimilarityComposite(
+	const LrMassIntensMap& mapObserved,
+	const LrMassIntensMap& mapTheoretical,
+	double dWeightMass = 1.0,
+	double dWeightIntens = 0.5);
+
+
 #endif

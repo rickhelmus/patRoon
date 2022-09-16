@@ -11,6 +11,13 @@
  *  GNU General Public License for more details.
 */
 
+/*
+* Author	Date		Changes
+* -----------------------------
+* Markus	11.09.2022	add this change history,
+*                       introduced option max as proposed by Rick (max.patch)
+*/
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -58,7 +65,7 @@ void GenFormMatchIsotopeMsMsUsage(const string& strProgName)
 	cerr << "\t[wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=<number>] [oei]\n";
 	cerr << "\t[dbeexc=<number>] [ivsm2mv=<number>] [vsm2ap2=<number>]\n";
 	cerr << "\t[oms[=<filename>]] [omsms[=<filename>]] [oclean[=<filename>]]\n";
-	cerr << "\t[analyze [loss] [intens]] [dbe] [cm] [pc] [sc] [max=<number>]\n";
+	cerr << "\t[analyze [loss] [intens]] [dbe] [cm] [pc] [sc] [max]\n";
 	cerr << "Explanation:\n";
 //5.1
 	cerr << "\tms\t: filename of MS data (*.txt)\n";
@@ -110,7 +117,7 @@ void GenFormMatchIsotopeMsMsUsage(const string& strProgName)
 	cerr << "\tsc\t: strip calculated isotope distributions\n";
 //new
 	cerr << "\tnoref\t: hide the reference information\n";
-	cerr << "\tmax\t: maximum number of final candidates (0 is no limit)\n";
+    cerr << "\tmax\t: maximum number of final candidates (0 is no limit)\n";
 }
 
 int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArgValue)
@@ -142,7 +149,7 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 	enum SortMethod { SortPpm, SortMsMv, SortMsMsMv, SortCombMv, SortUndefined };
 	const char* pSortValue[SortUndefined]={"ppm","msmv","msmsmv","combmv"};
 	unsigned int iSortMethod=SortUndefined;
-	unsigned int iMaxFinal = 0; // Added by Rick Helmus
+    unsigned int iMaxFinal = 0;
 	 
 	if((it=mapArgValue.find("m"))!=mapArgValue.end())
 	{ dMass=atof(it->second.c_str()); mapArgValue.erase(it); }
@@ -287,7 +294,6 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 		mapArgValue.erase(it); 
 	}
 	
-	// Added by Rick Helmus
 	if((it=mapArgValue.find("max"))!=mapArgValue.end())
 	{ iMaxFinal=atoi(it->second.c_str()); mapArgValue.erase(it); }
 	
@@ -417,8 +423,6 @@ int GenFormMatchIsotopeMsMs(const string& strProgName,map<string,string>& mapArg
 
 	GenFormByMassAlgo<double> BFBMA(EIM,dMinMass,dMaxMass);
 
-	// Modified by Rick Helmus
-	//for(BFBMA.begin();!BFBMA.end();BFBMA.operator++())
 	for(BFBMA.begin();!BFBMA.end()&&(iMaxFinal==0 || iCombCount<iMaxFinal);BFBMA.operator++())
 	{
 		ElementMultMap emmIon,emmMol;

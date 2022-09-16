@@ -119,8 +119,13 @@
 <code><a href="../reference/generics.html">delete()</a></code> function for MS peak lists</li>
 <li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/reporting.html">reportHTML()</a></code> is effective again</li>
 <li>Fixed: blank filter didn’t properly handle differing blank assignments per analysis</li>
-<li>
-<code>generateTPsLibrary</code>: the <code>matchParentsBy</code> argument now also accepts <code>"formula"</code> and <code>"name"</code>.</li>
+<li>TPs
+<ul><li>
+<code><a href="../reference/generateTPsLibrary.html">generateTPsLibrary()</a></code>: the <code>matchParentsBy</code> argument now also accepts <code>"formula"</code> and <code>"name"</code>.</li>
+<li>TP libraries may contain a <code>retDir</code> column that specifies the retention time direction of the TP compared to its parent (alternative to specifying <code>log P</code> values).</li>
+<li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
+<li>New argument <code>matchGenerationsBy</code> to the <code>library</code> (and <code>library_formula</code>) algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>, which controls how parents/TPs are matched when searching multiple transformation generations.</li>
+</ul></li>
 </ul></div>
 </div>
     <div class="section level2">

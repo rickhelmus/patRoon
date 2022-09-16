@@ -88,6 +88,10 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
 
   \item \code{parent_SMILES} and \code{TP_SMILES} The SMILES of the parent/TP structure.
 
+  \item \code{retDir} The retention direction of the TP compared to its parent: \samp{-1} (elutes before), \samp{1}
+  (elutes after) or \samp{0} (elutes similarly or unknown). If not specified then the \code{log P} values below may
+  be used to calculate the retention time directions. (\strong{optional})
+
   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
 
   \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}

@@ -152,12 +152,12 @@ genFormulaTPLibrary <- function(parents, transformations = NULL, minMass = 40, g
                                   return(subtractFormula(addFormula(parForm, a), s))
                               }),
                               TP_neutralMass = parMass + transformations$deltaMZ,
-                              generation = gen)
+                              generation = gen,
+                              retDir = transformations$retDir)
             return(tab[TP_neutralMass >= minMass & sapply(TP_formula, function(f) min(splitFormulaToList(f)) > 0)])
         }))
     }
     
-    # UNDONE: handle retDir?
     ret <- genLibItems(parents$name, parents$formula, parents$neutralMass, 1)
     
     if (generations > 1)

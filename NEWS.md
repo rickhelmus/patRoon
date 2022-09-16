@@ -22,7 +22,9 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - `delete()` function for MS peak lists
 - Fixed: `EICOnlyPresent` argument to `reportHTML()` is effective again
 - Fixed: blank filter didn't properly handle differing blank assignments per analysis
-- `generateTPsLibrary`: the `matchParentsBy` argument now also accepts `"formula"` and `"name"`.
+- TPs
+    - `generateTPsLibrary`: the `matchParentsBy` argument now also accepts `"formula"` and `"name"`.
+    - TP libraries may contain a `retDir` column that specifies the retention time direction of the TP compared to its parent (alternative to specifying `log P` values).
 
 
 # patRoon 2.1

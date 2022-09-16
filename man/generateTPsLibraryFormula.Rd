@@ -70,6 +70,10 @@ Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchP
 
   \item \code{parent_formula} and \code{TP_formula} The formula of the parent/TP structure.
 
+  \item \code{retDir} The retention direction of the TP compared to its parent: \samp{-1} (elutes before), \samp{1}
+  (elutes after) or \samp{0} (elutes similarly or unknown). If not specified then the \code{log P} values below may
+  be used to calculate the retention time directions. (\strong{optional})
+
   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
 
   \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}

@@ -250,7 +250,12 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, match
         set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
     })
     
-    if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
+    if (!is.null(TPLibrary[["retDir"]]))
+    {
+        results <- Map(results, TPLibrary[match(names(results), parent_name)]$retDir,
+                       f = data.table::set, MoreArgs = list(i = NULL, j = "retDir"))
+    }
+    else if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
     {
         results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
                        f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))

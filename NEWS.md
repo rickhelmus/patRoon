@@ -27,6 +27,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - TP libraries may contain a `retDir` column that specifies the retention time direction of the TP compared to its parent (alternative to specifying `log P` values).
     - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
     - New argument `matchGenerationsBy` to the `library` (and `library_formula`) algorithm for `generateTPs()`, which controls how parents/TPs are matched when searching multiple transformation generations.
+    - Fixed: `reportHTML()` could show MS/MS similarity plots of wrong feature groups
     
 
 

@@ -663,13 +663,15 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 {
                     # calculate per set spectrum similarities
                     simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
-                    grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
+                    # NOTE: do _not_ use intersect below, since we want to keep duplicate group names (ie if multiple
+                    # TPs are assigned to a same feat group) so that similarities are are returned for all.
+                    grpsInSet <- cmp$group[cmp$group %in% groupNames(unsetMSPeakLists[[s]])]
                     
                     if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[parentFG]][["MSMS"]]))
                     {
                         sims <- genTPSpecSimilarities(unsetMSPeakLists[[s]], parentFG, grpsInSet,
                                                       specSimParams = specSimParams)
-                        cmp[match(grpsInSet, group), (simColNames) := sims]
+                        cmp[group %in% grpsInSet, (simColNames) := sims]
                     }
                     else
                         cmp[, (simColNames) := NA_real_]

@@ -14,6 +14,10 @@
   elements = "CHNOP",
   hetero = TRUE,
   oc = FALSE,
+  thrMS = NULL,
+  thrMSMS = NULL,
+  thrComb = NULL,
+  maxCandidates = Inf,
   extraOpts = NULL,
   calculateFeatures = TRUE,
   featThreshold = 0,
@@ -61,6 +65,16 @@ command line option.}
 
 \item{oc}{Only consider organic formulae (\emph{i.e.} with at least one carbon atom). Sets the \option{oc}
 commandline option.}
+
+\item{thrMS, thrMSMS, thrComb}{Sets the thresholds for the \command{GenForm} MS score (\code{isoScore}), MS/MS score
+(\code{MSMSScore}) and combined score (\code{combMatch}). Sets the \option{thms}/\option{thmsms}/\option{thcomb}
+command line options, respectively. Set to \code{NULL} for no threshold.}
+
+\item{maxCandidates}{If this number of candidates are found then \command{GenForm} aborts any further formula
+calculations. The number of candidates is determined \emph{after} any formula filters, hence, the properties and
+'quality' of the candidates is influenced by options such as \code{oc} and \code{thrMS} arguments. Note that this
+is different than \code{topMost}, which selects the candidates after \command{GenForm} finished. Sets the
+\option{max} command line option. Set to \samp{0} or \code{Inf} for no maximum.}
 
 \item{extraOpts}{An optional character vector with any other command line options that will be passed to
 \command{GenForm}. See the \verb{GenForm options} section for all available command line options.}

@@ -271,6 +271,14 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @param hetero Only consider formulae with at least one hetero atom. Sets the \option{het} commandline option.
 #' @param oc Only consider organic formulae (\emph{i.e.} with at least one carbon atom). Sets the \option{oc}
 #'   commandline option.
+#' @param thrMS,thrMSMS,thrComb Sets the thresholds for the \command{GenForm} MS score (\code{isoScore}), MS/MS score
+#'   (\code{MSMSScore}) and combined score (\code{combMatch}). Sets the \option{thms}/\option{thmsms}/\option{thcomb}
+#'   command line options, respectively. Set to \code{NULL} for no threshold.
+#' @param maxCandidates If this number of candidates are found then \command{GenForm} aborts any further formula
+#'   calculations. The number of candidates is determined \emph{after} any formula filters, hence, the properties and
+#'   'quality' of the candidates is influenced by options such as \code{oc} and \code{thrMS} arguments. Note that this
+#'   is different than \code{topMost}, which selects the candidates after \command{GenForm} finished. Sets the
+#'   \option{max} command line option. Set to \samp{0} or \code{Inf} for no maximum.
 #' @param extraOpts An optional character vector with any other command line options that will be passed to
 #'   \command{GenForm}. See the \verb{GenForm options} section for all available command line options.
 #' @param MSMode Whether formulae should be generated only from MS data (\code{"ms"}), MS/MS data (\code{"msms"}) or
@@ -325,18 +333,25 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @template main-rd-method
 #' @export
 setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                                               elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
+                                                               elements = "CHNOP", hetero = TRUE, oc = FALSE,
+                                                               thrMS = NULL, thrMSMS = NULL, thrComb = NULL,
+                                                               maxCandidates = Inf, extraOpts = NULL,
                                                                calculateFeatures = TRUE, featThreshold = 0,
                                                                featThresholdAnn = 0.75, absAlignMzDev = 0.002,
                                                                MSMode = "both", isolatePrec = TRUE, timeout = 120,
                                                                topMost = 50, batchSize = 8)
 {
+    if (is.infinite(maxCandidates))
+        maxCandidates <- 0
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ thrMS + thrMSMS + thrComb, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(maxCandidates, add = ac)
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
            fixed = list(add = ac))
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
@@ -371,8 +386,14 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                   "cm",
                   sprintf("ppm=%f", relMzDev),
                   sprintf("el=%s", elements),
+                  sprintf("max=%d", maxCandidates),
                   extraOpts)
-    
+    if (!is.null(thrMS))
+        mainArgs <- c(mainArgs, sprintf("thms=%f", thrMS))
+    if (!is.null(thrMSMS))
+        mainArgs <- c(mainArgs, sprintf("thmsms=%f", thrMSMS))
+    if (!is.null(thrComb))
+        mainArgs <- c(mainArgs, sprintf("thcomb=%f", thrComb))
     if (hetero)
         mainArgs <- c(mainArgs, "het")
     if (oc)

@@ -8,7 +8,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
 - Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
-- SIRUS:
+- SIRUS
     - Fixed: Features with data offsets are now properly loaded.
     - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
     - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
@@ -28,6 +28,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
     - New argument `matchGenerationsBy` to the `library` (and `library_formula`) algorithm for `generateTPs()`, which controls how parents/TPs are matched when searching multiple transformation generations.
     - Fixed: `reportHTML()` could show MS/MS similarity plots of wrong feature groups
+- GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
     
 
 

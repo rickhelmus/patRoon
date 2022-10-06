@@ -8,6 +8,7 @@ generateTPsBioTransformer(
   parents,
   type = "env",
   generations = 2,
+  maxExpGenerations = generations + 2,
   extraOpts = NULL,
   skipInvalid = TRUE,
   prefCalcChemProps = TRUE,
@@ -28,6 +29,8 @@ suspect (hits) are used as parents, whereas in the latter case all candidates ar
 
 \item{generations}{The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
 More generations may be reported, see the \verb{Hierarchy expansion} section below.}
+
+\item{maxExpGenerations}{The maximum number of generations during hierarchy expansion, see below.}
 
 \item{extraOpts}{A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.}
 
@@ -114,7 +117,8 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
  TP3
   }
   
-  Note that this may result in pathways with more generations than defined by the \code{generations} argument.
+  Note that this may result in pathways with more generations than defined by the \code{generations} argument. Thus,
+  the \code{maxExpGenerations} argument is used to avoid excessive expansions.
 }
 
 \section{Validating and calculating chemical properties}{

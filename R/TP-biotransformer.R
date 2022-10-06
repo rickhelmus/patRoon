@@ -9,7 +9,7 @@ setMethod("initialize", "transformationProductsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash)
+getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash, maxExpGenerations)
 {
     mainArgs <- c("-b", type,
                   "-k", "pred",
@@ -18,7 +18,7 @@ getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash)
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", parent, ".txt"), parent = parent,
-                SMILES = SMILES, hash = makeHash(parent, SMILES, baseHash)))
+                SMILES = SMILES, maxExpGenerations = maxExpGenerations, hash = makeHash(parent, SMILES, baseHash)))
 }
 
 BTMPFinishHandler <- function(cmd)
@@ -42,10 +42,11 @@ BTMPFinishHandler <- function(cmd)
     
     # BT only specifies to which chemical structure a TP is, not if it the parent came from a specific route. For now
     # assume the TP could be from any of the parents.
-    # UNDONE: take steps/generation into account? This expansion may lead to TPs with generation>steps.
     curTPID <- 0
     processChilds <- function(parID, parChemID, generation)
     {
+        if (generation > cmd$maxExpGenerations)
+            return(data.table())
         resSub <- copy(results[parent_chem_ID == parChemID])
         resSub[, c("ID", "parent_ID", "generation") := .(curTPID + seq_len(nrow(resSub)), parID, generation)]
         curTPID <<- curTPID + nrow(resSub)
@@ -114,6 +115,7 @@ BTMPPrepareHandler <- function(cmd)
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
 #' @param generations The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
 #'   More generations may be reported, see the \verb{Hierarchy expansion} section below.
+#' @param maxExpGenerations The maximum number of generations during hierarchy expansion, see below.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
 #' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
@@ -157,7 +159,8 @@ BTMPPrepareHandler <- function(cmd)
 #'  TP3
 #'   }
 #'   
-#'   Note that this may result in pathways with more generations than defined by the \code{generations} argument.
+#'   Note that this may result in pathways with more generations than defined by the \code{generations} argument. Thus,
+#'   the \code{maxExpGenerations} argument is used to avoid excessive expansions.
 #'
 #' @template tp_gen-scr
 #' @template tp_gen-sim
@@ -172,8 +175,8 @@ BTMPPrepareHandler <- function(cmd)
 #' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
 #'
 #' @export
-generateTPsBioTransformer <- function(parents, type = "env", generations = 2, extraOpts = NULL,
-                                      skipInvalid = TRUE, prefCalcChemProps = TRUE, calcSims = FALSE,
+generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = generations + 2,
+                                      extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE, calcSims = FALSE,
                                       fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)
 {
     checkmate::assert(
@@ -189,6 +192,7 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ex
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
+    checkmate::assertCount(maxExpGenerations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims + MP, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
@@ -196,11 +200,12 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ex
 
     parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
 
-    baseHash <- makeHash(type, generations, extraOpts, skipInvalid, fpType, fpSimMethod)
+    baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,
-                    MoreArgs = list(type = type, generations = generations, extraOpts = extraOpts, baseHash = baseHash))
+                    MoreArgs = list(type = type, generations = generations, maxExpGenerations = maxExpGenerations,
+                                    extraOpts = extraOpts, baseHash = baseHash))
 
     results <- list()
 

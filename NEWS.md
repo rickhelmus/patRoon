@@ -29,6 +29,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - New argument `matchGenerationsBy` to the `library` (and `library_formula`) algorithm for `generateTPs()`, which controls how parents/TPs are matched when searching multiple transformation generations.
     - Fixed: `reportHTML()` could show MS/MS similarity plots of wrong feature groups
     - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
+    - Added `maxExpGenerations` argument to `generateTPsBiotransformer` to avoid excessive TP hierarchy expansions.
 - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
 - `as.data.table()` for `featureGroups`: added p values when `regression=TRUE`
 - `selectIons()` does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.

@@ -1030,7 +1030,10 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     prefAdduct <- as.character(checkAndToAdduct(prefAdduct))
     
     if (is.null(componentInfo(components)[["neutral_mass"]]))
-        stop("No adduct/isotope information available in given components!")
+    {
+        cat("No adduct/isotope information available in given components!\n")
+        return(fGroups)
+    }
     
     cTab <- as.data.table(components)
     cTab <- cTab[group %in% names(fGroups)]

@@ -31,6 +31,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
 - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
 - `as.data.table()` for `featureGroups`: added p values when `regression=TRUE`
+- `selectIons()` does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.
     
 
 

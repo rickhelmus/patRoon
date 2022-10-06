@@ -665,15 +665,20 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
-                ret[, c("RSQ", "intercept", "slope") := {
+                ret[, c("RSQ", "intercept", "slope", "p") := {
                     notna <- !is.na(conc)
                     if (!any(notna))
                         NA_real_
                     else
                     {
                         suppressWarnings(reg <- summary(lm(intensity[notna] ~ conc[notna])))
-                        slope <- if (nrow(reg[["coefficients"]]) > 1) reg[["coefficients"]][2, 1] else NA_real_
-                        list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope)
+                        slope <- pv <- NA_real_
+                        if (nrow(reg[["coefficients"]]) > 1)
+                        {
+                            slope <- reg[["coefficients"]][2, 1]
+                            pv <- reg[["coefficients"]][2, 4]
+                        }
+                        list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope, pv)
                     }
                 }, by = group]
                 ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
@@ -715,11 +720,11 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             notna <- !is.na(concs)
             notnaconcs <- concs[notna]
             regr <- lapply(gTable, function(grp) summary(lm(grp[notna] ~ notnaconcs)))
-
-            ret[!sapply(regr, is.null), c("RSQ", "intercept", "slope") :=
+            ret[!sapply(regr, is.null), c("RSQ", "intercept", "slope", "p") :=
                     .(sapply(regr, "[[", "r.squared"),
                       sapply(regr, function(r) r$coefficients[1, 1]),
-                      sapply(regr, function(r) r$coefficients[2, 1]))]
+                      sapply(regr, function(r) r$coefficients[2, 1]),
+                      sapply(regr, function(r) r$coefficients[2, 4]))]
         }
 
         if (!is.null(FCParams))

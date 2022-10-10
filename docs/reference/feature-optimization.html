@@ -95,38 +95,38 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">optimizeFeatureGrouping</span><span class="op">(</span>
-  <span class="va">features</span>,
-  <span class="va">algorithm</span>,
-  <span class="va">...</span>,
-  templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  paramRanges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  maxIterations <span class="op">=</span> <span class="fl">50</span>,
-  maxModelDeviation <span class="op">=</span> <span class="fl">0.1</span>,
-  parallel <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">generateFGroupsOptPSet</span><span class="op">(</span><span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">getDefFGroupsOptParamRanges</span><span class="op">(</span><span class="va">algorithm</span><span class="op">)</span>
-
-<span class="fu">optimizeFeatureFinding</span><span class="op">(</span>
-  <span class="va">anaInfo</span>,
-  <span class="va">algorithm</span>,
-  <span class="va">...</span>,
-  templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  paramRanges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  isoIdent <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">algorithm</span> <span class="op">==</span> <span class="st">"openms"</span><span class="op">)</span> <span class="st">"OpenMS"</span> <span class="kw">else</span> <span class="st">"IPO"</span>,
-  checkPeakShape <span class="op">=</span> <span class="st">"none"</span>,
-  CAMERAOpts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  maxIterations <span class="op">=</span> <span class="fl">50</span>,
-  maxModelDeviation <span class="op">=</span> <span class="fl">0.1</span>,
-  parallel <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">generateFeatureOptPSet</span><span class="op">(</span><span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">getDefFeaturesOptParamRanges</span><span class="op">(</span><span class="va">algorithm</span>, method <span class="op">=</span> <span class="st">"centWave"</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">optimizeFeatureGrouping</span><span class="op">(</span></span>
+<span>  <span class="va">features</span>,</span>
+<span>  <span class="va">algorithm</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  paramRanges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  maxIterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  maxModelDeviation <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">generateFGroupsOptPSet</span><span class="op">(</span><span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getDefFGroupsOptParamRanges</span><span class="op">(</span><span class="va">algorithm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">optimizeFeatureFinding</span><span class="op">(</span></span>
+<span>  <span class="va">anaInfo</span>,</span>
+<span>  <span class="va">algorithm</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  paramRanges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  isoIdent <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">algorithm</span> <span class="op">==</span> <span class="st">"openms"</span><span class="op">)</span> <span class="st">"OpenMS"</span> <span class="kw">else</span> <span class="st">"IPO"</span>,</span>
+<span>  checkPeakShape <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  CAMERAOpts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  maxIterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  maxModelDeviation <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">generateFeatureOptPSet</span><span class="op">(</span><span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getDefFeaturesOptParamRanges</span><span class="op">(</span><span class="va">algorithm</span>, method <span class="op">=</span> <span class="st">"centWave"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -312,40 +312,39 @@ paremeters more easily (see <code>examples</code>).</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># example data from patRoonData package</span>
-<span class="va">dataDir</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleDataPath</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="analysis-information.html">generateAnalysisInfo</a></span><span class="op">(</span><span class="va">dataDir</span><span class="op">)</span>
-<span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="va">anaInfo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="op">]</span> <span class="co"># only focus on first two analyses (e.g. training set)</span>
-
-<span class="co"># optimize mzPPM and chromFWHM parameters</span>
-<span class="va">ftOpt</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureFinding</span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mzPPM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, chromFWHM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># optimize chromFWHM and isotopeFilteringModel (a qualitative parameter)</span>
-<span class="va">ftOpt2</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureFinding</span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>,
-                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>isotopeFilteringModel <span class="op">=</span> <span class="st">"metabolites (5% RMS)"</span><span class="op">)</span>,
-                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>isotopeFilteringModel <span class="op">=</span> <span class="st">"metabolites (2% RMS)"</span><span class="op">)</span>,
-                                 templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>chromFWHM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># perform grouping optimization with optimized features object</span>
-<span class="va">fgOpt</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureGrouping</span><span class="op">(</span><span class="fu"><a href="optimizationResult-class.html">optimizedObject</a></span><span class="op">(</span><span class="va">ftOpt</span><span class="op">)</span>, <span class="st">"xcms"</span>,
-                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">28</span><span class="op">)</span><span class="op">)</span>,
-                                      retcorArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"obiwarp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># same, but using the XCMS3 interface</span>
-<span class="va">fgOpt2</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureGrouping</span><span class="op">(</span><span class="fu"><a href="optimizationResult-class.html">optimizedObject</a></span><span class="op">(</span><span class="va">ftOpt</span><span class="op">)</span>, <span class="st">"xcms3"</span>,
-                                  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>groupMethod <span class="op">=</span> <span class="st">"density"</span>, groupParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">28</span><span class="op">)</span><span class="op">)</span>,
-                                       retAlignMethod <span class="op">=</span> <span class="st">"obiwarp"</span><span class="op">)</span><span class="op">)</span>
-
-
-<span class="co"># plot contour of first parameter set/DoE iteration</span>
-<span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span><span class="va">ftOpt</span>, paramSet <span class="op">=</span> <span class="fl">1</span>, DoEIteration <span class="op">=</span> <span class="fl">1</span>, type <span class="op">=</span> <span class="st">"contour"</span><span class="op">)</span>
-
-<span class="co"># generate parameter set with some predefined and custom parameters to be</span>
-<span class="co"># optimized.</span>
-<span class="va">pSet</span> <span class="op">&lt;-</span> <span class="fu">generateFeatureOptPSet</span><span class="op">(</span><span class="st">"openms"</span>, chromSNR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">9</span><span class="op">)</span>,
-                               useSmoothedInts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># example data from patRoonData package</span></span>
+<span><span class="va">dataDir</span> <span class="op">&lt;-</span> <span class="fu">patRoonData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html" class="external-link">exampleDataPath</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="analysis-information.html">generateAnalysisInfo</a></span><span class="op">(</span><span class="va">dataDir</span><span class="op">)</span></span>
+<span><span class="va">anaInfo</span> <span class="op">&lt;-</span> <span class="va">anaInfo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="op">]</span> <span class="co"># only focus on first two analyses (e.g. training set)</span></span>
+<span></span>
+<span><span class="co"># optimize mzPPM and chromFWHM parameters</span></span>
+<span><span class="va">ftOpt</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureFinding</span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mzPPM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, chromFWHM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># optimize chromFWHM and isotopeFilteringModel (a qualitative parameter)</span></span>
+<span><span class="va">ftOpt2</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureFinding</span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>,</span>
+<span>                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>isotopeFilteringModel <span class="op">=</span> <span class="st">"metabolites (5% RMS)"</span><span class="op">)</span>,</span>
+<span>                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>isotopeFilteringModel <span class="op">=</span> <span class="st">"metabolites (2% RMS)"</span><span class="op">)</span>,</span>
+<span>                                 templateParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>chromFWHM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># perform grouping optimization with optimized features object</span></span>
+<span><span class="va">fgOpt</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureGrouping</span><span class="op">(</span><span class="fu"><a href="optimizationResult-class.html">optimizedObject</a></span><span class="op">(</span><span class="va">ftOpt</span><span class="op">)</span>, <span class="st">"xcms"</span>,</span>
+<span>                                 <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">28</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                      retcorArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"obiwarp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># same, but using the XCMS3 interface</span></span>
+<span><span class="va">fgOpt2</span> <span class="op">&lt;-</span> <span class="fu">optimizeFeatureGrouping</span><span class="op">(</span><span class="fu"><a href="optimizationResult-class.html">optimizedObject</a></span><span class="op">(</span><span class="va">ftOpt</span><span class="op">)</span>, <span class="st">"xcms3"</span>,</span>
+<span>                                  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>groupMethod <span class="op">=</span> <span class="st">"density"</span>, groupParams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">28</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                       retAlignMethod <span class="op">=</span> <span class="st">"obiwarp"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># plot contour of first parameter set/DoE iteration</span></span>
+<span><span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span><span class="va">ftOpt</span>, paramSet <span class="op">=</span> <span class="fl">1</span>, DoEIteration <span class="op">=</span> <span class="fl">1</span>, type <span class="op">=</span> <span class="st">"contour"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># generate parameter set with some predefined and custom parameters to be</span></span>
+<span><span class="co"># optimized.</span></span>
+<span><span class="va">pSet</span> <span class="op">&lt;-</span> <span class="fu">generateFeatureOptPSet</span><span class="op">(</span><span class="st">"openms"</span>, chromSNR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">9</span><span class="op">)</span>,</span>
+<span>                               useSmoothedInts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -359,7 +358,7 @@ paremeters more easily (see <code>examples</code>).</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

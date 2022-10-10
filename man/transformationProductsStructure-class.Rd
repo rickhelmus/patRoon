@@ -177,28 +177,28 @@ store their results. The methods defined for this class extend the functionality
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{convertToMFDB}: Exports this object as a \file{.csv} file that can be used as a \command{MetFrag} local
+\item \code{convertToMFDB(transformationProductsStructure)}: Exports this object as a \file{.csv} file that can be used as a \command{MetFrag} local
 database. Any duplicate TPs (formed by different pathways or parents) will be merged based on their
 \acronym{InChIKey}.
 
-\item \code{filter}: Performs rule-based filtering. Useful to simplify and clean-up the data.
+\item \code{filter(transformationProductsStructure)}: Performs rule-based filtering. Useful to simplify and clean-up the data.
 
-\item \code{plotGraph}: Plots an interactive hierarchy graph of the transformation products. The
+\item \code{plotGraph(transformationProductsStructure)}: Plots an interactive hierarchy graph of the transformation products. The
 resulting graph can be browsed interactively and allows exploration of the different TP formation pathways.
 Furthermore, results from \link[=generateComponentsTPs]{TP componentization} can be used to match the hierarchy
 with screening results. The graph is rendered with \pkg{\link{visNetwork}}.
 
-\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
+\item \code{plotVenn(transformationProductsStructure)}: plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
 candidates of up to five different \code{featureAnnotations} objects.
 
-\item \code{plotUpSet}: Plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function)
+\item \code{plotUpSet(transformationProductsStructure)}: Plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function)
 outlining unique and shared TPs between different \code{transformationProductsStructure} objects.
 
-\item \code{consensus}: Generates a consensus from different
+\item \code{consensus(transformationProductsStructure)}: Generates a consensus from different
 \code{transformationProductsStructure} objects. Currently this removes any hierarchical data, and all TPs are
 considered to originate from the same (original) parent.
-}}
 
+}}
 \note{
 \code{consensus}: If the \code{retDir} values differs between matched TPs it will be set to \samp{0}. If
   structure similarity data is available (\emph{i.e.} \code{calcSims=TRUE} to \code{generateTPs}) then the mean

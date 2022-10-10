@@ -321,9 +321,9 @@ order.</p></dd>
 their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 analyses as numeric index, logical or character, <code>j</code> the feature groups as numeric index, logical or character. If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the analyses of the features in the group to be removed (same format as <code>i</code>).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each feature group,
+with a vector of the group intensities, the group name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the analyses of the features in the group to be removed (same format as <code>i</code>).</p></dd>
 
 
 <dt>...</dt>
@@ -539,42 +539,42 @@ features across analyses.</p>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>names</code>: Obtain feature group names.</p></li>
-<li><p><code>analyses</code>: returns a <code>character</code> vector with the names of the
+<ul><li><p><code>names(featureGroups)</code>: Obtain feature group names.</p></li>
+<li><p><code>analyses(featureGroups)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>replicateGroups</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>replicateGroups(featureGroups)</code>: returns a <code>character</code> vector with the names of the
 replicate groups for which data is present in this object.</p></li>
-<li><p><code>groupNames</code>: Same as <code>names</code>. Provided for consistency to other classes.</p></li>
-<li><p><code>length</code>: Obtain number of feature groups.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>groupTable</code>: Accessor for <code>groups</code> slot.</p></li>
-<li><p><code>analysisInfo</code>: Obtain analysisInfo (see analysisInfo slot in <code><a href="features-class.html">features</a></code>).</p></li>
-<li><p><code>groupInfo</code>: Accessor for <code>groupInfo</code> slot.</p></li>
-<li><p><code>featureTable</code>: Obtain feature information (see <code><a href="features-class.html">features</a></code>).</p></li>
-<li><p><code>getFeatures</code>: Accessor for <code>features</code> slot.</p></li>
-<li><p><code>groupFeatIndex</code>: Accessor for <code>ftindex</code> slot.</p></li>
-<li><p><code>groupQualities</code>: Accessor for <code>groupQualities</code> slot.</p></li>
-<li><p><code>groupScores</code>: Accessor for <code>groupScores</code> slot.</p></li>
-<li><p><code>annotations</code>: Accessor for <code>annotations</code> slot.</p></li>
-<li><p><code>internalStandards</code>: Accessor for <code>ISTDs</code> slot.</p></li>
-<li><p><code>internalStandardAssignments</code>: Accessor for <code>ISTDAssignments</code> slot.</p></li>
-<li><p><code>adducts</code>: Returns a named <code>character</code> with adduct annotations assigned to each feature group (if
+<li><p><code>groupNames(featureGroups)</code>: Same as <code>names</code>. Provided for consistency to other classes.</p></li>
+<li><p><code>length(featureGroups)</code>: Obtain number of feature groups.</p></li>
+<li><p><code>show(featureGroups)</code>: Shows summary information for this object.</p></li>
+<li><p><code>groupTable(featureGroups)</code>: Accessor for <code>groups</code> slot.</p></li>
+<li><p><code>analysisInfo(featureGroups)</code>: Obtain analysisInfo (see analysisInfo slot in <code><a href="features-class.html">features</a></code>).</p></li>
+<li><p><code>groupInfo(featureGroups)</code>: Accessor for <code>groupInfo</code> slot.</p></li>
+<li><p><code>featureTable(featureGroups)</code>: Obtain feature information (see <code><a href="features-class.html">features</a></code>).</p></li>
+<li><p><code>getFeatures(featureGroups)</code>: Accessor for <code>features</code> slot.</p></li>
+<li><p><code>groupFeatIndex(featureGroups)</code>: Accessor for <code>ftindex</code> slot.</p></li>
+<li><p><code>groupQualities(featureGroups)</code>: Accessor for <code>groupQualities</code> slot.</p></li>
+<li><p><code>groupScores(featureGroups)</code>: Accessor for <code>groupScores</code> slot.</p></li>
+<li><p><code>annotations(featureGroups)</code>: Accessor for <code>annotations</code> slot.</p></li>
+<li><p><code>internalStandards(featureGroups)</code>: Accessor for <code>ISTDs</code> slot.</p></li>
+<li><p><code>internalStandardAssignments(featureGroups)</code>: Accessor for <code>ISTDAssignments</code> slot.</p></li>
+<li><p><code>adducts(featureGroups)</code>: Returns a named <code>character</code> with adduct annotations assigned to each feature group (if
 available).</p></li>
-<li><p><code>adducts&lt;-</code>: Sets adduct annotations for feature groups.</p></li>
-<li><p><code>[</code>: Subset on analyses/feature groups.</p></li>
-<li><p><code>[[</code>: Extract intensity values.</p></li>
+<li><p><code>adducts(featureGroups) &lt;- value</code>: Sets adduct annotations for feature groups.</p></li>
+<li><p><code>x[i</code>: Subset on analyses/feature groups.</p></li>
+<li><p><code>x[[i</code>: Extract intensity values.</p></li>
 <li><p><code>$</code>: Extract intensity values for a feature group.</p></li>
-<li><p><code>delete</code>: Completely deletes specified feature groups.</p></li>
-<li><p><code>export</code>: Exports feature groups to a <code class="file">.csv</code> file that is readable to Bruker ProfileAnalysis (a
+<li><p><code>delete(featureGroups)</code>: Completely deletes specified feature groups.</p></li>
+<li><p><code>export(featureGroups)</code>: Exports feature groups to a <code class="file">.csv</code> file that is readable to Bruker ProfileAnalysis (a
 'bucket table'), Bruker TASQ (an analyte database) or that is suitable as input for the <code>Targeted peak
 detection</code> functionality of <a href="http://mzmine.github.io/" class="external-link">MZmine</a>.</p></li>
-<li><p><code>as.data.table</code>: Obtain a summary table (a <code>data.table</code>) with retention, <em>m/z</em>, intensity
+<li><p><code>as.data.table(featureGroups)</code>: Obtain a summary table (a <code>data.table</code>) with retention, <em>m/z</em>, intensity
 and optionally other feature data.</p></li>
-<li><p><code>unique</code>: Obtain a subset with unique feature groups
+<li><p><code>unique(featureGroups)</code>: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).</p></li>
-<li><p><code>overlap</code>: Obtain a subset with feature groups that overlap
+<li><p><code>overlap(featureGroups)</code>: Obtain a subset with feature groups that overlap
 between a set of specified replicate group(s).</p></li>
-<li><p><code>calculatePeakQualities</code>: Calculates peak and group qualities for all features and feature groups. The peak qualities
+<li><p><code>calculatePeakQualities(featureGroups)</code>: Calculates peak and group qualities for all features and feature groups. The peak qualities
 (and scores) are calculated with the <a href="features-class.html">features method of this
 function</a>, and subsequently averaged per feature group. Then, <span class="pkg">MetaClean</span> is used to calculate the
 <code>Elution Shift</code> and <code>Retention Time Consistency</code> group quality metrics (see the <span class="pkg">MetaClean</span>
@@ -583,7 +583,7 @@ by normalizing qualities among all groups and scaling them from <samp>0</samp> (
 <code>totalScore</code> for each group is then calculated as the weighted sum from all feature (group) scores. The
 <code><a href="check-GUI.html">getMCTrainData</a></code> and <code><a href="check-GUI.html">predictCheckFeaturesSession</a></code> functions can be used to train and apply
 Pass/Fail ML models from <span class="pkg">MetaClean</span>.</p></li>
-<li><p><code>selectIons</code>: uses <a href="generateComponents.html">componentization</a> results to select feature groups with
+<li><p><code>selectIons(featureGroups)</code>: uses <a href="generateComponents.html">componentization</a> results to select feature groups with
 preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
 (de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
 copied from the components to the <code>annotations</code> slot. If the adduct for a feature group is unknown, its
@@ -596,7 +596,7 @@ annotation accuracy. On the other hand, it is important the componentization res
 highly recommended that, prior to calling <code>selectIons</code>, the settings to <code><a href="generateComponents.html">generateComponents</a></code> are
 optimized and its results are reviewed with <code><a href="check-GUI.html">checkComponents</a></code>. Finally, the <code>adducts&lt;-</code> method can
 be used to manually correct adduct assignments afterwards if necessary.</p></li>
-<li><p><code>normInts</code>: Provides various methods to normalizes feature intensities for each sample analysis or of
+<li><p><code>normInts(featureGroups)</code>: Provides various methods to normalizes feature intensities for each sample analysis or of
 all features within a feature group. See the <code>Feature intensity normalization</code> section below.</p></li>
 </ul></div>
     <div id="slots">
@@ -766,7 +766,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

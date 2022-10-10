@@ -39,8 +39,7 @@ NULL
 #' @templateVar delj candidates
 #' @templateVar deljtype numeric indices (rows)
 #' @templateVar delfwhat feature group
-#' @templateVar delfa1 the annotation table (a \code{data.table})
-#' @templateVar delfa2 the feature group name
+#' @templateVar delfa the annotation table (a \code{data.table}), the feature group name
 #' @templateVar delfr the candidate indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args

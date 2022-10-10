@@ -95,26 +95,26 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">generateTPsCTS</span><span class="op">(</span>
-  <span class="va">parents</span>,
-  <span class="va">transLibrary</span>,
-  generations <span class="op">=</span> <span class="fl">1</span>,
-  errorRetries <span class="op">=</span> <span class="fl">3</span>,
-  skipInvalid <span class="op">=</span> <span class="cn">TRUE</span>,
-  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,
-  calcLogP <span class="op">=</span> <span class="st">"rcdk"</span>,
-  calcSims <span class="op">=</span> <span class="cn">FALSE</span>,
-  fpType <span class="op">=</span> <span class="st">"extended"</span>,
-  fpSimMethod <span class="op">=</span> <span class="st">"tanimoto"</span>,
-  parallel <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateTPsCTS</span><span class="op">(</span></span>
+<span>  <span class="va">parents</span>,</span>
+<span>  <span class="va">transLibrary</span>,</span>
+<span>  generations <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  errorRetries <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  skipInvalid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  calcLogP <span class="op">=</span> <span class="st">"rcdk"</span>,</span>
+<span>  calcSims <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fpType <span class="op">=</span> <span class="st">"extended"</span>,</span>
+<span>  fpSimMethod <span class="op">=</span> <span class="st">"tanimoto"</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>parents</dt>
 <dd><p>The parents for which transformation products should be obtained. This can be (1) a suspect list (see
-<a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output
+<a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output of
 <code><a href="suspect-screening.html">screenSuspects</a></code> or (3) a <code><a href="compounds-class.html">compounds</a></code> annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.</p></dd>
 
@@ -270,7 +270,7 @@ see the parallelization section in the handbook for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

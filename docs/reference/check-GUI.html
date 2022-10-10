@@ -99,35 +99,35 @@ unrelated feature groups in a component) can easily be selected for removal.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for components</span>
-<span class="fu">checkComponents</span><span class="op">(</span>
-  <span class="va">components</span>,
-  <span class="va">fGroups</span>,
-  session <span class="op">=</span> <span class="st">"checked-components.yml"</span>,
-  rtWindow <span class="op">=</span> <span class="fl">30</span>,
-  clearSession <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">importCheckFeaturesSession</span><span class="op">(</span>
-  <span class="va">sessionIn</span>,
-  <span class="va">sessionOut</span>,
-  <span class="va">fGroups</span>,
-  rtWindow <span class="op">=</span> <span class="fl">6</span>,
-  mzWindow <span class="op">=</span> <span class="fl">0.002</span>,
-  overWrite <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroups</span>
-<span class="fu">checkFeatures</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  session <span class="op">=</span> <span class="st">"checked-features.yml"</span>,
-  rtWindow <span class="op">=</span> <span class="fl">30</span>,
-  clearSession <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">getMCTrainData</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">session</span><span class="op">)</span>
-
-<span class="fu">predictCheckFeaturesSession</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">session</span>, model <span class="op">=</span> <span class="cn">NULL</span>, overWrite <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for components</span></span>
+<span><span class="fu">checkComponents</span><span class="op">(</span></span>
+<span>  <span class="va">components</span>,</span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  session <span class="op">=</span> <span class="st">"checked-components.yml"</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>  clearSession <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">importCheckFeaturesSession</span><span class="op">(</span></span>
+<span>  <span class="va">sessionIn</span>,</span>
+<span>  <span class="va">sessionOut</span>,</span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  mzWindow <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  overWrite <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">checkFeatures</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  session <span class="op">=</span> <span class="st">"checked-features.yml"</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>  clearSession <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getMCTrainData</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">session</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">predictCheckFeaturesSession</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">session</span>, model <span class="op">=</span> <span class="cn">NULL</span>, overWrite <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -228,7 +228,7 @@ executed again. Furthermore, functionality is provided to import and export sess
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

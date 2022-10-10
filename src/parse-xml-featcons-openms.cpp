@@ -77,8 +77,10 @@ Rcpp::List parseFeatConsXMLFile(Rcpp::CharacterVector file, Rcpp::IntegerVector 
 // generating XML via package is too slow...http://r.789695.n4.nabble.com/Creating-XML-document-extremely-slow-td4376088.html
 // generate by simply writing text to file instead
 // [[Rcpp::export]]
-void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out, Rcpp::LogicalVector hulls)
+void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector fPath, Rcpp::CharacterVector out,
+                     Rcpp::LogicalVector hulls)
 {
+    const char *fPathStr = Rcpp::as<const char *>(fPath);
     const char *outStr = Rcpp::as<const char *>(out);
     const Rcpp::NumericVector rets = featList["ret"];
     const Rcpp::NumericVector mzs = featList["mz"];
@@ -97,6 +99,8 @@ void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out, Rcpp::
           << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
     
     auto indent = [](int level) { return(std::string(level * 4, ' ')); };
+    
+    ofile << indent(1) << "<UserParam type=\"stringList\" name=\"spectra_data\" value=\"[" << fPathStr << "]\"/>\n";
     
     ofile << indent(1) << "<featureList count=\"" << ftCount << "\">\n";
     ofile << std::fixed << std::setprecision(6);

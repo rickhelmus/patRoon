@@ -44,8 +44,7 @@ NULL
 #' @templateVar delj feature groups
 #' @templateVar deljtype numeric index/logical (relative to component) or character
 #' @templateVar delfwhat component
-#' @templateVar delfa1 the component (a \code{data.table})
-#' @templateVar delfa2 the component name
+#' @templateVar delfa the component (a \code{data.table}), the component name
 #' @templateVar delfr the feature groups to be removed (same format as \code{j})
 #' @templateVar dollarOpName component
 #' @template sub_sel_del-args

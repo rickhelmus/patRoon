@@ -97,39 +97,40 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">MSPeakLists</span>,
-  relMzDev <span class="op">=</span> <span class="fl">5</span>,
-  adduct <span class="op">=</span> <span class="cn">NULL</span>,
-  projectPath <span class="op">=</span> <span class="cn">NULL</span>,
-  elements <span class="op">=</span> <span class="st">"CHNOP"</span>,
-  profile <span class="op">=</span> <span class="st">"qtof"</span>,
-  formulaDatabase <span class="op">=</span> <span class="cn">NULL</span>,
-  fingerIDDatabase <span class="op">=</span> <span class="st">"pubchem"</span>,
-  noise <span class="op">=</span> <span class="cn">NULL</span>,
-  cores <span class="op">=</span> <span class="cn">NULL</span>,
-  topMost <span class="op">=</span> <span class="fl">100</span>,
-  topMostFormulas <span class="op">=</span> <span class="fl">5</span>,
-  extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,
-  extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,
-  dryRun <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">MSPeakLists</span>,
-  relMzDev <span class="op">=</span> <span class="fl">5</span>,
-  adduct <span class="op">=</span> <span class="cn">NULL</span>,
-  projectPath <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>,
-  setThreshold <span class="op">=</span> <span class="fl">0</span>,
-  setThresholdAnn <span class="op">=</span> <span class="fl">0</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  relMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  projectPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  elements <span class="op">=</span> <span class="st">"CHNOP"</span>,</span>
+<span>  profile <span class="op">=</span> <span class="st">"qtof"</span>,</span>
+<span>  formulaDatabase <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fingerIDDatabase <span class="op">=</span> <span class="st">"pubchem"</span>,</span>
+<span>  noise <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  topMostFormulas <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  token <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dryRun <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  relMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  projectPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -208,6 +209,14 @@ large numbers of candidates.</p></dd>
 <dt>topMostFormulas</dt>
 <dd><p>Do not return more than this number of candidate formulae. Note that only compounds for these
 formulae will be searched. Sets the <span class="option">--candidates</span> commandline option.</p></dd>
+
+
+<dt>token</dt>
+<dd><p>A <code>character</code> string with the refresh token to be used for logging in with <code class="command">SIRIUS</code> (from
+version <samp>5</samp> only). The token can be obtained with the <code><a href="getSIRIUSToken.html">getSIRIUSToken</a></code> function, or by running
+<code class="command">SIRIUS</code> directly (<em>e.g.</em> with the <code class="command">login</code> command). See the
+<a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link">SIRIUS website</a> for more
+information. If <code>NULL</code> then the log in is skipped.</p></dd>
 
 
 <dt>extraOptsGeneral, extraOptsFormula</dt>
@@ -311,7 +320,7 @@ ISBN 978-3-319-16706-0.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

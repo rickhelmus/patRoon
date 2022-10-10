@@ -125,6 +125,8 @@ if \code{pch=NULL} then values are automatically assigned.}
 (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
 
+\item{obj, x}{\code{featureGroups} object to be used for plotting.}
+
 \item{average}{If \code{TRUE} then data within replicate groups are averaged.
 
   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.}

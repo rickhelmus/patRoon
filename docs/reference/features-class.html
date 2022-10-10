@@ -207,9 +207,9 @@ SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 their index or name, respectively (for the order/names see <code><a href="generics.html">analyses()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses are selected.<br><br> For <code>[[</code>: should be a scalar value.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 analyses as numeric index, logical or character, <code>j</code> the features as numeric index (row) of the feature. If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-analysis, with the feature table (a <code>data.table</code>) as first argument, the analysis name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each analysis,
+with the feature table (a <code>data.table</code>), the analysis name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
 <dt>...</dt>
@@ -281,25 +281,25 @@ and derived objects are created by 'feature finders' such as
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>length</code>: Obtain total number of features.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>featureTable</code>: Get table with feature information</p></li>
-<li><p><code>analysisInfo</code>: Get analysis information</p></li>
-<li><p><code>analyses</code>: returns a <code>character</code> vector with the names of the
+<ul><li><p><code>length(features)</code>: Obtain total number of features.</p></li>
+<li><p><code>show(features)</code>: Shows summary information for this object.</p></li>
+<li><p><code>featureTable(features)</code>: Get table with feature information</p></li>
+<li><p><code>analysisInfo(features)</code>: Get analysis information</p></li>
+<li><p><code>analyses(features)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>replicateGroups</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>replicateGroups(features)</code>: returns a <code>character</code> vector with the names of the
 replicate groups for which data is present in this object.</p></li>
-<li><p><code>as.data.table</code>: Returns all feature data in a table.</p></li>
-<li><p><code>filter</code>: Performs common rule based filtering of features. Note
+<li><p><code>as.data.table(features)</code>: Returns all feature data in a table.</p></li>
+<li><p><code>filter(features)</code>: Performs common rule based filtering of features. Note
 that this (and much more) functionality is also provided by the
 <code>filter</code> method defined for <code><a href="featureGroups-class.html">featureGroups</a></code>. However,
 filtering a <code>features</code> object may be useful to avoid grouping large
 amounts of features.</p></li>
-<li><p><code>[</code>: Subset on analyses.</p></li>
-<li><p><code>[[</code>: Extract a feature table for an analysis.</p></li>
+<li><p><code>x[i</code>: Subset on analyses.</p></li>
+<li><p><code>x[[i</code>: Extract a feature table for an analysis.</p></li>
 <li><p><code>$</code>: Extract a feature table for an analysis.</p></li>
-<li><p><code>delete</code>: Completely deletes specified features.</p></li>
-<li><p><code>calculatePeakQualities</code>: Calculates peak qualities for each feature. This uses
+<li><p><code>delete(features)</code>: Completely deletes specified features.</p></li>
+<li><p><code>calculatePeakQualities(features)</code>: Calculates peak qualities for each feature. This uses
 <a href="https://github.com/KelseyChetnik/MetaClean/" class="external-link">MetaClean</a> <span style="R">R</span> package to calculate the following metrics:
 <code>Apex-Boundary Ratio</code>, <code>FWHM2Base</code>, <code>Jaggedness</code>, <code>Modality</code>, <code>Symmetry</code>, <code>Gaussian
 Similarity</code>, <code>Sharpness</code>, <code>Triangle Peak Area Similarity Ratio</code> and <code>Zig-Zag index</code>. Please see the
@@ -380,7 +380,7 @@ for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

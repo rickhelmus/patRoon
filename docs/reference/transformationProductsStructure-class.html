@@ -95,55 +95,55 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">convertToMFDB</a></span><span class="op">(</span><span class="va">TPs</span>, <span class="va">out</span>, includeParents <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">...</span>,
-  removeParentIsomers <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeTPIsomers <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeDuplicates <span class="op">=</span> <span class="cn">FALSE</span>,
-  minSimilarity <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  negate <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">which</span>,
-  components <span class="op">=</span> <span class="cn">NULL</span>,
-  structuresMax <span class="op">=</span> <span class="fl">25</span>,
-  prune <span class="op">=</span> <span class="cn">TRUE</span>,
-  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, commonParents <span class="op">=</span> <span class="cn">FALSE</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, vennArgs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">...</span>,
-  commonParents <span class="op">=</span> <span class="cn">FALSE</span>,
-  labels <span class="op">=</span> <span class="cn">NULL</span>,
-  nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,
-  nintersects <span class="op">=</span> <span class="cn">NA</span>,
-  upsetArgs <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for transformationProductsStructure</span>
-<span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">...</span>,
-  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,
-  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,
-  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,
-  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>,
-  labels <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">convertToMFDB</a></span><span class="op">(</span><span class="va">TPs</span>, <span class="va">out</span>, includeParents <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  removeParentIsomers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeTPIsomers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeDuplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  minSimilarity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">which</span>,</span>
+<span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  structuresMax <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  prune <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, commonParents <span class="op">=</span> <span class="cn">FALSE</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, vennArgs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  commonParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,</span>
+<span>  nintersects <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  upsetArgs <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -308,19 +308,19 @@ store their results. The methods defined for this class extend the functionality
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>convertToMFDB</code>: Exports this object as a <code class="file">.csv</code> file that can be used as a <code class="command">MetFrag</code> local
+<ul><li><p><code>convertToMFDB(transformationProductsStructure)</code>: Exports this object as a <code class="file">.csv</code> file that can be used as a <code class="command">MetFrag</code> local
 database. Any duplicate TPs (formed by different pathways or parents) will be merged based on their
 <acronym>InChIKey</acronym>.</p></li>
-<li><p><code>filter</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
-<li><p><code>plotGraph</code>: Plots an interactive hierarchy graph of the transformation products. The
+<li><p><code>filter(transformationProductsStructure)</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
+<li><p><code>plotGraph(transformationProductsStructure)</code>: Plots an interactive hierarchy graph of the transformation products. The
 resulting graph can be browsed interactively and allows exploration of the different TP formation pathways.
 Furthermore, results from <a href="generateComponentsTPs.html">TP componentization</a> can be used to match the hierarchy
 with screening results. The graph is rendered with <span class="pkg">visNetwork</span>.</p></li>
-<li><p><code>plotVenn</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>) outlining unique and shared
+<li><p><code>plotVenn(transformationProductsStructure)</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>) outlining unique and shared
 candidates of up to five different <code>featureAnnotations</code> objects.</p></li>
-<li><p><code>plotUpSet</code>: Plots an UpSet diagram (using the <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> function)
+<li><p><code>plotUpSet(transformationProductsStructure)</code>: Plots an UpSet diagram (using the <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> function)
 outlining unique and shared TPs between different <code>transformationProductsStructure</code> objects.</p></li>
-<li><p><code>consensus</code>: Generates a consensus from different
+<li><p><code>consensus(transformationProductsStructure)</code>: Generates a consensus from different
 <code>transformationProductsStructure</code> objects. Currently this removes any hierarchical data, and all TPs are
 considered to originate from the same (original) parent.</p></li>
 </ul></div>
@@ -376,7 +376,7 @@ considered to originate from the same (original) parent.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

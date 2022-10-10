@@ -31,13 +31,13 @@ them directly with the \code{setObjects} method (described below).
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{setObjects}: Accessor for the \code{setObjects} slot.
+\item \code{setObjects(workflowStepSet)}: Accessor for the \code{setObjects} slot.
 
-\item \code{sets}: Returns the names for each set in this object.
+\item \code{sets(workflowStepSet)}: Returns the names for each set in this object.
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(workflowStepSet)}: Shows summary information for this object.
+
 }}
-
 \section{Slots}{
 
 \describe{

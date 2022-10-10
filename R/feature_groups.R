@@ -49,8 +49,7 @@ NULL
 #' @templateVar delj feature groups
 #' @templateVar deljtype numeric index, logical or character
 #' @templateVar delfwhat feature group
-#' @templateVar delfa1 a vector of the group intensities
-#' @templateVar delfa2 the group name
+#' @templateVar delfa a vector of the group intensities, the group name
 #' @templateVar delfr the analyses of the features in the group to be removed (same format as \code{i})
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args

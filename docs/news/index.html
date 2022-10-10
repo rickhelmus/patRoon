@@ -90,10 +90,45 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="2.1.1" id="patroon-211">patRoon 2.1.1<a class="anchor" aria-label="anchor" href="#patroon-211"></a></h2>
+<h2 class="page-header" data-toc-text="2.2" id="patroon-22">patRoon 2.2<a class="anchor" aria-label="anchor" href="#patroon-22"></a></h2>
+<div class="section level3">
+<h3 id="note-usage-of-sirius-version-2-2">NOTE Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#note-usage-of-sirius-version-2-2"></a></h3>
+<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compability fixes for the latest <code>SIRIUS</code> version.</p>
+</div>
+<div class="section level3">
+<h3 id="changes-2-2">Changes<a class="anchor" aria-label="anchor" href="#changes-2-2"></a></h3>
 <ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
+<li>Fixes for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> with consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>SIRUS:
+<ul><li>Fixed: Features with data offsets are now properly loaded.</li>
+<li>
+<code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> to interactively obtain a SIRIUS login refresh token.</li>
+<li>
+<code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> to log in using the given refresh token.</li>
+<li>code generation to obtain SIRIUS reference token with <code><a href="../reference/newProject.html">newProject()</a></code>
+</li>
+<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>).</li>
+</ul></li>
+<li>Updated PubChem transformations to September release (0.1.3)</li>
+<li>Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>Updated MetFrag to 2.5.0</li>
+<li>Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.</li>
+<li>Fix: multiprocessing with classic: don’t try to capture output when logging is disabled</li>
+<li>
+<code><a href="../reference/generics.html">delete()</a></code> function for MS peak lists</li>
+<li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/reporting.html">reportHTML()</a></code> is effective again</li>
+<li>Fixed: blank filter didn’t properly handle differing blank assignments per analysis</li>
+<li>TPs
+<ul><li>
+<code><a href="../reference/generateTPsLibrary.html">generateTPsLibrary()</a></code>: the <code>matchParentsBy</code> argument now also accepts <code>"formula"</code> and <code>"name"</code>.</li>
+<li>TP libraries may contain a <code>retDir</code> column that specifies the retention time direction of the TP compared to its parent (alternative to specifying <code>log P</code> values).</li>
+<li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
+<li>New argument <code>matchGenerationsBy</code> to the <code>library</code> (and <code>library_formula</code>) algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>, which controls how parents/TPs are matched when searching multiple transformation generations.</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show MS/MS similarity plots of wrong feature groups</li>
+</ul></li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1" id="patroon-21">patRoon 2.1<a class="anchor" aria-label="anchor" href="#patroon-21"></a></h2>
 <p>This release extends version <code>2.0</code> with new functionality, several important changes and bug fixes. The <code><a href="../reference/newProject.html">newProject()</a></code> function was updated for the new functionality. Please see the updated Handbook and sections below for more information.</p>
@@ -519,13 +554,13 @@
 <p><strong>IMPORTANT</strong>: The suspect screening interface has changed significantly. Please read the documentation (<code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and the handbook) for more details. If you want to quickly update your code without using any new functionality:</p>
 <p>Change your existing code, e.g.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span>
-<span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></span></code></pre></div>
 <p>to</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Major changes</strong></p>
 <ul><li>New suspect screening interface
 <ul><li>By default, feature groups without suspect hit are <em>not</em> removed (unless <code>onlyHits=TRUE</code>). This allows straightforward mixing of suspect and full non-target workflows.</li>
@@ -1101,7 +1136,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

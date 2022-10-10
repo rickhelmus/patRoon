@@ -95,58 +95,58 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for featureGroups</span>
-<span class="fu">screenSuspects</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">suspects</span>,
-  <span class="va">rtWindow</span>,
-  <span class="va">mzWindow</span>,
-  <span class="va">adduct</span>,
-  <span class="va">skipInvalid</span>,
-  <span class="va">prefCalcChemProps</span>,
-  <span class="va">onlyHits</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsScreening</span>
-<span class="fu">screenSuspects</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">suspects</span>,
-  <span class="va">rtWindow</span>,
-  <span class="va">mzWindow</span>,
-  <span class="va">adduct</span>,
-  <span class="va">skipInvalid</span>,
-  <span class="va">onlyHits</span>,
-  amend <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">numericIDLevel</span><span class="op">(</span><span class="va">level</span><span class="op">)</span>
-
-<span class="fu">genIDLevelRulesFile</span><span class="op">(</span><span class="va">out</span>, inLevels <span class="op">=</span> <span class="cn">NULL</span>, exLevels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsSet</span>
-<span class="fu">screenSuspects</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">suspects</span>,
-  <span class="va">rtWindow</span>,
-  <span class="va">mzWindow</span>,
-  <span class="va">adduct</span>,
-  <span class="va">skipInvalid</span>,
-  <span class="va">prefCalcChemProps</span>,
-  <span class="va">onlyHits</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for featureGroupsScreeningSet</span>
-<span class="fu">screenSuspects</span><span class="op">(</span>
-  <span class="va">fGroups</span>,
-  <span class="va">suspects</span>,
-  <span class="va">rtWindow</span>,
-  <span class="va">mzWindow</span>,
-  <span class="va">adduct</span>,
-  <span class="va">skipInvalid</span>,
-  <span class="va">prefCalcChemProps</span>,
-  <span class="va">onlyHits</span>,
-  amend <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="fu">screenSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">suspects</span>,</span>
+<span>  <span class="va">rtWindow</span>,</span>
+<span>  <span class="va">mzWindow</span>,</span>
+<span>  <span class="va">adduct</span>,</span>
+<span>  <span class="va">skipInvalid</span>,</span>
+<span>  <span class="va">prefCalcChemProps</span>,</span>
+<span>  <span class="va">onlyHits</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsScreening</span></span>
+<span><span class="fu">screenSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">suspects</span>,</span>
+<span>  <span class="va">rtWindow</span>,</span>
+<span>  <span class="va">mzWindow</span>,</span>
+<span>  <span class="va">adduct</span>,</span>
+<span>  <span class="va">skipInvalid</span>,</span>
+<span>  <span class="va">onlyHits</span>,</span>
+<span>  amend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">numericIDLevel</span><span class="op">(</span><span class="va">level</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">genIDLevelRulesFile</span><span class="op">(</span><span class="va">out</span>, inLevels <span class="op">=</span> <span class="cn">NULL</span>, exLevels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="fu">screenSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">suspects</span>,</span>
+<span>  <span class="va">rtWindow</span>,</span>
+<span>  <span class="va">mzWindow</span>,</span>
+<span>  <span class="va">adduct</span>,</span>
+<span>  <span class="va">skipInvalid</span>,</span>
+<span>  <span class="va">prefCalcChemProps</span>,</span>
+<span>  <span class="va">onlyHits</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroupsScreeningSet</span></span>
+<span><span class="fu">screenSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">suspects</span>,</span>
+<span>  <span class="va">rtWindow</span>,</span>
+<span>  <span class="va">mzWindow</span>,</span>
+<span>  <span class="va">adduct</span>,</span>
+<span>  <span class="va">skipInvalid</span>,</span>
+<span>  <span class="va">prefCalcChemProps</span>,</span>
+<span>  <span class="va">onlyHits</span>,</span>
+<span>  amend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -319,7 +319,7 @@ possible, as it can significantly reduce the load on data interpretation.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

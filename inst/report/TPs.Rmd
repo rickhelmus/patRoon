@@ -125,7 +125,8 @@ if (length(components) > 0)
             
             if (length(plSpecArgs) > 0)
             {
-                plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d.png", grpi))
+                plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d_%d.png",
+                                                                   match(ctRow$parent_group, names(rmdVars$fGroups)), grpi))
                 makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$parent_group, ctRow$group),
                                                                                    specSimParams = rmdVars$specSimParams, title = "")),
                                5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)

@@ -253,15 +253,15 @@ prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
     chemData[!is.na(InChIKey) & !grepl("^[[:upper:]]{14}\\-[[:upper:]]{10}\\-[[:upper:]]{1}$", InChIKey),
              InChIKey := NA_character_]
     
-    # NOTE: for formula calculation, both RCDK and OpenBabel cannot output formulas with isotopes. However, OpenBabel
-    # does output deuterium as D.
+    chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
+    chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
+    
+    # NOTE: for formula calculation, both RCDK and OpenBabel cannot output formulas with labeled isotopes. However,
+    # OpenBabel does output deuterium as D.
     # --> For now don't consider any formulae from isotope labeled SMILES, unless the isotopes are just deuterium
     convForms <- fifelse(!is.na(convertedSMILES$formula), convertedSMILES$formula, convertedInChIs$formula)
     isSMIOKForFormula <- !is.na(chemData$SMILES) &
         !grepl("\\[[[:digit:]]+[[:upper:]]{1}[[:lower:]]*\\]", gsub("[2H]", "", chemData$SMILES, fixed = TRUE))
-    
-    chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
-    chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
     
     takeConvertedIK <- !is.na(chemData$InChI)
     takeConvertedFormula <- !is.na(convForms) & isSMIOKForFormula

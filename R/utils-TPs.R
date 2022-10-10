@@ -1,4 +1,4 @@
-getTPParents <- function(parents, skipInvalid, prefCalcChemProps)
+getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkWhat = "SMILES")
 {
     if (is.data.frame(parents))
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
@@ -25,15 +25,17 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps)
         parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
     
-    if (is.null(parents[["SMILES"]]))
-        stop("No SMILES information available for parents. Please include either SMILES or InChI columns.")
+    if (is.null(parents[[checkWhat]]))
+        stop(sprintf("No %s information available for parents. Please include either %s columns.", checkWhat,
+                     if (checkWhat == "formula") "formula or SMILES/InChI" else "SMILES or InChI"), call. = FALSE)
     
-    noSM <- is.na(parents$SMILES) | !nzchar(parents$SMILES)
-    if (any(noSM))
+    noData <- is.na(parents[[checkWhat]]) | !nzchar(parents[[checkWhat]])
+    if (any(noData))
     {
         do.call(if (skipInvalid) warning else stop,
-                list("The following parents miss mandatory SMILES: ", paste0(parents$name[noSM], collapse = ",")))
-        parents <- parents[!noSM]
+                list(sprintf("The following parents miss mandatory %s: %s", checkWhat,
+                             paste0(parents$name[noData], collapse = ","))))
+        parents <- parents[!noData]
     }
     
     return(parents)
@@ -79,4 +81,268 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
                   "ALogP", "LogP", "XLogP", "parent")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
+}
+
+doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyCompletePaths)
+{
+    # UNDONE: don't make name unique, but use IDs?
+    
+    if (nrow(TPTab) == 0)
+        stop("No TPs to plot", call. = FALSE)
+    
+    TPTab <- copy(TPTab)
+    TPTab[, c("name_orig", "name") := .(name, make.unique(name))]
+    TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
+    
+    if (!is.null(cmpTab))
+    {
+        TPTab <- TPTab[parent %chin% cmpTab$parent_name] # omit missing root parents
+        TPTab[, present := name_orig %chin% cmpTab$TP_name]
+        
+        TPTab[, childPresent := FALSE]
+        markChildPresent <- function(TPNames)
+        {
+            if (length(TPNames) == 0)
+                return()
+            TPTab[name %chin% TPNames, childPresent := TRUE]
+            pars <- TPTab[name %chin% TPNames]$parent_name
+            markChildPresent(pars[TPTab[name %chin% pars]$childPresent == FALSE])
+        }
+        markChildPresent(TPTab[present == TRUE]$parent_name)
+        
+        if (prune)
+            TPTab <- TPTab[present == TRUE | childPresent == TRUE]
+        if (onlyCompletePaths)
+        {
+            TPTab <- TPTab[present == TRUE]
+            # keep removing TPs without parent until no change
+            oldn <- nrow(TPTab)
+            repeat
+            {
+                TPTab <- TPTab[parent_name == parent | parent_name %chin% name]
+                newn <- nrow(TPTab)
+                if (oldn == newn)
+                    break
+                oldn <- newn
+            }
+        }
+    }
+    
+    TPTab[, parent_formula := fifelse(is.na(parent_ID),
+                                      parents$formula[match(parent_name, parents$name)],
+                                      formula[match(parent_name, name)])]
+    TPTab[, formulaDiff := mapply(formula, parent_formula, FUN = function(f, pf)
+    {
+        sfl <- splitFormulaToList(subtractFormula(f, pf))
+        ret <- ""
+        subfl <- sfl[sfl < 0]
+        if (length(subfl) > 0)
+            ret <- paste0("-", formulaListToString(abs(subfl)))
+        addfl <- sfl[sfl > 0]
+        if (length(addfl) > 0)
+            ret <- if (nzchar(ret)) paste0(ret, " +", formulaListToString(addfl)) else paste0("+", formulaListToString(addfl))
+        return(ret)
+    })]
+    
+    nodes <- data.table(id = union(TPTab$parent, TPTab$name))
+    nodes[, isTP := id %chin% TPTab$name]
+    nodes[isTP == TRUE, label := paste0("TP", TPTab$chem_ID[match(id, TPTab$name)])]
+    nodes[isTP == FALSE, label := id]
+    nodes[, group := if (.N > 1) label else "unique", by = "label"]
+    nodes[, present := isTP == FALSE | TPTab$present[match(id, TPTab$name)]]
+    nodes[present == TRUE, shapeProperties := list(list(list(useBorderWithImage = TRUE)))]
+    nodes[present == FALSE, shapeProperties := list(list(list(useBorderWithImage = FALSE)))]
+    nodes[, present := NULL]
+    nodes[isTP == FALSE, level := 0]
+    nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
+    
+    if (nrow(nodes) <= structuresMax && nrow(nodes) > 0)
+    {
+        # UNDONE: make util?
+        imgf <- tempfile(fileext = ".png") # temp file is re-used
+        getURIFromSMILES <- function(SMILES)
+        {
+            mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
+            withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
+            return(knitr::image_uri(imgf))
+        }
+        nodes[, shape := "image"]
+        nodes[, SMILES := fifelse(isTP, TPTab$SMILES[match(id, TPTab$name)], parents$SMILES[match(id, parents$name)])]
+        nodes[, image := getURIFromSMILES(SMILES[1]), by = "SMILES"]
+        nodes[, SMILES := NULL]
+    }
+    else
+        nodes[, shape := "ellipse"]
+    
+    TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "generation", "accumulation", "production",
+                          "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
+                          "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
+                          "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref", "similarity",
+                          "mergedBy", "coverage"), names(TPTab))
+    nodes[isTP == TRUE, title := sapply(id, function(TP)
+    {
+        TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]
+        return(paste0(names(TPTabSub), ": ", TPTabSub, collapse = "<br>"))
+    })]
+    
+    edges <- data.table(from = TPTab$parent_name, to = TPTab$name, label = TPTab$formulaDiff)
+    
+    visNetwork::visNetwork(nodes = nodes, edges = edges) %>%
+        visNetwork::visNodes(shapeProperties = list(useBorderWithImage = FALSE)) %>%
+        visNetwork::visEdges(arrows = "to", font = list(align = "top", size = 12)) %>%
+        visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
+                               selectedBy = list(variable = "group", main = "Select duplicate TPs",
+                                                 values = unique(nodes$group[nodes$group != "unique"]))) %>%
+        visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
+}
+
+getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, matchIDBy)
+{
+    results <- split(TPLibrary, by = "parent_name")
+    
+    curTPIDs <- setNames(vector("integer", length = length(results)), names(results))
+    prepTPs <- function(r, pn, pid, gen, prvLogPDiff)
+    {
+        # remove parent columns
+        set(r, j = grep("^parent_", names(r), value = TRUE), value = NULL)
+        
+        # remove TP_ prefix
+        cols <- grep("^TP_", names(r), value = TRUE)
+        setnames(r, cols, sub("^TP_", "", cols))
+        setnames(r, "name", "name_lib")
+        
+        r[, retDir := 0] # may be changed below
+        r[, generation := gen]
+        
+        r[, ID := curTPIDs[pn] + seq_len(nrow(r))]
+        curTPIDs[pn] <<- curTPIDs[pn] + nrow(r)
+        r[, parent_ID := pid]
+        
+        # make it additive so LogPDiff corresponds to the original parent
+        if (!is.null(r[["LogPDiff"]]) && !is.null(prvLogPDiff))
+            r[, LogPDiff := LogPDiff + prvLogPDiff]
+        
+        return(r)
+    }
+    results <- Map(results, names(results), f = prepTPs, MoreArgs = list(pid = NA_integer_, gen = 1, prvLogPDiff = NULL))
+    
+    if (generations > 1)
+    {
+        for (gen in seq(2, generations))
+        {
+            results <- Map(results, names(results), f = function(r, pn)
+            {
+                tps <- r[generation == (gen-1)]
+                nexttps <- rbindlist(lapply(split(tps, seq_len(nrow(tps))), function(tpRow)
+                {
+                    nt <- copy(TPLibrary[get(paste0("parent_", matchGenerationsBy)) == tpRow[[matchGenerationsBy]]])
+                    return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$LogPDiff))
+                }))
+                return(rbind(r, nexttps))
+            })
+        }
+    }
+    
+    # fill in chem IDs and names now that we sorted out all TPs
+    results <- Map(results, names(results), f = function(r, pn)
+    {
+        set(r, j = "chem_ID", value = match(r[[matchIDBy]], unique(r[[matchIDBy]])))
+        set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
+    })
+    
+    if (!is.null(TPLibrary[["retDir"]]))
+    {
+        results <- Map(results, TPLibrary[match(names(results), parent_name)]$retDir,
+                       f = data.table::set, MoreArgs = list(i = NULL, j = "retDir"))
+    }
+    else if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
+    {
+        results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
+                       f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
+    }
+    else if (!is.null(TPLibrary[["LogPDiff"]]))
+    {
+        results <- lapply(results, function(x) set(x, j = "retDir", value = fcase(x$LogPDiff < 0, -1,
+                                                                                  x$LogPDiff > 0, 1,
+                                                                                  default = 0)))
+    }
+    
+    results <- pruneList(results, checkZeroRows = TRUE)
+
+    return(results)
+}
+
+prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, matchIDBy)
+{
+    TPLibrary <- copy(as.data.table(TPLibrary))
+    
+    # add chem infos where necessary
+    for (wh in c("parent", "TP"))
+    {
+        if (!is.null(TPLibrary[[paste0(wh, "_SMILES")]])) # may not be there for formula library
+        {
+            for (col in c("formula", "InChI", "InChIKey"))
+            {
+                whcol <- paste0(wh, "_", col)
+                if (is.null(TPLibrary[[whcol]]))
+                {
+                    whSMI <- paste0(wh, "_SMILES")
+                    TPLibrary[, (whcol) := switch(col,
+                                                  formula = babelConvert(get(whSMI), "smi", "formula"),
+                                                  InChI = babelConvert(get(whSMI), "smi", "inchi"),
+                                                  InChIKey = babelConvert(get(whSMI), "smi", "inchikey"))]
+                }
+            }
+        }
+        
+        if ("InChIKey1" %in% c(matchParentsBy, matchGenerationsBy))
+        {
+            whcol <- paste0(wh, "_InChIKey")
+            if (is.null(TPLibrary[[whcol]]))
+                stop(sprintf("Cannot match by InChIKey1: missing %s column in the library", whcol), call. = FALSE)
+            TPLibrary[, (paste0(whcol, 1)) := getIKBlock1(get(whcol))]
+        }
+        
+        for (mb in union(matchParentsBy, matchGenerationsBy))
+        {
+            whcol <- paste0(wh, "_", mb)
+            if (is.null(TPLibrary[[whcol]]))
+                stop(sprintf("Cannot match by %s: missing %s column in the library", mb, whcol), call. = FALSE)
+        }
+        
+        whmcol <- paste0(wh, "_neutralMass")
+        if (is.null(TPLibrary[[whmcol]]))
+            TPLibrary[, (whmcol) := sapply(get(paste0(wh, "_formula")), getFormulaMass)]
+    }
+    
+    if (!is.null(parents))
+    {
+        # match with library
+        
+        dataLib <- TPLibrary[[paste0("parent_", matchParentsBy)]]
+        dataSusp <- parents[[matchParentsBy]]
+        
+        if (matchParentsBy != "name")
+        {
+            # rename from suspect list
+            TPLibrary[, parent_name_lib := parent_name] # store original
+            TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
+        }
+        
+        # only take data in both
+        dataInBoth <- intersect(dataLib, dataSusp)
+        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
+        parents <- parents[dataSusp %chin% dataInBoth]
+    }
+    else
+    {
+        parents <- unique(TPLibrary[, grepl("^parent_", names(TPLibrary)), with = FALSE], by = "parent_name")
+        setnames(parents, sub("^parent_", "", names(parents)))
+    }
+    
+    products <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy, matchIDBy)
+    parents <- parents[name %in% names(products)]
+    products <- products[match(parents$name, names(products))] # sync order
+    
+    return(list(parents = parents, products = products))
 }

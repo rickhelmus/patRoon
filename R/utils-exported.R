@@ -330,3 +330,53 @@ getEICs <- function(file, ranges)
     
     return(doGetEICs(file, as.data.table(ranges)))
 }
+
+#' Obtains a SIRIUS refresh token
+#'
+#' This function is used to obtain a \command{SIRIUS} refresh token with your login details, which allows
+#' \code{\link{generateCompoundsSIRIUS}} to automatically log in to use \emph{e.g.} \command{CSI:FingerID}.
+#'
+#' \command{SIRIUS} version \samp{5} requires the user to be logged in when using web services such as
+#' \command{CSI:FingerID}. To allow secure log in by external software tools such as \pkg{patRoon}, a \emph{referesh
+#' token} is needed. This function uses your user name (email) and asks for a password (using \code{\link{getPass}}) to
+#' obtain such a token more easily.
+#'
+#' More details for \emph{e.g.} account creation can be found on
+#' \url{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}.
+#'
+#' @param user A \code{character} string with the user name/email.
+#'
+#' @return A \code{character} string with the (secret) refresh token.
+#'
+#' @references \insertRef{Dhrkop2019}{patRoon}
+#'
+#' @export
+getSIRIUSToken <- function(user)
+{
+    checkmate::assertString(user, min.chars = 1)
+    
+    cmd <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
+    pw <- getPass::getPass("SIRIUS password:", noblank = TRUE)
+    
+    gotRefHeader <- FALSE
+    ret <- NULL
+    # NOTE: processx::run() is used as it allows correctly setting the environment, which doesn't seem to work very well
+    # with base::system2()
+    runv <- processx::run(cmd, c("login", "--user-env=SIRUSER", "--password-env=SIRPW", "--request-token-only"),
+                          env = c("current", SIRUSER = user, SIRPW = pw), stdout_line_callback = function(out, px)
+                          {
+                              if (gotRefHeader && is.null(ret))
+                                  ret <<- out
+                              else
+                                  gotRefHeader <<- grepl("^(\\#)+ Refresh token (\\#)+$", out)
+                              
+                          })
+    
+    if (is.null(ret))
+    {
+        cat(runv$stderr)
+        stop("Failed to retrieve SIRIUS token! See error output above for details.", call. = FALSE)
+    }
+    
+    return(ret)
+}

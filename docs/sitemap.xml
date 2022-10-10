@@ -160,6 +160,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/formulas-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/genFormulaTPLibrary.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/generateComponents.html</loc>
   </url>
   <url>
@@ -235,6 +238,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLogic.html</loc>
   </url>
   <url>
@@ -248,6 +254,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/getFCParams.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/getSIRIUSToken.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/groupFeatures.html</loc>
@@ -353,6 +362,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/transformationProducts-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsFormula-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsStructure-class.html</loc>

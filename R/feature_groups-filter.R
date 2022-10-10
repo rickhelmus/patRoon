@@ -44,14 +44,12 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 blankFilter <- function(fGroups, threshold, negate = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
-    gNames <- names(fGroups)
     rGroups <- unique(anaInfo$group)
 
     # multiple groups may be specified separated by comma
     blankGroups <- sapply(anaInfo$blank, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
     allBlanks <- unique(unlist(blankGroups))
     allBlanks <- allBlanks[allBlanks %in% rGroups]
-    blAnaInds <- anaInfo$group %chin% allBlanks
     
     if (length(allBlanks) == 0)
     {
@@ -64,7 +62,7 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         pred <- function(x, t) x < t
         if (negate)
             pred <- Negate(pred)
-
+        
         avgBls <- lapply(allBlanks, function(bl)
         {
             avg <- vapply(fGroups@groups[anaInfo$group == bl], function(x) mean(x[x > 0]), FUN.VALUE = numeric(1),
@@ -73,12 +71,23 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
             return(avg)
         })
         avgBls <- transpose(avgBls)
-        minInts <- sapply(avgBls, max) * threshold
-
+        
+        anaBlInds <- lapply(blankGroups, match, allBlanks, nomatch = 0)
+        
+        anaThrs <- lapply(avgBls, function(abl)
+        {
+            thrs <- sapply(anaBlInds, function(i)
+            {
+                x <- abl[i]
+                x[x != 0]
+                return(if (length(x) > 0) max(x) * threshold else 0)
+            })
+        })
+        
         delGroups <- copy(fGroups@groups)
         
         for (j in seq_along(delGroups))
-            set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], minInts[[j]]), 1, 0))
+            set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], anaThrs[[j]]), 1, 0))
         return(delete(fGroups, j = delGroups))
     }))
 }

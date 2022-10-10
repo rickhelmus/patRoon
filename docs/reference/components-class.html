@@ -188,9 +188,9 @@ unset(obj, set)</code></pre></div>
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. <code>j</code> is optional.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
 components as numeric index, logical or character, <code>j</code> the feature groups as numeric index/logical (relative to component) or character. If either is
-<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each 
-component, with the component (a <code>data.table</code>) as first argument, the component name as second argument, and any other arguments passed as
-<code>...</code> to <code>delete</code>. The return value of this function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each component,
+with the component (a <code>data.table</code>), the component name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
 
 
 <dt>...</dt>
@@ -310,29 +310,29 @@ generate the components.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>componentTable</code>: Accessor method for the <code>components</code> slot of a
+<ul><li><p><code>componentTable(components)</code>: Accessor method for the <code>components</code> slot of a
 <code>components</code> class. Each component is stored as a
 <code>data.table</code>.</p></li>
-<li><p><code>componentInfo</code>: Accessor method for the <code>componentInfo</code> slot of a
+<li><p><code>componentInfo(components)</code>: Accessor method for the <code>componentInfo</code> slot of a
 <code>components</code> class.</p></li>
-<li><p><code>groupNames</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>groupNames(components)</code>: returns a <code>character</code> vector with the names of the
 feature groups for which data is present in this object.</p></li>
-<li><p><code>length</code>: Obtain total number of components.</p></li>
-<li><p><code>names</code>: Obtain the names of all components.</p></li>
-<li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on components/feature groups.</p></li>
-<li><p><code>[[</code>: Extracts a component table, optionally filtered by a feature group.</p></li>
+<li><p><code>length(components)</code>: Obtain total number of components.</p></li>
+<li><p><code>names(components)</code>: Obtain the names of all components.</p></li>
+<li><p><code>show(components)</code>: Show summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on components/feature groups.</p></li>
+<li><p><code>x[[i</code>: Extracts a component table, optionally filtered by a feature group.</p></li>
 <li><p><code>$</code>: Extracts a component table by component name.</p></li>
-<li><p><code>delete</code>: Completely deletes specified (parts of) components.</p></li>
-<li><p><code>as.data.table</code>: Returns all component data in a table.</p></li>
-<li><p><code>filter</code>: Provides rule based filtering for components.</p></li>
-<li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
+<li><p><code>delete(components)</code>: Completely deletes specified (parts of) components.</p></li>
+<li><p><code>as.data.table(components)</code>: Returns all component data in a table.</p></li>
+<li><p><code>filter(components)</code>: Provides rule based filtering for components.</p></li>
+<li><p><code>findFGroup(components)</code>: Returns the component id(s) to which a feature group
 belongs.</p></li>
-<li><p><code>plotSpectrum</code>: Plot a <em>pseudo</em> mass spectrum for a single
+<li><p><code>plotSpectrum(components)</code>: Plot a <em>pseudo</em> mass spectrum for a single
 component.</p></li>
-<li><p><code>plotChroms</code>: Plot an extracted ion chromatogram (EIC) for all
+<li><p><code>plotChroms(components)</code>: Plot an extracted ion chromatogram (EIC) for all
 feature groups within a single component.</p></li>
-<li><p><code>consensus</code>: Generates a consensus from multiple <code>components</code>
+<li><p><code>consensus(components)</code>: Generates a consensus from multiple <code>components</code>
 objects. At this point results are simply combined and no attempt is made to
 merge similar components.</p></li>
 </ul></div>
@@ -399,7 +399,7 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

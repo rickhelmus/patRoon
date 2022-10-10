@@ -255,6 +255,8 @@ assignPrecursorToMSPeakList <- function(MSPeakList, precursorMZ)
 
 deIsotopeMSPeakList <- function(MSPeakList, negate)
 {
+    # UNDONE: this is DA specific and not tested for a while, maybe update some day...
+    
     if (nrow(MSPeakList) == 0)
         return(MSPeakList)
 

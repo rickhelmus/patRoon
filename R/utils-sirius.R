@@ -6,6 +6,13 @@ getSiriusBin <- function()
     return("sirius")
 }
 
+isSIRIUS5 <- function()
+{
+    out <- executeCommand(patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS"), "--version",
+                          stdout = TRUE)
+    return(any(grepl("^(SIRIUS 5\\.)", out)))
+}
+
 getSIRIUSCmpName <- function() "unknownCompound"
 
 getSiriusResultPath <- function(outPath, msFName)
@@ -15,10 +22,19 @@ getSiriusResultPath <- function(outPath, msFName)
     return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
-getSiriusFragFiles <- function(resultPath)
+getAndPrepareSIRIUSFragFiles <- function(resultPath)
 {
+    # NOTE: SIRIUS 5 packs spectra --> unzip them
+    spPath <- file.path(resultPath, "spectra")
+    if (file.exists(spPath) && !file.info(spPath, extra_cols = FALSE)$isdir)
+    {
+        exDir <- paste0(spPath, "-unz")
+        unzip(spPath, exdir = exDir)
+        spPath <- exDir
+    }
+    
     pat <- "([A-Za-z0-9]+).*\\.tsv"
-    return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
+    return(list.files(spPath, full.names = TRUE, pattern = pat))
 }
 
 getFormulaFromSiriusFragFile <- function(ffile)
@@ -97,6 +113,11 @@ SIRMPPrepareHandler <- function(cmd)
 {
     command <- patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS")
     
+    # UNDONE: it seems we would only need to log in once per worker, is this adding a lot of overhead?
+    if (!is.null(cmd[["token"]]))
+        executeCommand(command, c("login", paste0("--token=", cmd$token)), stdout = if (cmd$verbose) "" else FALSE,
+                       stderr = if (cmd$verbose) "" else FALSE)
+    
     inPath <- tempfile("sirius_in")
     outPath <- if (is.null(cmd[["projectPath"]])) tempfile("sirius_out") else cmd$projectPath
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
@@ -119,7 +140,7 @@ SIRMPPrepareHandler <- function(cmd)
 }
 
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adducts, adductsChr, ppmMax, elements,
-                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath,
+                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, token,
                       extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches, dryRun)
 {
     mainArgs <- character()
@@ -143,8 +164,14 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     if (!is.null(extraOptsFormula))
         formArgs <- c(formArgs, extraOptsFormula)
 
-    cmpArgs <- if (withFingerID) c("structure", "--database", fingerIDDatabase) else character()
-
+    isV5 <- isSIRIUS5() # UNDONE: what if SIRUS is only available on the workers?
+    cmpArgs <- if (withFingerID && isV5)
+        c("fingerprint", "structure", "--database", fingerIDDatabase)
+    else if (withFingerID)
+        c("structure", "--database", fingerIDDatabase)
+    else
+        character()
+    
     batchn <- 1
     if (splitBatches) 
     {
@@ -165,9 +192,13 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         {
             batch <- batches[[bi]]
             fArgs <- c(formArgs, "-i", addChr)
-            return(list(args = c(mainArgs, fArgs, cmpArgs), precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
-                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, resNames = resNames[batch],
-                        processFunc = processFunc, processArgs = processArgs, dryRun = dryRun,
+            allArgs <- c(mainArgs, fArgs, cmpArgs)
+            if (isV5)
+                allArgs <- c(allArgs, "write-summaries")
+            return(list(args = allArgs, precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
+                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, token = token,
+                        verbose = verbose, resNames = resNames[batch], processFunc = processFunc,
+                        processArgs = processArgs, dryRun = dryRun,
                         logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))
         })
         
@@ -186,7 +217,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
 }
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
-                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath,
+                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, token,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
                      splitBatches, dryRun)
 {
@@ -266,7 +297,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             msmspls <- lapply(doPLists, "[[", "MSMS")
             allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta$name[doWhich], profile, flPLMeta$adduct[doWhich],
                                     flPLMeta$adductChr[doWhich], relMzDev, elements, database, noise, cores,
-                                    withFingerID, fingerIDDatabase, topMost, projectPath,
+                                    withFingerID, fingerIDDatabase, topMost, projectPath, token,
                                     extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches,
                                     dryRun)
         }

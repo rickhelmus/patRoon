@@ -476,33 +476,33 @@ the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> 
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>defaultExclNormScores</code>: Returns default scorings that are excluded from normalization.</p></li>
-<li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>identifiers</code>: Returns a list containing for each feature group a
+<ul><li><p><code>defaultExclNormScores(compounds)</code>: Returns default scorings that are excluded from normalization.</p></li>
+<li><p><code>show(compounds)</code>: Show summary information for this object.</p></li>
+<li><p><code>identifiers(compounds)</code>: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
 <code>identifiers</code> option of <code><a href="generateCompoundsMetFrag.html">generateCompoundsMetFrag</a></code>.</p></li>
-<li><p><code>filter</code>: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
+<li><p><code>filter(compounds)</code>: Provides rule based filtering for generated compounds. Useful to eliminate unlikely candidates
 and speed up further processing. Also see the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>
 method.</p></li>
-<li><p><code>addFormulaScoring</code>: Adds formula ranking data from a <code><a href="formulas-class.html">formulas</a></code>
+<li><p><code>addFormulaScoring(compounds)</code>: Adds formula ranking data from a <code><a href="formulas-class.html">formulas</a></code>
 object as an extra compound candidate scoring (<code>formulaScore</code> column).
 The formula score for each compound candidate is between <samp>0-1</samp>, where
 <em>zero</em> means no match with any formula candidates, and <em>one</em>
 means that the compound candidate's formula is the highest ranked.</p></li>
-<li><p><code>getMCS</code>: Calculates the maximum common substructure (MCS)
+<li><p><code>getMCS(compounds)</code>: Calculates the maximum common substructure (MCS)
 for two or more candidate structures for a feature group. This method uses
 the <code>get.mcs</code> function from <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></li>
-<li><p><code>plotStructure</code>: Plots a structure of a candidate compound using the
+<li><p><code>plotStructure(compounds)</code>: Plots a structure of a candidate compound using the
 <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> package. If multiple candidates are specified (<em>i.e.</em>
 by specifying a <code>vector</code> for <code>index</code>) then the maximum common
 substructure (MCS) of the selected candidates is drawn.</p></li>
-<li><p><code>plotScores</code>: Plots a barplot with scoring of a candidate compound.</p></li>
-<li><p><code>annotatedPeakList</code>: Returns an MS/MS peak list annotated with data from a
+<li><p><code>plotScores(compounds)</code>: Plots a barplot with scoring of a candidate compound.</p></li>
+<li><p><code>annotatedPeakList(compounds)</code>: Returns an MS/MS peak list annotated with data from a
 given candidate compound for a feature group.</p></li>
-<li><p><code>plotSpectrum</code>: Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
+<li><p><code>plotSpectrum(compounds)</code>: Plots an annotated spectrum for a given candidate compound for a feature group. Two spectra can
 be compared by specifying a two-sized vector for the <code>index</code> and <code>groupName</code> arguments.</p></li>
-<li><p><code>consensus</code>: Generates a consensus of results from multiple
+<li><p><code>consensus(compounds)</code>: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
 (the scores are normalized and the highest ranked candidate gets value
@@ -608,7 +608,7 @@ create this object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

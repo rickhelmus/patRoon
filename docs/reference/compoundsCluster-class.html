@@ -254,34 +254,34 @@ average silhouette width calculation.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>clusters</code>: Accessor method to the <code>clusters</code> slot.
+<ul><li><p><code>clusters(compoundsCluster)</code>: Accessor method to the <code>clusters</code> slot.
 Returns a list that contains for each feature group an object as returned
 by <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></code>.</p></li>
-<li><p><code>cutClusters</code>: Accessor method to the <code>cutClusters</code> slot.
+<li><p><code>cutClusters(compoundsCluster)</code>: Accessor method to the <code>cutClusters</code> slot.
 Returns a list that contains for each feature group a vector with cluster
 membership for each candidate (format as <code><a href="https://rdrr.io/r/stats/cutree.html" class="external-link">cutree</a></code>).</p></li>
-<li><p><code>clusterProperties</code>: Returns a list with properties on how the
+<li><p><code>clusterProperties(compoundsCluster)</code>: Returns a list with properties on how the
 clustering was performed.</p></li>
-<li><p><code>groupNames</code>: returns a <code>character</code> vector with the names of the
+<li><p><code>groupNames(compoundsCluster)</code>: returns a <code>character</code> vector with the names of the
 feature groups for which data is present in this object.</p></li>
-<li><p><code>length</code>: Returns the total number of clusters.</p></li>
-<li><p><code>lengths</code>: Returns a <code>vector</code> with the number of
+<li><p><code>length(compoundsCluster)</code>: Returns the total number of clusters.</p></li>
+<li><p><code>lengths(compoundsCluster)</code>: Returns a <code>vector</code> with the number of
 clusters per feature group.</p></li>
-<li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on feature groups.</p></li>
-<li><p><code>treeCut</code>: Manually (re-)cut a dendrogram that was
+<li><p><code>show(compoundsCluster)</code>: Show summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on feature groups.</p></li>
+<li><p><code>treeCut(compoundsCluster)</code>: Manually (re-)cut a dendrogram that was
 generated for a feature group.</p></li>
-<li><p><code>treeCutDynamic</code>: Automatically (re-)cut a dendrogram that was
+<li><p><code>treeCutDynamic(compoundsCluster)</code>: Automatically (re-)cut a dendrogram that was
 generated for a feature group using the <code>cutreeDynamicTree</code>
 function from <span class="pkg">dynamicTreeCut</span>.</p></li>
-<li><p><code>plot</code>: Plot the dendrogram for clustered compounds of a
+<li><p><code>plot(x = compoundsCluster, y = missing)</code>: Plot the dendrogram for clustered compounds of a
 feature group. Clusters are highlighted using <a href="https://CRAN.R-project.org/package=dendextend" class="external-link"><span class="pkg">dendextend</span></a>.</p></li>
-<li><p><code>getMCS</code>: Calculates the maximum common substructure (MCS)
+<li><p><code>getMCS(compoundsCluster)</code>: Calculates the maximum common substructure (MCS)
 for all candidate structures within a specified cluster. This method uses
 the <code>get.mcs</code> function from <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></li>
-<li><p><code>plotStructure</code>: Plots the maximum common substructure (MCS) for
+<li><p><code>plotStructure(compoundsCluster)</code>: Plots the maximum common substructure (MCS) for
 all candidate structures within a specified cluster.</p></li>
-<li><p><code>plotSilhouettes</code>: Plots the average silhouette width when the
+<li><p><code>plotSilhouettes(compoundsCluster)</code>: Plots the average silhouette width when the
 clusters are cut by a sequence of k numbers. The k value with the highest
 value (marked in the plot) may be considered as the optimal number of
 clusters.</p></li>
@@ -328,7 +328,7 @@ clustering.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

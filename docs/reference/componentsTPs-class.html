@@ -99,26 +99,26 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for componentsTPs</span>
-<span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-
-<span class="co"># S4 method for componentsTPs</span>
-<span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span>
-  <span class="va">obj</span>,
-  <span class="va">...</span>,
-  retDirMatch <span class="op">=</span> <span class="cn">FALSE</span>,
-  minSpecSim <span class="op">=</span> <span class="cn">NULL</span>,
-  minSpecSimPrec <span class="op">=</span> <span class="cn">NULL</span>,
-  minSpecSimBoth <span class="op">=</span> <span class="cn">NULL</span>,
-  minFragMatches <span class="op">=</span> <span class="cn">NULL</span>,
-  minNLMatches <span class="op">=</span> <span class="cn">NULL</span>,
-  formulas <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  negate <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for componentsTPs</span>
-<span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for componentsTPs</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for componentsTPs</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  retDirMatch <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  minSpecSim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minSpecSimPrec <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minSpecSimBoth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minNLMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for componentsTPs</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -179,9 +179,9 @@ formula annotations. Set to <code>NULL</code> to ignore.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>as.data.table</code>: Returns all component data as a <code>data.table</code>.</p></li>
-<li><p><code>filter</code>: Provides various rule based filtering options to clean and prioritize TP data.</p></li>
-<li><p><code>plotGraph</code>: Plots an interactive network graph for linked components. Components are linked with each
+<ul><li><p><code>as.data.table(componentsTPs)</code>: Returns all component data as a <code>data.table</code>.</p></li>
+<li><p><code>filter(componentsTPs)</code>: Provides various rule based filtering options to clean and prioritize TP data.</p></li>
+<li><p><code>plotGraph(componentsTPs)</code>: Plots an interactive network graph for linked components. Components are linked with each
 other if one or more transformation products overlap. The graph is constructed with the <span class="pkg">igraph</span> package
 and rendered with <span class="pkg">visNetwork</span>.</p></li>
 </ul></div>
@@ -222,7 +222,7 @@ and rendered with <span class="pkg">visNetwork</span>.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

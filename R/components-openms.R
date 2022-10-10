@@ -157,7 +157,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     }, prepareHandler = function(cmd)
     {
         inFile <- tempfile(fileext = ".featureXML")
-        writeFeatureXML(cmd$fTable, inFile, TRUE)
+        writeFeatureXML(cmd$fTable, "analysis.mzML", inFile, TRUE) # NOTE: dummy input mzML file name --> not needed
         outFile <- tempfile(fileext = ".consensusXML")
         cmdMAD <- do.call(patRoon:::getOpenMSMADCommand, c(list(inFile = inFile, outFile = outFile), params))
         return(c(cmd, list(outFile = outFile), cmdMAD))

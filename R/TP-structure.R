@@ -175,31 +175,18 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     return(obj)
 })
 
-#' @describeIn transformationProductsStructure Plots an interactive hierarchy graph of the transformation products. The
-#'   resulting graph can be browsed interactively and allows exploration of the different TP formation pathways.
-#'   Furthermore, results from \link[=generateComponentsTPs]{TP componentization} can be used to match the hierarchy
-#'   with screening results. The graph is rendered with \pkg{\link{visNetwork}}.
-#'
-#' @param which Either a \code{character} or \code{integer} vector with one or more names/indices of the parents to
-#'   plot.
-#' @param components If specified (\emph{i.e.} not \code{NULL}), a \code{\link{componentsTPs}} object that is used for
-#'   matching the graph with screening results. The TPs that were found will be marked. See also the \code{prune} and
-#'   \code{onlyCompletePaths} arguments.
+#' @templateVar class transformationProductsStructure
+#' @template plotGraph-TPs
+#' 
 #' @param structuresMax An \code{integer} with the maximum number of structures to plot. Setting a maximum is mainly
 #'   done to avoid long times needed to construct the graph.
-#' @param prune If \code{TRUE} and \code{components} is set, then pathways without \emph{any} detected TPs are not shown
-#'   (pruned). See also the \code{onlyCompletePaths} and \code{components} arguments.
-#' @param onlyCompletePaths If \code{TRUE} and \code{components} is set, then only pathways are shown for which
-#'   \emph{all} TPs were detected. See also the \code{prune} and \code{components} arguments.
-#'
+#'   
 #' @template plotGraph
 #'
 #' @export
 setMethod("plotGraph", "transformationProductsStructure", function(obj, which, components = NULL, structuresMax = 25,
                                                                    prune = TRUE, onlyCompletePaths = FALSE)
 {
-    # UNDONE: don't make name unique, but use IDs?
-    
     checkmate::assert(
         checkmate::checkSubset(which, names(obj), empty.ok = FALSE),
         checkmate::checkIntegerish(which, lower = 1, upper = nrow(parents(obj)), any.missing = FALSE, min.len = 1),
@@ -211,117 +198,10 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, which, c
     aapply(checkmate::assertFlag, . ~ prune + onlyCompletePaths, fixed = list(add = ac))
     checkmate::assertCount(structuresMax, add = ac)
     checkmate::reportAssertions(ac)
-    
-    obj <- obj[which]
-    if (length(obj) == 0)
-        stop("No TPs to plot", call. = FALSE)
-    
-    TPTab <- copy(as.data.table(obj))
-    TPTab[, c("name_orig", "name") := .(name, make.unique(name))]
-    TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
-    
-    if (!is.null(components))
-    {
-        cmpTab <- as.data.table(components)
-        TPTab <- TPTab[parent %chin% cmpTab$parent_name] # omit missing root parents
-        TPTab[, present := name_orig %chin% cmpTab$TP_name]
-        
-        TPTab[, childPresent := FALSE]
-        markChildPresent <- function(TPNames)
-        {
-            if (length(TPNames) == 0)
-                return()
-            TPTab[name %chin% TPNames, childPresent := TRUE]
-            pars <- TPTab[name %chin% TPNames]$parent_name
-            markChildPresent(pars[TPTab[name %chin% pars]$childPresent == FALSE])
-        }
-        markChildPresent(TPTab[present == TRUE]$parent_name)
-        
-        if (prune)
-            TPTab <- TPTab[present == TRUE | childPresent == TRUE]
-        if (onlyCompletePaths)
-        {
-            TPTab <- TPTab[present == TRUE]
-            # keep removing TPs without parent until no change
-            oldn <- nrow(TPTab)
-            repeat
-            {
-                TPTab <- TPTab[parent_name == parent | parent_name %chin% name]
-                newn <- nrow(TPTab)
-                if (oldn == newn)
-                    break
-                oldn <- newn
-            }
-        }
-    }
-    
-    pars <- parents(obj)
-    TPTab[, parent_formula := fifelse(is.na(parent_ID),
-                                      pars$formula[match(parent_name, pars$name)],
-                                      formula[match(parent_name, name)])]
-    TPTab[, formulaDiff := mapply(formula, parent_formula, FUN = function(f, pf)
-    {
-        sfl <- splitFormulaToList(subtractFormula(f, pf))
-        ret <- ""
-        subfl <- sfl[sfl < 0]
-        if (length(subfl) > 0)
-            ret <- paste0("-", formulaListToString(abs(subfl)))
-        addfl <- sfl[sfl > 0]
-        if (length(addfl) > 0)
-            ret <- if (nzchar(ret)) paste0(ret, " +", formulaListToString(addfl)) else paste0("+", formulaListToString(addfl))
-        return(ret)
-    })]
-    
-    nodes <- data.table(id = union(TPTab$parent, TPTab$name))
-    nodes[, isTP := id %chin% TPTab$name]
-    nodes[isTP == TRUE, label := paste0("TP", TPTab$chem_ID[match(id, TPTab$name)])]
-    nodes[isTP == FALSE, label := id]
-    nodes[, group := if (.N > 1) label else "unique", by = "label"]
-    nodes[, present := isTP == FALSE | TPTab$present[match(id, TPTab$name)]]
-    nodes[present == TRUE, shapeProperties := list(list(list(useBorderWithImage = TRUE)))]
-    nodes[present == FALSE, shapeProperties := list(list(list(useBorderWithImage = FALSE)))]
-    nodes[, present := NULL]
-    nodes[isTP == FALSE, level := 0]
-    nodes[isTP == TRUE, level := TPTab$generation[match(id, TPTab$name)]]
-    
-    if (nrow(nodes) <= structuresMax && nrow(nodes) > 0)
-    {
-        # UNDONE: make util?
-        imgf <- tempfile(fileext = ".png") # temp file is re-used
-        getURIFromSMILES <- function(SMILES)
-        {
-            mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
-            withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
-            return(knitr::image_uri(imgf))
-        }
-        nodes[, shape := "image"]
-        nodes[, SMILES := fifelse(isTP, TPTab$SMILES[match(id, TPTab$name)], pars$SMILES[match(id, pars$name)])]
-        nodes[, image := getURIFromSMILES(SMILES[1]), by = "SMILES"]
-        nodes[, SMILES := NULL]
-    }
-    else
-        nodes[, shape := "ellipse"]
-    
-    TPCols <- intersect(c("name", "name_lib", "SMILES", "formula", "generation", "accumulation", "production",
-                          "globalAccumulation", "likelihood", "Lipinski_Violations", "Insecticide_Likeness_Violations",
-                          "Post_Em_Herbicide_Likeness_Violations", "transformation", "transformation_ID", "enzyme",
-                          "biosystem", "evidencedoi", "evidencedref", "sourcecomment", "datasetref", "similarity",
-                          "mergedBy", "coverage"), names(TPTab))
-    nodes[isTP == TRUE, title := sapply(id, function(TP)
-    {
-        TPTabSub <- TPTab[name == TP, TPCols, with = FALSE]
-        return(paste0(names(TPTabSub), ": ", TPTabSub, collapse = "<br>"))
-    })]
-    
-    edges <- data.table(from = TPTab$parent_name, to = TPTab$name, label = TPTab$formulaDiff)
-    
-    visNetwork::visNetwork(nodes = nodes, edges = edges) %>%
-        visNetwork::visNodes(shapeProperties = list(useBorderWithImage = FALSE)) %>%
-        visNetwork::visEdges(arrows = "to", font = list(align = "top", size = 12)) %>%
-        visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
-                               selectedBy = list(variable = "group", main = "Select duplicate TPs",
-                                                 values = unique(nodes$group[nodes$group != "unique"]))) %>%
-        visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
+
+    doPlotTPGraph(as.data.table(obj[which]), parents(obj),
+                  cmpTab = if (!is.null(components)) as.data.table(components) else NULL,
+                  structuresMax = structuresMax, prune = prune, onlyCompletePaths = onlyCompletePaths)
 })
 
 #' @describeIn transformationProductsStructure plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared

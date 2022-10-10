@@ -254,9 +254,9 @@ order.}
 their index or name, respectively (for the order/names see \code{analyses()/names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 analyses as numeric index, logical or character, \code{j} the feature groups as numeric index, logical or character. If either is
-\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each 
-feature group, with a vector of the group intensities as first argument, the group name as second argument, and any other arguments passed as
-\code{\dots} to \code{delete}. The return value of this function specifies the analyses of the features in the group to be removed (same format as \code{i}).}
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
+with a vector of the group intensities, the group name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the analyses of the features in the group to be removed (same format as \code{i}).}
 
 \item{\dots}{For the \code{"["} operator: ignored.
 
@@ -404,69 +404,69 @@ features across analyses.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{names}: Obtain feature group names.
+\item \code{names(featureGroups)}: Obtain feature group names.
 
-\item \code{analyses}: returns a \code{character} vector with the names of the
+\item \code{analyses(featureGroups)}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
-\item \code{replicateGroups}: returns a \code{character} vector with the names of the
+\item \code{replicateGroups(featureGroups)}: returns a \code{character} vector with the names of the
 replicate groups for which data is present in this object.
 
-\item \code{groupNames}: Same as \code{names}. Provided for consistency to other classes.
+\item \code{groupNames(featureGroups)}: Same as \code{names}. Provided for consistency to other classes.
 
-\item \code{length}: Obtain number of feature groups.
+\item \code{length(featureGroups)}: Obtain number of feature groups.
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(featureGroups)}: Shows summary information for this object.
 
-\item \code{groupTable}: Accessor for \code{groups} slot.
+\item \code{groupTable(featureGroups)}: Accessor for \code{groups} slot.
 
-\item \code{analysisInfo}: Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
+\item \code{analysisInfo(featureGroups)}: Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
 
-\item \code{groupInfo}: Accessor for \code{groupInfo} slot.
+\item \code{groupInfo(featureGroups)}: Accessor for \code{groupInfo} slot.
 
-\item \code{featureTable}: Obtain feature information (see \code{\link{features}}).
+\item \code{featureTable(featureGroups)}: Obtain feature information (see \code{\link{features}}).
 
-\item \code{getFeatures}: Accessor for \code{features} slot.
+\item \code{getFeatures(featureGroups)}: Accessor for \code{features} slot.
 
-\item \code{groupFeatIndex}: Accessor for \code{ftindex} slot.
+\item \code{groupFeatIndex(featureGroups)}: Accessor for \code{ftindex} slot.
 
-\item \code{groupQualities}: Accessor for \code{groupQualities} slot.
+\item \code{groupQualities(featureGroups)}: Accessor for \code{groupQualities} slot.
 
-\item \code{groupScores}: Accessor for \code{groupScores} slot.
+\item \code{groupScores(featureGroups)}: Accessor for \code{groupScores} slot.
 
-\item \code{annotations}: Accessor for \code{annotations} slot.
+\item \code{annotations(featureGroups)}: Accessor for \code{annotations} slot.
 
-\item \code{internalStandards}: Accessor for \code{ISTDs} slot.
+\item \code{internalStandards(featureGroups)}: Accessor for \code{ISTDs} slot.
 
-\item \code{internalStandardAssignments}: Accessor for \code{ISTDAssignments} slot.
+\item \code{internalStandardAssignments(featureGroups)}: Accessor for \code{ISTDAssignments} slot.
 
-\item \code{adducts}: Returns a named \code{character} with adduct annotations assigned to each feature group (if
+\item \code{adducts(featureGroups)}: Returns a named \code{character} with adduct annotations assigned to each feature group (if
 available).
 
-\item \code{adducts<-}: Sets adduct annotations for feature groups.
+\item \code{adducts(featureGroups) <- value}: Sets adduct annotations for feature groups.
 
-\item \code{[}: Subset on analyses/feature groups.
+\item \code{x[i}: Subset on analyses/feature groups.
 
-\item \code{[[}: Extract intensity values.
+\item \code{x[[i}: Extract intensity values.
 
 \item \code{$}: Extract intensity values for a feature group.
 
-\item \code{delete}: Completely deletes specified feature groups.
+\item \code{delete(featureGroups)}: Completely deletes specified feature groups.
 
-\item \code{export}: Exports feature groups to a \file{.csv} file that is readable to Bruker ProfileAnalysis (a
+\item \code{export(featureGroups)}: Exports feature groups to a \file{.csv} file that is readable to Bruker ProfileAnalysis (a
 'bucket table'), Bruker TASQ (an analyte database) or that is suitable as input for the \verb{Targeted peak
 detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 
-\item \code{as.data.table}: Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
+\item \code{as.data.table(featureGroups)}: Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
 and optionally other feature data.
 
-\item \code{unique}: Obtain a subset with unique feature groups
+\item \code{unique(featureGroups)}: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).
 
-\item \code{overlap}: Obtain a subset with feature groups that overlap
+\item \code{overlap(featureGroups)}: Obtain a subset with feature groups that overlap
 between a set of specified replicate group(s).
 
-\item \code{calculatePeakQualities}: Calculates peak and group qualities for all features and feature groups. The peak qualities
+\item \code{calculatePeakQualities(featureGroups)}: Calculates peak and group qualities for all features and feature groups. The peak qualities
 (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
 function}, and subsequently averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
 \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
@@ -476,7 +476,7 @@ by normalizing qualities among all groups and scaling them from \samp{0} (worst)
 \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
 Pass/Fail ML models from \pkg{MetaClean}.
 
-\item \code{selectIons}: uses \link[=generateComponents]{componentization} results to select feature groups with
+\item \code{selectIons(featureGroups)}: uses \link[=generateComponents]{componentization} results to select feature groups with
 preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
 (de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
 copied from the components to the \code{annotations} slot. If the adduct for a feature group is unknown, its
@@ -490,10 +490,10 @@ highly recommended that, prior to calling \code{selectIons}, the settings to \co
 optimized and its results are reviewed with \code{\link{checkComponents}}. Finally, the \code{adducts<-} method can
 be used to manually correct adduct assignments afterwards if necessary.
 
-\item \code{normInts}: Provides various methods to normalizes feature intensities for each sample analysis or of
+\item \code{normInts(featureGroups)}: Provides various methods to normalizes feature intensities for each sample analysis or of
 all features within a feature group. See the \verb{Feature intensity normalization} section below.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

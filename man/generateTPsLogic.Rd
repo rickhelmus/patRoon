@@ -42,10 +42,9 @@ With this algorithm TPs are predicted from common (environmental) chemical react
   advantage of this method is that it does not rely on structural information of the parent, which may be unknown in
   a full non-target analysis.
 }
-\section{Custom transformations}{
- The \code{transformations} argument to \code{generateTPsLogic} is used to specify
-  custom rules to calculate transformation products. This should be a \code{data.frame} with the following columns:
-  \itemize{
+\section{Transformation reactions}{
+ The \code{transformations} argument specifies custom rules to calculate
+  transformation products. This should be a \code{data.frame} with the following columns: \itemize{
 
   \item \code{transformation} The name of the chemical transformation
 
@@ -61,8 +60,8 @@ With this algorithm TPs are predicted from common (environmental) chemical react
 }
 
 \section{Source}{
- The algorithm of \code{generateTPsLogic} is directly based on the work done by Schollee \emph{et
-  al.} (see references).
+ The algorithms using transformation reactions are directly based on the work done by Schollee
+  \emph{et al.} (see references).
 }
 
 \references{

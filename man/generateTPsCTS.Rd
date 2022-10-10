@@ -20,7 +20,7 @@ generateTPsCTS(
 }
 \arguments{
 \item{parents}{The parents for which transformation products should be obtained. This can be (1) a suspect list (see
-\link[=suspect-screening]{suspect screening} for more information), (2) the resulting output
+\link[=suspect-screening]{suspect screening} for more information), (2) the resulting output of
 \code{\link{screenSuspects}} or (3) a \code{\link{compounds}} annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.}
 

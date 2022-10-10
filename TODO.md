@@ -5,6 +5,7 @@
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
 - FIX: MetaClean is not an optional dependency --> featureQualities()
+- SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 
 
 ## Features

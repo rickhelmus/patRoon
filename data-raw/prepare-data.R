@@ -10,7 +10,7 @@ TPsLogicTransformations <- data.table::fread(system.file("data-raw", "TP-logic.c
 
 # obtain PubChem transformations and prepare data
 transFile <- tempfile(fileext = ".tsv")
-utils::download.file("https://zenodo.org/record/5644561/files/PubChem_all_transformations_wExtraInfo.csv?download=1",
+utils::download.file("https://zenodo.org/record/7041946/files/PubChem_all_transformations_wExtraInfo.csv?download=1",
                      destfile = transFile)
 
 PubChemTransformations <- data.table::fread(transFile)

@@ -97,13 +97,13 @@ algorithm independent way.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adduct</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for adduct</span>
-<span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S4 method for adduct</span>
-<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, err <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adduct</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for adduct</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for adduct</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, err <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -139,8 +139,8 @@ otherwise returns without data.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>as.character</code>: Converts an <code>adduct</code> object to a specified
+<ul><li><p><code>show(adduct)</code>: Shows summary information for this object.</p></li>
+<li><p><code>as.character(adduct)</code>: Converts an <code>adduct</code> object to a specified
 <code>character</code> format.</p></li>
 </ul></div>
     <div id="slots">
@@ -169,15 +169,14 @@ molecule (<em>e.g.</em> for a dimer this would be <samp>2</samp>). Default is <s
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adduct</span><span class="op">(</span><span class="st">"H"</span><span class="op">)</span> <span class="co"># [M+H]+</span>
-<span class="fu">adduct</span><span class="op">(</span>sub <span class="op">=</span> <span class="st">"H"</span>, charge <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co"># [M-H]-</span>
-<span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"K"</span>, sub <span class="op">=</span> <span class="st">"H2"</span>, charge <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co"># [M+K-H2]+</span>
-<span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"H3"</span>, charge <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="co"># [M+H3]3+</span>
-<span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"H"</span>, molMult <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># [2M+H]+</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">adduct</span><span class="op">(</span><span class="st">"H"</span><span class="op">)</span><span class="op">)</span> <span class="co"># returns "[M+H]+"</span>
-
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adduct</span><span class="op">(</span><span class="st">"H"</span><span class="op">)</span> <span class="co"># [M+H]+</span></span>
+<span><span class="fu">adduct</span><span class="op">(</span>sub <span class="op">=</span> <span class="st">"H"</span>, charge <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co"># [M-H]-</span></span>
+<span><span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"K"</span>, sub <span class="op">=</span> <span class="st">"H2"</span>, charge <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co"># [M+K-H2]+</span></span>
+<span><span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"H3"</span>, charge <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="co"># [M+H3]3+</span></span>
+<span><span class="fu">adduct</span><span class="op">(</span>add <span class="op">=</span> <span class="st">"H"</span>, molMult <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># [2M+H]+</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">adduct</span><span class="op">(</span><span class="st">"H"</span><span class="op">)</span><span class="op">)</span> <span class="co"># returns "[M+H]+"</span></span>
+<span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -191,7 +190,7 @@ molecule (<em>e.g.</em> for a dimer this would be <samp>2</samp>). Default is <s
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

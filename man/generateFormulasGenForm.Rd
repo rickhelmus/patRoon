@@ -14,6 +14,10 @@
   elements = "CHNOP",
   hetero = TRUE,
   oc = FALSE,
+  thrMS = NULL,
+  thrMSMS = NULL,
+  thrComb = NULL,
+  maxCandidates = Inf,
   extraOpts = NULL,
   calculateFeatures = TRUE,
   featThreshold = 0,
@@ -61,6 +65,16 @@ command line option.}
 
 \item{oc}{Only consider organic formulae (\emph{i.e.} with at least one carbon atom). Sets the \option{oc}
 commandline option.}
+
+\item{thrMS, thrMSMS, thrComb}{Sets the thresholds for the \command{GenForm} MS score (\code{isoScore}), MS/MS score
+(\code{MSMSScore}) and combined score (\code{combMatch}). Sets the \option{thms}/\option{thmsms}/\option{thcomb}
+command line options, respectively. Set to \code{NULL} for no threshold.}
+
+\item{maxCandidates}{If this number of candidates are found then \command{GenForm} aborts any further formula
+calculations. The number of candidates is determined \emph{after} any formula filters, hence, the properties and
+'quality' of the candidates is influenced by options such as \code{oc} and \code{thrMS} arguments. Note that this
+is different than \code{topMost}, which selects the candidates after \command{GenForm} finished. Sets the
+\option{max} command line option. Set to \samp{0} or \code{Inf} for no maximum.}
 
 \item{extraOpts}{An optional character vector with any other command line options that will be passed to
 \command{GenForm}. See the \verb{GenForm options} section for all available command line options.}
@@ -144,11 +158,11 @@ Usage: GenForm ms=<filename> [msms=<filename>] [out=<filename>]
         [ppm=<number>] [msmv=ndp|nsse|nsae] [acc=<number>] [rej=<number>]
         [thms=<number>] [thmsms=<number>] [thcomb=<number>]
         [sort[=ppm|msmv|msmsmv|combmv]] [el=<elements> [oc]] [ff=<fuzzy formula>]
-        [vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf]
+        [vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf] [kfer[=ex]]
         [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=<number>] [oei]
         [dbeexc=<number>] [ivsm2mv=<number>] [vsm2ap2=<number>]
         [oms[=<filename>]] [omsms[=<filename>]] [oclean[=<filename>]]
-        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
+        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc] [max]
 Explanation:
         ms      : filename of MS data (*.txt)
         msms    : filename of MS/MS data (*.txt)
@@ -181,6 +195,7 @@ Explanation:
         vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
                   (>=0 for graphical connected formulas)
         hcf     : apply Heuerding-Clerc filter
+        kfer    : apply Kind-Fiehn element ratio (extended) ranges
         wm      : m/z weighting for MS/MS match value
         wi      : intensity weighting for MS/MS match value
         exp     : exponent used, when wi is set to log
@@ -201,6 +216,7 @@ Explanation:
         pc      : output match values in percent
         sc      : strip calculated isotope distributions
         noref   : hide the reference information
+        max     : maximum number of final candidates (0 is no limit)
 }
 }
 

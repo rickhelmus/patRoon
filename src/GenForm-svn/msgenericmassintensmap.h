@@ -16,6 +16,7 @@
 
 #include <map>
 #include <list>
+//#include <cmath>
 
 template<class M,class I> class GenericMassIntensMap : public std::map<M,I>
 {
@@ -58,6 +59,7 @@ public:
 	const GenericMassIntensMap&	DelMasses(const std::map<M,I> &MIM);
 	const GenericMassIntensMap&	Maximum(const std::map<M,I> &MIM);
 	const GenericMassIntensMap&	ShiftMasses(const M &dShift);
+	const GenericMassIntensMap&	WeightIntens(double dWeightMass, double dWeightIntens);
 };
 
 template<class M,class I>
@@ -281,6 +283,15 @@ const GenericMassIntensMap<M,I>& GenericMassIntensMap<M,I>::ShiftMasses(const M 
 		itMIM=MIM.insert(itMIM,std::pair<M,I>(it->first+dShift,it->second));
 
 	return *this=MIM;
+}
+
+template<class M,class I>
+const GenericMassIntensMap<M,I>& GenericMassIntensMap<M,I>::WeightIntens(double dWeightMass, double dWeightIntens)
+{
+	for(typename GenericMassIntensMap<M,I>::iterator it=this->begin();it!=this->end();it++)
+		it->second=pow(it->first,dWeightMass)*pow(it->second,dWeightIntens);
+
+	return *this;
 }
 
 template<class M,class I>	

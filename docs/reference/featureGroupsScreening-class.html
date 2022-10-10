@@ -348,21 +348,21 @@ in opposite manner.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>screenInfo</code>: Returns a table with screening information
+<ul><li><p><code>screenInfo(featureGroupsScreening)</code>: Returns a table with screening information
 (see <code>screenInfo</code> slot).</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on analyses, feature groups and/or
+<li><p><code>show(featureGroupsScreening)</code>: Shows summary information for this object.</p></li>
+<li><p><code>x[i</code>: Subset on analyses, feature groups and/or
 suspects.</p></li>
-<li><p><code>as.data.table</code>: Obtain a summary table (a
+<li><p><code>as.data.table(featureGroupsScreening)</code>: Obtain a summary table (a
 <code>data.table</code>) with retention, <em>m/z</em>, intensity and
 optionally other feature data. Furthermore, the output table will be merged
 with information from <code>screenInfo</code>, such as suspect names and other
 properties and annotation data.</p></li>
-<li><p><code>annotateSuspects</code>: Incorporates annotation data obtained during the workflow to annotate suspects
+<li><p><code>annotateSuspects(featureGroupsScreening)</code>: Incorporates annotation data obtained during the workflow to annotate suspects
 with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
 the <code>Suspect annotation</code> section for more details. The estimation of identification levels for each suspect is
 logged in the <code>log/ident</code> directory.</p></li>
-<li><p><code>filter</code>: Performs rule based filtering. This method
+<li><p><code>filter(featureGroupsScreening)</code>: Performs rule based filtering. This method
 builds on the comprehensive filter functionality from the base
 <code><a href="feature-filtering.html">filter,featureGroups-method</a></code>. It adds several filters to
 select <em>e.g.</em> the best ranked suspects or those with a minimum
@@ -551,7 +551,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

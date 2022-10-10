@@ -126,52 +126,52 @@ Objects from this type are returned by the \code{compounds} method for
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{clusters}: Accessor method to the \code{clusters} slot.
+\item \code{clusters(compoundsCluster)}: Accessor method to the \code{clusters} slot.
 Returns a list that contains for each feature group an object as returned
 by \code{\link{hclust}}.
 
-\item \code{cutClusters}: Accessor method to the \code{cutClusters} slot.
+\item \code{cutClusters(compoundsCluster)}: Accessor method to the \code{cutClusters} slot.
 Returns a list that contains for each feature group a vector with cluster
 membership for each candidate (format as \code{\link{cutree}}).
 
-\item \code{clusterProperties}: Returns a list with properties on how the
+\item \code{clusterProperties(compoundsCluster)}: Returns a list with properties on how the
 clustering was performed.
 
-\item \code{groupNames}: returns a \code{character} vector with the names of the
+\item \code{groupNames(compoundsCluster)}: returns a \code{character} vector with the names of the
 feature groups for which data is present in this object.
 
-\item \code{length}: Returns the total number of clusters.
+\item \code{length(compoundsCluster)}: Returns the total number of clusters.
 
-\item \code{lengths}: Returns a \code{vector} with the number of
+\item \code{lengths(compoundsCluster)}: Returns a \code{vector} with the number of
 clusters per feature group.
 
-\item \code{show}: Show summary information for this object.
+\item \code{show(compoundsCluster)}: Show summary information for this object.
 
-\item \code{[}: Subset on feature groups.
+\item \code{x[i}: Subset on feature groups.
 
-\item \code{treeCut}: Manually (re-)cut a dendrogram that was
+\item \code{treeCut(compoundsCluster)}: Manually (re-)cut a dendrogram that was
 generated for a feature group.
 
-\item \code{treeCutDynamic}: Automatically (re-)cut a dendrogram that was
+\item \code{treeCutDynamic(compoundsCluster)}: Automatically (re-)cut a dendrogram that was
 generated for a feature group using the \code{\link{cutreeDynamicTree}}
 function from \pkg{\link{dynamicTreeCut}}.
 
-\item \code{plot}: Plot the dendrogram for clustered compounds of a
+\item \code{plot(x = compoundsCluster, y = missing)}: Plot the dendrogram for clustered compounds of a
 feature group. Clusters are highlighted using \CRANpkg{dendextend}.
 
-\item \code{getMCS}: Calculates the maximum common substructure (MCS)
+\item \code{getMCS(compoundsCluster)}: Calculates the maximum common substructure (MCS)
 for all candidate structures within a specified cluster. This method uses
 the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
 
-\item \code{plotStructure}: Plots the maximum common substructure (MCS) for
+\item \code{plotStructure(compoundsCluster)}: Plots the maximum common substructure (MCS) for
 all candidate structures within a specified cluster.
 
-\item \code{plotSilhouettes}: Plots the average silhouette width when the
+\item \code{plotSilhouettes(compoundsCluster)}: Plots the average silhouette width when the
 clusters are cut by a sequence of k numbers. The k value with the highest
 value (marked in the plot) may be considered as the optimal number of
 clusters.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

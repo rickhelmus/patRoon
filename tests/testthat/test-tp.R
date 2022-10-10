@@ -11,9 +11,17 @@ TPsLibPC <- generateTPs("library")
 TPsLibPCGen2 <- generateTPs("library", generations = 2)
 TPsLibSusp <- generateTPs("library", suspL)
 TPsLibScr <- generateTPs("library", fGroups)
-TPsLibCustom <- generateTPs("library",
-                            TPLibrary = data.table(parent_name = "Diuron", parent_SMILES = "CN(C)C(O)=NC1C=C(Cl)C(Cl)=CC=1",
-                                                   TP_name = "Linuron", TP_SMILES = "CN(C(=O)NC1=CC(=C(C=C1)Cl)Cl)OC"))
+TPCustLib <- data.table(parent_name = "Diuron", parent_SMILES = "CN(C)C(O)=NC1C=C(Cl)C(Cl)=CC=1",
+                        TP_name = "Linuron", TP_SMILES = "CN(C(=O)NC1=CC(=C(C=C1)Cl)Cl)OC")
+TPsLibCustom <- generateTPs("library", TPLibrary = TPCustLib)
+
+TPCustFormLib <- data.table(parent_name = "Diuron", parent_formula = "C9H10Cl2N2O",
+                            TP_name = "Monuron", TP_formula = "C9H11ClN2O")
+TPsLibForm <- generateTPs("library_formula", TPLibrary = TPCustFormLib)
+TPsLibFormGen2 <- generateTPs("library_formula", TPLibrary = TPCustFormLib, generations = 2)
+TPsLibFormSusp <- generateTPs("library_formula", TPLibrary = TPCustFormLib, suspL)
+TPsLibFormScr <- generateTPs("library_formula", TPLibrary = TPCustFormLib, fGroups)
+
 TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
 TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], calcSims = TRUE) # for filter tests
@@ -25,6 +33,7 @@ fGroupsEmpty <- getEmptyTestFGroups()
 fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
 TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
+TPsLibFormEmpty <- generateTPs("library_formula", TPLibrary = TPCustFormLib, fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
 TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
@@ -47,6 +56,10 @@ test_that("verify TP generation", {
     expect_known_value(TPsLibPC, testFile("tp-lib_pc"))
     expect_known_value(TPsLibSusp, testFile("tp-lib_susp"))
     expect_known_value(TPsLibScr, testFile("tp-lib_scr"))
+    expect_known_value(TPsLibCustom, testFile("tp-lib_custom"))
+    expect_known_value(TPsLibForm, testFile("tp-lib_form"))
+    expect_known_value(TPsLibFormSusp, testFile("tp-lib_form_susp"))
+    expect_known_value(TPsLibFormScr, testFile("tp-lib_form_scr"))
     expect_known_value(TPsBTSusp, testFile("tp-bt_susp"))
     expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
     expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
@@ -74,6 +87,8 @@ test_that("verify TP generation", {
     expect_range(as.data.table(TPsLibPCGen2)$generation, 1:2)
     expect_equal(parents(TPsLibCustom)$name, "Diuron")
     expect_match(TPsLibCustom[[1]]$name_lib, "Linuron")
+    expect_equal(TPsLibCustom, generateTPs("library", TPLibrary = TPCustLib, matchParentsBy = "InChI"))
+    expect_equal(TPsLibPCGen2, generateTPs("library", generations = 2, matchGenerationsBy = "InChI"))
 
     checkmate::expect_names(parents(TPsBTSusp)$name, subset.of = suspL$name)
     checkmate::expect_names(parents(TPsBTScr)$name, subset.of = screenInfo(fGroups)$name)
@@ -82,6 +97,7 @@ test_that("verify TP generation", {
     
     expect_length(TPsLogicEmpty, 0)
     expect_length(TPsLibEmpty, 0)
+    expect_length(TPsLibFormEmpty, 0)
     expect_length(TPsBTEmpty, 0)
     expect_length(TPsCTSEmpty, 0)
     
@@ -171,6 +187,19 @@ test_that("basic usage", {
     testMFDB(TPsCTSComp)
 })
 
+TPFormLib <- genFormulaTPLibrary(patRoonData::suspectsPos)
+TPFormLibG2 <- genFormulaTPLibrary(patRoonData::suspectsPos, generations = 2)
+test_that("genFormulaTPLibrary works", {
+    checkmate::expect_data_table(TPFormLib, any.missing = FALSE)
+    checkmate::expect_names(names(TPFormLib), must.include = c("parent_name", "parent_formula", "parent_neutralMass",
+                                                               "TP_name", "TP_formula", "TP_neutralMass"))
+    expect_gt(nrow(TPFormLibG2), nrow(TPFormLib))
+    expect_setequal(TPFormLibG2$generation, c(1, 2))
+    checkmate::expect_subset(TPFormLibG2[generation == 2]$parent_name, TPFormLibG2[generation == 1]$TP_name)
+    
+    expect_length(generateTPs("library_formula", TPLibrary = TPFormLib), nrow(TPFormLib))
+})
+
 TPsCons <- consensus(TPsLibScr, TPsBTScr)
 collapsedTPLen <- function(TPs) sum(sapply(products(TPs), function(x) uniqueN(x$InChIKey)))
 test_that("consensus works", {
@@ -197,6 +226,7 @@ test_that("consensus works", {
 
 test_that("plotting works", {
     expect_HTML(plotGraph(TPsLibScr, which = 1))
+    expect_HTML(plotGraph(TPsLibFormScr, which = 1))
     
     expect_doppel("venn", function() plotVenn(TPsLibScr, TPsBTScr))
     expect_error(plotVenn(TPsLibEmpty, TPsBTEmpty))
@@ -221,6 +251,8 @@ componTPsNoneTPDiff <- generateComponents(fGroupsMore[, 1:25], "tp", fGroupsMore
 
 componTPsLib <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibSusp, includeParents = TRUE)), "tp",
                                    TPs = TPsLibSusp)
+componTPsLibForm <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibFormSusp, includeParents = TRUE)),
+                                       "tp", TPs = TPsLibFormSusp)
 
 TPsLogicMore <- doGenLogicTPs(fGroupsMore[, 1:50])
 fGroupsTPsLogic <- doScreen(fGroupsMore, convertToSuspects(TPsLogicMore), onlyHits = TRUE)
@@ -248,12 +280,14 @@ test_that("TP componentization", {
     expect_known_value(componTPsNone, testFile("tp-compon-none"))
     expect_known_value(componTPsLogic, testFile("tp-compon-logic"))
     expect_known_value(componTPsLib, testFile("tp-compon-lib"))
+    expect_known_value(componTPsLibForm, testFile("tp-compon-lib_form"))
     expect_known_value(componTPsBT, testFile("tp-compon-bt"))
     expect_known_value(componTPsCTS, testFile("tp-compon-cts"))
     
     expect_known_show(componTPsNone, testFile("tp-compon-none", text = TRUE))
     expect_known_show(componTPsLogic, testFile("tp-compon-logic", text = TRUE))
     expect_known_show(componTPsLib, testFile("tp-compon-lib", text = TRUE))
+    expect_known_show(componTPsLibForm, testFile("tp-compon-lib_form", text = TRUE))
     expect_known_show(componTPsBT, testFile("tp-compon-bt", text = TRUE))
     expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))
     
@@ -314,6 +348,8 @@ if (doMetFrag)
 test_that("TP component usage", {
     expect_HTML(plotGraph(componTPsLogic, onlyLinked = FALSE))
     expect_HTML(plotGraph(TPsLibSusp, which = componentInfo(componTPsLib)$parent_name[1], components = componTPsLib))
+    expect_HTML(plotGraph(TPsLibFormSusp, which = componentInfo(componTPsLibForm)$parent_name[1],
+                          components = componTPsLibForm))
     
     expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
                  as.data.table(componTPsRetF)[, -"size"])

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.4 Chromatographic peak qualities | patRoon handbook</title>
   <meta name="description" content="8.4 Chromatographic peak qualities | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.4 Chromatographic peak qualities | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-06-19" />
+<meta name="date" content="2022-09-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -273,7 +273,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
 <li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> Custom libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
@@ -344,10 +344,10 @@ div.csl-indent {
 <div id="peakQual" class="section level2 hasAnchor" number="8.4">
 <h2><span class="header-section-number">8.4</span> Chromatographic peak qualities<a href="peakQual.html#peakQual" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The algorithms used by <code>findFeatures</code> detect chromatographic peaks automatically to find the features. However, it is common that not all detected features have ‘proper’ chromatographic peaks, and some features could be just noise. The <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> <code>R</code> package supports various quality measures for chromatographic peaks. The quality measures include Gaussian fit, symmetry, sharpness and others. In addition, <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> averages all feature data for each feature group and adds a few additional group specific quality measures (<em>e.g.</em> retention time consistency). Please see <span class="citation">Chetnik, Petrick, and Pandey (<a href="#ref-Chetnik2020" role="doc-biblioref">2020</a>)</span> for more details. The calculations are integrated into <code>patRoon</code>, and are easily performed with the <code>calculatePeakQualities()</code> generic function.</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="peakQual.html#cb228-1" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">calculatePeakQualities</span>(fList) <span class="co"># calculate for all features</span></span></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="peakQual.html#cb229-1" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">calculatePeakQualities</span>(fList) <span class="co"># calculate for all features</span></span></code></pre></div>
 <pre><code>#&gt; Verifying if your data is centroided...
 #&gt; Calculating feature peak qualities and scores...</code></pre>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="peakQual.html#cb230-1" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">calculatePeakQualities</span>(fGroups) <span class="co"># calculate for all features and groups</span></span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="peakQual.html#cb231-1" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">calculatePeakQualities</span>(fGroups) <span class="co"># calculate for all features and groups</span></span></code></pre></div>
 <pre><code>#&gt; Verifying if your data is centroided...
 #&gt; Calculating feature peak qualities and scores...
 #&gt; Verifying if your data is centroided...
@@ -356,17 +356,17 @@ div.csl-indent {
 <p>Most often the <code>featureGroups</code> method is only used, unless you want to filter features (discussed below) prior to grouping.</p>
 <p>An extension in <code>patRoon</code> is that the qualities are used to calculate <em>peak scores</em>. The score for each quality measure is calculated by normalizing and scaling the values into a <code>0-1</code> range, where zero is the worst and one the best. Note that most scores are relative, hence, the values should only be used to compare features among each other. Finally, a <code>totalScore</code> is calculated which sums all individual scores and serves as a rough overall score indicator for a feature (group).</p>
 <p>The qualities and scores are easily obtained with the <code>as.data.table()</code> function.</p>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="peakQual.html#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (limit rows/columns for clarity)</span></span>
-<span id="cb232-2"><a href="peakQual.html#cb232-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">26</span><span class="sc">:</span><span class="dv">30</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="peakQual.html#cb233-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (limit rows/columns for clarity)</span></span>
+<span id="cb233-2"><a href="peakQual.html#cb233-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">26</span><span class="sc">:</span><span class="dv">30</span>]</span></code></pre></div>
 <pre><code>#&gt;    GaussianSimilarityScore SharpnessScore TPASRScore ZigZagScore totalScore
 #&gt; 1:               0.6314046   3.443351e-02  0.9956949   0.9103221   6.302180
 #&gt; 2:               0.9633994   9.900530e-10  0.9944988   0.3565674   6.513205
 #&gt; 3:               0.3613087   7.565147e-10  0.8006569   0.9999449   5.651379
 #&gt; 4:               0.9151027   8.600747e-03  0.9405262   0.9637153   5.892201
 #&gt; 5:               0.3676623   1.000000e+00  0.9907657   0.8435805   5.825267</code></pre>
-<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="peakQual.html#cb234-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the qualities argument is necessary to include the scores.</span></span>
-<span id="cb234-2"><a href="peakQual.html#cb234-2" aria-hidden="true" tabindex="-1"></a><span class="co"># valid values are: &quot;quality&quot;, &quot;score&quot; or &quot;both&quot;</span></span>
-<span id="cb234-3"><a href="peakQual.html#cb234-3" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">qualities =</span> <span class="st">&quot;both&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">25</span><span class="sc">:</span><span class="dv">29</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="peakQual.html#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the qualities argument is necessary to include the scores.</span></span>
+<span id="cb235-2"><a href="peakQual.html#cb235-2" aria-hidden="true" tabindex="-1"></a><span class="co"># valid values are: &quot;quality&quot;, &quot;score&quot; or &quot;both&quot;</span></span>
+<span id="cb235-3"><a href="peakQual.html#cb235-3" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">qualities =</span> <span class="st">&quot;both&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">25</span><span class="sc">:</span><span class="dv">29</span>]</span></code></pre></div>
 <pre><code>#&gt;    TPASRScore ZigZagScore ElutionShiftScore RetentionTimeCorrelationScore totalScore
 #&gt; 1:  0.7305554   0.9962254         0.8421657                     0.9937370   7.930701
 #&gt; 2:  0.0000000   0.9744541         0.9960804                     0.6808412   5.962788
@@ -374,31 +374,31 @@ div.csl-indent {
 #&gt; 4:  0.8227904   0.8907734         0.9403958                     0.9948720   8.450124
 #&gt; 5:  0.9848653   0.8667116         0.5754979                     0.9978621   8.739507</code></pre>
 <p>The feature quality values can also be reviewed interactively with reports generated with <code>reportHTML</code> (see <a href="report.html#report">Reporting</a>) and with <code>checkFeatures</code> (see <a href="intReview.html#intReview">here</a>). The <code>filter</code> function can be used filter out low scoring features and feature groups:</p>
-<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="peakQual.html#cb236-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep features with at least 0.3 Modality score and 0.5 symmetry score</span></span>
-<span id="cb236-2"><a href="peakQual.html#cb236-2" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">filter</span>(fList, <span class="at">qualityRange =</span> <span class="fu">list</span>(<span class="at">ModalityScore =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="cn">Inf</span>),</span>
-<span id="cb236-3"><a href="peakQual.html#cb236-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">SymmetryScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span>
-<span id="cb236-4"><a href="peakQual.html#cb236-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb236-5"><a href="peakQual.html#cb236-5" aria-hidden="true" tabindex="-1"></a><span class="co"># same as above</span></span>
-<span id="cb236-6"><a href="peakQual.html#cb236-6" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">featQualityRange =</span> <span class="fu">list</span>(<span class="at">ModalityScore =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="cn">Inf</span>),</span>
-<span id="cb236-7"><a href="peakQual.html#cb236-7" aria-hidden="true" tabindex="-1"></a>                                                   <span class="at">SymmetryScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span>
-<span id="cb236-8"><a href="peakQual.html#cb236-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb236-9"><a href="peakQual.html#cb236-9" aria-hidden="true" tabindex="-1"></a><span class="co"># filter group averaged data</span></span>
-<span id="cb236-10"><a href="peakQual.html#cb236-10" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">groupQualityRange =</span> <span class="fu">list</span>(<span class="at">totalScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="peakQual.html#cb237-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep features with at least 0.3 Modality score and 0.5 symmetry score</span></span>
+<span id="cb237-2"><a href="peakQual.html#cb237-2" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">filter</span>(fList, <span class="at">qualityRange =</span> <span class="fu">list</span>(<span class="at">ModalityScore =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="cn">Inf</span>),</span>
+<span id="cb237-3"><a href="peakQual.html#cb237-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">SymmetryScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span>
+<span id="cb237-4"><a href="peakQual.html#cb237-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb237-5"><a href="peakQual.html#cb237-5" aria-hidden="true" tabindex="-1"></a><span class="co"># same as above</span></span>
+<span id="cb237-6"><a href="peakQual.html#cb237-6" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">featQualityRange =</span> <span class="fu">list</span>(<span class="at">ModalityScore =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="cn">Inf</span>),</span>
+<span id="cb237-7"><a href="peakQual.html#cb237-7" aria-hidden="true" tabindex="-1"></a>                                                   <span class="at">SymmetryScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span>
+<span id="cb237-8"><a href="peakQual.html#cb237-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb237-9"><a href="peakQual.html#cb237-9" aria-hidden="true" tabindex="-1"></a><span class="co"># filter group averaged data</span></span>
+<span id="cb237-10"><a href="peakQual.html#cb237-10" aria-hidden="true" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">groupQualityRange =</span> <span class="fu">list</span>(<span class="at">totalScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span></code></pre></div>
 <div id="applying-machine-learning-with-metaclean" class="section level3 hasAnchor" number="8.4.1">
 <h3><span class="header-section-number">8.4.1</span> Applying machine learning with MetaClean<a href="peakQual.html#applying-machine-learning-with-metaclean" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An important feature of <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> is to use the quality measures to train a machine learning model to automatically recognize ‘good’ and ‘bad’ features. <code>patRoon</code> provides a few extensions to simplify training and using a model. Furthermore, while <code>MetaClean</code> was primarily designed to work with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a>, the extensions of <code>patRoon</code> allow the usage of data from all the algorithms supported by <code>patRoon</code>.</p>
 <p>The <code>getMCTrainData</code> function can be used to convert data from a <a href="intReview.html#intReview">feature check session</a> to training data that can be used by <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a>. This allows you to use interactively select good/bad peaks. The workflow looks like this:</p>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="peakQual.html#cb237-1" aria-hidden="true" tabindex="-1"></a><span class="co"># untick the &#39;keep&#39; checkbox for all &#39;bad&#39; feature groups</span></span>
-<span id="cb237-2"><a href="peakQual.html#cb237-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroupsTrain, <span class="st">&quot;train_session.yml&quot;</span>)</span>
-<span id="cb237-3"><a href="peakQual.html#cb237-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb237-4"><a href="peakQual.html#cb237-4" aria-hidden="true" tabindex="-1"></a><span class="co"># get train data. This gives comparable data as MetaClean::getPeakQualityMetrics()</span></span>
-<span id="cb237-5"><a href="peakQual.html#cb237-5" aria-hidden="true" tabindex="-1"></a>trainData <span class="ot">&lt;-</span> <span class="fu">getMCTrainData</span>(fGroupsTrain, <span class="st">&quot;train_session.yml&quot;</span>)</span>
-<span id="cb237-6"><a href="peakQual.html#cb237-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb237-7"><a href="peakQual.html#cb237-7" aria-hidden="true" tabindex="-1"></a><span class="co"># use train data with MetaClean with MetaClean::runCrossValidation(),</span></span>
-<span id="cb237-8"><a href="peakQual.html#cb237-8" aria-hidden="true" tabindex="-1"></a><span class="co"># MetaClean::getEvaluationMeasures(), MetaClean::trainClassifier() etc</span></span>
-<span id="cb237-9"><a href="peakQual.html#cb237-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --&gt; see the MetaClean vignette for details</span></span></code></pre></div>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="peakQual.html#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="co"># untick the &#39;keep&#39; checkbox for all &#39;bad&#39; feature groups</span></span>
+<span id="cb238-2"><a href="peakQual.html#cb238-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroupsTrain, <span class="st">&quot;train_session.yml&quot;</span>)</span>
+<span id="cb238-3"><a href="peakQual.html#cb238-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb238-4"><a href="peakQual.html#cb238-4" aria-hidden="true" tabindex="-1"></a><span class="co"># get train data. This gives comparable data as MetaClean::getPeakQualityMetrics()</span></span>
+<span id="cb238-5"><a href="peakQual.html#cb238-5" aria-hidden="true" tabindex="-1"></a>trainData <span class="ot">&lt;-</span> <span class="fu">getMCTrainData</span>(fGroupsTrain, <span class="st">&quot;train_session.yml&quot;</span>)</span>
+<span id="cb238-6"><a href="peakQual.html#cb238-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb238-7"><a href="peakQual.html#cb238-7" aria-hidden="true" tabindex="-1"></a><span class="co"># use train data with MetaClean with MetaClean::runCrossValidation(),</span></span>
+<span id="cb238-8"><a href="peakQual.html#cb238-8" aria-hidden="true" tabindex="-1"></a><span class="co"># MetaClean::getEvaluationMeasures(), MetaClean::trainClassifier() etc</span></span>
+<span id="cb238-9"><a href="peakQual.html#cb238-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --&gt; see the MetaClean vignette for details</span></span></code></pre></div>
 <p>Once you have created a model with <a href="https://github.com/KelseyChetnik/MetaClean/">MetaClean</a> it can be used with the <code>predictCheckFeaturesSession()</code> function:</p>
-<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="peakQual.html#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictCheckFeaturesSession</span>(fGroups, <span class="st">&quot;model_session.yml&quot;</span>, model)</span></code></pre></div>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="peakQual.html#cb239-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictCheckFeaturesSession</span>(fGroups, <span class="st">&quot;model_session.yml&quot;</span>, model)</span></code></pre></div>
 <p>This will generate another <em>check session file</em>: all the feature groups that are considered good will be with a ‘keep’ state, the others without. As <a href="intReview.html#intReview">described elsewhere</a>, the <code>checkFeatures</code> function is used to review the results from a session and the <code>filter</code> function can be used to remove unwanted feature groups. Note that <code>calculatePeakQualitites()</code> must be called before <code>getMCTrainData</code>/<code>predictCheckFeaturesSession</code> can be used.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> <code>MetaClean</code> only predicts at the feature group level. Thus, only the kept feature groups from a <em>feature check session</em> will be used for training, and any indivual features that were marked as removed will be ignored.</p>

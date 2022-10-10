@@ -57,8 +57,8 @@
   obj,
   adduct,
   spectrumType = "MS2",
-  avgSpecParams = getDefAvgPListParams(minIntensityPre = 0, minIntensityPost = 2,
-    topMost = 10),
+  avgSpecParams = getDefAvgPListParams(minIntensityPre = 0, minIntensityPost = 2, topMost
+    = 10),
   collapse = TRUE,
   suspects = NULL,
   prefCalcChemProps = TRUE
@@ -147,41 +147,41 @@ This class is used by \code{\link{loadMSLibrary}} to store the loaded MS library
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{records}: Accessor method for the \code{records} slot of an \code{MSLibrary} class.
+\item \code{records(MSLibrary)}: Accessor method for the \code{records} slot of an \code{MSLibrary} class.
 
-\item \code{spectra}: Accessor method for the \code{spectra} slot of an \code{MSLibrary} class.
+\item \code{spectra(MSLibrary)}: Accessor method for the \code{spectra} slot of an \code{MSLibrary} class.
 
-\item \code{length}: Obtains the total number of records stored.
+\item \code{length(MSLibrary)}: Obtains the total number of records stored.
 
-\item \code{names}: Obtains the names of the stored records (\code{DB_ID} field).
+\item \code{names(MSLibrary)}: Obtains the names of the stored records (\code{DB_ID} field).
 
-\item \code{show}: Shows summary information for this object.
+\item \code{show(MSLibrary)}: Shows summary information for this object.
 
-\item \code{[}: Subset on records.
+\item \code{x[i}: Subset on records.
 
-\item \code{[[}: Extracts a spectrum table for a record.
+\item \code{x[[i}: Extracts a spectrum table for a record.
 
 \item \code{$}: Extracts a spectrum table for a record.
 
-\item \code{as.data.table}: Converts all the data (spectra and metadata) to a single \code{data.table}.
+\item \code{as.data.table(MSLibrary)}: Converts all the data (spectra and metadata) to a single \code{data.table}.
 
-\item \code{delete}: Completely deletes specified full records or spectra.
+\item \code{delete(MSLibrary)}: Completely deletes specified full records or spectra.
 
-\item \code{filter}: Performs rule-based filtering of records and spectra. This may be especially to improve
+\item \code{filter(MSLibrary)}: Performs rule-based filtering of records and spectra. This may be especially to improve
 annotation with \code{\link{generateCompoundsLibrary}}.
 
-\item \code{convertToSuspects}: Converts the MS library data to a suspect list, which can be used with
+\item \code{convertToSuspects(MSLibrary)}: Converts the MS library data to a suspect list, which can be used with
 \code{\link{screenSuspects}}. See the \verb{Suspect conversion} section for details.
 
-\item \code{export}: Exports the library data to a \file{.msp} file. The export is accelerated by an \code{C++}
+\item \code{export(MSLibrary)}: Exports the library data to a \file{.msp} file. The export is accelerated by an \code{C++}
 interface with \CRANpkg{Rcpp}.
 
-\item \code{merge}: Merges two \code{MSLibrary} objects (\code{x} and \code{y}). The records from \code{y} that are
+\item \code{merge(x = MSLibrary, y = MSLibrary)}: Merges two \code{MSLibrary} objects (\code{x} and \code{y}). The records from \code{y} that are
 unique are added to \code{x}. Records that were already in \code{x} are simply ignored. The
 \href{https://splash.fiehnlab.ucdavis.edu/}{SPLASH} values are used to test equality between records, hence, the
 \code{calcSPLASH} argument to \code{\link{loadMSLibrary}} should be \code{TRUE}.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

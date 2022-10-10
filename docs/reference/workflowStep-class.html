@@ -99,17 +99,17 @@ class are never created directly.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for workflowStep</span>
-<span class="fu"><a href="generics.html">algorithm</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>
-
-<span class="co"># S4 method for workflowStep</span>
-<span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, keep.rownames <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for workflowStep</span>
-<span class="fu"><a href="generics.html">as.data.frame</a></span><span class="op">(</span><span class="va">x</span>, row.names <span class="op">=</span> <span class="cn">NULL</span>, optional <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for workflowStep</span>
-<span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="fu"><a href="generics.html">algorithm</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, keep.rownames <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="fu"><a href="generics.html">as.data.frame</a></span><span class="op">(</span><span class="va">x</span>, row.names <span class="op">=</span> <span class="cn">NULL</span>, optional <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -134,13 +134,13 @@ derived classes.</p></dd>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
     
-<ul><li><p><code>algorithm</code>: Returns the algorithm that was used to generate an
+<ul><li><p><code>algorithm(workflowStep)</code>: Returns the algorithm that was used to generate an
 object.</p></li>
-<li><p><code>as.data.table</code>: Summarizes the data in this object and returns this
+<li><p><code>as.data.table(workflowStep)</code>: Summarizes the data in this object and returns this
 as a <code>data.table</code>.</p></li>
-<li><p><code>as.data.frame</code>: This method simply calls <code>as.data.table</code> and
+<li><p><code>as.data.frame(workflowStep)</code>: This method simply calls <code>as.data.table</code> and
 converts the result to a classic a <code>data.frame</code>.</p></li>
-<li><p><code>show</code>: Shows summary information for this object.</p></li>
+<li><p><code>show(workflowStep)</code>: Shows summary information for this object.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -158,6 +158,8 @@ converts the result to a classic a <code>data.frame</code>.</p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsCTS</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsBT</a></code></p></li>
 <li><p><code><a href="transformationProductsStructure-class.html">transformationProductsLibrary</a></code></p></li>
+</ul></li>
+<li><p><code><a href="transformationProductsFormula-class.html">transformationProductsFormula</a></code></p><ul><li><p><code><a href="transformationProductsFormula-class.html">transformationProductsLibraryFormula</a></code></p></li>
 </ul></li>
 <li><p><code><a href="transformationProducts-class.html">transformationProductsLogic</a></code></p></li>
 </ul></li>
@@ -234,7 +236,7 @@ converts the result to a classic a <code>data.frame</code>.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

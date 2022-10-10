@@ -18,8 +18,8 @@
   relMzDev = 5,
   minSize = 2,
   relMinReplicates = 0.5,
-  RCExperimentVals = list(design = list(platform = "LC-MS"), instrument =
-    list(ionization = ionization, MSlevs = 1)),
+  RCExperimentVals = list(design = list(platform = "LC-MS"), instrument = list(ionization
+    = ionization, MSlevs = 1)),
   extraOptsRC = NULL,
   extraOptsFM = NULL
 )

@@ -33,19 +33,21 @@ The next sections will outline more details on these steps are performed and con
 
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
-Algorithm        | Usage                                            | Remarks
----------------- | ------------------------------------------------ | ---------------------------------
-[BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)` | Predicts TPs with full structural information
-[CTS]            | `generateTPs(algorithm = "cts", ...)`            | Predicts TPs with full structural information
-Library          | `generateTPs(algorithm = "library", ...)`        | Obtains transformation products from a library ([PubChem transformations][PubChemLiteTR] or custom)
-Metabolic logic  | `generateTPs(algorithm = "logic", ...)`          | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
+Algorithm        | Usage                                             | Remarks
+---------------- | ------------------------------------------------- | ---------------------------------
+[BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)`  | Predicts TPs with full structural information
+[CTS]            | `generateTPs(algorithm = "cts", ...)`             | Predicts TPs with full structural information
+Library          | `generateTPs(algorithm = "library", ...)`         | Obtains transformation products from a library ([PubChem transformations][PubChemLiteTR] or custom)
+Formula library  | `generateTPs(algorithm = "library_formula", ...)` | Obtains transformation products from a library (only formula data) 
+Metabolic logic  | `generateTPs(algorithm = "logic", ...)`           | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
 
-The output of these algorithms can be distinguished in two groups:
+The output of these algorithms can be distinguished in three categories:
 
 1. **Structural TPs** (`biotransformer`, `cts` and `library`) come with full structural information for the TPs (e.g. formula, SMILES, predicted Log P). As such, the corresponding algorithms also require the full chemical structure of the parent compound.
+2. **Formula TPs** (`library_formula`) are similar to structural TPs, but only involve formula and no other structural information.
 2. **Calculated TPs** (`logic`) are based solely on _m/z_ differences and only require the feature masses. 
 
-The algorithms yielding structural TPs are typically suitable when parents are known in advance, for instance, from a target or suspect screening. On the other hand, the simplicity of calculated TPs always allows TP prediction for all features, which is most suitable for full non-target analysis. However, extra care must be taken to rule out false positives.
+Algorithms that fall into the first category are typically used when parents are known in advance, for instance, from a target or suspect screening. This is also true for the second category, however, here only formula data is used, which is useful when the complete structure of parents and/or TPs are not known. Calculated TPs allow TP prediction for all features, even when nothing is known about their structure. This is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives. Finally, the logic used to calculate TPs can also be used to automatically to generate a library suitable for the `library_formula` algorithm, which allows a hybrid approach of the second and third categories.
 
 An overview of common arguments for TP generation is listed below.
 
@@ -62,13 +64,13 @@ Argument                      | Algorithm(s)      | Remarks
 
 ### Parent input
 
-The input parent structures to generate structural TPs (`biotransformer`, `cts` and `library` algorithms) must be specified as one of the following:
+The input parent structures to generate structural/formula TPs (`biotransformer`, `cts`, `library` and `library_formula` algorithms) must be specified as one of the following:
 
 * A suspect list (follows the same format as [suspect screening](#suspscr))
 * A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
-* A `compounds` object obtained with [compound annotation](#compounds)
+* A `compounds` object obtained with [compound annotation](#compounds) (not supported for `library_formula`)
 
-In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation](#compounds) are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
+In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation](#compounds) are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library` and `library_formula`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
 
 For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data.
 
@@ -171,11 +173,11 @@ plotGraph(TPsBT, which = "Triazophos") # hierarchy for Triazophos parent
 
 Finally, results from different algorithms can be combined with the `consensus` generic function. This is further discussed in [algorithm consensus](#consensus).
 
-### Custom libraries and transformations {#TPsCustom}
+### (Custom) Libraries and transformations {#TPsCustom}
 
-By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on [PubChem transformations][PubChemLiteTR] and @Scholle2015, respectively). However, it is also possible to use custom data.
+By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on [PubChem transformations][PubChemLiteTR] and @Scholle2015, respectively). However, it is also possible to use custom data. For the `library_formula` no default library is provided, however, these can easily be generated as is discussed at the end of the section. 
 
-To use a custom TP library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
+To use a custom TP structure library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
 
 ```{r TPsCustomDB,eval=TRUE}
 myTPLib <- data.frame(parent_name = c("1H-Benzotriazole", "1H-Benzotriazole", "DEET"),
@@ -191,7 +193,9 @@ To use this library, simply pass it to the `TPLibrary` argument:
 TPs <- generateTPs("library", TPLibrary = myTPLib)
 ```
 
-Similarly, for `logic` a table with custom transformation rules can be specified for TP calculations:
+For `library_formula` the library follows the same format. However, here the formula should be specified instead of the `SMILES` with the `parent_formula` and `TP_formula` columns (although it is still allowed to only specify SMILES, as in this case the formulae are automatically calculated).
+
+For the `logic` algorithm a table with custom transformation rules can be specified for TP calculations:
 
 ```{r TPCustomLogic,eval=TRUE}
 myTrans <- data.frame(transformation = c("hydroxylation", "demethylation"),
@@ -206,6 +210,20 @@ The `add` and `sub` columns are used to denote the elements that are added or su
 ```{r eval=FALSE}
 TPs <- generateTPs("logic", fGroups, adduct = "[M+H]+", transformations = myTrans)
 ```
+
+The `genFormulaTPLibrary()` utility function can be used to automatically generate TP libraries suitable for the `library_formula` algorithm. The transformation rules to calculate TPs are specified in the same format as used by the `logic` algorithm.
+
+```{r TPFormLib,eval=FALSE}
+myTPFormLib <- genFormulaTPLibrary(parents = patRoonData::suspectsPos, transformations = myTrans)
+# also calculate second generation TPs (TPs of TPs)
+myTPFormLib2 <- genFormulaTPLibrary(parents = patRoonData::suspectsPos, transformations = myTrans,
+                                    generations = 2)
+
+# Use library
+TPs <- generateTPs("library_formula", TPLibrary = myTPFormLib)
+```
+
+Compared to the `logic` algorithm, the `library_formula` algorithm is more (and only) suitable for suspect/target screening workflows, allows multiple transformation generations and allows better customization through manually adding/removing TPs from the library prior to passing it to `generateTPs()`.
 
 ## Linking parent and transformation product features
 

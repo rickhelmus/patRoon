@@ -405,21 +405,28 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
             annTable <- annTableNorm
         }
         
-        scoreVal <- rowMeans(annRow[, scCols, with = FALSE])
+        scoreVal <- rowMeans(annRow[, scCols, with = FALSE], na.rm = TRUE)
+        if (is.infinite(scoreVal)) # only NA values
+            return("no value(s) available for this score")
         if (scoreVal < minValue)
             return(sprintf("(average) score too low: %f/%f", scoreVal, minValue))
         
         htn <- getOptVal(val, "higherThanNext", 0)
         if (htn > 0 && nrow(annTable) > 1)
         {
-            otherHighest <- max(rowMeans(annTable[-rank, scCols, with = FALSE]))
-            if (is.infinite(htn)) # special case: should be highest
+            otherVals <- rowMeans(annTable[-rank, scCols, with = FALSE], na.rm = TRUE)
+            otherVals <- otherVals[is.finite(otherVals)] # remove results for NA rows
+            if (length(otherVals) > 0)
             {
-                if (otherHighest > 0)
-                    return("not the highest score")
+                otherHighest <- max(otherVals)
+                if (is.infinite(htn)) # special case: should be highest
+                {
+                    if (otherHighest > 0)
+                        return("not the highest score")
+                }
+                else if ((scoreVal - otherHighest) < htn)
+                    return(sprintf("difference with highest score from other candidates too low: %f/%f", scoreVal - otherHighest, htn))
             }
-            else if ((scoreVal - otherHighest) < htn)
-                return(sprintf("difference with highest score from other candidates too low: %f/%f", scoreVal - otherHighest, htn))
         }
         
         return(TRUE)            

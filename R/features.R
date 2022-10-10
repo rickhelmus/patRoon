@@ -37,8 +37,7 @@ printFeatStats <- function(fList)
 #' @templateVar delj features
 #' @templateVar deljtype numeric index (row) of the feature
 #' @templateVar delfwhat analysis
-#' @templateVar delfa1 the feature table (a \code{data.table})
-#' @templateVar delfa2 the analysis name
+#' @templateVar delfa the feature table (a \code{data.table}), the analysis name
 #' @templateVar delfr the feature indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
 #' @templateVar dollarOpName analysis
 #' @template sub_sel_del-args

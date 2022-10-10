@@ -31,3 +31,8 @@ vignettes/*.pdf
 **/GenForm
 **/GenForm.exe
 inst/doc
+src/patRoon.dll
+src/patRoon.so
+
+# cunha ignores
+/dev

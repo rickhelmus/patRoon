@@ -113,7 +113,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE)
 #'
 #' @section Sets workflows: The output class supports additional methods such as \code{plotGraph}.
 #'
-#' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
+#' @references \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
 #'
 #' @templateVar what generateComponentsNontarget
 #' @template main-rd-method

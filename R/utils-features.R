@@ -20,6 +20,7 @@ isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
 featureQualities <- function()
 {
+    checkPackage("MetaClean")
     list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
          FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
          Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
@@ -33,6 +34,7 @@ featureQualities <- function()
 
 featureGroupQualities <- function()
 {
+    checkPackage("MetaClean")
     list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)

@@ -319,6 +319,8 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
+    checkPackage("MetaClean")
+    
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
@@ -341,8 +343,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
         return(cd)
     
     EICs <- getEICsForFeatures(obj)
-    
-    checkPackage("MetaClean")
     
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached

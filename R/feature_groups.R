@@ -887,6 +887,8 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
                                                               parallel = TRUE)
 {
+    checkPackage("MetaClean")
+    
     allScores <- featureQualityNames(scores = TRUE, totScore = FALSE)
     
     ac <- checkmate::makeAssertCollection()
@@ -903,8 +905,6 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     cd <- loadCacheData("calculatePeakQualities", hash)
     if (!is.null(cd))
         return(cd)
-    
-    checkPackage("MetaClean")
     
     if (length(obj) == 0)
         return(obj)

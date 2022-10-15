@@ -252,9 +252,10 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
 {
     ret <- character()
     if (feat)
-        ret <- names(featureQualities())
+        ret <- c("ApexBoundaryRatio", "FWHM2Base", "Jaggedness", "Modality", "Symmetry", "GaussianSimilarity",
+                 "Sharpness", "TPASR", "ZigZag")
     if (group)
-        ret <- c(ret, names(featureGroupQualities()))
+        ret <- c(ret, "ElutionShift", "RetentionTimeCorrelation")
     if (scores)
     {
         ret <- paste0(ret, "Score")

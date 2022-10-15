@@ -104,6 +104,10 @@
 <span>  elements <span class="op">=</span> <span class="st">"CHNOP"</span>,</span>
 <span>  hetero <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  oc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  thrMS <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  thrMSMS <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  thrComb <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxCandidates <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  calculateFeatures <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  featThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -166,6 +170,20 @@ command line option.</p></dd>
 <dt>oc</dt>
 <dd><p>Only consider organic formulae (<em>i.e.</em> with at least one carbon atom). Sets the <span class="option">oc</span>
 commandline option.</p></dd>
+
+
+<dt>thrMS, thrMSMS, thrComb</dt>
+<dd><p>Sets the thresholds for the <code class="command">GenForm</code> MS score (<code>isoScore</code>), MS/MS score
+(<code>MSMSScore</code>) and combined score (<code>combMatch</code>). Sets the <span class="option">thms</span>/<span class="option">thmsms</span>/<span class="option">thcomb</span>
+command line options, respectively. Set to <code>NULL</code> for no threshold.</p></dd>
+
+
+<dt>maxCandidates</dt>
+<dd><p>If this number of candidates are found then <code class="command">GenForm</code> aborts any further formula
+calculations. The number of candidates is determined <em>after</em> any formula filters, hence, the properties and
+'quality' of the candidates is influenced by options such as <code>oc</code> and <code>thrMS</code> arguments. Note that this
+is different than <code>topMost</code>, which selects the candidates after <code class="command">GenForm</code> finished. Sets the
+<span class="option">max</span> command line option. Set to <samp>0</samp> or <code>Inf</code> for no maximum.</p></dd>
 
 
 <dt>extraOpts</dt>
@@ -276,11 +294,11 @@ Usage: GenForm ms=&lt;filename&gt; [msms=&lt;filename&gt;] [out=&lt;filename&gt;
         [ppm=&lt;number&gt;] [msmv=ndp|nsse|nsae] [acc=&lt;number&gt;] [rej=&lt;number&gt;]
         [thms=&lt;number&gt;] [thmsms=&lt;number&gt;] [thcomb=&lt;number&gt;]
         [sort[=ppm|msmv|msmsmv|combmv]] [el=&lt;elements&gt; [oc]] [ff=&lt;fuzzy formula&gt;]
-        [vsp[=&lt;even|odd&gt;]] [vsm2mv[=&lt;value&gt;]] [vsm2ap2[=&lt;value&gt;]] [hcf]
+        [vsp[=&lt;even|odd&gt;]] [vsm2mv[=&lt;value&gt;]] [vsm2ap2[=&lt;value&gt;]] [hcf] [kfer[=ex]]
         [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=&lt;number&gt;] [oei]
         [dbeexc=&lt;number&gt;] [ivsm2mv=&lt;number&gt;] [vsm2ap2=&lt;number&gt;]
         [oms[=&lt;filename&gt;]] [omsms[=&lt;filename&gt;]] [oclean[=&lt;filename&gt;]]
-        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
+        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc] [max]
 Explanation:
         ms      : filename of MS data (*.txt)
         msms    : filename of MS/MS data (*.txt)
@@ -313,6 +331,7 @@ Explanation:
         vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
                   (&gt;=0 for graphical connected formulas)
         hcf     : apply Heuerding-Clerc filter
+        kfer    : apply Kind-Fiehn element ratio (extended) ranges
         wm      : m/z weighting for MS/MS match value
         wi      : intensity weighting for MS/MS match value
         exp     : exponent used, when wi is set to log
@@ -333,6 +352,7 @@ Explanation:
         pc      : output match values in percent
         sc      : strip calculated isotope distributions
         noref   : hide the reference information
+        max     : maximum number of final candidates (0 is no limit)
 </code></pre></div>
 
     </div>

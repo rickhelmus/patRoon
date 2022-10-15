@@ -74,7 +74,7 @@ as returned by \code{\link[nontarget]{homol.search}}}
 }
 
 \references{
-\addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
+\insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
 
 \addCitations{igraph}{1}
 }

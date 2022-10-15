@@ -476,10 +476,11 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #'   and rendered with \pkg{\link{visNetwork}}.
 #'
 #' @inheritParams plotGraph,componentsNT-method
-#' @inherit plotGraph,componentsNT-method references
 #' 
 #' @template plotGraph
 #'
+#' @references \addCitations{igraph}{1}
+#' 
 #' @export
 setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE)
 {

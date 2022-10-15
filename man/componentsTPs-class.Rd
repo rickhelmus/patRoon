@@ -87,8 +87,6 @@ The intensity values for components (used by \code{plotSpectrum}) are set
 }
 
 \references{
-\addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
-
 \addCitations{igraph}{1}
 }
 \seealso{

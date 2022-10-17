@@ -671,7 +671,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                         NA_real_
                     else
                     {
-                        suppressWarnings(reg <- summary(lm(intensity[notna] ~ conc[notna])))
+                        ints <- intensity[notna]
+                        ints[ints == 0] <- NA
+                        suppressWarnings(reg <- summary(lm(ints ~ conc[notna])))
                         slope <- pv <- NA_real_
                         if (nrow(reg[["coefficients"]]) > 1)
                         {
@@ -719,7 +721,11 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         {
             notna <- !is.na(concs)
             notnaconcs <- concs[notna]
-            regr <- lapply(gTable, function(grp) summary(lm(grp[notna] ~ notnaconcs)))
+            regr <- lapply(gTable, function(grp)
+            {
+                grp[grp == 0] <- NA
+                summary(lm(grp[notna] ~ notnaconcs))
+            })
             ret[!sapply(regr, is.null), c("RSQ", "intercept", "slope", "p") :=
                     .(sapply(regr, "[[", "r.squared"),
                       sapply(regr, function(r) r$coefficients[1, 1]),

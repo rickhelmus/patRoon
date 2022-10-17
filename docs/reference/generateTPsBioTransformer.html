@@ -99,6 +99,7 @@
 <span>  <span class="va">parents</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"env"</span>,</span>
 <span>  generations <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  maxExpGenerations <span class="op">=</span> <span class="va">generations</span> <span class="op">+</span> <span class="fl">2</span>,</span>
 <span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  skipInvalid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -126,6 +127,10 @@ suspect (hits) are used as parents, whereas in the latter case all candidates ar
 <dt>generations</dt>
 <dd><p>The number of generations (steps) for the predictions. Sets the <code class="command">-s</code> command line option.
 More generations may be reported, see the <code>Hierarchy expansion</code> section below.</p></dd>
+
+
+<dt>maxExpGenerations</dt>
+<dd><p>The maximum number of generations during hierarchy expansion, see below.</p></dd>
 
 
 <dt>extraOpts</dt>
@@ -213,7 +218,8 @@ Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.</p></
   |            
  TP3
   </code></p>  
-<p>Note that this may result in pathways with more generations than defined by the <code>generations</code> argument.</p>
+<p>Note that this may result in pathways with more generations than defined by the <code>generations</code> argument. Thus,
+  the <code>maxExpGenerations</code> argument is used to avoid excessive expansions.</p>
     </div>
     <div id="validating-and-calculating-chemical-properties">
     <h2>Validating and calculating chemical properties</h2>

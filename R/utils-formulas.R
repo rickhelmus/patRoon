@@ -295,7 +295,7 @@ rankFormulaTable <- function(formTable)
 
 calculateFormScoreRanges <- function(formTable, mConsNames)
 {
-    scoreCols <- getAllMergedConsCols(formulaScorings()$name, names(formTable), mConsNames)
+    scoreCols <- getAllMergedConsCols(formScoreNames(FALSE), names(formTable), mConsNames)
     return(setNames(lapply(scoreCols,
                            function(sc) if (any(!is.na(formTable[[sc]]))) range(formTable[[sc]], na.rm = TRUE) else c(NA, NA)),
                     scoreCols))
@@ -320,7 +320,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
             formTable <- formTable[featCoverage >= formThreshold & featCoverageAnn >= formThresholdAnn]
         
         # average scorings
-        avgCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
+        avgCols <- intersect(c(formScoreNames(FALSE), "error", "error_median"), names(formTable))
         formTable[, (avgCols) := lapply(unique(.SD, by = "analysis")[, avgCols, with = FALSE], mean, na.rm = TRUE),
                   by = "neutral_formula", .SDcols = c(avgCols, "analysis")]
         

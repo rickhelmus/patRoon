@@ -406,7 +406,7 @@ getScriptCode <- function(input, analyses)
         if (input$ionization != "both" || (!input$exSuspList && !nzchar(input$suspectListNeg)))
             addScreenCall("suspList", !useScrForTPScreening)
         else
-            addScreenCall(c("suspListPos", "suspListNeg"), !useScrForTPScreening)
+            addScreenCall("list(suspListPos, suspListNeg)", !useScrForTPScreening)
     }
     else
         useScrForTPScreening <- FALSE

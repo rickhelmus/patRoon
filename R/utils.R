@@ -566,7 +566,8 @@ readYAML <- function(f) yaml::read_yaml(f, eval.expr = FALSE)
 # get a vector of all (merged) columns
 getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
 {
-    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames), USE.NAMES = FALSE))
+    if (length(mConsNames) > 0)
+        targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames), USE.NAMES = FALSE))
     return(intersect(targetCols, allCols))
 }
 

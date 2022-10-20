@@ -69,7 +69,19 @@ setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@merged
 setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount",
                                                                 "annotHitCount", "libMatch"))
 
-setMethod("annScoreNames", "compounds", function(obj, onlyNums) compScoreNames(onlyNums))
+setMethod("annScoreNames", "compounds", function(obj, onlyNums)
+{
+    ret <- callNextMethod()
+    if (onlyNums && length(ret) > 0)
+    {
+        # exclude suspect presence 'scores'
+        suspScores <- compoundScorings("metfrag")
+        suspScores[suspScores$suspect_list == TRUE, ]
+        suspCols <- getAllMergedConsCols(suspScores, ret, mergedConsensusNames(obj))
+        ret <- setdiff(ret, suspCols)
+    }
+    return(ret)
+})
 
 
 #' @describeIn compounds Show summary information for this object.

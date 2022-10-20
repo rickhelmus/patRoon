@@ -2,7 +2,8 @@ normalizeAnnScores <- function(res, scoreCols, scoreRanges, mConsNames, minMaxNo
 {
     res <- copy(res)
     columns <- names(res)
-    scoreCols <- getAllMergedConsCols(scoreCols, columns, mConsNames)
+    
+    scoreCols <- intersect(scoreCols, names(res))
     
     if (!is.null(exclude))
         scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]

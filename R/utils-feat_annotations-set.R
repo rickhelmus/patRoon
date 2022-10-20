@@ -21,7 +21,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     
     sCount <- length(setObjects)
     
-    scoreCols <- if (sCount > 0) annScoreNames(setObjects[[1]], TRUE)
+    allScoreCols <- unique(unlist(lapply(setObjects, annScoreNames, TRUE)))
     
     cons <- sapply(allAnnGNames, function(gName)
     {
@@ -49,9 +49,10 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         
         Reduce(x = allResults, f = function(left, right)
         {
-            scoreColsLeft <- getAllMergedConsCols(scoreCols, names(left), mConsNames)
-            scoreColsRight <- getAllMergedConsCols(scoreCols, names(right), mConsNames)
+            scoreColsLeft <- intersect(allScoreCols, names(left))
+            scoreColsRight <- intersect(allScoreCols, names(right))
             scoreColsBoth <- intersect(scoreColsLeft, scoreColsRight)
+            
             # UNDONE: below cols are specific to compounds --> make method?
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
             combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
@@ -101,7 +102,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     # update average scores and convert absolute merge counts to coverage
     cons <- lapply(cons, function(ct)
     {
-        scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
+        scCols <- intersect(allScoreCols, names(ct))
         ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
         
         # re-sort by avg rank scores

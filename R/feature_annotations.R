@@ -277,7 +277,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
            null.ok = TRUE, fixed = list(add = ac))
-    assertScoreRange(scoreLimits, annScoreNames(obj, FALSE), add = ac)
+    assertScoreRange(scoreLimits, NULL, add = ac)
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
@@ -443,6 +443,14 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
         stop("Need at least two non-empty objects to plot")
     
     do.call(UpSetR::upset, c(list(annTab, nsets = nsets, nintersects = nintersects), upsetArgs))
+})
+
+setMethod("annScoreNames", "featureAnnotations", function(obj, onlyNums)
+{
+    # NOTE: onlyNums ignored here, mainly for MF
+    if (length(obj@scoreRanges) == 0)
+        return(character())
+    return(unique(unlist(lapply(obj@scoreRanges, names))))
 })
 
 setMethod("prepareConsensusLabels", "featureAnnotations", function(obj, ..., labels)

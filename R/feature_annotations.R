@@ -158,7 +158,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     {
         annTable <- Map(annTable, x@scoreRanges, f = normalizeAnnScores,
                         MoreArgs = list(scoreCols = annScoreNames(x, TRUE), mConsNames = mcn, normalizeScores == "minmax",
-                                      exclude = excludeNormScores))
+                                        exclude = excludeNormScores))
     }
     
     if (fragments)

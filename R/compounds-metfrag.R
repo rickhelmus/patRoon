@@ -40,7 +40,7 @@ setMethod("initialize", "compoundsMF",
 setMethod("settings", "compoundsMF", function(compoundsMF) compoundsMF@settings)
 
 
-unifyMFNames <- function(mfr)
+unifyMFNames <- function(mfr, scoreTypesMF)
 {
     unNames <- c(NoExplPeaks = "explainedPeaks",
                  Score = "score",
@@ -161,8 +161,10 @@ unifyMFNames <- function(mfr)
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
     setnames(mfr, names(unNames), unNames)
+    
+    scoreTypesMF <- intersect(scoreTypesMF, names(mfr))
 
-    return(mfr[, unNames, with = FALSE]) # filter out any other columns
+    return(mfr[, union(unNames, scoreTypesMF), with = FALSE]) # filter out any other columns
 }
 
 # MetFragCL gives bracketed fragment formulas including charge and weird (de)protonation adducts
@@ -328,16 +330,20 @@ processMFResults <- function(comptab, runData, lfile = "")
     {
         compsc <- compoundScorings("metfrag")
         compsc <- compsc[compsc$metfrag %in% names(comptab), ]
+        allScoreCols <- union(compsc$metfrag, runData$mfSettings$MetFragScoreTypes)
 
-        if (nrow(compsc) > 0)
+        if (length(allScoreCols) > 0)
         {
             # fix up score and suspect list columns: dash --> 0
             # NOTE: do as.numeric as values with '-' will cause the column to be a character
-            comptab[, (compsc$metfrag) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
-                    .SDcols = compsc$metfrag]
+            comptab[, (allScoreCols) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
+                    .SDcols = allScoreCols]
 
-            scRanges <- setNames(lapply(compsc$metfrag, function(sc) range(comptab[[sc]])),
-                                 compsc$name)
+            scRanges <- sapply(allScoreCols, function(sc) range(comptab[[sc]]), simplify = FALSE)
+            namesInGenSC <- match(names(scRanges), compsc$metfrag)
+            notNA <- !is.na(namesInGenSC)
+            if (any(notNA))
+                names(scRanges)[notNA] <- compsc$name[notNA]
         }
 
         if (!is.null(runData$topMost) && nrow(comptab) > runData$topMost)
@@ -358,7 +364,7 @@ processMFResults <- function(comptab, runData, lfile = "")
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
         # unify column names & filter unnecessary columns
-        comptab <- unifyMFNames(comptab)
+        comptab <- unifyMFNames(comptab, runData$mfSettings$MetFragScoreTypes)
 
         if (!is.null(comptab[["CASRN"]]))
             comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
@@ -782,7 +788,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     
     # Ensure that scoreTypes doesn't contain anything 'extra', e.g. this can happen when the user specified scores not
     # present in the database.
-    scoreTypes <- intersect(scoreTypes, unlist(lapply(scoreRanges, names)))
+    scoreTypes <- if (length(scoreRanges) > 0) intersect(scoreTypes, unlist(lapply(scoreRanges, names))) else character()
 
     return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
                        scoreRanges = scoreRanges, settings = mfSettings))

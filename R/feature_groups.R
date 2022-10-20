@@ -673,14 +673,19 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                     {
                         ints <- intensity[notna]
                         ints[ints == 0] <- NA
-                        suppressWarnings(reg <- summary(lm(ints ~ conc[notna])))
-                        slope <- pv <- NA_real_
-                        if (nrow(reg[["coefficients"]]) > 1)
+                        if (all(is.na(ints)))
+                            NA_real_
+                        else
                         {
-                            slope <- reg[["coefficients"]][2, 1]
-                            pv <- reg[["coefficients"]][2, 4]
+                            suppressWarnings(reg <- summary(lm(ints ~ conc[notna])))
+                            slope <- pv <- NA_real_
+                            if (nrow(reg[["coefficients"]]) > 1)
+                            {
+                                slope <- reg[["coefficients"]][2, 1]
+                                pv <- reg[["coefficients"]][2, 4]
+                            }
+                            list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope, pv)
                         }
-                        list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope, pv)
                     }
                 }, by = group]
                 ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
@@ -721,16 +726,19 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         {
             notna <- !is.na(concs)
             notnaconcs <- concs[notna]
-            regr <- lapply(gTable, function(grp)
+            regr <- sapply(gTable, function(grp)
             {
                 grp[grp == 0] <- NA
-                summary(lm(grp[notna] ~ notnaconcs))
-            })
-            ret[!sapply(regr, is.null), c("RSQ", "intercept", "slope", "p") :=
-                    .(sapply(regr, "[[", "r.squared"),
-                      sapply(regr, function(r) r$coefficients[1, 1]),
-                      sapply(regr, function(r) r$coefficients[2, 1]),
-                      sapply(regr, function(r) r$coefficients[2, 4]))]
+                if (all(is.na(grp[notna])))
+                    return(NULL)
+                return(summary(lm(grp[notna] ~ notnaconcs)))
+            }, simplify = FALSE)
+            notNULL <- !sapply(regr, is.null)
+            ret[notNULL, c("RSQ", "intercept", "slope", "p") :=
+                    .(sapply(regr[notNULL], "[[", "r.squared"),
+                      sapply(regr[notNULL], function(r) r$coefficients[1, 1]),
+                      sapply(regr[notNULL], function(r) if (nrow(r$coefficients) > 1) r$coefficients[2, 1] else NA_real_),
+                      sapply(regr[notNULL], function(r) if (nrow(r$coefficients) > 1) r$coefficients[2, 4] else NA_real_))]
         }
 
         if (!is.null(FCParams))

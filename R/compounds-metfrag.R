@@ -777,10 +777,15 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     isMFScore <- scoreTypes %in% compsScores$metfrag
     if (any(isMFScore))
         scoreTypes[isMFScore] <- compsScores[match(scoreTypes[isMFScore], compsScores$metfrag), "name"]
+    
+    scoreRanges <- lapply(results, "[[", "scRanges")
+    
+    # Ensure that scoreTypes doesn't contain anything 'extra', e.g. this can happen when the user specified scores not
+    # present in the database.
+    scoreTypes <- intersect(scoreTypes, unlist(lapply(scoreRanges, names)))
 
     return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
-                       scoreRanges = lapply(results, "[[", "scRanges"),
-                       settings = mfSettings))
+                       scoreRanges = scoreRanges, settings = mfSettings))
 })
 
 #' @template featAnnSets-gen_args

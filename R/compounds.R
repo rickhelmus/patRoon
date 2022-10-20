@@ -76,7 +76,7 @@ setMethod("annScoreNames", "compounds", function(obj, onlyNums)
     {
         # exclude suspect presence 'scores'
         suspScores <- compoundScorings("metfrag")
-        suspScores[suspScores$suspect_list == TRUE, ]
+        suspScores <- suspScores[suspScores$suspect_list == TRUE, ]
         suspCols <- getAllMergedConsCols(suspScores, ret, mergedConsensusNames(obj))
         ret <- setdiff(ret, suspCols)
     }

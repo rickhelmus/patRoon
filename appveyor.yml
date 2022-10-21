@@ -4,10 +4,9 @@
 init:
     - ps: |
         $ErrorActionPreference = "Stop"
-        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+        Invoke-WebRequest https://raw.githubusercontent.com/rickhelmus/r-appveyor/rtools42/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 
-# NOTE: Rtools42 is installed manually, based on r-appveyor code to install Rtools40
 install:
     - ps: Bootstrap
     - ps: mkdir -Force c:\deps
@@ -41,16 +40,8 @@ install:
             Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe -OutFile "C:\deps\openbabel311.exe"
         }
         C:\deps\openbabel311.exe /S
-    - ps: >-
-        if (-Not (Test-Path C:\deps\Rtools42.exe)) {
-            Invoke-WebRequest https://cloud.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5355-5357.exe -OutFile "C:\deps\Rtools42.exe"
-        }
-        
-        Start-Process -FilePath C:\deps\Rtools42.exe -ArgumentList /VERYSILENT -NoNewWindow -Wait
-        
-        $env:PATH = 'c:\rtools42\usr\bin;c:\rtools42\mingw64\bin;' + $env:PATH
-        
-        #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   #- C:\RLibrary
@@ -84,7 +75,6 @@ environment:
       secure: VNNpZ/vmYAXvbXKtPfD/JNj4PPJOgbyUGMowVtH0Q//HULJrlOo62MWSuhksQ2MR
 
 build_script:
-    - ps: $env:PATH = 'c:\rtools42\usr\bin;c:\rtools42\mingw64\bin;' + $env:PATH
     - travis-tool.sh install_r tibble # workaround for MSnbase
     - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop ropls BiocStyle Rgraphviz InterpretMSSpectrum
     - travis-tool.sh install_github blosloos/enviPick

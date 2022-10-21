@@ -43,9 +43,9 @@ install:
     #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  - C:\RLibrary
-  - C:\Program Files\Pandoc\
-  - C:\deps
+  #- C:\RLibrary
+  #- C:\Program Files\Pandoc\
+  #- C:\deps
 
 # Adapt as necessary starting from here
 

@@ -66,6 +66,7 @@ before_test:
 platform: x64
 environment:
     R_ARCH: x64
+    R_VERSION: stable
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: FALSE
     R_CHECK_ARGS: --no-build-vignettes --no-manual --no-multiarch

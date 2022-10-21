@@ -45,9 +45,12 @@ install:
         if (-Not (Test-Path C:\deps\Rtools42.exe)) {
             Invoke-WebRequest https://cloud.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5355-5357.exe -OutFile "C:\deps\Rtools42.exe"
         }
+        
         Start-Process -FilePath C:\deps\Rtools42.exe -ArgumentList /VERYSILENT -NoNewWindow -Wait
+        
         $env:PATH = 'c:\rtools42\usr\bin;c:\rtools42\mingw64\bin;' + $env:PATH
-    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+        
+        #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   #- C:\RLibrary

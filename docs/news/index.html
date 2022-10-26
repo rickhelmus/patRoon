@@ -144,6 +144,7 @@
 <ul><li>Fixed: <code>scoreTypes</code> slot could contain scorings not actually used, e.g. if the <code>scoreTypes</code> argument to <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> contained scorings not actually present in the used database.</li>
 <li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
 </ul></li>
+<li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">

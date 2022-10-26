@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   tutorial: tutorial.html
-last_built: 2022-10-21T06:48Z
+last_built: 2022-10-26T13:15Z
 urls:
   reference: https://rickhelmus.github.io/patRoon/reference
   article: https://rickhelmus.github.io/patRoon/articles

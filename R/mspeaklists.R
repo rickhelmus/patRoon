@@ -532,7 +532,11 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         isReAveraged <- is.null(ana) && reAverage
         
         if (type == "MS")
+        {
             plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, deIsotopeMS, TRUE, negate)
+            if (!is.null(isolatePrec))
+                plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
+        }
         else
         {
             if (!isReAveraged && !is.null(annotatedBy))
@@ -564,9 +568,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             plF <- doMSPeakListFilter(plF, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, deIsotopeMSMS,
                                       retainPrecursorMSMS, negate)
         }
-        
-        if (!is.null(isolatePrec))
-            plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
         
         return(!pl$ID %in% plF$ID)
     }, reAverage = reAverage)

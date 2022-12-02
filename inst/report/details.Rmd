@@ -1,0 +1,88 @@
+Details {data-orientation=rows}
+===
+
+<label for="view-select">View:</label>
+<select name="view" id="view-select">
+    <option value="plain">Plain</option>
+    <option value="suspects">Suspects</option>
+</select>
+
+## { data-height=150 }
+
+### Feature groups { data-width=200 }
+
+```{r}
+reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
+```
+
+##
+### Details component/parent/suspect { data-width=100 }
+
+```{r}
+plot(1:10)
+```
+
+## { data-height=200, .tabset }
+
+### Feature group
+
+```{r}
+plot(1:10)
+```
+
+### Features
+
+### Formulas
+
+### Compounds
+
+### Transformations
+
+
+Details2 {data-orientation=columns}
+===
+
+<label for="view-select">View:</label>
+<select name="view" id="view-select">
+    <option value="plain">Plain</option>
+    <option value="suspects">Suspects</option>
+</select>
+
+## { data-width=150, .tabset }
+
+### components/parents/suspects
+
+```{r}
+reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
+```
+
+### Heatmap
+
+### Dendro
+
+### plotGraph
+
+## { data-width=250 }
+
+### Feature groups
+
+```{r}
+reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
+```
+
+
+## { data-width=200, .tabset }
+
+### Feature group
+
+```{r}
+plot(1:10)
+```
+
+### Features
+
+### Formulas
+
+### Compounds
+
+### Transformations

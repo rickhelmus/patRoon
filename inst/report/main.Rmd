@@ -4,7 +4,7 @@ author: "`r getPackageName(create = FALSE)`"
 date: "`r if (!rmdVars$noDate) date() else '' `"
 output:
     flexdashboard::flex_dashboard:
-        vertical_layout: scroll
+        vertical_layout: fill
         mathjax: null
         fig_mobile: false
         dev: png
@@ -203,3 +203,5 @@ rmdText <- if (isFGSet(rmdVars$fGroups))
 ```
 
 ```{r child="TPs.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0 && isComponentsTP}
+
+```{r child="details.Rmd"}

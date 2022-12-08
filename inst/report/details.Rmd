@@ -39,7 +39,9 @@ plot(1:10)
 ### Transformations
 
 
-Details2 {data-orientation=columns}
+
+
+Details2 {data-orientation=rows}
 ===
 
 <label for="view-select">View:</label>
@@ -48,30 +50,58 @@ Details2 {data-orientation=columns}
     <option value="suspects">Suspects</option>
 </select>
 
-## { data-width=150, .tabset }
+## { data-height=250 }
 
-### components/parents/suspects
-
-```{r}
-reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
-```
-
-### Heatmap
-
-### Dendro
-
-### plotGraph
-
-## { data-width=250 }
-
-### Feature groups
+### Feature groups { data-width=250 }
 
 ```{r}
-reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
+tab <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
+tab[, ret := round(ret, 2)]
+tab[, mz := round(mz, 5)]
+
+groupBy <- NULL
+if (F && !is.null(rmdVars$components))
+{
+    tabc <- as.data.table(rmdVars$components)
+    tab <- merge(tabc, tab)
+    groupBy <- "name"
+}
+#reactable::reactable(tab, groupBy = groupBy)
+
+ci <- copy(componentInfo(rmdVars$components))
+setnames(ci, sub("^parent_", "", names(ci)))
+ci[, c("SMILES", "InChI", "InChIKey", "size", "links") := NULL]
+ci[, rt := round(rt, 2)]
+ci[, c("mz", "neutralMass") := .(round(mz, 5), round(neutralMass, 5))]
+reactable::reactable(ci, details = function(index)
+{
+    htmltools::div(style = "padding: 1rem",
+                   reactable::reactable(tab[group %in% rmdVars$components[[index]]$group],
+                                        pagination = FALSE, outlined = TRUE,
+                                        theme = reactable::reactableTheme(backgroundColor = "grey")))
+}, pagination = FALSE, onClick = "expand")
+
 ```
 
+### Component EIC { data-width=100 }
 
-## { data-width=200, .tabset }
+<div>
+<input type="radio" id="eic-choice" name="componentView" value="eic">
+<label for="eic-choice">EIC</label>
+<input type="radio" id="spec-choice" name="componentView" value="spec">
+<label for="spec-choice">Spectrum</label>
+</div>
+
+<div>
+<button type="button">EIC</button>
+<button type="button">Spectrum</button>
+</div>
+
+```{r fig.show='hold'}
+plot(1:10)
+```
+
+## { data-height=250, .tabset }
 
 ### Feature group
 

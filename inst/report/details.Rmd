@@ -1,8 +1,8 @@
 Details {data-orientation=rows}
 ===
 
-<label for="view-select">View:</label>
-<select name="view" id="view-select">
+<label for="view-select-old">View:</label>
+<select name="view" id="view-select-old">
     <option value="plain">Plain</option>
     <option value="suspects">Suspects</option>
 </select>
@@ -44,31 +44,81 @@ plot(1:10)
 Details2 {data-orientation=rows}
 ===
 
+<script>
+function updateView(sel)
+{
+    for (var o of document.getElementById("view-select").options)
+        document.getElementById("detailsTab" + o.value).style.display = (o.value === sel) ? "" : "none"
+}
+</script>
+
 <label for="view-select">View:</label>
-<select name="view" id="view-select">
-    <option value="plain">Plain</option>
-    <option value="suspects">Suspects</option>
+<select name="view" id="view-select" onChange="updateView(this.value)">
+    <option value="Plain">Plain</option>
+    <option value="Suspects">Suspects</option>
+    <option value="Components">Components</option>
+    <option value="TPs">Transformation products</option>
 </select>
 
 ## { data-height=250 }
 
 ### Feature groups { data-width=250 }
 
-```{r}
+```{r echo=FALSE}
 tab <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
 tab[, ret := round(ret, 2)]
 tab[, mz := round(mz, 5)]
 
-groupBy <- NULL
-if (F && !is.null(rmdVars$components))
+if (T)
 {
     tabc <- as.data.table(rmdVars$components)
-    tab <- merge(tabc, tab)
-    groupBy <- "name"
-}
-#reactable::reactable(tab, groupBy = groupBy)
+    tab <- merge(tabc[, c("group", setdiff(names(tabc), names(tab))), with = FALSE], tab, by = "group")
+    setnames(tab, "name", "component")
+    setnames(tab, "TP_name", "name")
+    # tab[, component := sprintf("<b>%s</b><br>%s (%s)", component, parent_group, parent_name)]
+    groupBy <- "component"
 
+    parAggr <- function(col) htmlwidgets::JS(sprintf("function(values, rows)
+    {
+        return '<i>' + rows[0].parent_%s + '</i>';
+    }", col))
+    
+    rCols <- list(
+        # component = reactable::colDef(html = TRUE, minWidth = 300)
+    )
+    for (col in c("group", "name", "formula"))
+    {
+        rCols[[col]] <- reactable::colDef(aggregate = parAggr(col), html = TRUE)
+        rCols[[paste0("parent_", col)]] <- reactable::colDef(show = FALSE)
+    }
+    tab[, c("parent_rt", "parent_mz", "parent_SMILES", "parent_InChI", "parent_InChIKey", "parent_neutralMass",
+            "size", "SMILES", "InChI", "InChIKey", "links", "intensity") := NULL]
+    
+    EICs <- invisible(getEICsForFGroups(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMZWindow, 1, FALSE, TRUE))
+    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
+    EICs <- Reduce(modifyList, EICs)
+    rCols$group$cell <- function(value, index)
+    {
+        htmltools::div(value,
+                       htmltools::br(),
+                       sparkline::sparkline(EICs[[value]]$intensity, xvalues = EICs[[value]]$time, type = "line"))
+    }
+    
+    reactable::reactable(tab, groupBy = groupBy, pagination = FALSE, columns = rCols,
+                         wrap = FALSE, resizable = TRUE,onClick = htmlwidgets::JS("function(rowInfo, column)
+{
+    Reactable.setMeta('detailsTabTPs', { selectedRow: rowInfo.index });
+}"), rowStyle = htmlwidgets::JS("function(rowInfo, state)
+{
+    const sel = state.meta.selectedRow;
+    if (sel != null && rowInfo.index == sel)
+        return { background: 'grey', cursor: 'pointer' };
+    return { cursor: 'pointer' };
+}"), elementId = "detailsTabTPs", meta = list(selectedRow = NULL))
+} else
+{
 ci <- copy(componentInfo(rmdVars$components))
+setnames(ci, "name", "component")
 setnames(ci, sub("^parent_", "", names(ci)))
 ci[, c("SMILES", "InChI", "InChIKey", "size", "links") := NULL]
 ci[, rt := round(rt, 2)]
@@ -77,13 +127,43 @@ reactable::reactable(ci, details = function(index)
 {
     htmltools::div(style = "padding: 1rem",
                    reactable::reactable(tab[group %in% rmdVars$components[[index]]$group],
-                                        pagination = FALSE, outlined = TRUE,
-                                        theme = reactable::reactableTheme(backgroundColor = "grey")))
-}, pagination = FALSE, onClick = "expand")
+                                        pagination = FALSE, outlined = TRUE))
+}, pagination = FALSE, onClick = htmlwidgets::JS("function(rowInfo, column)
+{
+    Reactable.setMeta('detailsTabTPs', { selectedRow: rowInfo.index });
+}"), rowStyle = htmlwidgets::JS("function(rowInfo, state)
+{
+    const sel = state.meta.selectedRow;
+    console.log('Sel: ' + sel);
+    console.log('Me: ' + rowInfo.index);
+    if (sel != null && rowInfo.index == sel)
+        return { background: 'grey', cursor: 'pointer' };
+    return { cursor: 'pointer' };
+}"), elementId = "detailsTabTPs", meta = list(selectedRow = 2))
+}
 
+htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabPlain"),
+                      htmlwidgets::JS("function(el, x)
+{
+    el.style.display = 'none';
+}"))
+
+htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabComponents"),
+                      htmlwidgets::JS("function(el, x)
+{
+    el.style.display = 'none';
+}"))
+
+htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabSuspects"),
+                      htmlwidgets::JS("function(el, x)
+{
+    el.style.display = 'none';
+}"))
 ```
 
 ### Component EIC { data-width=100 }
+
+<div>
 
 <div>
 <input type="radio" id="eic-choice" name="componentView" value="eic">
@@ -100,6 +180,8 @@ reactable::reactable(ci, details = function(index)
 ```{r fig.show='hold'}
 plot(1:10)
 ```
+
+</div>
 
 ## { data-height=250, .tabset }
 

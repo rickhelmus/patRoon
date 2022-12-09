@@ -5,6 +5,11 @@
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
+- No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
+
+## Reporting
+
+- Put CSV/PDF functions also in separate files
 
 
 ## Features

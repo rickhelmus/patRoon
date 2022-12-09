@@ -1,0 +1,55 @@
+---
+title: "report"
+author: "`r getPackageName(create = FALSE)`"
+date: "`r if (!properties$noDate) date() else '' `"
+output:
+    flexdashboard::flex_dashboard:
+        vertical_layout: fill
+        mathjax: null
+        fig_mobile: false
+        dev: svg
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
+
+```
+
+<style>
+pre, code {
+    white-space: pre !important;
+    overflow-x: auto !important;
+    max-height: 275px;
+    overflow-y: auto;
+}
+</style>
+
+Summary {data-orientation=rows}
+================
+
+## { data-height=350 }
+
+### EICs
+
+```{r,results='asis'}
+printf("![feature chromatograms](%s)\n", plots$overview$chroms)
+```
+
+
+## { data-height=300 }
+
+### Objects
+
+```{r obj-show}
+cat("Objects here\n")
+```
+
+
+### Retention vs m/z
+```{r fig.height=4}
+plot(1:10)
+```
+
+
+```{r child="details.Rmd"}
+```

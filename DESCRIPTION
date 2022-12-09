@@ -239,6 +239,7 @@ Collate:
     'multi-process-future.R'
     'multi-process.R'
     'project-tool.R'
+    'report-html.R'
     'report.R'
     'utils-TPs.R'
     'utils-checkmate.R'

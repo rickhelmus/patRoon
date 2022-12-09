@@ -1,49 +1,6 @@
 Details {data-orientation=rows}
 ===
 
-<label for="view-select-old">View:</label>
-<select name="view" id="view-select-old">
-    <option value="plain">Plain</option>
-    <option value="suspects">Suspects</option>
-</select>
-
-## { data-height=150 }
-
-### Feature groups { data-width=200 }
-
-```{r}
-reactable::reactable(as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE))
-```
-
-##
-### Details component/parent/suspect { data-width=100 }
-
-```{r}
-plot(1:10)
-```
-
-## { data-height=200, .tabset }
-
-### Feature group
-
-```{r}
-plot(1:10)
-```
-
-### Features
-
-### Formulas
-
-### Compounds
-
-### Transformations
-
-
-
-
-Details2 {data-orientation=rows}
-===
-
 <script>
 function updateView(sel)
 {
@@ -64,7 +21,7 @@ function updateView(sel)
 
 ### Feature groups { data-width=250 }
 
-```{r echo=FALSE}
+```{r echo=FALSE,eval=FALSE}
 tab <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
 tab[, ret := round(ret, 2)]
 tab[, mz := round(mz, 5)]

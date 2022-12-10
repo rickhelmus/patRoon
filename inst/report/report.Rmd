@@ -29,10 +29,10 @@ Summary {data-orientation=rows}
 
 ## { data-height=350 }
 
-### EICs
+### Top intensity chromatograms
 
-```{r,results='asis'}
-printf("![feature chromatograms](%s)\n", plots$overview$chroms)
+```{r, results = "asis"}
+printf("![](%s)\n", plots$overview$chroms)
 ```
 
 
@@ -46,10 +46,20 @@ cat("Objects here\n")
 
 
 ### Retention vs m/z
-```{r fig.height=4}
-plot(1:10)
+
+```{r, results = "asis"}
+printf("![](%s)\n", plots$overview$retMZ)
 ```
 
+```{r, results = "asis", eval = !is.null(plots$overview$chord) || !is.null(plots$overview$venn) || is.null(plots$overview$UpSet)}
+cat("## { data-height=425 }\n\n")
+if (!is.null(plots$overview$chord))
+    printf("### Chord diagram\n\n![](%s)\n\n", plots$overview$chord)
+if (!is.null(plots$overview$venn))
+    printf("### Venn diagram\n\n![](%s)\n\n", plots$overview$venn)
+if (!is.null(plots$overview$UpSet))
+    printf("### UpSet diagram\n\n![](%s)\n\n", plots$overview$UpSet)
+```
 
 ```{r child="details.Rmd"}
 ```

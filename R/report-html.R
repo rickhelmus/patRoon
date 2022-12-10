@@ -20,7 +20,43 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
         # UNDONE: params
         plotChroms(fGroups, 30, 0.005, TRUE, 1, FALSE, EICs, TRUE, FALSE, colourBy = "fGroups", showLegend = FALSE,
                    onlyPresent = TRUE)
-    })
+    }, width = 10, height = 4)
+    
+    ret$overview$retMZ <- makeHTMLReportPlot("retmz.svg", outPath, selfContained, {
+        par(mai = c(0.9, 0.8, 0.1, 0.1))
+        # UNDONE: params
+        plot(fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = TRUE)
+    }, width = 7, height = 4)
+    
+    rGroupLenNonEmpty <- length(replicateGroups(removeEmptyAnalyses(fGroups)))
+    rGroupLen <- length(replicateGroups(fGroups))
+    anyOverlap <- rGroupLen > 1 &&
+        length(unique(fGroups, which = replicateGroups(fGroups), outer = TRUE)) < length(fGroups)
+    
+    ret$overview$chord <- ret$overview$venn  <- ret$overview$UpSet <- NULL
+    if (anyOverlap && rGroupLenNonEmpty > 1)
+    {
+        if (rGroupLenNonEmpty > 2)
+        {
+            ret$overview$chord <- makeHTMLReportPlot("retmz.svg", outPath, selfContained, {
+                # UNDONE: params(?)
+                plotChord(fGroups, average = TRUE)
+            }, width = 7, height = 5.5)
+        }
+        if (rGroupLen < 6)
+        {
+            ret$overview$venn <- makeHTMLReportPlot("venn.svg", outPath, selfContained, {
+                # UNDONE: params(?)
+                plotVenn(fGroups)
+            }, width = 7, height = 5.5)
+        }
+        
+        # UpSet
+        ret$overview$UpSet <- makeHTMLReportPlot("upset.svg", outPath, selfContained, {
+            # UNDONE: params(?)
+            print(plotUpSet(fGroups))
+        }, width = 7, height = 5.5)
+    }
     
     return(ret)
 }

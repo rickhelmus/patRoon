@@ -22,7 +22,7 @@ COPY --chown=rstudio docker/install_deps.R DESCRIPTION .
 COPY --chown=rstudio docker/rstudio/ccache.conf /home/rstudio/.ccache/
 COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 
-ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=250
 
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/ipb-halle/MetFragRelaunched/releases/download/v.2.5.0/MetFragCommandLine-2.5.0.jar && \

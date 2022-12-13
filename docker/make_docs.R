@@ -14,12 +14,11 @@ file.rename(origRmds, disabledRmds)
 # remotes::install_github("r-lib/pkgdown@v1.6.1")
 install.packages("pkgdown")
 
-install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
+install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot2", "tinytex"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()
 tinytex::tlmgr_install("pdfcrop")
-webshot::install_phantomjs()
 Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 
 pkgdown::clean_site()

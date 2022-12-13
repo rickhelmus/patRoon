@@ -347,7 +347,9 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached
     # based on https://stackoverflow.com/a/36611896
-    withr::local_environment(list(SSgauss = xcms::SSgauss))
+    eg <- new.env()
+    eg$SSgauss <- xcms::SSgauss
+    withr::local_environment(eg)
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {

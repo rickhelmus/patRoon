@@ -268,7 +268,7 @@ getScriptCode <- function(input, analyses)
         addText("}")
     }
     
-    # addHeader("features")
+    addHeader("features")
     
     if (input$featGrouper != "SIRIUS") # NOTE: never the case with sets
     {
@@ -704,7 +704,7 @@ doCreateProject <- function(input, analyses)
     if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
-        rstudioapi::insertText(Inf, code, getSourceEditorContext()$id)
+        rstudioapi::insertText(Inf, code, rstudioapi::getSourceEditorContext()$id)
     }
     else
     {

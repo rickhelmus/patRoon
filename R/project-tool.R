@@ -85,12 +85,7 @@ getScriptCode <- function(input, analyses)
         {
             addComment("Load analysis table", condition = comment)
             addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
-            if (any(anaTable$exclude))
-            {
-              toExclude <- paste0('c(',paste0(which(anaTable$exclude),collapse = ', '),')')
-              addAssignment(anaInfoVarName, paste0(anaInfoVarName,'[-',toExclude,',]'))
-              addNL()
-            }
+            addNL()
         }
         else if (input$generateAnaInfo == "script")
         {
@@ -684,7 +679,7 @@ doCreateProject <- function(input, analyses)
         
         # Make analysis table
         if (input$generateAnaInfo == "table")
-            write.csv(anas[, c("path", "analysis", "group", "blank", "norm_conc")],
+            write.csv(anas[!anas$exclude, c("path", "analysis", "group", "blank", "norm_conc")],
                       file.path(input$destinationPath, tableFile), row.names = FALSE)
         
         return(anas)

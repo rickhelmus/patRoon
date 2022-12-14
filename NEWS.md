@@ -42,6 +42,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fixed regression where the `filter()` method for `MSPeakLists` where precursor isolation (`isolatePrec` argument) also applied to MS/MS data (issue #56).
 - Fixed: `predictCheckFeaturesSession()` marked passing peaks to be removed instead of the other way around (issue #59)
 - Fixed: newProject(): properly call `rstudioapi::getSourceEditorContext()` (issue #62)
+- `newProject`: added possibility to exclude analyses out of folder (issue #60, #63)
 
 
 # patRoon 2.1

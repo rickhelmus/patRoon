@@ -14,11 +14,12 @@ file.rename(origRmds, disabledRmds)
 # remotes::install_github("r-lib/pkgdown@v1.6.1")
 install.packages("pkgdown")
 
-install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot2", "tinytex"))
+install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()
 tinytex::tlmgr_install("pdfcrop")
+webshot::install_phantomjs()
 Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 
 pkgdown::clean_site()
@@ -33,7 +34,10 @@ out <- file.path(normalizePath("docs", mustWork = FALSE), "handbook_bd")
 withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", output_dir = out))
 
 # PDF versions
-withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", "bookdown::pdf_book", output_dir = out))
+# OPENSSL_CONF workaround for PhamtomJS --> see https://stackoverflow.com/a/73063745
+withr::with_dir("vignettes/handbook/",
+                withr::with_envvar(OPENSSL_CONF = "/dev/null",
+                                   bookdown::render_book("index.Rmd", "bookdown::pdf_book", output_dir = out)))
 rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document", output_dir = file.path("docs", "articles"))
 
 tinytex::tlmgr_install("makeindex")

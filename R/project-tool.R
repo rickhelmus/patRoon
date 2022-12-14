@@ -85,6 +85,12 @@ getScriptCode <- function(input, analyses)
         {
             addComment("Load analysis table", condition = comment)
             addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
+            if (any(anaTable$exclude))
+            {
+              toExclude <- paste0('c(',paste0(which(anaTable$exclude),collapse = ', '),')')
+              addAssignment(anaInfoVarName, paste0(anaInfoVarName,'[-',toExclude,',]'))
+              addNL()
+            }
         }
         else if (input$generateAnaInfo == "script")
         {
@@ -94,6 +100,12 @@ getScriptCode <- function(input, analyses)
                 list(name = "blanks", value = anaTable$blank, quote = TRUE),
                 list(name = "norm_concs", value = anaTable$norm_conc)
             ))
+            if (any(anaTable$exclude))
+            {
+              toExclude <- paste0('c(',paste0(which(anaTable$exclude),collapse = ', '),')')
+              addAssignment(anaInfoVarName, paste0(anaInfoVarName,'[-',toExclude,',]'))
+              addNL()
+            }
         }
         else if (input$generateAnaInfo == "example")
         {
@@ -256,7 +268,7 @@ getScriptCode <- function(input, analyses)
         addText("}")
     }
     
-    addHeader("features")
+    # addHeader("features")
     
     if (input$featGrouper != "SIRIUS") # NOTE: never the case with sets
     {
@@ -692,7 +704,7 @@ doCreateProject <- function(input, analyses)
     if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
-        rstudioapi::insertText(Inf, code, rstudioapi::getSourceEditorContext()$id)
+        rstudioapi::insertText(Inf, code, getSourceEditorContext()$id)
     }
     else
     {
@@ -843,8 +855,7 @@ getNewProjectUI <- function(destPath)
                     condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                     miniUI::miniButtonBlock(
                         actionButton("addAnalysesDir", "Add analyses from directory ..."),
-                        actionButton("addAnalysesCSV", "Add analyses from csv file ..."),
-                        actionButton("removeAnalyses", "Remove")
+                        actionButton("addAnalysesCSV", "Add analyses from csv file ...")
                     )
                 )
             ),
@@ -1186,7 +1197,7 @@ newProject <- function(destPath = NULL)
                     selectionMode = "range", outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
-    emptyAnaTable <- function() data.table(analysis = character(0), format = character(0),
+    emptyAnaTable <- function() data.table(exclude = logical(0), analysis = character(0), format = character(0),
                                            group = character(0), blank = character(0), norm_conc = numeric(0),
                                            path = character(0))
     
@@ -1202,7 +1213,8 @@ newProject <- function(destPath = NULL)
                            c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
-                rhandsontable::hot_col("norm_conc", readOnly = FALSE, type = "numeric")
+                rhandsontable::hot_col("norm_conc", readOnly = FALSE, type = "numeric") %>%
+                rhandsontable::hot_col("exclude", readOnly = FALSE, type = "checkbox")
             
             return(hot)
         }
@@ -1332,10 +1344,6 @@ newProject <- function(destPath = NULL)
             if (!is.null(dest))
                 updateTextInput(session, "destinationPath", value = dest)
         })
-
-        observeEvent(input$generateAnaInfo, {
-            shinyjs::toggle("removeAnalyses", condition = input$generateAnaInfo == "table")
-        })
         
         doObserveAnaHot <- function(name, rvName)
         {
@@ -1343,7 +1351,7 @@ newProject <- function(destPath = NULL)
             if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
             {
                 df <- rhandsontable::hot_to_r(input[[name]])
-                rValues[[rvName]][, c("group", "blank") := .(df$group, df$blank)]
+                rValues[[rvName]][, c("exclude","group", "blank") := .(df$exclude, df$group, df$blank)]
             }
         }
         observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
@@ -1369,7 +1377,8 @@ newProject <- function(destPath = NULL)
 
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    setcolorder(dt, c("analysis", "format", "group", "blank", "norm_conc", "path"))
+                    dt$exclude <- FALSE
+                    setcolorder(dt, c("exclude","analysis", "format", "group", "blank", "norm_conc", "path"))
 
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
@@ -1408,17 +1417,11 @@ newProject <- function(destPath = NULL)
                     
                     if (is.null(csvTab[["norm_conc"]])) # older files lack this column
                         csvTab[, norm_conc := NA_real_]
-                    
+                    csvTab$exclude <- FALSE
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab)
                 }
             }
-        })
-
-        observeEvent(input$removeAnalyses, {
-            rvName <- getCurAnaRVName()
-            hotSel <- paste0(getCurAnaHotName(), "_select")
-            rValues[[rvName]] <- rValues[[rvName]][-seq.int(input[[hotSel]]$select$r, input[[hotSel]]$select$r2)]
         })
 
         observeEvent(input$convAlgo, {

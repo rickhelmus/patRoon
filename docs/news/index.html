@@ -145,6 +145,8 @@
 <li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
 </ul></li>
 <li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> marked passing peaks to be removed instead of the other way around (issue <a href="https://github.com/rickhelmus/patRoon/issues/59" class="external-link">#59</a>)</li>
+<li>Fixed: newProject(): properly call <code><a href="https://rstudio.github.io/rstudioapi/reference/rstudio-editors.html" class="external-link">rstudioapi::getSourceEditorContext()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/62" class="external-link">#62</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">

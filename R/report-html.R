@@ -3,25 +3,39 @@ NULL
 
 makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
 {
-    if (selfContained)
+    if (FALSE)
     {
-        svgstr <- svglite::svgstring(standalone = FALSE, ...)
-        on.exit(dev.off, add = TRUE)
-        force(code)
-        ret <- as.character(svgstr())
-        # replace fixed width/height properties to allow proper scaling (see https://stackoverflow.com/a/45144857).
-        # NOTE: use sub so that only header (first occurrence) is modified. Furthermore, note that the svglite css class
-        # is changed in report.Rmd.
-        ret <- sub("width=\\'[[:graph:]]+\\'", "width='100%'", ret)
-        ret <- sub("height=\\'[[:graph:]]+\\'", "height='auto'", ret)
-        return(ret)
+        if (selfContained)
+        {
+            svgstr <- svglite::svgstring(standalone = FALSE, fix_text_size = FALSE, ...)
+            on.exit(dev.off(), add = TRUE)
+            force(code)
+            ret <- as.character(svgstr())
+            
+            # replace fixed width/height properties to allow proper scaling (see https://stackoverflow.com/a/45144857).
+            # NOTE: use sub so that only header (first occurrence) is modified. Furthermore, note that the svglite css class
+            # is changed in report.Rmd.
+            # ret <- sub("width=\\'[[:graph:]]+\\'", "width='100%'", ret)
+            # ret <- sub("height=\\'[[:graph:]]+\\'", "height='auto'", ret)
+            return(ret)
+        }
+    }
+    else if (selfContained)
+    {
+        # UNDONE: while embedding the SVG directly would be nice, this seems to give major headaches with scaling,
+        # especially with Firefox... For now just base64 it :(
+        withSVGLite(out, standalone = TRUE, code = code, ...)
+        return(paste0("<img src=", knitr::image_uri(out), "></img>"))
     }
     
     destPath <- file.path(outPath, "report_files", "plots")
     mkdirp(destPath)
     out <- file.path(destPath, out)
-    withSVGLite(out, standalone = FALSE, code = code, ...)
+    withSVGLite(out, standalone = TRUE, code = code, ...)
     return(paste0("<img src='", out, "'></img>"))
+    
+    # UNDONE: object tag makes text selectable but messes up layout...
+    # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
 }
 
 generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,

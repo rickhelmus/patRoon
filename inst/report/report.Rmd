@@ -23,10 +23,14 @@ pre, code {
     overflow-y: auto;
 }
 
-// set positioning to allow scaling: https://stackoverflow.com/a/45144857
-svglite {
+/* set positioning to allow scaling: https://stackoverflow.com/a/45144857 */
+/* UNDONE: doesn't work...
+.svglite {
     position: absolute;
-}
+    width: 100%;
+    height: auto;
+}*/
+
 </style>
 
 Summary {data-orientation=rows}
@@ -40,7 +44,6 @@ Summary {data-orientation=rows}
 printf("%s\n\n", plots$overview$chroms)
 ```
 
-
 ## { data-height=300 }
 
 ### Objects
@@ -53,7 +56,7 @@ cat("Objects here\n")
 ### Retention vs m/z
 
 ```{r, results = "asis"}
-printf("%s\n", plots$overview$retMZ)
+printf("%s\n\n", plots$overview$retMZ)
 ```
 
 ```{r, results = "asis", eval = !is.null(plots$overview$chord) || !is.null(plots$overview$venn) || is.null(plots$overview$UpSet)}

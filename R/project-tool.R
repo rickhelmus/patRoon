@@ -85,7 +85,6 @@ getScriptCode <- function(input, analyses)
         {
             addComment("Load analysis table", condition = comment)
             addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
-            addNL()
         }
         else if (input$generateAnaInfo == "script")
         {
@@ -97,9 +96,9 @@ getScriptCode <- function(input, analyses)
             ))
             if (any(anaTable$exclude))
             {
-              toExclude <- paste0('c(',paste0(which(anaTable$exclude),collapse = ', '),')')
-              addAssignment(anaInfoVarName, paste0(anaInfoVarName,'[-',toExclude,',]'))
-              addNL()
+                toExclude <- paste0('c(', paste0(which(anaTable$exclude), collapse = ', '), ')')
+                addAssignment(anaInfoVarName, paste0(anaInfoVarName, '[-', toExclude, ', ]'))
+                addNL()
             }
         }
         else if (input$generateAnaInfo == "example")
@@ -1346,7 +1345,7 @@ newProject <- function(destPath = NULL)
             if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
             {
                 df <- rhandsontable::hot_to_r(input[[name]])
-                rValues[[rvName]][, c("exclude","group", "blank") := .(df$exclude, df$group, df$blank)]
+                rValues[[rvName]][, c("exclude", "group", "blank") := .(df$exclude, df$group, df$blank)]
             }
         }
         observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
@@ -1373,7 +1372,7 @@ newProject <- function(destPath = NULL)
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
                     dt$exclude <- FALSE
-                    setcolorder(dt, c("exclude","analysis", "format", "group", "blank", "norm_conc", "path"))
+                    setcolorder(dt, c("exclude", "analysis", "format", "group", "blank", "norm_conc", "path"))
 
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)

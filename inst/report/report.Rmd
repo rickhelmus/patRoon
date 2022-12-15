@@ -22,6 +22,11 @@ pre, code {
     max-height: 275px;
     overflow-y: auto;
 }
+
+// set positioning to allow scaling: https://stackoverflow.com/a/45144857
+svglite {
+    position: absolute;
+}
 </style>
 
 Summary {data-orientation=rows}
@@ -32,7 +37,7 @@ Summary {data-orientation=rows}
 ### Top intensity chromatograms
 
 ```{r, results = "asis"}
-printf("![](%s)\n", plots$overview$chroms)
+printf("%s\n\n", plots$overview$chroms)
 ```
 
 
@@ -48,17 +53,17 @@ cat("Objects here\n")
 ### Retention vs m/z
 
 ```{r, results = "asis"}
-printf("![](%s)\n", plots$overview$retMZ)
+printf("%s\n", plots$overview$retMZ)
 ```
 
 ```{r, results = "asis", eval = !is.null(plots$overview$chord) || !is.null(plots$overview$venn) || is.null(plots$overview$UpSet)}
 cat("## { data-height=425 }\n\n")
 if (!is.null(plots$overview$chord))
-    printf("### Chord diagram\n\n![](%s)\n\n", plots$overview$chord)
+    printf("### Chord diagram\n\n%s\n\n", plots$overview$chord)
 if (!is.null(plots$overview$venn))
-    printf("### Venn diagram\n\n![](%s)\n\n", plots$overview$venn)
+    printf("### Venn diagram\n\n%s\n\n", plots$overview$venn)
 if (!is.null(plots$overview$UpSet))
-    printf("### UpSet diagram\n\n![](%s)\n\n", plots$overview$UpSet)
+    printf("### UpSet diagram\n\n%s\n\n", plots$overview$UpSet)
 ```
 
 ```{r child="details.Rmd"}

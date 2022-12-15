@@ -507,3 +507,5 @@ doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, ty
     
     par(oldp)
 }
+
+withSVGLite <- withr::with_(function(file, ...) svglite::svglite(file, ...), function(old) dev.off())

@@ -1,13 +1,27 @@
 #' @include main.R
 NULL
 
-makeHTMLReportPlot <- function(out, outPath, selfContained, ...)
+makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
 {
-    destPath <- if (selfContained) "." else file.path(outPath, "report_files", "plots")
+    if (selfContained)
+    {
+        svgstr <- svglite::svgstring(standalone = FALSE, ...)
+        on.exit(dev.off, add = TRUE)
+        force(code)
+        ret <- as.character(svgstr())
+        # replace fixed width/height properties to allow proper scaling (see https://stackoverflow.com/a/45144857).
+        # NOTE: use sub so that only header (first occurrence) is modified. Furthermore, note that the svglite css class
+        # is changed in report.Rmd.
+        ret <- sub("width=\\'[[:graph:]]+\\'", "width='100%'", ret)
+        ret <- sub("height=\\'[[:graph:]]+\\'", "height='auto'", ret)
+        return(ret)
+    }
+    
+    destPath <- file.path(outPath, "report_files", "plots")
     mkdirp(destPath)
     out <- file.path(destPath, out)
-    withr::with_svg(out, ...)
-    return(out)
+    withSVGLite(out, standalone = FALSE, code = code, ...)
+    return(paste0("<img src='", out, "'></img>"))
 }
 
 generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,

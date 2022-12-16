@@ -500,7 +500,10 @@ getSimPLAndPrec <- function(MSPeakLists, group, analysis, MSLevel, specSimParams
                 if (MSLevel == 2)
                 {
                     precSpec <- getSpec(MSPeakLists, gn, 1, ana)
-                    ret <- precSpec[precursor == TRUE]$mz
+                    ret <- if (is.null(precSpec))
+                        numeric()
+                    else
+                        precSpec[precursor == TRUE]$mz
                 }
             }
             return(if (length(ret) == 0) NA_real_ else ret)            

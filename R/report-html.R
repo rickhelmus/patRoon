@@ -66,7 +66,7 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
     {
         if (rGroupLenNonEmpty > 2)
         {
-            ret$overview$chord <- makeHTMLReportPlot("retmz.svg", outPath, selfContained, {
+            ret$overview$chord <- makeHTMLReportPlot("chord.svg", outPath, selfContained, {
                 # UNDONE: params(?)
                 plotChord(fGroups, average = TRUE)
             }, width = 7, height = 5.5)

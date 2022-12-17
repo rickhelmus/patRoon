@@ -12,6 +12,7 @@ NULL
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
 #' @slot annotations,ISTDAssignments \setsWF As the \code{featureGroups} slots, but contains the data per set.
+#' @slot annotationsChanged Set internally by \code{adducts()<-} and applied as soon as \code{reGroup=TRUE}. 
 #'
 #' @section Sets workflows: \setsWFClass{featureGroupsSet}{featureGroups}
 #'
@@ -23,7 +24,7 @@ NULL
 #'   \item \code{adducts}, \code{adducts<-} require the \code{set} argument. The order of the data that is
 #'   returned/changed follows that of the \code{annotations} slot. Furthermore, \code{adducts<-} will perform a
 #'   re-grouping of features when its \code{reGroup} parameter is set to \code{TRUE}. The implications for this are
-#'   discussed below.
+#'   discussed below. Note that no adducts are changed \emph{until} \code{reGroup=TRUE}.
 #'
 #'   \item the subset operator (\code{[}) has specific arguments to choose (feature presence in) sets. See the argument
 #'   descriptions.
@@ -49,7 +50,8 @@ NULL
 #' @rdname featureGroups-class
 #' @export
 featureGroupsSet <- setClass("featureGroupsSet",
-                             slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical"),
+                             slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical",
+                                       annotationsChanged = "list"),
                              contains = "featureGroups")
 
 #' @rdname featureGroups-class
@@ -106,14 +108,22 @@ setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = T
     
     if (!isTRUE(all.equal(annotations(obj), updatedAnn)))
     {
-        obj@annotations <- rbind(obj@annotations[set != s], updatedAnn)
+        if (length(obj@annotationsChanged) == 0)
+            obj@annotationsChanged <- copy(obj@annotations)
+        obj@annotationsChanged <- rbind(obj@annotationsChanged[set != s], updatedAnn)
         
         if (reGroup)
         {
             usFGroups <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+            usFGroups <- Map(usFGroups, sets(obj), f = function(ufg, us)
+            {
+                ufg@annotations <- obj@annotationsChanged[set == us]
+                return(ufg)
+            })
             obj <- do.call(makeSet, c(unname(usFGroups), list(groupAlgo = obj@groupAlgo, groupArgs = obj@groupArgs,
                                                               verbose = obj@groupVerbose, labels = names(usFGroups),
                                                               adducts = NULL)))
+            obj@annotationsChanged <- data.table()
         }
     }
     
@@ -383,31 +393,7 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
                             groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
                             analysisInfo = analysisInfo(fGroups), features = obj, ftindex = groupFeatIndex(fGroups),
                             algorithm = makeSetAlgorithm(list(fGroups)))
-    
-    anaInfo <- analysisInfo(ret)
-    ftind <- groupFeatIndex(ret)
-    fTable <- featureTable(ret)
-
-    if (length(obj) > 0)
-    {
-        ret@annotations <- rbindlist(sapply(sets(obj), function(s)
-        {
-            anaInds <- which(anaInfo$set == s)
-            anas <- anaInfo[anaInds, "analysis"]
-            grps <- names(ret)[sapply(ftind[anaInds], function(x) any(x != 0))]
-            
-            firstFeats <- rbindlist(lapply(ftind[anaInds, grps, with = FALSE], function(x)
-            {
-                firstAna <- which(x != 0)[1]
-                return(featureTable(ret)[[anas[firstAna]]][x[firstAna]])
-            }))
-            
-            return(data.table(group = grps, adduct = firstFeats$adduct))
-        }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
-        ret@annotations[, neutralMass := groupInfo(ret)[ret@annotations$group, "mzs"]]
-    }
-    else
-        ret@annotations <- data.table()
+    ret@annotations <- getAnnotationsFromSetFeatures(ret)
     
     return(ret)
 })
@@ -433,6 +419,9 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     checkmate::assertList(groupArgs, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (is.null(groupArgs))
+        groupArgs <- list()
+    
     if (all(lengths(fGroupsList) == 0))
         stop("Cannot make set if all feature groups objects are empty")
     
@@ -457,30 +446,77 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
     }
     
-    # prepare features: add adducts needed for neutralization and clearout group assignments
+    assignAdductsToFeatTab <- function(ft, mcol, add, ann)
+    {
+        ft <- copy(ft)
+        if (nrow(ft) == 0)
+            ft[, adduct := character()]
+        else if (!is.null(add))
+            ft[, adduct := add]
+        else
+            ft[, adduct := ann[match(ft[[mcol]], group)]$adduct]
+        return(ft)
+    }
+    
+    # prepare features: add adducts needed for neutralization later
     fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
         ann <- annotations(fGroups)
-        
-        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
-        {
-            ft <- copy(ft)
-            if (nrow(ft) == 0)
-                ft[, adduct := character()]
-            else if (!is.null(add))
-                ft[, adduct := add]
-            else
-                ft[, adduct := ann[match(ft$group, group)]$adduct]
-            ft[, group := NULL]
-            return(ft)
-        })
+        fGroups@features@features <- lapply(featureTable(fGroups), assignAdductsToFeatTab, "group", add, ann)
         return(fGroups)
     })
     
     allFeats <- sapply(fGroupsList, getFeatures, simplify = FALSE)
     featSet <- doMakeFeaturesSet(allFeats, adducts)
     
-    return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
+    # convert all unset fGroups to pseudo features
+    # neutralize pseudo features & group
+    # assign new group names to featSet
+    # construct final fGroups
+    
+    fgFeat <- convertFGroupsToPseudoFeatures(fGroupsList)
+    fgFeat@features <- Map(featureTable(fgFeat), adductsChr, lapply(fGroupsList, annotations), f = assignAdductsToFeatTab,
+                           MoreArgs = list(mcol = "ID"))
+    fgFeat <- neutralizeFeatures(fgFeat, adduct = NULL)
+    setGroups <- groupPseudoFeatures(fgFeat, groupAlgo, c(groupArgs, list(verbose = verbose)))
+    featSet@features <- Map(featureTable(featSet), analysisInfo(featSet)$set, f = function(ft, s)
+    {
+        ft <- copy(ft)
+        ft[, groupOld := group] # UNDONE: keep this?
+        ft[, group := featureTable(setGroups)[[s]][match(ft$group, ID)]$group]
+        return(ft)
+    })
+    
+    # HACK: add a dummy column for empty feature tables to ensure a row is still added
+    grpInts <- rbindlist(lapply(featureTable(featSet), function(ft)
+    {
+        if (nrow(ft) == 0)
+            return(data.table(dummy = NA))
+        setnames(transpose(ft[, "intensity", with = FALSE]), ft$group)
+    }), fill = TRUE)
+    if (!is.null(grpInts[["dummy"]]))
+        grpInts[, dummy := NULL]
+    setnafill(grpInts, fill = 0)
+    setcolorder(grpInts, rownames(groupInfo(setGroups)))
+    
+    grpFeatInds <- rbindlist(lapply(featureTable(featSet), function(ft)
+    {
+        if (nrow(ft) == 0)
+            return(data.table(dummy = NA))
+        setnames(as.data.table(transpose(list(seq_len(nrow(ft))))), ft$group)
+    }), fill = TRUE)
+    if (!is.null(grpFeatInds[["dummy"]]))
+        grpFeatInds[, dummy := NULL]
+    setnafill(grpFeatInds, fill = 0)
+    setcolorder(grpFeatInds, rownames(groupInfo(setGroups)))
+    
+    ret <- featureGroupsSet(groupAlgo = groupAlgo, groupArgs = groupArgs, groupVerbose = verbose,
+                            groups = grpInts, groupInfo = groupInfo(setGroups),
+                            analysisInfo = analysisInfo(featSet), features = featSet, ftindex = grpFeatInds,
+                            algorithm = paste0(groupAlgo, "-set"))
+    ret@annotations <- getAnnotationsFromSetFeatures(ret)
+    
+    return(ret)
 })
 
 #' @rdname makeSet

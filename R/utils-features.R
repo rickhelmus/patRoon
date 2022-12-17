@@ -127,3 +127,30 @@ maybeAutoNormalizeFGroups <- function(fGroups)
     printf("Automatically normalizing feature groups, see ?normInts for more options.\n")
     return(normInts(fGroups, featNorm = "none", groupNorm = TRUE))
 }
+
+getAnnotationsFromSetFeatures <- function(fGroups)
+{
+    if (length(fGroups) > 0)
+    {
+        anaInfo <- analysisInfo(fGroups)
+        ftind <- groupFeatIndex(fGroups)
+        fTable <- featureTable(fGroups)
+        
+        ret <- rbindlist(sapply(sets(fGroups), function(s)
+        {
+            anaInds <- which(anaInfo$set == s)
+            anas <- anaInfo[anaInds, "analysis"]
+            grps <- names(fGroups)[sapply(ftind[anaInds], function(x) any(x != 0))]
+            firstFeats <- rbindlist(lapply(ftind[anaInds, grps, with = FALSE], function(x)
+            {
+                firstAna <- which(x != 0)[1]
+                return(fTable[[anas[firstAna]]][x[firstAna]])
+            }))
+            
+            return(data.table(group = grps, adduct = firstFeats$adduct))
+        }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
+        ret[, neutralMass := groupInfo(fGroups)[ret$group, "mzs"]]
+    }
+    else
+        ret <- data.table()
+}

@@ -113,7 +113,7 @@ featureGroupsConsensus <- setClass("featureGroupsConsensus", contains = "feature
 
 # pseudo features: feature groups are converted to features by averaging their
 # intensities. Given feature group objects are then considered as an 'analysis'.
-convertFeatureGroupsToFeatures <- function(fGroupsList)
+convertFGroupsToPseudoFeatures <- function(fGroupsList)
 {
     fGNames <- names(fGroupsList)
 
@@ -162,6 +162,13 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
     return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo))
 }
 
+groupPseudoFeatures <- function(pf, groupAlgo, groupArgs)
+{
+    if (groupAlgo == "xcms" || groupAlgo == "xcms3" || groupAlgo == "kpic2")
+        groupArgs <- c(list(loadRawData = FALSE), groupArgs)
+    return(do.call(groupFeatures, c(list(pf, groupAlgo), groupArgs)))
+}
+
 #' @details The \code{comparison} method generates a
 #'   \code{\link{featureGroupsComparison}} object from given feature groups
 #'   objects, which in turn may be used for (visually) comparing presence of
@@ -201,11 +208,8 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     names(fGroupsList) <- make.unique(n)
 
     # convert feature groups to features
-    featsFromGroups <- convertFeatureGroupsToFeatures(fGroupsList)
-
-    if (groupAlgo == "xcms" || groupAlgo == "xcms3" || groupAlgo == "kpic2")
-        groupArgs <- c(list(loadRawData = FALSE), groupArgs)
-    compGroups <- do.call(groupFeatures, c(list(featsFromGroups, groupAlgo), groupArgs))
+    featsFromGroups <- convertFGroupsToPseudoFeatures(fGroupsList)
+    compGroups <- groupPseudoFeatures(featsFromGroups, groupAlgo, groupArgs)
 
     return(featureGroupsComparison(fGroupsList = fGroupsList, comparedFGroups = compGroups))
 })

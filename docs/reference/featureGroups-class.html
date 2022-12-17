@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0</span>
       </span>
     </div>
 
@@ -653,6 +653,10 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 <dd><p>(<strong>sets workflow</strong>) As the <code>featureGroups</code> slots, but contains the data per set.</p></dd>
 
 
+<dt><code>annotationsChanged</code></dt>
+<dd><p>Set internally by <code>adducts()&lt;-</code> and applied as soon as <code>reGroup=TRUE</code>.</p></dd>
+
+
 </dl></div>
     <div id="s-class-hierarchy">
     <h2>S4 class hierarchy</h2>
@@ -726,7 +730,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </ul><p>The following methods are changed or with new functionality:</p><ul><li><p><code>adducts</code>, <code>adducts&lt;-</code> require the <code>set</code> argument. The order of the data that is
   returned/changed follows that of the <code>annotations</code> slot. Furthermore, <code>adducts&lt;-</code> will perform a
   re-grouping of features when its <code>reGroup</code> parameter is set to <code>TRUE</code>. The implications for this are
-  discussed below.</p></li>
+  discussed below. Note that no adducts are changed <em>until</em> <code>reGroup=TRUE</code>.</p></li>
 <li><p>the subset operator (<code>[</code>) has specific arguments to choose (feature presence in) sets. See the argument
   descriptions.</p></li>
 <li><p><code>as.data.table</code>: normalization of intensities is performed per set.</p></li>
@@ -766,7 +770,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

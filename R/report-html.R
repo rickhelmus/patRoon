@@ -54,7 +54,7 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
         par(mai = c(0.9, 0.8, 0.1, 0.1))
         # UNDONE: params
         plot(fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = TRUE)
-    }, width = 7, height = 4)
+    }, width = 10, height = 4)
     
     rGroupLenNonEmpty <- length(replicateGroups(removeEmptyAnalyses(fGroups)))
     rGroupLen <- length(replicateGroups(fGroups))
@@ -69,21 +69,21 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
             ret$overview$chord <- makeHTMLReportPlot("chord.svg", outPath, selfContained, {
                 # UNDONE: params(?)
                 plotChord(fGroups, average = TRUE)
-            }, width = 7, height = 5.5)
+            }, width = 7, height = 7)
         }
         if (rGroupLen < 6)
         {
             ret$overview$venn <- makeHTMLReportPlot("venn.svg", outPath, selfContained, {
                 # UNDONE: params(?)
                 plotVenn(fGroups)
-            }, width = 7, height = 5.5)
+            }, width = 7, height = 7)
         }
         
         # UpSet
         ret$overview$UpSet <- makeHTMLReportPlot("upset.svg", outPath, selfContained, {
             # UNDONE: params(?)
             print(plotUpSet(fGroups))
-        }, width = 7, height = 5.5)
+        }, width = 7, height = 7)
     }
     
     return(ret)
@@ -136,6 +136,14 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
                                            selfContained)
+    
+    reportEnv$objectsShow <- paste0(utils::capture.output({
+        for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))
+        {
+            show(o)
+            cat("\n")
+        }
+    }), collapse = "\n")
     
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

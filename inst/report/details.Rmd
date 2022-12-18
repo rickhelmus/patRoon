@@ -21,12 +21,9 @@ function updateView(sel)
 
 ### Feature groups { data-width=250 }
 
-```{r echo=FALSE,eval=FALSE}
-tab <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
-tab[, ret := round(ret, 2)]
-tab[, mz := round(mz, 5)]
+```{r echo=FALSE,eval=TRUE}
 
-if (T)
+if (F)
 {
     tabc <- as.data.table(rmdVars$components)
     tab <- merge(tabc[, c("group", setdiff(names(tabc), names(tab))), with = FALSE], tab, by = "group")
@@ -72,7 +69,7 @@ if (T)
         return { background: 'grey', cursor: 'pointer' };
     return { cursor: 'pointer' };
 }"), elementId = "detailsTabTPs", meta = list(selectedRow = NULL))
-} else
+} else if (F)
 {
 ci <- copy(componentInfo(rmdVars$components))
 setnames(ci, "name", "component")
@@ -99,23 +96,30 @@ reactable::reactable(ci, details = function(index)
 }"), elementId = "detailsTabTPs", meta = list(selectedRow = 2))
 }
 
-htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabPlain"),
-                      htmlwidgets::JS("function(el, x)
+makeRTab <- function(d, id, visible, ...)
 {
-    el.style.display = 'none';
-}"))
+    rt <- reactable::reactable(d, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
+                               onClick = htmlwidgets::JS(sprintf("function(rowInfo, column)
+{
+    Reactable.setMeta('%s', { selectedRow: rowInfo.index });
+}", id)), rowStyle = htmlwidgets::JS("function(rowInfo, state)
+{
+    const sel = state.meta.selectedRow;
+    if (sel != null && rowInfo.index == sel)
+        return { background: 'grey', cursor: 'pointer' };
+    return { cursor: 'pointer' };
+}"), meta = list(selectedRow = NULL), ...)
+    
+    if (!visible)
+        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
+    
+    return(rt)
+}
 
-htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabComponents"),
-                      htmlwidgets::JS("function(el, x)
-{
-    el.style.display = 'none';
-}"))
-
-htmlwidgets::onRender(reactable::reactable(as.data.table(rmdVars$fGroups), elementId = "detailsTabSuspects"),
-                      htmlwidgets::JS("function(el, x)
-{
-    el.style.display = 'none';
-}"))
+makeRTab(tables$features$plain, "detailsTabPlain", TRUE)
+makeRTab(tables$features$plain, "detailsTabComponents", FALSE)
+makeRTab(tables$features$plain, "detailsTabSuspects", FALSE)
+makeRTab(tables$features$plain, "detailsTabTPs", FALSE)
 ```
 
 ### Component EIC { data-width=100 }

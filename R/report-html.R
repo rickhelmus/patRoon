@@ -89,6 +89,43 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
     return(ret)
 }
 
+generateReportTables <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, EICs, plots)
+{
+    ret <- list()
+    
+    getFeatTable <- function()
+    {
+        tab <- as.data.table(fGroups, qualities = "score", average = TRUE)
+        
+        # if (rmdVars$retMin) UNDONE
+        tab[, ret := ret / 60]
+        
+        for (col in names(tab)[(sapply(tab, is.numeric))])
+            set(tab, j = col, value = round(tab[[col]], if (col == "mz") 5 else 2))
+        
+        if (nrow(internalStandards(fGroups)) > 0)
+        {
+            wrapISTDs <- function(s) wrapStr(gsub(",", ", ", s, fixed = TRUE), 50)
+            if (isFGSet(fGroups))
+            {
+                for (s in sets(fGroups))
+                {
+                    cn <- paste0("ISTD_assigned-", s)
+                    tab[, (cn) := sapply(get(cn), wrapISTDs)]
+                }
+            }
+            else if (!is.null(tab[["ISTD_assigned"]]))
+                tab[, ISTD_assigned := sapply(ISTD_assigned, wrapISTDs)]
+        }
+        return(tab)        
+    }
+    
+    ret$features <- list()
+    ret$features$plain <- getFeatTable()
+    
+    return(ret)
+}
+
 # UNDONE: method
 #' @export
 reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas = NULL, compounds = NULL,
@@ -136,6 +173,8 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
                                            selfContained)
+    reportEnv$tables <- generateReportTables(fGroups, MSPeakLists, formulas, compounds, components, TPs, EICs,
+                                             reportEnv$plots)
     
     reportEnv$objectsShow <- paste0(utils::capture.output({
         for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))

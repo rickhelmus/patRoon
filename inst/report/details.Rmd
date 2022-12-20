@@ -22,104 +22,11 @@ function updateView(sel)
 ### Feature groups { data-width=250 }
 
 ```{r echo=FALSE,eval=TRUE}
+generator$genFeatTablePlain()
+generator$genFeatTableSuspects()
+generator$genFeatTableComponents()
+generator$genFeatTableTPs()
 
-if (F)
-{
-    tabc <- as.data.table(rmdVars$components)
-    tab <- merge(tabc[, c("group", setdiff(names(tabc), names(tab))), with = FALSE], tab, by = "group")
-    setnames(tab, "name", "component")
-    setnames(tab, "TP_name", "name")
-    # tab[, component := sprintf("<b>%s</b><br>%s (%s)", component, parent_group, parent_name)]
-    groupBy <- "component"
-
-    parAggr <- function(col) htmlwidgets::JS(sprintf("function(values, rows)
-    {
-        return '<i>' + rows[0].parent_%s + '</i>';
-    }", col))
-    
-    rCols <- list(
-        # component = reactable::colDef(html = TRUE, minWidth = 300)
-    )
-    for (col in c("group", "name", "formula"))
-    {
-        rCols[[col]] <- reactable::colDef(aggregate = parAggr(col), html = TRUE)
-        rCols[[paste0("parent_", col)]] <- reactable::colDef(show = FALSE)
-    }
-    tab[, c("parent_rt", "parent_mz", "parent_SMILES", "parent_InChI", "parent_InChIKey", "parent_neutralMass",
-            "size", "SMILES", "InChI", "InChIKey", "links", "intensity") := NULL]
-    
-    EICs <- invisible(getEICsForFGroups(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMZWindow, 1, FALSE, TRUE))
-    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
-    EICs <- Reduce(modifyList, EICs)
-    rCols$group$cell <- function(value, index)
-    {
-        htmltools::div(value,
-                       htmltools::br(),
-                       sparkline::sparkline(EICs[[value]]$intensity, xvalues = EICs[[value]]$time, type = "line"))
-    }
-    
-    reactable::reactable(tab, groupBy = groupBy, pagination = FALSE, columns = rCols,
-                         wrap = FALSE, resizable = TRUE,onClick = htmlwidgets::JS("function(rowInfo, column)
-{
-    Reactable.setMeta('detailsTabTPs', { selectedRow: rowInfo.index });
-}"), rowStyle = htmlwidgets::JS("function(rowInfo, state)
-{
-    const sel = state.meta.selectedRow;
-    if (sel != null && rowInfo.index == sel)
-        return { background: 'grey', cursor: 'pointer' };
-    return { cursor: 'pointer' };
-}"), elementId = "detailsTabTPs", meta = list(selectedRow = NULL))
-} else if (F)
-{
-ci <- copy(componentInfo(rmdVars$components))
-setnames(ci, "name", "component")
-setnames(ci, sub("^parent_", "", names(ci)))
-ci[, c("SMILES", "InChI", "InChIKey", "size", "links") := NULL]
-ci[, rt := round(rt, 2)]
-ci[, c("mz", "neutralMass") := .(round(mz, 5), round(neutralMass, 5))]
-reactable::reactable(ci, details = function(index)
-{
-    htmltools::div(style = "padding: 1rem",
-                   reactable::reactable(tab[group %in% rmdVars$components[[index]]$group],
-                                        pagination = FALSE, outlined = TRUE))
-}, pagination = FALSE, onClick = htmlwidgets::JS("function(rowInfo, column)
-{
-    Reactable.setMeta('detailsTabTPs', { selectedRow: rowInfo.index });
-}"), rowStyle = htmlwidgets::JS("function(rowInfo, state)
-{
-    const sel = state.meta.selectedRow;
-    console.log('Sel: ' + sel);
-    console.log('Me: ' + rowInfo.index);
-    if (sel != null && rowInfo.index == sel)
-        return { background: 'grey', cursor: 'pointer' };
-    return { cursor: 'pointer' };
-}"), elementId = "detailsTabTPs", meta = list(selectedRow = 2))
-}
-
-makeRTab <- function(d, id, visible, ...)
-{
-    rt <- reactable::reactable(d, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               onClick = htmlwidgets::JS(sprintf("function(rowInfo, column)
-{
-    Reactable.setMeta('%s', { selectedRow: rowInfo.index });
-}", id)), rowStyle = htmlwidgets::JS("function(rowInfo, state)
-{
-    const sel = state.meta.selectedRow;
-    if (sel != null && rowInfo.index == sel)
-        return { background: 'grey', cursor: 'pointer' };
-    return { cursor: 'pointer' };
-}"), meta = list(selectedRow = NULL), ...)
-    
-    if (!visible)
-        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
-    
-    return(rt)
-}
-
-makeRTab(tables$features$plain, "detailsTabPlain", TRUE)
-makeRTab(tables$features$plain, "detailsTabComponents", FALSE)
-makeRTab(tables$features$plain, "detailsTabSuspects", FALSE)
-makeRTab(tables$features$plain, "detailsTabTPs", FALSE)
 ```
 
 ### Component EIC { data-width=100 }

@@ -54,6 +54,7 @@ pre, code {
 
 img:not(.zoomImg) {
     cursor: zoom-in;
+    max-width: 100%;
 }
 
 </style>

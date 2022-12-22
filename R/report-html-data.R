@@ -103,26 +103,51 @@ reportHTMLGenerator$methods(
     },
     genFeatTableTPs = function()
     {
-        tabTPs <- getFeatTable(objects$fGroups)
+        tabTPsFeat <- getFeatTable(objects$fGroups)
         tabCompon <- as.data.table(objects$components)
-        tabTPs <- merge(tabCompon[, c("group", setdiff(names(tabCompon), names(tabTPs))), with = FALSE],
-                        tabTPs, by = "group")
+        tabTPs <- merge(tabCompon[, c("group", setdiff(names(tabCompon), names(tabTPsFeat))), with = FALSE],
+                        tabTPsFeat, by = "group")
         setnames(tabTPs, "name", "component")
         setnames(tabTPs, "TP_name", "name")
         tabTPs[, c("parent_rt", "parent_mz", "parent_SMILES", "parent_InChI", "parent_InChIKey", "parent_neutralMass",
-                   "size", "SMILES", "InChI", "InChIKey", "links", "intensity") := NULL]
+                   "size", "SMILES", "InChI", "InChIKey", "links", "intensity", "susp_name") := NULL]
         
-        parAggr <- function(col) htmlwidgets::JS(sprintf("function(values, rows)
+        parAggr <- function(parentCol) htmlwidgets::JS(sprintf("function(values, rows, groupRows)
 {
-    return '<i>' + rows[0].parent_%s + '</i>';
-}", col))
+    return '<i>' + rows[0]['%s'] + '</i>';
+}", parentCol))
+        
+        parAggred <- function(level) htmlwidgets::JS(sprintf("function(cellInfo, state)
+{
+    return (cellInfo.level === %d) ? cellInfo.value : '';
+}", level))
+
+        # NOTE: below values may be in components but then from suspect list
+        # UNDONE: convert RT to minutes if needed
+        tabTPs[, c("parent_ret", "parent_mz") := groupInfo(objects$fGroups)[parent_group, ]]
+        
+        for (col in c("parent_ret", "retDiff"))
+            tabTPs[, (col) := round(get(col), 2)]
+        for (col in c("parent_mz", "mzDiff"))
+            tabTPs[, (col) := round(get(col), 5)]
+
+        # add parent intensities
+        rgs <- replicateGroups(objects$fGroups)
+        tabTPsPar <- unique(tabTPsFeat[, c("group", rgs), with = FALSE], by = "group")
+        setnames(tabTPsPar, rgs, paste0("parent_", rgs))
+        tabTPs <- merge(tabTPs, tabTPsPar, by.x = "parent_group", by.y = "group", sort = FALSE, all.x = TRUE)
         
         colDefs <- list()
-        for (col in c("group", "name", "formula"))
+        # set parent 'aggregates': actual value of parent feature group
+        for (col in c("group", "name", "formula", "ret", "mz", rgs))
         {
-            colDefs[[col]] <- reactable::colDef(aggregate = parAggr(col), html = TRUE)
+            colDefs[[col]] <- reactable::colDef(aggregate = parAggr(paste0("parent_", col)),
+                                                aggregated = parAggred(0), html = TRUE)
             colDefs[[paste0("parent_", col)]] <- reactable::colDef(show = FALSE)
         }
+        # similar for TP retDir
+        colDefs$retDir <- reactable::colDef(aggregate = parAggr("TP_retDir"), aggregated = parAggred(1), html = TRUE)
+        colDefs$TP_retDir <- reactable::colDef(show = FALSE)
         
         colDefs$group$cell <- function(value, index)
         {
@@ -132,7 +157,7 @@ reportHTMLGenerator$methods(
                                                 type = "line"))
         }
         
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = "component", columns = colDefs)
+        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = c("component", "name"), columns = colDefs)
     }
 )
 

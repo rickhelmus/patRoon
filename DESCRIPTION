@@ -240,6 +240,8 @@ Collate:
     'multi-process.R'
     'project-tool.R'
     'report-html.R'
+    'report-html-data.R'
+    'report-html-plots.R'
     'report.R'
     'utils-TPs.R'
     'utils-checkmate.R'

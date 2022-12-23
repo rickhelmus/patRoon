@@ -52,8 +52,14 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         changedNames <- which(sanNames != suspects$name)
         if (length(changedNames) > 0)
         {
-            warning(paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
-                           paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n")))
+            many <- length(changedNames) > 100
+            if (many)
+                changedNames <- changedNames[seq_len(100)]
+            msg <- paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
+                          paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n"))
+            if (many)
+                msg <- paste0(msg, "\n", "(only the first 100 occurences are shown).")
+            warning(msg, call. = FALSE)
             suspects[, name_orig := name]
             suspects[, name := sanNames]
         }

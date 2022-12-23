@@ -83,7 +83,8 @@ reportHTMLGenerator$methods(
         tabTPsFeat <- subsetDTColumnsIfPresent(tabTPsFeat, c("group", "ret", "mz", replicateGroups(objects$fGroups),
                                                              "adduct", "neutralMass",
                                                              paste0("susp_", c("name", "estIDLevel", "neutralMass",
-                                                                               "formula", "d_rt", "d_mz", "sets"))))
+                                                                               "formula", "d_rt", "d_mz", "sets",
+                                                                               "InChIKey"))))
         tabCompon <- as.data.table(objects$components)
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
@@ -116,9 +117,10 @@ reportHTMLGenerator$methods(
 
         # add parent intensities & screening info
         rgs <- replicateGroups(objects$fGroups)
-        tabTPsPar <- unique(subsetDTColumnsIfPresent(tabTPsFeat, c("group", rgs,
-                                                                   paste0("susp_", c("estIDLevel", "neutralMass",
-                                                                                     "formula", "d_rt", "d_mz", "sets")))),
+        tabTPsPar <- unique(subsetDTColumnsIfPresent(tabTPsFeat,
+                                                     c("group", rgs,
+                                                       paste0("susp_", c("estIDLevel", "neutralMass", "formula", "d_rt",
+                                                                         "d_mz", "sets", "InChIKey")))),
                             by = "group")
         setnames(tabTPsPar, paste0("parent_", names(tabTPsPar)))
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
@@ -142,7 +144,6 @@ reportHTMLGenerator$methods(
         
         # and these...
         hasSusp <- !is.null(tabTPs[["susp_neutralMass"]])
-        hasIDL <- !is.null(tabTPs[["susp_estIDLevel"]])
         if (hasSusp)
         {
             colDefs$susp_neutralMass$name <- "neutralMass"
@@ -150,12 +151,18 @@ reportHTMLGenerator$methods(
                 colDefs$susp_formula$name <- "formula"
             colDefs$susp_d_rt$name <- "\U0394 ret"
             colDefs$susp_d_mz$name <- "\U0394 mz"
-            if (hasIDL)
+            if (!is.null(tabTPs[["susp_estIDLevel"]]))
             {
-                colDefs$susp_estIDLevel$name <- "estIDLevel" # UNDONE: hove-over?
+                colDefs$susp_estIDLevel$name <- "estIDLevel" # UNDONE: tool-tip?
                 colDefs$susp_estIDLevel$align <- "right"
             }
         }
+        
+        # InChIKeys are only there for internal usage
+        if (!is.null(tabTPs[["susp_InChIKey"]]))
+            colDefs$susp_InChIKey <- reactable::colDef(show = FALSE)
+        if (!is.null(tabTPs[["parent_susp_InChIKey"]]))
+            colDefs$parent_susp_InChIKey <- reactable::colDef(show = FALSE)
         
         colDefs$group$cell <- function(value, index)
         {
@@ -186,14 +193,20 @@ reportHTMLGenerator$methods(
         
         onClick <- "function(tabEl, rowInfo)
 {
-    let el = document.getElementById('chrom_view');
-    let grp;
-    // handle clicking on expandable rows
-    if (rowInfo.index == undefined)
-        grp = (rowInfo.level === 0) ? rowInfo.subRows[0]._subRows[0].parent_group : rowInfo.subRows[0].parent_group;
+    const chromEl = document.getElementById('chrom_view');
+    const structEl = document.getElementById('struct_view');
+    let rd;
+    
+    // check level: handle clicking on expandable rows
+    if (rowInfo.level === 0)
+        rd = rowInfo.subRows[0]._subRows[0];
+    else if (rowInfo.level === 1)
+        rd = rowInfo.subRows[0];
     else
-        grp = rowInfo.values.parent_group;
-    el.src = Reactable.getState(tabEl).meta.plots.chroms[grp];
+        rd = rowInfo.values;
+        
+    chromEl.src = Reactable.getState(tabEl).meta.plots.chroms[rd.parent_group];
+    structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.parent_susp_InChIKey];
 }"
         
         makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,

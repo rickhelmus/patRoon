@@ -51,18 +51,20 @@ genHTMLReportPlotsChroms <- function(fGroups, outPath, EICs, selfContained)
 
 genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained)
 {
-    scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups[, c("SMILES", "InChIKey"), with = FALSE]) else NULL
+    scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
+    compStructInfo <- if (!is.null(compounds)) as.data.table(compounds)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
     
-    structInfo <- scrStructInfo # UNDONE: compounds too
-    if (!is.null(structInfo))
+    structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
+    if (nrow(structInfo) > 0)
     {
-        return(setNames(lapply(structInfo$SMILES, function(smi)
+        structInfo <- unique(structInfo, by = "InChIKey")
+        return(Map(structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
         {
-            makeHTMLReportPlot(paste0("chrom-", grp, ".svg"), outPath, selfContained, {
+            makeHTMLReportPlot(paste0("struct-", ik, ".svg"), outPath, selfContained, {
                 mol <- getMoleculesFromSMILES(smi, emptyIfFails = TRUE)[[1]]
                 withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
             }, width = 5, height = 4)
-        }), structInfo$InChIKey))
+        }))
     }
     return(list())
 }
@@ -116,6 +118,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     }
     
     ret$chroms <- genHTMLReportPlotsChroms(fGroups, outPath, EICs, selfContained)
+    ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
     
     return(ret)
 }

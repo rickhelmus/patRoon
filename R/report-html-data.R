@@ -4,7 +4,10 @@ NULL
 
 getFeatTable <- function(fGroups, colSusp)
 {
-    tab <- as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
+    tab <- if (isScreening(fGroups))
+        as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
+    else
+        as.data.table(fGroups, qualities = "score", average = TRUE)
     
     # if (rmdVars$retMin) UNDONE
     tab[, ret := ret / 60]
@@ -70,6 +73,8 @@ reportHTMLGenerator$methods(
     },
     genFeatTableTPs = function()
     {
+        # UNDONE: put general suspect info (formula/neutralMass) not in group rows but in suspect aggregate (or simply omit?)
+        
         tabTPsFeat <- getFeatTable(objects$fGroups, NULL)
         tabTPsFeat <- subsetDTColumnsIfPresent(tabTPsFeat, c("group", "ret", "mz", replicateGroups(objects$fGroups),
                                                              "adduct", "neutralMass",
@@ -78,7 +83,7 @@ reportHTMLGenerator$methods(
         tabCompon <- as.data.table(objects$components)
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
-                                                           "specSimilarity"))
+                                                           "specSimilarity", "mergedBy"))
 
         tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"))
         setnames(tabTPs, "name", "component")
@@ -87,7 +92,8 @@ reportHTMLGenerator$methods(
 
         parAggr <- function(parentCol) htmlwidgets::JS(sprintf("function(values, rows, groupRows)
 {
-    return '<i>' + rows[0]['%s'] + '</i>';
+    const v = rows[0]['%s'];
+    return (v == null) ? '' : '<i>' + v + '</i>';
 }", parentCol))
         
         parAggred <- function(level) htmlwidgets::JS(sprintf("function(cellInfo, state)
@@ -99,7 +105,7 @@ reportHTMLGenerator$methods(
         # UNDONE: convert RT to minutes if needed
         tabTPs[, c("parent_ret", "parent_mz") := groupInfo(objects$fGroups)[parent_group, ]]
         
-        for (col in c("parent_ret", "retDiff"))
+        for (col in intersect(c("parent_ret", "retDiff", "specSimilarity"), names(tabTPs)))
             tabTPs[, (col) := round(get(col), 2)]
         for (col in c("parent_mz", "mzDiff"))
             tabTPs[, (col) := round(get(col), 5)]
@@ -164,7 +170,7 @@ reportHTMLGenerator$methods(
                                 headerStyle = ststyle),
             reactable::colGroup("feature", columns = c("group", "ret", "mz")),
             reactable::colGroup("TP", columns = intersect(c("retDiff", "mzDiff", "formulaDiff", "retDir",
-                                                            "specSimilarity"), names(tabTPs))),
+                                                            "specSimilarity", "mergedBy"), names(tabTPs))),
             if (hasSusp) reactable::colGroup("screening",
                                              columns = intersect(c("susp_neutralMass", "susp_formula", "susp_d_rt",
                                                                    "susp_d_mz", "susp_estIDLevel"),

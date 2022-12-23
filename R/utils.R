@@ -213,6 +213,9 @@ prepareDTForComparison <- function(dt)
     setindex(dt, NULL)
 }
 
+removeDTColumnsIfPresent <- function(dt, cols) dt[, setdiff(names(dt), cols), with = FALSE]
+subsetDTColumnsIfPresent <- function(dt, cols) dt[, intersect(names(dt), cols), with = FALSE]
+
 readAllFile <- function(f) readChar(f, file.size(f))
 
 getArgNames <- function(..., def = NULL)

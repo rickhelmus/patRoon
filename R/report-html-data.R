@@ -108,7 +108,8 @@ reportHTMLGenerator$methods(
         tabTPs <- merge(tabCompon[, c("group", setdiff(names(tabCompon), names(tabTPsFeat))), with = FALSE],
                         tabTPsFeat, by = "group")
         setnames(tabTPs, "name", "component")
-        setnames(tabTPs, "TP_name", "name")
+        setnames(tabTPs, "TP_name", "suspect")
+        setnames(tabTPs, "parent_name", "parent_suspect")
         tabTPs[, c("parent_rt", "parent_mz", "parent_SMILES", "parent_InChI", "parent_InChIKey", "parent_neutralMass",
                    "size", "SMILES", "InChI", "InChIKey", "links", "intensity", "susp_name") := NULL]
         
@@ -139,7 +140,7 @@ reportHTMLGenerator$methods(
         
         colDefs <- list()
         # set parent 'aggregates': actual value of parent feature group
-        for (col in c("group", "name", "formula", "ret", "mz", rgs))
+        for (col in c("group", "suspect", "formula", "ret", "mz", rgs))
         {
             colDefs[[col]] <- reactable::colDef(aggregate = parAggr(paste0("parent_", col)),
                                                 aggregated = parAggred(0), html = TRUE)
@@ -149,6 +150,11 @@ reportHTMLGenerator$methods(
         colDefs$retDir <- reactable::colDef(aggregate = parAggr("TP_retDir"), aggregated = parAggred(1), html = TRUE)
         colDefs$TP_retDir <- reactable::colDef(show = FALSE)
         
+        # these are grouped
+        colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
+        colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
+        colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula")
+        
         colDefs$group$cell <- function(value, index)
         {
             htmltools::div(value,
@@ -157,7 +163,19 @@ reportHTMLGenerator$methods(
                                                 type = "line"))
         }
         
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = c("component", "name"), columns = colDefs)
+        ststyle <- list(borderRight = "3px solid #eee") # from Reactable examples
+        colDefs$suspect$style <- colDefs$suspect$headerStyle <- ststyle
+        
+        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = c("component", "suspect"), columns = colDefs,
+                          columnGroups = list(
+                              # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
+                              reactable::colGroup("", columns = c("component", "suspect"), sticky = "left",
+                                                  headerStyle = ststyle),
+                              reactable::colGroup("feature", columns = c("group", "ret", "mz")),
+                              reactable::colGroup("screening", columns = c("formula")),
+                              reactable::colGroup("TP", columns = c("retDiff", "mzDiff", "formulaDiff", "retDir")),
+                              reactable::colGroup("intensity", columns = rgs)
+                          ), bordered = TRUE)
     }
 )
 

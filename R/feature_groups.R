@@ -632,6 +632,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         
         ret <- rbindlist(fTable, idcol = "analysis")
         setorder(ret, "group")
+        
+        ret[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
+        
         if (doConc)
             ret[, conc := anaInfo$conc[match(analysis, anaInfo$analysis)]]
 

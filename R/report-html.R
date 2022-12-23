@@ -3,7 +3,7 @@ NULL
 
 reportHTMLGenerator <- setRefClass("reportHTMLGenerator",
                                    fields = list(objects = "list", EICs = "list", EICsTopMost = "list",
-                                                 properties = "list"))
+                                                 plots = "list", properties = "list"))
 
 # UNDONE: method
 #' @export
@@ -53,12 +53,13 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     reportEnv <- new.env()
     
     reportEnv$properties <- list(noDate = noDate)
-    reportEnv$plots <- generateReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
-                                           selfContained)
+    reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
+                                               selfContained)
     reportEnv$generator <- reportHTMLGenerator$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                                   formulas = formulas, compounds = compounds,
                                                                   components = components, TPs = TPs),
-                                                   EICs = EICs, EICsTopMost = EICsTopMost)
+                                                   EICs = EICs, EICsTopMost = EICsTopMost, plots = reportEnv$plots,
+                                                   properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs
     
     reportEnv$objectsShow <- paste0(utils::capture.output({

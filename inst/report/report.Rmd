@@ -81,13 +81,13 @@ Summary {data-orientation=columns}
 ### Most intense feature of each group 
 
 ```{r, results = "asis"}
-printf("%s\n\n", plots$overview$chroms)
+printf("%s\n\n", generator$plotImg(plots$overview$chroms))
 ```
 
 ### Retention vs m/z
 
 ```{r, results = "asis"}
-printf("%s\n\n", plots$overview$retMZ)
+printf("%s\n\n", generator$plotImg(plots$overview$retMZ))
 ```
 
 ## { data-width=300 }
@@ -102,11 +102,11 @@ cat(objectsShow)
 ```{r, results = "asis", eval = !is.null(plots$overview$chord) || !is.null(plots$overview$venn) || is.null(plots$overview$UpSet)}
 cat("### Feature distribution { data-height=200 }\n\n")
 if (!is.null(plots$overview$chord))
-    printf("#### Chord diagram\n\n%s\n\n", plots$overview$chord)
+    printf("#### Chord diagram\n\n%s\n\n", generator$plotImg(plots$overview$chord))
 if (!is.null(plots$overview$venn))
-    printf("#### Venn diagram\n\n%s\n\n", plots$overview$venn)
+    printf("#### Venn diagram\n\n%s\n\n", generator$plotImg(plots$overview$venn))
 if (!is.null(plots$overview$UpSet))
-    printf("#### UpSet diagram\n\n%s\n\n", plots$overview$UpSet)
+    printf("#### UpSet diagram\n\n%s\n\n", generator$plotImg(plots$overview$UpSet))
 ```
 
 ```{r child="details.Rmd"}

@@ -29,9 +29,7 @@ generator$genFeatTableTPs()
 
 ```
 
-### Component EIC { data-width=100 }
-
-<div>
+### Parent { data-width=100 }
 
 <div>
 <input type="radio" id="eic-choice" name="componentView" value="eic">
@@ -45,9 +43,25 @@ generator$genFeatTableTPs()
 <button type="button">Spectrum</button>
 </div>
 
-```{r fig.show='hold'}
-plot(1:10)
+<div style="flex-wrap: nowrap;">
+
+#### EIC
+
+<img id="chrom_view"></img>
+
+#### Structure
+
+<img id="struct_view"></img>
+
+#### Transformations
+
+<div style="height: 200px;">
+
+```{r, echo = FALSE}
+generator$genTPGraphs()
 ```
+
+</div>
 
 </div>
 

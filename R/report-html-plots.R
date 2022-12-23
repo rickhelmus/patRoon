@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include report-html.R
 NULL
 
 makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
@@ -25,21 +26,49 @@ makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
         # UNDONE: while embedding the SVG directly would be nice, this seems to give major headaches with scaling,
         # especially with Firefox... For now just base64 it :(
         withSVGLite(out, standalone = TRUE, code = code, ...)
-        return(paste0("<img src=", knitr::image_uri(out), "></img>"))
+        return(knitr::image_uri(out))
     }
     
     destPath <- file.path(outPath, "report_files", "plots")
     mkdirp(destPath)
-    out <- file.path(destPath, out)
-    withSVGLite(out, standalone = TRUE, code = code, ...)
-    return(paste0("<img src='", out, "'></img>"))
+    withSVGLite(file.path(destPath, out), standalone = TRUE, code = code, ...)
+    return(file.path("report_files", "plots", out))
     
     # UNDONE: object tag makes text selectable but messes up layout...
     # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
 }
 
-generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,
-                                selfContained)
+genHTMLReportPlotsChroms <- function(fGroups, outPath, EICs, selfContained)
+{
+    sapply(names(fGroups), function(grp)
+    {
+        makeHTMLReportPlot(paste0("chrom-", grp, ".svg"), outPath, selfContained, {
+            # UNDONE: params
+            plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, colourBy = "rGroups", onlyPresent = TRUE)
+        }, width = 5, height = 4)
+    }, simplify = FALSE)
+}
+
+genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained)
+{
+    scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups[, c("SMILES", "InChIKey"), with = FALSE]) else NULL
+    
+    structInfo <- scrStructInfo # UNDONE: compounds too
+    if (!is.null(structInfo))
+    {
+        return(setNames(lapply(structInfo$SMILES, function(smi)
+        {
+            makeHTMLReportPlot(paste0("chrom-", grp, ".svg"), outPath, selfContained, {
+                mol <- getMoleculesFromSMILES(smi, emptyIfFails = TRUE)[[1]]
+                withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
+            }, width = 5, height = 4)
+        }), structInfo$InChIKey))
+    }
+    return(list())
+}
+
+generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,
+                                    selfContained)
 {
     ret <- list()
     
@@ -86,5 +115,20 @@ generateReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compo
         }, width = 7, height = 7)
     }
     
+    ret$chroms <- genHTMLReportPlotsChroms(fGroups, outPath, EICs, selfContained)
+    
     return(ret)
 }
+
+reportHTMLGenerator$methods(
+    plotImg = function(p)
+    {
+        if (properties$selfContained)
+            return(paste0("<img src=", knitr::image_uri(p), "></img>"))
+        return(paste0("<img src='", p, "'></img>"))
+    },
+    genTPGraphs = function()
+    {
+        plotGraph(objects$TPs, components = objects$components, which = 1)
+    }
+)

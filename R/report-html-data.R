@@ -37,19 +37,23 @@ getFeatTable <- function(fGroups, colSusp)
     return(tab)
 }
 
-makeFeatReactable <- function(tab, id, visible, ...)
+makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
 {
+    oc <- htmlwidgets::JS(sprintf("function(rowInfo, column)
+{
+    const tabEl = '%s';
+    Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
+    %s;
+}", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
+    
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               onClick = htmlwidgets::JS(sprintf("function(rowInfo, column)
-{
-    Reactable.setMeta('%s', { selectedRow: rowInfo.index });
-}", id)), rowStyle = htmlwidgets::JS("function(rowInfo, state)
+                               onClick = oc, rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
     if (sel != null && rowInfo.index == sel)
         return { background: 'grey', cursor: 'pointer' };
     return { cursor: 'pointer' };
-}"), meta = list(selectedRow = NULL), ...)
+}"), meta = list(selectedRow = NULL, plots = plots), ...)
     
     if (!visible)
         rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
@@ -61,15 +65,15 @@ makeFeatReactable <- function(tab, id, visible, ...)
 reportHTMLGenerator$methods(
     genFeatTablePlain = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabPlain", TRUE)
+        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabPlain", TRUE, plots)
     },
     genFeatTableSuspects = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabSuspects", TRUE)
+        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabSuspects", TRUE, plots)
     },
     genFeatTableComponents = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabComponents", TRUE)
+        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabComponents", TRUE, plots)
     },
     genFeatTableTPs = function()
     {
@@ -180,8 +184,20 @@ reportHTMLGenerator$methods(
         
         setcolorder(tabTPs, unlist(lapply(colGroups, "[[", "columns")))
         
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = c("component", "suspect"), columns = colDefs,
-                          columnGroups = colGroups, bordered = TRUE)
+        onClick <- "function(tabEl, rowInfo)
+{
+    let el = document.getElementById('chrom_view');
+    let grp;
+    // handle clicking on expandable rows
+    if (rowInfo.index == undefined)
+        grp = (rowInfo.level === 0) ? rowInfo.subRows[0]._subRows[0].parent_group : rowInfo.subRows[0].parent_group;
+    else
+        grp = rowInfo.values.parent_group;
+    el.src = Reactable.getState(tabEl).meta.plots.chroms[grp];
+}"
+        
+        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,
+                          columnGroups = colGroups, bordered = TRUE, onClick = onClick)
     }
 )
 

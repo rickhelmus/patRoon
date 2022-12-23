@@ -151,6 +151,9 @@
 <code>newProject</code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
 <li>
 <code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
+<li>Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>featureGroups</code> adds replicate group column when executed with <code>features=TRUE</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

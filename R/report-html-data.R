@@ -49,44 +49,6 @@ makeFeatReactable <- function(tab, id, visible, ...)
     return(rt)
 }
 
-genHTMLReportDataFeatures <- function(fGroups, EICs)
-{
-    ret <- list()
-    
-    ret$features <- list()
-    ret$features$plain <- makeReactable(getFeatTable(), "detailsTabPlain", TRUE)
-    ret$features$suspects <- makeReactable(getFeatTable(), "detailsTabSuspects", TRUE)
-    ret$features$components <- makeReactable(getFeatTable(), "detailsTabComponents", TRUE)
-    return(ret)
-    
-    tabTPs <- getFeatTable()
-    tabCompon <- as.data.table(components)
-    tabTPs <- merge(tabCompon[, c("group", setdiff(names(tabCompon), names(tabTPs))), with = FALSE],
-                              tabTPs, by = "group")
-    setnames(tabTPs, "name", "component")
-    setnames(tabTPs, "TP_name", "name")
-    
-    colDefs <- list()
-    for (col in c("group", "name", "formula"))
-    {
-        colDefs[[col]] <- reactable::colDef(aggregate = parAggr(col), html = TRUE)
-        colDefs[[paste0("parent_", col)]] <- reactable::colDef(show = FALSE)
-    }
-    tabTPs[, c("parent_rt", "parent_mz", "parent_SMILES", "parent_InChI", "parent_InChIKey", "parent_neutralMass",
-               "size", "SMILES", "InChI", "InChIKey", "links", "intensity") := NULL]
-    
-    tabTPsRT <- makeReactable(tabTPs, "detailsTabTPs", FALSE, groupBy = "component", columns = colDefs)
-    ret$features$TPs <- tabTPsRT
-    
-    return(ret)
-    
-}
-
-generateHTMLReportData <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, EICs, plots)
-{
-    return(genHTMLReportDataFeatures(fGroups, EICs))
-}
-
 
 reportHTMLGenerator$methods(
     genFeatTablePlain = function()

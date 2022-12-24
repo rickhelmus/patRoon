@@ -69,6 +69,56 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
     return(list())
 }
 
+genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfContained)
+{
+    return(mapply(groupNames(formulas), annotations(formulas), FUN = function(grp, ann)
+    {
+        ret <- list()
+        
+        ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
+        {
+            if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+                return("")
+            makeHTMLReportPlot(sprintf("form-spec-%s-%d.svg", grp, index), outPath, selfContained, {
+                plotSpectrum(formulas, index, grp, MSPeakLists = MSPeakLists)
+            }, width = 7, height = 4)
+        })
+        
+        ret$scores <- sapply(seq_len(nrow(ann)), function(index)
+        {
+            makeHTMLReportPlot(sprintf("form-scores-%s-%d.svg", grp, index), outPath, selfContained, {
+                plotScores(formulas, index, grp) # UNDONE: params
+            }, width = 6, height = 5)
+        })
+        
+        return(ret)
+    }))
+}
+
+genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPath, selfContained)
+{
+    return(mapply(groupNames(compounds), annotations(compounds), FUN = function(grp, ann)
+    {
+        ret <- list()
+        
+        ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
+        {
+            makeHTMLReportPlot(sprintf("comp-spec-%s-%d.svg", grp, index), outPath, selfContained, {
+                plotSpectrum(compounds, index, grp, MSPeakLists, formulas, FALSE)
+            }, width = 7, height = 4)
+        })
+        
+        ret$scores <- sapply(seq_len(nrow(ann)), function(index)
+        {
+            makeHTMLReportPlot(sprintf("comp-scores-%s-%d.svg", grp, index), outPath, selfContained, {
+                plotScores(compounds, index, grp) # UNDONE: params
+            }, width = 6, height = 5)
+        })
+        
+        return(ret)
+    }))
+}
+
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,
                                     selfContained)
 {
@@ -119,6 +169,10 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     
     ret$chroms <- genHTMLReportPlotsChroms(fGroups, outPath, EICs, selfContained)
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
+    if (!is.null(formulas))
+        ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)
+    if (!is.null(compounds))
+        ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, outPath, selfContained)
     
     return(ret)
 }

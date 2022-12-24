@@ -47,12 +47,18 @@ makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
     
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               onClick = oc, rowStyle = htmlwidgets::JS("function(rowInfo, state)
+                               onClick = oc, defaultExpanded = TRUE,
+                               rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
-    if (sel != null && rowInfo.index == sel)
-        return { background: 'grey', cursor: 'pointer' };
-    return { cursor: 'pointer' };
+    let ret = { cursor: 'pointer' };
+    if (sel != null && rowInfo.index === sel)
+        ret.background = 'grey';
+    else if (rowInfo.level === 0)
+        ret.borderTop = '2px solid black';
+    else if (rowInfo.level === 1)
+        ret.borderBottom = '1px solid black';
+    return ret;
 }"), meta = list(selectedRow = NULL, plots = plots), ...)
     
     if (!visible)

@@ -1,4 +1,4 @@
-Details {data-orientation=rows}
+Details {data-orientation=columns}
 ===
 
 <script>
@@ -17,7 +17,7 @@ function updateView(sel)
     <option value="TPs">Transformation products</option>
 </select>
 
-## { data-height=250 }
+## { data-width=200 }
 
 ### Feature groups { data-width=250 }
 
@@ -26,36 +26,37 @@ generator$genFeatTablePlain()
 generator$genFeatTableSuspects()
 generator$genFeatTableComponents()
 generator$genFeatTableTPs()
-
 ```
 
-### Parent { data-width=100 }
+## { data-width=150 }
+
+### Selected parent { data-width=100 }
+
+<script>
+function updateParentImg(sel)
+{
+    let elements = document.getElementsByName("parentImgs");
+    for (var i=0; i<elements.length; i++)
+        document.getElementById(elements[i].value + "_view").style.display = (elements[i].value === sel) ? "" : "none";
+}
+</script>
 
 <div>
-<input type="radio" id="eic-choice" name="componentView" value="eic">
-<label for="eic-choice">EIC</label>
-<input type="radio" id="spec-choice" name="componentView" value="spec">
-<label for="spec-choice">Spectrum</label>
+<input type="radio" id="chrom-choice" name="parentImgs" value="chrom" onChange="updateParentImg(this.value);">
+<label for="chrom-choice">Chromatogram</label>
+<input type="radio" id="struct-choice" name="parentImgs" value="struct" onChange="updateParentImg(this.value);">
+<label for="struct-choice">Structure</label>
+<input type="radio" id="graph-choice" name="parentImgs" value="graph" onChange="updateParentImg(this.value);">
+<label for="graph-choice">Graph</label>
 </div>
 
 <div>
-<button type="button">EIC</button>
-<button type="button">Spectrum</button>
-</div>
-
-<div style="flex-wrap: nowrap;">
-
-#### EIC
 
 <img id="chrom_view"></img>
 
-#### Structure
-
 <img id="struct_view"></img>
 
-#### Transformations
-
-<div style="height: 200px;">
+<div id="graph_view" style="height: 200px;">
 
 ```{r, echo = FALSE}
 generator$genTPGraphs()
@@ -65,18 +66,18 @@ generator$genTPGraphs()
 
 </div>
 
-## { data-height=250, .tabset }
+### Selected feature group
 
-### Feature group
+#### Feature group
 
 ```{r}
 plot(1:10)
 ```
 
-### Features
+#### Features
 
-### Formulas
+#### Formulas
 
-### Compounds
+#### Compounds
 
-### Transformations
+#### Transformations

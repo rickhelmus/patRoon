@@ -43,6 +43,9 @@ makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
 {
     const tabEl = '%s';
     Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
+    
+    if (rowInfo.values)
+        Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
     %s;
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
     
@@ -217,6 +220,21 @@ reportHTMLGenerator$methods(
         
         makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,
                           columnGroups = colGroups, bordered = TRUE, onClick = onClick)
+    },
+    
+    genCompoundTable = function()
+    {
+        tab <- as.data.table(objects$compounds)[, c("group", "compoundName", "InChIKey")]
+        tab[, structure := plotImg(plots$structs[InChIKey])][, InChIKey := NULL]
+        tab[, spectrum := plotImg(plots$compounds[[group]]$spectra), by = "group"]
+        tab[, scorings := plotImg(plots$compounds[[group]]$scores), by = "group"]
+        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
+                                    pagination = FALSE, columns = list(
+            group = reactable::colDef(show = FALSE),
+            structure = reactable::colDef(html = TRUE, width = 150),
+            spectrum = reactable::colDef(html = TRUE, width = 600),
+            scorings = reactable::colDef(html = TRUE, width = 500)
+        )))
     }
 )
 

@@ -104,15 +104,16 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
             makeHTMLReportPlot(sprintf("comp-spec-%s-%d.svg", grp, index), outPath, selfContained, {
+                # par(cex = 1.5) # , cex.lab = 1.5, cex.axis = 1.5
                 plotSpectrum(compounds, index, grp, MSPeakLists, formulas, FALSE)
-            }, width = 7, height = 4)
+            }, width = 7, height = 4, pointsize = 14)
         })
         
         ret$scores <- sapply(seq_len(nrow(ann)), function(index)
         {
             makeHTMLReportPlot(sprintf("comp-scores-%s-%d.svg", grp, index), outPath, selfContained, {
                 plotScores(compounds, index, grp) # UNDONE: params
-            }, width = 6, height = 5)
+            }, width = 6, height = 5, pointsize = 14)
         })
         
         return(ret)

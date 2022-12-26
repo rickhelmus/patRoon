@@ -63,7 +63,7 @@ img:not(.zoomImg) {
     // Image zooming, based on https://stackoverflow.com/a/57694495
     $(document).ready(function() {
         $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
-        $('img:not(.zoomImg)').click(function() {
+        $('body').on('click', 'img:not(.zoomImg)', function() {
            $('.zoomImg').attr('src', $(this).attr('src'));
            $('.zoomDiv').css({opacity: '1', width: '70%'});
         });

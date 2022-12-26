@@ -71,7 +71,7 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
 
 genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfContained)
 {
-    return(mapply(groupNames(formulas), annotations(formulas), FUN = function(grp, ann)
+    return(Map(groupNames(formulas), annotations(formulas), f = function(grp, ann)
     {
         ret <- list()
         
@@ -97,7 +97,7 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfConta
 
 genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPath, selfContained)
 {
-    return(mapply(groupNames(compounds), annotations(compounds), FUN = function(grp, ann)
+    return(Map(groupNames(compounds), annotations(compounds), f = function(grp, ann)
     {
         ret <- list()
         

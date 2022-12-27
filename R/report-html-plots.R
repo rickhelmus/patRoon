@@ -187,6 +187,27 @@ reportHTMLGenerator$methods(
     },
     genTPGraphs = function()
     {
-        plotGraph(objects$TPs, components = objects$components, which = 1)
+        cInfo <- componentInfo(objects$components)
+        pars <- parents(objects$TPs)
+        hwidgets <- lapply(seq_len(nrow(cInfo)), function(i)
+        {
+            DOMID <- paste0('TPGraph_', cInfo$name[i])
+            TPInd <- match(cInfo$parent_name[i], pars$name, nomatch = NA)
+            if (is.na(TPInd))
+                return(htmltools::div(id = DOMID))
+        
+            # NOTE: bit less height to avoid scrollbar in card    
+            gr <- plotGraph(objects$TPs, which = TPInd, components = objects$components, structuresMax = 10,
+                            width = "100%", height = "97%") # UNDONE: params
+            gr$elementId <- DOMID
+            return(htmlwidgets::onRender(gr, htmlwidgets::JS("function(el, x)
+{
+    el.style.display = 'none'; // hide by default
+    // auto fit TP graphs on window resize
+    let ro = new ResizeObserver(() => { document.getElementById('graph' + el.id).chart.fit(); });
+    ro.observe(el);
+}")))
+        })
+        return(do.call(htmltools::tagList, hwidgets))
     }
 )

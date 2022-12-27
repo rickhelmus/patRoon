@@ -216,6 +216,7 @@ reportHTMLGenerator$methods(
         
     chromEl.src = Reactable.getState(tabEl).meta.plots.chroms[rd.parent_group];
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.parent_susp_InChIKey];
+    showTPGraph(rd.component);
 }"
         
         makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,

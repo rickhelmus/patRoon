@@ -9,13 +9,12 @@ output:
         fig_mobile: false
         dev: svg
         theme:
-            version: 3
+            version: 5
             bootswatch: cerulean
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
-
 ```
 
 <style>

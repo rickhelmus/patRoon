@@ -1,83 +1,67 @@
-Details {data-orientation=columns}
+Details
 ===
 
 <script>
-function updateView(sel)
-{
-    for (var o of document.getElementById("view-select").options)
-        document.getElementById("detailsTab" + o.value).style.display = (o.value === sel) ? "" : "none"
-}
+`r readAllFile(system.file("js", "utils-report-new.js", package = "patRoon"))`
 </script>
 
+##
+
+```{r, echo = FALSE,eval=TRUE}
+bslib::layout_column_wrap(
+    width = 1,
+    height = "100%",
+    style = "padding-bottom: 10px; padding-right: 10px;", # NOTE: extra bottom padding to compensate for top view selector
+    bslib::card(
+        full_screen = TRUE,
+        bslib::card_header("Feature groups"),
+        htmltools::HTML('
 <label for="view-select">View:</label>
 <select name="view" id="view-select" onChange="updateView(this.value)">
     <option value="Plain">Plain</option>
     <option value="Suspects">Suspects</option>
     <option value="Components">Components</option>
     <option value="TPs">Transformation products</option>
-</select>
-
-## { data-width=200 }
-
-### Feature groups { data-width=250 }
-
-```{r echo=FALSE,eval=TRUE}
-generator$genFeatTablePlain()
-generator$genFeatTableSuspects()
-generator$genFeatTableComponents()
-generator$genFeatTableTPs()
+</select>'),
+        bslib::card_body_fill(
+            generator$genFeatTablePlain(),
+            generator$genFeatTableSuspects(),
+            generator$genFeatTableComponents(),
+            generator$genFeatTableTPs()
+        ),
+    ),
+    bslib::layout_column_wrap(
+        width = NULL,
+        style = htmltools::css(grid_template_columns = "1fr 2fr"),
+        heights_equal = "row",
+        bslib::navs_tab_card(
+            title = "Selected component",
+            full_screen = TRUE,
+            bslib::nav(
+                "Chromatogram",
+                bslib::card_body_fill(htmltools::img(id = "chrom_view"))
+            ),
+            bslib::nav(
+                "Suspect",
+                bslib::card_body_fill(htmltools::img(id = "struct_view"))
+            ),
+            bslib::nav(
+                "Transformations",
+                bslib::card_body_fill(generator$genTPGraphs())
+            )
+        ),
+        bslib::navs_tab_card(
+            title = "Selected feature group",
+            full_screen = TRUE,
+            bslib::nav(
+                "Compounds",
+                bslib::card_body_fill(generator$genCompoundTable())
+            ),
+            bslib::nav(
+                "More things",
+                bslib::card_body_fill("har")
+            )
+        )
+    )
+)
 ```
-
-## { data-width=150 }
-
-### Selected parent { data-width=100 }
-
-<script>
-function updateParentImg(sel)
-{
-    let elements = document.getElementsByName("parentImgs");
-    for (var i=0; i<elements.length; i++)
-        document.getElementById(elements[i].value + "_view").style.display = (elements[i].value === sel) ? "" : "none";
-}
-</script>
-
-<div>
-<input type="radio" id="chrom-choice" name="parentImgs" value="chrom" onChange="updateParentImg(this.value);">
-<label for="chrom-choice">Chromatogram</label>
-<input type="radio" id="struct-choice" name="parentImgs" value="struct" onChange="updateParentImg(this.value);">
-<label for="struct-choice">Structure</label>
-<input type="radio" id="graph-choice" name="parentImgs" value="graph" onChange="updateParentImg(this.value);">
-<label for="graph-choice">Graph</label>
-</div>
-
-<div>
-
-<img id="chrom_view"></img>
-
-<img id="struct_view"></img>
-
-<div id="graph_view" style="height: 200px;">
-
-```{r, echo = FALSE}
-generator$genTPGraphs()
-```
-
-</div>
-
-</div>
-
-### Selected feature group
-
-#### Feature group
-
-```{r}
-plot(1:10)
-```
-
-#### Features
-
-#### Formulas
-
-#### Compounds
-
-#### Transformations

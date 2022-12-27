@@ -211,7 +211,8 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
 #'
 #' @export
 setMethod("plotGraph", "transformationProductsStructure", function(obj, which, components = NULL, structuresMax = 25,
-                                                                   prune = TRUE, onlyCompletePaths = FALSE)
+                                                                   prune = TRUE, onlyCompletePaths = FALSE,
+                                                                   width = NULL, height = NULL)
 {
     checkmate::assert(
         checkmate::checkSubset(which, names(obj), empty.ok = FALSE),
@@ -227,7 +228,8 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, which, c
 
     doPlotTPGraph(as.data.table(obj[which]), parents(obj),
                   cmpTab = if (!is.null(components)) as.data.table(components) else NULL,
-                  structuresMax = structuresMax, prune = prune, onlyCompletePaths = onlyCompletePaths)
+                  structuresMax = structuresMax, prune = prune, onlyCompletePaths = onlyCompletePaths,
+                  width = width, height = height)
 })
 
 #' @describeIn transformationProductsStructure plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared

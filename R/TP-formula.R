@@ -35,7 +35,7 @@ setMethod("linkParentsToFGroups", "transformationProductsFormula", function(TPs,
 #'
 #' @export
 setMethod("plotGraph", "transformationProductsFormula", function(obj, which, components = NULL, prune = TRUE,
-                                                                 onlyCompletePaths = FALSE)
+                                                                 onlyCompletePaths = FALSE, width = NULL, height = NULL)
 {
     checkmate::assert(
         checkmate::checkSubset(which, names(obj), empty.ok = FALSE),
@@ -50,5 +50,5 @@ setMethod("plotGraph", "transformationProductsFormula", function(obj, which, com
     
     doPlotTPGraph(as.data.table(obj[which]), parents(obj),
                   cmpTab = if (!is.null(components)) as.data.table(components) else NULL, structuresMax = 0,
-                  prune = prune, onlyCompletePaths = onlyCompletePaths)
+                  prune = prune, onlyCompletePaths = onlyCompletePaths, width = width, height = height)
 })

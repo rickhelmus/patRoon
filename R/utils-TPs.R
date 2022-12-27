@@ -86,7 +86,7 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }
 
-doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyCompletePaths)
+doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyCompletePaths, width, height)
 {
     # UNDONE: don't make name unique, but use IDs?
     
@@ -190,7 +190,7 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
     
     edges <- data.table(from = TPTab$parent_name, to = TPTab$name, label = TPTab$formulaDiff)
     
-    visNetwork::visNetwork(nodes = nodes, edges = edges) %>%
+    visNetwork::visNetwork(nodes = nodes, edges = edges, width = width, height = height) %>%
         visNetwork::visNodes(shapeProperties = list(useBorderWithImage = FALSE)) %>%
         visNetwork::visEdges(arrows = "to", font = list(align = "top", size = 12)) %>%
         visNetwork::visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),

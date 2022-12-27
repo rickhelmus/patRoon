@@ -12,3 +12,4 @@
 #'   (pruned). See also the \code{onlyCompletePaths} and \code{components} arguments.
 #' @param onlyCompletePaths If \code{TRUE} and \code{components} is set, then only pathways are shown for which
 #'   \emph{all} TPs were detected. See also the \code{prune} and \code{components} arguments.
+#' @param width,height Passed to \code{\link{visNetwork}}.

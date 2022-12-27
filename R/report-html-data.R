@@ -78,11 +78,11 @@ reportHTMLGenerator$methods(
     },
     genFeatTableSuspects = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabSuspects", TRUE, plots)
+        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabSuspects", FALSE, plots)
     },
     genFeatTableComponents = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabComponents", TRUE, plots)
+        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabComponents", FALSE, plots)
     },
     genFeatTableTPs = function()
     {

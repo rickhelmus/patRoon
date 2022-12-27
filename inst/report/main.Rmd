@@ -203,5 +203,3 @@ rmdText <- if (isFGSet(rmdVars$fGroups))
 ```
 
 ```{r child="TPs.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0 && isComponentsTP}
-
-```{r child="details.Rmd"}

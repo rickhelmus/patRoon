@@ -11,7 +11,7 @@ Details
 bslib::layout_column_wrap(
     width = 1,
     height = "100%",
-    style = "padding-bottom: 10px; padding-right: 10px;", # NOTE: extra bottom padding to compensate for top view selector
+    style = "padding-bottom: 10px; padding-right: 10px;",
     bslib::card(
         full_screen = TRUE,
         bslib::card_header("Feature groups"),

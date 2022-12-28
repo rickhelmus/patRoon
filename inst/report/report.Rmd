@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
 pre, code {
     white-space: pre !important;
     overflow-x: auto !important;
-    max-height: 275px;
+    height: auto;
     overflow-y: auto;
 }
 
@@ -54,6 +54,7 @@ pre, code {
 img:not(.zoomImg) {
     cursor: zoom-in;
     max-width: 100%;
+    max-height: 100%;
 }
 
 </style>
@@ -72,40 +73,56 @@ img:not(.zoomImg) {
     });
 </script>
 
-Summary {data-orientation=columns}
+Summary
 ================
 
-## { data-width=500 }
+##
 
-### Most intense feature of each group 
+```{r, echo=FALSE}
+rightColumnCards <- list(
+    bslib::card(
+        bslib::card_header("Objects"),
+        bslib::card_body_fill(htmltools::pre(htmltools::code(objectsShow)))
+    )
+)
 
-```{r, results = "asis"}
-printf("%s\n\n", generator$plotImg(plots$overview$chroms))
-```
+if (!is.null(plots$overview$chord) || !is.null(plots$overview$venn) || !is.null(plots$overview$UpSet))
+{
+    tabs <- list()
+    makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(generator$plotImg(plot))))
+    if (!is.null(plots$overview$chord))
+        tabs <- c(tabs, list(makeTab("Chord diagram", plots$overview$chord)))
+    if (!is.null(plots$overview$venn))
+        tabs <- c(tabs, list(makeTab("Venn diagram", plots$overview$venn)))
+    if (!is.null(plots$overview$UpSet))
+        tabs <- c(tabs, list(makeTab("UpSet diagram", plots$overview$UpSet)))
+    rightColumnCards <- c(rightColumnCards,
+                          list(style = "grid-template-rows: 2fr 3fr;",
+                               do.call(bslib::navs_tab_card, c(list(title = "Feature distribution"), tabs))))
+}
 
-### Retention vs m/z
-
-```{r, results = "asis"}
-printf("%s\n\n", generator$plotImg(plots$overview$retMZ))
-```
-
-## { data-width=300 }
-
-### Objects { data-height=100 }
-
-```{r obj-show}
-cat(objectsShow)
-```
-
-
-```{r, results = "asis", eval = !is.null(plots$overview$chord) || !is.null(plots$overview$venn) || is.null(plots$overview$UpSet)}
-cat("### Feature distribution { data-height=200 }\n\n")
-if (!is.null(plots$overview$chord))
-    printf("#### Chord diagram\n\n%s\n\n", generator$plotImg(plots$overview$chord))
-if (!is.null(plots$overview$venn))
-    printf("#### Venn diagram\n\n%s\n\n", generator$plotImg(plots$overview$venn))
-if (!is.null(plots$overview$UpSet))
-    printf("#### UpSet diagram\n\n%s\n\n", generator$plotImg(plots$overview$UpSet))
+bslib::layout_column_wrap(
+    width = 1/2,
+    height = "100%",
+    heights_equal = "row",
+    style = "padding-bottom: 10px; padding-right: 10px; grid-template-columns: 2fr 1fr;",
+    bslib::layout_column_wrap(
+        width = 1,
+        heights_equal = "row",
+        bslib::card(
+            bslib::card_header("Most intense feature of each group"),
+            bslib::card_body_fill(htmltools::HTML(generator$plotImg(plots$overview$chroms)))
+        ),
+        bslib::card(
+            bslib::card_header("Retention vs m/z"),
+            bslib::card_body_fill(htmltools::HTML(generator$plotImg(plots$overview$retMZ)))
+        )
+    ),
+    do.call(bslib::layout_column_wrap, c(list(
+        width = 1,
+        heights_equal = "row"
+    ), rightColumnCards))
+)
 ```
 
 ```{r child="details.Rmd"}

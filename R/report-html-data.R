@@ -56,11 +56,7 @@ makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
     const sel = state.meta.selectedRow;
     let ret = { cursor: 'pointer' };
     if (sel != null && rowInfo.index === sel)
-        ret.background = 'grey';
-    else if (rowInfo.level === 0)
-        ret.borderTop = '2px solid black';
-    else if (rowInfo.level === 1)
-        ret.borderBottom = '1px solid black';
+        ret.background = '#eee';
     return ret;
 }"), meta = list(selectedRow = NULL, plots = plots), ...)
     
@@ -181,21 +177,44 @@ reportHTMLGenerator$methods(
                                                 type = "line"))
         }
         
-        ststyle <- list(borderRight = "3px solid #eee") # from Reactable examples
-        colDefs$suspect$style <- colDefs$suspect$headerStyle <- ststyle
+        colGrpStartCols <- c("group", "retDiff", "susp_neutralMass", rgs[1])
+        colSepStyle <- list(borderLeft = "1px solid DarkGrey")
+        for (col in colGrpStartCols)
+            colDefs[[col]]$headerStyle <- colSepStyle
+
+        bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
+{
+    let ret = { }
+    if (rowInfo.level === 0)
+    {
+        ret.background = 'black';
+        ret.color = 'white';
+    }
+    else if (rowInfo.level === 1 && column.id !== 'component')
+        ret.background = 'LightGrey';
+    if ([ %s ].includes(column.id))
+        ret.borderLeft = '%s';
+    return ret;
+}", paste0("'", colGrpStartCols, "'", collapse = ","), colSepStyle))
+        
+        colDefs <- lapply(colDefs, function(cd)
+        {
+            cd$style <- bgstyle
+            return(cd)
+        })
         
         colGroups <- pruneList(list(
             # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
-            reactable::colGroup("", columns = c("component", "suspect"), sticky = "left",
-                                headerStyle = ststyle),
-            reactable::colGroup("feature", columns = c("group", "ret", "mz")),
+            reactable::colGroup("", columns = c("component", "suspect"), sticky = "left"),
+            reactable::colGroup("feature", columns = c("group", "ret", "mz"), headerStyle = colSepStyle),
             reactable::colGroup("TP", columns = intersect(c("retDiff", "mzDiff", "formulaDiff", "retDir",
-                                                            "specSimilarity", "mergedBy"), names(tabTPs))),
+                                                            "specSimilarity", "mergedBy"), names(tabTPs)),
+                                headerStyle = colSepStyle),
             if (hasSusp) reactable::colGroup("screening",
                                              columns = intersect(c("susp_neutralMass", "susp_formula", "susp_d_rt",
                                                                    "susp_d_mz", "susp_estIDLevel"),
-                                                                 names(tabTPs))) else NULL,
-            reactable::colGroup("intensity", columns = rgs)
+                                                                 names(tabTPs)), headerStyle = colSepStyle) else NULL,
+            reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle)
         ))
         
         setcolorder(tabTPs, unlist(lapply(colGroups, "[[", "columns")))
@@ -220,7 +239,8 @@ reportHTMLGenerator$methods(
 }"
         
         makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,
-                          columnGroups = colGroups, bordered = TRUE, onClick = onClick)
+                          defaultColDef = reactable::colDef(style = bgstyle),
+                          columnGroups = colGroups, highlight = TRUE, onClick = onClick)
     },
     
     genCompoundTable = function()
@@ -232,9 +252,9 @@ reportHTMLGenerator$methods(
         return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
                                     pagination = FALSE, columns = list(
             group = reactable::colDef(show = FALSE),
-            structure = reactable::colDef(html = TRUE, width = 150),
-            spectrum = reactable::colDef(html = TRUE, width = 600),
-            scorings = reactable::colDef(html = TRUE, width = 500)
+            structure = reactable::colDef(html = TRUE, minWidth = 150),
+            spectrum = reactable::colDef(html = TRUE, minWidth = 600),
+            scorings = reactable::colDef(html = TRUE, minWidth = 500)
         )))
     }
 )

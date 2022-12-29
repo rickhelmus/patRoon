@@ -84,7 +84,9 @@ reportHTMLGenerator$methods(
     {
         # UNDONE: put general suspect info (formula/neutralMass) not in group rows but in suspect aggregate (or simply omit?)
         
-        tabTPsFeat <- getFeatTable(objects$fGroups, NULL)
+        fromTPs <- objects$components@fromTPs
+        
+        tabTPsFeat <- getFeatTable(objects$fGroups, if (fromTPs) NULL else ",")
         tabTPsFeat <- subsetDTColumnsIfPresent(tabTPsFeat, c("group", "ret", "mz", replicateGroups(objects$fGroups),
                                                              "adduct", "neutralMass",
                                                              paste0("susp_", c("name", "estIDLevel", "neutralMass",
@@ -95,10 +97,18 @@ reportHTMLGenerator$methods(
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
                                                            "specSimilarity", "mergedBy"))
 
-        tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"))
-        setnames(tabTPs, "name", "component")
-        setnames(tabTPs, "TP_name", "suspect")
-        setnames(tabTPs, "parent_name", "parent_suspect")
+        if (fromTPs)
+        {
+            tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"))
+            setnames(tabTPs, c("name", "TP_name", "parent_name"),
+                     c("component", "suspect", "parent_suspect"), skip_absent = TRUE)
+        }
+        else
+        {
+            tabTPs <- merge(tabCompon, tabTPsFeat, by = "group")
+            setnames(tabTPs, "name", "component")
+            tabTPs <- removeDTColumnsIfPresent(tabTPs, "susp_name")
+        }
 
         parAggr <- function(parentCol) htmlwidgets::JS(sprintf("function(values, rows, groupRows)
 {
@@ -177,7 +187,10 @@ reportHTMLGenerator$methods(
                                                 type = "line"))
         }
         
-        colGrpStartCols <- c("group", "retDiff", "susp_neutralMass", rgs[1])
+        if (!is.null(tabTPs[["TP_name"]]))
+            colDefs$TP_name <- reactable::colDef("name")
+        
+        colGrpStartCols <- c("group", if(fromTPs) "retDiff" else "TP_name", "susp_neutralMass", rgs[1])
         colSepStyle <- list(borderLeft = "1px solid DarkGrey")
         for (col in colGrpStartCols)
             colDefs[[col]]$headerStyle <- colSepStyle
@@ -190,12 +203,12 @@ reportHTMLGenerator$methods(
         ret.background = 'black';
         ret.color = 'white';
     }
-    else if (rowInfo.level === 1 && column.id !== 'component')
+    else if (%s && rowInfo.level === 1 && column.id !== 'component')
         ret.background = 'LightGrey';
     if ([ %s ].includes(column.id))
         ret.borderLeft = '%s';
     return ret;
-}", paste0("'", colGrpStartCols, "'", collapse = ","), colSepStyle))
+}", if (fromTPs) "true" else "false", paste0("'", colGrpStartCols, "'", collapse = ","), colSepStyle))
         
         colDefs <- lapply(colDefs, function(cd)
         {
@@ -203,11 +216,13 @@ reportHTMLGenerator$methods(
             return(cd)
         })
         
+        groupBy <- if (fromTPs) c("component", "suspect") else "component"
+        
         colGroups <- pruneList(list(
             # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
-            reactable::colGroup("", columns = c("component", "suspect"), sticky = "left"),
+            reactable::colGroup("", columns = groupBy, sticky = "left"),
             reactable::colGroup("feature", columns = c("group", "ret", "mz"), headerStyle = colSepStyle),
-            reactable::colGroup("TP", columns = intersect(c("retDiff", "mzDiff", "formulaDiff", "retDir",
+            reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff", "formulaDiff", "retDir",
                                                             "specSimilarity", "mergedBy"), names(tabTPs)),
                                 headerStyle = colSepStyle),
             if (hasSusp) reactable::colGroup("screening",
@@ -238,7 +253,7 @@ reportHTMLGenerator$methods(
     showTPGraph(rd.component);
 }"
         
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = c("component", "suspect"), columns = colDefs,
+        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, columns = colDefs,
                           defaultColDef = reactable::colDef(style = bgstyle),
                           columnGroups = colGroups, highlight = TRUE, onClick = onClick)
     },

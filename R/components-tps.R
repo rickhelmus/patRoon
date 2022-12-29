@@ -99,7 +99,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                                specSimParams)
 {
     if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
-        return(componentsTPs(componentInfo = data.table(), components = list()))
+        return(componentsTPs(componentInfo = data.table(), components = list()), fromTPs = !is.null(TPs))
     
     hash <- makeHash(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLists, formulas, compounds, minRTDiff,
                      specSimParams)
@@ -117,7 +117,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
-        return(componentsTPs(componentInfo = data.table(), components = list()))
+        return(componentsTPs(componentInfo = data.table(), components = list()), fromTPs = !is.null(TPs))
     }
     
     gInfoParents <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
@@ -278,7 +278,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
            if (length(compList) > 0) sum(sapply(compList, nrow)) else 0)
     
-    ret <- componentsTPs(componentInfo = compInfo[], components = compList)
+    ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = !is.null(TPs))
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)
@@ -299,7 +299,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
 #'
 #' @template components_noint
 #' @export
-componentsTPs <- setClass("componentsTPs", contains = "components")
+componentsTPs <- setClass("componentsTPs", contains = "components", slots = c(fromTPs = "logical"))
 
 setMethod("initialize", "componentsTPs",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "tp"))

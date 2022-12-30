@@ -5,6 +5,13 @@ Details
 `r readAllFile(system.file("js", "utils-report-new.js", package = "patRoon"))`
 </script>
 
+<style>
+/* HACK: to make expander button visible on both dark and light backgrounds */
+.rt-expander:after {
+    border-top-color: dodgerblue;
+}
+</style>
+
 ##
 
 ```{r, echo = FALSE,eval=TRUE}

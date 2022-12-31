@@ -8,6 +8,10 @@ getFeatTable <- function(fGroups, colSusp)
         as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
     else
         as.data.table(fGroups, qualities = "score", average = TRUE)
+
+    tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", replicateGroups(fGroups), "adduct", "neutralMass",
+                                           paste0("susp_", c("name", "estIDLevel", "neutralMass", "formula", "d_rt",
+                                                             "d_mz", "sets", "InChIKey"))))
     
     # if (rmdVars$retMin) UNDONE
     tab[, ret := ret / 60]
@@ -37,7 +41,79 @@ getFeatTable <- function(fGroups, colSusp)
     return(tab)
 }
 
-makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
+getFeatColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
+
+getFeatColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
+
+featTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
+
+getFeatColDefs <- function(tab, groupDefs, EICsTopMost)
+{
+    colDefs <- list()
+    
+    setCD <- function(col, field, value)
+    {
+        if (col %chin% names(tab))
+        {
+            if (is.null(colDefs[[col]]))
+                colDefs[[col]] <<- do.call(reactable::colDef, setNames(list(value), field))
+            else
+                colDefs[[col]][[field]] <<- value
+        }
+    }
+
+    setCD("group", "cell", function(value, index)
+    {
+        htmltools::div(value,
+                       htmltools::br(),
+                       sparkline::sparkline(EICsTopMost[[value]]$intensity, xvalues = EICsTopMost[[value]]$time,
+                                            type = "line"))
+    })
+    
+    setCD("mz", "name", "m/z")
+    if (featTabHasSusps(tab))
+        setCD("susp_name", "name", "suspect")
+    else
+        setCD("susp_name", "name", "name(s)")
+    setCD("susp_neutralMass", "name", "neutralMass")
+    setCD("susp_formula", "name", "formula")
+    setCD("susp_d_rt", "name", "\U0394 ret")
+    setCD("susp_d_mz", "name", "\U0394 mz")
+    setCD("susp_estIDLevel", "name", "estIDLevel") # UNDONE: tool-tip?
+    setCD("susp_estIDLevel", "align", "right")
+    # InChIKeys are only there for internal usage
+    setCD("susp_InChIKey", "show", FALSE)
+    
+    colSepStyle <- getFeatColSepStyle()
+    for (col in getFeatColGrpStartCols(groupDefs))
+        colDefs[[col]]$headerStyle <- colSepStyle
+    
+    return(colDefs)
+}
+
+getFeatGroupDefs <- function(tab, groupBy, rgs)
+{
+    colSepStyle <- getFeatColSepStyle()
+    hasSusp <- featTabHasSusps(tab)
+    isGrouped <- !is.null(groupBy)
+    
+    return(pruneList(list(
+        # NOTE: the first group doesn't have a headerStyle (left border)
+        # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
+        if (isGrouped) reactable::colGroup("", columns = groupBy, sticky = "left") else NULL,
+        reactable::colGroup("feature", columns = c("group", "ret", "mz"), headerStyle = if (isGrouped) colSepStyle else NULL),
+        if (hasSusp) reactable::colGroup("screening",
+                                         columns = intersect(c("susp_neutralMass", "susp_formula", "susp_d_rt",
+                                                               "susp_d_mz", "susp_estIDLevel"),
+                                                             names(tab)),
+                                         headerStyle = colSepStyle)
+        # may still be suspects, but collapsed
+        else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
+        reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle)
+    )))
+}
+
+makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., onClick = NULL)
 {
     oc <- htmlwidgets::JS(sprintf("function(rowInfo, column)
 {
@@ -49,9 +125,42 @@ makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
     %s;
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
     
+    bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
+{
+    let ret = { }
+    const gby = state.groupBy;
+    debugger;
+    if (gby.length !== 0)
+    {
+        if (rowInfo.level === 0)
+        {
+            ret.background = 'black';
+            ret.color = 'white';
+        }
+        else if (gby.length > 1 && rowInfo.level === 1 && column.id !== gby[0])
+            ret.background = 'LightGrey';
+    }
+    
+    if ([ %s ].includes(column.id))
+        ret.borderLeft = '%s';
+
+    return ret;
+}", paste0("'", getFeatColGrpStartCols(groupDefs), "'", collapse = ","), getFeatColSepStyle()))
+    
+    colDefs <- lapply(colDefs, function(cd)
+    {
+        cd$style <- bgstyle
+        return(cd)
+    })
+
+    # sync column order    
+    tab <- copy(tab)
+    setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
+    
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               onClick = oc, defaultExpanded = TRUE,
-                               rowStyle = htmlwidgets::JS("function(rowInfo, state)
+                               highlight = TRUE, onClick = oc, defaultExpanded = TRUE, columns = colDefs,
+                               defaultColDef = reactable::colDef(style = bgstyle),
+                               columnGroups = groupDefs, rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
     let ret = { cursor: 'pointer' };
@@ -66,19 +175,28 @@ makeFeatReactable <- function(tab, id, visible, plots, ..., onClick = NULL)
     return(rt)
 }
 
-
 reportHTMLGenerator$methods(
     genFeatTablePlain = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabPlain", TRUE, plots)
+        tab <- getFeatTable(objects$fGroups, ",")
+        groupDefs <- getFeatGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        colDefs <- getFeatColDefs(tab, groupDefs, EICsTopMost)
+        makeFeatReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
+                          plots = plots)
     },
     genFeatTableSuspects = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabSuspects", FALSE, plots)
+        tab <- getFeatTable(objects$fGroups, NULL)
+        groupDefs <- getFeatGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
+        colDefs <- getFeatColDefs(tab, groupDefs, EICsTopMost)
+        makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
+                          plots = plots, groupBy = "susp_name")
     },
     genFeatTableComponents = function()
     {
-        makeFeatReactable(getFeatTable(objects$fGroups, ","), "detailsTabComponents", FALSE, plots)
+        # tab <- getFeatTable(objects$fGroups, ",")
+        # makeFeatReactable(tab, "detailsTabComponents", getFeatColDefs(tab, NULL), FALSE, plots)
+        reactable::reactable(as.data.table(objects$fGroups), elementId = "detailsTabComponents")
     },
     genFeatTableTPs = function()
     {
@@ -87,11 +205,7 @@ reportHTMLGenerator$methods(
         fromTPs <- objects$components@fromTPs
         
         tabTPsFeat <- getFeatTable(objects$fGroups, if (fromTPs) NULL else ",")
-        tabTPsFeat <- subsetDTColumnsIfPresent(tabTPsFeat, c("group", "ret", "mz", replicateGroups(objects$fGroups),
-                                                             "adduct", "neutralMass",
-                                                             paste0("susp_", c("name", "estIDLevel", "neutralMass",
-                                                                               "formula", "d_rt", "d_mz", "sets",
-                                                                               "InChIKey"))))
+        
         tabCompon <- as.data.table(objects$components)
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
@@ -101,7 +215,7 @@ reportHTMLGenerator$methods(
         {
             tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"))
             setnames(tabTPs, c("name", "TP_name", "parent_name"),
-                     c("component", "suspect", "parent_suspect"), skip_absent = TRUE)
+                     c("component", "susp_name", "parent_susp_name"), skip_absent = TRUE)
         }
         else
         {
@@ -140,7 +254,19 @@ reportHTMLGenerator$methods(
         setnames(tabTPsPar, paste0("parent_", names(tabTPsPar)))
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
         
-        colDefs <- list()
+        groupBy <- if (fromTPs) c("component", "susp_name") else "component"
+        groupDefs <- getFeatGroupDefs(tab, groupBy, rgs)
+        # squeeze in TP column
+        groupDefs <- c(groupDefs[1:2],
+                       list(reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff",
+                                                                            "formulaDiff", "retDir",
+                                                                            "specSimilarity", "mergedBy"),
+                                                                          names(tabTPs)),
+                                                headerStyle = getFeatColSepStyle())),
+                       groupDefs[seq(3, length(groupDefs))])
+        
+        colDefs <- getFeatColDefs(tabTPs, groupDefs, EICsTopMost)
+        
         # set parent 'aggregates': actual value of parent feature group
         for (col in grep("^parent_", names(tabTPs), value = TRUE))
         {
@@ -153,86 +279,15 @@ reportHTMLGenerator$methods(
         colDefs$TP_retDir <- reactable::colDef(show = FALSE)
         
         # these are grouped
+        if (!is.null(tabTPs[["TP_name"]]))
+            colDefs$TP_name <- reactable::colDef("name")
         colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
         colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
         colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula")
         
-        # and these...
-        hasSusp <- !is.null(tabTPs[["susp_neutralMass"]])
-        if (hasSusp)
-        {
-            colDefs$susp_neutralMass$name <- "neutralMass"
-            if (!is.null(tabTPs[["susp_formula"]]))
-                colDefs$susp_formula$name <- "formula"
-            colDefs$susp_d_rt$name <- "\U0394 ret"
-            colDefs$susp_d_mz$name <- "\U0394 mz"
-            if (!is.null(tabTPs[["susp_estIDLevel"]]))
-            {
-                colDefs$susp_estIDLevel$name <- "estIDLevel" # UNDONE: tool-tip?
-                colDefs$susp_estIDLevel$align <- "right"
-            }
-        }
-        
         # InChIKeys are only there for internal usage
-        if (!is.null(tabTPs[["susp_InChIKey"]]))
-            colDefs$susp_InChIKey <- reactable::colDef(show = FALSE)
         if (!is.null(tabTPs[["parent_susp_InChIKey"]]))
             colDefs$parent_susp_InChIKey <- reactable::colDef(show = FALSE)
-        
-        colDefs$group$cell <- function(value, index)
-        {
-            htmltools::div(value,
-                           htmltools::br(),
-                           sparkline::sparkline(EICsTopMost[[value]]$intensity, xvalues = EICsTopMost[[value]]$time,
-                                                type = "line"))
-        }
-        
-        if (!is.null(tabTPs[["TP_name"]]))
-            colDefs$TP_name <- reactable::colDef("name")
-        
-        colGrpStartCols <- c("group", if(fromTPs) "retDiff" else "TP_name", "susp_neutralMass", rgs[1])
-        colSepStyle <- list(borderLeft = "1px solid DarkGrey")
-        for (col in colGrpStartCols)
-            colDefs[[col]]$headerStyle <- colSepStyle
-
-        bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
-{
-    let ret = { }
-    if (rowInfo.level === 0)
-    {
-        ret.background = 'black';
-        ret.color = 'white';
-    }
-    else if (%s && rowInfo.level === 1 && column.id !== 'component')
-        ret.background = 'LightGrey';
-    if ([ %s ].includes(column.id))
-        ret.borderLeft = '%s';
-    return ret;
-}", if (fromTPs) "true" else "false", paste0("'", colGrpStartCols, "'", collapse = ","), colSepStyle))
-        
-        colDefs <- lapply(colDefs, function(cd)
-        {
-            cd$style <- bgstyle
-            return(cd)
-        })
-        
-        groupBy <- if (fromTPs) c("component", "suspect") else "component"
-        
-        colGroups <- pruneList(list(
-            # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
-            reactable::colGroup("", columns = groupBy, sticky = "left"),
-            reactable::colGroup("feature", columns = c("group", "ret", "mz"), headerStyle = colSepStyle),
-            reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff", "formulaDiff", "retDir",
-                                                            "specSimilarity", "mergedBy"), names(tabTPs)),
-                                headerStyle = colSepStyle),
-            if (hasSusp) reactable::colGroup("screening",
-                                             columns = intersect(c("susp_neutralMass", "susp_formula", "susp_d_rt",
-                                                                   "susp_d_mz", "susp_estIDLevel"),
-                                                                 names(tabTPs)), headerStyle = colSepStyle) else NULL,
-            reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle)
-        ))
-        
-        setcolorder(tabTPs, unlist(lapply(colGroups, "[[", "columns")))
         
         onClick <- "function(tabEl, rowInfo)
 {
@@ -252,10 +307,9 @@ reportHTMLGenerator$methods(
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.parent_susp_InChIKey];
     showTPGraph(rd.component);
 }"
-        
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, columns = colDefs,
-                          defaultColDef = reactable::colDef(style = bgstyle),
-                          columnGroups = colGroups, highlight = TRUE, onClick = onClick)
+    
+        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, colDefs = colDefs,
+                          groupDefs = groupDefs, onClick = onClick)
     },
     
     genCompoundTable = function()

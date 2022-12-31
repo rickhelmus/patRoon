@@ -11,6 +11,7 @@
 ## Reporting
 
 - Put CSV/PDF functions also in separate files
+- make columns in feature tables optional, eg feat qualities
 
 
 ## Features

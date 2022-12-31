@@ -10,8 +10,9 @@ getFeatTable <- function(fGroups, colSusp)
         as.data.table(fGroups, qualities = "score", average = TRUE)
 
     tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", replicateGroups(fGroups), "adduct", "neutralMass",
-                                           paste0("susp_", c("name", "estIDLevel", "neutralMass", "formula", "d_rt",
-                                                             "d_mz", "sets", "InChIKey"))))
+                                           paste0("susp_", c("name", "estIDLevel", "d_rt", "d_mz", "sets", "InChIKey")),
+                                           featureQualityNames(scores = TRUE),
+                                           grep("^ISTD_assigned", names(tab), value = TRUE)))
     
     # if (rmdVars$retMin) UNDONE
     tab[, ret := ret / 60]
@@ -20,7 +21,7 @@ getFeatTable <- function(fGroups, colSusp)
     
     for (col in names(tab)[(sapply(tab, is.numeric))])
         set(tab, j = col, value = round(tab[[col]],
-                                        if (col %in% c("mz", "neutralMass", "susp_neutralMass", "susp_d_mz")) 5 else 2))
+                                        if (col %in% c("mz", "neutralMass", "susp_d_mz")) 5 else 2))
     tab[, (replicateGroups(fGroups)) := lapply(.SD, round, 0), .SDcols = replicateGroups(fGroups)]
     
     if (nrow(internalStandards(fGroups)) > 0)
@@ -47,7 +48,7 @@ getFeatColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col
 
 featTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
-getFeatColDefs <- function(tab, groupDefs, EICsTopMost)
+getFeatColDefs <- function(tab, EICsTopMost)
 {
     colDefs <- list()
     
@@ -75,8 +76,6 @@ getFeatColDefs <- function(tab, groupDefs, EICsTopMost)
         setCD("susp_name", "name", "suspect")
     else
         setCD("susp_name", "name", "name(s)")
-    setCD("susp_neutralMass", "name", "neutralMass")
-    setCD("susp_formula", "name", "formula")
     setCD("susp_d_rt", "name", "\U0394 ret")
     setCD("susp_d_mz", "name", "\U0394 mz")
     setCD("susp_estIDLevel", "name", "estIDLevel") # UNDONE: tool-tip?
@@ -84,9 +83,12 @@ getFeatColDefs <- function(tab, groupDefs, EICsTopMost)
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)
     
-    colSepStyle <- getFeatColSepStyle()
-    for (col in getFeatColGrpStartCols(groupDefs))
-        colDefs[[col]]$headerStyle <- colSepStyle
+    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
+    if (length(featScoreNames) > 0)
+    {
+        for (col in featScoreNames)
+            setCD(col, "name", sub("Score$", "", col))
+    }
     
     return(colDefs)
 }
@@ -96,20 +98,25 @@ getFeatGroupDefs <- function(tab, groupBy, rgs)
     colSepStyle <- getFeatColSepStyle()
     hasSusp <- featTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
+    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
     
     return(pruneList(list(
         # NOTE: the first group doesn't have a headerStyle (left border)
         # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
         if (isGrouped) reactable::colGroup("", columns = groupBy, sticky = "left") else NULL,
-        reactable::colGroup("feature", columns = c("group", "ret", "mz"), headerStyle = if (isGrouped) colSepStyle else NULL),
+        reactable::colGroup("feature", columns = intersect(c("group", "ret", "mz", "adduct", "neutralMass",
+                                                             grep("^ISTD_assigned", names(tab), value = TRUE)),
+                                                           names(tab)),
+                            headerStyle = if (isGrouped) colSepStyle else NULL),
         if (hasSusp) reactable::colGroup("screening",
-                                         columns = intersect(c("susp_neutralMass", "susp_formula", "susp_d_rt",
-                                                               "susp_d_mz", "susp_estIDLevel"),
+                                         columns = intersect(c("susp_d_rt", "susp_d_mz", "susp_estIDLevel", "sets"),
                                                              names(tab)),
                                          headerStyle = colSepStyle)
         # may still be suspects, but collapsed
         else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
-        reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle)
+        reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle),
+        if (length(featScoreNames) > 0) reactable::colGroup("Feature quality scores", columns = featScoreNames,
+                                                            headerStyle = colSepStyle) else NULL
     )))
 }
 
@@ -124,6 +131,9 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., 
         Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
     %s;
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
+    
+    colSepStyle <- getFeatColSepStyle()
+    grpStartCols <- getFeatColGrpStartCols(groupDefs)
     
     bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
 {
@@ -145,7 +155,11 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., 
         ret.borderLeft = '%s';
 
     return ret;
-}", paste0("'", getFeatColGrpStartCols(groupDefs), "'", collapse = ","), getFeatColSepStyle()))
+}", paste0("'", grpStartCols, "'", collapse = ","), colSepStyle))
+    
+    
+    for (col in grpStartCols)
+        colDefs[[col]]$headerStyle <- colSepStyle
     
     colDefs <- lapply(colDefs, function(cd)
     {
@@ -180,7 +194,7 @@ reportHTMLGenerator$methods(
     {
         tab <- getFeatTable(objects$fGroups, ",")
         groupDefs <- getFeatGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
-        colDefs <- getFeatColDefs(tab, groupDefs, EICsTopMost)
+        colDefs <- getFeatColDefs(tab, EICsTopMost)
         makeFeatReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
                           plots = plots)
     },
@@ -188,7 +202,7 @@ reportHTMLGenerator$methods(
     {
         tab <- getFeatTable(objects$fGroups, NULL)
         groupDefs <- getFeatGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatColDefs(tab, groupDefs, EICsTopMost)
+        colDefs <- getFeatColDefs(tab, EICsTopMost)
         makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
                           plots = plots, groupBy = "susp_name")
     },
@@ -200,8 +214,6 @@ reportHTMLGenerator$methods(
     },
     genFeatTableTPs = function()
     {
-        # UNDONE: put general suspect info (formula/neutralMass) not in group rows but in suspect aggregate (or simply omit?)
-        
         fromTPs <- objects$components@fromTPs
         
         tabTPsFeat <- getFeatTable(objects$fGroups, if (fromTPs) NULL else ",")
@@ -248,8 +260,8 @@ reportHTMLGenerator$methods(
         rgs <- replicateGroups(objects$fGroups)
         tabTPsPar <- unique(subsetDTColumnsIfPresent(tabTPsFeat,
                                                      c("group", rgs,
-                                                       paste0("susp_", c("estIDLevel", "neutralMass", "formula", "d_rt",
-                                                                         "d_mz", "sets", "InChIKey")))),
+                                                       paste0("susp_", c("estIDLevel", "d_rt", "d_mz", "sets",
+                                                                         "InChIKey")))),
                             by = "group")
         setnames(tabTPsPar, paste0("parent_", names(tabTPsPar)))
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
@@ -265,7 +277,7 @@ reportHTMLGenerator$methods(
                                                 headerStyle = getFeatColSepStyle())),
                        groupDefs[seq(3, length(groupDefs))])
         
-        colDefs <- getFeatColDefs(tabTPs, groupDefs, EICsTopMost)
+        colDefs <- getFeatColDefs(tabTPs, EICsTopMost)
         
         # set parent 'aggregates': actual value of parent feature group
         for (col in grep("^parent_", names(tabTPs), value = TRUE))

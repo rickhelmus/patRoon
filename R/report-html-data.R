@@ -255,7 +255,7 @@ reportHTMLGenerator$methods(
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
         
         groupBy <- if (fromTPs) c("component", "susp_name") else "component"
-        groupDefs <- getFeatGroupDefs(tab, groupBy, rgs)
+        groupDefs <- getFeatGroupDefs(tabTPs, groupBy, rgs)
         # squeeze in TP column
         groupDefs <- c(groupDefs[1:2],
                        list(reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff",
@@ -271,7 +271,9 @@ reportHTMLGenerator$methods(
         for (col in grep("^parent_", names(tabTPs), value = TRUE))
         {
             colTP <- sub("^parent_", "", col)
-            colDefs[[colTP]] <- reactable::colDef(aggregate = parAggr(col), aggregated = parAggred(0), html = TRUE)
+            colDefs[[colTP]]$aggregate <- parAggr(col)
+            colDefs[[colTP]]$aggregated <- parAggred(0)
+            colDefs[[colTP]]$html <- TRUE
             colDefs[[col]] <- reactable::colDef(show = FALSE)
         }
         # similar for TP retDir

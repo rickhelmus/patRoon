@@ -15,6 +15,14 @@ Details
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
+    # <label for="view-select">View:</label>
+    # <select name="view" id="view-select" onChange="updateView(this.value)">
+    #     <option value="Plain">Plain</option>
+    #     <option value="Suspects">Suspects</option>
+    #     <option value="Components">Components</option>
+    #     <option value="TPs">Transformation products</option>
+    # </select>
+
 bslib::layout_column_wrap(
     width = 1,
     height = "100%",
@@ -23,13 +31,30 @@ bslib::layout_column_wrap(
         full_screen = TRUE,
         bslib::card_header("Feature groups"),
         htmltools::HTML('
-<label for="view-select">View:</label>
-<select name="view" id="view-select" onChange="updateView(this.value)">
-    <option value="Plain">Plain</option>
-    <option value="Suspects">Suspects</option>
-    <option value="Components">Components</option>
-    <option value="TPs">Transformation products</option>
-</select>'),
+<div>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            View dropdown
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" onClick="updateView(&quot;Plain&quot;)">Plain</a></li>
+            <li><a class="dropdown-item" onClick="updateView(&quot;Suspects&quot;)">Suspects</a></li>
+            <li><a class="dropdown-item" onClick="updateView(&quot;Components&quot;)">Components</a></li>
+            <li><a class="dropdown-item" onClick="updateView(&quot;TPs&quot;)">Transformation products</a></li>
+        </ul>
+    </div>
+    <div class="btn-group" role="group" aria-label="Feature table columns">
+        <input type="checkbox" class="btn-check" id="feat-cols-info" autocomplete="off">
+        <label class="btn btn-outline-primary" for="feat-cols-info">Feature info</label>
+        <input type="checkbox" class="btn-check" id="feat-cols-int" autocomplete="off">
+        <label class="btn btn-outline-primary" for="feat-cols-int">Feature intensities</label>
+        <input type="checkbox" class="btn-check" id="feat-cols-qual" autocomplete="off">
+        <label class="btn btn-outline-primary" for="feat-cols-qual">Feature quality scores</label>
+        <input type="checkbox" class="btn-check" id="feat-big-chroms" autocomplete="off">
+        <label class="btn btn-outline-primary" for="feat-big-chroms">Big chromatograms</label>
+    </div>
+</div>
+'),
         bslib::card_body_fill(
             generator$genFeatTablePlain(),
             generator$genFeatTableSuspects(),

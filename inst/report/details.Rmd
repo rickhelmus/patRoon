@@ -35,13 +35,13 @@ bslib::layout_column_wrap(
     </select>
 
     <input type="checkbox" id="feat-cols-info" checked>
-    <label for="feat-cols-info">Feature info</label>
+    <label for="feat-cols-info">Group info</label>
     <input type="checkbox" id="feat-cols-int" checked>
-    <label for="feat-cols-int">Feature intensities</label>
+    <label for="feat-cols-int">Intensities</label>
     <input type="checkbox" id="feat-cols-qual">
-    <label for="feat-cols-qual">Feature quality scores</label>
-    <input type="checkbox" id="feat-big-chroms">
-    <label for="feat-big-chroms" style="margin-right: 10px;">Big chromatograms</label>
+    <label for="feat-cols-qual">Quality scores</label>
+    <input type="checkbox" id="feat-large-chroms">
+    <label for="feat-large-chroms" style="margin-right: 10px;">Large chromatograms</label>
 
     <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.downloadDataCSV(&quot;detailsTabPlain&quot;)">Download CSV</button>
     <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.toggleAllRowsExpanded(&quot;detailsTabTPs&quot;)">Expand/collapse</button>

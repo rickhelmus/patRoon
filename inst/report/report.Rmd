@@ -11,6 +11,7 @@ output:
         theme:
             version: 5
             bootswatch: cerulean
+            card-spacer-y: 0.5px
 ---
 
 ```{r setup, include=FALSE}

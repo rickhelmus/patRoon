@@ -139,7 +139,6 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., 
 {
     let ret = { }
     const gby = state.groupBy;
-    debugger;
     if (gby.length !== 0)
     {
         if (rowInfo.level === 0)
@@ -171,17 +170,23 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., 
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
+    headThemeStyle <- list(padding = "2px 4px")
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               highlight = TRUE, onClick = oc, defaultExpanded = TRUE, columns = colDefs,
-                               defaultColDef = reactable::colDef(style = bgstyle),
-                               columnGroups = groupDefs, rowStyle = htmlwidgets::JS("function(rowInfo, state)
+                               highlight = TRUE, outlined = TRUE, onClick = oc, defaultExpanded = TRUE,
+                               columns = colDefs, defaultColDef = reactable::colDef(style = bgstyle),
+                               columnGroups = groupDefs, filterable = TRUE,
+                               theme = reactable::reactableTheme(headerStyle = headThemeStyle,
+                                                                 groupHeaderStyle = headThemeStyle,
+                                                                 cellPadding = "2px 4px"),
+                               meta = list(selectedRow = NULL, plots = plots),
+                               rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
     let ret = { cursor: 'pointer' };
     if (sel != null && rowInfo.index === sel)
         ret.background = '#eee';
     return ret;
-}"), meta = list(selectedRow = NULL, plots = plots), ...)
+}"), ...)
     
     if (!visible)
         rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
@@ -328,6 +333,8 @@ reportHTMLGenerator$methods(
     
     genCompoundTable = function()
     {
+        if (is.null(objects[["compounds"]]))
+            return(htmltools::div()) # UNDONE
         tab <- as.data.table(objects$compounds)[, c("group", "compoundName", "InChIKey")]
         tab[, structure := plotImg(plots$structs[InChIKey])][, InChIKey := NULL]
         tab[, spectrum := plotImg(plots$compounds[[group]]$spectra), by = "group"]

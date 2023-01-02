@@ -10,13 +10,11 @@ Details
 .rt-expander:after {
     border-top-color: dodgerblue;
 }
-
 </style>
 
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
-
 bslib::layout_column_wrap(
     width = 1,
     height = "100%",
@@ -24,27 +22,34 @@ bslib::layout_column_wrap(
     bslib::card(
         full_screen = TRUE,
         bslib::card_header("Feature groups"),
-        htmltools::HTML('
-<label for="view-select">View:</label>
-<select name="view" id="view-select" onChange="updateView(this.value)">
-    <option value="Plain">Plain</option>
-    <option value="Suspects">Suspects</option>
-    <option value="Components">Components</option>
-    <option value="TPs">Transformation products</option>
-</select>
-'),
-        htmltools::HTML('
-<div class="btn-group" role="group" aria-label="Feature table columns">
-    <input type="checkbox" class="btn-check btn-group-sm" id="feat-cols-info" autocomplete="off">
-    <label class="btn btn-outline-primary" for="feat-cols-info">Feature info</label>
-    <input type="checkbox" class="btn-check btn-group-sm" id="feat-cols-int" autocomplete="off">
-    <label class="btn btn-outline-primary" for="feat-cols-int">Feature intensities</label>
-    <input type="checkbox" class="btn-check btn-group-sm" id="feat-cols-qual" autocomplete="off">
-    <label class="btn btn-outline-primary" for="feat-cols-qual">Feature quality scores</label>
-    <input type="checkbox" class="btn-check btn-group-sm" id="feat-big-chroms" autocomplete="off">
-    <label class="btn btn-outline-primary" for="feat-big-chroms">Big chromatograms</label>
+        bslib::card_body(
+            class = "mt-2",
+            htmltools::HTML('
+<div class="pb-1">
+    <label for="view-select">View:</label>
+    <select name="view" id="view-select" onChange="updateView(this.value)" style="margin-right: 10px; margin-top: 3px;">
+        <option value="Plain">Plain</option>
+        <option value="Suspects">Suspects</option>
+        <option value="Components">Components</option>
+        <option value="TPs">Transformation products</option>
+    </select>
+
+    <input type="checkbox" id="feat-cols-info" checked>
+    <label for="feat-cols-info">Feature info</label>
+    <input type="checkbox" id="feat-cols-int" checked>
+    <label for="feat-cols-int">Feature intensities</label>
+    <input type="checkbox" id="feat-cols-qual">
+    <label for="feat-cols-qual">Feature quality scores</label>
+    <input type="checkbox" id="feat-big-chroms">
+    <label for="feat-big-chroms" style="margin-right: 10px;">Big chromatograms</label>
+
+    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.downloadDataCSV(&quot;detailsTabPlain&quot;)">Download CSV</button>
+    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.toggleAllRowsExpanded(&quot;detailsTabTPs&quot;)">Expand/collapse</button>
+
+    <label for="feat-search">Search</label>
+    <input type="text" id="feat-search" oninput="Reactable.setSearch(&quot;detailsTabPlain&quot;, this.value)">
 </div>
-'),
+')),
         bslib::card_body_fill(
             generator$genFeatTablePlain(),
             generator$genFeatTableSuspects(),

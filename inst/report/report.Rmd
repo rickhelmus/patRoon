@@ -46,6 +46,7 @@ pre, code {
     max-height: 100%; 
     overflow: auto;
     cursor: zoom-out;
+    background: white;
 }
 
 .zoomImg {
@@ -56,6 +57,12 @@ img:not(.zoomImg) {
     cursor: zoom-in;
     max-width: 100%;
     max-height: 100%;
+}
+
+/* this sort-off prevents vertical scrolling after refreshing */
+/* UNDONE: doesn't always work, at least not in FF */
+html, body {
+    overflow: hidden;
 }
 
 </style>

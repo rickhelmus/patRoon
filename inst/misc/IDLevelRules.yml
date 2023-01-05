@@ -26,7 +26,6 @@
     annMSMSSim:
         type: formula
         min: 0.7
-        higherThanNext: 0.2
     isoScore:
         min: 0.5
         higherThanNext: 0.2

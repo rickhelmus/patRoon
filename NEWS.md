@@ -47,6 +47,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.
 - `as.data.table()` method for `featureGroups` adds replicate group column when executed with `features=TRUE`.
 - `delete()` method for `transformationProducts`
+- remove bogus `higherThanNext` setting from estimated ID level 4a
 
 
 # patRoon 2.1

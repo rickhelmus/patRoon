@@ -46,6 +46,8 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - `makeSet()` method for `featureGroups` (and related functions `adducts()` and `selectIons()`): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot `annotationsChanged` to `featureGroupsSet` for internal usage by the `adducts()<-` method.
 - Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.
 - `as.data.table()` method for `featureGroups` adds replicate group column when executed with `features=TRUE`.
+- `delete()` method for `transformationProducts`
+
 
 # patRoon 2.1
 

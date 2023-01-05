@@ -16,6 +16,7 @@
 \alias{$,transformationProducts-method}
 \alias{as.data.table,transformationProducts-method}
 \alias{convertToSuspects,transformationProducts-method}
+\alias{delete,transformationProducts-method}
 \alias{filter,transformationProducts-method}
 \alias{transformationProductsLogic-class}
 \alias{transformationProductsLogic}
@@ -41,18 +42,24 @@
 
 \S4method{convertToSuspects}{transformationProducts}(obj, includeParents = FALSE)
 
+\S4method{delete}{transformationProducts}(obj, i = NULL, j = NULL, ...)
+
 \S4method{filter}{transformationProducts}(obj, properties = NULL, verbose = TRUE, negate = FALSE)
 }
 \arguments{
 \item{TPs, x, obj, object}{\code{transformationProducts} object to be accessed}
 
-\item{i}{For \code{[}/\code{[[}: A numeric or character value which is used to select parents by
+\item{i, j}{For \code{[}/\code{[[}: A numeric or character value which is used to select parents by
 their index or name, respectively (for the order/names see \code{names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all parents are selected.\cr\cr For \code{[[}: should be a scalar value.}
+(similar to regular vectors). If missing all parents are selected.\cr\cr For \code{[[}: should be a scalar value.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
+parents as numeric index, logical or character, \code{j} the transformation products as numeric index (row) or name of the TP. If either is
+\code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each parent,
+with the TP info table (a \code{data.table}), the parent name and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
+function specifies the TP indices (rows) (specified as an \code{integer} or \code{logical} vector) or names to be removed.}
 
-\item{\dots}{Unused.}
+\item{\dots}{For \code{delete}: passed to the function specified as \code{j}. Otherwise ignored.}
 
-\item{drop, j}{ignored.}
+\item{drop}{ignored.}
 
 \item{name}{The parent name (partially matched).}
 
@@ -67,6 +74,8 @@ with the name of the property, and should be a vector with allowed values. To ob
 \item{negate}{If \code{TRUE} then filters are performed in opposite manner.}
 }
 \value{
+\code{delete} returns the object for which the specified data was removed.
+
 \code{filter} returns a filtered \code{transformationProducts} object.
 }
 \description{
@@ -106,6 +115,8 @@ the data), the \code{retDir} values are based on calculated \code{log P} values 
 
 \item \code{convertToSuspects(transformationProducts)}: Converts this object to a suspect list that can be used as input for
 \code{\link{screenSuspects}}.
+
+\item \code{delete(transformationProducts)}: Completely deletes specified transformation product data.
 
 \item \code{filter(transformationProducts)}: Performs rule-based filtering. Useful to simplify and clean-up the data.
 

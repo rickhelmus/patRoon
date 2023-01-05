@@ -164,6 +164,17 @@ test_that("basic usage", {
     testMFDB(TPsCTSSusp)
     expect_error(convertToMFDB(TPsBTEmpty, tempfile(fileext = ".csv")), "create")
     
+    expect_length(delete(TPsLogic, i = names(TPsLogic)), 0)
+    expect_false(delete(TPsLogic, j = 1)[[1]]$name[1] == TPsLogic[[1]]$name[1])
+    expect_length(delete(TPsLogic, j = 3:4), length(TPsLogic) - (length(names(TPsLogic)) * 2))
+    expect_false(delete(TPsLogic, j = function(...) 1)[[1]]$name[1] == TPsLogic[[1]]$name[1])
+    expect_length(delete(TPsLogic, j = function(...) 3:4), length(TPsLogic) - (length(names(TPsLogic)) * 2))
+    expect_length(delete(TPsLogic, j = function(...) TRUE), 0)
+    expect_equal(delete(TPsLogic, i = character()), TPsLogic)
+    expect_equal(delete(TPsLogic, j = integer()), TPsLogic)
+    expect_length(delete(TPsLogic), 0)
+    expect_length(delete(TPsLibEmpty), 0)
+    
     expect_setequal(as.data.table(filter(TPsLibPC, properties = list(retDir = c(-1, 1))))$retDir, c(-1, 1))
     expect_setequal(as.data.table(filter(TPsLibPC, properties = list(retDir = c(-1, 1)), negate = TRUE))$retDir, 0)
     expect_equal(anyDuplicated(as.data.table(filter(TPsBTSuspMore, removeDuplicates = TRUE)), by = c("SMILES", "parent")), 0)

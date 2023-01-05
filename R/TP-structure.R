@@ -129,19 +129,25 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     {
         if (removeParentIsomers || removeTPIsomers || removeDuplicates)
         {
-            # NOTE: obj@products should be first arg to Map to keep names...
-            obj@products <- Map(obj@products, parents(obj)$formula, f = function(prod, pform)
+            mark <- if (negate) function(x) !x else function(x) x
+            obj <- delete(obj, j = function(tab, par)
             {
+                tab <- copy(tab)
+                tab[, keep := TRUE]
+                
                 if (removeDuplicates)
-                    prod <- if (negate) prod[duplicated(SMILES)] else prod[!duplicated(SMILES)]
+                    tab[keep == TRUE, keep := mark(!duplicated(SMILES))]
                 if (removeParentIsomers)
-                    prod <- if (negate) prod[formula == pform] else prod[formula != pform]
+                {
+                    pform <- parents(obj)[match(par, name)]$formula
+                    tab[keep == TRUE, keep := mark(formula != pform)]
+                }
                 if (removeTPIsomers)
                 {
-                    df <- getDuplicatedStrings(prod$formula)
-                    prod <- if (negate) prod[formula %chin% df] else prod[!formula %chin% df]
+                    df <- getDuplicatedStrings(tab$formula)
+                    tab[keep == TRUE, keep := mark(!formula %chin% df)]
                 }
-                return(prod)
+                return(!tab$keep)
             })
         }
         
@@ -154,7 +160,7 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
                 function(x) is.na(x) | x < minSimilarity
             else
                 function(x) !is.na(x) & numGTE(x, minSimilarity)
-            obj@products <- lapply(obj@products, function(p) p[pred(similarity)])
+            obj <- delete(obj, j = function(tab, ...) !pred(tab$similarity))
         }
         
         obj@products <- pruneList(obj@products, checkZeroRows = TRUE)

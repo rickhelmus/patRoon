@@ -126,6 +126,9 @@ as.data.table(x)
 convertToSuspects(obj, includeParents = FALSE)
 
 # S4 method for transformationProducts
+delete(obj, i = NULL, j = NULL, ...)
+
+# S4 method for transformationProducts
 filter(obj, properties = NULL, verbose = TRUE, negate = FALSE)</code></pre></div>
     </div>
 
@@ -135,17 +138,21 @@ filter(obj, properties = NULL, verbose = TRUE, negate = FALSE)</code></pre></div
 <dd><p><code>transformationProducts</code> object to be accessed</p></dd>
 
 
-<dt>i</dt>
+<dt>i, j</dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select parents by
 their index or name, respectively (for the order/names see <code><a href="generics.html">names()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all parents are selected.<br><br> For <code>[[</code>: should be a scalar value.</p></dd>
+(similar to regular vectors). If missing all parents are selected.<br><br> For <code>[[</code>: should be a scalar value.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
+parents as numeric index, logical or character, <code>j</code> the transformation products as numeric index (row) or name of the TP. If either is
+<code>NULL</code> then data for all is removed. <code>j</code> may also be a function: it will be called for each parent,
+with the TP info table (a <code>data.table</code>), the parent name and any other arguments passed as <code>...</code> to <code>delete</code>. The return value of this
+function specifies the TP indices (rows) (specified as an <code>integer</code> or <code>logical</code> vector) or names to be removed.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Unused.</p></dd>
+<dd><p>For <code>delete</code>: passed to the function specified as <code>j</code>. Otherwise ignored.</p></dd>
 
 
-<dt>drop, j</dt>
+<dt>drop</dt>
 <dd><p>ignored.</p></dd>
 
 
@@ -175,6 +182,9 @@ with the name of the property, and should be a vector with allowed values. To ob
     <h2>Value</h2>
     
 
+<p><code>delete</code> returns the object for which the specified data was removed.</p>
+
+
 <p><code>filter</code> returns a filtered <code>transformationProducts</code> object.</p>
     </div>
     <div id="details">
@@ -203,6 +213,7 @@ the data), the <code>retDir</code> values are based on calculated <code>log P</c
 <li><p><code>as.data.table(transformationProducts)</code>: Returns all TP data in a table.</p></li>
 <li><p><code>convertToSuspects(transformationProducts)</code>: Converts this object to a suspect list that can be used as input for
 <code><a href="suspect-screening.html">screenSuspects</a></code>.</p></li>
+<li><p><code>delete(transformationProducts)</code>: Completely deletes specified transformation product data.</p></li>
 <li><p><code>filter(transformationProducts)</code>: Performs rule-based filtering. Useful to simplify and clean-up the data.</p></li>
 </ul></div>
     <div id="slots">

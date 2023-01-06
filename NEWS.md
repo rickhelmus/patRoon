@@ -49,7 +49,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - `delete()` method for `transformationProducts`
 - remove bogus `higherThanNext` setting from estimated ID level 4a
 - Fixed: `screenSuspects()` would fail if the adduct column contains partially `NA` data.
-
+- Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors
 
 
 # patRoon 2.1

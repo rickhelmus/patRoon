@@ -472,7 +472,6 @@ doFeatAnnFilterSets <- function(obj, ..., sets = NULL, updateConsensus = FALSE, 
             # filter set objects and re-generate annotation consensus
             
             obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
-            obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
             
             # synchronize other objects
             cat("Synchronizing set objects...\n")

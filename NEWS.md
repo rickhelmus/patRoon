@@ -48,6 +48,8 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - `as.data.table()` method for `featureGroups` adds replicate group column when executed with `features=TRUE`.
 - `delete()` method for `transformationProducts`
 - remove bogus `higherThanNext` setting from estimated ID level 4a
+- Fixed: `screenSuspects()` would fail if the adduct column contains partially `NA` data.
+
 
 
 # patRoon 2.1

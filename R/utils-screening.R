@@ -79,7 +79,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             else
             {
                 unAdducts <- sapply(unique(suspects[is.na(mz)]$adduct), as.adduct)
-                suspects[is.na(mz), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
+                suspects[is.na(mz) & !is.na(adduct), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
             }
         }
         else if (is.null(suspects[["mz"]]))

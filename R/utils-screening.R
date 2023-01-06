@@ -477,13 +477,14 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
             else
                 doLog(indent, "Checking ID level type '%s'\n", type)
             
-            if (type == "or")
+            if (type %in% c("or", "and"))
             {
                 if (!is.list(val) || checkmate::testNamed(val))
-                    stop("Specify a list with 'or'")
-                levelOK <- any(mapply(val, seq_along(val), FUN = function(IDL, i)
+                    stop(sprintf("Specify a list with '%s'", type))
+                checkf <- if (type == "or") any else all
+                levelOK <- checkf(mapply(val, seq_along(val), FUN = function(IDL, i)
                 {
-                    doLog(indent + 1, "check OR condition %d/%d\n", i, length(val))
+                    doLog(indent + 1, "check %s condition %d/%d\n", toupper(type), i, length(val))
                     return(checkLevelOK(IDL, indent + 2))
                 }))
             }

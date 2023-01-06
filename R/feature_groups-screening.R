@@ -91,6 +91,7 @@ screeningSlots <- c(screenInfo = "data.table")
 #'   \item For \code{suspectFragments}: if the number of fragments from the suspect list (\code{maxFrags} column) is
 #'   less then the minimum rule value, the minimum is adjusted to the number of available fragments.
 #'
+#'   \item The \code{or} and \code{and} keywords can be used to combine multiple conditions.
 #'   }
 #'
 #'   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can

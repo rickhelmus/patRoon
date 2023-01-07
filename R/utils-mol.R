@@ -224,7 +224,7 @@ calculateLogP <- function(SMILES, method, mustWork)
     return(ret)
 }
 
-prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
+prepareChemTable <- function(chemData, prefCalcChemProps, neutralChemProps, verbose = TRUE)
 {
     if (verbose)
         printf("Calculating/Validating chemical data... ")
@@ -242,8 +242,11 @@ prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
             chemData[, (col) := trimws(get(col))]
     }
     
-    convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE)
-    convertedSMILES <- babelConvert(chemData$InChI, "inchi", "smi", appendFormula = TRUE, mustWork = FALSE)
+    eopts <- if (neutralChemProps) "--neutralize" else NULL
+    convertedInChIs <- babelConvert(chemData$SMILES, "smi", "inchi", appendFormula = TRUE, mustWork = FALSE,
+                                    extraOpts = eopts)
+    convertedSMILES <- babelConvert(chemData$InChI, "inchi", "smi", appendFormula = TRUE, mustWork = FALSE,
+                                    extraOpts = eopts)
     
     # clear input data that couldn't be converted: it's probably invalid
     chemData[is.na(convertedInChIs$result), SMILES := NA_character_]
@@ -256,6 +259,32 @@ prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
     chemData[, SMILES := fifelse(!is.na(SMILES), SMILES, convertedSMILES$result)]
     chemData[, InChI := fifelse(!is.na(InChI), InChI, convertedInChIs$result)]
     
+    if (neutralChemProps)
+    {
+        # UNDONE: InChI has its own neutralization algorithm, which seems more strict. Prefer this over OpenBabel, i.e.
+        # by taking converted SMILES from InChIs?
+        
+        # NOTE: calculated SMILES/InChIs from above are already neutralized
+        doNeutSMI <- !is.na(chemData$SMILES) & (is.na(convertedSMILES$result) | chemData$SMILES != convertedSMILES$result)
+        doNeutInChI <- !is.na(chemData$InChI) & (is.na(convertedInChIs$result) | chemData$InChI != convertedInChIs$result)
+        if (!prefCalcChemProps)
+        {
+            # only neutralize if charge!=0, so we retain the original data where possible
+            # assume both SMILES and InChI are charged if prefCalcChemProps==F, so only look at SMILES
+            chemData[doNeutSMI == TRUE,
+                     molCharge := rcdk::get.total.charge(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
+                     by = "SMILES"]
+            doNeutSMI <- doNeutSMI & chemData$molCharge != 0
+            doNeutInChI <- doNeutInChI & !is.na(chemData$molCharge) & chemData$molCharge != 0
+            chemData[doNeutSMI | doNeutInChI, c("InChIKey", "formula", "neutralMass") :=
+                         .(NA_character_, NA_character_, NA_real_)] # force update
+            chemData[, molCharge := NULL]
+        }
+        
+        chemData[doNeutSMI, SMILES := babelConvert(SMILES, "smi", "smi", extraOpts = eopts)]
+        chemData[doNeutInChI, InChI := babelConvert(InChI, "inchi", "inchi", extraOpts = c(eopts, "-xT", "nochg"))]
+    }
+
     # NOTE: for formula calculation, both RCDK and OpenBabel cannot output formulas with labeled isotopes. However,
     # OpenBabel does output deuterium as D.
     # --> For now don't consider any formulae from isotope labeled SMILES, unless the isotopes are just deuterium
@@ -274,13 +303,17 @@ prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
     chemData[takeConvertedIK, InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
     chemData[, formula := fifelse(takeConvertedFormula, convForms, formula)]
     
+    convFormulaEq <- !is.na(chemData$formula) & !is.na(convForms) & chemData$formula == convForms
+    
     # NOTE: use by to avoid duplicated calculations.
     # NOTE: For neutral mass calculation prefer SMILES over formulae as it's faster.
     # NOTE: However, for formulae that were not calculated and therefore need to be validated, the neutral mass is taken
     # from the formulae since rcdk::get.formula returns both.
     
-    # Get neutral mass from SMILES: only consider if formula was calculated (thus not verified below) or unavailable.
-    chemData[(prefCalcChemProps | is.na(neutralMass)) & (takeConvertedFormula | (is.na(formula) & !is.na(SMILES))), neutralMass := {
+    # Get neutral mass from SMILES: only consider if formula is (the same as) calculated (thus not verified below) or
+    # unavailable.
+    chemData[(prefCalcChemProps | is.na(neutralMass)) & isSMIOKForFormula &
+                 (takeConvertedFormula | convFormulaEq | (is.na(formula) & !is.na(SMILES))), neutralMass := {
         ret <- tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], SMILESParser = smp)[[1]]),
                         error = function(...) NA_real_)
         if (is.na(ret) && !is.na(formula[1])) # failed, try from formula
@@ -288,8 +321,12 @@ prepareChemTable <- function(chemData, prefCalcChemProps, verbose = TRUE)
         ret
     }, by = "SMILES"]
     
-    # for non-calculated formulae: set to NA if invalid or normalize the format and get the neutralMass
-    chemData[!is.na(formula) & !takeConvertedFormula, c("formula", "neutralMassCalc") := {
+    
+    # For non-calculated formulae: set to NA if invalid or normalize the format and get the neutralMass. Only
+    # validate/normalize formulae if different than calculated or we lack a neutralMass.
+    chemData[!is.na(formula) & !takeConvertedFormula & (!convFormulaEq | is.na(neutralMass)),
+             c("formula", "neutralMassCalc") := {
+        
         form <- tryCatch(rcdk::get.formula(formula[1]), error = function(...) NULL)
         if (is.null(form))
             list(NA_character_, NA_real_)

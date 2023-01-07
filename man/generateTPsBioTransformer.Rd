@@ -12,6 +12,8 @@ generateTPsBioTransformer(
   extraOpts = NULL,
   skipInvalid = TRUE,
   prefCalcChemProps = TRUE,
+  neutralChemProps = FALSE,
+  neutralizeTPs = TRUE,
   calcSims = FALSE,
   fpType = "extended",
   fpSimMethod = "tanimoto",
@@ -41,6 +43,15 @@ information (\emph{e.g.} SMILES) is available.}
 \acronym{InChIKey} are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
 more details.}
+
+\item{neutralChemProps}{If \code{TRUE} then the neutral form of the molecule is considered to calculate
+\acronym{SMILES}, fomrulae etc. Enabling this may improve feature matching when considering common adducts
+(\emph{e.g.} \code{[M+H]+}, \code{[M-H]-}). See the \verb{Validating and calculating chemical properties} section
+for more details.}
+
+\item{neutralizeTPs}{If \code{TRUE} then all resulting TP structure information is neutralized. This argument has a
+similar meaning as \code{neutralChemProps}. This is defaulted to \code{TRUE} for prediction algorithms, as these
+may output charged molecules.}
 
 \item{calcSims}{If set to \code{TRUE} then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the \link[=filter,transformationProductsStructure-method]{filter
@@ -129,6 +140,10 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
 
   \item Validation of \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey} and formula data (if present). Invalid
   entries will be set to \code{NA}.
+
+  \item If \code{neutralChemProps=TRUE} then the \acronym{SMILES}\acronym{InChI} data is neutralized by
+  (de-)protonation (using the \command{--neutralized} option of \command{OpenBabel}). If
+  \code{prefCalcChemProps=FALSE} then only charged molecules are considered.
 
   \item The \acronym{SMILES} and \acronym{InChI} data are used to calculate missing or invalid \acronym{SMILES},
   \acronym{InChI}, \acronym{InChIKey} and formula data. If \code{prefCalcChemProps=TRUE} then existing

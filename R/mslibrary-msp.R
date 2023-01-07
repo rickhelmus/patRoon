@@ -31,12 +31,12 @@ NULL
 #'   formats).
 #'
 #' @export
-loadMSLibraryMSP <- function(file, parseComments = TRUE, prefCalcChemProps = TRUE, potAdducts = TRUE,
-                             potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
+loadMSLibraryMSP <- function(file, parseComments = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE,
+                             potAdducts = TRUE, potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
-    aapply(checkmate::assertFlag, . ~ parseComments + prefCalcChemProps + potAdductsLib + calcSPLASH,
+    aapply(checkmate::assertFlag, . ~ parseComments + prefCalcChemProps + neutralChemProps + potAdductsLib + calcSPLASH,
            fixed = list(add = ac))
     checkmate::assert(checkmate::checkFlag(potAdducts),
                       checkmate::checkCharacter(potAdducts, any.missing = FALSE, min.chars = 1),
@@ -45,14 +45,14 @@ loadMSLibraryMSP <- function(file, parseComments = TRUE, prefCalcChemProps = TRU
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(makeFileHash(file), parseComments, prefCalcChemProps, potAdducts, potAdductsLib, absMzDev,
-                     calcSPLASH)
+    hash <- makeHash(makeFileHash(file), parseComments, prefCalcChemProps, neutralChemProps, potAdducts, potAdductsLib,
+                     absMzDev, calcSPLASH)
     cd <- loadCacheData("MSLibraryMSP", hash)
     if (!is.null(cd))
         return(cd)
     
     lib <- readMSP(normalizePath(file), parseComments)
-    lib <- sanitizeMSLibrary(lib, prefCalcChemProps, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
+    lib <- sanitizeMSLibrary(lib, prefCalcChemProps, neutralChemProps, potAdducts, potAdductsLib, absMzDev, calcSPLASH)
     
     ret <- MSLibrary(records = lib$records[], spectra = lib$spectra, algorithm = "msp")
     

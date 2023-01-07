@@ -5,7 +5,10 @@
 #'   <%= if (exists("parNULL")) "If \\code{NULL} then TPs for all parents in the library are obtained." %>
 #' @param skipInvalid If set to \code{TRUE} then the parents will be skipped (with a warning) for which insufficient
 #'   information (\emph{e.g.} SMILES) is available.
-#'
+#' @param neutralizeTPs If \code{TRUE} then all resulting TP structure information is neutralized. This argument has a
+#'   similar meaning as \code{neutralChemProps}. This is defaulted to \code{TRUE} for prediction algorithms, as these
+#'   may output charged molecules.
+#' 
 #' @details An important advantage of this algorithm is that it provides structural information for generated TPs.
 #'   However, this also means that if the input is from a parent suspect list or screening then either \acronym{SMILES}
 #'   or \acronym{InChI} information must be available for the parents.

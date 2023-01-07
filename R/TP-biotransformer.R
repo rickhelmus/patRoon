@@ -9,7 +9,7 @@ setMethod("initialize", "transformationProductsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash, maxExpGenerations)
+getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash, maxExpGenerations, neutralizeTPs)
 {
     mainArgs <- c("-b", type,
                   "-k", "pred",
@@ -18,7 +18,8 @@ getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash,
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", parent, ".txt"), parent = parent,
-                SMILES = SMILES, maxExpGenerations = maxExpGenerations, hash = makeHash(parent, SMILES, baseHash)))
+                SMILES = SMILES, maxExpGenerations = maxExpGenerations, neutralizeTPs = neutralizeTPs,
+                hash = makeHash(parent, SMILES, baseHash)))
 }
 
 BTMPFinishHandler <- function(cmd)
@@ -76,6 +77,8 @@ BTMPFinishHandler <- function(cmd)
     ret[, retDir := fifelse(ALogP < parALogP, -1, 1)]
 
     setcolorder(ret, c("name", "ID", "parent_ID", "chem_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
+    
+    ret <- prepareChemTable(ret, prefCalcChemProps = FALSE, neutralChemProps = cmd$neutralizeTPs, verbose = FALSE)
     
     return(ret)
 }
@@ -176,7 +179,8 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = generations + 2,
-                                      extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE, calcSims = FALSE,
+                                      extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+                                      neutralChemProps = FALSE, neutralizeTPs = TRUE, calcSims = FALSE,
                                       fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)
 {
     checkmate::assert(
@@ -194,18 +198,20 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCount(maxExpGenerations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims + MP, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims + MP,
+           fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
 
-    baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, skipInvalid, fpType, fpSimMethod)
+    baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, prefCalcChemProps, neutralChemProps,
+                         neutralizeTPs, skipInvalid, fpType, fpSimMethod)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,
                     MoreArgs = list(type = type, generations = generations, maxExpGenerations = maxExpGenerations,
-                                    extraOpts = extraOpts, baseHash = baseHash))
+                                    neutralizeTPs = neutralizeTPs, extraOpts = extraOpts, baseHash = baseHash))
 
     results <- list()
 

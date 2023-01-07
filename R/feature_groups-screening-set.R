@@ -366,7 +366,8 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                         adduct, skipInvalid, prefCalcChemProps, onlyHits)
+                                                         adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
+                                                         onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -377,7 +378,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
                                                          adduct = NULL, skipInvalid = skipInvalid,
                                                          prefCalcChemProps = prefCalcChemProps,
-                                                         onlyHits = onlyHits))
+                                                         neutralChemProps = neutralChemProps, onlyHits = onlyHits))
     
     scr <- mergeScreeningSetInfos(setObjects)
     if (onlyHits)
@@ -398,12 +399,12 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 #' @export
 setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                                   adduct, skipInvalid, prefCalcChemProps,
-                                                                  onlyHits, amend = FALSE)
+                                                                  neutralChemProps, onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
     fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
-                                      onlyHits)
+                                      neutralChemProps, onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

@@ -2,6 +2,10 @@
 #'   \acronym{InChIKey} are preferred over what is already present in the <%=whatCP%>. For efficiency reasons it is
 #'   recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
 #'   more details.
+#' @param neutralChemProps If \code{TRUE} then the neutral form of the molecule is considered to calculate
+#'   \acronym{SMILES}, fomrulae etc. Enabling this may improve feature matching when considering common adducts
+#'   (\emph{e.g.} \code{[M+H]+}, \code{[M-H]-}). See the \verb{Validating and calculating chemical properties} section
+#'   for more details.
 #'
 #' @section Validating and calculating chemical properties: Chemical properties such as \acronym{SMILES},
 #'   \acronym{InChIKey} and formula in the <%=whatCP%> are automatically validated and calculated if missing/invalid.
@@ -10,6 +14,10 @@
 #'
 #'   \item Validation of \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey} and formula data (if present). Invalid
 #'   entries will be set to \code{NA}.
+#'
+#'   \item If \code{neutralChemProps=TRUE} then the \acronym{SMILES}\acronym{InChI} data is neutralized by
+#'   (de-)protonation (using the \command{--neutralized} option of \command{OpenBabel}). If
+#'   \code{prefCalcChemProps=FALSE} then only charged molecules are considered.
 #'
 #'   \item The \acronym{SMILES} and \acronym{InChI} data are used to calculate missing or invalid \acronym{SMILES},
 #'   \acronym{InChI}, \acronym{InChIKey} and formula data. If \code{prefCalcChemProps=TRUE} then existing

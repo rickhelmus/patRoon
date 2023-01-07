@@ -146,7 +146,8 @@ convertToSuspects(
     = 10),
   collapse = TRUE,
   suspects = NULL,
-  prefCalcChemProps = TRUE
+  prefCalcChemProps = TRUE,
+  neutralChemProps = FALSE
 )
 
 # S4 method for MSLibrary
@@ -246,6 +247,13 @@ be amended with spectra data. See the <code>Suspect conversion</code> section fo
 <acronym>InChIKey</acronym> are preferred over what is already present in the input suspect list to <code>convertToSuspects</code>. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
+<dt>neutralChemProps</dt>
+<dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
+<acronym>SMILES</acronym>, fomrulae etc. Enabling this may improve feature matching when considering common adducts
+(<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
+for more details.</p></dd>
 
 
 <dt>type</dt>
@@ -353,6 +361,9 @@ the <code>spectra</code> method for access.</p></dd>
   <acronym>InChIKey</acronym> and formula in the input suspect list to <code>convertToSuspects</code> are automatically validated and calculated if missing/invalid.</p>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
+<li><p>If <code>neutralChemProps=TRUE</code> then the <acronym>SMILES</acronym><acronym>InChI</acronym> data is neutralized by
+  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). If
+  <code>prefCalcChemProps=FALSE</code> then only charged molecules are considered.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
   <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data. If <code>prefCalcChemProps=TRUE</code> then existing
   <acronym>InChIKey</acronym> and formula data is overwritten by calculated values whenever possible.</p></li>

@@ -100,6 +100,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loadMSLibraryMoNAJSON</span><span class="op">(</span></span>
 <span>  <span class="va">file</span>,</span>
 <span>  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  neutralChemProps <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  potAdducts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  potAdductsLib <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
@@ -123,6 +124,13 @@
 <acronym>InChIKey</acronym> are preferred over what is already present in the MS library. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
+
+
+<dt>neutralChemProps</dt>
+<dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
+<acronym>SMILES</acronym>, fomrulae etc. Enabling this may improve feature matching when considering common adducts
+(<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
+for more details.</p></dd>
 
 
 <dt>potAdducts, potAdductsLib</dt>
@@ -194,6 +202,9 @@ more details.</p></dd>
   <acronym>InChIKey</acronym> and formula in the MS library are automatically validated and calculated if missing/invalid.</p>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
+<li><p>If <code>neutralChemProps=TRUE</code> then the <acronym>SMILES</acronym><acronym>InChI</acronym> data is neutralized by
+  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). If
+  <code>prefCalcChemProps=FALSE</code> then only charged molecules are considered.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
   <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data. If <code>prefCalcChemProps=TRUE</code> then existing
   <acronym>InChIKey</acronym> and formula data is overwritten by calculated values whenever possible.</p></li>

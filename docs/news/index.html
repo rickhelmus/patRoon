@@ -157,6 +157,14 @@
 <li>
 <code><a href="../reference/generics.html">delete()</a></code> method for <code>transformationProducts</code>
 </li>
+<li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
+<li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> would fail if the adduct column contains partially <code>NA</code> data.</li>
+<li>Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors</li>
+<li>
+<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>: Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the  keyword.</li>
+<li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
+</li>
+<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments.</li>
 </ul></div>
 </div>
     <div class="section level2">

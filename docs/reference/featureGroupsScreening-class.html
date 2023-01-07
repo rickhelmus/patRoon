@@ -452,7 +452,6 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
     annMSMSSim:
         type: formula
         min: 0.7
-        higherThanNext: 0.2
     isoScore:
         min: 0.5
         higherThanNext: 0.2
@@ -482,6 +481,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 <li><p>If <code>relative=yes</code> then the relative scoring will be used for testing.</p></li>
 <li><p>For <code>suspectFragments</code>: if the number of fragments from the suspect list (<code>maxFrags</code> column) is
   less then the minimum rule value, the minimum is adjusted to the number of available fragments.</p></li>
+<li><p>The <code>or</code> and <code>and</code> keywords can be used to combine multiple conditions.</p></li>
 </ul><p>A template rules file can be generated with the <code><a href="suspect-screening.html">genIDLevelRulesFile</a></code> function, and this file can
   subsequently passed to <code>annotateSuspects</code>. The file format is highly flexible and (sub)levels can be added or
   removed if desired. Note that the default file is currently only suitable when annotation is performed with GenForm

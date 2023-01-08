@@ -23,9 +23,16 @@ function updateView(sel)
 function showFeatCols(column, show)
 {
     const tabIDs = getFeatTableIDs();
-    debugger;
-    if (column === "chrom_large")
-        tabIDs.forEach(id => Reactable.toggleHideColumn(id, column, show));
+    tabIDs.forEach(function(id)
+    {
+        const cols = Reactable.getState(id).meta.colToggles[column];
+        if (Array.isArray(cols))
+            cols.forEach(col => Reactable.toggleHideColumn(id, col, show));
+        else
+            Reactable.toggleHideColumn(id, cols, show);
+    })
+    /*if (column === "chrom_large")
+        tabIDs.forEach(id => Reactable.toggleHideColumn(id, column, show));*/
 }
 
 function showTPGraph(cmp)

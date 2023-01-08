@@ -107,7 +107,7 @@ getFeatGroupDefs <- function(tab, groupBy, rgs)
         # may still be suspects, but collapsed
         else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
         reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle),
-        if (length(featScoreNames) > 0) reactable::colGroup("Feature quality scores", columns = featScoreNames,
+        if (length(featScoreNames) > 0) reactable::colGroup("feature quality scores", columns = featScoreNames,
                                                             headerStyle = colSepStyle) else NULL
     )))
 }
@@ -123,7 +123,7 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     const tabEl = '%s';
     Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
     
-    if (rowInfo.values)
+    if (rowInfo.values && document.getElementById('compoundsTab'))
         Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
     %s;
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
@@ -132,11 +132,11 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     tab[, c("chrom_small", "chrom_large") := group]
     tabn <- names(tab)
     setcolorder(tab, c(tabn[seq_len(match("group", tabn))], "chrom_small", "chrom_large")) # move after group column
-    colDefs$chrom_small <- reactable::colDef("EIC", cell = function(value, index)
+    colDefs$chrom_small <- reactable::colDef("chromatogram", cell = function(value, index)
     {
         sparkline::sparkline(EICsTopMost[[value]]$intensity, xvalues = EICsTopMost[[value]]$time, type = "line")
     })
-    colDefs$chrom_large <- reactable::colDef("EIC", minWidth = 450, show = FALSE, cell = function(value, index)
+    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 450, show = FALSE, cell = function(value, index)
     {
         htmltools::img(src = plots$chroms[[value]])
     })
@@ -182,6 +182,15 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
         cd$style <- bgstyle
         return(cd)
     })
+    
+    groupCols <- lapply(groupDefs, "[[", "columns")
+    names(groupCols) <- sapply(groupDefs, "[[", "name")
+    colToggles <- list(
+        group = setdiff(as.vector(groupCols$feature), c("group", "chrom_small", "chrom_large")), # don't toggle group and chroms
+        intensities = as.vector(groupCols$intensity),
+        qualities = as.vector(groupCols[["feature quality scores"]]),
+        chrom_large = "chrom_large"
+    )
 
     headThemeStyle <- list(padding = "2px 4px")
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
@@ -191,7 +200,7 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
                                theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                                  groupHeaderStyle = headThemeStyle,
                                                                  cellPadding = "2px 4px"),
-                               meta = list(selectedRow = NULL, plots = plots),
+                               meta = list(selectedRow = NULL, plots = plots, colToggles = colToggles),
                                rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
@@ -221,14 +230,16 @@ reportHTMLGenerator$methods(
         tab <- getFeatTable(objects$fGroups, NULL)
         groupDefs <- getFeatGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatColDefs(tab)
-        makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
+        makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                           EICsTopMost, plots = plots, groupBy = "susp_name")
     },
     genFeatTableComponents = function()
     {
-        # tab <- getFeatTable(objects$fGroups, ",")
-        # makeFeatReactable(tab, "detailsTabComponents", getFeatColDefs(tab, NULL), FALSE, plots)
-        reactable::reactable(as.data.table(objects$fGroups), elementId = "detailsTabComponents")
+        tab <- getFeatTable(objects$fGroups, ",")
+        groupDefs <- getFeatGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        colDefs <- getFeatColDefs(tab)
+        makeFeatReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
+                          EICsTopMost, plots = plots)
     },
     genFeatTableTPs = function()
     {

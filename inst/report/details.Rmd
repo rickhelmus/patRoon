@@ -34,11 +34,11 @@ bslib::layout_column_wrap(
         <option value="TPs">Transformation products</option>
     </select>
 
-    <input type="checkbox" id="feat-cols-info" checked>
+    <input type="checkbox" id="feat-cols-info" onChange="showFeatCols(&quot;group&quot;, !this.checked)" checked>
     <label for="feat-cols-info">Group info</label>
-    <input type="checkbox" id="feat-cols-int" checked>
+    <input type="checkbox" id="feat-cols-int" onChange="showFeatCols(&quot;intensities&quot;, !this.checked)" checked>
     <label for="feat-cols-int">Intensities</label>
-    <input type="checkbox" id="feat-cols-qual">
+    <input type="checkbox" id="feat-cols-qual" onChange="showFeatCols(&quot;qualities&quot;, !this.checked)">
     <label for="feat-cols-qual">Quality scores</label>
     <input type="checkbox" id="feat-large-chroms" onChange="showFeatCols(&quot;chrom_large&quot;, !this.checked)">
     <label for="feat-large-chroms" style="margin-right: 10px;">Large chromatograms</label>

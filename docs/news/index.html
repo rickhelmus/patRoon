@@ -164,7 +164,10 @@
 <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>: Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the  keyword.</li>
 <li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
 </li>
-<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments.</li>
+<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.
+<ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
+</ul></li>
+<li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> didn’t properly detect changes in local database files when considering cached data.</li>
 </ul></div>
 </div>
     <div class="section level2">

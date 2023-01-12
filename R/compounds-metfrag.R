@@ -288,7 +288,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     
     baseHash <- makeHash(method, topMost)
     if (!is.null(extDB))
-        baseHash <- makeHash(baseHash, extDB)
+        baseHash <- makeHash(baseHash, makeFileHash(extDB))
 
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "metfrag")
 

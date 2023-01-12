@@ -38,7 +38,27 @@ setMethod("initialize", "transformationProductsStructure", function(.Object, cal
 {
     .Object <- callNextMethod(.Object, ...)
     
-    if (length(.Object) > 0 && calcSims)
+    if (length(.Object) == 0)
+        return(.Object)
+    
+    # remove neutralized TPs that became duplicates
+    rmNeutTPs <- 0
+    .Object@products <- lapply(products(.Object), function(pr)
+    {
+        if (!is.null(pr[["molNeutralized"]]))
+        {
+            prNN <- pr[molNeutralized == FALSE]
+            wh <- pr$molNeutralized & pr$InChIKey %chin% prNN$InChIKey
+            pr <- pr[!wh]
+            rmNeutTPs <<- rmNeutTPs + sum(wh)
+        }
+        return(pr)
+    })
+    
+    if (rmNeutTPs > 0)
+        printf(sprintf("Removed %d TPs that were duplicates after neutralization.\n", rmNeutTPs))
+    
+    if (calcSims)
     {
         hash <- makeHash(.Object)
         cd <- loadCacheData("TPsParentSims", hash)

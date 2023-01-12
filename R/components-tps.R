@@ -211,8 +211,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "trans_add",
-                              "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage")
+                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "molNeutralized", "CID", "mass",
+                              "retDir", "trans_add", "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage")
                 prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
                 prods <- unique(prods, by = "name") # omit duplicates from different routes
                 
@@ -254,7 +254,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         if (!is.null(TPs))
         {
             pars <- parents(TPs)
-            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass")
+            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "molNeutralized")
             cols <- intersect(names(pars), cols)
             cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
             targetCols <- paste0("parent_", cols)

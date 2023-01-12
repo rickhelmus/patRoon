@@ -7,7 +7,7 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
-    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",  "d_rt", "d_mz", "fragments_formula")
+    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz", "fragments_formula")
     
     renameDupCols <- function(si, suf)
     {

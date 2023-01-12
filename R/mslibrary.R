@@ -452,6 +452,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                      InChIKey = "InChIKey",
                      formula = "formula",
                      neutralMass = "neutralMass",
+                     molNeutralized = "molNeutralized",
                      fragments_mz = "fragments_mz")
         if (!is.null(adduct))
             mapCols <- c(mapCols, Precursor_type = "adduct")

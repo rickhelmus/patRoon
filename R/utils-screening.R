@@ -121,8 +121,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     
     # NOTE: rt is always included
     metaDataCols <- c("name", "rt",
-                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
-                                  "fragments_mz", "fragments_formula"), names(suspects)))
+                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass",
+                                  "molNeutralized", "adduct", "fragments_mz", "fragments_formula"), names(suspects)))
     
     emptyResult <- function()
     {

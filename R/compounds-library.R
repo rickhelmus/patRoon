@@ -14,6 +14,7 @@ unifyLibNames <- function(cTab)
                  InChIKey = "InChIKey",
                  formula = "neutral_formula",
                  neutralMass = "neutralMass",
+                 molNeutralized = "molNeutralized",
                  Precursor_type = "precursorType",
                  Spectrum_type = "spectrumType",
                  PrecursorMZ = "ion_formula_mz",

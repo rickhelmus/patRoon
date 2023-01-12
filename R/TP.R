@@ -128,14 +128,14 @@ setMethod("convertToSuspects", "transformationProducts", function(obj, includePa
     # remove TPs that are equal for a parent that were predicted through different routes
     prodAll <- unique(prodAll, by = "name")
     
-    keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
+    keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "molNeutralized")
     prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
     prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE, FALSE, FALSE)
     
     if (includeParents)
         prodAll <- rbind(parents(obj), prodAll, fill = TRUE)
 
-    return(prodAll)
+    return(prodAll[])
 })
 
 setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)

@@ -11,7 +11,8 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemPro
             compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
         else
             setnames(compTab, "identifier", "name")
-        parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey", "neutral_formula", "neutralMass"), with = FALSE]
+        parents <- compTab[, intersect(c("name", "SMILES", "InChI", "InChIKey", "neutral_formula", "neutralMass",
+                                         "molNeutralized"), names(compTab)), with = FALSE]
         setnames(parents, "neutral_formula", "formula")
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = FALSE,
                                       prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
@@ -22,7 +23,7 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemPro
         parents <- copy(screenInfo(parents))
         parents <- unique(parents, by = "name")
         # only keep columns that are relevant for suspect lists (ie when convertToSuspects is called)
-        keepCols <- c("name", "rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",
+        keepCols <- c("name", "rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "molNeutralized",
                       "fragments_mz", "fragments_formula", "adduct")
         parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
@@ -80,7 +81,7 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     prodAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
-                  "ALogP", "LogP", "XLogP", "parent")
+                  "molNeutralized", "ALogP", "LogP", "XLogP", "parent")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }

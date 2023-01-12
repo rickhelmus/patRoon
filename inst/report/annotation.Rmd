@@ -70,7 +70,7 @@ if (isSusp)
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
     
     isSet <- isFGSet(rmdVars$fGroups)
-    keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz")
+    keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz", "susp_molNeutralized")
 
     clR2 <- c("susp_d_rt", "susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel")
     clR2 <- getAllSuspCols(clR2, names(fGroupsSpecDT), mergedConsensusNames(rmdVars$fGroups))

@@ -52,7 +52,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors
 - `annotateSuspects()`: Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the \code{or} keyword.
 - Validation of formula data in e.g. suspect lists is now much faster when `prefCalcChemProps=FALSE`
-- Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments.
+- Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether neutralization occurred is reported by the new `molNeutralized` column.
 
 
 # patRoon 2.1

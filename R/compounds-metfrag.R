@@ -149,6 +149,7 @@ unifyMFNames <- function(mfr, scoreTypesMF)
                  ForIdentCategories = "categories",
 
                  # database generated from TP prediction
+                 molNeutralized = "molNeutralized",
                  parent = "parent",
                  ALogP = "ALogP",
                  LogP = "LogP",

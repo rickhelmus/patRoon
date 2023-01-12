@@ -190,6 +190,8 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
+    
+    ctext <- addValText(ctext, "%s", "molNeutralized")
 
     ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP", "LogP"))
 

@@ -26,8 +26,12 @@ TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
 TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], calcSims = TRUE) # for filter tests
 
-TPsCTSSusp <- generateTPs("cts", suspL, "photolysis_unranked")
-TPsCTSScr <- generateTPs("cts", fGroups, "photolysis_unranked")
+doCTS <- FALSE
+if (doCTS)
+{
+    TPsCTSSusp <- generateTPs("cts", suspL, "photolysis_unranked")
+    TPsCTSScr <- generateTPs("cts", fGroups, "photolysis_unranked")
+}
 
 fGroupsEmpty <- getEmptyTestFGroups()
 fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
@@ -35,7 +39,8 @@ TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
 TPsLibFormEmpty <- generateTPs("library_formula", TPLibrary = TPCustFormLib, fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
-TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
+if (doCTS)
+    TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
 doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
@@ -48,7 +53,8 @@ if (doMetFrag)
     compsMF <- callMF(fGroups, plists)
     TPsLibComp <- generateTPs("library", compsMF)
     TPsBTComp <- generateTPs("biotransformer", compsMF)
-    TPsCTSComp <- generateTPs("cts", compsMF, "photolysis_unranked")
+    if (doCTS)
+        TPsCTSComp <- generateTPs("cts", compsMF, "photolysis_unranked")
 }
 
 test_that("verify TP generation", {
@@ -62,8 +68,6 @@ test_that("verify TP generation", {
     expect_known_value(TPsLibFormScr, testFile("tp-lib_form_scr"))
     expect_known_value(TPsBTSusp, testFile("tp-bt_susp"))
     expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
-    expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
-    expect_known_value(TPsCTSScr, testFile("tp-cts_scr"))
     
     expect_known_show(TPsLogic, testFile("tp-logic", text = TRUE))
     expect_known_show(TPsLibPC, testFile("tp-lib_pc", text = TRUE))
@@ -71,8 +75,6 @@ test_that("verify TP generation", {
     expect_known_show(TPsLibScr, testFile("tp-lib_scr", text = TRUE))
     expect_known_show(TPsBTSusp, testFile("tp-bt_susp", text = TRUE))
     expect_known_show(TPsBTScr, testFile("tp-bt_scr", text = TRUE))
-    expect_known_show(TPsCTSSusp, testFile("tp-cts_susp", text = TRUE))
-    expect_known_show(TPsCTSScr, testFile("tp-cts_scr", text = TRUE))
     
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
@@ -99,19 +101,25 @@ test_that("verify TP generation", {
     expect_length(TPsLibEmpty, 0)
     expect_length(TPsLibFormEmpty, 0)
     expect_length(TPsBTEmpty, 0)
-    expect_length(TPsCTSEmpty, 0)
     
     skip_if_not(doMetFrag)
 
     expect_known_value(TPsLibComp, testFile("tp-lib_comp"))
     expect_known_value(TPsBTComp, testFile("tp-bt_comp"))
-    expect_known_value(TPsCTSComp, testFile("tp-cts_comp"))
     expect_known_show(TPsLibComp, testFile("tp-lib_comp", text = TRUE))
     expect_known_show(TPsBTComp, testFile("tp-bt_comp", text = TRUE))
-    expect_known_show(TPsCTSComp, testFile("tp-cts_comp", text = TRUE))
 
     checkmate::expect_names(parents(TPsLibComp)$name, subset.of = as.data.table(compsMF)$identifier)
     checkmate::expect_names(parents(TPsBTComp)$name, subset.of = as.data.table(compsMF)$identifier)
+    
+    skip_if_not(doCTS)
+    expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
+    expect_known_value(TPsCTSScr, testFile("tp-cts_scr"))
+    expect_known_show(TPsCTSSusp, testFile("tp-cts_susp", text = TRUE))
+    expect_known_show(TPsCTSScr, testFile("tp-cts_scr", text = TRUE))
+    expect_length(TPsCTSEmpty, 0)
+    expect_known_value(TPsCTSComp, testFile("tp-cts_comp"))
+    expect_known_show(TPsCTSComp, testFile("tp-cts_comp", text = TRUE))
     checkmate::expect_names(parents(TPsCTSComp)$name, subset.of = as.data.table(compsMF)$identifier)
 })
 
@@ -124,8 +132,8 @@ testMFDB <- function(TPs)
     MFDBP <- getMFDB(TPs, includeParents = TRUE)
     
     cols <- c("Identifier", "MolecularFormula", "MonoisotopicMass",
-              "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP", "LogP", "XLogP", "parent", "transformation",
-              "enzyme", "evidencedoi")
+              "SMILES", "InChI", "InChIKey", "InChIKey1", "molNeutralized", "ALogP", "LogP", "XLogP", "parent",
+              "transformation", "enzyme", "evidencedoi")
     
     unTPN <- uniqueN(as.data.table(TPs), by = "InChIKey")
     
@@ -156,12 +164,10 @@ test_that("basic usage", {
     expect_error(assertSusp(convertToSuspects(TPsLogic)), NA)
     expect_error(assertSusp(convertToSuspects(TPsLibScr, includeParents = TRUE)), NA)
     expect_error(assertSusp(convertToSuspects(TPsBTSusp, includeParents = TRUE)), NA)
-    expect_error(assertSusp(convertToSuspects(TPsCTSSusp, includeParents = TRUE)), NA)
     expect_error(convertToSuspects(TPsLogicEmpty), "create")
     
     testMFDB(TPsLibScr)
     testMFDB(TPsBTSusp)
-    testMFDB(TPsCTSSusp)
     expect_error(convertToMFDB(TPsBTEmpty, tempfile(fileext = ".csv")), "create")
     
     expect_length(delete(TPsLogic, i = names(TPsLogic)), 0)
@@ -192,9 +198,13 @@ test_that("basic usage", {
     
     expect_error(assertSusp(convertToSuspects(TPsLibComp, includeParents = TRUE)), NA)
     expect_error(assertSusp(convertToSuspects(TPsBTComp, includeParents = TRUE)), NA)
-    expect_error(assertSusp(convertToSuspects(TPsCTSComp, includeParents = TRUE)), NA)
     testMFDB(TPsLibComp)
     testMFDB(TPsBTComp)
+    
+    skip_if_not(doCTS)
+    expect_error(assertSusp(convertToSuspects(TPsCTSSusp, includeParents = TRUE)), NA)
+    testMFDB(TPsCTSSusp)
+    expect_error(assertSusp(convertToSuspects(TPsCTSComp, includeParents = TRUE)), NA)
     testMFDB(TPsCTSComp)
 })
 
@@ -272,7 +282,8 @@ componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp, includeParents = TRUE), onlyHits = TRUE)
 componTPsBT <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsBTSusp)
 
-componTPsCTS <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsCTSSusp)
+if (doCTS)
+    componTPsCTS <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsCTSSusp)
 
 if (doMetFrag)
 {
@@ -293,14 +304,12 @@ test_that("TP componentization", {
     expect_known_value(componTPsLib, testFile("tp-compon-lib"))
     expect_known_value(componTPsLibForm, testFile("tp-compon-lib_form"))
     expect_known_value(componTPsBT, testFile("tp-compon-bt"))
-    expect_known_value(componTPsCTS, testFile("tp-compon-cts"))
     
     expect_known_show(componTPsNone, testFile("tp-compon-none", text = TRUE))
     expect_known_show(componTPsLogic, testFile("tp-compon-logic", text = TRUE))
     expect_known_show(componTPsLib, testFile("tp-compon-lib", text = TRUE))
     expect_known_show(componTPsLibForm, testFile("tp-compon-lib_form", text = TRUE))
     expect_known_show(componTPsBT, testFile("tp-compon-bt", text = TRUE))
-    expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))
     
     expect_equal(nrow(as.data.table(componTPsNone)), length(groupNames(componTPsNone))^2)
     expect_length(intersect(componentInfo(componTPsNoneTPDiff)$parent_group, groupNames(componTPsNoneTPDiff)), 0)
@@ -337,6 +346,10 @@ test_that("TP componentization", {
     
     expect_error(generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL, MSPeakLists = plistsEmpty), NA)
     expect_error(generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL, MSPeakLists = plistsEmptyMS), NA)
+    
+    skip_if_not(doCTS)
+    expect_known_value(componTPsCTS, testFile("tp-compon-cts"))
+    expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))
 })
 
 getMinCompTblVal <- function(x, field) min(as.data.table(x)[[field]], na.rm = TRUE)

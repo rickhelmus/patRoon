@@ -283,7 +283,7 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
     # prepare chem infos
     for (wh in c("parent", "TP"))
     {
-        cols <- c("SMILES", "InChI", "InChIKey", "formula", "neutralMass")
+        cols <- c("SMILES", "InChI", "InChIKey", "formula", "neutralMass", "molNeutralized")
         
         # temporarily remove parent/TP prefix for prepareChemTable
         whcols <- intersect(paste0(wh, "_", cols), names(TPLibrary))

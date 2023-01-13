@@ -168,6 +168,9 @@
 <ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
 </ul></li>
 <li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> didn’t properly detect changes in local database files when considering cached data.</li>
+<li>Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.</li>
+<li>
+<code><a href="../reference/generics.html">plotChord()</a></code> method for <code>featureGroups</code>: significantly optimized some old code</li>
 </ul></div>
 </div>
     <div class="section level2">

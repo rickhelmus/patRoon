@@ -292,6 +292,13 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
         
         # put back prefix
         regcols <- intersect(cols, names(TPLibrary))
+        # clean out NA columns
+        for (col in regcols)
+        {
+            if (all(is.na(TPLibrary[[col]])))
+                TPLibrary[, (col) := NULL]
+        }
+        regcols <- intersect(regcols, names(TPLibrary))
         setnames(TPLibrary, regcols, paste0(wh, "_", regcols))
         
         if ("InChIKey1" %in% c(matchParentsBy, matchGenerationsBy))

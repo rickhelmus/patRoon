@@ -45,7 +45,7 @@ genHTMLReportPlotsChroms <- function(fGroups, outPath, EICs, selfContained)
         makeHTMLReportPlot(paste0("chrom-", grp, ".svg"), outPath, selfContained, {
             # UNDONE: params
             mar <- par("mar")
-            par(mar = c(mar[1], mar[2], 0.2, mar[4]))
+            par(mar = c(mar[1], mar[2], 0.2, 0.2))
             plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, colourBy = "rGroups", title = "",
                        onlyPresent = TRUE, bty = "l")
         }, width = 6, height = 4, bg = "transparent", pointsize = 16)

@@ -14,10 +14,16 @@ function getFeatTableInstances()
     return getFeatTableIDs().map(id => Reactable.getInstance(id));
 }
 
+function getSelFeatTableElement()
+{
+    return "detailsTab" + document.getElementById("view-select").value;
+}
+
 function updateView(sel)
 {
-    sel = "detailsTab" + sel;
-    getFeatTableElements().forEach(el => el.style.display = (el.id === sel) ? "" : "none");
+    tid = "detailsTab" + sel;
+    getFeatTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
+    document.getElementById("feat-expand").style.display = (sel !== "Plain") ? "" : "none";
 }
 
 function showFeatCols(column, show)
@@ -31,8 +37,8 @@ function showFeatCols(column, show)
         else
             Reactable.toggleHideColumn(id, cols, show);
     })
-    /*if (column === "chrom_large")
-        tabIDs.forEach(id => Reactable.toggleHideColumn(id, column, show));*/
+    if (column === "chrom_large")
+        tabIDs.forEach(id => Reactable.toggleHideColumn(id, "chrom_small", !show));
 }
 
 function showTPGraph(cmp)

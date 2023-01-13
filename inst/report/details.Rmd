@@ -43,11 +43,13 @@ bslib::layout_column_wrap(
     <input type="checkbox" id="feat-large-chroms" onChange="showFeatCols(&quot;chrom_large&quot;, !this.checked)">
     <label for="feat-large-chroms" style="margin-right: 10px;">Large chromatograms</label>
 
-    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.downloadDataCSV(&quot;detailsTabPlain&quot;)">Download CSV</button>
-    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.toggleAllRowsExpanded(&quot;detailsTabTPs&quot;)">Expand/collapse</button>
+    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.downloadDataCSV(getSelFeatTableElement())">Download CSV</button>
+    <button type="button" class="btn btn-primary btn-sm" id="feat-expand" onClick="Reactable.toggleAllRowsExpanded(getSelFeatTableElement())" style="display: none;">Expand/collapse</button>
 
-    <label for="feat-search">Search</label>
-    <input type="text" id="feat-search" oninput="Reactable.setSearch(&quot;detailsTabPlain&quot;, this.value)">
+    <div class="float-right">
+        <label for="feat-search">Search</label>
+        <input type="text" id="feat-search" oninput="Reactable.setSearch(getSelFeatTableElement(), this.value)">
+    </div>
 </div>
 ')),
         bslib::card_body_fill(
@@ -62,7 +64,7 @@ bslib::layout_column_wrap(
         style = htmltools::css(grid_template_columns = "1fr 2fr"),
         heights_equal = "row",
         bslib::navs_tab_card(
-            title = "Selected component",
+            title = "Selected parent",
             full_screen = TRUE,
             bslib::nav(
                 "Chromatogram",

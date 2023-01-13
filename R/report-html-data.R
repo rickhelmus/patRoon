@@ -79,7 +79,10 @@ getFeatColDefs <- function(tab)
     if (length(featScoreNames) > 0)
     {
         for (col in featScoreNames)
+        {
             setCD(col, "name", sub("Score$", "", col))
+            setCD(col, "show", FALSE) # hidden by default, controlled by checkbox
+        }
     }
     
     return(colDefs)
@@ -136,7 +139,7 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     {
         sparkline::sparkline(EICsTopMost[[value]]$intensity, xvalues = EICsTopMost[[value]]$time, type = "line")
     })
-    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 450, show = FALSE, cell = function(value, index)
+    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, cell = function(value, index)
     {
         htmltools::img(src = plots$chroms[[value]])
     })

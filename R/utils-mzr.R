@@ -249,10 +249,12 @@ verifyDataCentroided <- function(anaInfo)
     {
         fpath <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
         
-        hash <- makeFileHash(fpath)
+        # hash <- makeFileHash(fpath) complete file hash is most accurate, but slow with many analyses. For now assume
+        # user keeps centroided data centroided, and only check again if it wasn't
+        hash <- makeHash(fpath)
         cd <- loadCacheData("dataCentroided", hash, cacheDB)
-        if (!is.null(cd))
-            return(cd)
+        if (!is.null(cd) && cd)
+            return(TRUE)
 
         msf <- mzR::openMSfile(fpath)
         # NOTE: don't check more than first 100 spectra: most often the first will tell us enough, and loading
@@ -260,7 +262,7 @@ verifyDataCentroided <- function(anaInfo)
         hd <- mzR::header(msf, seq_len(min(100, length(msf))))
         mzR::close(msf)
         
-        # UNDONE: for now we just don't put out any warnings if there is now centroided flag available
+        # UNDONE: for now we just don't put out any warnings if there is no centroided flag available
         isCentr <- is.null(hd[["centroided"]]) || all(hd$centroided)
         saveCacheData("dataCentroided", isCentr, hash, cacheDB)
         

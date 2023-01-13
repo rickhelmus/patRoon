@@ -56,6 +56,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
 - Fixed: `generateCompoundsMetFrag()` didn't properly detect changes in local database files when considering cached data.
 - Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.
+- `plotChord()` method for `featureGroups`: significantly optimized some old code
 
 
 # patRoon 2.1

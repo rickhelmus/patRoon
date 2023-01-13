@@ -242,44 +242,20 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     chordTable <- rbindlist(lapply(seq_along(snames),
                                    function(sni) data.table(from = snames[sni], to = snames[seq(sni, length(snames))])))
     
-    getGTable <- function(snlist = c())
-    {
-        if (average)
-        {
-            if (length(snlist) > 0)
-                fgf <- replicateGroupFilter(obj, snlist, verbose = FALSE)
-            else
-                fgf <- obj
-            if (length(fgf) == 0)
-                return(data.table())
-            return(averageGroups(fgf))
-        }
-        else
-        {
-            if (length(snlist) > 0)
-                return(groupTable(obj[snlist]))
-            return(groupTable(obj))
-        }
-    }
+    groupTab <- as.data.table(obj, average = average)
     
     getLinkScore <- function(sn1, sn2)
     {
         if (sn1 == sn2)
             return(0)
-        
-        gTable <- getGTable(c(sn1, sn2))
-        if (nrow(gTable) == 0)
-            return(0)
-        
-        # Count all feature groups that are present in both samples/groups
-        return(sum(gTable[, sapply(.SD, function(rows) all(rows > 0))]))
+        return(sum(groupTab[[sn1]] > 0 & groupTab[[sn2]] > 0))
     }
     
-    chordTable[, value := as.integer(Vectorize(getLinkScore)(from, to))]
+    chordTable[, value := mapply(getLinkScore, from, to)]
     
     if (addSelfLinks)
     {
-        gt <- getGTable()
+        gt <- if (average) averageGroups(obj) else groupTable(obj)
         uniqueLinkCount <- sapply(seq_along(snames),
                                   function(sni) sum(sapply(gt, function(ints) ints[sni] > 0 && all(ints[-sni] == 0))))
         chordTable[from == to, value := uniqueLinkCount[.GRP], by = from]
@@ -342,7 +318,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     {
         retMz <- rbindlist(sapply(unique(cdf$rn), function(sn)
         {
-            ftgrps <- colnames(getGTable(sn))
+            ftgrps <- groupTab[get(sn) > 0]$group
             return(gInfo[ftgrps, ])
         }, simplify = FALSE), idcol = "sname")
         retMz$rts <- retMz$rts / max(retMz$rts) # normalize

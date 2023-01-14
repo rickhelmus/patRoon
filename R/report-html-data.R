@@ -233,8 +233,15 @@ reportHTMLGenerator$methods(
         tab <- getFeatTable(objects$fGroups, NULL)
         groupDefs <- getFeatGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatColDefs(tab)
+        
+        onClick <- "function(tabEl, rowInfo)
+{
+    const structEl = document.getElementById('struct_view-suspect');
+    const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
+    structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
+}"
         makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                          EICsTopMost, plots = plots, groupBy = "susp_name")
+                          EICsTopMost, plots = plots, groupBy = "susp_name", onClick = onClick)
     },
     genFeatTableComponents = function()
     {
@@ -337,8 +344,8 @@ reportHTMLGenerator$methods(
         
         onClick <- "function(tabEl, rowInfo)
 {
-    const chromEl = document.getElementById('chrom_view');
-    const structEl = document.getElementById('struct_view');
+    const chromEl = document.getElementById('chrom_view-tp');
+    const structEl = document.getElementById('struct_view-tp');
     let rd;
     
     // check level: handle clicking on expandable rows

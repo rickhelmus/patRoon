@@ -63,16 +63,41 @@ bslib::layout_column_wrap(
         width = NULL,
         style = htmltools::css(grid_template_columns = "1fr 2fr"),
         heights_equal = "row",
+        class = "bottomLayout",
+        bslib::navs_tab_card(
+            title = "Selected suspect",
+            full_screen = TRUE,
+            bslib::nav(
+                "Suspect",
+                bslib::card_body_fill(htmltools::img(id = "struct_view-suspect"))
+            ),
+            bslib::nav(
+                "Info",
+                "Info here?"
+            )
+        ),
+        bslib::navs_tab_card(
+            title = "Selected component",
+            full_screen = TRUE,
+            bslib::nav(
+                "Chromatogram",
+                bslib::card_body_fill(htmltools::img(id = "chrom_view-component"))
+            ),
+            bslib::nav(
+                "Spectrum",
+                bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
+            )
+        ),
         bslib::navs_tab_card(
             title = "Selected parent",
             full_screen = TRUE,
             bslib::nav(
                 "Chromatogram",
-                bslib::card_body_fill(htmltools::img(id = "chrom_view"))
+                bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
             ),
             bslib::nav(
                 "Suspect",
-                bslib::card_body_fill(htmltools::img(id = "struct_view"))
+                bslib::card_body_fill(htmltools::img(id = "struct_view-tp"))
             ),
             bslib::nav(
                 "Transformations",

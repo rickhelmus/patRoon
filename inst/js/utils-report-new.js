@@ -1,7 +1,11 @@
+function getViews()
+{
+    return Array.from(document.getElementById("view-select").options).map(o => o.value);
+}
+
 function getFeatTableIDs()
 {
-    const opts = document.getElementById("view-select").options;
-    return Array.from(opts).map(o => "detailsTab" + o.value);
+    return getViews().map(v => "detailsTab" + v);
 }
 
 function getFeatTableElements()
@@ -19,11 +23,40 @@ function getSelFeatTableElement()
     return "detailsTab" + document.getElementById("view-select").value;
 }
 
+function getNavTab(which)
+{
+    // HACK: the following functions work their way up from a child element to the relevant parent, since it seems no
+    // class or ID can be set for bslib::nav_tab_card()
+
+    let el;
+    if (which === "Suspects")
+        el = document.getElementById("struct_view-suspect");
+    else if (which === "Components")
+        el = document.getElementById("chrom_view-component");
+    else if (which === "TPs")
+        el = document.getElementById("chrom_view-tp");
+
+    for (var i=0; i<6; i++)
+        el = el.parentElement;
+    
+    return el;
+}
+
 function updateView(sel)
 {
     tid = "detailsTab" + sel;
     getFeatTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
     document.getElementById("feat-expand").style.display = (sel !== "Plain") ? "" : "none";
+    
+    document.getElementsByClassName("bottomLayout")[0].style["grid-template-columns"] = (sel === "Plain") ? "1fr" : "1fr 2fr";
+    
+    getViews().forEach(function(v)
+    {
+        if (v === "Plain")
+            return;
+        let el = getNavTab(v);
+        el.classList.toggle("d-none", v !== sel)
+    })
 }
 
 function showFeatCols(column, show)
@@ -56,3 +89,17 @@ function showTPGraph(cmp)
             TPGraphs[i].style.display = "none";
     }
 }
+
+$(document).ready(function() {
+    // Image zooming, based on https://stackoverflow.com/a/57694495
+    $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
+    $('body').on('click', 'img:not(.zoomImg)', function() {
+       $('.zoomImg').attr('src', $(this).attr('src'));
+       $('.zoomDiv').css({opacity: '1', width: '70%'});
+    });
+    $('img.zoomImg').click(function() {
+       $('.zoomDiv').css({opacity: '0', width: '0%'});
+    });
+    
+    updateView("Plain");
+});

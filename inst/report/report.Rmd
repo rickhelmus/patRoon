@@ -67,20 +67,6 @@ html, body {
 
 </style>
 
-<script type="text/javascript">
-    // Image zooming, based on https://stackoverflow.com/a/57694495
-    $(document).ready(function() {
-        $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
-        $('body').on('click', 'img:not(.zoomImg)', function() {
-           $('.zoomImg').attr('src', $(this).attr('src'));
-           $('.zoomDiv').css({opacity: '1', width: '70%'});
-        });
-        $('img.zoomImg').click(function() {
-           $('.zoomDiv').css({opacity: '0', width: '0%'});
-        });
-    });
-</script>
-
 Summary
 ================
 

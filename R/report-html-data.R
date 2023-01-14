@@ -369,16 +369,88 @@ reportHTMLGenerator$methods(
     {
         if (is.null(objects[["compounds"]]))
             return(htmltools::div()) # UNDONE
-        tab <- as.data.table(objects$compounds)[, c("group", "compoundName", "InChIKey")]
-        tab[, structure := plotImg(plots$structs[InChIKey])][, InChIKey := NULL]
-        tab[, spectrum := plotImg(plots$compounds[[group]]$spectra), by = "group"]
-        tab[, scorings := plotImg(plots$compounds[[group]]$scores), by = "group"]
+        
+        compounds <- objects$compounds[names(objects$fGroups)]
+        
+        tab <- as.data.table(compounds)[, c("group", "compoundName", "compoundName2", "neutral_formula", "neutralMass",
+                                            "explainedPeaks", "score", "InChIKey")]
+        
+        cmpIndices <- tab[, seq_len(.N), by = "group"][[2]]
+        
+        tab[!is.na(compoundName), compoundName := paste0("<strong>", compoundName, "</strong>")]
+        if (!is.null(tab[["compoundName2"]]))
+        {
+            tab[!is.na(compoundName2) & nzchar(compoundName2),
+                compoundName := fifelse(is.na(compoundName), compoundName2, paste0(compoundName, "<br>(", compoundName2, ")"))]
+            tab[, compoundName2 := NULL]
+        }
+        
+        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
+        tab[, neutralMass := round(neutralMass, 5)]
+        tab[, score := round(score, 2)]
+        
+        tab[, structure := plots$structs[InChIKey]][, InChIKey := NULL]
+        tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
+        tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
+        
+        getImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+        
+        getAnnPLDetails <- function(index)
+        {
+            # Nested table: based on from reactable cookbook
+            
+            apl <- annotatedPeakList(compounds, index = cmpIndices[index], groupName = tab$group[index],
+                                     MSPeakLists = objects$MSPeakLists, formulas = objects$formulas,
+                                     onlyAnnotated = TRUE)
+            
+            if (is.null(apl) || nrow(apl) == 0)
+                return(htmltools::div(align = "center", "No annotation available."))
+            
+            isPrec <- apl$precursor
+            
+            apl[, c("ID", "annotated", "precursor") := NULL]
+            apl[, c("mz", "intensity") := .(round(mz, 5), round(intensity))]
+            apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
+            apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
+            if (!is.null(apl[["ion_formula_MF"]]))
+                apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
+            
+            colDefs <- pruneList(list(
+                ion_formula = reactable::colDef(html = TRUE),
+                neutral_loss = reactable::colDef(html = TRUE),
+                ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE) else NULL
+            ))
+            
+            rt <- reactable::reactable(apl, pagination = FALSE, compact = TRUE, bordered = TRUE, columns = colDefs,
+                                       striped = TRUE,
+                                       rowClass = function(index) if (isPrec[index]) "font-weight-bold" else "")
+            
+            return(htmltools::div(style = list(margin = "12px 45px"), rt))
+        }
+        
+        getScoreDetails <- function(index)
+        {
+            cRow <- compounds[[tab$group[index]]][cmpIndices[index]]
+            sc <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mergedConsensusNames(compounds))
+            
+            scores <- cRow[, sc, with = FALSE]
+            rt <- reactable::reactable(scores, pagination = FALSE, compact = TRUE, bordered = TRUE,
+                                       defaultColDef = reactable::colDef(format = reactable::colFormat(digits = 2)))
+            
+            return(htmltools::div(style = list(margin = "12px 45px"), rt))
+        }
+        
+        setcolorder(tab, c("compoundName", "structure"))
+        
         return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
-                                    pagination = FALSE, columns = list(
+                                    pagination = FALSE, compact = TRUE, columns = list(
             group = reactable::colDef(show = FALSE),
-            structure = reactable::colDef(html = TRUE, minWidth = 150),
-            spectrum = reactable::colDef(html = TRUE, minWidth = 600),
-            scorings = reactable::colDef(html = TRUE, minWidth = 500)
+            compoundName = reactable::colDef("compound", html = TRUE),
+            neutral_formula = reactable::colDef("formula", html = TRUE),
+            neutralMass = reactable::colDef("neutral mass"),
+            structure = reactable::colDef(cell = getImgCell),
+            spectrum = reactable::colDef(cell = getImgCell, details = getAnnPLDetails, minWidth = 200),
+            scorings = reactable::colDef(cell = getImgCell, details = getScoreDetails, minWidth = 200)
         )))
     }
 )

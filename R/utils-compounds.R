@@ -210,6 +210,55 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     return(ctext)
 }
 
+getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
+{
+    compCols <- names(compResults)
+    
+    resultRow <- compResults[compIndex, ]
+    
+    takeCols <- c(
+        "compoundName",
+        "identifier",
+        "relatedCIDs",
+        "neutral_formula",
+        "SMILES",
+        "InChIKey",
+        "XlogP", "AlogP", "LogP",
+        
+        # PubChemLite
+        "FP", "compoundName2", # UNDONE: update?
+        
+        # CompTox
+        "CASRN", "QCLevel",
+        
+        # FOR-IDENT
+        "tonnage", "categories",
+        
+        # TP DB
+        "parent", "transformation", "enzyme", "evidencedoi"
+    )
+    
+    dbcols <- getAllMergedConsCols("database", compCols, mConsNames)
+    
+    return(rbindlist(lapply(takeCols, function(col)
+    {
+        cols <- getAllMergedConsCols(col, compCols, mConsNames)
+        
+        rbindlist(Map(cols, dbcols, f = function(cl, dbcl)
+        {
+            val <- resultRow[[cl]]
+            if (is.na(val) | (is.character(val) & !nzchar(val)))
+                return(NULL)
+            if (is.numeric(val))
+                val <- as.character(round(val, 2))
+            else if (addHTMLURL && col %in% c("identifier", "relatedCIDs"))
+                val <- makeDBIdentLink(resultRow[[dbcl]], val)
+            return(data.table(property = cl, value = val))
+        }))
+    })))
+}
+
+
 buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 {
     # Via personal communication Steffen/Emma, see https://github.com/Treutler/MetFamily/blob/22b9f46b2716b805c24c03d260045605c0da8b3e/ClusteringMS2SpectraGUI.R#L2433

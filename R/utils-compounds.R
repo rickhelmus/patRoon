@@ -220,6 +220,7 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
         "compoundName",
         "identifier",
         "relatedCIDs",
+        "explainedPeaks",
         "neutral_formula",
         "SMILES",
         "InChIKey",

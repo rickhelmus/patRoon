@@ -373,8 +373,10 @@ reportHTMLGenerator$methods(
         compounds <- objects$compounds[names(objects$fGroups)]
         mcn <- mergedConsensusNames(compounds)
         
-        tab <- as.data.table(compounds)[, c("group", "compoundName", "compoundName2", "neutral_formula", "neutralMass",
-                                            "explainedPeaks", "score", "InChIKey")]
+        tab <- as.data.table(compounds)
+        # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
+        tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "neutral_formula",
+                                               "neutralMass", "explainedPeaks", "score", "InChIKey"))
         
         cmpIndices <- tab[, seq_len(.N), by = "group"][[2]]
         cmpNames2 <- tab[["compoundName2"]]
@@ -383,7 +385,8 @@ reportHTMLGenerator$methods(
         
         tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         tab[, neutralMass := round(neutralMass, 5)]
-        tab[, score := round(score, 2)]
+        if (!is.null(tab[["score"]]))
+            tab[, score := round(score, 2)]
         
         tab[, structure := plots$structs[InChIKey]][, InChIKey := NULL]
         tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
@@ -467,18 +470,20 @@ reportHTMLGenerator$methods(
                 )))
         }
         
-        setcolorder(tab, c("compoundName", "structure"))
+        setcolorder(tab, intersect(c("compoundName", "structure"), names(tab)))
         
-        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
-                                    pagination = FALSE, compact = TRUE, columns = list(
+        colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE),
-            compoundName = reactable::colDef("compound", cell = getCompCell),
+            compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
             structure = reactable::colDef(cell = getImgCell),
             spectrum = reactable::colDef(cell = getImgCell),
             scorings = reactable::colDef(cell = getImgCell)
-        ), details = function(index)
+        ))
+        
+        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
+                                    pagination = FALSE, compact = TRUE, columns = colDefs, details = function(index)
         {
             htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
                                         background = "#FCFCFC", border = "dashed 1px",

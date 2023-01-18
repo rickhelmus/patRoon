@@ -391,12 +391,14 @@ reportHTMLGenerator$methods(
         
         getImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
         
-        makeDetailsTable <- function(...)
+        makeDetailsTable <- function(title, ...)
         {
             # Nested table: based on from reactable cookbook
-            return(htmltools::div(style = list(margin = "12px 45px"),
-                                  reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE,
-                                                       fullWidth = FALSE, resizable = TRUE, striped = TRUE, ...)))
+            return(htmltools::div(style = list(margin = "10px 20px"),
+                                  htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
+                                  reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = TRUE,
+                                                       fullWidth = FALSE, resizable = TRUE, striped = TRUE,
+                                                       height = 200, ...)))
         }
         
         getCompCell <- function(value, index)
@@ -417,8 +419,9 @@ reportHTMLGenerator$methods(
         {
             tab <- getCompInfoTable(compounds[[tab$group[index]]], cmpIndices[index], mcn, TRUE)
             tab <- tab[!property %in% c("compoundName", "compoundName2", "neutral_formula")]
-            return(makeDetailsTable(tab, columns = list(
-                value = reactable::colDef(html = TRUE)
+            return(makeDetailsTable("Compound properties", tab, columns = list(
+                property = reactable::colDef(minWidth = 150),
+                value = reactable::colDef(html = TRUE, minWidth = 250)
             )))
         }
         
@@ -441,12 +444,12 @@ reportHTMLGenerator$methods(
                 apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
             
             colDefs <- pruneList(list(
-                ion_formula = reactable::colDef(html = TRUE),
-                neutral_loss = reactable::colDef(html = TRUE),
-                ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE) else NULL
+                ion_formula = reactable::colDef(html = TRUE, minWidth = 125),
+                neutral_loss = reactable::colDef(html = TRUE, minWidth = 125),
+                ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
             ))
             
-            return(makeDetailsTable(apl, columns = colDefs,
+            return(makeDetailsTable("Peak list annotations", apl, columns = colDefs,
                                     rowClass = function(index) if (isPrec[index]) "font-weight-bold" else ""))
         }
         
@@ -457,8 +460,11 @@ reportHTMLGenerator$methods(
             
             scores <- cRow[, sc, with = FALSE]
             scores <- setnames(transpose(scores, keep.names = "score"), 2, "value")
-            return(makeDetailsTable(scores, defaultColDef = reactable::colDef(format = reactable::colFormat(digits = 2),
-                                                                              minWidth = 250)))
+            return(makeDetailsTable("Scorings", scores, columns = list(
+                score = reactable::colDef(minWidth = 150),
+                value = reactable::colDef(format = reactable::colFormat(digits = 2),
+                                          minWidth = 100)
+                )))
         }
         
         setcolorder(tab, c("compoundName", "structure"))
@@ -466,13 +472,19 @@ reportHTMLGenerator$methods(
         return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
                                     pagination = FALSE, compact = TRUE, columns = list(
             group = reactable::colDef(show = FALSE),
-            compoundName = reactable::colDef("compound", cell = getCompCell, details = getCompDetails),
+            compoundName = reactable::colDef("compound", cell = getCompCell),
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
             structure = reactable::colDef(cell = getImgCell),
-            spectrum = reactable::colDef(cell = getImgCell, details = getAnnPLDetails, minWidth = 200),
-            scorings = reactable::colDef(cell = getImgCell, details = getScoreDetails, minWidth = 200)
-        )))
+            spectrum = reactable::colDef(cell = getImgCell),
+            scorings = reactable::colDef(cell = getImgCell)
+        ), details = function(index)
+        {
+            htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
+                                        background = "#FCFCFC", border = "dashed 1px",
+                                        "justify-content" = "space-between", "overflow-x" = "auto"),
+                           getCompDetails(index), getAnnPLDetails(index), getScoreDetails(index))
+        }))
     }
 )
 

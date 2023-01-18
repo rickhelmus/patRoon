@@ -243,8 +243,7 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
     return(rbindlist(lapply(takeCols, function(col)
     {
         cols <- getAllMergedConsCols(col, compCols, mConsNames)
-        
-        rbindlist(Map(cols, dbcols, f = function(cl, dbcl)
+        rbindlist(lapply(cols, function(cl)
         {
             val <- resultRow[[cl]]
             if (is.na(val) | (is.character(val) & !nzchar(val)))
@@ -252,7 +251,10 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
             if (is.numeric(val))
                 val <- as.character(round(val, 2))
             else if (addHTMLURL && col %in% c("identifier", "relatedCIDs"))
-                val <- makeDBIdentLink(resultRow[[dbcl]], val)
+            {
+                # assume column order for algo consensus specific IDs and DBs are the same
+                val <- makeDBIdentLink(resultRow[[dbcols[match(cl, cols)]]], val)
+            }
             return(data.table(property = cl, value = val))
         }))
     })))

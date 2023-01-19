@@ -161,6 +161,36 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 
 #' @rdname MSPeakLists-class
 #' @export
+setMethod("delete", "MSPeakListsSet", function(obj, ...)
+{
+    obj <- callNextMethod()
+    
+    # sync set objects
+    obj@setObjects <- Map(sets(obj), obj@setObjects, f = function(sn, so)
+    {
+        # remove removed analyses
+        so <- delete(so, k = !analyses(so) %chin% analyses(obj))
+        
+        # remove removed groups
+        so <- delete(so, i = !groupNames(so) %chin% groupNames(obj))
+        
+        # remove removed peaks
+        delete(so, j = function(PL, grp, ana, t)
+        {
+            setPL <- if (is.null(ana)) obj[[grp]][[t]] else obj[[ana, grp]][[t]]
+            if (is.null(setPL))
+                return(TRUE)
+            if (is.null(ana))
+                setPL <- setPL[set == sn]
+            return(!PL$ID %in% setPL$ID)
+        })
+    })
+    
+    return(obj)
+})
+
+#' @rdname MSPeakLists-class
+#' @export
 setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursorMSMS = TRUE,
                                                reAverage = FALSE, negate = FALSE, sets = NULL)
 {

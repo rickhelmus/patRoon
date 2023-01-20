@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-01-19" />
+<meta name="date" content="2023-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -364,14 +364,14 @@ div.csl-indent {
 #&gt; $PVTestFunc
 #&gt; function (x, y) 
 #&gt; t.test(x, y, paired = TRUE)$p.value
-#&gt; &lt;bytecode: 0x5601952a1aa0&gt;
-#&gt; &lt;environment: 0x5601952a2440&gt;
+#&gt; &lt;bytecode: 0x556bb968b940&gt;
+#&gt; &lt;environment: 0x556bb96881d8&gt;
 #&gt; 
 #&gt; $PVAdjFunc
 #&gt; function (pv) 
 #&gt; p.adjust(pv, &quot;BH&quot;)
-#&gt; &lt;bytecode: 0x5601952a1f00&gt;
-#&gt; &lt;environment: 0x5601952a2440&gt;</code></pre>
+#&gt; &lt;bytecode: 0x556bb968bc50&gt;
+#&gt; &lt;environment: 0x556bb96881d8&gt;</code></pre>
 <p>In this example we generate a <code>list</code> with parameters in order to make a comparison between two replicate groups: <code>before</code> and <code>after</code>. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (<code>?featureGroups</code>).</p>
 <p>The <code>as.data.table</code> function for feature groups is used to perform the FC calculations.</p>
 <div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="FCCalc.html#cb268-1" aria-hidden="true" tabindex="-1"></a>myFCParams <span class="ot">&lt;-</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="st">&quot;standard-pos&quot;</span>)) <span class="co"># compare solvent/standard</span></span>

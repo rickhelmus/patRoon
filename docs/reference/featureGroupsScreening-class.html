@@ -117,8 +117,7 @@ annotateSuspects(
   formulas,
   compounds,
   absMzDev = 0.005,
-  relMinMSMSIntensity = 0.05,
-  simMSMSMethod = "cosine",
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   checkFragments = c("mz", "formula", "compound"),
   formulasNormalizeScores = "max",
   compoundsNormalizeScores = "max",
@@ -162,10 +161,16 @@ as.data.table(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 # S4 method for featureGroupsScreeningSet
 annotateSuspects(
   fGroups,
-  MSPeakLists = NULL,
-  formulas = NULL,
-  compounds = NULL,
-  ...
+  MSPeakLists,
+  formulas,
+  compounds,
+  absMzDev = 0.005,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  checkFragments = c("mz", "formula", "compound"),
+  formulasNormalizeScores = "max",
+  compoundsNormalizeScores = "max",
+  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+  logPath = file.path("log", "ident")
 )
 
 # S4 method for featureGroupsScreeningSet
@@ -244,14 +249,9 @@ to exclude it from the annotation.</p></dd>
 <dd><p>Maximum absolute <em>m/z</em> deviation.</p></dd>
 
 
-<dt>relMinMSMSIntensity</dt>
-<dd><p>Minimum relative intensity (<samp>0-1</samp>) threshold applied when calculating annotation
-similarities.</p></dd>
-
-
-<dt>simMSMSMethod</dt>
-<dd><p>Either <code>"cosine"</code> or <code>"jaccard"</code>: used to compare MS/MS peak lists for annotation
-similarity calculation.</p></dd>
+<dt>specSimParams</dt>
+<dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
+See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 
 <dt>checkFragments</dt>
@@ -383,10 +383,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </dl></div>
     <div id="note">
     <h2>Note</h2>
-    <p>The <code>relMinMSMSIntensity</code> filter argument to <code>annotateSuspects</code> is applied <em>after</em> removing the
-  precursor ion from the peak lists (if present). Thus, intensity scales may be different when this filter is applied
-  when the most abundant peak resulted from the precursor ion.</p>
-<p><code>filter</code> removes suspect hits with <code>NA</code> values when any of
+    <p><code>filter</code> removes suspect hits with <code>NA</code> values when any of
   the filters related to minimum or maximum values are applied (unless
   <code>negate=TRUE</code>).</p>
     </div>
@@ -402,11 +399,11 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
   between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
   peaks were annotated. If both formula and compound annotations are available then <code>annSimBoth</code> is calculated
   after combining all the annotated peaks, otherwise <code>annSimBoth</code> equals the available value for
-  <code>annSimForm</code> or <code>annSimComp</code>. The similarity calculation can be configured with the
-  <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments to <code>annotateSuspects</code>. Note for annotation with
-  <code>generateCompoundsLibrary</code> results: the method and default parameters for <code>annSimComp</code> calculation
-  slightly differs to those from the spectral similarity calculated with compound annotation (<code>libMatch</code> score),
-  hence small differences in results are typically observed.</p></li>
+  <code>annSimForm</code> or <code>annSimComp</code>. The similarity calculation can be configured with the <code>specSimParams</code>
+  argument to <code>annotateSuspects</code>. Note for annotation with <code>generateCompoundsLibrary</code> results: the method
+  and default parameters for <code>annSimComp</code> calculation slightly differs to those from the spectral similarity
+  calculated with compound annotation (<code>libMatch</code> score), hence small differences in results are typically
+  observed.</p></li>
 <li><p><code>maxFrags</code> The maximum number of MS/MS fragments that can be matched for this suspect (based on the
   <code>fragments_*</code> columns from the suspect list).</p></li>
 <li><p><code>maxFragMatches</code>,<code>maxFragMatchesRel</code> The absolute and relative amount of experimental MS/MS peaks
@@ -493,11 +490,6 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </ul></li>
 </ul></li>
 </ul></div>
-    <div id="source">
-    <h2>Source</h2>
-    <p>Cosine spectral similarity calculation was based on the code from <code>SpectrumSimilarity()</code>
-  function of <span class="pkg">OrgMassSpecR</span>.</p>
-    </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
     <p>The <code>featureGroupsScreeningSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>featureGroupsScreening</code> and therefore largely follows the same user interface.</p>

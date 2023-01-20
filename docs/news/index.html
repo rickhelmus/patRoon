@@ -99,7 +99,14 @@
 <h3 id="changes-2-2">Changes<a class="anchor" aria-label="anchor" href="#changes-2-2"></a></h3>
 <ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
-<li>Fixes for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> with consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>
+<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>
+<ul><li>Fixes for consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the  keyword.</li>
+<li>Sets workflows now separate log files for each set.</li>
+<li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
+<li>Fixed: annotation similarities didn’t properly handle results from <code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code> if the library did not contain peak formula annotations.</li>
+</ul></li>
 <li>SIRUS
 <ul><li>Fixed: Features with data offsets are now properly loaded.</li>
 <li>
@@ -160,8 +167,6 @@
 <li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
 <li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> would fail if the adduct column contains partially <code>NA</code> data.</li>
 <li>Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors</li>
-<li>
-<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>: Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the  keyword.</li>
 <li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
 </li>
 <li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.

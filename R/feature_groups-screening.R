@@ -241,6 +241,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                                       package = "patRoon"),
                                                                  logPath = file.path("log", "ident"))
 {
+    # NOTE: keep args in sync with sets method
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))

@@ -225,7 +225,15 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds, ...)
+setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds,
+                                                                    absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                                                    simMSMSMethod = "cosine",
+                                                                    checkFragments = c("mz", "formula", "compound"),
+                                                                    formulasNormalizeScores = "max",
+                                                                    compoundsNormalizeScores = "max",
+                                                                    IDFile = system.file("misc", "IDLevelRules.yml",
+                                                                                         package = "patRoon"),
+                                                                    logPath = file.path("log", "ident"))
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
@@ -236,8 +244,16 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     unsetFormulas <- checkAndUnSetOther(sets(fGroups), formulas, "formulas", TRUE)
     unsetCompounds <- checkAndUnSetOther(sets(fGroups), compounds, "compounds", TRUE)
     
-    fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
-                              f = annotateSuspects, MoreArgs = list(...))
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    
+    fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
+                              f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
+                                                                    relMinMSMSIntensity = relMinMSMSIntensity,
+                                                                    simMSMSMethod = simMSMSMethod,
+                                                                    checkFragments = checkFragments,
+                                                                    formulasNormalizeScores = formulasNormalizeScores,
+                                                                    compoundsNormalizeScores = compoundsNormalizeScores,
+                                                                    IDFile = IDFile))
     
     # clear old set cols if present
     cols <- c("formRank", "compRank", "estIDLevel")

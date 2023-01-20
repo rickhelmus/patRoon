@@ -316,31 +316,21 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
     return(obj)
 }
 
-annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
+annotatedMSMSSimilarity <- function(annPL, specSimParams)
 {
-    if (is.null(annPL[["ion_formula"]]))
-        return(0)
-
-    # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
-    annPL <- annPL[precursor == FALSE]
-    
-    if (nrow(annPL) > 0)
-    {
-        maxInt <- max(annPL$intensity)
-        annPL <- annPL[(intensity / maxInt) >= relMinIntensity]
-    }
-    
-    if (nrow(annPL) == 0 || sum(!is.na(annPL$ion_formula)) == 0)
+    if (is.null(annPL)) # mainly to handle formula candidates w/out MS/MS
         return(0)
     
-    if (method == "cosine")
-    {
-        annPL[, intensityAnn := ifelse(!annotated, 0, intensity)]
-        return(as.vector((annPL$intensityAnn %*% annPL$intensity) /
-                             (sqrt(sum(annPL$intensityAnn^2)) * sqrt(sum(annPL$intensity^2)))))
-    }
-    else # jaccard
-        return(sum(!is.na(annPL$ion_formula)) / nrow(annPL))
+    annPL <- prepSpecSimilarityPL(annPL, specSimParams$removePrecursor, specSimParams$relMinIntensity,
+                                  specSimParams$minPeaks)
+    
+    if (nrow(annPL) == 0 || !any(annPL$annotated))
+        return(0)
+    
+    annPLAnn <- annPL[annotated == TRUE]
+    
+    return(drop(specDistRect(list(annPLAnn), list(annPL), specSimParams$method, "none", 0, 0,
+                             specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)))
 }
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,

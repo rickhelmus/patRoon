@@ -101,7 +101,7 @@ if (hasMF)
     fGroupsAnnNothing <- doAnnot(fGroupsScr)
     fGroupsAnnMF <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
     fGroupsAnnMFJ <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF,
-                                      simMSMSMethod = "jaccard")
+                             specSimParams = getDefSpecSimParams(removePrecursor = TRUE, method = "jaccard"))
     fGroupsAnnMoNA <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     fGroupsOnlyForms <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms)
     fGroupsAnnNoRT <- doAnnot(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)

@@ -226,8 +226,8 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
 #' @rdname featureGroupsScreening-class
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                    absMzDev = 0.005, relMinMSMSIntensity = 0.05,
-                                                                    simMSMSMethod = "cosine",
+                                                                    absMzDev = 0.005,
+                                                                    specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                     checkFragments = c("mz", "formula", "compound"),
                                                                     formulasNormalizeScores = "max",
                                                                     compoundsNormalizeScores = "max",
@@ -248,8 +248,7 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     
     fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
                               f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
-                                                                    relMinMSMSIntensity = relMinMSMSIntensity,
-                                                                    simMSMSMethod = simMSMSMethod,
+                                                                    specSimParams = specSimParams,
                                                                     checkFragments = checkFragments,
                                                                     formulasNormalizeScores = formulasNormalizeScores,
                                                                     compoundsNormalizeScores = compoundsNormalizeScores,

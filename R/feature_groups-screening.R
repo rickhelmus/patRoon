@@ -42,11 +42,11 @@ screeningSlots <- c(screenInfo = "data.table")
 #'   between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
 #'   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
 #'   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
-#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the
-#'   \code{relMinMSMSIntensity} and \code{simMSMSMethod} arguments to \code{annotateSuspects}. Note for annotation with
-#'   \code{generateCompoundsLibrary} results: the method and default parameters for \code{annSimComp} calculation
-#'   slightly differs to those from the spectral similarity calculated with compound annotation (\code{libMatch} score),
-#'   hence small differences in results are typically observed.
+#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the \code{specSimParams}
+#'   argument to \code{annotateSuspects}. Note for annotation with \code{generateCompoundsLibrary} results: the method
+#'   and default parameters for \code{annSimComp} calculation slightly differs to those from the spectral similarity
+#'   calculated with compound annotation (\code{libMatch} score), hence small differences in results are typically
+#'   observed.
 #'
 #'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
 #'   \code{fragments_*} columns from the suspect list).
@@ -197,15 +197,13 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
 #' @template norm-args
+#' 
+#' @template specSimParams-arg
 #'
 #' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
 #'   \code{\link{compounds}}) obtained for this \code{featureGroupsScreening} object. All arguments can be \code{NULL}
 #'   to exclude it from the annotation.
 #' @param absMzDev Maximum absolute \emph{m/z} deviation.
-#' @param relMinMSMSIntensity Minimum relative intensity (\samp{0-1}) threshold applied when calculating annotation
-#'   similarities.
-#' @param simMSMSMethod Either \code{"cosine"} or \code{"jaccard"}: used to compare MS/MS peak lists for annotation
-#'   similarity calculation.
 #' @param checkFragments Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
 #'   suspect fragment matches (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns in the suspect
 #'   list). Valid values are: \code{"mz"}, \code{"formula"}, \code{"compounds"}. The former uses \emph{m/z} values in
@@ -219,21 +217,14 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 #' @return \code{annotateSuspects} returns a \code{featureGroupsScreening} object, which is a
 #'   \code{\link{featureGroups}} object amended with annotation data.
 #'
-#' @note The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is applied \emph{after} removing the
-#'   precursor ion from the peak lists (if present). Thus, intensity scales may be different when this filter is applied
-#'   when the most abundant peak resulted from the precursor ion.
-#'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
 #'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
-#'
-#' @section Source: Cosine spectral similarity calculation was based on the code from \code{SpectrumSimilarity()}
-#'   function of \pkg{OrgMassSpecR}.
 #'
 #' @aliases annotateSuspects
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
-                                                                 simMSMSMethod = "cosine",
+                                                                 absMzDev = 0.005,
+                                                                 specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
@@ -246,9 +237,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
+    aapply(checkmate::assertNumber, . ~ absMzDev, lower = 0,
            finite = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(simMSMSMethod, c("cosine", "jaccard"))
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
@@ -257,9 +248,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         assertCanCreateDir(logPath, add = ac)
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
-                     relMinMSMSIntensity, simMSMSMethod, checkFragments, formulasNormalizeScores,
-                     compoundsNormalizeScores, makeFileHash(IDFile))
+    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev, specSimParams, checkFragments,
+                     formulasNormalizeScores, compoundsNormalizeScores, makeFileHash(IDFile))
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
         return(cd)
@@ -309,7 +299,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                                       index = formRank,
                                                                                       groupName = gName,
                                                                                       MSPeakLists = MSPeakLists),
-                                                                    absMzDev, relMinMSMSIntensity, simMSMSMethod)
+                                                                    specSimParams)
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
@@ -323,13 +313,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             {
                 annSimComp <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
                                                                         groupName = gName, MSPeakLists = MSPeakLists),
-                                                      absMzDev, relMinMSMSIntensity, simMSMSMethod)
+                                                      specSimParams)
                 
                 if (!is.na(formRank))
                     annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
                                                                             groupName = gName, MSPeakLists = MSPeakLists,
                                                                             formulas = formulas),
-                                                          absMzDev, relMinMSMSIntensity, simMSMSMethod)
+                                                          specSimParams)
                 else
                     annSimBoth <- annSimComp
             }

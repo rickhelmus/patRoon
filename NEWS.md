@@ -7,7 +7,12 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 ## Changes
 
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
-- Fixes for `annotateSuspects()` with consensus annotation results (issue #54)
+- `annotateSuspects()`
+    - Fixes for consensus annotation results (issue #54)
+    - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the \code{or} keyword.
+    - Sets workflows now separate log files for each set.
+    - Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the `specSimParams` argument replaces the `relMinMSMSIntensity` and `simMSMSMethod` arguments.
+    - Fixed: annotation similarities didn't properly handle results from `generateCompoundsLibrary()` if the library did not contain peak formula annotations.
 - SIRUS
     - Fixed: Features with data offsets are now properly loaded.
     - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
@@ -50,14 +55,13 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - remove bogus `higherThanNext` setting from estimated ID level 4a
 - Fixed: `screenSuspects()` would fail if the adduct column contains partially `NA` data.
 - Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors
-- `annotateSuspects()`: Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the \code{or} keyword.
 - Validation of formula data in e.g. suspect lists is now much faster when `prefCalcChemProps=FALSE`
 - Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether neutralization occurred is reported by the new `molNeutralized` column.
     - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
 - Fixed: `generateCompoundsMetFrag()` didn't properly detect changes in local database files when considering cached data.
 - Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.
 - `plotChord()` method for `featureGroups`: significantly optimized some old code
-- `annotateSuspects()` for sets workflows now separates log files for each set.
+
 
 
 # patRoon 2.1

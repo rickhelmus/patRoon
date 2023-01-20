@@ -371,17 +371,24 @@ reportHTMLGenerator$methods(
             return(htmltools::div()) # UNDONE
         
         compounds <- objects$compounds[names(objects$fGroups)]
+        
+        if (length(compounds) == 0)
+            return(htmltools::div()) # UNDONE
+        
         mcn <- mergedConsensusNames(compounds)
         
         tab <- as.data.table(compounds)
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
-        tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "neutral_formula",
-                                               "neutralMass", "explainedPeaks", "score", "InChIKey"))
+        tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier", "database",
+                                               "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
         
         cmpIndices <- tab[, seq_len(.N), by = "group"][[2]]
         cmpNames2 <- tab[["compoundName2"]]
         if (!is.null(cmpNames2))
             tab[, compoundName2 := NULL]
+        
+        if (!is.null(tab[["identifier"]]))
+            tab[, identifier := sapply(identifier, makeDBIdentLink, db = database[1])][, database := NULL]
         
         tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         tab[, neutralMass := round(neutralMass, 5)]
@@ -399,7 +406,7 @@ reportHTMLGenerator$methods(
             # Nested table: based on from reactable cookbook
             return(htmltools::div(style = list(margin = "10px 20px"),
                                   htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
-                                  reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = TRUE,
+                                  reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = FALSE,
                                                        fullWidth = FALSE, resizable = TRUE, striped = TRUE,
                                                        height = 200, ...)))
         }
@@ -420,9 +427,11 @@ reportHTMLGenerator$methods(
         
         getCompDetails <- function(index)
         {
-            tab <- getCompInfoTable(compounds[[tab$group[index]]], cmpIndices[index], mcn, TRUE)
-            tab <- tab[!property %in% c("compoundName", "compoundName2", "neutral_formula")]
-            return(makeDetailsTable("Compound properties", tab, columns = list(
+            cit <- getCompInfoTable(compounds[[tab$group[index]]], cmpIndices[index], mcn, TRUE)
+            cit <- cit[!property %in% names(tab)]
+            if (!is.null(tab[["compoundName"]]))
+                cit <- cit[property != "compoundName2"] # already in main table compoundName column
+            return(makeDetailsTable("Compound properties", cit, columns = list(
                 property = reactable::colDef(minWidth = 150),
                 value = reactable::colDef(html = TRUE, minWidth = 250)
             )))
@@ -475,14 +484,15 @@ reportHTMLGenerator$methods(
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
+            identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
-            structure = reactable::colDef(cell = getImgCell),
-            spectrum = reactable::colDef(cell = getImgCell),
-            scorings = reactable::colDef(cell = getImgCell)
+            structure = reactable::colDef(cell = getImgCell, minWidth = 125),
+            spectrum = reactable::colDef(cell = getImgCell, minWidth = 200),
+            scorings = reactable::colDef(cell = getImgCell, minWidth = 200)
         ))
         
-        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE,
+        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE, wrap = FALSE,
                                     pagination = FALSE, compact = TRUE, columns = colDefs, details = function(index)
         {
             htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",

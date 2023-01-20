@@ -223,6 +223,7 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
         "explainedPeaks",
         "neutral_formula",
         "SMILES",
+        "InChI",
         "InChIKey",
         "XlogP", "AlogP", "LogP",
         
@@ -244,7 +245,7 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
     return(rbindlist(lapply(takeCols, function(col)
     {
         cols <- getAllMergedConsCols(col, compCols, mConsNames)
-        rbindlist(lapply(cols, function(cl)
+        tab <- rbindlist(lapply(cols, function(cl)
         {
             val <- resultRow[[cl]]
             if (is.na(val) | (is.character(val) & !nzchar(val)))
@@ -258,6 +259,14 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
             }
             return(data.table(property = cl, value = val))
         }))
+        
+        # merge equal consensus columns
+        if (nrow(tab) > 0 && length(cols) > 1 && allSame(tab[property %in% cols]$value))
+        {
+            tab[property == cols[1], property := col]
+            tab <- tab[!property %in% cols[-1]]
+        }
+        return(tab)
     })))
 }
 

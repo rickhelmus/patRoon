@@ -531,7 +531,7 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
     if (removePrecursor)
         pl <- pl[precursor == FALSE]
     
-    if (relMinIntensity > 0)
+    if (relMinIntensity > 0 && nrow(pl) > 0)
     {
         minInt <- relMinIntensity * max(pl$intensity)
         pl <- pl[numGTE(intensity, minInt)]

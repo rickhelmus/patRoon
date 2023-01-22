@@ -117,7 +117,7 @@ getFeatGroupDefs <- function(tab, groupBy, rgs)
 
 makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, plots, ..., onClick = NULL)
 {
-    # sync column order    
+    # sync column order
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
@@ -253,10 +253,41 @@ reportHTMLUtils$methods(
     genFeatTableComponents = function()
     {
         tab <- getFeatTable(objects$fGroups, ",")
-        groupDefs <- getFeatGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        groupDefs <- getFeatGroupDefs(tab, "component", replicateGroups(objects$fGroups))
         colDefs <- getFeatColDefs(tab)
+        
+        ctab <- as.data.table(objects$components)
+        setnames(ctab, "name", "component")
+        ctab <- removeDTColumnsIfPresent(ctab, c(
+            # already present from features table
+            "ret", "mz",
+            
+            # general component properties
+            "mz_increment", "rt_increment", "ret_min", "ret_max", "ret_range",
+            replicateGroups(objects$fGroups), # nontarget: presence in replicate groups
+            "cmp_ret", "cmp_mz", "cmp_retsd", "neutral_mass", "cmp_ppm", "analysis", "size",
+            
+            # for graphs
+            "links"
+        ))
+        if (all(ctab$intensity == 1))
+            ctab[, intensity := NULL]
+        tab <- merge(tab, ctab, by = "group", sort = FALSE)
+        
+        groupDefs <- c(groupDefs, list(reactable::colGroup("component", setdiff(names(ctab), c("component", "group")),
+                                                           headerStyle = getFeatColSepStyle())))
+        
+        onClick <- "function(tabEl, rowInfo)
+{
+    let chromEl = document.getElementById('chrom_view-component');
+    let specEl = document.getElementById('spectrum_view-component');
+    const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
+    chromEl.src = Reactable.getState(tabEl).meta.plots.components[rd.component].chrom;
+    specEl.src = Reactable.getState(tabEl).meta.plots.components[rd.component].spec;
+}"
+        
         makeFeatReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                          EICsTopMost, plots = plots)
+                          EICsTopMost, plots = plots, groupBy = "component", onClick = onClick)
     },
     genFeatTableTPs = function()
     {

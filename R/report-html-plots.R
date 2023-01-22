@@ -126,6 +126,33 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
     }))
 }
 
+genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, selfContained)
+{
+    cInfo <- componentInfo(components)
+    return(pruneList(Map(names(components), componentTable(components), f = function(cn, ct)
+    {
+        if (!any(ct$group %chin% names(fGroups)))
+            return(NULL)
+        
+        pl <- list()
+        
+        pl$chrom <- makeHTMLReportPlot(paste0("compon-chrom-", cn, ".svg"), outPath, selfContained, {
+            mar <- par("mar")
+            par(mar = c(mar[1], mar[2], 0.2, 0.2))
+            plotChroms(components, cn, fGroups, retMin = TRUE, title = "", EICs = EICs) # UNDONE: params
+        }, width = 6, height = 4, bg = "transparent", pointsize = 16)
+        
+        pl$spec <- makeHTMLReportPlot(paste0("compon-spec-", cn, ".svg"), outPath, selfContained, {
+            mar <- par("mar")
+            par(mar = c(mar[1], mar[2], 0.2, 0.2))
+            cir <- cInfo[name == cn] 
+            plotSpectrum(components, cn)
+        }, width = 7, height = 4, pointsize = 16)
+        
+        return(pl)
+    })))
+}
+
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,
                                     selfContained)
 {
@@ -180,6 +207,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)
     if (!is.null(compounds))
         ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, outPath, selfContained)
+    if (!is.null(components) && !inherits(components, "componentsTPs"))
+        ret$components <- genHTMLReportPlotsComponents(fGroups, components, outPath, EICs, selfContained)
     
     return(ret)
 }

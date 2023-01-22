@@ -83,7 +83,7 @@ rightColumnCards <- list(
 if (!is.null(plots$overview$chord) || !is.null(plots$overview$venn) || !is.null(plots$overview$UpSet))
 {
     tabs <- list()
-    makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(generator$plotImg(plot))))
+    makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(utils$plotImg(plot))))
     if (!is.null(plots$overview$chord))
         tabs <- c(tabs, list(makeTab("Chord diagram", plots$overview$chord)))
     if (!is.null(plots$overview$venn))
@@ -105,11 +105,11 @@ bslib::layout_column_wrap(
         heights_equal = "row",
         bslib::card(
             bslib::card_header("Most intense feature of each group"),
-            bslib::card_body_fill(htmltools::HTML(generator$plotImg(plots$overview$chroms)))
+            bslib::card_body_fill(htmltools::HTML(utils$plotImg(plots$overview$chroms)))
         ),
         bslib::card(
             bslib::card_header("Retention vs m/z"),
-            bslib::card_body_fill(htmltools::HTML(generator$plotImg(plots$overview$retMZ)))
+            bslib::card_body_fill(htmltools::HTML(utils$plotImg(plots$overview$retMZ)))
         )
     ),
     do.call(bslib::layout_column_wrap, c(list(

@@ -55,7 +55,7 @@ genHTMLReportPlotsChroms <- function(fGroups, outPath, EICs, selfContained)
 genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained)
 {
     scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
-    compStructInfo <- if (!is.null(compounds)) as.data.table(compounds)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
+    compStructInfo <- if (!is.null(compounds) && length(compounds) != 0) as.data.table(compounds)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
     
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
     if (nrow(structInfo) > 0)
@@ -184,7 +184,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     return(ret)
 }
 
-reportHTMLGenerator$methods(
+reportHTMLUtils$methods(
     plotImg = function(p)
     {
         if (properties$selfContained)

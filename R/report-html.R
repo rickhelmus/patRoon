@@ -1,9 +1,17 @@
 #' @include main.R
 NULL
 
-reportHTMLGenerator <- setRefClass("reportHTMLGenerator",
+reportHTMLUtils <- setRefClass("reportHTMLUtils",
                                    fields = list(objects = "list", EICs = "list", EICsTopMost = "list",
                                                  plots = "list", properties = "list"))
+
+reportHTMLUtils$methods(
+    hasSuspects = function() isScreening(objects$fGroups),
+    hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
+    hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
+    hasFormulas = function() !is.null(objects[["formulas"]]),
+    hasCompounds = function() !is.null(objects[["compounds"]])
+)
 
 # UNDONE: method
 #' @export
@@ -55,11 +63,11 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
                                                selfContained)
-    reportEnv$generator <- reportHTMLGenerator$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
-                                                                  formulas = formulas, compounds = compounds,
-                                                                  components = components, TPs = TPs),
-                                                   EICs = EICs, EICsTopMost = EICsTopMost, plots = reportEnv$plots,
-                                                   properties = list(selfContained = selfContained))
+    reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
+                                                          formulas = formulas, compounds = compounds,
+                                                          components = components, TPs = TPs),
+                                           EICs = EICs, EICsTopMost = EICsTopMost, plots = reportEnv$plots,
+                                           properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs
     
     reportEnv$objectsShow <- paste0(utils::capture.output({

@@ -219,7 +219,14 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     return(rt)
 }
 
-reportHTMLGenerator$methods(
+makeAnnReactable <- function(tab, id, ...)
+{
+    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = TRUE, wrap = FALSE,
+                                pagination = FALSE, compact = TRUE,
+                                language = reactable::reactableLang(noData = "No annotations available"), ...))
+}
+
+reportHTMLUtils$methods(
     genFeatTablePlain = function()
     {
         tab <- getFeatTable(objects$fGroups, ",")
@@ -367,17 +374,18 @@ reportHTMLGenerator$methods(
     
     genCompoundTable = function()
     {
-        if (is.null(objects[["compounds"]]))
-            return(htmltools::div()) # UNDONE
-        
         compounds <- objects$compounds[names(objects$fGroups)]
-        
-        if (length(compounds) == 0)
-            return(htmltools::div()) # UNDONE
         
         mcn <- mergedConsensusNames(compounds)
         
+        if (length(compounds) == 0)
+        {
+            # dummy table to show empty results
+            return(makeAnnReactable(data.table(compound = character()), "compoundsTab"))
+        }
+
         tab <- as.data.table(compounds)
+        
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
         tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier", "database",
                                                "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
@@ -492,8 +500,7 @@ reportHTMLGenerator$methods(
             scorings = reactable::colDef(cell = getImgCell, minWidth = 200)
         ))
         
-        return(reactable::reactable(tab, elementId = "compoundsTab", resizable = TRUE, bordered = TRUE, wrap = FALSE,
-                                    pagination = FALSE, compact = TRUE, columns = colDefs, details = function(index)
+        return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, details = function(index)
         {
             htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
                                         background = "#FCFCFC", border = "dashed 1px",

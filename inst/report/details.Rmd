@@ -15,6 +15,10 @@ Details
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
+# small tools to make handling optional elements easier
+maybeIncl <- function(cond, tag) if (cond) tag else NULL
+callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))
+
 bslib::layout_column_wrap(
     width = 1,
     height = "100%",
@@ -24,47 +28,50 @@ bslib::layout_column_wrap(
         bslib::card_header("Feature groups"),
         bslib::card_body(
             class = "mt-2",
-            htmltools::HTML('
-<div class="pb-1">
-    <label for="view-select">View:</label>
-    <select name="view" id="view-select" onChange="updateView(this.value)" style="margin-right: 10px; margin-top: 3px;">
-        <option value="Plain">Plain</option>
-        <option value="Suspects">Suspects</option>
-        <option value="Components">Components</option>
-        <option value="TPs">Transformation products</option>
-    </select>
-
-    <input type="checkbox" id="feat-cols-info" onChange="showFeatCols(&quot;group&quot;, !this.checked)" checked>
-    <label for="feat-cols-info">Group info</label>
-    <input type="checkbox" id="feat-cols-int" onChange="showFeatCols(&quot;intensities&quot;, !this.checked)" checked>
-    <label for="feat-cols-int">Intensities</label>
-    <input type="checkbox" id="feat-cols-qual" onChange="showFeatCols(&quot;qualities&quot;, !this.checked)">
-    <label for="feat-cols-qual">Quality scores</label>
-    <input type="checkbox" id="feat-large-chroms" onChange="showFeatCols(&quot;chrom_large&quot;, !this.checked)">
-    <label for="feat-large-chroms" style="margin-right: 10px;">Large chromatograms</label>
-
-    <button type="button" class="btn btn-primary btn-sm" onClick="Reactable.downloadDataCSV(getSelFeatTableElement())">Download CSV</button>
-    <button type="button" class="btn btn-primary btn-sm" id="feat-expand" onClick="Reactable.toggleAllRowsExpanded(getSelFeatTableElement())" style="display: none;">Expand/collapse</button>
-
-    <div class="float-right">
-        <label for="feat-search">Search</label>
-        <input type="text" id="feat-search" oninput="Reactable.setSearch(getSelFeatTableElement(), this.value)">
-    </div>
-</div>
-')),
-        bslib::card_body_fill(
-            generator$genFeatTablePlain(),
-            generator$genFeatTableSuspects(),
-            generator$genFeatTableComponents(),
-            generator$genFeatTableTPs()
+            htmltools::withTags({
+                div(class = "pb-1",
+                    label("for" = "view-select", "View"),
+                    callIncl(select, name = "view", id = "view-select", onChange = "updateView(this.value)",
+                           style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                           option(value = "Plain", "Plain"),
+                           maybeIncl(utils$hasSuspects(), option(value = "Suspects", "Suspects")),
+                           maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
+                           maybeIncl(utils$hasTPs(), option(value = "TPs", "Transformation products"))
+                    ),
+                    
+                    input(type = "checkbox", id = "feat-cols-info", onChange = "showFeatCols(&quot;group&quot;, !this.checked)", checked = TRUE),
+                    label("for" = "feat-cols-info", "Group info"),
+                    input(type = "checkbox", id = "feat-cols-int", onChange = "showFeatCols(&quot;intensities&quot;, !this.checked)", checked = TRUE),
+                    label("for" = "feat-cols-int", "Intensities"),
+                    input(type = "checkbox", id = "feat-cols-qual", onChange = "showFeatCols(&quot;qualities&quot;, !this.checked)"),
+                    label("for" = "feat-cols-qual", "Quality scores"),
+                    input(type = "checkbox", id = "feat-large-chroms", onChange = "showFeatCols(&quot;chrom_large&quot;, !this.checked)"),
+                    label("for" = "feat-large-chroms", style = list("margin-right" = "10px"), "Large chromatograms"),
+                    
+                    button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFeatTableElement())", "Download CSV"),
+                    button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
+                           onClick = "Reactable.toggleAllRowsExpanded(getSelFeatTableElement())",  style = list(display = "none"), "Expand/collapse"),
+                    
+                    div(class = "float-right",
+                        label("for" = "feat-search", "Search"),
+                        input(type = "text", id = "feat-search", oninput="Reactable.setSearch(getSelFeatTableElement(), this.value)")
+                    )
+                )
+            })
+        ),
+        callIncl(bslib::card_body_fill,
+            utils$genFeatTablePlain(),
+            maybeIncl(utils$hasSuspects(), utils$genFeatTableSuspects()),
+            maybeIncl(utils$hasComponents(), utils$genFeatTableComponents()),
+            maybeIncl(utils$hasTPs(), utils$genFeatTableTPs())
         ),
     ),
-    bslib::layout_column_wrap(
-        width = NULL,
+    callIncl(bslib::layout_column_wrap,
+        fixed = list(width = NULL),
         style = htmltools::css(grid_template_columns = "1fr 2fr"),
         heights_equal = "row",
         class = "bottomLayout",
-        bslib::navs_tab_card(
+        maybeIncl(utils$hasSuspects(), bslib::navs_tab_card(
             title = "Selected suspect",
             full_screen = TRUE,
             bslib::nav(
@@ -75,8 +82,8 @@ bslib::layout_column_wrap(
                 "Info",
                 "Info here?"
             )
-        ),
-        bslib::navs_tab_card(
+        )),
+        maybeIncl(utils$hasComponents(), bslib::navs_tab_card(
             title = "Selected component",
             full_screen = TRUE,
             bslib::nav(
@@ -87,8 +94,8 @@ bslib::layout_column_wrap(
                 "Spectrum",
                 bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
             )
-        ),
-        bslib::navs_tab_card(
+        )),
+        maybeIncl(utils$hasTPs(), bslib::navs_tab_card(
             title = "Selected parent",
             full_screen = TRUE,
             bslib::nav(
@@ -101,16 +108,16 @@ bslib::layout_column_wrap(
             ),
             bslib::nav(
                 "Transformations",
-                bslib::card_body_fill(generator$genTPGraphs())
+                bslib::card_body_fill(utils$genTPGraphs())
             )
-        ),
-        bslib::navs_tab_card(
+        )),
+        callIncl(bslib::navs_tab_card,
             title = "Selected feature group",
             full_screen = TRUE,
-            bslib::nav(
+            maybeIncl(utils$hasCompounds(), bslib::nav(
                 "Compounds",
-                bslib::card_body_fill(generator$genCompoundTable())
-            ),
+                bslib::card_body_fill(utils$genCompoundTable())
+            )),
             bslib::nav(
                 "More things",
                 bslib::card_body_fill("har")

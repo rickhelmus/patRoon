@@ -33,7 +33,7 @@
 \item{\dots}{Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}),
 \code{\link[graphics]{plot}} (\code{plotInt}).}
 
-\item{index}{Numeric component/cluster index.}
+\item{index}{Numeric component/cluster index or component name.}
 
 \item{pch, type, lty}{Passed to \code{\link{lines}}.}
 }

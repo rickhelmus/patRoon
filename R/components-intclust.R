@@ -62,7 +62,7 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
 
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity
 #'   profiles of the feature groups within a given cluster.
-#' @param index Numeric component/cluster index.
+#' @param index Numeric component/cluster index or component name.
 #' @param pch,type,lty Passed to \code{\link{lines}}.
 #' @export
 setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
@@ -70,8 +70,14 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type =
 {
     verifyCompNotAltered(obj)
     
-    checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
-
+    checkmate::assert(
+        checkmate::checkInt(index, lower = 1, upper = length(obj)),
+        checkChoiceSilent(index, names(obj))
+        , .var.name = "index")
+    
+    if (is.character(index))
+        index <- which(index == names(obj))
+    
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
 

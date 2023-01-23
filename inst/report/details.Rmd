@@ -83,7 +83,7 @@ bslib::layout_column_wrap(
                 "Info here?"
             )
         )),
-        maybeIncl(utils$hasComponents(), bslib::navs_tab_card(
+        maybeIncl(utils$hasComponents(), callIncl(bslib::navs_tab_card,
             title = "Selected component",
             full_screen = TRUE,
             bslib::nav(
@@ -93,7 +93,14 @@ bslib::layout_column_wrap(
             bslib::nav(
                 "Spectrum",
                 bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
-            )
+            ),
+            maybeIncl(utils$hasComponentsIntClust(), bslib::nav(
+                "Profile",
+                bslib::card_body_fill(
+                    htmltools::img(id = "profileRel_view-component"),
+                    htmltools::img(id = "profileAbs_view-component")
+                )
+            ))
         )),
         maybeIncl(utils$hasTPs(), bslib::navs_tab_card(
             title = "Selected parent",

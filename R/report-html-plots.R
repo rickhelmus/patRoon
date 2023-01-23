@@ -149,6 +149,18 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
             plotSpectrum(components, cn)
         }, width = 7, height = 4, pointsize = 16)
         
+        if (inherits(components, "componentsIntClust"))
+        {
+            pl$profileRel <- makeHTMLReportPlot(paste0("compon-int_rel-", cn, ".svg"), outPath, selfContained, {
+                plotInt(components, index = cn, main = "normalized")
+            }, width = 7, height = 6, pointsize = 16)
+            
+            pl$profileAbs <- makeHTMLReportPlot(paste0("compon-int_abs-", cn, ".svg"), outPath, selfContained, {
+                plotInt(fGroups[, components[[cn]]$group], average = clusterProperties(components)$average,
+                        main = "absolute")
+            }, width = 7, height = 6, pointsize = 16)
+        }
+        
         return(pl)
     })))
 }

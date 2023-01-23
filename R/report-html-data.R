@@ -274,16 +274,25 @@ reportHTMLUtils$methods(
             ctab[, intensity := NULL]
         tab <- merge(tab, ctab, by = "group", sort = FALSE)
         
-        groupDefs <- c(groupDefs, list(reactable::colGroup("component", setdiff(names(ctab), c("component", "group")),
-                                                           headerStyle = getFeatColSepStyle())))
+        cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
+        if (length(cmpGrpCols) > 0)
+            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFeatColSepStyle())))
         
         onClick <- "function(tabEl, rowInfo)
 {
     let chromEl = document.getElementById('chrom_view-component');
     let specEl = document.getElementById('spectrum_view-component');
+    let profileRelEl = document.getElementById('profileRel_view-component');
+    let profileAbsEl = document.getElementById('profileAbs_view-component');
     const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
-    chromEl.src = Reactable.getState(tabEl).meta.plots.components[rd.component].chrom;
-    specEl.src = Reactable.getState(tabEl).meta.plots.components[rd.component].spec;
+    const pl = Reactable.getState(tabEl).meta.plots.components[rd.component];
+    chromEl.src = pl.chrom;
+    specEl.src = pl.spec;
+    if (profileRelEl != undefined)
+    {
+        profileRelEl.src = pl.profileRel;
+        profileAbsEl.src = pl.profileAbs;
+    }
 }"
         
         makeFeatReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,

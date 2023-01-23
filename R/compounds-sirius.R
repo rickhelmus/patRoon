@@ -4,6 +4,10 @@
 #' @include feature_groups-set.R
 NULL
 
+#' @export
+compoundsSIRIUS <- setClass("compoundsSIRIUS", slots = c(fingerprints = "list"),
+                            contains = "compounds")
+
 processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost)
 {
     resultPath <- getSiriusResultPath(outPath, msFName)
@@ -35,7 +39,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for
         # candidates with the same formula.
-        fragFiles <- patRoon:::getAndPrepareSIRIUSFragFiles(resultPath)
+        fragFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "spectra", "tsv")
         for (ff in fragFiles)
         {
             fragInfo <- fread(ff)
@@ -81,11 +85,27 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
                     nrow(results)))]
             results[, explainedPeaks := 0]
         }
-        
         results[, database := database][]
     }
     
-    ret <- list(comptab = results, scRanges = scRanges)
+    # get SIRIUS fingerprints
+    fingerprints <- data.table()
+    if (file.exists(file.path(resultPath, "fingerprints")))
+    {
+        fpFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
+        fpForms <- patRoon:::getFormulaFromSIRIUSResFile(fpFiles, "fpt")
+        # obtain neutral formula of FP results from candidate list
+        formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
+        fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
+        for (i in seq_along(fpFiles))
+            fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
+        # add absoluteIndices
+        fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
+        fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
+    }
+    
+    
+    ret <- list(comptab = results, scRanges = scRanges, fingerprints = fingerprints)
     return(ret)
 }
 
@@ -159,7 +179,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
-        return(compounds(algorithm = "sirius"))
+        return(compoundsSIRIUS(algorithm = "sirius"))
     
     if (!is.null(projectPath))
         projectPath <- normalizePath(projectPath, mustWork = FALSE)
@@ -189,9 +209,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 
-    return(compounds(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
-                     scoreRanges = lapply(results, "[[", "scRanges"),
-                     algorithm = "sirius"))
+    return(compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
+                           scoreRanges = lapply(results, "[[", "scRanges"),
+                           fingerprints = lapply(results, "[[", "fingerprints"), algorithm = "sirius"))
 })
 
 #' @template featAnnSets-gen_args

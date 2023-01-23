@@ -21,7 +21,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     else
     {
         forms <- fread(summary)
-        fragFiles <- patRoon:::getAndPrepareSIRIUSFragFiles(resultPath)
+        fragFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "spectra", "tsv")
         
         if (nrow(forms) == 0 || length(fragFiles) == 0)
             forms <- noResult
@@ -68,7 +68,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                 }
                 return(fragInfo)
             })
-            names(fragInfoList) <- sapply(fragFiles, patRoon:::getFormulaFromSiriusFragFile)
+            names(fragInfoList) <- sapply(fragFiles, patRoon:::getFormulaFromSIRIUSResFile, "tsv")
             
             # initialize all with empty fragInfos
             if (length(fragInfoList) > 0)

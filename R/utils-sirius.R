@@ -21,24 +21,24 @@ getSiriusResultPath <- function(outPath, msFName)
     return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
-getAndPrepareSIRIUSFragFiles <- function(resultPath)
+getAndPrepareSIRIUSResFiles <- function(resultPath, subDir, ext)
 {
-    # NOTE: SIRIUS 5 packs spectra --> unzip them
-    spPath <- file.path(resultPath, "spectra")
+    spPath <- file.path(resultPath, subDir)
     if (file.exists(spPath) && !file.info(spPath, extra_cols = FALSE)$isdir)
     {
+        # NOTE: SIRIUS 5 packs most result files --> unzip them
         exDir <- paste0(spPath, "-unz")
         unzip(spPath, exdir = exDir)
         spPath <- exDir
     }
     
-    pat <- "([A-Za-z0-9]+).*\\.tsv"
+    pat <- paste0("([A-Za-z0-9]+).*\\.", ext)
     return(list.files(spPath, full.names = TRUE, pattern = pat))
 }
 
-getFormulaFromSiriusFragFile <- function(ffile)
+getFormulaFromSIRIUSResFile <- function(ffile, ext)
 {
-    pat <- "([A-Za-z0-9]+).*\\.tsv"
+    pat <- paste0("([A-Za-z0-9]+).*\\.", ext)
     return(gsub(pat, "\\1", basename(ffile)))
 }
 

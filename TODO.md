@@ -18,6 +18,12 @@
 - check CAMERA on PD
 - update GHPreRel ref in handbook
 
+## Predict
+
+- show() for compoundsSIRIUS?
+- docs
+    - SIRIUS compound class
+
 ## General
 
 - add showProgress option for future MP

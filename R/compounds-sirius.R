@@ -11,99 +11,101 @@ compoundsSIRIUS <- setClass("compoundsSIRIUS", slots = c(fingerprints = "list"),
 processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost)
 {
     resultPath <- getSiriusResultPath(outPath, msFName)
-    summary <- file.path(resultPath, "structure_candidates.tsv")
-    results <- scRanges <- data.table()
+    results <- scRanges <- fingerprints <- data.table()
     
-    if (length(summary) != 0 && file.exists(summary))
+    if (length(resultPath) != 0) # zero for no results
     {
-        results <- fread(summary)
-        results <- unifySirNames(results)
-        
-        # NOTE: so far SIRIUS only has one score
-        if (nrow(results) > 0)
-            scRanges <- list(score = range(results$score))
-        
-        # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
-        # NOTE: do this before topMost filter step below to ensure proper filtering
-        setorderv(results, c("score", "identifier"), order = c(-1, 1))
-        
-        if (!is.null(topMost))
+        summary <- file.path(resultPath, "structure_candidates.tsv")
+        if (file.exists(summary))
         {
-            if (nrow(results) > topMost)
-                results <- results[seq_len(topMost)] # results should already be sorted on score
-        }
-        
-        # identifiers to characters, as they sometimes are and sometimes aren't depending on if multiple are present
-        results[, identifier := as.character(identifier)]
-
-        # NOTE: fragment info is based on SIRIUS results, ie from formula
-        # prediction and not by compounds! Hence, results are the same for
-        # candidates with the same formula.
-        fragFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "spectra", "tsv")
-        for (ff in fragFiles)
-        {
-            fragInfo <- fread(ff)
-            fragInfo[, ionization := gsub(" ", "", ionization)]
-            fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
-
-            # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
-            # candidate(s) it belongs to
-            wh <- which(results$neutral_formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
+            results <- fread(summary)
+            results <- unifySirNames(results)
             
-            # Remove zero intensity precursor peak since it wasn't actually present in the peak list
-            fragInfo <- fragInfo[intensity != 0 | formula != results$neutral_formula[wh[1]]]
+            # NOTE: so far SIRIUS only has one score
+            if (nrow(results) > 0)
+                scRanges <- list(score = range(results$score))
             
-            fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
+            # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
+            # NOTE: do this before topMost filter step below to ensure proper filtering
+            setorderv(results, c("score", "identifier"), order = c(-1, 1))
             
-            if (length(wh) > 0)
+            if (!is.null(topMost))
             {
-                # sirius neutralizes fragments, make them ion again
-                if (!is.null(fragInfo[["implicitAdduct"]]))
-                    ionImpAdducts <- ifelse(nzchar(fragInfo$implicitAdduct),
-                                            mapply(paste0("+", fragInfo$implicitAdduct, "]"), fragInfo$ionization,
-                                                   FUN = sub, MoreArgs = list(pattern = "\\]")),
-                                            fragInfo$ionization)
-                else
-                    ionImpAdducts <- fragInfo$ionization
-                setnames(fragInfo, "formula", "formula_SIR")
-                fragInfo[, ion_formula := mapply(formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
-                
-                ionform <- calculateIonFormula(results$neutral_formula[wh[1]], adduct)
-                fragInfo[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
-                
-                set(results, wh, "fragInfo", list(list(fragInfo)))
-                set(results, wh, "explainedPeaks", nrow(fragInfo))
+                if (nrow(results) > topMost)
+                    results <- results[seq_len(topMost)] # results should already be sorted on score
             }
+            
+            # identifiers to characters, as they sometimes are and sometimes aren't depending on if multiple are present
+            results[, identifier := as.character(identifier)]
+            
+            # NOTE: fragment info is based on SIRIUS results, ie from formula
+            # prediction and not by compounds! Hence, results are the same for
+            # candidates with the same formula.
+            fragFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "spectra", "tsv")
+            for (ff in fragFiles)
+            {
+                fragInfo <- fread(ff)
+                fragInfo[, ionization := gsub(" ", "", ionization)]
+                fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
+                
+                # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
+                # candidate(s) it belongs to
+                wh <- which(results$neutral_formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
+                
+                # Remove zero intensity precursor peak since it wasn't actually present in the peak list
+                fragInfo <- fragInfo[intensity != 0 | formula != results$neutral_formula[wh[1]]]
+                
+                fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
+                
+                if (length(wh) > 0)
+                {
+                    # sirius neutralizes fragments, make them ion again
+                    if (!is.null(fragInfo[["implicitAdduct"]]))
+                        ionImpAdducts <- ifelse(nzchar(fragInfo$implicitAdduct),
+                                                mapply(paste0("+", fragInfo$implicitAdduct, "]"), fragInfo$ionization,
+                                                       FUN = sub, MoreArgs = list(pattern = "\\]")),
+                                                fragInfo$ionization)
+                    else
+                        ionImpAdducts <- fragInfo$ionization
+                    setnames(fragInfo, "formula", "formula_SIR")
+                    fragInfo[, ion_formula := mapply(formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
+                    
+                    ionform <- calculateIonFormula(results$neutral_formula[wh[1]], adduct)
+                    fragInfo[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
+                    
+                    set(results, wh, "fragInfo", list(list(fragInfo)))
+                    set(results, wh, "explainedPeaks", nrow(fragInfo))
+                }
+            }
+            
+            if (is.null(results[["fragInfo"]]))
+            {
+                # warning(sprintf("no fragment info for %s", cmd$gName))
+                results[, fragInfo := list(rep(list(data.table(mz = numeric(0), ion_formula = character(0),
+                                                               neutral_loss = character(0),  score = numeric(0),
+                                                               PLID = numeric(0))),
+                                               nrow(results)))]
+                results[, explainedPeaks := 0]
+            }
+            results[, database := database][]
         }
         
-        if (is.null(results[["fragInfo"]]))
+        # get SIRIUS fingerprints
+        fingerprints <- data.table()
+        if (file.exists(file.path(resultPath, "fingerprints")))
         {
-            # warning(sprintf("no fragment info for %s", cmd$gName))
-            results[, fragInfo := list(rep(list(data.table(mz = numeric(0), ion_formula = character(0),
-                                                           neutral_loss = character(0),  score = numeric(0),
-                                                           PLID = numeric(0))),
-                    nrow(results)))]
-            results[, explainedPeaks := 0]
+            fpFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
+            fpForms <- patRoon:::getFormulaFromSIRIUSResFile(fpFiles, "fpt")
+            # obtain neutral formula of FP results from candidate list
+            formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
+            fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
+            for (i in seq_along(fpFiles))
+                fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
+            # add absoluteIndices
+            fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
+            fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
         }
-        results[, database := database][]
     }
-    
-    # get SIRIUS fingerprints
-    fingerprints <- data.table()
-    if (file.exists(file.path(resultPath, "fingerprints")))
-    {
-        fpFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
-        fpForms <- patRoon:::getFormulaFromSIRIUSResFile(fpFiles, "fpt")
-        # obtain neutral formula of FP results from candidate list
-        formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
-        fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
-        for (i in seq_along(fpFiles))
-            fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
-        # add absoluteIndices
-        fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
-        fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
-    }
-    
     
     ret <- list(comptab = results, scRanges = scRanges, fingerprints = fingerprints)
     return(ret)

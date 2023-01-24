@@ -229,3 +229,50 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
                          setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                          setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
+
+
+# UNDONE: method
+predictConcentrations <- function(compounds, fGroups, calibrants, organicSolvent)
+{
+    # UNDONE: needs to be done per set
+    # UNDONE: check if compounds are from SIRIUS
+    # UNDONE: check calibrant format
+    # UNDONE: check organicSolvent
+    
+    # calibrants <- if (is.data.table(calibrants)) copy(calibrants) else as.data.table(calibrants)
+    
+    compTab <- as.data.table(compounds, fGroups = fGroups)
+    compTabUn <- unique(compTab, by = c("group", "neutral_formula"))
+    compTabUn[, qID := seq_len(.N)]
+    
+    unknowns <- compTabUn[, c("qID", "ret"), with = FALSE]
+    unknowns[, ret := ret / 60]
+    setnames(unknowns, c("qID", "ret"), c("identifier", "retention_time"))
+    unknowns[, c("SMILES", "area", "conc_M") := .("", 1000, NA_real_)]
+    
+    # UNDONE: would be nice if we could just pass table directly
+    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns), quantFile)
+    
+    fingerprintInTab <- compTabUn[, c("qID", "neutral_formula", "group")]
+    setnames(fingerprintInTab, "qID", "identifier")
+    
+    allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
+                               make.names = "absoluteIndex"), idcol = "group")
+    fpColRange <- seq(3, ncol(allFPs))
+    setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
+    
+    fingerprintInTab <- merge(fingerprintInTab, allFPs, by = c("group", "neutral_formula"))
+    setnames(fingerprintInTab, "identifier", "id")
+    # figure out polarity
+    ion <- compounds[[fingerprintInTab$group[1]]][neutral_formula == fingerprintInTab$neutral_formula[1]]$fragInfo[[1]]$ionization[1]
+    isPositive <- as.adduct(ion)@charge > 0
+    # MS2Quant checks polarity from pattern match of predion column, and only check [M+H]+/[M]+ for now
+    fingerprintInTab[, predion := paste0(neutral_formula, "_", if (isPositive) "[M+H]+" else "[M-H]-")]
+    MS2Quant::MS2Quant_quantify(quantFile,
+                                # UNDONE
+                                system.file("example_data", "eluent.csv", package = "MS2Quant"),
+                                organic_modifier = organicSolvent,
+                                # UNDONE
+                                pH_aq = 2.7,
+                                fingerprintInTab)
+}

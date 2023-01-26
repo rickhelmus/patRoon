@@ -324,9 +324,10 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 #' @export
 setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
                                                                    minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
-                                                                  ..., setThreshold = 0, setThresholdAnn = 0)
+                                                                  ..., setThreshold = 0, setThresholdAnn = 0,
+                                                                  setAvgSpecificScores = FALSE)
 {
     generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsLibrary, MSLibrary = MSLibrary, minSim = minSim,
                          minAnnSim = minAnnSim, absMzDev = absMzDev, ..., setThreshold = setThreshold,
-                         setThresholdAnn = setThresholdAnn)
+                         setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores)
 })

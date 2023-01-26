@@ -157,7 +157,8 @@
   labels = NULL,
   filterSets = FALSE,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 
 \S4method{unset}{compoundsSet}(obj, set)
@@ -306,6 +307,9 @@ workflows} section below.}
 \item{setThreshold, setThresholdAnn}{\setsWF Thresholds used to create the annotation set consensus. See
 \code{\link{generateCompounds}}.}
 
+\item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific annotation scores (\emph{e.g.} MS/MS and
+isotopic pattern match scores) are averaged for the set consensus. See \code{\link{generateCompounds}}.}
+
 \item{set}{\setsWF The name of the set.}
 }
 \value{
@@ -376,8 +380,8 @@ the \code{rank} columns.
 \section{Slots}{
 
 \describe{
-\item{\code{setThreshold,setThresholdAnn}}{\setsWF A copy of the equally named arguments that were passed when this object
-was created by \code{\link{generateCompounds}}.}
+\item{\code{setThreshold,setThresholdAnn,setAvgSpecificScores}}{\setsWF A copy of the equally named arguments that were
+passed when this object was created by \code{\link{generateCompounds}}.}
 
 \item{\code{origFGNames}}{\setsWF The original (order of) names of the \code{\link{featureGroups}} object that was used to
 create this object.}

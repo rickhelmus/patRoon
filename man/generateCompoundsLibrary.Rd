@@ -30,7 +30,8 @@
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 }
 \arguments{
@@ -77,6 +78,9 @@ library spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \co
 
 \item{setThresholdAnn}{\setsWF As \code{setThreshold}, but only taking into account the set data that contain
 annotations for the feature group of the candidate.}
+
+\item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
+averaged.}
 }
 \description{
 Uses a MS library loaded by \code{\link{loadMSLibrary}} for compound annotation.

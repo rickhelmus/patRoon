@@ -44,7 +44,8 @@
   adduct = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 }
 \arguments{
@@ -139,6 +140,9 @@ to \code{NULL} to ignore.}
 
 \item{setThresholdAnn}{\setsWF As \code{setThreshold}, but only taking into account the set data that contain
 annotations for the feature group of the candidate.}
+
+\item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
+averaged.}
 }
 \value{
 \code{generateCompoundsMetFrag} returns a \code{\link{compoundsMF}} object.

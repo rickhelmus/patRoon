@@ -36,7 +36,8 @@
   projectPath = NULL,
   ...,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 }
 \arguments{
@@ -118,6 +119,9 @@ execution, which is often the fastest if calculations are performed on a single 
 
 \item{setThresholdAnn}{\setsWF As \code{setThreshold}, but only taking into account the set data that contain
 annotations for the feature group of the candidate.}
+
+\item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
+averaged.}
 }
 \value{
 A \code{\link{compounds}} derived object containing all compound annotations.

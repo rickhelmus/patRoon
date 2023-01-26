@@ -405,6 +405,7 @@ if (testWithSets())
 {
     fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
     compsOneEmptySet <- callMF(fgOneEmptySet, plists)
+    compsAvgSpecCols <- callMF(fGroups, plists, setAvgSpecificScores = TRUE)
 }
 
 test_that("sets functionality", {
@@ -421,6 +422,11 @@ test_that("sets functionality", {
     
     expect_lt(length(callMF(fgOneEmptySet, plists, setThreshold = 1)), length(compsOneEmptySet))
     expect_length(callMF(fgOneEmptySet, plists, setThresholdAnn = 0), length(compsOneEmptySet))
+    
+    # setAvgSpecificScores=FALSE (default)
+    checkmate::expect_names(names(as.data.table(comps)),
+                            must.include = paste0("fragScore-", sets(compsAvgSpecCols)[1]))
+    checkmate::expect_names(names(as.data.table(compsAvgSpecCols)), must.include = "fragScore")
     
     expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE,
                                                                perSet = FALSE))

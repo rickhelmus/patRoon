@@ -802,10 +802,11 @@ setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPe
                                                                    timeoutRetries = 2, errorRetries = 2, topMost = 100,
                                                                    dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
                                                                    adduct = NULL, ..., setThreshold = 0,
-                                                                   setThresholdAnn = 0)
+                                                                   setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsMetFrag, method = method, timeout = timeout,
                          timeoutRetries = timeoutRetries, errorRetries = errorRetries, topMost = topMost,
                          dbRelMzDev = dbRelMzDev, fragRelMzDev = fragRelMzDev, fragAbsMzDev = fragAbsMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                         setAvgSpecificScores = setAvgSpecificScores)
 })

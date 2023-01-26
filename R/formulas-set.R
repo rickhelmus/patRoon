@@ -18,6 +18,7 @@ NULL
 #' @export
 formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
                                                  setThresholdAnn = "numeric",
+                                                 setAvgSpecificScores = "logical",
                                                  origFGNames = "character"),
                         contains = c("formulas", "workflowStepSet"))
 
@@ -198,7 +199,8 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
 #' @export
 setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
-                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0)
+                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0,
+                                               setAvgSpecificScores = FALSE)
 {
     allAnnObjs <- c(list(obj), list(...))
     
@@ -206,7 +208,7 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertList(allAnnObjs, types = "formulasSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
-    checkmate::assertFlag(filterSets, add = ac)
+    aapply(checkmate::assertFlag, . ~ filterSets + setAvgSpecificScores, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     checkmate::reportAssertions(ac)
     
@@ -214,13 +216,15 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
+    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores,
+                                   rankWeights)
     combFormulas <- Reduce(modifyList, lapply(cons$setObjects, annotations, features = TRUE))
     
     ret <- formulasConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
-                                setThresholdAnn = setThresholdAnn, origFGNames = cons$origFGNames,
-                                groupAnnotations = cons$groupAnnotations, featureFormulas = combFormulas,
-                                algorithm = cons$algorithm, mergedConsensusNames = cons$mergedConsensusNames)
+                                setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
+                                origFGNames = cons$origFGNames, groupAnnotations = cons$groupAnnotations,
+                                featureFormulas = combFormulas, algorithm = cons$algorithm,
+                                mergedConsensusNames = cons$mergedConsensusNames)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterSets)
     
@@ -229,10 +233,11 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
 
 
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn,
-                                setArgs = list())
+                                setAvgSpecificScores, setArgs = list())
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
+    checkmate::assertFlag(setAvgSpecificScores)
     verifyNoAdductIonizationArg(adduct)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
@@ -246,10 +251,12 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, .
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))
     
-    cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, NULL)
+    cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, setAvgSpecificScores,
+                                    NULL)
 
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
-                       setThresholdAnn = setThresholdAnn, groupAnnotations = cons, featureFormulas = combFormulas,
+                       setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
+                       groupAnnotations = cons, featureFormulas = combFormulas,
                        algorithm = makeSetAlgorithm(setObjects)))
 }
 
@@ -263,7 +270,7 @@ setMethod("unset", "formulasSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
     uann <- doFeatAnnUnset(obj, set)
-    return(formulasUnset(groupAnnotations = uann, featureFormulas = annotations(obj, features = TRUE),
+    return(formulasUnset(groupAnnotations = uann$annotations, featureFormulas = annotations(obj, features = TRUE),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })
 

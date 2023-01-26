@@ -74,7 +74,8 @@ ranking.
 
   \item The MS/MS fragment annotations (\code{fragInfo} column) from each set are combined.
 
-  \item The scorings for each set are averaged to calculate overall scores.
+  \item The scorings for each set are averaged to calculate overall scores. if \code{setAvgSpecificScores=FALSE} then
+  scorings that are considered set specific (\emph{e.g.} MS/MS and isotopic pattern match) are \emph{not} averaged.
 
   \item The candidates are re-ranked based on their average ranking among the set data (if a candidate is absent in a
   set it is assigned the poorest rank in that set).

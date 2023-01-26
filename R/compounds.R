@@ -348,12 +348,15 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         return(NULL)
     
     mcn <- mergedConsensusNames(obj, FALSE)
+    mcnAll <- mergedConsensusNames(obj, TRUE)
+    if (length(mcn) == 0)
+        mcn <- mcnAll # HACK: only split set scores if not consensus
     
     if (normalizeScores != "none")
-        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,
+        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcnAll,
                                        normalizeScores == "minmax", excludeNormScores)
     
-    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcn)
+    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
     

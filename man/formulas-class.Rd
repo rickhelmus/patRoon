@@ -138,7 +138,8 @@
   labels = NULL,
   filterSets = FALSE,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 
 \S4method{unset}{formulasSet}(obj, set)
@@ -268,6 +269,9 @@ workflows} section below.}
 \item{setThreshold, setThresholdAnn}{\setsWF Thresholds used to create the annotation set consensus. See
 \code{\link{generateFormulas}}.}
 
+\item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific annotation scores (\emph{e.g.} MS/MS and
+isotopic pattern match scores) are averaged for the set consensus. See \code{\link{generateFormulas}}.}
+
 \item{set}{\setsWF The name of the set.}
 }
 \value{
@@ -327,8 +331,8 @@ the \code{rank} columns.
 \item{\code{featureFormulas}}{A \code{list} with all generated formulae for each analysis/feature group. Use the
 \code{annotations} method for access.}
 
-\item{\code{setThreshold,setThresholdAnn}}{\setsWF A copy of the equally named arguments that were passed when this object
-was created by \code{\link{generateFormulas}}.}
+\item{\code{setThreshold,setThresholdAnn,setAvgSpecificScores}}{\setsWF A copy of the equally named arguments that were
+passed when this object was created by \code{\link{generateFormulas}}.}
 
 \item{\code{origFGNames}}{\setsWF The original (order of) names of the \code{\link{featureGroups}} object that was used to
 create this object.}

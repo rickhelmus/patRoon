@@ -62,7 +62,9 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fixed: `generateCompoundsMetFrag()` didn't properly detect changes in local database files when considering cached data.
 - Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.
 - `plotChord()` method for `featureGroups`: significantly optimized some old code
-
+- `plotScores()`
+    - split bars for sets
+    - only split bars if results are present for >1 sets and/or consensus algorithms
 
 
 # patRoon 2.1

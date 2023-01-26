@@ -155,25 +155,22 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 
 #' Clearing of cached data
 #'
-#' Remove (part of) the cache database used to store (intermediate) processing
-#' results.
+#' Remove (part of) the cache database used to store (intermediate) processing results.
 #'
-#' This function will either remove one or more tables within the cache
-#' \code{sqlite} database or simply wipe the whole cache file. Removing tables
-#' will \code{VACUUM} the database, which may take some time for large cache
-#' files.
+#' This function will either remove one or more tables within the cache \code{sqlite} database or simply wipe the whole
+#' cache file. Removing tables will \code{VACUUM} the database (unless \code{vacuum=FALSE}), which may take some time
+#' for large cache files.
 #'
-#' @param what This argument describes what should be done. When \code{what =
-#'   NULL} this function will list which tables are present along with an
-#'   indication of their size (database rows). If \code{what = "all"} then the
-#'   complete file will be removed. Otherwise, \code{what} should be a character
-#'   string (a regular expression) that is used to match the table names that
-#'   should be removed.
-#' @param file The cache file. If \code{NULL} then the value of the
-#'   \code{patRoon.cache.fileName} option is used.
+#' @param what This argument describes what should be done. When \code{what = NULL} this function will list which tables
+#'   are present along with an indication of their size (database rows). If \code{what = "all"} then the complete file
+#'   will be removed. Otherwise, \code{what} should be a character string (a regular expression) that is used to match
+#'   the table names that should be removed.
+#' @param file The cache file. If \code{NULL} then the value of the \code{patRoon.cache.fileName} option is used.
+#' @param vacuum If \code{TRUE} then the \code{VACUUM} operation will be run on the cache database to reduce the file
+#'   size. Setting this to \code{FALSE} might be handy to avoid long processing times on large cache databases.
 #'
 #' @export
-clearCache <- function(what = NULL, file = NULL)
+clearCache <- function(what = NULL, file = NULL, vacuum = TRUE)
 {
     checkmate::assertString(what, na.ok = FALSE, null.ok = TRUE)
     
@@ -181,6 +178,8 @@ clearCache <- function(what = NULL, file = NULL)
         checkmate::assertFile(file, "r")
     else
         file <- getCacheFile()
+    
+    checkmate::assertFlag(vacuum)
     
     if (!file.exists(file))
         printf("No cache file found, nothing to do ...\n")
@@ -217,7 +216,8 @@ clearCache <- function(what = NULL, file = NULL)
             {
                 for (tab in matchedTables)
                     DBI::dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
-                DBI::dbExecute(db, "VACUUM")
+                if (vacuum)
+                    DBI::dbExecute(db, "VACUUM")
                 printf("Removed caches: %s\n", paste0(matchedTables, collapse = ", "))
             }
         }

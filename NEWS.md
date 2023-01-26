@@ -66,6 +66,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - split bars for sets
     - only split bars if results are present for >1 sets and/or consensus algorithms
 - Fixed: `selectIons()` didn't properly handle empty components objects
+- `clearCache()`: `vacuum` option to speed up clearing large cache files.
 
 
 # patRoon 2.1

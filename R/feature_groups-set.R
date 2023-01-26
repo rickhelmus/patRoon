@@ -313,6 +313,12 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
                       .var.name = "prefAdduct")
     prefAdduct <- rep(prefAdduct, length.out = setLen)
     
+    if (length(components) == 0 || is.null(componentInfo(components)[["neutral_mass"]]))
+    {
+        cat("Components are empty or lack adduct/isotope annotations, skipping...\n")
+        return(fGroups)
+    }
+    
     # annotate and merge ions for all set objects
     usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     usComponents <- checkAndUnSetOther(sets(fGroups), components, "components")

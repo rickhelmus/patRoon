@@ -1051,6 +1051,11 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         cat("No adduct/isotope information available in given components!\n")
         return(fGroups)
     }
+    if (length(components) == 0)
+    {
+        cat("Components are empty, skipping...\n")
+        return(fGroups)
+    }
     
     cTab <- as.data.table(components)
     cTab <- cTab[group %in% names(fGroups)]

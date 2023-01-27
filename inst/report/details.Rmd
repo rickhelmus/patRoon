@@ -39,13 +39,13 @@ bslib::layout_column_wrap(
                            maybeIncl(utils$hasTPs(), option(value = "TPs", "Transformation products"))
                     ),
                     
-                    input(type = "checkbox", id = "feat-cols-info", onChange = "showFeatCols(&quot;group&quot;, !this.checked)", checked = TRUE),
+                    input(type = "checkbox", id = "feat-cols-info", onChange = 'showFeatCols("group", !this.checked)', checked = TRUE),
                     label("for" = "feat-cols-info", "Group info"),
-                    input(type = "checkbox", id = "feat-cols-int", onChange = "showFeatCols(&quot;intensities&quot;, !this.checked)", checked = TRUE),
+                    input(type = "checkbox", id = "feat-cols-int", onChange = 'showFeatCols("intensities", !this.checked)', checked = TRUE),
                     label("for" = "feat-cols-int", "Intensities"),
-                    input(type = "checkbox", id = "feat-cols-qual", onChange = "showFeatCols(&quot;qualities&quot;, !this.checked)"),
+                    input(type = "checkbox", id = "feat-cols-qual", onChange = 'showFeatCols("qualities", !this.checked)'),
                     label("for" = "feat-cols-qual", "Quality scores"),
-                    input(type = "checkbox", id = "feat-large-chroms", onChange = "showFeatCols(&quot;chrom_large&quot;, !this.checked)"),
+                    input(type = "checkbox", id = "feat-large-chroms", onChange = 'showFeatCols("chrom_large", !this.checked)'),
                     label("for" = "feat-large-chroms", style = list("margin-right" = "10px"), "Large chromatograms"),
                     
                     button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFeatTableElement())", "Download CSV"),

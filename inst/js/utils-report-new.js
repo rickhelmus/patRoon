@@ -93,7 +93,7 @@ function showTPGraph(cmp)
 $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495
     $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
-    $('body').on('click', 'img:not(.zoomImg)', function() {
+    $('body').on('click', 'img:not(.zoomImg, .noZoomImg)', function() {
        $('.zoomImg').attr('src', $(this).attr('src'));
        $('.zoomDiv').css({opacity: '1', width: '70%'});
     });

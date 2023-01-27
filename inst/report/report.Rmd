@@ -53,7 +53,7 @@ pre, code {
     width: 100%;
 }
 
-img:not(.zoomImg) {
+img:not(.zoomImg, .noZoomImg) {
     cursor: zoom-in;
     max-width: 100%;
     max-height: 100%;

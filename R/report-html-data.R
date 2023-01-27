@@ -137,11 +137,11 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     setcolorder(tab, c(tabn[seq_len(match("group", tabn))], "chrom_small", "chrom_large")) # move after group column
     colDefs$chrom_small <- reactable::colDef("chromatogram", cell = function(value, index)
     {
-        sparkline::sparkline(EICsTopMost[[value]]$intensity, xvalues = EICsTopMost[[value]]$time, type = "line")
+        htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"), class = "noZoomImg")
     })
     colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, cell = function(value, index)
     {
-        htmltools::img(src = plots$chroms[[value]])
+        htmltools::img(src = plots$chromsLarge[[value]])
     })
     
     for (i in seq_along(groupDefs))

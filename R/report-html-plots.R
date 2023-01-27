@@ -38,17 +38,30 @@ makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
     # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
 }
 
-genHTMLReportPlotsChroms <- function(fGroups, outPath, EICs, selfContained)
+genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
 {
     sapply(names(fGroups), function(grp)
     {
-        makeHTMLReportPlot(paste0("chrom-", grp, ".svg"), outPath, selfContained, {
+        makeHTMLReportPlot(paste0("chrom_large-", grp, ".svg"), outPath, selfContained, {
             # UNDONE: params
             mar <- par("mar")
             par(mar = c(mar[1], mar[2], 0.2, 0.2))
             plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, colourBy = "rGroups", title = "",
                        onlyPresent = TRUE, bty = "l")
         }, width = 6, height = 4, bg = "transparent", pointsize = 16)
+    }, simplify = FALSE)
+}
+
+genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
+{
+    sapply(names(fGroups), function(grp)
+    {
+        makeHTMLReportPlot(paste0("chrom_small-", grp, ".svg"), outPath, selfContained, {
+            # UNDONE: params
+            par(mai = c(0, 0, 0, 0), lwd = 10)
+            plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, showFGroupRect = FALSE, showPeakArea = TRUE,
+                       title = "", onlyPresent = TRUE, bty = "n")
+        }, width = 12, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
 }
 
@@ -213,7 +226,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         }, width = 7, height = 7)
     }
     
-    ret$chroms <- genHTMLReportPlotsChroms(fGroups, outPath, EICs, selfContained)
+    ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
+    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
     if (!is.null(formulas))
         ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)

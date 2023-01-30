@@ -240,10 +240,10 @@ test_that("selectIons works", {
     
     expect_gt(length(selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = FALSE)), length(fGroupsSI))
     
-    # stop()s with empty components
-    expect_error(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    # ignore empty components
+    expect_equal(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
     # ... and components without annotations in general
-    expect_error(selectIons(fGroups, compsInt, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    expect_equal(selectIons(fGroups, compsNT, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
     
     skip_if(testWithSets())
     

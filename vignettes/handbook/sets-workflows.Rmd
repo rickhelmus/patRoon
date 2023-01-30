@@ -222,7 +222,7 @@ compounds <- compoundsSets
 ```
 
 ```{r setsProcData,eval=runData}
-as.data.table(compounds)[1:5, c("group", "score", "compoundName", "set")]
+as.data.table(compounds)[1:5, c("group", "score-positive", "score-negative", "compoundName", "set")]
 ```
 
 In addition, some the data processing functionality contains additional functionality for a sets workflow:

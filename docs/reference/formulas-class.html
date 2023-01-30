@@ -217,7 +217,8 @@ consensus(
   labels = NULL,
   filterSets = FALSE,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 
 # S4 method for formulasSet
@@ -404,6 +405,11 @@ workflows</code> section below.</p></dd>
 <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
 
 
+<dt>setAvgSpecificScores</dt>
+<dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific annotation scores (<em>e.g.</em> MS/MS and
+isotopic pattern match scores) are averaged for the set consensus. See <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
@@ -463,9 +469,9 @@ the <code>rank</code> columns.</p></li>
 <code>annotations</code> method for access.</p></dd>
 
 
-<dt><code>setThreshold,setThresholdAnn</code></dt>
-<dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were passed when this object
-was created by <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
+<dt><code>setThreshold,setThresholdAnn,setAvgSpecificScores</code></dt>
+<dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were
+passed when this object was created by <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
 
 
 <dt><code>origFGNames</code></dt>

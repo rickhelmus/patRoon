@@ -121,7 +121,8 @@
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span></span>
+<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setAvgSpecificScores <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -196,6 +197,11 @@ library spectra (only the <code>removePrecursor</code>, <code>relMinIntensity</c
 <dt>setThresholdAnn</dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
+
+
+<dt>setAvgSpecificScores</dt>
+<dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific scorings (<em>e.g.</em> MS/MS match) are also
+averaged.</p></dd>
 
 </dl></div>
     <div id="details">

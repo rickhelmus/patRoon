@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-01-20" />
+<meta name="date" content="2023-01-30" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,7 +52,7 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.6.0/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.9/grViz.js"></script>
@@ -344,13 +344,13 @@ div.csl-indent {
 <div id="processing-data" class="section level2 hasAnchor" number="6.4">
 <h2><span class="header-section-number">6.4</span> Processing data<a href="processing-data.html#processing-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>All data objects that are generated during a sets workflow <em>inherit</em> from the classes from a ‘regular’ workflow. This means that, with some minor exceptions, <em>all</em> of the data processing functionality discussed in the <a href="processing.html#processing">previous chapter</a> (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the <code>as.data.table()</code> method can be used for general inspection:</p>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="processing-data.html#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
-<pre><code>#&gt;            group    score                           compoundName               set
-#&gt; 1: M198_R317_272 3.947213    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 2: M198_R317_272 1.903801    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 3: M198_R317_272 1.740323 2-amino-4-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 4: M198_R317_272 1.769777 3-amino-5-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 5: M198_R317_272 1.647140         1-(2-chlorophenyl)-3-ethylurea positive,negative</code></pre>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="processing-data.html#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
+<pre><code>#&gt;            group score-positive score-negative                           compoundName               set
+#&gt; 1: M198_R317_272       3.368104       4.526321    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 2: M198_R317_272       1.782297       2.025304    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 3: M198_R317_272       1.688567       1.792079 2-amino-4-chloro-N,N-dimethylbenzamide positive,negative
+#&gt; 4: M198_R317_272       1.684356       1.855199 3-amino-5-chloro-N,N-dimethylbenzamide positive,negative
+#&gt; 5: M198_R317_272       1.772617       1.521663         1-(2-chlorophenyl)-3-ethylurea positive,negative</code></pre>
 <p>In addition, some the data processing functionality contains additional functionality for a sets workflow:</p>
 <div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="processing-data.html#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
 <span id="cb156-2"><a href="processing-data.html#cb156-2" aria-hidden="true" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>

@@ -87,7 +87,7 @@ featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
-                                    ISTDs = "data.table", ISTDAssignments = "list"),
+                                    ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -1378,6 +1378,43 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     
     return(fGroups)
 })
+
+# UNDONE: method
+predictConcentrations <- function(fGroups, compounds, calibrants, eluent, pH_aq, organicSolvent)
+{
+    # UNDONE: needs to be done per set
+    # UNDONE: check if compounds are from SIRIUS
+    # UNDONE: check calibrant format
+    # UNDONE: check organicSolvent
+    
+    # calibrants <- if (is.data.table(calibrants)) copy(calibrants) else as.data.table(calibrants)
+
+    fTab <- as.data.table(getFeatures(fGroups))
+    compounds <- compounds[names(fGroups)]
+    allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
+                               make.names = "absoluteIndex"), idcol = "group")
+    fpColRange <- seq(3, ncol(allFPs))
+    setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
+    allFPs[, id := seq_len(nrow(allFPs))]
+    allFPs[, ionization := mapply(group, neutral_formula, FUN = function(g, f)
+    {
+        # UNDONE: need to check for empty fragInfo?
+        return(compounds[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
+    })]
+    # convert to MS2Quant format
+    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
+    allFPs[, predion := paste0(neutral_formula, "_", ionization)]
+    
+    unknowns <- data.table(identifier = allFPs$id, retention_time = groupInfo(fGroups)[allFPs$group, "rts"],
+                           SMILES = NA_character_, conc_M = NA_real_, area = 1)
+
+    # UNDONE: would be nice if we could just pass table directly
+    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
+    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    
+    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicSolvent, pH_aq, allFPs)
+}
+
 
 #' Grouping of features
 #'

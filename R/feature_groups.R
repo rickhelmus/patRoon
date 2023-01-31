@@ -95,7 +95,7 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     args <- list(...)
 
     # data.table's don't seem to initialize well (gives error that slot is init as list)
-    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs"))
+    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs", "concentrations"))
     {
         if (is.null(args[[s]]))
             args[[s]] <- data.table()
@@ -1387,15 +1387,13 @@ predictConcentrations <- function(fGroups, compounds, calibrants, eluent, pH_aq,
     # UNDONE: check calibrant format
     # UNDONE: check organicSolvent
     
-    # calibrants <- if (is.data.table(calibrants)) copy(calibrants) else as.data.table(calibrants)
-
     fTab <- as.data.table(getFeatures(fGroups))
     compounds <- compounds[names(fGroups)]
     allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
                                make.names = "absoluteIndex"), idcol = "group")
     fpColRange <- seq(3, ncol(allFPs))
     setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
-    allFPs[, id := seq_len(nrow(allFPs))]
+    allFPs[, id := as.character(seq_len(nrow(allFPs)))]
     allFPs[, ionization := mapply(group, neutral_formula, FUN = function(g, f)
     {
         # UNDONE: need to check for empty fragInfo?
@@ -1413,6 +1411,28 @@ predictConcentrations <- function(fGroups, compounds, calibrants, eluent, pH_aq,
     eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
     
     pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicSolvent, pH_aq, allFPs)
+    
+    concs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
+                   pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
+                   by.x = "id", by.y = "identifier", sort = FALSE)
+    concs[, type := "SIRIUS"]
+    setnames(concs, "neutral_formula", "candidate")
+    concs[, candidate_MW := sapply(candidate, formulaMW)]
+    concs[, id := NULL]
+    setcolorder(concs, c("group", "type", "candidate"))
+    
+    # expand for features, since we used area=1 above we simply assume that we can multiply conc_M with the intensity to
+    # get feature concentrations
+    gt <- transpose(groupTable(fGroups)[, concs$group, with = FALSE])
+    setnames(gt, analyses(fGroups))
+    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) conc_M * ints)][, conc_M := NULL]
+    # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
+    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) (cm * candidate_MW * 1E6)),
+          .SDcols = (paste0(analyses(fGroups), "_conc_M"))]
+
+    fGroups@concentrations <- concs[]
+    
+    return(fGroups)
 }
 
 

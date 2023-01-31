@@ -204,6 +204,19 @@ averageFormulas <- function(formulas)
     return(formulaListToString(fl))
 }
 
+# based on RCDK PerformanceNote vignette (https://github.com/CDK-R/cdkr/blob/95f7e23591381c9f0aa75ecc3c0aa6da82f71ebf/rcdk/vignettes/PerformanceNotes.Rmd#L127)
+formulaMW <- function(formula)
+{
+    mfm <- rJava::J("org/openscience/cdk/tools/manipulator/MolecularFormulaManipulator")
+    sco <- rJava::J("org.openscience.cdk.silent.SilentChemObjectBuilder")
+    
+    bi <- rJava::.jcall(sco, "Lorg/openscience/cdk/interfaces/IChemObjectBuilder;", "getInstance")
+    mform  <- rJava::.jcall(mfm, "Lorg/openscience/cdk/interfaces/IMolecularFormula;", "getMolecularFormula", formula,
+                            bi)
+    return(rJava::.jcall(mfm, "D", "getMass", mform))
+}
+
+
 countUniqueFormulas <- function(fList) sum(unlist(lapply(fList, function(ft) length(unique(ft$neutral_formula)))))
 
 # classification according to Abdulla 2013 (10.1021/ac303221j)

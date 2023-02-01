@@ -444,7 +444,7 @@ reportHTMLUtils$methods(
     else
         rd = rowInfo.values;
         
-    chromEl.src = Reactable.getState(tabEl).meta.plots.chroms[rd.parent_group];
+    chromEl.src = Reactable.getState(tabEl).meta.plots.chromsLarge[rd.parent_group];
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.parent_susp_InChIKey];
     showTPGraph(rd.component);
 }"

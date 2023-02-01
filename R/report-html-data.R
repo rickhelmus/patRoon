@@ -135,11 +135,13 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     tab[, c("chrom_small", "chrom_large") := group]
     tabn <- names(tab)
     setcolorder(tab, c(tabn[seq_len(match("group", tabn))], "chrom_small", "chrom_large")) # move after group column
-    colDefs$chrom_small <- reactable::colDef("chromatogram", cell = function(value, index)
+    colDefs$chrom_small <- reactable::colDef("chromatogram", filterable = FALSE, searchable = FALSE,
+                                             cell = function(value, index)
     {
         htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"), class = "noZoomImg")
     })
-    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, cell = function(value, index)
+    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, filterable = FALSE,
+                                             searchable = FALSE, cell = function(value, index)
     {
         htmltools::img(src = plots$chromsLarge[[value]])
     })
@@ -201,7 +203,6 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
             next
         if (is.null(colDefs[[col]]))
             colDefs[[col]] <- reactable::colDef()
-        colDefs[[col]]$filterable <- TRUE
         colDefs[[col]]$filterInput <- function(values, name)
         {
             htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
@@ -225,7 +226,7 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
                                highlight = TRUE, bordered = TRUE, onClick = oc, defaultExpanded = TRUE,
                                columns = colDefs, defaultColDef = reactable::colDef(style = bgstyle),
-                               columnGroups = groupDefs,
+                               columnGroups = groupDefs, filterable = TRUE,
                                theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                                  groupHeaderStyle = headThemeStyle,
                                                                  cellPadding = "2px 4px"),
@@ -302,7 +303,7 @@ reportHTMLUtils$methods(
         
         if (!is.null(tab[["set"]]))
         {
-            colDefs$set <- reactable::colDef(filterable = TRUE, filterInput = function(values, name)
+            colDefs$set <- reactable::colDef(filterInput = function(values, name)
             {
                 # from examples
                 htmltools::tags$select(

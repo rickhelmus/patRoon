@@ -274,6 +274,21 @@ reportHTMLUtils$methods(
             ctab[, intensity := NULL]
         tab <- merge(tab, ctab, by = "group", sort = FALSE)
         
+        if (!is.null(tab[["set"]]))
+        {
+            colDefs$set <- reactable::colDef(filterable = TRUE, filterInput = function(values, name)
+            {
+                # from examples
+                htmltools::tags$select(
+                    onchange = sprintf("Reactable.setFilter('detailsTabComponents', '%s', event.target.value || undefined)", name),
+                    tags$option(value = "", "All"),
+                    lapply(unique(values), tags$option),
+                    "aria-label" = paste("Filter", name),
+                    style = "width: 100%; height: 28px;"
+                )
+            })
+        }
+        
         cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
         if (length(cmpGrpCols) > 0)
             groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFeatColSepStyle())))

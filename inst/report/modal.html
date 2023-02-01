@@ -1,0 +1,26 @@
+<!-- NOTE: this needs included with before_body -->
+<div class="modal fade" id="filterRangeModal" tabindex="-1" aria-labelledby="filterRangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="filterRangeModalLabel">Set filter range</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="input-group mb-1">
+                        <span class="input-group-text" id="min-addon">Range</span>
+                        <input type="number" class="form-control" id="filtNumMin" step="any" min="" max=""
+                         placeholder="Empty for no minimum" aria-label="Range" aria-describedby="range-addon">
+                        <input type="number" class="form-control" id="filtNumMax" step="any" min="" max=""
+                         placeholder="Empty for no maximum" aria-label="Maximum" aria-describedby="range-addon">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="filtNumClear" data-bs-dismiss="modal" onClick="filtNumClear()">Clear</button>
+                <button type="button" class="btn btn-primary" id="filtNumApply" data-bs-dismiss="modal">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

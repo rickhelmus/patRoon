@@ -90,6 +90,41 @@ function showTPGraph(cmp)
     }
 }
 
+function initRangeModal(tab, col)
+{
+    const mname = "filter_" + col;
+    const curF = Reactable.getState(tab).meta[mname];
+    
+    document.getElementById("filtNumMin").value = (curF == undefined) ? "" : curF[0];
+    document.getElementById("filtNumMax").value = (curF == undefined) ? "" : curF[1];
+    
+    document.getElementById("filtNumApply").addEventListener("click", function(e)
+    {
+        const r = [ document.getElementById("filtNumMin").value, document.getElementById("filtNumMax").value ];
+        Reactable.setFilter(tab, col, r);
+        Reactable.setMeta(tab, { [mname]: r });
+    }, { once: true });
+    
+    window.addEventListener('keydown', filtModalKeyHandler);
+}
+
+function filtModalKeyHandler(e)
+{
+    // based on https://stackoverflow.com/a/41055853
+    if ($("#filterRangeModal").hasClass("show") && (e.keycode == 13 || e.which == 13))
+    {
+        document.getElementById("filtNumApply").click();
+        window.removeEventListener('keydown', filtModalKeyHandler);    
+    }
+}
+
+function filtNumClear()
+{
+    document.getElementById("filtNumMin").value = "";
+    document.getElementById("filtNumMax").value = "";
+    document.getElementById("filtNumApply").click();
+}
+
 $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495
     $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
@@ -102,4 +137,8 @@ $(document).ready(function() {
     });
     
     updateView("Plain");
+    
+    document.getElementById("filterRangeModal").addEventListener('shown.bs.modal', () => {
+        document.getElementById("filtNumMin").focus();
+    });
 });

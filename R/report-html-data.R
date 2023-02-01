@@ -194,6 +194,32 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
         qualities = as.vector(groupCols[["feature quality scores"]]),
         chrom_large = "chrom_large"
     )
+    
+    for (col in names(tab))
+    {
+        if (!is.numeric(tab[[col]]))
+            next
+        if (is.null(colDefs[[col]]))
+            colDefs[[col]] <- reactable::colDef()
+        colDefs[[col]]$filterable <- TRUE
+        colDefs[[col]]$filterInput <- function(values, name)
+        {
+            htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
+                                   "data-bs-target" = "#filterRangeModal",
+                                   onclick = sprintf("initRangeModal('%s', '%s')", id, name), "Range")
+        }
+        colDefs[[col]]$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
+        {
+            if (filterValue[0] == '')
+                filterValue[0] = -Infinity;
+            if (filterValue[1] == '')
+                filterValue[1] = Infinity;
+            return rows.filter(function(row)
+            {
+                return row.values[columnId] >= filterValue[0] && row.values[columnId] <= filterValue[1];
+            })
+        }")
+    }
 
     headThemeStyle <- list(padding = "2px 4px")
     rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,

@@ -12,6 +12,8 @@ output:
             version: 5
             bootswatch: cerulean
             card-spacer-y: 0.5px
+        includes:
+            before_body: modal.html
 ---
 
 ```{r setup, include=FALSE}

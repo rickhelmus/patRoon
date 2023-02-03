@@ -66,12 +66,12 @@ function showFeatCols(column, show)
     {
         const cols = Reactable.getState(id).meta.colToggles[column];
         if (Array.isArray(cols))
-            cols.forEach(col => Reactable.toggleHideColumn(id, col, show));
+            cols.forEach(col => Reactable.toggleHideColumn(id, col, !show));
         else
-            Reactable.toggleHideColumn(id, cols, show);
+            Reactable.toggleHideColumn(id, cols, !show);
     })
     if (column === "chrom_large")
-        tabIDs.forEach(id => Reactable.toggleHideColumn(id, "chrom_small", !show));
+        tabIDs.forEach(id => Reactable.toggleHideColumn(id, "chrom_small", show));
 }
 
 function showTPGraph(cmp)
@@ -123,6 +123,23 @@ function filtNumClear()
     document.getElementById("filtNumMin").value = "";
     document.getElementById("filtNumMax").value = "";
     document.getElementById("filtNumApply").click();
+}
+
+function toggleFeatFilter(e)
+{
+    const tabIDs = getFeatTableIDs();
+    tabIDs.forEach(function(id)
+    {
+        Reactable.getInstance(id).allColumns.forEach(function(col)
+        {
+            if (col.name !== "chromatogram") // UNDONE: do this more elegantly?
+                col.filterable = e;
+        })
+    })
+    // HACK: this also redraws table to toggle the filter row
+    // NOTE: we only have to do this on the active table as the rest will be re-drawn when activated
+    // NOTE: use a non filterable column so nothing gets reset
+    Reactable.setFilter(getSelFeatTableElement(), "chrom_small", undefined);
 }
 
 $(document).ready(function() {

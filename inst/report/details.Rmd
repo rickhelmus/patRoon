@@ -126,6 +126,34 @@ bslib::layout_column_wrap(
         callIncl(bslib::navs_tab_card,
             title = "Selected feature group",
             full_screen = TRUE,
+            bslib::nav(
+                "Features",
+                bslib::card_body(
+                    class = "mt-2",
+                    htmltools::withTags({
+                        div(class = "pb-1",
+                            label("for" = "features-groupBy", "Group by"),
+                            select(id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
+                                   style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                   option(value = "", "None"),
+                                   option(value = "rGroup", "Replicate group"),
+                                   option(value = "set", "Set")
+                            ),
+                            
+                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFeatCols("qualities", this.checked)'),
+                            label("for" = "features-cols-qual", "Quality scores"),
+                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilter(this.checked)',
+                                  checked = TRUE),
+                            label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
+                            
+                            button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('featuresTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
+                                   onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse"),
+                        )
+                    })
+                ),
+                bslib::card_body_fill(utils$genFeaturesTable())
+            ),
             maybeIncl(utils$hasCompounds(), bslib::nav(
                 "Compounds",
                 bslib::card_body_fill(utils$genCompoundTable())

@@ -115,6 +115,24 @@ getFeatGroupDefs <- function(tab, groupBy, rgs)
     )))
 }
 
+reactSelectFilter <- function(id, values, name)
+{
+    # from examples
+    htmltools::tags$select(
+        onchange = sprintf("Reactable.setFilter('detailsTabComponents', '%s', event.target.value || undefined)", name),
+        tags$option(value = "", "All"),
+        lapply(unique(values), tags$option),
+        "aria-label" = paste("Filter", name),
+        style = "width: 100%; height: 28px;"
+    )
+}
+
+makeReactable <- function(tab, id, ...)
+{
+    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = TRUE, wrap = FALSE,
+                                pagination = FALSE, ...))
+}
+
 makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, plots, ..., onClick = NULL)
 {
     # sync column order
@@ -126,8 +144,13 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     const tabEl = '%s';
     Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
     
-    if (rowInfo.values && document.getElementById('compoundsTab'))
-        Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
+    if (rowInfo.values)
+    {
+        Reactable.setFilter('featuresTab', 'group', rowInfo.values.group);    
+        if (document.getElementById('compoundsTab'))
+            Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
+    }
+        
     %s;
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
  
@@ -223,15 +246,13 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
     }
 
     headThemeStyle <- list(padding = "2px 4px")
-    rt <- reactable::reactable(tab, elementId = id, pagination = FALSE, wrap = FALSE, resizable = TRUE,
-                               highlight = TRUE, bordered = TRUE, onClick = oc, defaultExpanded = TRUE,
-                               columns = colDefs, defaultColDef = reactable::colDef(style = bgstyle),
-                               columnGroups = groupDefs, filterable = TRUE,
-                               theme = reactable::reactableTheme(headerStyle = headThemeStyle,
-                                                                 groupHeaderStyle = headThemeStyle,
-                                                                 cellPadding = "2px 4px"),
-                               meta = list(selectedRow = NULL, plots = plots, colToggles = colToggles),
-                               rowStyle = htmlwidgets::JS("function(rowInfo, state)
+    rt <- makeReactable(tab, id, highlight = TRUE, onClick = oc, defaultExpanded = TRUE, columns = colDefs,
+                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs, filterable = TRUE,
+                        theme = reactable::reactableTheme(headerStyle = headThemeStyle,
+                                                          groupHeaderStyle = headThemeStyle,
+                                                          cellPadding = "2px 4px"),
+                        meta = list(selectedRow = NULL, plots = plots, colToggles = colToggles),
+                        rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
     let ret = { cursor: 'pointer' };
@@ -248,9 +269,8 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
 
 makeAnnReactable <- function(tab, id, ...)
 {
-    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = TRUE, wrap = FALSE,
-                                pagination = FALSE, compact = TRUE,
-                                language = reactable::reactableLang(noData = "No annotations available"), ...))
+    return(makeReactable(tab, id, compact = TRUE,
+                         language = reactable::reactableLang(noData = "No annotations available"), ...))
 }
 
 reportHTMLUtils$methods(
@@ -303,17 +323,8 @@ reportHTMLUtils$methods(
         
         if (!is.null(tab[["set"]]))
         {
-            colDefs$set <- reactable::colDef(filterInput = function(values, name)
-            {
-                # from examples
-                htmltools::tags$select(
-                    onchange = sprintf("Reactable.setFilter('detailsTabComponents', '%s', event.target.value || undefined)", name),
-                    tags$option(value = "", "All"),
-                    lapply(unique(values), tags$option),
-                    "aria-label" = paste("Filter", name),
-                    style = "width: 100%; height: 28px;"
-                )
-            })
+            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("detailsTabComponents",
+                                                                                                    values, name))
         }
         
         cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
@@ -452,6 +463,40 @@ reportHTMLUtils$methods(
     
         makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, EICsTopMost, plots, groupBy = groupBy, colDefs = colDefs,
                           groupDefs = groupDefs, onClick = onClick)
+    },
+    
+    genFeaturesTable = function()
+    {
+        tab <- as.data.table(getFeatures(objects$fGroups))
+        tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
+      
+        for (col in names(tab)[sapply(tab, is.numeric)])
+            set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax")) 5 else 2))
+        
+        anaInfo <- analysisInfo(objects$fGroups)
+        tab[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
+        
+        # add EICs
+        tab[, chromatogram := ""] # dummy value, not needed
+        tabn <- names(tab)
+        setcolorder(tab, c(tabn[seq_len(match("ID", tabn))], "chromatogram")) # move after ID column
+
+        colDefs <- list(
+            group = reactable::colDef(show = FALSE),
+            rGroup = reactable::colDef("replicate group"),
+            chromatogram = reactable::colDef(minWidth = 175, cell = function(value, index)
+            {
+                htmltools::img(src = plots$chromsFeatures[[tab$group[index]]][[tab$analysis[index]]])
+            })
+        )
+        if (!is.null(tab[["set"]]))
+        {
+            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("featuresTab",
+                                                                                                    values, name),
+                                             filterable = TRUE)
+        }
+        
+        makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs)
     },
     
     genCompoundTable = function()

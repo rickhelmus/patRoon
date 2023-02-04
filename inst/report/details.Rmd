@@ -49,8 +49,7 @@ bslib::layout_column_wrap(
                     label("for" = "fg-cols-qual", "Quality scores"),
                     input(type = "checkbox", id = "fg-large-chroms", onChange = 'showFGCols("chrom_large", this.checked)'),
                     label("for" = "fg-large-chroms", "Large chromatograms"),
-                    input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)',
-                          checked = TRUE),
+                    input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
                     label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                     
                     button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFGTableElement())", "Download CSV"),
@@ -140,10 +139,9 @@ bslib::layout_column_wrap(
                                    option(value = "set", "Set")
                             ),
                             
-                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFGCols("qualities", this.checked)'),
+                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFeatQualityCols(this.checked)'),
                             label("for" = "features-cols-qual", "Quality scores"),
-                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFGFilters(this.checked)',
-                                  checked = TRUE),
+                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
                             label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
                             
                             button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('featuresTab')", "Download CSV"),

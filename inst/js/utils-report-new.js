@@ -74,6 +74,12 @@ function showFGCols(column, show)
         tabIDs.forEach(id => Reactable.toggleHideColumn(id, "chrom_small", show));
 }
 
+function showFeatQualityCols(show)
+{
+    const cols = Reactable.getState("featuresTab").meta.featQualCols;
+    cols.forEach(col => Reactable.toggleHideColumn("featuresTab", col, !show));
+}
+
 function showTPGraph(cmp)
 {
     TPGraphs = document.querySelectorAll('[id ^= "TPGraph_"]');
@@ -140,6 +146,17 @@ function toggleFGFilters(e)
     // NOTE: we only have to do this on the active table as the rest will be re-drawn when activated
     // NOTE: use a non filterable column so nothing gets reset
     Reactable.setFilter(getSelFGTableElement(), "chrom_small", undefined);
+}
+
+function toggleFeatFilters(e)
+{
+    // as above, for feature table
+    Reactable.getInstance("featuresTab").allColumns.forEach(function(col)
+    {
+        if (col.name !== "chromatogram" && col.name !== "group") // UNDONE: do this more elegantly?
+            col.filterable = e;
+    })
+    Reactable.setFilter("featuresTab", "chromatogram", undefined);
 }
 
 $(document).ready(function() {

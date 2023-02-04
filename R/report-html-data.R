@@ -127,6 +127,36 @@ reactSelectFilter <- function(id, values, name)
     )
 }
 
+setReactNumRangeFilters <- function(id, tab, colDefs)
+{
+    for (col in names(tab))
+    {
+        if (!is.numeric(tab[[col]]))
+            next
+        if (is.null(colDefs[[col]]))
+            colDefs[[col]] <- reactable::colDef()
+        colDefs[[col]]$filterInput <- function(values, name)
+        {
+            htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
+                                   "data-bs-target" = "#filterRangeModal",
+                                   onclick = sprintf("initRangeModal('%s', '%s')", id, name), "Range")
+        }
+        colDefs[[col]]$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
+        {
+            if (filterValue[0] == '')
+                filterValue[0] = -Infinity;
+            if (filterValue[1] == '')
+                filterValue[1] = Infinity;
+            return rows.filter(function(row)
+            {
+                return row.values[columnId] >= filterValue[0] && row.values[columnId] <= filterValue[1];
+            })
+        }")
+    }
+    
+    return(colDefs)
+}
+
 makeReactable <- function(tab, id, ...)
 {
     return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = TRUE, wrap = FALSE,
@@ -220,34 +250,11 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, p
         chrom_large = "chrom_large"
     )
     
-    for (col in names(tab))
-    {
-        if (!is.numeric(tab[[col]]))
-            next
-        if (is.null(colDefs[[col]]))
-            colDefs[[col]] <- reactable::colDef()
-        colDefs[[col]]$filterInput <- function(values, name)
-        {
-            htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
-                                   "data-bs-target" = "#filterRangeModal",
-                                   onclick = sprintf("initRangeModal('%s', '%s')", id, name), "Range")
-        }
-        colDefs[[col]]$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
-        {
-            if (filterValue[0] == '')
-                filterValue[0] = -Infinity;
-            if (filterValue[1] == '')
-                filterValue[1] = Infinity;
-            return rows.filter(function(row)
-            {
-                return row.values[columnId] >= filterValue[0] && row.values[columnId] <= filterValue[1];
-            })
-        }")
-    }
+    colDefs <- setReactNumRangeFilters(id, tab, colDefs)
 
     headThemeStyle <- list(padding = "2px 4px")
     rt <- makeReactable(tab, id, highlight = TRUE, onClick = oc, defaultExpanded = TRUE, columns = colDefs,
-                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs, filterable = TRUE,
+                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs, filterable = FALSE,
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
@@ -469,6 +476,7 @@ reportHTMLUtils$methods(
     {
         tab <- as.data.table(getFeatures(objects$fGroups))
         tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
+        tab <- removeDTColumnsIfPresent(tab, featureQualityNames(group = FALSE, scores = FALSE)) # only show scores
       
         for (col in names(tab)[sapply(tab, is.numeric)])
             set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax")) 5 else 2))
@@ -492,11 +500,20 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["set"]]))
         {
             colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("featuresTab",
-                                                                                                    values, name),
-                                             filterable = TRUE)
+                                                                                                    values, name))
         }
         
-        makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs)
+        fqn <- featureQualityNames(group = FALSE, scores = TRUE)
+        for (col in fqn)
+        {
+            if (!is.null(tab[[col]]))
+                colDefs[[col]] <- reactable::colDef(show = FALSE)
+        }
+        
+        colDefs <- setReactNumRangeFilters("featuresTab", tab, colDefs)
+        
+        makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
+                      meta = list(featQualCols = fqn))
     },
     
     genCompoundTable = function()

@@ -29,7 +29,7 @@ bslib::layout_column_wrap(
         bslib::card_body(
             class = "mt-2",
             htmltools::withTags({
-                div(class = "pb-1",
+                callIncl(div, class = "pb-1",
                     label("for" = "view-select", "View"),
                     callIncl(select, name = "view", id = "view-select", onChange = "updateView(this.value)",
                            style = list("margin-right" = "10px", "margin-top" = " 3px"),
@@ -45,8 +45,9 @@ bslib::layout_column_wrap(
                     input(type = "checkbox", id = "fg-cols-int", onChange = 'showFGCols("intensities", this.checked)',
                           checked = TRUE),
                     label("for" = "fg-cols-int", "Intensities"),
-                    input(type = "checkbox", id = "fg-cols-qual", onChange = 'showFGCols("qualities", this.checked)'),
-                    label("for" = "fg-cols-qual", "Quality scores"),
+                    maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "fg-cols-qual",
+                                                           onChange = 'showFGCols("qualities", this.checked)')),
+                    maybeIncl(utils$hasFQualities(), label("for" = "fg-cols-qual", "Quality scores")),
                     input(type = "checkbox", id = "fg-large-chroms", onChange = 'showFGCols("chrom_large", this.checked)'),
                     label("for" = "fg-large-chroms", "Large chromatograms"),
                     input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
@@ -130,7 +131,7 @@ bslib::layout_column_wrap(
                 bslib::card_body(
                     class = "mt-2",
                     htmltools::withTags({
-                        div(class = "pb-1",
+                        callIncl(div, class = "pb-1",
                             label("for" = "features-groupBy", "Group by"),
                             callIncl(select, id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
                                      style = list("margin-right" = "10px", "margin-top" = " 3px"),
@@ -139,14 +140,15 @@ bslib::layout_column_wrap(
                                      maybeIncl(utils$hasSets(), option(value = "set", "Set"))
                             ),
                             
-                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFeatQualityCols(this.checked)'),
-                            label("for" = "features-cols-qual", "Quality scores"),
+                            maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "features-cols-qual",
+                                                                   onChange = 'showFeatQualityCols(this.checked)')),
+                            maybeIncl(utils$hasFQualities(), label("for" = "features-cols-qual", "Quality scores")),
                             input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
                             label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
                             
                             button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('featuresTab')", "Download CSV"),
                             button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
-                                   onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse"),
+                                   onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse")
                         )
                     })
                 ),

@@ -159,6 +159,18 @@ function toggleFeatFilters(e)
     Reactable.setFilter("featuresTab", "chromatogram", undefined);
 }
 
+function toggleFormFilters(e)
+{
+    // as above, for formulas table
+    const skipCols = [ ".details", "group", "spectrum", "scorings" ];
+    Reactable.getInstance("formulasTab").allColumns.forEach(function(col)
+    {
+        if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
+            col.filterable = e;
+    })
+    Reactable.setFilter("formulasTab", "spectrum", undefined);
+}
+
 function toggleCompFilters(e)
 {
     // as above, for compounds table

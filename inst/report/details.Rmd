@@ -154,6 +154,21 @@ bslib::layout_column_wrap(
                 ),
                 bslib::card_body_fill(utils$genFeaturesTable())
             ),
+            maybeIncl(utils$hasFormulas(), bslib::nav(
+                "Formulas",
+                bslib::card_body(
+                    class = "mt-2",
+                    htmltools::withTags({
+                        div(class = "pb-1",
+                            input(type = "checkbox", id = "formulas-filter", onChange = 'toggleFormFilters(this.checked)'),
+                            label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
+                            button(type = "button", class = "btn btn-primary btn-sm",
+                                   onClick = "Reactable.downloadDataCSV('formulasTab')", "Download CSV"),
+                        )
+                    })
+                ),
+                bslib::card_body_fill(utils$genFormulasTable())
+            )),
             maybeIncl(utils$hasCompounds(), bslib::nav(
                 "Compounds",
                 bslib::card_body(
@@ -176,7 +191,7 @@ bslib::layout_column_wrap(
                         )
                     })
                 ),
-                bslib::card_body_fill(utils$genCompoundTable())
+                bslib::card_body_fill(utils$genCompoundsTable())
             )),
             bslib::nav(
                 "More things",

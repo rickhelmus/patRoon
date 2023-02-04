@@ -210,12 +210,9 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     return(ctext)
 }
 
-getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
+getCompInfoTable <- function(resultRow, mConsNames, addHTMLURL)
 {
-    compCols <- names(compResults)
-    
-    resultRow <- compResults[compIndex, ]
-    
+    compCols <- names(resultRow)
     takeCols <- c(
         "compoundName",
         "identifier",
@@ -248,7 +245,7 @@ getCompInfoTable <- function(compResults, compIndex, mConsNames, addHTMLURL)
         tab <- rbindlist(lapply(cols, function(cl)
         {
             val <- resultRow[[cl]]
-            if (is.na(val) | (is.character(val) & !nzchar(val)))
+            if (is.na(val) || (is.character(val) && !nzchar(val)))
                 return(NULL)
             if (is.numeric(val))
                 val <- as.character(round(val, 2))

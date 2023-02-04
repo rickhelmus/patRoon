@@ -443,6 +443,46 @@ getFormInfoList <- function(formTable, index, mConsNames, useHTML)
     return(ret)
 }
 
+getFormInfoTable <- function(resultRow, mConsNames, useHTML)
+{
+    formCols <- names(resultRow)
+    takeCols <- c(
+        "neutral_formula",
+        "ion_formula",
+        "neutralMass",
+        "ion_formula_mz",
+        "error",
+        "error_frag_median",
+        "error_frag_median_abs",
+        "explainedPeaks",
+        "explainedIntensity"
+    )
+    
+    return(rbindlist(lapply(takeCols, function(col)
+    {
+        cols <- getAllMergedConsCols(col, formCols, mConsNames)
+        tab <- rbindlist(lapply(cols, function(cl)
+        {
+            val <- resultRow[[cl]]
+            if (is.na(val) || (is.character(val) && !nzchar(val)))
+                return(NULL)
+            if (is.numeric(val))
+                val <- as.character(round(val, if (col %in% c("neutralMass", "ion_formula_mz")) 5 else 2))
+            else if (col %in% c("neutral_formula", "ion_formula"))
+                val <- subscriptFormulaHTML(val)
+            return(data.table(property = cl, value = val))
+        }))
+        
+        # merge equal consensus columns
+        if (nrow(tab) > 0 && length(cols) > 1 && allSame(tab[property %in% cols]$value))
+        {
+            tab[property == cols[1], property := col]
+            tab <- tab[!property %in% cols[-1]]
+        }
+        return(tab)
+    })))
+}
+
 getFormulaMass <- memoise(function(f, c = 0) rcdk::get.formula(f, c)@mass)
 
 addMiscFormulaInfo <- function(formTable, adduct)

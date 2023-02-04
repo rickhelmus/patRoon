@@ -177,6 +177,8 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, p
     if (rowInfo.values)
     {
         Reactable.setFilter('featuresTab', 'group', rowInfo.values.group);    
+        if (document.getElementById('formulasTab'))
+            Reactable.setFilter('formulasTab', 'group', rowInfo.values.group);
         if (document.getElementById('compoundsTab'))
             Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
     }
@@ -274,9 +276,78 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, p
     return(rt)
 }
 
-makeAnnReactable <- function(tab, id, ...)
+getAnnReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+
+makeAnnSubReact <- function(title, ...)
 {
-    return(makeReactable(tab, id, compact = TRUE,
+    # Nested table: based from reactable cookbook
+    return(htmltools::div(style = list(margin = "10px 20px"),
+                          htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
+                          reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = FALSE,
+                                               fullWidth = FALSE, resizable = TRUE, striped = TRUE,
+                                               height = 200, ...)))
+}
+
+makeAnnDetailsReact <- function(title, infoTable)
+{
+    return(makeAnnSubReact(title, infoTable, columns = list(
+        property = reactable::colDef(minWidth = 150),
+        value = reactable::colDef(html = TRUE, minWidth = 250)
+    )))
+}
+
+
+makeAnnPLReact <- function(apl)
+{
+    if (is.null(apl) || nrow(apl) == 0)
+        return(htmltools::div(align = "center", "No annotation available."))
+    
+    isPrec <- apl$precursor
+    
+    apl[, c("ID", "annotated", "precursor") := NULL]
+    apl[, c("mz", "intensity") := .(round(mz, 5), round(intensity))]
+    apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
+    apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
+    if (!is.null(apl[["ion_formula_MF"]]))
+        apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
+    
+    colDefs <- pruneList(list(
+        ion_formula = reactable::colDef(html = TRUE, minWidth = 125),
+        neutral_loss = reactable::colDef(html = TRUE, minWidth = 125),
+        ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
+    ))
+    
+    return(makeAnnSubReact("Peak list annotations", apl, columns = colDefs,
+                           rowClass = function(index) if (isPrec[index]) "fw-light" else ""))
+}
+
+makeAnnScoreReact <- function(annRow, scCols)
+{
+    scores <- annRow[, scCols, with = FALSE]
+    scores <- setnames(transpose(scores, keep.names = "score"), 2, "value")
+    return(makeAnnSubReact("Scorings", scores, columns = list(
+        score = reactable::colDef(minWidth = 150),
+        value = reactable::colDef(format = reactable::colFormat(digits = 2),
+                                  minWidth = 100)
+    )))
+}
+
+makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL, scoreTabFunc = NULL, ...)
+{
+    details <- if (is.null(detailsTabFunc))
+        NULL
+    else
+    {
+        function(index)
+        {
+            htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
+                                        background = "#FCFCFC", border = "dashed 1px",
+                                        "justify-content" = "space-between", "overflow-x" = "auto"),
+                           detailsTabFunc(index), annPLTabFunc(index), scoreTabFunc(index))
+        }
+    }
+    
+    return(makeReactable(tab, id, compact = TRUE, details = details,
                          language = reactable::reactableLang(noData = "No annotations available"), ...))
 }
 
@@ -515,8 +586,73 @@ reportHTMLUtils$methods(
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
                       meta = list(featQualCols = fqn))
     },
+        
+    genFormulasTable = function()
+    {
+        formulas <- objects$formulas[names(objects$fGroups)]
+        
+        mcn <- mergedConsensusNames(formulas)
+        
+        if (length(formulas) == 0)
+        {
+            # dummy table to show empty results
+            return(makeAnnReactable(data.table(formula = character()), "formulasTab"))
+        }
+        
+        tab <- as.data.table(formulas)
+        
+        # NOTE: for consensus results, duplicate algo columns (eg explainedPeaks) are only shown in details
+        tab <- subsetDTColumnsIfPresent(tab, c("group", "neutral_formula", "neutralMass", "explainedPeaks",
+                                               "explainedIntensity", "error"))
+        
+        formIndices <- tab[, seq_len(.N), by = "group"][[2]]
+        
+        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
+        for (col in names(tab))
+        {
+            if (is.numeric(tab[[col]]))
+                tab[, (col) := round(get(col), if (col == "neutralMass") 5 else 2)]
+        }
+        
+        tab[, spectrum := plots$formulas[[group]]$spectra, by = "group"]
+        tab[, scorings := plots$formulas[[group]]$scores, by = "group"]
+        
+        getFormDetails <- function(index)
+        {
+            fit <- getFormInfoTable(formulas[[tab$group[index]]][formIndices[index]], mcn, TRUE)
+            fit <- fit[!property %in% names(tab)]
+            return(makeAnnDetailsReact("Formula properties", fit))
+        }
+        
+        getAnnPLDetails <- function(index)
+        {
+            apl <- annotatedPeakList(formulas, index = formIndices[index], groupName = tab$group[index],
+                                     MSPeakLists = objects$MSPeakLists, onlyAnnotated = TRUE)
+            return(makeAnnPLReact(apl))
+        }
+        
+        getScoreDetails <- function(index)
+        {
+            fRow <- formulas[[tab$group[index]]][formIndices[index]]
+            sc <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
+            return(makeAnnScoreReact(fRow, sc))
+        }
+        
+        colDefs <- pruneList(list(
+            group = reactable::colDef(show = FALSE),
+            neutral_formula = reactable::colDef("formula", html = TRUE),
+            neutralMass = reactable::colDef("neutral mass"),
+            spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
+            scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)
+        ))
+        
+        colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
+        
+        return(makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
+                                getScoreDetails))
+    },
     
-    genCompoundTable = function()
+    genCompoundsTable = function()
     {
         compounds <- objects$compounds[names(objects$fGroups)]
         
@@ -551,18 +687,6 @@ reportHTMLUtils$methods(
         tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
         tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
         
-        getImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
-        
-        makeDetailsTable <- function(title, ...)
-        {
-            # Nested table: based on from reactable cookbook
-            return(htmltools::div(style = list(margin = "10px 20px"),
-                                  htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
-                                  reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = FALSE,
-                                                       fullWidth = FALSE, resizable = TRUE, striped = TRUE,
-                                                       height = 200, ...)))
-        }
-        
         getCompCell <- function(value, index)
         {
             cn2 <- cmpNames2[index]
@@ -579,14 +703,11 @@ reportHTMLUtils$methods(
         
         getCompDetails <- function(index)
         {
-            cit <- getCompInfoTable(compounds[[tab$group[index]]], cmpIndices[index], mcn, TRUE)
+            cit <- getCompInfoTable(compounds[[tab$group[index]]][cmpIndices[index]], mcn, TRUE)
             cit <- cit[!property %in% names(tab)]
             if (!is.null(tab[["compoundName"]]))
                 cit <- cit[property != "compoundName2"] # already in main table compoundName column
-            return(makeDetailsTable("Compound properties", cit, columns = list(
-                property = reactable::colDef(minWidth = 150),
-                value = reactable::colDef(html = TRUE, minWidth = 250)
-            )))
+            return(makeAnnDetailsReact("Compound properties", cit))
         }
         
         getAnnPLDetails <- function(index)
@@ -594,41 +715,14 @@ reportHTMLUtils$methods(
             apl <- annotatedPeakList(compounds, index = cmpIndices[index], groupName = tab$group[index],
                                      MSPeakLists = objects$MSPeakLists, formulas = objects$formulas,
                                      onlyAnnotated = TRUE)
-            
-            if (is.null(apl) || nrow(apl) == 0)
-                return(htmltools::div(align = "center", "No annotation available."))
-            
-            isPrec <- apl$precursor
-            
-            apl[, c("ID", "annotated", "precursor") := NULL]
-            apl[, c("mz", "intensity") := .(round(mz, 5), round(intensity))]
-            apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
-            apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
-            if (!is.null(apl[["ion_formula_MF"]]))
-                apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
-            
-            colDefs <- pruneList(list(
-                ion_formula = reactable::colDef(html = TRUE, minWidth = 125),
-                neutral_loss = reactable::colDef(html = TRUE, minWidth = 125),
-                ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
-            ))
-            
-            return(makeDetailsTable("Peak list annotations", apl, columns = colDefs,
-                                    rowClass = function(index) if (isPrec[index]) "font-weight-bold" else ""))
+            return(makeAnnPLReact(apl))
         }
         
         getScoreDetails <- function(index)
         {
             cRow <- compounds[[tab$group[index]]][cmpIndices[index]]
             sc <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
-            
-            scores <- cRow[, sc, with = FALSE]
-            scores <- setnames(transpose(scores, keep.names = "score"), 2, "value")
-            return(makeDetailsTable("Scorings", scores, columns = list(
-                score = reactable::colDef(minWidth = 150),
-                value = reactable::colDef(format = reactable::colFormat(digits = 2),
-                                          minWidth = 100)
-                )))
+            return(makeAnnScoreReact(cRow, sc))
         }
         
         setcolorder(tab, intersect(c("compoundName", "structure"), names(tab)))
@@ -639,20 +733,15 @@ reportHTMLUtils$methods(
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
-            structure = reactable::colDef(cell = getImgCell, minWidth = 125),
-            spectrum = reactable::colDef(cell = getImgCell, minWidth = 200),
-            scorings = reactable::colDef(cell = getImgCell, minWidth = 200)
+            structure = reactable::colDef(cell = getAnnReactImgCell, minWidth = 125),
+            spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
+            scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)
         
-        return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, details = function(index)
-        {
-            htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
-                                        background = "#FCFCFC", border = "dashed 1px",
-                                        "justify-content" = "space-between", "overflow-x" = "auto"),
-                           getCompDetails(index), getAnnPLDetails(index), getScoreDetails(index))
-        }))
+        return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
+                                getScoreDetails))
     }
 )
 

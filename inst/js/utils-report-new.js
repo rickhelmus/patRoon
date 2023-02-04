@@ -159,6 +159,18 @@ function toggleFeatFilters(e)
     Reactable.setFilter("featuresTab", "chromatogram", undefined);
 }
 
+function toggleCompFilters(e)
+{
+    // as above, for compounds table
+    const skipCols = [ ".details", "group", "structure", "spectrum", "scorings" ];
+    Reactable.getInstance("compoundsTab").allColumns.forEach(function(col)
+    {
+        if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
+            col.filterable = e;
+    })
+    Reactable.setFilter("compoundsTab", "structure", undefined);
+}
+
 $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495
     $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");

@@ -156,6 +156,26 @@ bslib::layout_column_wrap(
             ),
             maybeIncl(utils$hasCompounds(), bslib::nav(
                 "Compounds",
+                bslib::card_body(
+                    class = "mt-2",
+                    htmltools::withTags({
+                        div(class = "pb-1",
+                            label("for" = "compounds-groupBy", "Group by"),
+                            select(id = "compounds-groupBy", onChange = "Reactable.setGroupBy('compoundsTab', [ this.value ])",
+                                   style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                   option(value = "", "None"),
+                                   option(value = "neutral_formula", "Formula")
+                            ),
+                            
+                            input(type = "checkbox", id = "compounds-filter", onChange = 'toggleCompFilters(this.checked)'),
+                            label("for" = "compounds-filter", style = list("margin-right" = "10px"), "Filters"),
+                            
+                            button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('compoundsTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
+                                   onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse")
+                        )
+                    })
+                ),
                 bslib::card_body_fill(utils$genCompoundTable())
             )),
             bslib::nav(

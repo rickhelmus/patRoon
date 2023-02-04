@@ -644,6 +644,8 @@ reportHTMLUtils$methods(
             scorings = reactable::colDef(cell = getImgCell, minWidth = 200)
         ))
         
+        colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)
+        
         return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, details = function(index)
         {
             htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",

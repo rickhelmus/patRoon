@@ -13,21 +13,22 @@ reportHTMLUtils$methods(
     hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
     hasFormulas = function() !is.null(objects[["formulas"]]),
-    hasCompounds = function() !is.null(objects[["compounds"]])
+    hasCompounds = function() !is.null(objects[["compounds"]]),
+    hasCompsCluster = function() !is.null(objects[["compsCluster"]])
 )
 
 # UNDONE: method
 #' @export
 reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                          components = NULL, TPs = NULL, selfContained = FALSE, clearPath = FALSE, openReport = TRUE,
-                          noDate = FALSE)
+                          compsCluster = NULL, components = NULL, TPs = NULL, selfContained = FALSE, clearPath = FALSE,
+                          openReport = TRUE, noDate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ selfContained + clearPath + openReport + noDate,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds + components + TPs,
-           c("MSPeakLists", "formulas", "compounds", "components", "transformationProducts"),
+    aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds + compsCluster + components + TPs,
+           c("MSPeakLists", "formulas", "compounds", "compoundsCluster", "components", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
     # assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
@@ -66,11 +67,12 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     reportEnv <- new.env()
     
     reportEnv$properties <- list(noDate = noDate)
-    reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, components, TPs, path, EICs,
-                                               selfContained)
+    reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
+                                               TPs, path, EICs, selfContained)
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
-                                                          components = components, TPs = TPs),
+                                                          compsCluster = compsCluster, components = components,
+                                                          TPs = TPs),
                                            EICs = EICs, EICsTopMost = EICsTopMost, plots = reportEnv$plots,
                                            properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs

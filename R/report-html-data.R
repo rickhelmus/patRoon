@@ -176,11 +176,19 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, p
     
     if (rowInfo.values)
     {
-        Reactable.setFilter('featuresTab', 'group', rowInfo.values.group);    
+        const grp = rowInfo.values.group;
+        Reactable.setFilter('featuresTab', 'group', grp);    
         if (document.getElementById('formulasTab'))
-            Reactable.setFilter('formulasTab', 'group', rowInfo.values.group);
+            Reactable.setFilter('formulasTab', 'group', grp);
         if (document.getElementById('compoundsTab'))
-            Reactable.setFilter('compoundsTab', 'group', rowInfo.values.group);
+            Reactable.setFilter('compoundsTab', 'group', grp);
+        
+        const ccd = document.getElementById('comps_cluster-dendro');
+        if (ccd)
+        {
+            ccd.src = Reactable.getState(tabEl).meta.plots.compsCluster[grp].dendro;
+            Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
+        }
     }
         
     %s;

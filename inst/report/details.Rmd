@@ -193,6 +193,13 @@ bslib::layout_column_wrap(
                 ),
                 bslib::card_body_fill(utils$genCompoundsTable())
             )),
+            maybeIncl(utils$hasCompsCluster(), bslib::nav(
+                "Compounds clusters",
+                bslib::card_body_fill(
+                    htmltools::img(id = "comps_cluster-dendro"),
+                    utils$genCompClustsImgs()
+                )
+            )),
             bslib::nav(
                 "More things",
                 bslib::card_body_fill("har")

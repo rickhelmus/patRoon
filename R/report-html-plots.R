@@ -156,6 +156,27 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
     }))
 }
 
+genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
+{
+    return(Map(groupNames(compsCluster), cutClusters(compsCluster), f = function(grp, ct)
+    {
+        ret <- list()
+        
+        ret$dendro <- makeHTMLReportPlot(sprintf("comp-clust-dendro-%s.svg", grp), outPath, selfContained, {
+            plot(compsCluster, groupName = grp)
+        }, width = 12, height = 4, pointsize = 16)
+        
+        ret$mcs <- sapply(sort(unique(ct)), function(cli)
+        {
+            makeHTMLReportPlot(sprintf("comp-clust-mcs-%s-%d.svg", grp, cli), outPath, selfContained, {
+                plotStructure(compsCluster, groupName = grp, cluster = cli, 100, 100)
+            }, width = 5, height = 4)
+        })
+
+        return(ret)
+    }))
+}
+
 genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, selfContained)
 {
     cInfo <- componentInfo(components)
@@ -195,7 +216,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
     })))
 }
 
-generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, components, TPs, outPath, EICs,
+generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath, EICs,
                                     selfContained)
 {
     ret <- list()
@@ -251,6 +272,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)
     if (!is.null(compounds))
         ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, outPath, selfContained)
+    if (!is.null(compsCluster))
+        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster, outPath, selfContained)
     if (!is.null(components) && !inherits(components, "componentsTPs"))
         ret$components <- genHTMLReportPlotsComponents(fGroups, components, outPath, EICs, selfContained)
     
@@ -288,5 +311,18 @@ reportHTMLUtils$methods(
 }")))
         })
         return(do.call(htmltools::tagList, hwidgets))
+    },
+    genCompClustsImgs = function()
+    {
+        elements <- unlist(Map(names(plots$compsCluster), plots$compsCluster, f = function(grp, pl)
+        {
+            lapply(seq_along(pl$mcs), function(i)
+            {
+                img <- htmltools::img(src = pl$mcs[[i]], class = paste0("mcs mcs-", grp),
+                                      style = "max-height: 250px; display: none;")
+            })
+        }), recursive = FALSE)
+        elements <- do.call(htmltools::tagList, elements)
+        return(htmltools::div(style = list(display = "flex"), elements))
     }
 )

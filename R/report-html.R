@@ -7,6 +7,7 @@ reportHTMLUtils <- setRefClass("reportHTMLUtils",
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups),
+    hasSets = function() isFGSet(objects$fGroups),
     hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
     hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),

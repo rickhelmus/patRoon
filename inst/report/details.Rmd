@@ -132,11 +132,11 @@ bslib::layout_column_wrap(
                     htmltools::withTags({
                         div(class = "pb-1",
                             label("for" = "features-groupBy", "Group by"),
-                            select(id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
-                                   style = list("margin-right" = "10px", "margin-top" = " 3px"),
-                                   option(value = "", "None"),
-                                   option(value = "rGroup", "Replicate group"),
-                                   option(value = "set", "Set")
+                            callIncl(select, id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
+                                     style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                     option(value = "", "None"),
+                                     option(value = "rGroup", "Replicate group"),
+                                     maybeIncl(utils$hasSets(), option(value = "set", "Set"))
                             ),
                             
                             input(type = "checkbox", id = "features-cols-qual", onChange = 'showFeatQualityCols(this.checked)'),

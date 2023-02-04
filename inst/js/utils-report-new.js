@@ -3,22 +3,22 @@ function getViews()
     return Array.from(document.getElementById("view-select").options).map(o => o.value);
 }
 
-function getFeatTableIDs()
+function getFGTableIDs()
 {
     return getViews().map(v => "detailsTab" + v);
 }
 
-function getFeatTableElements()
+function getFGTableElements()
 {
-    return getFeatTableIDs().map(id => document.getElementById(id));
+    return getFGTableIDs().map(id => document.getElementById(id));
 }
 
-function getFeatTableInstances()
+function getFGTableInstances()
 {
-    return getFeatTableIDs().map(id => Reactable.getInstance(id));
+    return getFGTableIDs().map(id => Reactable.getInstance(id));
 }
 
-function getSelFeatTableElement()
+function getSelFGTableElement()
 {
     return "detailsTab" + document.getElementById("view-select").value;
 }
@@ -45,8 +45,8 @@ function getNavTab(which)
 function updateView(sel)
 {
     tid = "detailsTab" + sel;
-    getFeatTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
-    document.getElementById("feat-expand").style.display = (sel !== "Plain") ? "" : "none";
+    getFGTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
+    document.getElementById("fg-expand").style.display = (sel !== "Plain") ? "" : "none";
     
     document.getElementsByClassName("bottomLayout")[0].style["grid-template-columns"] = (sel === "Plain") ? "1fr" : "1fr 2fr";
     
@@ -59,9 +59,9 @@ function updateView(sel)
     })
 }
 
-function showFeatCols(column, show)
+function showFGCols(column, show)
 {
-    const tabIDs = getFeatTableIDs();
+    const tabIDs = getFGTableIDs();
     tabIDs.forEach(function(id)
     {
         const cols = Reactable.getState(id).meta.colToggles[column];
@@ -125,9 +125,9 @@ function filtNumClear()
     document.getElementById("filtNumApply").click();
 }
 
-function toggleFeatFilter(e)
+function toggleFGFilters(e)
 {
-    const tabIDs = getFeatTableIDs();
+    const tabIDs = getFGTableIDs();
     tabIDs.forEach(function(id)
     {
         Reactable.getInstance(id).allColumns.forEach(function(col)
@@ -139,7 +139,7 @@ function toggleFeatFilter(e)
     // HACK: this also redraws table to toggle the filter row
     // NOTE: we only have to do this on the active table as the rest will be re-drawn when activated
     // NOTE: use a non filterable column so nothing gets reset
-    Reactable.setFilter(getSelFeatTableElement(), "chrom_small", undefined);
+    Reactable.setFilter(getSelFGTableElement(), "chrom_small", undefined);
 }
 
 $(document).ready(function() {

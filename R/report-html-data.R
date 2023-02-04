@@ -2,7 +2,7 @@
 #' @include report-html.R
 NULL
 
-getFeatTable <- function(fGroups, colSusp)
+getFGTable <- function(fGroups, colSusp)
 {
     tab <- if (isScreening(fGroups))
         as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
@@ -42,13 +42,13 @@ getFeatTable <- function(fGroups, colSusp)
     return(tab)
 }
 
-getFeatColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
+getFGColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
 
-getFeatColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
+getFGColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
 
-featTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
+featGroupTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
-getFeatColDefs <- function(tab)
+getFeatGroupColDefs <- function(tab)
 {
     colDefs <- list()
     
@@ -64,7 +64,7 @@ getFeatColDefs <- function(tab)
     }
 
     setCD("mz", "name", "m/z")
-    if (featTabHasSusps(tab))
+    if (featGroupTabHasSusps(tab))
         setCD("susp_name", "name", "suspect")
     else
         setCD("susp_name", "name", "name(s)")
@@ -88,10 +88,10 @@ getFeatColDefs <- function(tab)
     return(colDefs)
 }
 
-getFeatGroupDefs <- function(tab, groupBy, rgs)
+getFGGroupDefs <- function(tab, groupBy, rgs)
 {
-    colSepStyle <- getFeatColSepStyle()
-    hasSusp <- featTabHasSusps(tab)
+    colSepStyle <- getFGColSepStyle()
+    hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
     
@@ -133,7 +133,7 @@ makeReactable <- function(tab, id, ...)
                                 pagination = FALSE, ...))
 }
 
-makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, plots, ..., onClick = NULL)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, plots, ..., onClick = NULL)
 {
     # sync column order
     tab <- copy(tab)
@@ -178,8 +178,8 @@ makeFeatReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost,
         }
     }
     
-    colSepStyle <- getFeatColSepStyle()
-    grpStartCols <- getFeatColGrpStartCols(groupDefs)
+    colSepStyle <- getFGColSepStyle()
+    grpStartCols <- getFGColGrpStartCols(groupDefs)
     
     bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
 {
@@ -274,19 +274,19 @@ makeAnnReactable <- function(tab, id, ...)
 }
 
 reportHTMLUtils$methods(
-    genFeatTablePlain = function()
+    genFGTablePlain = function()
     {
-        tab <- getFeatTable(objects$fGroups, ",")
-        groupDefs <- getFeatGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
-        colDefs <- getFeatColDefs(tab)
-        makeFeatReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
-                          EICsTopMost, plots = plots)
+        tab <- getFGTable(objects$fGroups, ",")
+        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        colDefs <- getFeatGroupColDefs(tab)
+        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
+                        EICsTopMost, plots = plots)
     },
-    genFeatTableSuspects = function()
+    genFGTableSuspects = function()
     {
-        tab <- getFeatTable(objects$fGroups, NULL)
-        groupDefs <- getFeatGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatColDefs(tab)
+        tab <- getFGTable(objects$fGroups, NULL)
+        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
+        colDefs <- getFeatGroupColDefs(tab)
         
         onClick <- "function(tabEl, rowInfo)
 {
@@ -294,14 +294,14 @@ reportHTMLUtils$methods(
     const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
 }"
-        makeFeatReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                          EICsTopMost, plots = plots, groupBy = "susp_name", onClick = onClick)
+        makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
+                        EICsTopMost, plots = plots, groupBy = "susp_name", onClick = onClick)
     },
-    genFeatTableComponents = function()
+    genFGTableComponents = function()
     {
-        tab <- getFeatTable(objects$fGroups, ",")
-        groupDefs <- getFeatGroupDefs(tab, "component", replicateGroups(objects$fGroups))
-        colDefs <- getFeatColDefs(tab)
+        tab <- getFGTable(objects$fGroups, ",")
+        groupDefs <- getFGGroupDefs(tab, "component", replicateGroups(objects$fGroups))
+        colDefs <- getFeatGroupColDefs(tab)
         
         ctab <- as.data.table(objects$components)
         setnames(ctab, "name", "component")
@@ -329,7 +329,7 @@ reportHTMLUtils$methods(
         
         cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
         if (length(cmpGrpCols) > 0)
-            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFeatColSepStyle())))
+            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFGColSepStyle())))
         
         onClick <- "function(tabEl, rowInfo)
 {
@@ -348,14 +348,14 @@ reportHTMLUtils$methods(
     }
 }"
         
-        makeFeatReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                          EICsTopMost, plots = plots, groupBy = "component", onClick = onClick)
+        makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
+                        EICsTopMost, plots = plots, groupBy = "component", onClick = onClick)
     },
-    genFeatTableTPs = function()
+    genFGTableTPs = function()
     {
         fromTPs <- objects$components@fromTPs
         
-        tabTPsFeat <- getFeatTable(objects$fGroups, if (fromTPs) NULL else ",")
+        tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",")
         
         tabCompon <- as.data.table(objects$components)
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
@@ -406,17 +406,17 @@ reportHTMLUtils$methods(
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
         
         groupBy <- if (fromTPs) c("component", "susp_name") else "component"
-        groupDefs <- getFeatGroupDefs(tabTPs, groupBy, rgs)
+        groupDefs <- getFGGroupDefs(tabTPs, groupBy, rgs)
         # squeeze in TP column
         groupDefs <- c(groupDefs[1:2],
                        list(reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff",
                                                                             "formulaDiff", "retDir",
                                                                             "specSimilarity", "mergedBy"),
                                                                           names(tabTPs)),
-                                                headerStyle = getFeatColSepStyle())),
+                                                headerStyle = getFGColSepStyle())),
                        groupDefs[seq(3, length(groupDefs))])
         
-        colDefs <- getFeatColDefs(tabTPs)
+        colDefs <- getFeatGroupColDefs(tabTPs)
         
         # set parent 'aggregates': actual value of parent feature group
         for (col in grep("^parent_", names(tabTPs), value = TRUE))
@@ -461,8 +461,8 @@ reportHTMLUtils$methods(
     showTPGraph(rd.component);
 }"
     
-        makeFeatReactable(tabTPs, "detailsTabTPs", FALSE, EICsTopMost, plots, groupBy = groupBy, colDefs = colDefs,
-                          groupDefs = groupDefs, onClick = onClick)
+        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, EICsTopMost, plots, groupBy = groupBy, colDefs = colDefs,
+                        groupDefs = groupDefs, onClick = onClick)
     },
     
     genFeaturesTable = function()

@@ -39,36 +39,36 @@ bslib::layout_column_wrap(
                            maybeIncl(utils$hasTPs(), option(value = "TPs", "Transformation products"))
                     ),
                     
-                    input(type = "checkbox", id = "feat-cols-info", onChange = 'showFeatCols("group", this.checked)',
+                    input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
                           checked = TRUE),
-                    label("for" = "feat-cols-info", "Group info"),
-                    input(type = "checkbox", id = "feat-cols-int", onChange = 'showFeatCols("intensities", this.checked)',
+                    label("for" = "fg-cols-info", "Group info"),
+                    input(type = "checkbox", id = "fg-cols-int", onChange = 'showFGCols("intensities", this.checked)',
                           checked = TRUE),
-                    label("for" = "feat-cols-int", "Intensities"),
-                    input(type = "checkbox", id = "feat-cols-qual", onChange = 'showFeatCols("qualities", this.checked)'),
-                    label("for" = "feat-cols-qual", "Quality scores"),
-                    input(type = "checkbox", id = "feat-large-chroms", onChange = 'showFeatCols("chrom_large", this.checked)'),
-                    label("for" = "feat-large-chroms", "Large chromatograms"),
-                    input(type = "checkbox", id = "feat-filter", onChange = 'toggleFeatFilter(this.checked)',
+                    label("for" = "fg-cols-int", "Intensities"),
+                    input(type = "checkbox", id = "fg-cols-qual", onChange = 'showFGCols("qualities", this.checked)'),
+                    label("for" = "fg-cols-qual", "Quality scores"),
+                    input(type = "checkbox", id = "fg-large-chroms", onChange = 'showFGCols("chrom_large", this.checked)'),
+                    label("for" = "fg-large-chroms", "Large chromatograms"),
+                    input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)',
                           checked = TRUE),
-                    label("for" = "feat-filter", style = list("margin-right" = "10px"), "Filters"),
+                    label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                     
-                    button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFeatTableElement())", "Download CSV"),
-                    button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
-                           onClick = "Reactable.toggleAllRowsExpanded(getSelFeatTableElement())",  style = list(display = "none"), "Expand/collapse"),
+                    button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFGTableElement())", "Download CSV"),
+                    button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
+                           onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",  style = list(display = "none"), "Expand/collapse"),
                     
                     div(class = "float-right",
-                        label("for" = "feat-search", "Search"),
-                        input(type = "text", id = "feat-search", oninput="Reactable.setSearch(getSelFeatTableElement(), this.value)")
+                        label("for" = "fg-search", "Search"),
+                        input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)")
                     )
                 )
             })
         ),
         callIncl(bslib::card_body_fill,
-            utils$genFeatTablePlain(),
-            maybeIncl(utils$hasSuspects(), utils$genFeatTableSuspects()),
-            maybeIncl(utils$hasComponents(), utils$genFeatTableComponents()),
-            maybeIncl(utils$hasTPs(), utils$genFeatTableTPs())
+            utils$genFGTablePlain(),
+            maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
+            maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
+            maybeIncl(utils$hasTPs(), utils$genFGTableTPs())
         ),
     ),
     callIncl(bslib::layout_column_wrap,
@@ -140,9 +140,9 @@ bslib::layout_column_wrap(
                                    option(value = "set", "Set")
                             ),
                             
-                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFeatCols("qualities", this.checked)'),
+                            input(type = "checkbox", id = "features-cols-qual", onChange = 'showFGCols("qualities", this.checked)'),
                             label("for" = "features-cols-qual", "Quality scores"),
-                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilter(this.checked)',
+                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFGFilters(this.checked)',
                                   checked = TRUE),
                             label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
                             

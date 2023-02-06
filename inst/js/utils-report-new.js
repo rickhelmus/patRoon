@@ -96,7 +96,7 @@ function showTPGraph(cmp)
     }
 }
 
-function initRangeModal(tab, col)
+function filtRangeModalInit(tab, col)
 {
     const mname = "filter_" + col;
     const curF = Reactable.getState(tab).meta[mname];
@@ -131,6 +131,65 @@ function filtNumClear()
     document.getElementById("filtNumApply").click();
 }
 
+function filtSelModalInit(tab, col)
+{
+    const mname = "filter_" + col;
+    const curF = Reactable.getState(tab).meta[mname];
+
+    let lg = document.getElementById("filterSelectListGroup");
+    while (lg.firstChild)
+        lg.removeChild(lg.firstChild);
+    
+    // UNDONE: this always adds all (unique) values, including those that are e.g. filtered out due to group selection    
+    const vals = new Set(Reactable.getState(tab).data.map(row => row[col]));
+    let checkEls = [ ];
+    vals.forEach(function(label)
+    {
+        let inpEl = document.createElement("input");
+        inpEl.classList.add("form-check-input", "me-1");
+        inpEl.type = "checkbox";
+        inpEl.checked = curF == undefined || curF.has(label);
+        
+        let labEl = document.createElement("label");
+        labEl.classList.add("list-group-item");
+        labEl.appendChild(inpEl);
+        labEl.appendChild(document.createTextNode(label));
+        
+        lg.appendChild(labEl);
+        checkEls.push(inpEl);
+    });
+    
+    document.getElementById("filtSelApply").addEventListener("click", function(e)
+    {
+        const checked = new Set();
+        checkEls.forEach(function(cel)
+        {
+            if (cel.checked)
+                checked.add(cel.nextSibling.textContent);
+        });
+        Reactable.setFilter(tab, col, checked);
+        Reactable.setMeta(tab, { [mname]: checked });
+    }, { once: true });
+    
+    //window.addEventListener('keydown', filtModalKeyHandler);
+}
+
+function filtSelModalToggleAll(e)
+{
+    Array.from(document.getElementById("filterSelectListGroup").children).forEach(el => el.children[0].checked = e);
+}
+
+function applyFilterToggle(tab, nonFiltCol, keepGroup = false)
+{
+    // HACK: setting a filter will toggle the visibility if all filters were enabled/disabled
+    // NOTE: use a non filterable column so nothing gets reset
+    // NOTE: this somehow will reset all filter values, so restore group filter if needed...
+    const grp = (keepGroup) ? Reactable.getInstance("featuresTab").allColumns.find(c => c.id === "group").filterValue : undefined;
+    Reactable.setFilter(tab, nonFiltCol, undefined);
+    if (keepGroup)
+        Reactable.setFilter(tab, "group", grp); 
+}
+
 function toggleFGFilters(e)
 {
     const tabIDs = getFGTableIDs();
@@ -142,10 +201,9 @@ function toggleFGFilters(e)
                 col.filterable = e;
         })
     })
-    // HACK: this also redraws table to toggle the filter row
+    
     // NOTE: we only have to do this on the active table as the rest will be re-drawn when activated
-    // NOTE: use a non filterable column so nothing gets reset
-    Reactable.setFilter(getSelFGTableElement(), "chrom_small", undefined);
+    applyFilterToggle(getSelFGTableElement(), "chrom_small");
 }
 
 function toggleFeatFilters(e)
@@ -156,7 +214,8 @@ function toggleFeatFilters(e)
         if (col.name !== "chromatogram" && col.name !== "group") // UNDONE: do this more elegantly?
             col.filterable = e;
     })
-    Reactable.setFilter("featuresTab", "chromatogram", undefined);
+    
+    applyFilterToggle("featuresTab", "chromatogram", true);
 }
 
 function toggleFormFilters(e)
@@ -168,7 +227,7 @@ function toggleFormFilters(e)
         if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
             col.filterable = e;
     })
-    Reactable.setFilter("formulasTab", "spectrum", undefined);
+    applyFilterToggle("formulasTab", "spectrum", true);
 }
 
 function toggleCompFilters(e)
@@ -180,7 +239,7 @@ function toggleCompFilters(e)
         if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
             col.filterable = e;
     })
-    Reactable.setFilter("compoundsTab", "structure", undefined);
+    applyFilterToggle("compoundsTab", "spectrum", true);
 }
 
 $(document).ready(function() {

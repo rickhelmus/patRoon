@@ -139,7 +139,7 @@ setReactNumRangeFilters <- function(id, tab, colDefs)
         {
             htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
                                    "data-bs-target" = "#filterRangeModal",
-                                   onclick = sprintf("initRangeModal('%s', '%s')", id, name), "Range")
+                                   onclick = sprintf("filtRangeModalInit('%s', '%s')", id, name), "Range")
         }
         colDefs[[col]]$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
         {
@@ -155,6 +155,24 @@ setReactNumRangeFilters <- function(id, tab, colDefs)
     }
     
     return(colDefs)
+}
+
+setReactSelRangeFilter <- function(id, colDef)
+{
+    if (is.null(colDef))
+        colDef <- reactable::colDef()
+    colDef$filterInput <- function(values, name)
+    {
+        htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
+                               "data-bs-target" = "#filterSelModal",
+                               onclick = sprintf("filtSelModalInit('%s', '%s')", id, name), "Select")
+    }
+    colDef$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
+    {
+        return rows.filter(r => filterValue.has(r.values[columnId]));
+    }")
+    
+    return(colDef)
 }
 
 makeReactable <- function(tab, id, ...)
@@ -590,6 +608,9 @@ reportHTMLUtils$methods(
         }
         
         colDefs <- setReactNumRangeFilters("featuresTab", tab, colDefs)
+        
+        colDefs$analysis <- setReactSelRangeFilter("featuresTab", reactable::colDef())
+        colDefs$rGroup <- setReactSelRangeFilter("featuresTab", colDefs$rGroup)
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
                       meta = list(featQualCols = fqn))

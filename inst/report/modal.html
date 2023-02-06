@@ -1,4 +1,5 @@
-<!-- NOTE: this needs included with before_body -->
+<!-- NOTE: this file needs included with before_body -->
+
 <div class="modal fade" id="filterRangeModal" tabindex="-1" aria-labelledby="filterRangeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -20,6 +21,30 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="filtNumClear" data-bs-dismiss="modal" onClick="filtNumClear()">Clear</button>
                 <button type="button" class="btn btn-primary" id="filtNumApply" data-bs-dismiss="modal">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="filterSelModal" tabindex="-1" aria-labelledby="filterSelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="filterSelModalLabel">Set filter range</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group" id="filterSelectListGroup" style="max-height: 250px; overflow-y: auto;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="filtSelAll" onChange="filtSelModalToggleAll(this.checked)" checked>
+                    <label class="form-check-label" for="filtSelAll">
+                        Toggle all
+                    </label>
+                </div>
+                <button type="button" class="btn btn-primary" id="filtSelApply" data-bs-dismiss="modal">Apply</button>
             </div>
         </div>
     </div>

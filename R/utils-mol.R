@@ -54,7 +54,7 @@ distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
 
 babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, mustWork = TRUE, extraOpts = NULL)
 {
-    # NOTE: this functions supports formula and logP outFormat as special cases
+    # NOTE: this functions supports formula, logP and MW outFormat as special cases
 
     if (outFormat == "smiles")
         outFormat <- "smi" # to make checks below easier
@@ -88,7 +88,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
     # see https://github.com/openbabel/openbabel/issues/2231
     
-    mainArgs <- c(paste0("-o", if (outFormat %in% c("formula", "logP")) "txt" else outFormat), "-e")
+    mainArgs <- c(paste0("-o", if (outFormat %in% c("formula", "logP", "MW")) "txt" else outFormat), "-e")
     if (inFormat == "inchi")
         mainArgs <- c(mainArgs, "-an")
     if (outFormat == "inchi" || outFormat == "inchikey")
@@ -121,8 +121,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         else
             ret <- fread(cmd$outFile, sep = if (outFormat == "smi") "\t" else " ", header = FALSE)
         
-        # NOTE: with formula/logP output the the index is the first column
-        if (outFormat %in% c("formula", "logP"))
+        # NOTE: with formula/logP/MW output the the index is the first column
+        if (outFormat %in% c("formula", "logP", "MW"))
             setnames(ret, 1, "index")
         else
             setnames(ret, seq_len(2), c("result", "index"))
@@ -133,8 +133,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             ret[, formula := sub("[\\+\\-]+$", "", formula)] # remove trailing positive/negative charge if present
             ret[, formula := gsub("D", "[2]H", formula, fixed = TRUE)] # handle deuteriums
         }
-        else if (outFormat == "logP")
-            setnames(ret, ncol(ret), "logP")
+        else if (outFormat %in% c("logP", "MW"))
+            setnames(ret, ncol(ret), outFormat)
         
         return(ret)
     }, prepareHandler = function(cmd)
@@ -145,8 +145,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         args <- c(cmd$args, c(paste0("-i", inFormat), inFile, "-O", outFile))
         if (appendFormula || outFormat == "formula")
             args <- c(args, "--append", "formula")
-        else if (outFormat == "logP")
-            args <- c(args, "--append", "logP")
+        else if (outFormat %in% c("logP", "MW"))
+            args <- c(args, "--append", outFormat)
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
         return(modifyList(cmd, list(command = getExtDepPath("openbabel"), args = args, outFile = outFile)))
@@ -161,6 +161,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             data.table(formula = r)
         else if (outFormat == "logP")
             data.table(logP = rep(NA_real_, length(input)))
+        else if (outFormat == "MW")
+            data.table(logP = rep(NA_character_, length(input)))
         else
             data.table(result = r)
         if (appendFormula)
@@ -173,19 +175,15 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         ret[, index := NULL][]
     }
     
-    failed <- if (outFormat == "formula")
-        which(is.na(ret$formula) & !is.na(input))
-    else if (outFormat == "logP")
-        which(is.na(ret$logP) & !is.na(input))
+    failed <- if (outFormat %in% c("formula", "logP", "MW"))
+        which(is.na(ret[[outFormat]]) & !is.na(input))
     else
         which(is.na(ret$result) & !is.na(input))
     for (i in failed)
         stopOrWarn(sprintf("Failed to convert %d ('%s') from %s to %s", i, input[i], inFormat, outFormat))
 
-    if (outFormat == "formula")
-        return(ret$formula)
-    if (outFormat == "logP")
-        return(ret$logP)
+    if (outFormat %in% c("formula", "logP", "MW"))
+        return(ret[[outFormat]])
     if (appendFormula)
         return(ret) # return as table
     return(ret$result)
@@ -344,4 +342,30 @@ prepareChemTable <- function(chemData, prefCalcChemProps, neutralChemProps, verb
         printf("Done!\n")
     
     return(chemData[])
+}
+
+predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, organicModifier, pHAq)
+{
+    # UNDONE: OpenBabel references in ref docs
+    
+    fgSMILESTab <- copy(fgSMILESTab)
+    fgSMILESTab[, identifier := group]
+    fgSMILESTab[, retention_time := gInfo[group, "rts"]]
+    fgSMILESTab[, conc_M := NA_real_]
+    fgSMILESTab[, area := 1] # NOTE: we set the area to one to effectively get the response factor
+    
+    # NOTE: we set the area to one to effectively get the response factor
+    
+    # UNDONE: would be nice if we could just pass table directly
+    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, fgSMILESTab, fill = TRUE), quantFile)
+    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    
+    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, NULL)
+    
+    ret <- as.data.table(pr$suspects_concentrations)
+    setnames(ret, c("identifier", "SMILES", "conc_M"), c("group", "candidate", "RF_pred"))
+    ret[, c("area", "retention_time") := NULL]
+    ret[, candidate_MW := babelConvert(candidate, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
+    
+    return(ret[])
 }

@@ -337,3 +337,43 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     
     return(ret)
 }
+
+predictRespFactorsSIRFPs <- function(compounds, gInfo, calibrants, eluent, organicModifier, pHAq)
+{
+    compounds <- compounds[rownames(gInfo)]
+    
+    allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
+                               make.names = "absoluteIndex"), idcol = "group")
+    fpColRange <- seq(3, ncol(allFPs))
+    setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
+    allFPs[, id := as.character(seq_len(nrow(allFPs)))]
+    allFPs[, ionization := mapply(group, neutral_formula, FUN = function(g, f)
+    {
+        # UNDONE: need to check for empty fragInfo?
+        return(compounds[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
+    })]
+    
+    # convert to MS2Quant format
+    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
+    allFPs[, predion := paste0(neutral_formula, "_", ionization)]
+    
+    # NOTE: we set the area to one to effectively get the response factor
+    unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
+                           SMILES = NA_character_, conc_M = NA_real_, area = 1)
+    
+    # UNDONE: would be nice if we could just pass table directly
+    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
+    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    
+    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, allFPs)
+    
+    ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
+                 pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
+                 by.x = "id", by.y = "identifier", sort = FALSE)
+    setnames(ret, c("neutral_formula", "conc_M"), c("candidate", "RF_pred"))
+    ret[, candidate_MW := sapply(candidate, formulaMW)]
+    ret[, id := NULL]
+    setcolorder(ret, c("group", "candidate"))
+    
+    return(ret[])
+}

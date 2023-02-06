@@ -1380,56 +1380,53 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 })
 
 # UNDONE: method
-predictConcentrations <- function(fGroups, compounds, calibrants, eluent, pH_aq, organicSolvent)
+predictConcentrations <- function(fGroups, calibrants, eluent, organicModifier, pHAq,
+                                  compounds = NULL, alwaysSMILES = FALSE)
 {
+    # UNDONE: make methods
     # UNDONE: needs to be done per set
-    # UNDONE: check if compounds are from SIRIUS
     # UNDONE: check calibrant format
-    # UNDONE: check organicSolvent
+    # UNDONE: check organicModifier
+    # UNDONE: cache results
+    # UNDONE: SIRIUS formulas as input, when it supports loading FPs
+    # UNDONE: clear out previous calculations
     
-    fTab <- as.data.table(getFeatures(fGroups))
-    compounds <- compounds[names(fGroups)]
-    allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
-                               make.names = "absoluteIndex"), idcol = "group")
-    fpColRange <- seq(3, ncol(allFPs))
-    setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
-    allFPs[, id := as.character(seq_len(nrow(allFPs)))]
-    allFPs[, ionization := mapply(group, neutral_formula, FUN = function(g, f)
+    respComp <- NULL
+    if (!is.null(compounds))
     {
-        # UNDONE: need to check for empty fragInfo?
-        return(compounds[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
-    })]
-    # convert to MS2Quant format
-    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
-    allFPs[, predion := paste0(neutral_formula, "_", ionization)]
+        if (alwaysSMILES || !inherits(compounds, "compoundsSIRIUS"))
+        {
+            inp <- as.data.table(compounds)[, c("group", "SMILES"), with = FALSE]
+            respComp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+            respComp[, type := "compound"]
+        }
+        else
+        {
+            respComp <- predictRespFactorsSIRFPs(compounds, groupInfo(fGroups), calibrants, eluent, organicModifier,
+                                                 pHAq)
+            respComp[, type := "SIRIUS_FP"]
+        }
+    }
+    else
+        NULL
     
-    unknowns <- data.table(identifier = allFPs$id, retention_time = groupInfo(fGroups)[allFPs$group, "rts"],
-                           SMILES = NA_character_, conc_M = NA_real_, area = 1)
-
-    # UNDONE: would be nice if we could just pass table directly
-    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
-    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    if (is.null(respComp))
+    {
+        printf("No input data, nothing to calculate...\n")
+        # UNDONE: clear any old calculations?
+        return(fGroups)
+    }
     
-    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicSolvent, pH_aq, allFPs)
-    
-    concs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
-                   pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
-                   by.x = "id", by.y = "identifier", sort = FALSE)
-    concs[, type := "SIRIUS"]
-    setnames(concs, "neutral_formula", "candidate")
-    concs[, candidate_MW := sapply(candidate, formulaMW)]
-    concs[, id := NULL]
-    setcolorder(concs, c("group", "type", "candidate"))
-    
-    # expand for features, since we used area=1 above we simply assume that we can multiply conc_M with the intensity to
-    # get feature concentrations
-    gt <- transpose(groupTable(fGroups)[, concs$group, with = FALSE])
+    # get concentration data from response factors
+    gt <- transpose(groupTable(fGroups)[, respComp$group, with = FALSE])
     setnames(gt, analyses(fGroups))
-    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) conc_M * ints)][, conc_M := NULL]
+    
+    concs <- copy(respComp)
+    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF_pred * ints)]
     # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
-    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) (cm * candidate_MW * 1E6)),
+    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) cm * candidate_MW * 1E6),
           .SDcols = (paste0(analyses(fGroups), "_conc_M"))]
-
+    
     fGroups@concentrations <- concs[]
     
     return(fGroups)

@@ -157,7 +157,7 @@ makeAnnSetScorings <- function(setObjects, setAvgSpecificScores, origFGNames)
             renameSc <- function(v, sn)
             {
                 wh <- grepl(paste0(featAnnSetSpecificScoreCols(), collapse = "|"), v)
-                v[wh] <- paste0(v, "-", sn)
+                v[wh] <- paste0(v[wh], "-", sn)
                 return(v)
             }
             allScTypes <- Map(allScTypes, names(allScTypes), f = renameSc)

@@ -68,7 +68,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Fixed: `selectIons()` didn't properly handle empty components objects
 - `clearCache()`: `vacuum` option to speed up clearing large cache files.
 - Fixed: `newProject()` used wrong variable name for suspect list under some conditions (issue #69) 
-
+- Fixed: `chromPeaks()` from `xcms` was somethimes not found (issue #68) 
 
 # patRoon 2.1
 

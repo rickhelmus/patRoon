@@ -304,8 +304,8 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData)
 
     grps <- as(xsgrps$groups, "DataFrame")
     if (!all(xcms::chromPeakData(xdata)$ms_level %in% msLevel))
-        df <- XCMSInternal$.update_feature_definitions(grps, rownames(chromPeaks(xdata, msLevel = msLevel)),
-                                                 rownames(chromPeaks(xdata)))
+        df <- XCMSInternal$.update_feature_definitions(grps, rownames(xcms::chromPeaks(xdata, msLevel = msLevel)),
+                                                 rownames(xcms::chromPeaks(xdata)))
     rownames(grps) <- XCMSInternal$.featureIDs(nrow(grps))
     xcms::featureDefinitions(xdata) <- grps
 

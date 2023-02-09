@@ -200,7 +200,7 @@ getScriptCode <- function(input, analyses)
             addComment(paste("Load", name))
             
             if (input$ionization != "both")
-                addLoadSuspCall("varBase", input[[inpVarBase]])
+                addLoadSuspCall(varBase, input[[inpVarBase]])
             else
             {
                 if (nzchar(input$suspectListNeg))

@@ -98,6 +98,7 @@ The changes are reflected in the installation section of the handbook.
 - Fixed: `chromPeaks()` from `xcms` was somethimes not found (issue #68) 
 - `plotGraph()` method for transformation products gained `width` and `height` arguments.
 - `plotInt()` method for components: `index` argument can now also be component name
+- `plotChroms()`: refactor and minor improvements
 
 
 # patRoon 2.1

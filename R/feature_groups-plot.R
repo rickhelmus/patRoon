@@ -407,20 +407,19 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
-    
-    fTable <- featureTable(obj)
-    gTable <- groupTable(obj)
-    gInfo <- groupInfo(obj)
-    gCount <- nrow(gInfo)
-    gNames <- names(obj)
-    anaInfo <- analysisInfo(obj)
-    ftind <- groupFeatIndex(obj)
-    
-    rGroups <- unique(anaInfo$group)
-    
+
     if (is.null(EICs))
         EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent)
-    EICFGroups <- unique(unlist(sapply(EICs, names)))
+    # omit data we don't need
+    EICs <- EICs[names(EICs) %chin% analyses(obj)]
+    EICs <- lapply(EICs, function(e) e[names(e) %chin% names(obj)])
+
+    gInfo <- groupInfo(obj)
+    gCount <- length(obj)
+    gNames <- names(obj)
+    anaInfo <- analysisInfo(obj)
+    featTab <- as.data.table(getFeatures(obj))
+    rGroups <- replicateGroups(obj)
     
     if (colourBy == "rGroups")
     {
@@ -438,66 +437,27 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
     names(fillColors) <- names(EICColors)
     
-    # get overall retention/intensity limits
-    plotLimits <- list(rtRange = c(0, 0), maxInt = 0)
-    
-    for (grpi in seq_len(gCount))
-    {
-        rtrs <- unlist(sapply(seq_len(nrow(anaInfo)), function(anai)
-        {
-            ana <- anaInfo$analysis[anai]
-            fti <- ftind[[grpi]][anai]
-            if (fti == 0)
-                return(NA)
-            return(unlist(fTable[[ana]][fti, .(retmin, retmax)]))
-        }))
-        
-        if (any(!is.na(rtrs)))
-        {
-            rtmin <- min(rtrs, na.rm = TRUE)
-            rtmax <- max(rtrs, na.rm = TRUE)
-            if (plotLimits$rtRange[1] == 0 || plotLimits$rtRange[1] > rtmin)
-                plotLimits$rtRange[1] <- rtmin
-            if (plotLimits$rtRange[2] < rtmax)
-                plotLimits$rtRange[2] <- rtmax
-        }
-        
-        plotLimits$maxInt <- max(plotLimits$maxInt, max(gTable[[grpi]]))
-    }
-    
-    plotLimits$rtRange <- plotLimits$rtRange + c(-rtWindow, rtWindow)
+    plotRTRange <- c(min(featTab$retmin) - rtWindow, max(featTab$retmax) + rtWindow)
     if (retMin)
-        plotLimits$rtRange <- plotLimits$rtRange / 60
+        plotRTRange <- plotRTRange / 60
+    plotIntMax <- max(featTab$intensity) 
     
     if (is.null(title))
     {
         # NOTE: plotChroms() for sets override default
         if (gCount == 1)
-            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", names(gTable)[1],
+            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", gNames[1],
                              if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
                              gInfo[1, "mzs"])
         else
             title <- sprintf("%d feature groups", gCount)
     }
     
-    anaIndsToPlot <- sapply(gNames, function(grp)
-    {
-        anasWGroup <- names(EICs)[sapply(EICs, function(e) !is.null(e[[grp]]))]
-        ret <- match(anasWGroup, anaInfo$analysis)
-        if (onlyPresent)
-            ret <- ret[gTable[[grp]][ret] != 0]
-        return(ret)
-    }, simplify = FALSE)
-    
-    rGroupsInPlot <- unique(anaInfo$group[unlist(anaIndsToPlot)])
-    fGroupsInPlot <- gNames[gNames %in% EICFGroups]
-    
-    oldp <- par(no.readonly = TRUE)
     if (showLegend)
     {
         makeLegend <- function(x, y, ...)
         {
-            texts <- if (colourBy == "rGroups") rGroupsInPlot else fGroupsInPlot
+            texts <- if (colourBy == "rGroups") replicateGroups(obj) else gNames
             return(legend(x, y, texts, col = EICColors[texts],
                           text.col = EICColors[texts], lty = 1,
                           xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
@@ -507,45 +467,33 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         leg <- makeLegend(0, 0, plot = FALSE)
         lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
         lw <- min(lw, 0.5) # don't make it too wide
-        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+        withr::local_par(par(omd = c(0, 1 - lw, 0, 1), new = TRUE))
     }
     
     if (is.null(xlim))
-        xlim <- plotLimits$rtRange
+        xlim <- plotRTRange
     if (is.null(ylim))
-        ylim <- c(0, plotLimits$maxInt * 1.1)
+        ylim <- c(0, plotIntMax * 1.1)
     
     plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ylab = "Intensity",
          xlim = xlim, ylim = ylim, ...)
     
+    effectiveXlim <- par("usr")[c(1, 2)]
+    effectiveYlim <- par("usr")[c(3, 4)]
+    
     if (showProgress)
         prog <- openProgBar(0, gCount)
     
-    for (grp in fGroupsInPlot)
+    for (grp in gNames)
     {
-        grpi <- match(grp, fGroupsInPlot)
-        
-        fts <- rbindlist(sapply(anaInfo$analysis, function(ana)
-        {
-            fti <- ftind[[grpi]][match(ana, anaInfo$analysis)]
-            if (fti == 0)
-                return(data.table(ret = NA, retmin = NA, retmax = NA, mz = NA))
-            return(fTable[[ana]][fti])
-        }, simplify = F), fill = TRUE)
-        
-        rtRange <- c(min(fts[anaIndsToPlot[[grp]], retmin], na.rm = TRUE), max(fts[anaIndsToPlot[[grp]], retmax], na.rm = TRUE))
-        # rtEICRange <- rtRange + c(-rtWindow, rtWindow)
-        
-        if (retMin)
-            rtRange <- rtRange / 60
+        grpi <- match(grp, gNames)
+        featTabGrp <- featTab[group == grp]
         
         for (ana in names(EICs))
         {
-            anai <- match(ana, anaInfo$analysis)
-            if (is.na(anai))
-                next
+            featRow <- featTabGrp[analysis == ana]
             
-            if (onlyPresent && gTable[[grp]][anai] == 0)
+            if (onlyPresent && nrow(featRow) == 0)
                 next
             
             EIC <- EICs[[ana]][[grp]]
@@ -561,15 +509,15 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
             
             points(if (retMin) EIC$time / 60 else EIC$time, EIC$intensity, type = "l", col = EICColors[colInd])
             
-            if (showPeakArea && !is.na(fts[["mz"]][anai]))
+            if (showPeakArea && nrow(featRow) != 0)
             {
-                EICFill <- EIC[numGTE(EIC$time, fts[anai, retmin]) & numLTE(EIC$time, fts[anai, retmax]), ]
+                EICFill <- setDT(EIC[numGTE(EIC$time, featRow$retmin) & numLTE(EIC$time, featRow$retmax), ])
                 if (retMin)
-                    EICFill$time <- EICFill$time / 60
-                EICFill <- EICFill[EICFill$time %inrange% xlim, ]
+                    EICFill[, time := time / 60]
+                EICFill <- EICFill[time %inrange% effectiveXlim]
                 # filling doesn't work if outside y plot range
-                EICFill$intensity[EICFill$intensity < ylim[1]] <- ylim[1]
-                EICFill$intensity[EICFill$intensity > ylim[2]] <- ylim[2]
+                EICFill[intensity < effectiveYlim[1], intensity := effectiveYlim[1]]
+                EICFill[intensity > effectiveYlim[2], intensity := effectiveYlim[2]]
                 polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
                         col = fillColors[colInd], border = NA)
             }
@@ -577,15 +525,18 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         
         if (showFGroupRect || !"none" %in% annotate)
         {
-            intRange <- c(0, max(fts[anaIndsToPlot[[grp]], intensity], na.rm = TRUE))
+            rtRange <- c(min(featTabGrp$retmin), max(featTabGrp$retmax))
+            if (retMin)
+                rtRange <- rtRange / 60
+            maxInt <- max(featTabGrp$intensity)
             
             if (showFGroupRect)
-                rect(rtRange[1], intRange[1], rtRange[2], intRange[2], border = "red", lty = "dotted")
+                rect(rtRange[1], 0, rtRange[2], maxInt, border = "red", lty = "dotted")
             
             if (!"none" %in% annotate)
             {
                 antxt <- character()
-                rt <- mean(fts[anaIndsToPlot[[grp]], ret], na.rm = TRUE)
+                rt <- mean(featTabGrp$ret)
                 if (retMin)
                     rt <- rt / 60
                 
@@ -595,7 +546,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
                     antxt <- paste(antxt, sprintf("%.4f", gInfo[grp, "mzs"]), sep = "\n")
                 
                 if (nzchar(antxt))
-                    text(rt, intRange[2] + ylim[2] * 0.02, antxt)
+                    text(rt, maxInt + ylim[2] * 0.02, antxt)
             }
         }
         
@@ -611,8 +562,6 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         setTxtProgressBar(prog, gCount)
         close(prog)
     }
-    
-    par(oldp)
 })
 
 setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE,

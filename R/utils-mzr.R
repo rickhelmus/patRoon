@@ -63,76 +63,58 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
 }
 
 setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                                         onlyPresent)
+                                                         onlyPresent, analysis, groupName)
 {
     if (length(fGroups) == 0)
         return(list())
     
-    gNames <- names(fGroups)
-    gTable <- groupTable(fGroups)
-    gInfo <- groupInfo(fGroups)
-    ftind <- groupFeatIndex(fGroups)
-    fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
+    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+    featTab <- as.data.table(getFeatures(fGroups))
 
     verifyDataCentroided(anaInfo)
     
-    # load EICs per analysis: we don't want to load multiple potentially large
-    # analysis files simultaneously. Before that, it's more efficient to first
-    # figure out for which feature groups EICs have to be generated per
-    # analysis. Furthermore, collect all retention ranges for EICs as these also
-    # have to be checked on a per group basis.
-
-
-    doEICs <- list()
-    rtRanges <- list()
-
-    getFTCol <- function(fg, anai, col)
-    {
-        if (ftind[[fg]][anai] == 0)
-            NA
-        else
-            fTable[[anaInfo$analysis[anai]]][ftind[[fg]][anai]][[col]]
-    }
+    # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before
+    # that, it's more efficient to first figure out for which feature groups EICs have to be generated per analysis.
+    # Furthermore, collect all retention ranges for EICs as these also have to be checked on a per group basis.
 
     if (!is.null(topMost))
         topMost <- min(topMost, nrow(anaInfo))
     
-    EICInfoTab <- sapply(gNames, function(fg)
+    EICInfoTab <- sapply(groupName, function(fg)
     {
+        ret <- featTab[group == fg, c("analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"), with = FALSE]
+        
+        # add missing analyses if needed
+        if (!onlyPresent && any(!analysis %chin% ret$analysis))
+        {
+            ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
+                                         retmin = min(ret$retmin), retmax = max(ret$retmax),
+                                         mzmin = min(ret$mzmin) - mzExpWindow, mzmax = max(ret$mzmax) + mzExpWindow))
+            
+        }
+        
+        # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
+        # above
+        ret <- ret[ret$analysis %chin% get("analysis", envir = parent.env(environment()))]
+        
         if (!is.null(topMost))
         {
             if (topMostByRGroup)
             {
-                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, anaInd = seq_len(nrow(anaInfo)))
-                tbl[, rank := frank(-int, ties.method = "first"), by = "group"]
-                topAnalysesInd <- tbl[rank <= topMost]$anaInd
+                ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
+                ret[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
+                ret <- ret[rank <= topMost]
             }
             else
             {
-                oint <- order(gTable[[fg]], decreasing = TRUE)
-                topAnalysesInd <- oint[seq_len(topMost)]
+                setorderv(ret, "intensity", order = -1L)
+                ret <- ret[seq_len(topMost)]
             }
         }
-        else
-            topAnalysesInd <- seq_len(nrow(anaInfo))
-        
-        if (onlyPresent)
-            topAnalysesInd <- topAnalysesInd[gTable[[fg]][topAnalysesInd] != 0]
 
-        rtMins <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "retmin")
-        rtMaxs <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "retmax")
-        rtMins[is.na(rtMins)] <- min(rtMins, na.rm = TRUE); rtMaxs[is.na(rtMaxs)] <- max(rtMaxs, na.rm = TRUE)
-        rtMins <- rtMins - rtWindow; rtMaxs <- rtMaxs + rtWindow
-        
-        mzMins <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "mzmin")
-        mzMaxs <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "mzmax")
-        mzMins[is.na(mzMins)] <- min(mzMins, na.rm = TRUE) - mzExpWindow
-        mzMaxs[is.na(mzMaxs)] <- max(mzMaxs, na.rm = TRUE) + mzExpWindow
-        
-        return(data.table(analysis = anaInfo$analysis[topAnalysesInd],
-                          retmin = rtMins, retmax = rtMaxs,
-                          mzmin = mzMins, mzmax = mzMaxs))
+        ret[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
+        return(ret)
     }, simplify = FALSE)
     
     cacheDB <- openCacheDBScope()
@@ -150,11 +132,14 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
 })
 
 setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                                            onlyPresent)
+                                                            onlyPresent, analysis, groupName)
 {
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-    EICList <- sapply(unsetFGroupsList, getEICsForFGroups, rtWindow = rtWindow, mzExpWindow = mzExpWindow,
-                      topMost = topMost, topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent, simplify = FALSE)
+    unsetAna <- lapply(unsetFGroupsList, function(ufg) intersect(analysis, analyses(ufg)))
+    unsetGrps <- lapply(unsetFGroupsList, function(ufg) intersect(groupName, names(ufg)))
+    EICList <- Map(unsetFGroupsList, analysis = unsetAna, groupName = unsetGrps, f = getEICsForFGroups,
+                   MoreArgs = list(rtWindow = rtWindow, mzExpWindow = mzExpWindow, topMost = topMost,
+                                   topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent))
     EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EICs) <- unlist(lapply(EICList, names))
     EICs <- EICs[intersect(analyses(fGroups), names(EICs))] # sync order
@@ -163,30 +148,28 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
     {
         # topMost is applied per set, make sure that the final result also doesn't contain >topMost results
         
-        gTable <- groupTable(fGroups)
-        gNames <- names(fGroups)
         anaInfo <- analysisInfo(fGroups)
         anasInEICs <- names(EICs)
-        anaIndsInEICs <- match(anasInEICs, anaInfo$analysis)
         topMost <- min(topMost, length(anasInEICs))
+        featTab <- as.data.table(getFeatures(fGroups))
         
-        for (fg in gNames)
+        for (fg in groupName)
         {
+            featTabGrp <- featTab[group == fg & analysis %chin% anasInEICs]
             if (topMostByRGroup)
             {
-                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, ana = anaInfo$analysis)
-                tbl <- tbl[ana %in% anasInEICs]
-                tbl[, rank := frank(-int, ties.method = "first"), by = "group"]
-                topAnalyses <- tbl[rank <= topMost]$ana
+                featTabGrp[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
+                featTabGrp[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
+                featTabGrp <- featTabGrp[rank <= topMost]
             }
             else
             {
-                oint <- order(gTable[[fg]][anaIndsInEICs], decreasing = TRUE)
-                topAnalyses <- anasInEICs[oint[seq_len(topMost)]]
+                setorderv(featTabGrp, "intensity", order = -1L)
+                featTabGrp <- featTabGrp[seq_len(topMost)]
             }
-            
+
             # clearout any analysis results not being in topMost
-            otherAnas <- setdiff(anasInEICs, topAnalyses)
+            otherAnas <- setdiff(anasInEICs, featTabGrp$analysis)
             EICs[otherAnas] <- lapply(EICs[otherAnas], function(e) e[setdiff(names(e), fg)])
         }
         EICs <- pruneList(EICs, checkEmptyElements = TRUE) # in case all EICs were removed from analyses

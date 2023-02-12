@@ -85,9 +85,9 @@ allPlots <- sapply(seq_len(length(rmdVars$fGroups)), function(grpi)
 {
     path <- file.path(plotPathFull, sprintf("chrom_%d.png", grpi))
     makeCachedPlot(path, "plotChroms",
-                   list(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow,
-                        rmdVars$EICMzExpWindow, rmdVars$retMin,
-                        rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup",
+                   list(rmdVars$fGroups, groupName = names(rmdVars$fGroups)[grpi], rtWindow = rmdVars$EICRtWindow,
+                        mzExpWindow = rmdVars$EICMzExpWindow, retMin = rmdVars$retMin, topMost =  rmdVars$EICTopMost,
+                        topMostByRGroup = rmdVars$EICTopMostByRGroup, EICs = rmdVars$EICs, colourBy = "rGroup",
                         onlyPresent = rmdVars$EICOnlyPresent),
                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     setTxtProgressBar(prog, grpi)
@@ -118,9 +118,9 @@ Summary {data-orientation=rows}
 
 ```{r obj-plot, fig.width=10, fig.height=4}
 par(mai = c(0.9, 0.8, 0.6, 0.1))
-plotChroms(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzExpWindow,
-           rmdVars$retMin, 1, FALSE, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroups", showLegend = FALSE,
-           onlyPresent = rmdVars$EICOnlyPresent)
+plotChroms(rmdVars$fGroups, rtWindow = rmdVars$EICRtWindow, mzExpWindow = rmdVars$EICMzExpWindow,
+           retMin = rmdVars$retMin, topMost = 1, topMostByRGroup = FALSE, EICs = rmdVars$EICs, showPeakArea = TRUE,
+           showFGroupRect = FALSE, colourBy = "fGroups", showLegend = FALSE, onlyPresent = rmdVars$EICOnlyPresent)
 ```
 
 

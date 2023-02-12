@@ -347,6 +347,10 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 
 #' @details \code{plotChroms} Plots extracted ion chromatograms (EICs) of feature groups.
 #'
+#' @param analysis,groupName \code{character} vector with the analyses/group names to be considered for plotting.
+#'   Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster and (if
+#'   \code{onlyPresent=FALSE}) allows plotting chromatograms for feature groups where none of the specified analyses
+#'   contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).
 #' @param rtWindow Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
 #'   retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
 #'   retention time axis.
@@ -376,7 +380,8 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
+setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj), rtWindow = 30,
+                                                  mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
                                                   topMostByRGroup = FALSE, EICs = NULL, showPeakArea = FALSE,
                                                   showFGroupRect = TRUE, title = NULL,
                                                   colourBy = c("none", "rGroups", "fGroups"),
@@ -385,6 +390,8 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
                                                   xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
+           fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ retMin + topMostByRGroup + showPeakArea + showFGroupRect + showLegend +
                onlyPresent + showProgress,
@@ -409,17 +416,21 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         showLegend <- FALSE
 
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent)
-    # omit data we don't need
-    EICs <- EICs[names(EICs) %chin% analyses(obj)]
-    EICs <- lapply(EICs, function(e) e[names(e) %chin% names(obj)])
-
+        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent, analysis,
+                                  groupName)
+    else
+    {
+        # omit data we don't need
+        EICs <- EICs[names(EICs) %chin% analyses(obj)]
+        EICs <- lapply(EICs, function(e) e[names(e) %chin% names(obj)])
+    }
+    
     gInfo <- groupInfo(obj)
-    gCount <- length(obj)
-    gNames <- names(obj)
+    gCount <- length(groupName)
     anaInfo <- analysisInfo(obj)
-    featTab <- as.data.table(getFeatures(obj))
-    rGroups <- replicateGroups(obj)
+    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+    featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
+    rGroups <- unique(anaInfo$group)
     
     if (colourBy == "rGroups")
     {
@@ -429,7 +440,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     else if (colourBy == "fGroups")
     {
         EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(gCount)
-        names(EICColors) <- gNames
+        names(EICColors) <- groupName
     }
     else
         EICColors <- "blue"
@@ -446,7 +457,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     {
         # NOTE: plotChroms() for sets override default
         if (gCount == 1)
-            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", gNames[1],
+            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", groupName[1],
                              if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
                              gInfo[1, "mzs"])
         else
@@ -457,7 +468,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     {
         makeLegend <- function(x, y, ...)
         {
-            texts <- if (colourBy == "rGroups") replicateGroups(obj) else gNames
+            texts <- if (colourBy == "rGroups") rGroups else groupName
             return(legend(x, y, texts, col = EICColors[texts],
                           text.col = EICColors[texts], lty = 1,
                           xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
@@ -467,7 +478,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         leg <- makeLegend(0, 0, plot = FALSE)
         lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
         lw <- min(lw, 0.5) # don't make it too wide
-        withr::local_par(par(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+        withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
     }
     
     if (is.null(xlim))
@@ -475,8 +486,10 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     if (is.null(ylim))
         ylim <- c(0, plotIntMax * 1.1)
     
-    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ylab = "Intensity",
-         xlim = xlim, ylim = ylim, ...)
+    if (!all(sapply(xlim, is.finite))) browser()
+    
+    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+         ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
     
     effectiveXlim <- par("usr")[c(1, 2)]
     effectiveYlim <- par("usr")[c(3, 4)]
@@ -484,24 +497,22 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     if (showProgress)
         prog <- openProgBar(0, gCount)
     
-    for (grp in gNames)
+    for (grp in groupName)
     {
-        grpi <- match(grp, gNames)
         featTabGrp <- featTab[group == grp]
         
-        for (ana in names(EICs))
+        for (ana in analysis)
         {
-            featRow <- featTabGrp[analysis == ana]
-            
-            if (onlyPresent && nrow(featRow) == 0)
-                next
-            
             EIC <- EICs[[ana]][[grp]]
             if (is.null(EIC))
                 next
             
+            featRow <- featTabGrp[analysis == ana]
+            if (onlyPresent && nrow(featRow) == 0)
+                next
+            
             if (colourBy == "rGroups")
-                colInd <- anaInfo$group[anai]
+                colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
             else if (colourBy == "fGroups")
                 colInd <- grp
             else
@@ -551,7 +562,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         }
         
         if (showProgress)
-            setTxtProgressBar(prog, grpi)
+            setTxtProgressBar(prog, match(grp, groupName))
     }
     
     if (showLegend)
@@ -564,7 +575,8 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     }
 })
 
-setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE,
+setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                      rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE,
                                                       topMost = NULL, topMostByRGroup = FALSE, EICs = NULL,
                                                       showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, colourBy = c("none", "rGroups", "fGroups"),
@@ -577,7 +589,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpW
     if ("none" %in% annotate)
         annotate <- "none"
     args <- allArgs(FALSE)
-    makeHash(args[setdiff(names(args), "obj")], featureTable(obj), groupInfo(obj), analysisInfo(obj))
+    makeHash(args[setdiff(names(args), "obj")], featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
+             analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])
 })
 
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature

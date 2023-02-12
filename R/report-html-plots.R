@@ -46,7 +46,8 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
             # UNDONE: params
             mar <- par("mar")
             par(mar = c(4.1, mar[2], 0.2, 0.2))
-            plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, colourBy = "rGroups", title = "",
+            plotChroms(fGroups, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1,
+                       topMostByRGroup = TRUE, EICs = EICs, colourBy = "rGroups", title = "",
                        onlyPresent = TRUE, bty = "l")
         }, width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -59,7 +60,8 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
         makeHTMLReportPlot(paste0("chrom_small-", grp, ".svg"), outPath, selfContained, {
             # UNDONE: params
             par(mai = c(0, 0, 0, 0), lwd = 10)
-            plotChroms(fGroups[, grp], 30, 0.005, TRUE, 1, TRUE, EICs, showFGroupRect = FALSE, showPeakArea = TRUE,
+            plotChroms(fGroups, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1,
+                       topMostByRGroup = TRUE, EICs = EICs, showFGroupRect = FALSE, showPeakArea = TRUE,
                        title = "", onlyPresent = TRUE, bty = "n")
         }, width = 12, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -75,8 +77,9 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, outPath, EICs, selfContain
                 # UNDONE: params
                 mar <- par("mar")
                 par(mar = c(4.1, mar[2], 0.2, 0.2))
-                plotChroms(fGroups[ana, grp], 30, 0.005, TRUE, 1, TRUE, EICs, showFGroupRect = FALSE, showPeakArea = TRUE,
-                           title = "", onlyPresent = TRUE, bty = "l")
+                plotChroms(fGroups, analysis = ana, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE,
+                           topMost = 1, topMostByRGroup = TRUE, EICs = EICs, showFGroupRect = FALSE,
+                           showPeakArea = TRUE, title = "", onlyPresent = TRUE, bty = "l")
             }, width = 6, height = 4, bg = "transparent", pointsize = 20, scaling = 1)
         })
     }, simplify = FALSE)
@@ -224,7 +227,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$overview$chroms <- makeHTMLReportPlot("chroms.svg", outPath, selfContained, {
         par(mai = c(0.9, 0.8, 0.6, 0.1))
         # UNDONE: params
-        plotChroms(fGroups, 30, 0.005, TRUE, 1, FALSE, EICs, TRUE, FALSE, colourBy = "fGroups", showLegend = FALSE,
+        plotChroms(fGroups, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1, topMostByRGroup = FALSE,
+                   EICs = EICs, showPeakArea = TRUE, showFGroupRect = FALSE, colourBy = "fGroups", showLegend = FALSE,
                    onlyPresent = TRUE)
     }, width = 10, height = 4)
     

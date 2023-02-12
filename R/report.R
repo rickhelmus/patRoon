@@ -153,16 +153,15 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
         return(invisible(NULL))
     }
 
-    gTable <- groupTable(fGroups)
     gCount <- length(fGroups)
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
+    gNames <- names(fGroups)
 
     pdfFile <- file.path(path, sprintf("%s.pdf", class(fGroups)))
     withr::local_pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
-    plotChroms(fGroups, rtWindow, mzExpWindow, retMin, 1, FALSE, EICs, TRUE, FALSE)
+    plotChroms(fGroups, rtWindow = rtWindow, mzExpWindow = mzExpWindow, retMin = retMin, topMost = 1, EICs = EICs,
+               showPeakArea = TRUE, showFGroupRect = FALSE)
 
     plotsPerPage <- plotGrid[1] * plotGrid[2]
     prog <- openProgBar(0, gCount)
@@ -180,8 +179,9 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
         }
         
         screen(scr[scrInd])
-        plotChroms(fGroups[, grpi], rtWindow, mzExpWindow, retMin, topMost, topMostByRGroup,
-                   EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
+        plotChroms(fGroups, groupName = gNames[grpi], rtWindow = rtWindow, mzExpWindow = mzExpWindow, retMin = retMin,
+                   topMost = topMost, topMostByRGroup = topMostByRGroup, EICs = EICs, onlyPresent = onlyPresent,
+                   colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 
@@ -280,7 +280,8 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
             # a4r: width=11.69, height=8.27
             withr::with_pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8, code = {
-                plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
+                plotChroms(fGroups, groupName = grp, rtWindow = EICRtWindow, mzExpWindow =  EICMzExpWindow,
+                           retMin = retMin, topMost = EICTopMost, topMostByRGroup = EICTopMostByRGroup, EICs = EICs)
                 
                 for (ind in seq_len(nrow(ft)))
                 {
@@ -395,7 +396,8 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
             # a4r: width=11.69, height=8.27
             withr::with_pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8, code = {
-                plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
+                plotChroms(fGroups, groupName = grp, rtWindow = EICRtWindow, mzExpWindow = EICMzExpWindow,
+                           retMin = retMin, topMost = EICTopMost, topMostByRGroup = EICTopMostByRGroup, EICs = EICs)
                 
                 for (idi in seq_len(nrow(compTable[[grp]])))
                 {

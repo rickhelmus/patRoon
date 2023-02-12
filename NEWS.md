@@ -98,7 +98,10 @@ The changes are reflected in the installation section of the handbook.
 - Fixed: `chromPeaks()` from `xcms` was somethimes not found (issue #68) 
 - `plotGraph()` method for transformation products gained `width` and `height` arguments.
 - `plotInt()` method for components: `index` argument can now also be component name
-- `plotChroms()`: refactor and minor improvements
+- `plotChroms()` / EIC loading
+    - refactor and minor improvements
+    - Fixed: group rectangle with topMost set didn't consider retention times and intensities from other features
+    - `analysis` and `groupName` arguments
 
 
 # patRoon 2.1

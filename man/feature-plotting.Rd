@@ -65,6 +65,8 @@
 
 \S4method{plotChroms}{featureGroups}(
   obj,
+  analysis = analyses(obj),
+  groupName = names(obj),
   rtWindow = 30,
   mzExpWindow = 0.001,
   retMin = FALSE,
@@ -154,6 +156,11 @@ to disable outer groups.}
 
 \item{addIntraOuterGroupLinks}{If \code{TRUE} then links will be added within
 outer groups.}
+
+\item{analysis, groupName}{\code{character} vector with the analyses/group names that should be considered for
+plotting. Compared to subsetting the \code{featureGroups} object (\code{obj}) this is slightly faster and (if
+\code{onlyPresent=FALSE}) allows plotting chromatograms for feature groups where none of the specified analyses
+contain the feature (which is impossible otherwise since subsetting removes 'empty' feature groups).}
 
 \item{rtWindow}{Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
 retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the

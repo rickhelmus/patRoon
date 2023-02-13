@@ -65,7 +65,7 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
 setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                                          onlyPresent, analysis, groupName)
 {
-    if (length(fGroups) == 0)
+    if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
         return(list())
     
     anaInfo <- analysisInfo(fGroups)
@@ -96,7 +96,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
         
         # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
         # above
-        ret <- ret[ret$analysis %chin% get("analysis", envir = parent.env(environment()))]
+        ret <- ret[analysis %chin% get("analysis", envir = parent.env(environment()))]
         
         if (!is.null(topMost))
         {

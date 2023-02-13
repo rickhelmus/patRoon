@@ -503,6 +503,12 @@ test_that("plotting works", {
     expect_doppel("eic-cbr", function() plotChroms(subFGroups, colourBy = "rGroups"))
     expect_doppel("eic-cbf", function() plotChroms(subFGroups, colourBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
+    # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
+    # some of the feature data that is used to determine the limits for these. For now just compare the two figures
+    # manually.
+    expect_doppel("eic-sub", function() plotChroms(subFGroups[1, 1]))
+    expect_doppel("eic-sub2", function() plotChroms(subFGroups, analysis = analyses(subFGroups)[1],
+                                                   groupName = names(subFGroups)[1]))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 rGroups

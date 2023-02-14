@@ -207,3 +207,27 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
 
     return(pruneList(EICs, checkEmptyElements = TRUE))
 }
+
+calcFeatureConcs <- function(fGroups, resp)
+{
+    # get concentration data from response factors
+    gt <- transpose(groupTable(fGroups)[, resp$group, with = FALSE])
+    setnames(gt, analyses(fGroups))
+    
+    concs <- copy(resp)
+    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF_pred * ints)]
+    # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
+    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) cm * candidate_MW * 1E6),
+          .SDcols = (paste0(analyses(fGroups), "_conc_M"))]
+
+    return(concs[])
+}
+
+finalizeFeatureConcsTab <- function(concs)
+{
+    co <- intersect(c("group", "type", "candidate", "candidate_name", "candidate_MW"), names(concs))
+    setcolorder(concs, co)
+    setorderv(concs, c("group", "type"))
+    return(concs)
+>>>>>>> e50ad55e (various WIP [skip ci])
+}

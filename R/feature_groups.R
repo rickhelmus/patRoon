@@ -1379,9 +1379,9 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     return(fGroups)
 })
 
-# UNDONE: method
-predictConcentrations <- function(fGroups, calibrants, eluent, organicModifier, pHAq,
-                                  compounds = NULL, alwaysSMILES = FALSE)
+#' @export
+setMethod("predictConc", "featureGroups", function(fGroups, calibrants, eluent, organicModifier, pHAq, compounds,
+                                                   alwaysSMILES)
 {
     # UNDONE: make methods
     # UNDONE: needs to be done per set
@@ -1394,17 +1394,26 @@ predictConcentrations <- function(fGroups, calibrants, eluent, organicModifier, 
     respComp <- NULL
     if (!is.null(compounds))
     {
+        ctab <- as.data.table(compounds)
         if (alwaysSMILES || !inherits(compounds, "compoundsSIRIUS"))
         {
-            inp <- as.data.table(compounds)[, c("group", "SMILES"), with = FALSE]
+            inp <- ctab[, c("group", "SMILES"), with = FALSE]
             respComp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
             respComp[, type := "compound"]
+            if (!is.null(ctab[["compoundName"]]))
+                respComp[, candidate_name := paste0(unique(ctab[SMILES == candidate &
+                                                             group == get("group", envir = parent.env(environment()))]$compoundName),
+                                                    collapse = ","), by = c("candidate", "group")]
         }
         else
         {
             respComp <- predictRespFactorsSIRFPs(compounds, groupInfo(fGroups), calibrants, eluent, organicModifier,
                                                  pHAq)
             respComp[, type := "SIRIUS_FP"]
+            if (!is.null(ctab[["compoundName"]]))
+                respComp[, candidate_name := paste0(unique(ctab[neutral_formula == candidate &
+                                                             group == get("group", envir = parent.env(environment()))]$compoundName),
+                                                    collapse = ","), by = c("candidate", "group")]
         }
     }
     else
@@ -1417,20 +1426,10 @@ predictConcentrations <- function(fGroups, calibrants, eluent, organicModifier, 
         return(fGroups)
     }
     
-    # get concentration data from response factors
-    gt <- transpose(groupTable(fGroups)[, respComp$group, with = FALSE])
-    setnames(gt, analyses(fGroups))
-    
-    concs <- copy(respComp)
-    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF_pred * ints)]
-    # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
-    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) cm * candidate_MW * 1E6),
-          .SDcols = (paste0(analyses(fGroups), "_conc_M"))]
-    
-    fGroups@concentrations <- concs[]
+    fGroups@concentrations <- finalizeFeatureConcsTab(calcFeatureConcs(fGroups, respComp))
     
     return(fGroups)
-}
+})
 
 
 #' Grouping of features

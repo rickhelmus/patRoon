@@ -189,6 +189,37 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
     return(ret)
 })
 
+#' @export
+setMethod("predictConc", "featureGroupsScreening", function(fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                            compounds, alwaysSMILES)
+{
+    if (!is.null(compounds))
+        fGroups <- callNextMethod()
+    
+    scr <- screenInfo(fGroups)
+    if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
+        stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
+    if (any(is.na(scr$SMILES)))
+        warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
+    
+    inp <- screenInfo(fGroups)[, c("group", "SMILES"), with = FALSE]
+    inp <- inp[!is.na(SMILES)]
+    # avoid duplicate calculations if there happen to be suspects with the same SMILES
+    inp <- unique(inp, by = c("group", "SMILES"))
+    resp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+
+    concs <- calcFeatureConcs(fGroups, resp)
+    concs[, type := "suspect"]
+    # assign and collapse candidate names
+    concs[, candidate_name := paste0(unique(scr[SMILES == candidate &
+                                             group == get("group", envir = parent.env(environment()))]$name), collapse = ","),
+          by = c("candidate", "group")]
+
+    fGroups@concentrations <- finalizeFeatureConcsTab(rbind(fGroups@concentrations, concs, fill = TRUE))
+    
+    return(fGroups)
+})
+
 #' @describeIn featureGroupsScreening Incorporates annotation data obtained during the workflow to annotate suspects
 #'   with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
 #'   the \verb{Suspect annotation} section for more details. The estimation of identification levels for each suspect is

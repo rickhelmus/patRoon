@@ -58,7 +58,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     cat("Loading all EICs... ")
     # UNDONE: params
     # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
-    EICs <- getEICsForFGroups(fGroups, 30, 0.002, NULL, FALSE, TRUE)
+    EICs <- getEICsForFGroups(fGroups, 30, 0.002, NULL, FALSE, FALSE)
     EICsTopMost <- getEICsForFGroups(fGroups, 30, 0.002, 1, FALSE, TRUE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICsTopMost <- Reduce(modifyList, EICsTopMost)

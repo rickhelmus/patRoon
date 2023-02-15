@@ -577,8 +577,23 @@ reportHTMLUtils$methods(
       
         for (col in names(tab)[sapply(tab, is.numeric)])
             set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax")) 5 else 2))
-        
+
         anaInfo <- analysisInfo(objects$fGroups)
+        
+        # add data for 'missing' analyses
+        missingTab <- rbindlist(sapply(unique(tab$group), function(grp)
+        {
+            data.table(analysis = setdiff(analyses(objects$fGroups), tab[group == grp]$analysis))
+        }, simplify = FALSE), idcol = "group")
+        if (nrow(missingTab) > 0)
+        {
+            tab <- rbind(tab, missingTab, fill = TRUE)
+            # make sure analyses retain order of anaInfo
+            tab[, anaInd := match(analysis, anaInfo$analysis)]
+            setorderv(tab, "anaInd")
+            tab[, anaInd := NULL]
+        }
+        
         tab[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
         
         # add EICs

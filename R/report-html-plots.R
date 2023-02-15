@@ -69,17 +69,20 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
 
 genHTMLReportPlotsChromsFeatures <- function(fGroups, outPath, EICs, selfContained)
 {
+    anas <- analyses(fGroups)
     sapply(names(fGroups), function(grp)
     {
-        sapply(analyses(fGroups)[fGroups[[grp]] > 0], function(ana)
+        # whana <- fGroups[[grp]] > 0
+        whana <- rep(TRUE, length(anas))
+        sapply(anas[whana], function(ana)
         {
             makeHTMLReportPlot(paste0("chrom-", grp, "-", ana, ".svg"), outPath, selfContained, {
                 # UNDONE: params
                 mar <- par("mar")
                 par(mar = c(4.1, mar[2], 0.2, 0.2))
                 plotChroms(fGroups, analysis = ana, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE,
-                           topMost = 1, topMostByRGroup = TRUE, EICs = EICs, showFGroupRect = FALSE,
-                           showPeakArea = TRUE, title = "", onlyPresent = TRUE, bty = "l")
+                           EICs = EICs, showFGroupRect = FALSE, showPeakArea = TRUE, title = "", onlyPresent = FALSE,
+                           bty = "l")
             }, width = 6, height = 4, bg = "transparent", pointsize = 20, scaling = 1)
         })
     }, simplify = FALSE)

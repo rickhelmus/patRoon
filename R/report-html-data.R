@@ -599,7 +599,8 @@ reportHTMLUtils$methods(
         # add EICs
         tab[, chromatogram := ""] # dummy value, not needed
         tabn <- names(tab)
-        setcolorder(tab, c(tabn[seq_len(match("ID", tabn))], "chromatogram")) # move after ID column
+        
+        setcolorder(tab, c("analysis", "rGroup", "ID", "chromatogram"))
 
         colDefs <- list(
             group = reactable::colDef(show = FALSE),

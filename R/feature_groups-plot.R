@@ -405,24 +405,24 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     assertXYLim(xlim, ylim, add = ac)
     
     checkmate::reportAssertions(ac)
-    
-    if (length(obj) == 0)
-    {
-        noDataPlot()
-        return(invisible(NULL))
-    }
-    
+
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
-
+    
     if (is.null(EICs))
         EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent, analysis,
                                   groupName)
     else
     {
         # omit data we don't need
-        EICs <- EICs[names(EICs) %chin% analyses(obj)]
-        EICs <- lapply(EICs, function(e) e[names(e) %chin% names(obj)])
+        EICs <- EICs[names(EICs) %chin% analysis]
+        EICs <- pruneList(lapply(EICs, function(e) e[names(e) %chin% groupName]), checkEmptyElements = TRUE)
+    }
+    
+    if (length(obj) == 0 || length(EICs) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
     }
     
     gInfo <- groupInfo(obj)
@@ -452,7 +452,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     if (retMin)
         plotRTRange <- plotRTRange / 60
     plotIntMax <- max(featTab$intensity) 
-    
+
     if (is.null(title))
     {
         # NOTE: plotChroms() for sets override default
@@ -485,8 +485,6 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         xlim <- plotRTRange
     if (is.null(ylim))
         ylim <- c(0, plotIntMax * 1.1)
-    
-    if (!all(sapply(xlim, is.finite))) browser()
     
     plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
          ylab = "Intensity", xlim = xlim, ylim = ylim, ...)

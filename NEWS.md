@@ -102,6 +102,7 @@ The changes are reflected in the installation section of the handbook.
     - refactor and minor improvements
     - Fixed: group rectangle with topMost set didn't consider retention times and intensities from other features
     - `analysis` and `groupName` arguments
+    - The plot y limit is now determined from EIC data to improve accuracy 
 
 
 # patRoon 2.1

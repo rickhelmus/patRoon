@@ -90,7 +90,10 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
             {
                 ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))
                 if (length(ret) > 0)
+                {
                     names(ret) <- df$hash
+                    ret <- ret[match(hashes, names(ret))] # sync order
+                }
             }
         }
     }

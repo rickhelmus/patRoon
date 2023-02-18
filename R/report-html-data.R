@@ -181,7 +181,7 @@ makeReactable <- function(tab, id, ...)
                                 pagination = FALSE, ...))
 }
 
-makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, EICsTopMost, plots, ..., onClick = NULL)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., onClick = NULL)
 {
     # sync column order
     tab <- copy(tab)
@@ -383,8 +383,7 @@ reportHTMLUtils$methods(
         tab <- getFGTable(objects$fGroups, ",")
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
-        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE,
-                        EICsTopMost, plots = plots)
+        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots)
     },
     genFGTableSuspects = function()
     {
@@ -399,7 +398,7 @@ reportHTMLUtils$methods(
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
 }"
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        EICsTopMost, plots = plots, groupBy = "susp_name", onClick = onClick)
+                        plots = plots, groupBy = "susp_name", onClick = onClick)
     },
     genFGTableComponents = function()
     {
@@ -453,7 +452,7 @@ reportHTMLUtils$methods(
 }"
         
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        EICsTopMost, plots = plots, groupBy = "component", onClick = onClick)
+                        plots = plots, groupBy = "component", onClick = onClick)
     },
     genFGTableTPs = function()
     {
@@ -565,7 +564,7 @@ reportHTMLUtils$methods(
     showTPGraph(rd.component);
 }"
     
-        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, EICsTopMost, plots, groupBy = groupBy, colDefs = colDefs,
+        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, colDefs = colDefs,
                         groupDefs = groupDefs, onClick = onClick)
     },
     

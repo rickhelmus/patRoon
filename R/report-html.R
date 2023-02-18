@@ -2,8 +2,7 @@
 NULL
 
 reportHTMLUtils <- setRefClass("reportHTMLUtils",
-                                   fields = list(objects = "list", EICs = "list", EICsTopMost = "list",
-                                                 plots = "list", properties = "list"))
+                               fields = list(objects = "list", EICs = "list", plots = "list", properties = "list"))
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups),
@@ -59,9 +58,6 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     # UNDONE: params
     # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
     EICs <- getEICsForFGroups(fGroups, 30, 0.002, NULL, FALSE, FALSE)
-    EICsTopMost <- getEICsForFGroups(fGroups, 30, 0.002, 1, FALSE, TRUE)
-    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
-    EICsTopMost <- Reduce(modifyList, EICsTopMost)
     cat("Done!\n")
     
     reportEnv <- new.env()
@@ -73,7 +69,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,
                                                           TPs = TPs),
-                                           EICs = EICs, EICsTopMost = EICsTopMost, plots = reportEnv$plots,
+                                           EICs = EICs, plots = reportEnv$plots,
                                            properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs
     

@@ -45,19 +45,23 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     hashes <- ranges[, makeHash(anaHash, .SD), by = seq_len(nrow(ranges)),
                      .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
     
-    EICs <- lapply(hashes, loadCacheData, category = "mzREIC", dbArg = cacheDB)
-    isNotCached <- sapply(EICs, is.null)
+    cachedData <- loadCacheData(category = "mzREIC", hashes, dbArg = cacheDB)
+    if (!is.null(cachedData) && length(cachedData) == nrow(ranges))
+        return(unname(cachedData)) # everything is in the cache
     
-    if (any(isNotCached))
-    {
-        spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
-        rangesToDo <- ranges[isNotCached]
-        EICs[isNotCached] <- loadEICs(spectra, rangesToDo$retmin, rangesToDo$retmax,
-                                      rangesToDo$mzmin, rangesToDo$mzmax)
-        
-        for (i in which(isNotCached))
-            saveCacheData("mzREIC", EICs[[i]], hashes[i], cacheDB)
-    }
+    spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
+    EICs <- vector("list", nrow(ranges))
+    
+    cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
+    isCached <- if (!is.null(cachedData)) names(cachedData) %chin% hashes else rep(FALSE, nrow(ranges))
+    EICs[isCached] <- cachedData
+
+    spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
+    rangesToDo <- ranges[!isCached]
+    EICs[!isCached] <- loadEICs(spectra, rangesToDo$retmin, rangesToDo$retmax, rangesToDo$mzmin, rangesToDo$mzmax)
+    
+    for (i in which(!isCached))
+        saveCacheData("mzREIC", EICs[[i]], hashes[i], cacheDB)
     
     return(EICs)
 }
@@ -80,10 +84,14 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
 
     if (!is.null(topMost))
         topMost <- min(topMost, nrow(anaInfo))
-    
+
+    # subset relevant things in advance    
+    featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
+                       with = FALSE]
+    takeAnalysis <- analysis # copy name to workaround DT access below
     EICInfoTab <- sapply(groupName, function(fg)
     {
-        ret <- featTab[group == fg, c("analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"), with = FALSE]
+        ret <- featTab[group == fg][, -"group"]
         
         # add missing analyses if needed
         if (!onlyPresent && any(!analysis %chin% ret$analysis))
@@ -96,7 +104,8 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
         
         # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
         # above
-        ret <- ret[analysis %chin% get("analysis", envir = parent.env(environment()))]
+        # HACK: need to take copy of 'analysis' function parameter to avoid confusions with equallt named DT column
+        ret <- ret[analysis %chin% takeAnalysis]
         
         if (!is.null(topMost))
         {

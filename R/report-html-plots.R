@@ -2,10 +2,27 @@
 #' @include report-html.R
 NULL
 
+getHTMLReportPlotPath <- function(outPath)
+{
+    plotPath <- file.path(outPath, "report_files", "plots")
+    mkdirp(plotPath)
+    return(plotPath)
+}
+
+getHTMLReportFinalPlotPath <- function(out, selfContained)
+{
+    if (selfContained)
+        return(knitr::image_uri(out))
+    return(file.path("report_files", "plots", basename(out)))
+}
+
 makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
 {
     if (FALSE)
     {
+        # UNDONE: while embedding the SVG directly would be nice, this seems to give major headaches with scaling,
+        # especially with Firefox... For now just base64 it :(
+        
         if (selfContained)
         {
             svgstr <- svglite::svgstring(standalone = FALSE, fix_text_size = FALSE, ...)
@@ -21,18 +38,9 @@ makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
             return(ret)
         }
     }
-    else if (selfContained)
-    {
-        # UNDONE: while embedding the SVG directly would be nice, this seems to give major headaches with scaling,
-        # especially with Firefox... For now just base64 it :(
-        withSVGLite(out, standalone = TRUE, code = code, ...)
-        return(knitr::image_uri(out))
-    }
     
-    destPath <- file.path(outPath, "report_files", "plots")
-    mkdirp(destPath)
-    withSVGLite(file.path(destPath, out), standalone = TRUE, code = code, ...)
-    return(file.path("report_files", "plots", out))
+    withSVGLite(file.path(getHTMLReportPlotPath(outPath), out), standalone = TRUE, code = code, ...)
+    return(getHTMLReportFinalPlotPath(out, selfContained))
     
     # UNDONE: object tag makes text selectable but messes up layout...
     # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
@@ -110,11 +118,10 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
         # UNDONE: parallel option
         return(doApply("Map", TRUE, structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
         {
+            pf <- file.path(getHTMLReportPlotPath(outPath), paste0("struct-", ik, ".svg"))
+            saveRCDKStructure(getMoleculesFromSMILES(smi)[[1]], "svg", pf, 100, 100)
+            return(getHTMLReportFinalPlotPath(pf, selfContained))
             doProgress()
-            makeHTMLReportPlot(paste0("struct-", ik, ".svg"), outPath, selfContained, {
-                mol <- getMoleculesFromSMILES(smi, emptyIfFails = TRUE)[[1]]
-                withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
-            }, width = 5, height = 4)
         }))
     }
     return(list())

@@ -1,0 +1,16 @@
+Homologues series
+===
+    
+##
+    
+```{r echo=FALSE}
+bslib::layout_column_wrap(
+    width = 1,
+    height = "100%",
+    style = "padding-bottom: 10px; padding-right: 10px;",
+    bslib::card(
+        bslib::card_header("Linked series"),
+        bslib::card_body_fill(utils$genComponNTGraph())
+    )
+)
+```

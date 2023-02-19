@@ -386,5 +386,6 @@ reportHTMLUtils$methods(
     genIntClustHeatMap = function()
     {
         plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configfurable
-    }
+    },
+    genComponNTGraph = function() plotGraph(objects$components, onlyLinked = TRUE)
 )

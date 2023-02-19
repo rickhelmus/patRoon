@@ -11,6 +11,7 @@ reportHTMLUtils$methods(
     hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
     hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
     hasComponentsSpecClust = function() hasComponents() && inherits(objects$components, "componentsSpecClust"),
+    hasComponentsNT = function() hasComponents() && inherits(objects$components, "componentsNT"),
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
     hasFormulas = function() !is.null(objects[["formulas"]]),
     hasCompounds = function() !is.null(objects[["compounds"]]),
@@ -52,6 +53,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     file.copy(system.file("report", "details.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "components_int.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "components_spec.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report", "components_nt.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "modal.html", package = "patRoon"), workPath)
     
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd

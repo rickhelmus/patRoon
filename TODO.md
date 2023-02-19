@@ -13,6 +13,7 @@
 
 - Put CSV/PDF functions also in separate files
 - title argument for plotInt()
+- plotGraph() for componentsNTSet? (wasn't done before...)
 
 
 ## Features

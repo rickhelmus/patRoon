@@ -132,3 +132,6 @@ bslib::layout_column_wrap(
 
 ```{r child="components_spec.Rmd",eval=utils$hasComponentsSpecClust()}
 ```
+
+```{r child="components_nt.Rmd",eval=utils$hasComponentsNT()}
+```

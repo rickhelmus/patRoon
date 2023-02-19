@@ -55,6 +55,7 @@ pre, code {
 
 .zoomImg {
     width: 100%;
+    max-height: 80vh;
 }
 
 img:not(.zoomImg, .noZoomImg) {

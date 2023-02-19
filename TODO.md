@@ -7,6 +7,7 @@
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
 - new fromTPs slot: doc, make method and use in reporting?
+- get rid of magrittr dependency?
 
 ## Reporting
 

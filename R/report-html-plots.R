@@ -222,7 +222,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
     cat("Generate component plots...\n")
     ret <- list()
     
-    if (isIntCl)
+    if (isIntCl || inherits(components, "componentsSpecClust"))
     {
         ret$dendro <- makeHTMLReportPlot("compon-dendro.svg", outPath, selfContained, {
             plot(components)

@@ -575,3 +575,10 @@ getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
 }
 
 getDuplicatedStrings <- function(x) names(which(table(x) > 1))
+
+doApply <- function(applyf, doPar, data, ...)
+{
+    if (doPar)
+        applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
+    withProg(length(data), doPar, do.call(applyf, list(data, ...)))
+}

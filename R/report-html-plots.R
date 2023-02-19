@@ -40,8 +40,11 @@ makeHTMLReportPlot <- function(out, outPath, selfContained, code, ...)
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
 {
-    sapply(names(fGroups), function(grp)
+    cat("Generate large chromatograms...\n")
+    # UNDONE: parallel option
+    doApply("sapply", TRUE, names(fGroups), function(grp)
     {
+        doProgress()
         makeHTMLReportPlot(paste0("chrom_large-", grp, ".svg"), outPath, selfContained, {
             # UNDONE: params
             mar <- par("mar")
@@ -55,8 +58,11 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
 
 genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
 {
-    sapply(names(fGroups), function(grp)
+    cat("Generate small chromatograms...\n")
+    # UNDONE: parallel option
+    doApply("sapply", TRUE, names(fGroups), function(grp)
     {
+        doProgress()
         makeHTMLReportPlot(paste0("chrom_small-", grp, ".svg"), outPath, selfContained, {
             # UNDONE: params
             par(mai = c(0, 0, 0, 0), lwd = 10)
@@ -70,8 +76,11 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
 genHTMLReportPlotsChromsFeatures <- function(fGroups, outPath, EICs, selfContained)
 {
     anas <- analyses(fGroups)
-    sapply(names(fGroups), function(grp)
+    cat("Generate individual feature chromatograms...\n")
+    # UNDONE: parallel option
+    doApply("sapply", TRUE, names(fGroups), function(grp)
     {
+        doProgress()
         # whana <- fGroups[[grp]] > 0
         whana <- rep(TRUE, length(anas))
         sapply(anas[whana], function(ana)
@@ -97,8 +106,11 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
     if (nrow(structInfo) > 0)
     {
         structInfo <- unique(structInfo, by = "InChIKey")
-        return(Map(structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
+        cat("Generate structures...\n")
+        # UNDONE: parallel option
+        return(doApply("Map", TRUE, structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
         {
+            doProgress()
             makeHTMLReportPlot(paste0("struct-", ik, ".svg"), outPath, selfContained, {
                 mol <- getMoleculesFromSMILES(smi, emptyIfFails = TRUE)[[1]]
                 withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150)))
@@ -110,7 +122,9 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
 
 genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfContained)
 {
-    return(Map(groupNames(formulas), annotations(formulas), f = function(grp, ann)
+    cat("Generate formula annotation plots...\n")
+    # UNDONE: parallel option
+    return(doApply("Map", TRUE, groupNames(formulas), annotations(formulas), f = function(grp, ann)
     {
         ret <- list()
         
@@ -130,13 +144,17 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfConta
             }, width = 6, height = 5)
         })
         
+        doProgress()
+        
         return(ret)
     }))
 }
 
 genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPath, selfContained)
 {
-    return(Map(groupNames(compounds), annotations(compounds), f = function(grp, ann)
+    cat("Generate compound annotation plots...\n")
+    # UNDONE: parallel option
+    return(doApply("Map", TRUE, groupNames(compounds), annotations(compounds), f = function(grp, ann)
     {
         ret <- list()
         
@@ -158,13 +176,17 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
             }, width = 7, height = 5, pointsize = 16)
         })
         
+        doProgress()
+        
         return(ret)
     }))
 }
 
 genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
 {
-    return(Map(groupNames(compsCluster), cutClusters(compsCluster), f = function(grp, ct)
+    cat("Generate compound cluster plots...\n")
+    # UNDONE: parallel option
+    return(doApply("Map", TRUE, groupNames(compsCluster), cutClusters(compsCluster), f = function(grp, ct)
     {
         ret <- list()
         
@@ -178,6 +200,8 @@ genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
                 plotStructure(compsCluster, groupName = grp, cluster = cli, 100, 100)
             }, width = 5, height = 4)
         })
+        
+        doProgress()
 
         return(ret)
     }))
@@ -186,7 +210,9 @@ genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
 genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, selfContained)
 {
     cInfo <- componentInfo(components)
-    return(pruneList(Map(names(components), componentTable(components), f = function(cn, ct)
+    cat("Generate compound annotation plots...\n")
+    # UNDONE: parallel option
+    return(pruneList(doApply("Map", TRUE, names(components), componentTable(components), f = function(cn, ct)
     {
         if (!any(ct$group %chin% names(fGroups)))
             return(NULL)
@@ -218,6 +244,8 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
             }, width = 7, height = 6, pointsize = 16)
         }
         
+        doProgress()
+        
         return(pl)
     })))
 }
@@ -227,6 +255,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
 {
     ret <- list()
     
+    cat("Genarate summary plots...")
     ret$overview$chroms <- makeHTMLReportPlot("chroms.svg", outPath, selfContained, {
         par(mai = c(0.9, 0.8, 0.6, 0.1))
         # UNDONE: params
@@ -270,10 +299,12 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
             print(plotUpSet(fGroups))
         }, width = 7, height = 7)
     }
-    
+    cat(" Done!\n")
+
     ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
+    
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
     if (!is.null(formulas))
         ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)

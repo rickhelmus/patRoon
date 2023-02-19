@@ -441,7 +441,7 @@ reportHTMLUtils$methods(
     let profileRelEl = document.getElementById('profileRel_view-component');
     let profileAbsEl = document.getElementById('profileAbs_view-component');
     const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
-    const pl = Reactable.getState(tabEl).meta.plots.components[rd.component];
+    const pl = Reactable.getState(tabEl).meta.plots.components.components[rd.component];
     chromEl.src = pl.chrom;
     specEl.src = pl.spec;
     if (profileRelEl != undefined)

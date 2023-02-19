@@ -217,9 +217,20 @@ genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
 genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, selfContained)
 {
     cInfo <- componentInfo(components)
-    cat("Generate compound annotation plots...\n")
+    isIntCl <- inherits(components, "componentsIntClust")
+    
+    cat("Generate component plots...\n")
+    ret <- list()
+    
+    if (isIntCl)
+    {
+        ret$dendro <- makeHTMLReportPlot("compon-dendro.svg", outPath, selfContained, {
+            plot(components)
+        })
+    }
+    
     # UNDONE: parallel option
-    return(pruneList(doApply("Map", TRUE, names(components), componentTable(components), f = function(cn, ct)
+    ret$components <- pruneList(doApply("Map", TRUE, names(components), componentTable(components), f = function(cn, ct)
     {
         if (!any(ct$group %chin% names(fGroups)))
             return(NULL)
@@ -239,7 +250,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
             plotSpectrum(components, cn)
         }, width = 7, height = 4, pointsize = 16)
         
-        if (inherits(components, "componentsIntClust"))
+        if (isIntCl)
         {
             pl$profileRel <- makeHTMLReportPlot(paste0("compon-int_rel-", cn, ".svg"), outPath, selfContained, {
                 plotInt(components, index = cn, main = "normalized")
@@ -254,7 +265,9 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
         doProgress()
         
         return(pl)
-    })))
+    }))
+    
+    return(ret)
 }
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath, EICs,
@@ -369,5 +382,9 @@ reportHTMLUtils$methods(
         }), recursive = FALSE)
         elements <- do.call(htmltools::tagList, elements)
         return(htmltools::div(style = list(display = "flex"), elements))
+    },
+    genIntClustHeatMap = function()
+    {
+        plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configfurable
     }
 )

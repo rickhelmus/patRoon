@@ -49,6 +49,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     
     file.copy(system.file("report", "report.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "details.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report", "components_int.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "modal.html", package = "patRoon"), workPath)
     
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd

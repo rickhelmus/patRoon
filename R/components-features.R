@@ -45,10 +45,10 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     cmpTab[, fCMPID := paste0(match(analysis, analyses(fGroups)), "-", fCMP)]
 
     # NOTE: abundance only takes assigned features into account, as unassigned won't be present
-    cmpTab[!is.na(adduct_ion), abundance := sapply(adduct_ion, function(a) sum(a == adduct_ion)) / .N, by = "group"]
+    cmpTab[!is.na(adduct_ion), adduct_abundance := sapply(adduct_ion, function(a) sum(a == adduct_ion)) / .N, by = "group"]
     
     # Filter adducts not abundantly assigned to same feature group
-    cmpTab <- cmpTab[is.na(abundance) | numGTE(abundance, relMinAdductAbundance)]
+    cmpTab <- cmpTab[is.na(adduct_abundance) | numGTE(adduct_abundance, relMinAdductAbundance)]
     
     if (adductConflictsUsePref && length(prefAdducts) > 0)
     {
@@ -65,7 +65,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # then these are now always the most abundant.
     # UNDONE: handle ties?
     cmpTab[!is.na(adduct_ion), keep :=
-               uniqueN(adduct_ion) == 1 | adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
+               uniqueN(adduct_ion) == 1 | adduct_ion == adduct_ion[which.max(adduct_abundance)], by = "group"]
     cmpTab <- cmpTab[is.na(adduct_ion) | keep == TRUE][, keep := NULL]
 
     # Start making group components; for each feature group:
@@ -147,7 +147,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     linkedFGs <- linkedFGs[!group %chin% getDuplicatedStrings(group)]
     
     # prepare for components
-    cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct_ion"),
+    cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct_ion", "adduct_abundance"),
                       names(linkedFGs))
     linkedFGs <- linkedFGs[, cols, with = FALSE]
     linkedFGs[, c("ret", "mz") := gInfo[group, c("rts", "mzs")]]

@@ -1,0 +1,34 @@
+Internal standards
+===
+    
+##
+    
+```{r echo=FALSE}
+if (!utils$hasSets())
+{
+    bslib::layout_column_wrap(
+        width = 1,
+        height = "100%",
+        style = "padding-bottom: 10px; padding-right: 10px;",
+        bslib::card(
+            bslib::card_header("Internal standard assignments"),
+            bslib::card_body_fill(utils$genISTDGraph())
+        )
+    )
+} else
+{
+    navs <- lapply(utils$getFGSets(), function(s)
+    {
+        bslib::nav(
+            s,
+            bslib::card_body_fill(utils$genISTDGraph(s))
+        )
+    })
+    bslib::layout_column_wrap(
+        width = 1,
+        height = "100%",
+        style = "padding-bottom: 10px; padding-right: 10px;",
+        do.call(bslib::navs_tab_card, c(list(title = "Internal standard assignments"), navs))
+    )
+}
+```

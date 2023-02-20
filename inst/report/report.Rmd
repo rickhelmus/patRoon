@@ -127,6 +127,9 @@ bslib::layout_column_wrap(
 ```{r child="details.Rmd"}
 ```
 
+```{r child="istds.Rmd",eval=utils$hasInternalStandards()}
+```
+
 ```{r child="components_int.Rmd",eval=utils$hasComponentsIntClust()}
 ```
 

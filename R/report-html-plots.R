@@ -345,6 +345,13 @@ reportHTMLUtils$methods(
             return(paste0("<img src=", knitr::image_uri(p), "></img>"))
         return(paste0("<img src='", p, "'></img>"))
     },
+    genISTDGraph = function(set = NULL)
+    {
+        args <- list(objects$fGroups, width = "100%", height = "90%") # NOTE: bit less height to avoid vertical scrollbar
+        if (!is.null(set))
+            args <- c(args, set = set)
+        do.call(plotGraph, args)
+    },
     genTPGraphs = function()
     {
         cInfo <- componentInfo(objects$components)

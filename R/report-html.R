@@ -6,6 +6,7 @@ reportHTMLUtils <- setRefClass("reportHTMLUtils",
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups),
+    hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
     hasSets = function() isFGSet(objects$fGroups),
     hasFQualities = function() hasFGroupScores(objects$fGroups),
     hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
@@ -15,7 +16,9 @@ reportHTMLUtils$methods(
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
     hasFormulas = function() !is.null(objects[["formulas"]]),
     hasCompounds = function() !is.null(objects[["compounds"]]),
-    hasCompsCluster = function() !is.null(objects[["compsCluster"]])
+    hasCompsCluster = function() !is.null(objects[["compsCluster"]]),
+    
+    getFGSets = function() sets(objects$fGroups)
 )
 
 # UNDONE: method
@@ -49,12 +52,9 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     unlink(workPath, TRUE)
     mkdirp(workPath)
     
-    file.copy(system.file("report", "report.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "details.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "components_int.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "components_spec.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "components_nt.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "modal.html", package = "patRoon"), workPath)
+    file.copy(system.file("report", c("report.Rmd", "details.Rmd", "istds.Rmd", "components_int.Rmd",
+                                      "components_spec.Rmd", "components_nt.Rmd", "modal.html"), package = "patRoon"),
+              workPath)
     
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd
     path <- normalizePath(path)

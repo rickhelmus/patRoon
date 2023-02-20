@@ -152,6 +152,8 @@
 <strong>IMPORTANT</strong>: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> argument to <code>TRUE</code>.</li>
 <li>Fixed: <code>scoreTypes</code> slot could contain scorings not actually used, e.g. if the <code>scoreTypes</code> argument to <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> contained scorings not actually present in the used database.</li>
 <li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
+<li>Fixed: <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code>: <code>updateScore</code> argument was ignored and treated always as <code>TRUE</code>
+</li>
 </ul></li>
 <li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
 <li>Fixed: <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> marked passing peaks to be removed instead of the other way around (issue <a href="https://github.com/rickhelmus/patRoon/issues/59" class="external-link">#59</a>)</li>
@@ -188,6 +190,7 @@
 <code><a href="../reference/clearCache.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> used wrong variable name for suspect list under some conditions (issue <a href="https://github.com/rickhelmus/patRoon/issues/69" class="external-link">#69</a>)</li>
 <li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was somethimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
+<li>Feature components: add <code>adduct_abundance</code> column</li>
 </ul></div>
 </div>
     <div class="section level2">

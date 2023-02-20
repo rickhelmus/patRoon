@@ -45,6 +45,7 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
     - **IMPORTANT**: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` argument to `TRUE`.
     - Fixed: `scoreTypes` slot could contain scorings not actually used, e.g. if the `scoreTypes` argument to `generateCompoundsMetFrag()` contained scorings not actually present in the used database.
     - Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()
+    - Fixed: `addFormulaScoring()`: `updateScore` argument was ignored and treated always as `TRUE`
 - Fixed regression where the `filter()` method for `MSPeakLists` where precursor isolation (`isolatePrec` argument) also applied to MS/MS data (issue #56).
 - Fixed: `predictCheckFeaturesSession()` marked passing peaks to be removed instead of the other way around (issue #59)
 - Fixed: newProject(): properly call `rstudioapi::getSourceEditorContext()` (issue #62)

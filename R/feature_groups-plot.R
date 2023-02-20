@@ -754,7 +754,7 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = T
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
+setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width = NULL, height = NULL)
 {
     checkmate::assertFlag(onlyPresent)
     
@@ -801,7 +801,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
     edges[, value := abs(gInfo[from, "rts"] - gInfo[to, "rts"])]
     edges[, value := max(0.1, 1 - (value / max(value)))]
     
-    visNetwork::visNetwork(nodes, edges,
+    visNetwork::visNetwork(nodes, edges, width = width, height = height,
                            submain = paste0("Explore connections by dragging/zooming/selecting.<br>",
                                             "Smaller retention time difference have wider edges.")) %>%
         visNetwork::visOptions(selectedBy = list(variable = "ISTD", multiple = TRUE),
@@ -816,4 +816,4 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE)
 #' @rdname feature-plotting
 #' @param set \setsWF The set for which data must be plotted.
 #' @export
-setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set) plotGraph(unset(obj, set), onlyPresent = onlyPresent))
+setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set, ...) plotGraph(unset(obj, set), onlyPresent = onlyPresent, ...))

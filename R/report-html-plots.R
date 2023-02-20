@@ -394,5 +394,5 @@ reportHTMLUtils$methods(
     {
         plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configfurable
     },
-    genComponNTGraph = function() plotGraph(objects$components, onlyLinked = TRUE)
+    genComponNTGraph = function() plotGraph(objects$components, onlyLinked = TRUE, width = "100%", height = "100%")
 )

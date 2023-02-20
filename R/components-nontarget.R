@@ -50,7 +50,7 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 #' @references \addCitations{igraph}{1}
 #' 
 #' @export
-setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE)
+setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = NULL, height = NULL)
 {
     checkmate::assertFlag(onlyLinked)
     
@@ -65,7 +65,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE)
     titles <- sprintf("<b>%s</b> (RT: %.2f; m/z: %.4f; #%d)<br>fGroups: <i>%s</i><br>rGroups: <i>%s</i>",
                       names(obj), cInfo$ret_increment, cInfo$mz_increment, cInfo$size, hsFGroups, hsRGroups)
 
-    makeGraph(obj, onlyLinked, titles)
+    makeGraph(obj, onlyLinked, titles, width, height)
 })
 
 #' Componentization of homologous series with nontarget

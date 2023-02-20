@@ -482,7 +482,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #' @references \addCitations{igraph}{1}
 #' 
 #' @export
-setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE)
+setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width = NULL, height = NULL)
 {
     checkmate::assertFlag(onlyLinked)
 
@@ -493,7 +493,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE)
                       names(obj), cInfo$parent_name, cInfo$parent_group,
                       sapply(cTable, function(cmp) paste0(cmp$TP_name, collapse = ", ")),
                       sapply(cTable, function(cmp) paste0(unique(cmp$group), collapse = ", ")))
-    makeGraph(obj, onlyLinked, titles)
+    makeGraph(obj, onlyLinked, titles, width, height)
 })
 
 #' Generate components of transformation products

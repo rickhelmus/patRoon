@@ -51,7 +51,7 @@ calculateComponentIntensities <- function(comps, fGroups)
     }))
 }
 
-makeGraph <- function(components, onlyLinked, titles)
+makeGraph <- function(components, onlyLinked, titles, width, height)
 {
     cInfo <- copy(components@componentInfo)
     
@@ -94,7 +94,7 @@ makeGraph <- function(components, onlyLinked, titles)
     nodes[, shape := "circle"]
     nodes[, title := titles[match(id, names(components))]]
     
-    visNetwork::visNetwork(nodes = nodes, edges = edges)
+    visNetwork::visNetwork(nodes = nodes, edges = edges, width = width, height = height)
 }
 
 printComponentsFiltered <- function(old, new)

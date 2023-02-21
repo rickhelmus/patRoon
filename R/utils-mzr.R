@@ -45,13 +45,12 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     hashes <- ranges[, makeHash(anaHash, .SD), by = seq_len(nrow(ranges)),
                      .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
     
-    cachedData <- loadCacheData(category = "mzREIC", hashes, dbArg = cacheDB)
+    cachedData <- loadCacheData(category = "mzREIC", hashes, dbArg = cacheDB, simplify = FALSE)
     if (!is.null(cachedData) && length(cachedData) == nrow(ranges))
         return(unname(cachedData)) # everything is in the cache
     
     spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
     EICs <- vector("list", nrow(ranges))
-    
     cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
     isCached <- if (!is.null(cachedData)) names(cachedData) %chin% hashes else rep(FALSE, nrow(ranges))
     EICs[isCached] <- cachedData

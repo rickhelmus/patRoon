@@ -56,9 +56,11 @@ openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB
 #' @details \code{loadCacheData} Loads cached data from a database.
 #' @param hashes A \code{character} with one more hashes (\emph{e.g.} obtained with \code{makeHash}) of the objects to
 #'   be loaded.
+#' @param simplify If \code{TRUE} and \code{length(hashes)==1} then the returned data is returned directly, otherwise
+#'   the data is in a \code{list}.
 #' @rdname caching
 #' @export
-loadCacheData <- function(category, hashes, dbArg = NULL)
+loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE)
 {
     if (getCacheMode() == "save" || getCacheMode() == "none")
         return(NULL)
@@ -79,7 +81,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
             df <- DBI::dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
 
             if (nrow(df) > 0)
-                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))[[1]]
+                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))
         }
         else
         {
@@ -95,6 +97,12 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
                     ret <- ret[match(hashes, names(ret))] # sync order
                 }
             }
+        }
+        
+        if (!is.null(ret))
+        {
+            if (simplify && length(ret) == 1)
+                ret <- ret[[1]]
         }
     }
 

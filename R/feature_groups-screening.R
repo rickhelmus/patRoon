@@ -190,26 +190,46 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 })
 
 #' @export
-setMethod("predictConc", "featureGroupsScreening", function(fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                            compounds, alwaysSMILES)
+setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq)
 {
-    if (!is.null(compounds))
-        fGroups <- callNextMethod()
-    
-    scr <- screenInfo(fGroups)
+    # UNDONE: verify args
+
+    scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
         stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
     if (any(is.na(scr$SMILES)))
         warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
     
-    inp <- screenInfo(fGroups)[, c("group", "SMILES"), with = FALSE]
+    inp <- screenInfo(obj)[, c("group", "SMILES"), with = FALSE]
     inp <- inp[!is.na(SMILES)]
     # avoid duplicate calculations if there happen to be suspects with the same SMILES
     inp <- unique(inp, by = c("group", "SMILES"))
-    resp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+    resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq)
+    scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE)
+    
+    obj@screenInfo <- scr
+    
+    return(obj)
+})
 
+#' @export
+setMethod("predictConc", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
+{
+    scr <- screenInfo(fGroups)
+    if (is.null(scr[["RF_SMILES"]]))
+        stop("Object lacks predicted response factors. Please call predictRespFactor() first!", call. = FALSE)
+    
+    if (!is.null(featureAnn) && length(featureAnn) > 0)
+        fGroups <- callNextMethod()
+    else
+        fGroups@concentrations <- data.table()
+    
+    resp <- scr[, c("group", "SMILES", "RF_SMILES"), with = FALSE]
+    resp[, type := "suspect"]
+    resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
+    setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
+    
     concs <- calcFeatureConcs(fGroups, resp)
-    concs[, type := "suspect"]
     # assign and collapse candidate names
     concs[, candidate_name := paste0(unique(scr[SMILES == candidate &
                                              group == get("group", envir = parent.env(environment()))]$name), collapse = ","),

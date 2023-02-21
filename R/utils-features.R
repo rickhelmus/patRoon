@@ -215,7 +215,7 @@ calcFeatureConcs <- function(fGroups, resp)
     setnames(gt, analyses(fGroups))
     
     concs <- copy(resp)
-    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF_pred * ints)]
+    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF * ints)]
     # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
     concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) cm * candidate_MW * 1E6),
           .SDcols = (paste0(analyses(fGroups), "_conc_M"))]

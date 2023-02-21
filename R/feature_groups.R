@@ -1380,10 +1380,8 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 })
 
 #' @export
-setMethod("predictConc", "featureGroups", function(fGroups, calibrants, eluent, organicModifier, pHAq, compounds,
-                                                   alwaysSMILES)
+setMethod("predictConc", "featureGroups", function(fGroups, featureAnn)
 {
-    # UNDONE: make methods
     # UNDONE: needs to be done per set
     # UNDONE: check calibrant format
     # UNDONE: check organicModifier
@@ -1391,42 +1389,43 @@ setMethod("predictConc", "featureGroups", function(fGroups, calibrants, eluent, 
     # UNDONE: SIRIUS formulas as input, when it supports loading FPs
     # UNDONE: clear out previous calculations
     
-    respComp <- NULL
-    if (!is.null(compounds))
+    if (length(fGroups) == 0)
     {
-        ctab <- as.data.table(compounds)
-        if (alwaysSMILES || !inherits(compounds, "compoundsSIRIUS"))
-        {
-            inp <- ctab[, c("group", "SMILES"), with = FALSE]
-            respComp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
-            respComp[, type := "compound"]
-            if (!is.null(ctab[["compoundName"]]))
-                respComp[, candidate_name := paste0(unique(ctab[SMILES == candidate &
-                                                             group == get("group", envir = parent.env(environment()))]$compoundName),
-                                                    collapse = ","), by = c("candidate", "group")]
-        }
-        else
-        {
-            respComp <- predictRespFactorsSIRFPs(compounds, groupInfo(fGroups), calibrants, eluent, organicModifier,
-                                                 pHAq)
-            respComp[, type := "SIRIUS_FP"]
-            if (!is.null(ctab[["compoundName"]]))
-                respComp[, candidate_name := paste0(unique(ctab[neutral_formula == candidate &
-                                                             group == get("group", envir = parent.env(environment()))]$compoundName),
-                                                    collapse = ","), by = c("candidate", "group")]
-        }
+        cat("No feature groups, nothing to do...\n")
+        return(fGroups)
     }
-    else
-        NULL
-    
-    if (is.null(respComp))
+    if (length(featureAnn) == 0)
     {
-        printf("No input data, nothing to calculate...\n")
-        # UNDONE: clear any old calculations?
+        cat("No feature annotations, nothing to do...\n")
         return(fGroups)
     }
     
-    fGroups@concentrations <- finalizeFeatureConcsTab(calcFeatureConcs(fGroups, respComp))
+    annTab <- as.data.table(featureAnn)
+    if (is.null(annTab[["RF_SMILES"]]) && is.null(annTab[["RF_SIRFP"]]))
+        stop("Feature annotations lack predicted response factors. Please call predictRespFactor() first!",
+             call. = FALSE)
+    
+    concs <- data.table()
+    
+    if (!is.null(annTab[["RF_SMILES"]]))
+    {
+        resp <- annTab[, c("group", "SMILES", "compoundName", "RF_SMILES"), with = FALSE]
+        resp[, type := "compound"]
+        resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
+        setnames(resp, c("SMILES", "compoundName", "RF_SMILES"), c("candidate", "candidate_name", "RF"))
+        concs <- calcFeatureConcs(fGroups, resp)
+    }
+    
+    if (!is.null(annTab[["RF_SIRFP"]]))
+    {
+        resp <- annTab[, c("group", "neutral_formula", "compoundName", "RF_SIRFP"), with = FALSE]
+        resp[, type := "SIRIUS_FP"]
+        resp[, candidate_MW := sapply(neutral_formula, formulaMW)]
+        setnames(resp, c("neutral_formula", "compoundName", "RF_SIRFP"), c("candidate", "candidate_name", "RF"))
+        concs <- rbind(concs, calcFeatureConcs(fGroups, resp))
+    }
+
+    fGroups@concentrations <- finalizeFeatureConcsTab(concs)
     
     return(fGroups)
 })

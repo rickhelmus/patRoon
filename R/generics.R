@@ -75,8 +75,7 @@ setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric
 #' @rdname featureGroups-class
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
-setGeneric("predictConc", function(fGroups, calibrants, eluent, organicModifier, pHAq, compounds = NULL,
-                                   alwaysSMILES = FALSE) standardGeneric("predictConc"))
+setGeneric("predictConc", function(fGroups, ...) standardGeneric("predictConc"))
 
 #' @rdname kpic2-conv
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
@@ -523,6 +522,12 @@ setGeneric("plotVenn", function(obj, ...) standardGeneric("plotVenn"))
 #' @templateVar desc plots an UpSet diagram to assess unique and overlapping data.
 #' @template generics
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
+
+#' @templateVar func predictRespFactor
+#' @templateVar desc Prediction of response factors.
+#' @template generics
+setGeneric("predictRespFactor", function(obj, ...) standardGeneric("predictRespFactor"))
+
 
 #' @templateVar func delete
 #' @templateVar desc Deletes results.

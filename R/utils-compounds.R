@@ -91,6 +91,32 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
 
 compScoreNames <- function(onlyNums) unique(compoundScorings(includeSuspectLists = !onlyNums)$name)
 
+addCompoundScore <- function(compounds, scoreName, updateScore, scoreWeight)
+{
+    if (updateScore)
+    {
+        compounds@groupAnnotations <- Map(groupNames(compounds), annotations(compounds), f = function(grp, ann)
+        {
+            ann <- copy(ann)
+            norm <- ann[[scoreName]] / max(ann[[scoreName]])
+            ann[, score := score + (scoreWeight * norm)]
+            return(ann)
+        })
+    }
+    
+    compounds@scoreRanges <- Map(compounds@scoreRanges, annotations(compounds), f = function(sc, ann)
+    {
+        ret <- c(sc, setNames(list(range(ann[[scoreName]])), scoreName))
+        # extend score range if necessary
+        if (updateScore)
+            ret$score <- c(min(ret$score, ann$score, na.rm = TRUE), max(ret$score, ann$score, na.rm = TRUE))
+        return(ret)
+    })
+    compounds@scoreTypes <- union(compounds@scoreTypes, scoreName)
+    
+    return(compounds)
+}
+
 makeDBIdentLink <- function(db, ident)
 {
     ident <- as.character(ident)

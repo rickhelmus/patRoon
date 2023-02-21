@@ -228,17 +228,8 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     close(prog)
 
     compounds@groupAnnotations <- cTable
-    compounds@scoreRanges <- mapply(compounds@scoreRanges, cTable, SIMPLIFY = FALSE, FUN = function(sc, ct)
-    {
-        ret <- c(sc, list(formulaScore = range(ct$formulaScore)))
-        # extend score range if necessary
-        ret$score <- c(min(ret$score, ct$score, na.rm = TRUE),
-                       max(ret$score, ct$score, na.rm = TRUE))
-        return(ret)
-    })
-    compounds@scoreTypes <- union(compounds@scoreTypes, "formulaScore")
-
-    return(compounds)
+    
+    return(addCompoundScore(compounds, "formulaScore", updateScore, formulaScoreWeight))
 })
 
 #' @describeIn compounds Calculates the maximum common substructure (MCS)
@@ -574,6 +565,25 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     
     return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, mincex, xlim, ylim, ...))
 })
+
+#' @export
+setMethod("predictRespFactor", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                     updateScore = FALSE, scoreWeight = 1)
+{
+    # UNDONE: verify args
+    
+    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        ann <- copy(ann)
+        inp <- data.table(group = grp, SMILES = ann$SMILES)
+        resp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+        ann <- merge(ann, resp[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE)
+        return(ann)
+    })
+    
+    return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
+})
+
 
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 {

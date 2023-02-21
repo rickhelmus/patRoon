@@ -370,10 +370,8 @@ predictRespFactorsSIRFPs <- function(compounds, gInfo, calibrants, eluent, organ
     ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
                  pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
                  by.x = "id", by.y = "identifier", sort = FALSE)
-    setnames(ret, c("neutral_formula", "conc_M"), c("candidate", "RF_pred"))
-    ret[, candidate_MW := sapply(candidate, formulaMW)]
+    setnames(ret, "conc_M", "RF_SIRFP")
     ret[, id := NULL]
-    setcolorder(ret, c("group", "candidate"))
     
     return(ret[])
 }

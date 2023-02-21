@@ -363,9 +363,8 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, NULL)
     
     ret <- as.data.table(pr$suspects_concentrations)
-    setnames(ret, c("identifier", "SMILES", "conc_M"), c("group", "candidate", "RF_pred"))
+    setnames(ret, c("identifier", "conc_M"), c("group", "RF_SMILES"))
     ret[, c("area", "retention_time") := NULL]
-    ret[, candidate_MW := babelConvert(candidate, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
     
     return(ret[])
 }

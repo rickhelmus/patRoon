@@ -117,6 +117,44 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
     return(ret)
 }
 
+#' @rdname compounds-class
+#' @export
+setMethod("delete", "compoundsSIRIUS", function(obj, i = NULL, j = NULL, ...)
+{
+    obj <- callNextMethod()
+    obj@fingerprints <- obj@fingerprints[names(obj@fingerprints) %chin% groupNames(obj)] # sync fingerprints
+    return(obj)
+})
+
+#' @export
+setMethod("predictRespFactor", "compoundsSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                           type = "FP")
+{
+    # UNDONE: verify args
+    
+    if (type == "SMILES" || type == "both")
+        obj <- callNextMethod(obj, fGroups = fGroups, calibrants = calibrants, eluent = eluent,
+                              organicModifier = organicModifier, pHAq = pHAq, updateScore = FALSE, scoreWeight = 1)
+
+    if (type == "FP" || type == "both")
+    {
+        resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+        
+        obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+        {
+            ann <- copy(ann)
+            ann <- merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
+                         sort = FALSE)
+            return(ann)
+        })
+        
+        obj <- addCompoundScore(obj, "RF_SIRFP", FALSE, 1)
+    }
+    
+    return(obj)
+})
+
+
 #' Compound annotation with SIRIUS
 #'
 #' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} in combination with
@@ -235,3 +273,4 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
                          setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                          setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
+

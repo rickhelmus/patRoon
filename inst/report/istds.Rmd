@@ -4,17 +4,15 @@ Internal standards
 ##
     
 ```{r echo=FALSE}
+layoutArgs <- list(width = 1, height = "100%", style = "padding-bottom: 10px; padding-right: 10px;")
 if (!utils$hasSets())
 {
-    bslib::layout_column_wrap(
-        width = 1,
-        height = "100%",
-        style = "padding-bottom: 10px; padding-right: 10px;",
+    do.call(bslib::layout_column_wrap, c(layoutArgs, list(
         bslib::card(
             bslib::card_header("Internal standard assignments"),
             bslib::card_body_fill(utils$genISTDGraph())
-        )
-    )
+        )        
+    )))
 } else
 {
     navs <- lapply(utils$getFGSets(), function(s)
@@ -24,11 +22,8 @@ if (!utils$hasSets())
             bslib::card_body_fill(utils$genISTDGraph(s))
         )
     })
-    bslib::layout_column_wrap(
-        width = 1,
-        height = "100%",
-        style = "padding-bottom: 10px; padding-right: 10px;",
+    do.call(bslib::layout_column_wrap, c(layoutArgs, list(
         do.call(bslib::navs_tab_card, c(list(title = "Internal standard assignments"), navs))
-    )
+    )))
 }
 ```

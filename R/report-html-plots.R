@@ -394,5 +394,11 @@ reportHTMLUtils$methods(
     {
         plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configfurable
     },
-    genComponNTGraph = function() plotGraph(objects$components, onlyLinked = TRUE, width = "100%", height = "100%")
+    genComponNTGraph = function(s)
+    {
+        args <- list(objects$components, onlyLinked = TRUE, width = "100%", height = "100%")
+        if (!is.null(s))
+            args <- c(args, list(set = s))
+        do.call(plotGraph, args)
+    }
 )

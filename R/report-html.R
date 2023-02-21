@@ -12,7 +12,7 @@ reportHTMLUtils$methods(
     hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
     hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
     hasComponentsSpecClust = function() hasComponents() && inherits(objects$components, "componentsSpecClust"),
-    hasComponentsNT = function() hasComponents() && inherits(objects$components, "componentsNT"),
+    hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
     hasFormulas = function() !is.null(objects[["formulas"]]),
     hasCompounds = function() !is.null(objects[["compounds"]]),

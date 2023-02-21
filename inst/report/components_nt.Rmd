@@ -4,13 +4,26 @@ Homologues series
 ##
     
 ```{r echo=FALSE}
-bslib::layout_column_wrap(
-    width = 1,
-    height = "100%",
-    style = "padding-bottom: 10px; padding-right: 10px;",
-    bslib::card(
-        bslib::card_header("Linked series"),
-        bslib::card_body_fill(utils$genComponNTGraph())
-    )
-)
+layoutArgs <- list(width = 1, height = "100%", style = "padding-bottom: 10px; padding-right: 10px;")
+if (!utils$hasSets())
+{
+    do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+        bslib::card(
+            bslib::card_header("Linked series"),
+            bslib::card_body_fill(utils$genComponNTGraph())
+        )        
+    )))
+} else
+{
+    navs <- lapply(utils$getFGSets(), function(s)
+    {
+        bslib::nav(
+            s,
+            bslib::card_body_fill(utils$genComponNTGraph(s))
+        )
+    })
+    do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+        do.call(bslib::navs_tab_card, c(list(title = "Linked series"), navs))
+    )))
+}
 ```

@@ -33,7 +33,7 @@ setMethod("collapseComponents", "componentsNTSet", function(obj)
 
 #' @rdname componentsNT-class
 #' @export
-setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked = TRUE, set) plotGraph(unset(obj, set), onlyLinked = onlyLinked))
+setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked = TRUE, set, ...) plotGraph(unset(obj, set), onlyLinked = onlyLinked, ...))
 
 #' @rdname componentsNT-class
 #' @export

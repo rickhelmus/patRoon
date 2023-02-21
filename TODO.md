@@ -15,6 +15,9 @@
 - title argument for plotInt()
 - plotGraph() for componentsNTSet? (wasn't done before...)
 
+## Components
+
+- makeGraph(): throw or not throw an error with empty components and onlyLinked=T
 
 ## Features
 

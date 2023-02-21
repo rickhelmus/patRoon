@@ -63,8 +63,6 @@ makeGraph <- function(components, onlyLinked, titles, width, height)
     
     if (nrow(cInfo) == 0)
     {
-        if (onlyLinked)
-            stop("No component links in your data and onlyLinked = TRUE, so nothing to show.")
         nodes <- data.table(id = character(), label = character(), group = numeric())
         edges <- data.table(from = character(), to = character())
     }

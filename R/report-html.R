@@ -62,7 +62,8 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     cat("Loading all EICs... ")
     # UNDONE: params
     # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
-    EICs <- getEICsForFGroups(fGroups, 30, 0.002, NULL, FALSE, FALSE)
+    EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
+                              onlyPresent = FALSE)
     cat("Done!\n")
     
     reportEnv <- new.env()

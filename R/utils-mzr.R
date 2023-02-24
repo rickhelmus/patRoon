@@ -65,30 +65,21 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     return(EICs)
 }
 
-setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                                         onlyPresent, analysis, groupName)
+setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, rtWindow, mzExpWindow, topMost,
+                                                        topMostByRGroup, onlyPresent)
 {
-    if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
-        return(list())
-    
     anaInfo <- analysisInfo(fGroups)
     anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
     featTab <- as.data.table(getFeatures(fGroups))
-
-    verifyDataCentroided(anaInfo)
     
-    # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before
-    # that, it's more efficient to first figure out for which feature groups EICs have to be generated per analysis.
-    # Furthermore, collect all retention ranges for EICs as these also have to be checked on a per group basis.
-
     if (!is.null(topMost))
         topMost <- min(topMost, nrow(anaInfo))
-
+    
     # subset relevant things in advance    
     featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
                        with = FALSE]
     takeAnalysis <- analysis # copy name to workaround DT access below
-    EICInfoTab <- sapply(groupName, function(fg)
+    return(sapply(groupName, function(fg)
     {
         ret <- featTab[group == fg][, -"group"]
         
@@ -103,7 +94,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
         
         # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
         # above
-        # HACK: need to take copy of 'analysis' function parameter to avoid confusions with equallt named DT column
+        # HACK: need to take copy of 'analysis' function parameter to avoid confusions with equally named DT column
         ret <- ret[analysis %chin% takeAnalysis]
         
         if (!is.null(topMost))
@@ -120,70 +111,95 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
                 ret <- ret[seq_len(topMost)]
             }
         }
-
+        
         ret[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
         return(ret)
-    }, simplify = FALSE)
+    }, simplify = FALSE))
+})
+
+setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., adductPos, adductNeg)
+{
+    ret <- callNextMethod(fGroups, ...)
     
-    cacheDB <- openCacheDBScope()
+    anaInfo <- analysisInfo(fGroups)
+    featTab <- as.data.table(getFeatures(fGroups))
     
+    # HACK: since feature tables store the character form, it's easier to keep it all the same
+    adductPos <- as.character(adductPos); adductNeg <- as.character(adductNeg)
+    
+    # 'ionize' m/zs
+    return(Map(names(ret), ret, f = function(grp, ranges)
+    {
+        featTabGrp <- featTab[group == grp]
+        ranges[, adduct := featTabGrp[match(ranges$analysis, analysis)]$adduct]
+        
+        if (any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
+        {
+            # First try to get adduct from other features in the same set: assume that adduct per set for a single
+            # feature group is always the same
+            adductSets <- unique(featTabGrp[, c("adduct", "set"), with = FALSE])
+            ranges[is.na(adduct), adduct := {
+                s <- anaInfo[match(analysis, anaInfo$analysis), "set"]
+                adductSets[set == s]$adduct
+            }, by = "analysis"]
+            
+            # Then fallback to default adducts for a polarity. For this we get the polarity from another feature in the
+            # same analysis (if present)
+            ranges[is.na(adduct), adduct := sapply(analysis, function(ana)
+            {
+                t <- featTab[analysis == ana]
+                if (nrow(t) == 0)
+                    NA # all features were removed
+                else if (as.adduct(t$adduct[1])@charge > 0)
+                    adductPos
+                else
+                    adductNeg
+            })]
+            
+            if (any(is.na(ranges$adduct)))
+            {
+                # If all failed then simply omit
+                warning(sprintf("Cannot get adduct information for group '%s' for features in analyses %s", grp,
+                                paste0(ranges[is.na(adduct)]$analysis, collapse = ", ")), call. = FALSE)
+                ranges <- ranges[!is.na(adduct)]
+            }
+        }
+
+        # NOTE: this is mostly copied from unset features method        
+        allAdducts <- sapply(unique(ranges$adduct), as.adduct)
+        mzmins <- calculateMasses(ranges$mzmin, allAdducts[ranges$adduct], type = "mz")
+        nmd <- mzmins - ranges$mzmin
+        set(ranges, j = c("mzmin", "mzmax"), value = list(mzmins, ranges$mzmax + nmd))
+        
+        return(ranges)
+    }))
+})
+
+setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, groupName, ...)
+{
+    if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
+        return(list())
+    
+    anaInfo <- analysisInfo(fGroups)
+    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+
+    verifyDataCentroided(anaInfo)
+
+    EICInfoTab <- getEICFGroupInfo(fGroups, analysis = analysis, groupName = groupName, ...)
     EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
     EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
     anaInfoEICs <- anaInfo[anaInfo$analysis %in% names(EICInfo), ]
     anaPaths <- mapply(anaInfoEICs$analysis, anaInfoEICs$path, FUN = getMzMLOrMzXMLAnalysisPath,
                        MoreArgs = list(mustExist = TRUE))
-    
+
+    # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before
+    # that, it's more efficient to first figure out for which feature groups EICs have to be generated per analysis.
+    # Furthermore, collect all retention ranges for EICs as these also have to be checked on a per group basis.
+    cacheDB <- openCacheDBScope()
     EICs <- Map(anaPaths, EICInfo, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
     EICs <- Map(EICs, lapply(EICInfo, "[[", "group"), f = setNames)
     
     return(pruneList(EICs))
-})
-
-setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                                            onlyPresent, analysis, groupName)
-{
-    unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-    unsetAna <- lapply(unsetFGroupsList, function(ufg) intersect(analysis, analyses(ufg)))
-    unsetGrps <- lapply(unsetFGroupsList, function(ufg) intersect(groupName, names(ufg)))
-    EICList <- Map(unsetFGroupsList, analysis = unsetAna, groupName = unsetGrps, f = getEICsForFGroups,
-                   MoreArgs = list(rtWindow = rtWindow, mzExpWindow = mzExpWindow, topMost = topMost,
-                                   topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent))
-    EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
-    names(EICs) <- unlist(lapply(EICList, names))
-    EICs <- EICs[intersect(analyses(fGroups), names(EICs))] # sync order
-    
-    if (!is.null(topMost))
-    {
-        # topMost is applied per set, make sure that the final result also doesn't contain >topMost results
-        
-        anaInfo <- analysisInfo(fGroups)
-        anasInEICs <- names(EICs)
-        topMost <- min(topMost, length(anasInEICs))
-        featTab <- as.data.table(getFeatures(fGroups))
-        
-        for (fg in groupName)
-        {
-            featTabGrp <- featTab[group == fg & analysis %chin% anasInEICs]
-            if (topMostByRGroup)
-            {
-                featTabGrp[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
-                featTabGrp[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
-                featTabGrp <- featTabGrp[rank <= topMost]
-            }
-            else
-            {
-                setorderv(featTabGrp, "intensity", order = -1L)
-                featTabGrp <- featTabGrp[seq_len(topMost)]
-            }
-
-            # clearout any analysis results not being in topMost
-            otherAnas <- setdiff(anasInEICs, featTabGrp$analysis)
-            EICs[otherAnas] <- lapply(EICs[otherAnas], function(e) e[setdiff(names(e), fg)])
-        }
-        EICs <- pruneList(EICs, checkEmptyElements = TRUE) # in case all EICs were removed from analyses
-    }
-
-    return(EICs)
 })
 
 setMethod("getEICsForFeatures", "features", function(features)

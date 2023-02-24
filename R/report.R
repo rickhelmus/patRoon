@@ -671,7 +671,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups || !is.null(formulas) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, rtWindow = EICRtWindow, mzExpWindow = EICMzExpWindow, topMost = EICTopMost,
+                                  topMostByRGroup = EICTopMostByRGroup, onlyPresent = EICOnlyPresent)
         cat("Done!\n")
     }
 
@@ -826,7 +827,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     #     !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, rtWindow = EICRtWindow, mzExpWindow = EICMzExpWindow, topMost = EICTopMost,
+                                  topMostByRGroup = EICTopMostByRGroup, onlyPresent = EICOnlyPresent)
         cat("Done!\n")
     }
 

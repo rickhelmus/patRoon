@@ -386,9 +386,9 @@ setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", rtWindow = 30,
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
-setGeneric("getEICsForFGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent,
-                                         analysis = analyses(fGroups),
-                                         groupName = names(fGroups)) standardGeneric("getEICsForFGroups"))
+setGeneric("getEICFGroupInfo", function(fGroups, ...) standardGeneric("getEICFGroupInfo"))
+setGeneric("getEICsForFGroups", function(fGroups, analysis = analyses(fGroups), groupName = names(fGroups),
+                                         ...) standardGeneric("getEICsForFGroups"))
 setGeneric("getEICsForFeatures", function(features) standardGeneric("getEICsForFeatures"))
 setGeneric("checkComponents", function(components, fGroups, session = "checked-components.yml", rtWindow = 30,
                                        clearSession = FALSE) standardGeneric("checkComponents"))

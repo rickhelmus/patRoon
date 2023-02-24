@@ -228,9 +228,11 @@ checkFeaturesInterface$methods(
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, 0.001, 1, TRUE, TRUE)
+                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
+                                                        topMostByRGroup = TRUE, onlyPresent = TRUE)
                 else
-                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, 0.001, NULL, FALSE, TRUE)
+                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = NULL,
+                                                  topMostByRGroup = FALSE, onlyPresent = TRUE)
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode
@@ -359,8 +361,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, topMostByRGroup = FALSE,
-                                     onlyPresent = TRUE)
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
+                                     topMostByRGroup = FALSE, onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- list()
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension

@@ -381,14 +381,15 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #' @rdname feature-plotting
 #' @export
 setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj), rtWindow = 30,
-                                                  mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
-                                                  topMostByRGroup = FALSE, EICs = NULL, showPeakArea = FALSE,
+                                                  mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
+                                                  onlyPresent = TRUE, retMin = FALSE, showPeakArea = FALSE,
                                                   showFGroupRect = TRUE, title = NULL,
                                                   colourBy = c("none", "rGroups", "fGroups"),
-                                                  showLegend = TRUE, onlyPresent = TRUE,
-                                                  annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                                  xlim = NULL, ylim = NULL, ...)
+                                                  showLegend = TRUE, annotate = c("none", "ret", "mz"),
+                                                  showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
+    # NOTE: keep args in sync with sets method
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
            fixed = list(add = ac))
@@ -410,8 +411,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         showLegend <- FALSE
     
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent, analysis,
-                                  groupName)
+        EICs <- getEICsForFGroups(obj, analysis, groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
+                                  onlyPresent)
     else
     {
         # omit data we don't need
@@ -582,6 +583,28 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         setTxtProgressBar(prog, gCount)
         close(prog)
     }
+})
+
+#' @export
+setMethod("plotChroms", "featureGroupsSet", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                     rtWindow = 30, mzExpWindow = 0.001, topMost = NULL,
+                                                     topMostByRGroup = FALSE, onlyPresent = TRUE, ..., EICs = NULL,
+                                                     adductPos = "[M+H]+", adductNeg = "[M-H]-")
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
+           fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
+    adductPos <- checkAndToAdduct(adductPos, .var.name = "adductPos")
+    adductNeg <- checkAndToAdduct(adductNeg, .var.name = "adductNeg")
+        
+    if (is.null(EICs))
+        EICs <- getEICsForFGroups(obj, analysis, groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
+                                  onlyPresent, adductPos = adductPos, adductNeg = adductNeg)
+    
+    callNextMethod(obj, analysis = analysis, groupName = groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
+                   onlyPresent, ..., EICs = EICs)
 })
 
 setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),

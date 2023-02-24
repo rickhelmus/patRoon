@@ -19,6 +19,13 @@
 
 - makeGraph(): throw or not throw an error with empty components and onlyLinked=T
 
+## NEWS/docs
+
+- plotChroms()
+    - Changed arg order
+    - adductPos/adductNeg & get EICs for missing features if all are absent in set
+
+
 ## Features
 
 - Normalization

@@ -150,6 +150,8 @@
 <span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu"><a href="generics.html">plotChroms</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>  groupName <span class="op">=</span> <span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
 <span>  rtWindow <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  mzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -274,6 +276,13 @@ to disable outer groups.</p></dd>
 <dt>addIntraOuterGroupLinks</dt>
 <dd><p>If <code>TRUE</code> then links will be added within
 outer groups.</p></dd>
+
+
+<dt>analysis, groupName</dt>
+<dd><p><code>character</code> vector with the analyses/group names that should be considered for
+plotting. Compared to subsetting the <code>featureGroups</code> object (<code>obj</code>) this is slightly faster and (if
+<code>onlyPresent=FALSE</code>) allows plotting chromatograms for feature groups where none of the specified analyses
+contain the feature (which is impossible otherwise since subsetting removes 'empty' feature groups).</p></dd>
 
 
 <dt>rtWindow</dt>

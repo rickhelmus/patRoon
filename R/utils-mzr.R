@@ -117,9 +117,9 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
     }, simplify = FALSE))
 })
 
-setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., adductPos, adductNeg)
+setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., onlyPresent, adductPos, adductNeg)
 {
-    ret <- callNextMethod(fGroups, ...)
+    ret <- callNextMethod(fGroups, onlyPresent = onlyPresent, ...)
     
     anaInfo <- analysisInfo(fGroups)
     featTab <- as.data.table(getFeatures(fGroups))
@@ -133,7 +133,7 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., adductP
         featTabGrp <- featTab[group == grp]
         ranges[, adduct := featTabGrp[match(ranges$analysis, analysis)]$adduct]
         
-        if (any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
+        if (!onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
         {
             # First try to get adduct from other features in the same set: assume that adduct per set for a single
             # feature group is always the same

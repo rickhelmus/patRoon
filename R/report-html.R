@@ -60,10 +60,14 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    # UNDONE: params
+    # UNDONE: params, handle sets
     # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
-    EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
-                              onlyPresent = FALSE)
+    if (isFGSet(fGroups))
+        EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
+                                  onlyPresent = FALSE, adductPos = "[M+H]+", adductNeg = "[M-H]-")
+    else
+        EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
+                                  onlyPresent = FALSE)
     cat("Done!\n")
     
     reportEnv <- new.env()

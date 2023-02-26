@@ -96,7 +96,9 @@ The changes are reflected in the installation section of the handbook.
 - Fixed: `checkFeatures()`/`checkComponents()`: disabling a feature/featureGroup in a sorted table would lead to wrong selections
 - `annotateSuspects()`: log if the suspect formula/compound data could not be matched with feature annotations
 - Fixed: `chromPeaks()` from `xcms` was somethimes not found (issue #68) 
-- `plotGraph()` now has `width` and `height` arguments.
+- `plotGraph()`
+    - now has `width` and `height` arguments.
+    - Methods for `transformationProductsStructure` now draw structures in SVG format to improve quality
 - `plotInt()` method for components: `index` argument can now also be component name
 - `plotChroms()` / EIC loading
     - refactor and minor improvements

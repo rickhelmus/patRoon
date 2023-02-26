@@ -162,11 +162,11 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
     if (nrow(nodes) <= structuresMax && nrow(nodes) > 0)
     {
         # UNDONE: make util?
-        imgf <- tempfile(fileext = ".png") # temp file is re-used
+        imgf <- tempfile(fileext = ".svg") # temp file is re-used
         getURIFromSMILES <- function(SMILES)
         {
             mol <- getMoleculesFromSMILES(SMILES, emptyIfFails = TRUE)[[1]]
-            withr::with_png(imgf, withr::with_par(list(mar = rep(0, 4)), plot(getRCDKStructurePlot(mol, 150, 150))))
+            saveRCDKStructure(mol, "svg", imgf, 500, 500, transparent = FALSE)
             return(knitr::image_uri(imgf))
         }
         nodes[, shape := "image"]

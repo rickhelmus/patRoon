@@ -57,6 +57,9 @@ function updateView(sel)
         let el = getNavTab(v);
         el.classList.toggle("d-none", v !== sel)
     })
+    
+    if (getViews().includes("TPs"))
+        showParentSimTab(sel === "TPs");
 }
 
 function showFGCols(column, show)
@@ -240,6 +243,29 @@ function toggleCompFilters(e)
             col.filterable = e;
     })
     applyFilterToggle("compoundsTab", "spectrum", true);
+}
+
+function showParentSimTab(enable)
+{
+    const tabsEl = document.getElementById("fGroupSelTabs");
+    let parSimTab = tabsEl.querySelectorAll('[data-value="Parent similarity"]')[0];
+    let parSimTabLi = parSimTab.parentElement;
+    if (enable)
+    {
+        parSimTabLi.style.display = "";
+    }
+    else
+    {
+        if (parSimTabLi.classList.contains("active"))
+        {
+            parSimTabLi.classList.remove("active");
+            parSimTab.classList.remove("active");
+            // Activate features tab, assuming it is always available
+            let featTab = tabsEl.querySelectorAll('[data-value="Features"]')[0];
+            $(featTab).tab("show");
+        }
+        parSimTabLi.style.display = "none";
+    }
 }
 
 $(document).ready(function() {

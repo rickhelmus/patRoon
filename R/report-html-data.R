@@ -464,6 +464,7 @@ reportHTMLUtils$methods(
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
                                                            "specSimilarity", "mergedBy"))
+        tabCompon[, cmpIndex := seq_len(.N), by = "name"]
 
         if (fromTPs)
         {
@@ -544,11 +545,14 @@ reportHTMLUtils$methods(
         # InChIKeys are only there for internal usage
         if (!is.null(tabTPs[["parent_susp_InChIKey"]]))
             colDefs$parent_susp_InChIKey <- reactable::colDef(show = FALSE)
+        # same for cmpIndex
+        colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
         onClick <- "function(tabEl, rowInfo)
 {
     const chromEl = document.getElementById('chrom_view-tp');
     const structEl = document.getElementById('struct_view-tp');
+    const specSimEl = document.getElementById('similarity_spec');
     let rd;
     
     // check level: handle clicking on expandable rows
@@ -558,9 +562,13 @@ reportHTMLUtils$methods(
         rd = rowInfo.subRows[0];
     else
         rd = rowInfo.values;
-        
-    chromEl.src = Reactable.getState(tabEl).meta.plots.chromsLarge[rd.parent_group];
-    structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.parent_susp_InChIKey];
+    
+    let plots = Reactable.getState(tabEl).meta.plots;
+    chromEl.src = plots.chromsLarge[rd.parent_group];
+    structEl.src = plots.structs[rd.parent_susp_InChIKey];
+    if (rowInfo.level === 2)
+        specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
+    
     showTPGraph(rd.component);
 }"
     

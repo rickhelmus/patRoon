@@ -125,6 +125,7 @@ bslib::layout_column_wrap(
         )),
         callIncl(bslib::navs_tab_card,
             title = "Selected feature group",
+            id = "fGroupSelTabs",
             full_screen = TRUE,
             bslib::nav(
                 "Features",
@@ -200,10 +201,11 @@ bslib::layout_column_wrap(
                     utils$genCompClustsImgs()
                 )
             )),
-            bslib::nav(
-                "More things",
-                bslib::card_body_fill("har")
-            )
+            maybeIncl(utils$hasTPs(), bslib::nav(
+                "Parent similarity",
+                # hide img if image is unavailable: https://stackoverflow.com/a/56053704
+                bslib::card_body_fill(htmltools::img(id = "similarity_spec", alt = ""))
+            ))
         )
     )
 )

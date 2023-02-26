@@ -270,6 +270,74 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
     return(ret)
 }
 
+genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, compounds, outPath, EICs, selfContained)
+{
+    if (is.null(MSPeakLists) || length(components) == 0 || length(MSPeakLists) == 0)
+        return(list())
+
+    scr <- if (isScreening(fGroups)) screenInfo(fGroups) else NULL
+    components <- components[, names(fGroups)]
+    
+    cat("Generate TP similarity plots...\n")
+    # UNDONE: parallel option
+    return(doApply("Map", F, names(components), componentTable(components), split(componentInfo(components), seq_len(length(components))), f = function(cmpName, cmpTab, cmpInfoRow)
+    {
+        ret <- mapply(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), FUN = function(ctRow, ctInd)
+        {
+            # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
+            plSpecArgs <- list()
+            
+            if (isScreening(fGroups))
+            {
+                scrParRow <- scr[name == cmpInfoRow$parent_name & group == cmpInfoRow$parent_group]
+                scrTPRow <- scr[name == ctRow$TP_name & group == ctRow$group]
+                if (!is.null(compounds) && !is.null(scr[["compRank"]]) &&
+                    all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(compounds)) &&
+                    nrow(scrTPRow) == 1 && !is.na(scrParRow$compRank) && !is.na(scrTPRow$compRank))
+                {
+                    plSpecArgs <- list(obj = compounds, formulas = formulas,
+                                       index = c(scrParRow$compRank, scrTPRow$compRank), MSPeakLists = MSPeakLists,
+                                       plotStruct = FALSE)
+                }
+                else if (!is.null(formulas) && !is.null(scr[["formRank"]]) &&
+                         all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(formulas)) &&
+                         nrow(scrTPRow) == 1 && !is.na(scrParRow$formRank) && !is.na(scrTPRow$formRank) &&
+                         !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
+                         !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
+                {
+                    plSpecArgs <- list(obj = formulas,
+                                       index = c(scrParRow$formRank, scrTPRow$formRank),
+                                       MSPeakLists = MSPeakLists)
+                }
+            }
+            
+            if (length(plSpecArgs) == 0 && !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
+                !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
+            {
+                # no formulas/compounds, try peak lists
+                plSpecArgs <- list(obj = MSPeakLists, MSLevel = 2)
+            }
+            
+            if (length(plSpecArgs) == 0)
+                return("")
+            
+            # UNDONE
+            specSimParams <- getDefSpecSimParams()
+            return(makeHTMLReportPlot(sprintf("spec_sim-%s-%d.svg", cmpName, ctInd), outPath, selfContained, {
+                mar <- par("mar")
+                par(mar = c(mar[1], mar[2], 0.2, 0.2))
+                do.call(plotSpectrum, c(plSpecArgs, list(groupName = c(cmpInfoRow$parent_group, ctRow$group),
+                                                         specSimParams = specSimParams, title = "")))
+            }, width = 10, height = 5, pointsize = 16))
+        })
+        
+        doProgress()
+        
+        return(ret)
+    }))
+    
+}
+
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath, EICs,
                                     selfContained)
 {
@@ -324,7 +392,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
-    
+
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
     if (!is.null(formulas))
         ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)
@@ -332,9 +400,14 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, outPath, selfContained)
     if (!is.null(compsCluster))
         ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster, outPath, selfContained)
-    if (!is.null(components) && !inherits(components, "componentsTPs"))
-        ret$components <- genHTMLReportPlotsComponents(fGroups, components, outPath, EICs, selfContained)
-    
+    if (!is.null(components))
+    {
+        if (!inherits(components, "componentsTPs"))
+            ret$components <- genHTMLReportPlotsComponents(fGroups, components, outPath, EICs, selfContained)
+        else
+            ret$TPs <- genHTMLReportPlotsTPs(fGroups, components, MSPeakLists, formulas, compounds, outPath, EICs,
+                                             selfContained)
+    }
     return(ret)
 }
 

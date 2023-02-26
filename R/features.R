@@ -353,6 +353,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
+        # NOTE: MetaClean expects matrices
         args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
         return(sapply(featQualityNames, function(q)
         {
@@ -374,7 +375,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
             ft[, c(featQualityNames, featScoreNames) := numeric()]
         else
         {
-            eic <- as.matrix(eic) # MetaClean expects matrices
             ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
             ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
         }

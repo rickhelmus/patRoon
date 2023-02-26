@@ -276,14 +276,16 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
         return(list())
 
     scr <- if (isScreening(fGroups)) screenInfo(fGroups) else NULL
-    components <- components[, names(fGroups)]
     
     cat("Generate TP similarity plots...\n")
     # UNDONE: parallel option
-    return(doApply("Map", F, names(components), componentTable(components), split(componentInfo(components), seq_len(length(components))), f = function(cmpName, cmpTab, cmpInfoRow)
+    return(doApply("Map", TRUE, names(components), componentTable(components), split(componentInfo(components), seq_len(length(components))), f = function(cmpName, cmpTab, cmpInfoRow)
     {
         ret <- mapply(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), FUN = function(ctRow, ctInd)
         {
+            if (!all(c(ctRow$group, cmpInfoRow$parent_group) %chin% names(fGroups)))
+                return("") # fGroups was probably subset
+            
             # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
             plSpecArgs <- list()
             
@@ -393,13 +395,18 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
 
+    gNames <- names(fGroups)
+    if (!is.null(compounds))
+        compounds <- compounds[gNames]
+    
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
+    
     if (!is.null(formulas))
-        ret$formulas <- genHTMLReportPlotsFormulas(formulas, MSPeakLists, outPath, selfContained)
+        ret$formulas <- genHTMLReportPlotsFormulas(formulas[gNames], MSPeakLists, outPath, selfContained)
     if (!is.null(compounds))
         ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, outPath, selfContained)
     if (!is.null(compsCluster))
-        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster, outPath, selfContained)
+        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster[gNames], outPath, selfContained)
     if (!is.null(components))
     {
         if (!inherits(components, "componentsTPs"))

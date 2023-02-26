@@ -461,6 +461,7 @@ reportHTMLUtils$methods(
         tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",")
         
         tabCompon <- as.data.table(objects$components)
+        tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
                                                            "specSimilarity", "mergedBy"))

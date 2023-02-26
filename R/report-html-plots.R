@@ -120,8 +120,8 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
         {
             pf <- file.path(getHTMLReportPlotPath(outPath), paste0("struct-", ik, ".svg"))
             saveRCDKStructure(getMoleculesFromSMILES(smi)[[1]], "svg", pf, 100, 100)
-            return(getHTMLReportFinalPlotPath(pf, selfContained))
             doProgress()
+            return(getHTMLReportFinalPlotPath(pf, selfContained))
         }))
     }
     return(list())

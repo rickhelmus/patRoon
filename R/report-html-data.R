@@ -468,13 +468,14 @@ reportHTMLUtils$methods(
 
         if (fromTPs)
         {
-            tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"))
+            tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"),
+                            sort = FALSE)
             setnames(tabTPs, c("name", "TP_name", "parent_name"),
                      c("component", "susp_name", "parent_susp_name"), skip_absent = TRUE)
         }
         else
         {
-            tabTPs <- merge(tabCompon, tabTPsFeat, by = "group")
+            tabTPs <- merge(tabCompon, tabTPsFeat, by = "group", sort = FALSE)
             setnames(tabTPs, "name", "component")
             tabTPs <- removeDTColumnsIfPresent(tabTPs, "susp_name")
         }

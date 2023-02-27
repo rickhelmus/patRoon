@@ -203,8 +203,16 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasTPs(), bslib::nav(
                 "Parent similarity",
-                # hide img if image is unavailable: https://stackoverflow.com/a/56053704
-                bslib::card_body_fill(htmltools::img(id = "similarity_spec", alt = ""))
+                bslib::card_body_fill(
+                    htmltools::div(
+                        style = "display: flex; overflow-y: auto;",
+                        # hide img if image is unavailable: https://stackoverflow.com/a/22051972
+                        htmltools::img(id = "similarity_spec", style = "flex-grow: 2;",
+                                       onerror = "this.style.display='none'"),
+                        htmltools::div(style = "min-width: 300px; flex-grow: 1; overflow-y: auto;",
+                                       utils$genTPSimTable())
+                    )
+                )
             ))
         )
     )

@@ -314,6 +314,60 @@ makeAnnSubReact <- function(title, ...)
                                                height = 200, ...)))
 }
 
+makePropTab <- function(tab, sets, idcol = FALSE)
+{
+    setCols <- if (!is.null(sets))
+        grep(paste0("\\-(", paste0(sets, collapse = "|"), ")$"), names(tab), value = TRUE)
+    else
+        NULL
+    haveSets <- !is.null(sets) && length(setCols) > 0
+    propTabList <- lapply(split(tab, seq_len(nrow(tab))), function(trow)
+    {
+        if (!isFALSE(idcol))
+            trow <- removeDTColumnsIfPresent(trow, idcol)
+        
+        if (!haveSets)
+            return(setnames(transpose(trow, keep.names = "property"), 2, "value"))
+        
+        commonRow <- trow[, setdiff(names(trow), setCols), with = FALSE]
+        setRows <- sapply(sets, function(s)
+        {
+            pat <- paste0("\\-", s, "$")
+            sr <- trow[, grep(pat, setCols, value = TRUE), with = FALSE]
+            if (nrow(sr) == 0) # set lacks data, make non-empty dummy table so it still gets added
+                sr <- setnames(data.table(NA), names(trow)[1])
+            else
+                setnames(sr, sub(pat, "", names(sr)))
+            return(sr)
+        }, simplify = FALSE)
+        ret <- rbindlist(c(setNames(list(commonRow), "common"), setRows), fill = TRUE, idcol = "row")
+        return(transpose(ret, keep.names = "property", make.names = "row"))
+    })
+    
+    if (!isFALSE(idcol))
+        names(propTabList) <- tab[[idcol]]
+    
+    return(rbindlist(propTabList, idcol = idcol))
+}
+
+makePropReactable <- function(tab, id, idcol = FALSE, ...)
+{
+    colDefs <- list()
+    if (!isFALSE(idcol))
+    {
+        colDefs[[idcol]] <- reactable::colDef(show = FALSE,
+                                              filterMethod = htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    return rows.filter(row => row.values[columnId] === filterValue)
+}"))
+    }
+    
+    for (r in intersect(c("property", "value"), names(tab)))
+        colDefs[[r]] <- reactable::colDef(name = "")
+    
+    return(makeReactable(tab, id, columns = colDefs, compact = TRUE, fullWidth = TRUE, striped = FALSE, ...))
+}
+
 makeAnnDetailsReact <- function(title, infoTable)
 {
     return(makeAnnSubReact(title, infoTable, columns = list(
@@ -321,7 +375,6 @@ makeAnnDetailsReact <- function(title, infoTable)
         value = reactable::colDef(html = TRUE, minWidth = 250)
     )))
 }
-
 
 makeAnnPLReact <- function(apl)
 {
@@ -569,7 +622,11 @@ reportHTMLUtils$methods(
     chromEl.src = plots.chromsLarge[rd.parent_group];
     structEl.src = plots.structs[rd.parent_susp_InChIKey];
     if (rowInfo.level === 2)
+    {
         specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
+        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        Reactable.setFilter('similarityTab', 'cmpID', rd.component + '-' + rd.cmpIndex);
+    }
     
     showTPGraph(rd.component);
 }"
@@ -796,6 +853,27 @@ reportHTMLUtils$methods(
         
         return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
                                 getScoreDetails))
+    },
+    
+    genTPSimTable = function()
+    {
+        tab <- as.data.table(objects$components)
+        tab[, cmpID := paste0(name[1], "-", seq_len(.N)), by = "name"] # make unique IDs
+        tab[, name := NULL]
+        cols <- data.table::copy(names(tab))
+        
+        for (col in cols)
+        {
+            if (grepl("^specSimilarity", col))
+                set(tab, j = col, value = round(tab[[col]], 2))
+            else if (col %chin% c("fragmentMatches", "neutralLossMatches"))
+                set(tab, j = col, value = round(tab[[col]], 0))
+            else if (col != "cmpID")
+                set(tab, j = col, value = NULL)
+        }
+        
+        ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$components) else NULL, "cmpID")
+        makePropReactable(ptab, "similarityTab", "cmpID")
     }
 )
 

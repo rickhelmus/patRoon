@@ -600,11 +600,12 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, analysis = analyses(ob
     adductNeg <- checkAndToAdduct(adductNeg, .var.name = "adductNeg")
         
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, analysis, groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                  onlyPresent, adductPos = adductPos, adductNeg = adductNeg)
+        EICs <- getEICsForFGroups(obj, analysis = analysis, groupName = groupName, rtWindow = rtWindow,
+                                  mzExpWindow = mzExpWindow, topMost = topMost, topMostByRGroup = topMostByRGroup,
+                                  onlyPresent = onlyPresent, adductPos = adductPos, adductNeg = adductNeg)
     
-    callNextMethod(obj, analysis = analysis, groupName = groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                   onlyPresent, ..., EICs = EICs)
+    callNextMethod(obj, analysis = analysis, groupName = groupName, rtWindow = rtWindow, mzExpWindow = mzExpWindow,
+                   topMost = topMost, topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent, ..., EICs = EICs)
 })
 
 setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),

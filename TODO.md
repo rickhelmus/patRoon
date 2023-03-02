@@ -15,6 +15,7 @@
 - title argument for plotInt()
 - plotGraph() for componentsNTSet? (wasn't done before...)
 - markup/split formulaDiff
+- adductPos/adductNeg args --> make options? makes things much easier and less complicated...
 
 
 ## Components

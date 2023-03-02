@@ -362,7 +362,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, ...)
 }"))
     }
     
-    for (r in intersect(c("property", "value"), names(tab)))
+    for (r in intersect(c("property", "value", "common"), names(tab)))
         colDefs[[r]] <- reactable::colDef(name = "")
     
     return(makeReactable(tab, id, columns = colDefs, compact = TRUE, fullWidth = TRUE, striped = FALSE, ...))

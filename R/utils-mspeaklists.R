@@ -595,6 +595,8 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
         # re-add precursor
         ret[, precursor := if (nr == 1) PLP1$specs[[1]][match(ret$ID, ID)]$precursor else PLP2$specs[[1]][match(ret$ID, ID)]$precursor]
         
+        setcolorder(ret, c("ID", "mz", "intensity", "precursor", "mergedBy"))
+        
         return(ret)
     }
     

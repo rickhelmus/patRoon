@@ -781,9 +781,6 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
 {
     checkmate::assertFlag(onlyPresent)
     
-    if (length(obj) == 0 || nrow(internalStandards(obj)) == 0)
-        stop("No feature groups to plot or no internal standards assigned.", call. = FALSE)
-    
     ISTDs <- internalStandards(obj)
     ISTDAssign <- internalStandardAssignments(obj)
     gNames <- names(obj)
@@ -821,19 +818,30 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
                         "-webkit-border-radius: 3px; border-radius: 3px; border: 1px solid #808074;",
                         "box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);")
     
-    edges[, value := abs(gInfo[from, "rts"] - gInfo[to, "rts"])]
-    edges[, value := max(0.1, 1 - (value / max(value)))]
+    if (nrow(edges) > 0)
+    {
+        edges[, value := abs(gInfo[from, "rts"] - gInfo[to, "rts"])]
+        edges[, value := max(0.1, 1 - (value / max(value)))]
+    }
+    else
+        edges[, c("from", "to") := character()]
+
+    gr <- visNetwork::visNetwork(nodes, edges, width = width, height = height,
+                                 submain = paste0("Explore connections by dragging/zooming/selecting.<br>",
+                                                  "Smaller retention time difference have wider edges."))
+    if (nrow(edges) > 0)
+    {
+        gr %>%
+            visNetwork::visOptions(selectedBy = list(variable = "ISTD", multiple = TRUE),
+                                   highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
+                                   nodesIdSelection = list(enabled = TRUE, main = "Select by feat group")) %>%
+            visNetwork::visIgraphLayout(layout = "layout_with_lgl") %>%
+            visNetwork::visEdges(arrows = "from", scaling = list(min = 0.5, max = 2)) %>%
+            visNetwork::visInteraction(tooltipStyle = titleStyle, hideEdgesOnDrag = TRUE, hideEdgesOnZoom = TRUE) %>%
+            visNetwork::visLegend()
+    }
     
-    visNetwork::visNetwork(nodes, edges, width = width, height = height,
-                           submain = paste0("Explore connections by dragging/zooming/selecting.<br>",
-                                            "Smaller retention time difference have wider edges.")) %>%
-        visNetwork::visOptions(selectedBy = list(variable = "ISTD", multiple = TRUE),
-                               highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
-                               nodesIdSelection = list(enabled = TRUE, main = "Select by feat group")) %>%
-        visNetwork::visIgraphLayout(layout = "layout_with_lgl") %>%
-        visNetwork::visEdges(arrows = "from", scaling = list(min = 0.5, max = 2)) %>%
-        visNetwork::visInteraction(tooltipStyle = titleStyle, hideEdgesOnDrag = TRUE, hideEdgesOnZoom = TRUE) %>%
-        visNetwork::visLegend()
+    return(gr)
 })
 
 #' @rdname feature-plotting

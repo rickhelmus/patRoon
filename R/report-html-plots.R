@@ -130,6 +130,10 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
 genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfContained)
 {
     cat("Generate formula annotation plots...\n")
+    
+    if (length(formulas) == 0)
+        return(list())
+    
     # UNDONE: parallel option
     return(doApply("Map", TRUE, groupNames(formulas), annotations(formulas), f = function(grp, ann)
     {
@@ -160,6 +164,10 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfConta
 genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPath, selfContained)
 {
     cat("Generate compound annotation plots...\n")
+    
+    if (length(compounds) == 0)
+        return(list())
+    
     # UNDONE: parallel option
     return(doApply("Map", TRUE, groupNames(compounds), annotations(compounds), f = function(grp, ann)
     {
@@ -192,6 +200,10 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
 genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
 {
     cat("Generate compound cluster plots...\n")
+    
+    if (length(compsCluster) == 0)
+        return(list())
+    
     # UNDONE: parallel option
     return(doApply("Map", TRUE, groupNames(compsCluster), cutClusters(compsCluster), f = function(grp, ct)
     {
@@ -216,10 +228,13 @@ genHTMLReportPlotsCompsCluster <- function(compsCluster, outPath, selfContained)
 
 genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, selfContained)
 {
+    cat("Generate component plots...\n")
+    
+    if (length(components) == 0)
+        return(list())
+
     cInfo <- componentInfo(components)
     isIntCl <- inherits(components, "componentsIntClust")
-    
-    cat("Generate component plots...\n")
     ret <- list()
     
     if (isIntCl || inherits(components, "componentsSpecClust"))

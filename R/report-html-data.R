@@ -872,7 +872,7 @@ reportHTMLUtils$methods(
                 set(tab, j = col, value = NULL)
         }
         
-        ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$components) else NULL, "cmpID")
+        ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL, "cmpID")
         makePropReactable(ptab, "similarityTab", "cmpID")
     }
 )

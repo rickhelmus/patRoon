@@ -131,7 +131,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         usObj <- sapply(theSets, unset, obj = obj, simplify = FALSE)
         
         # check which sets actually contain requested data
-        theSets <- theSets[sapply(theSets, function(s) all(groupName %in% groupNames(usObj[[s]])))]
+        theSets <- theSets[sapply(theSets, function(s) any(groupName %in% groupNames(usObj[[s]])))]
         if (length(theSets) == 0)
             return(NULL)
         usObj <- usObj[theSets]
@@ -141,7 +141,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         # only keep sets with MS/MS data
         theSets <- theSets[sapply(theSets, function(s)
         {
-            all(sapply(groupName, function(gn) !is.null(usMSPL[[s]][[gn]]) && !is.null(usMSPL[[s]][[gn]][["MSMS"]])))
+            any(sapply(groupName, function(gn) !is.null(usMSPL[[s]][[gn]]) && !is.null(usMSPL[[s]][[gn]][["MSMS"]])))
         })]
         if (length(theSets) == 0)
             return(NULL)
@@ -153,9 +153,12 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
 
         mergeBinnedAnn <- function(nr)
         {
-            binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
-            annPLs <- Map(usObj, usMSPL, f = annotatedPeakList,
-                          MoreArgs = list(index = index[nr], groupName = groupName[nr], analysis = analysis[nr]))
+            # convert candidate index to non set version by using the ranks
+            usInds <- lapply(theSets, function(s) obj[[groupName[nr]]][[paste0("rank-", s)]][index[nr]])
+            skip <- sapply(usInds, is.null)
+            binPLs <- sapply(binnedPLs[!skip], "[[", nr, simplify = FALSE)
+            annPLs <- Map(usObj[!skip], usInds[!skip], usMSPL[!skip], f = annotatedPeakList,
+                          MoreArgs = list(groupName = groupName[nr], analysis = analysis[nr]))
             annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
             annPLs <- rbindlist(annPLs, idcol = "set")
             return(annPLs)

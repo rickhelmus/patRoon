@@ -229,9 +229,9 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         if (min(plotData$intensity) < 0) # mirror plot?
         {
             # extend both vertical directions 
-            if (nrow(plotData) > 1)
+            if (max(plotData$intensity) > 0)
                 ylim <- range(plotData$intensity) * expand
-            else
+            else # only bottom plot
                 ylim <- c(min(plotData$intensity), abs(min(plotData$intensity)))
         }
         else

@@ -150,7 +150,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         usObj <- sapply(theSets, unset, obj = obj, simplify = FALSE)
         
         # check which sets actually contain requested data
-        theSets <- theSets[sapply(theSets, function(s) all(groupName %in% groupNames(usObj[[s]])))]
+        theSets <- theSets[sapply(theSets, function(s) any(groupName %in% groupNames(usObj[[s]])))]
         if (length(theSets) == 0)
             return(NULL)
         usObj <- usObj[theSets]
@@ -169,8 +169,9 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         {
             # convert candidate index to non set version by using the ranks
             usInds <- lapply(theSets, function(s) obj[[groupName[nr]]][[paste0("rank-", s)]][index[nr]])
-            binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
-            annPLs <- Map(usObj, usInds, usMSPL, usForm, f = annotatedPeakList,
+            skip <- sapply(usInds, is.null)
+            binPLs <- sapply(binnedPLs[!skip], "[[", nr, simplify = FALSE)
+            annPLs <- Map(usObj[!skip], usInds[!skip], usMSPL[!skip], usForm[!skip], f = annotatedPeakList,
                           MoreArgs = list(groupName = groupName[nr]))
             annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
             annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)

@@ -304,25 +304,11 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         binnedPLs <- Map(usObj, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
                                          specSimParams = specSimParams, mustExist = FALSE))
-        if (all(sapply(binnedPLs, is.null)))
-        {
-            # either no peak lists are available or no peak lists within the same sets were available. In the latter
-            # case nothing could be binned, hence, just mirror plot both spectra within binning
-            
-            topSpec <- copy(getSpec(obj, groupName[1], MSLevel, analysis[1]))
-            bottomSpec <- copy(getSpec(obj, groupName[2], MSLevel, analysis[2]))
-            
-            if (is.null(topSpec) || is.null(bottomSpec)) # really not there :-( ...
-                return(NULL)
-            
-            # topSpec[, mergedBy := "unique"]; bottomSpec[, mergedBy := "unique"]
-            setnames(topSpec, "set", "mergedBy"); setnames(bottomSpec, "set", "mergedBy")
-        }
-        else
-        {
-            topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
-            bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
-        }
+        if (all(unlist(lapply(binnedPLs, sapply, nrow)) == 0))
+            return(NULL)
+
+        topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
+        bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
         
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), mirror, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)

@@ -547,10 +547,24 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
 {
     PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, 1)
     PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, 2)
+    
     if (is.null(PLP1) || is.null(PLP2))
     {
         if (!mustExist)
-            return(NULL)
+        {
+            # create dummy output
+            dummySpec <- function(PLP)
+            {
+                if (is.null(PLP))
+                    return(data.table(ID = integer(), mz = numeric(), intensity = numeric(), precursor = logical(),
+                                      mergedBy = character()))
+                sp <- PLP$specs[[1]]
+                sp[, mergedBy := uniqueName]
+                sp[, intensity := intensity / max(intensity)]
+                return(sp)
+            }
+            return(list(spec1 = dummySpec(PLP1), spec2 = dummySpec(PLP2)))
+        }
         
         if (is.null(PLP1))
             stop("Could not obtain first spectrum")

@@ -106,6 +106,7 @@ The changes are reflected in the installation section of the handbook.
     - `analysis` and `groupName` arguments
     - The plot y limit is now determined from EIC data to improve accuracy
     - various optimizations to load (cached) EIC data
+- Fixed: `unset()` for `featureGroupsScreeningSet` resulted in loss of group quality scores and internal standard assignments
 
 
 # patRoon 2.1

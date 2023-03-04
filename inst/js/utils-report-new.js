@@ -252,19 +252,22 @@ function showParentSimTab(enable)
     let parSimTabLi = parSimTab.parentElement;
     if (enable)
     {
-        parSimTabLi.style.display = "";
+        $(parSimTabLi).show();
     }
     else
     {
-        if (parSimTabLi.classList.contains("active"))
+        $(parSimTabLi).hide();
+        // UNDONE: seems active class is not always applied on the same elements?
+        if (parSimTabLi.classList.contains("active") || parSimTab.classList.contains("active"))
         {
-            parSimTabLi.classList.remove("active");
-            parSimTab.classList.remove("active");
             // Activate features tab, assuming it is always available
             let featTab = tabsEl.querySelectorAll('[data-value="Features"]')[0];
             $(featTab).tab("show");
+            
+            // remove active classes, seems to be that this needs to be done last
+            parSimTabLi.classList.remove("active");
+            parSimTab.classList.remove("active");
         }
-        parSimTabLi.style.display = "none";
     }
 }
 

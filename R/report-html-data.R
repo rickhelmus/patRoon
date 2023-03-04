@@ -175,9 +175,9 @@ setReactSelRangeFilter <- function(id, colDef)
     return(colDef)
 }
 
-makeReactable <- function(tab, id, ...)
+makeReactable <- function(tab, id, bordered = TRUE, ...)
 {
-    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = TRUE, wrap = FALSE,
+    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = bordered, wrap = FALSE,
                                 pagination = FALSE, ...))
 }
 
@@ -355,6 +355,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, ...)
     colDefs <- list()
     if (!isFALSE(idcol))
     {
+        # exact match filter
         colDefs[[idcol]] <- reactable::colDef(show = FALSE,
                                               filterMethod = htmlwidgets::JS("function(rows, columnId, filterValue)
 {
@@ -362,10 +363,17 @@ makePropReactable <- function(tab, id, idcol = FALSE, ...)
 }"))
     }
     
-    for (r in intersect(c("property", "value", "common"), names(tab)))
-        colDefs[[r]] <- reactable::colDef(name = "")
+    for (col in names(tab))
+    {
+        if (col == idcol)
+            next
+        colDefs[[col]] <- reactable::colDef(minWidth = if (col == "property") 150 else 100)
+        if (col %chin% c("property", "value", "common"))
+            colDefs[[col]]$name <- ""
+    }
     
-    return(makeReactable(tab, id, columns = colDefs, compact = TRUE, fullWidth = TRUE, striped = FALSE, ...))
+    return(makeReactable(tab, id, columns = colDefs, compact = TRUE, fullWidth = FALSE, striped = TRUE, sortable = FALSE,
+                         rowStyle = list(fontSize = "11pt"), ...))
 }
 
 makeAnnDetailsReact <- function(title, infoTable)

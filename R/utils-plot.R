@@ -29,7 +29,7 @@ saveRCDKStructure <- function(molecule, format, out, width = 500L, height = 500L
 
     if (transparent)
     {
-        # HACK: make it transparent    
+        # HACK: make it transparent
         lines <- readLines(out)
         lines <- sub("fill='#FFFFFF'", "fill='none'", lines)
         writeLines(lines, out)

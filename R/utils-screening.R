@@ -3,6 +3,10 @@
 NULL
 
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
+isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
+
+suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
+                            "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
 
 getAllSuspCols <- function(targetCols, allCols, mConsNames)
 {
@@ -15,7 +19,7 @@ doScreeningShow <- function(obj)
 {
     printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(obj)$name), 6, ", "),
            nrow(screenInfo(obj)))
-    printf("Suspects annotated: %s\n", if (!is.null(screenInfo(obj)[["estIDLevel"]])) "yes" else "no")
+    printf("Suspects annotated: %s\n", if (isSuspAnnotated(obj)) "yes" else "no")
 }
 
 prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, neutralChemProps,

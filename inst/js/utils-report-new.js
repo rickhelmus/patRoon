@@ -58,6 +58,8 @@ function updateView(sel)
         el.classList.toggle("d-none", v !== sel)
     })
     
+    if (document.getElementById("suspAnnTab"))
+        showFeatureTab("Suspect annotation", sel === "Suspects" || sel === "TPs");
     if (getViews().includes("TPs"))
         showFeatureTab("Parent similarity", sel === "TPs");
 }

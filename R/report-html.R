@@ -6,6 +6,7 @@ reportHTMLUtils <- setRefClass("reportHTMLUtils",
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups),
+    hasSuspAnn = function() isSuspAnnotated(objects$fGroups),
     hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
     hasSets = function() isFGSet(objects$fGroups),
     hasFQualities = function() hasFGroupScores(objects$fGroups),

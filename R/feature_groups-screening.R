@@ -273,8 +273,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
     si <- copy(screenInfo(fGroups))
-    annCols <- c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
-                 "maxFragMatchesRel", "estIDLevel")
+    annCols <- suspAnnCols()
     si <- si[, setdiff(names(si), annCols), with = FALSE] # remove any previous results
     
     printf("Annotating %d suspects...\n", nrow(si))

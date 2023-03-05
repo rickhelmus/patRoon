@@ -201,18 +201,20 @@ bslib::layout_column_wrap(
                     utils$genCompClustsImgs()
                 )
             )),
+            maybeIncl(utils$hasSuspAnn(), bslib::nav(
+                "Suspect annotation",
+                bslib::card_body_fill(
+                    htmltools::div(style = "margin: 20px;", utils$genSuspAnnTable())
+                )
+            )),
             maybeIncl(utils$hasTPs(), bslib::nav(
                 "Parent similarity",
-                bslib::card_body_fill(
-                    htmltools::div(
-                        style = "display: flex; overflow-y: auto; align-items: center; justify-content: space-between;",
-                        class = "my-3",
-                        # hide img if image is unavailable: https://stackoverflow.com/a/22051972
-                        htmltools::img(id = "similarity_spec", style = "flex-grow: 2; display: none;",
-                                       onerror = "this.style.display='none'"),
-                        htmltools::div(style = "flex-grow: 1; overflow-y: auto;",
-                                       utils$genTPSimTable())
-                    )
+                bslib::card_body(
+                    style = "display: flex; flex-wrap: wrap; justify-content: flex-start; max-height: 100%; padding-top: 25px; align-items: flex-start; gap: 40px;",
+                    utils$genTPSimTable(),
+                    # hide img if image is unavailable: https://stackoverflow.com/a/22051972
+                    htmltools::img(id = "similarity_spec", style = "display: none;",
+                                   onerror = "this.style.display='none'")
                 )
             ))
         )

@@ -350,7 +350,7 @@ makePropTab <- function(tab, sets, idcol = FALSE)
     return(rbindlist(propTabList, idcol = idcol))
 }
 
-makePropReactable <- function(tab, id, idcol = FALSE, ...)
+makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minValWidth = 75, ...)
 {
     colDefs <- list()
     if (!isFALSE(idcol))
@@ -367,7 +367,8 @@ makePropReactable <- function(tab, id, idcol = FALSE, ...)
     {
         if (col == idcol)
             next
-        colDefs[[col]] <- reactable::colDef(minWidth = if (col == "property") 150 else 100)
+        colDefs[[col]] <- reactable::colDef(minWidth = if (col == "property") minPropWidth else minValWidth,
+                                            align = if (col == "property") "left" else "right")
         if (col %chin% c("property", "value", "common"))
             colDefs[[col]]$name <- ""
     }
@@ -457,6 +458,8 @@ reportHTMLUtils$methods(
     const structEl = document.getElementById('struct_view-suspect');
     const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
+    if (rowInfo.level === 1 && document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
 }"
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, groupBy = "susp_name", onClick = onClick)
@@ -633,6 +636,8 @@ reportHTMLUtils$methods(
     {
         specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
         specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        if (document.getElementById('suspAnnTab'))
+            Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
         Reactable.setFilter('similarityTab', 'cmpID', rd.component + '-' + rd.cmpIndex);
     }
     
@@ -863,6 +868,23 @@ reportHTMLUtils$methods(
                                 getScoreDetails))
     },
     
+    genSuspAnnTable = function()
+    {
+        tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
+        mcn <- mergedConsensusNames(objects$fGroups)
+        tab <- tab[, unique(c("group", "susp_name", getAllSuspCols(paste0("susp_", suspAnnCols()), names(tab), mcn))),
+                   with = FALSE]
+        tab[, suspID := paste0(susp_name, "-", group)][, c("susp_name", "group") := NULL]
+        setnames(tab, sub("^susp_", "", names(tab)))
+        
+        rcols <- getAllSuspCols(c("annSimForm", "annSimComp", "annSimBoth", "maxFragMatchesRel"), names(tab), mcn)
+        if (length(rcols) > 0)
+            tab[, (rcols) := lapply(.SD, round, 2), .SDcols = rcols]
+        
+        ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL, "suspID")
+        makePropReactable(ptab, "suspAnnTab", "suspID", minPropWidth = 100, minValWidth = 100)
+    },
+        
     genTPSimTable = function()
     {
         tab <- as.data.table(objects$components)
@@ -881,7 +903,7 @@ reportHTMLUtils$methods(
         }
         
         ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL, "cmpID")
-        makePropReactable(ptab, "similarityTab", "cmpID")
+        makePropReactable(ptab, "similarityTab", "cmpID", minPropWidth = 150, minValWidth = 85)
     }
 )
 

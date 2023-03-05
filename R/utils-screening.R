@@ -5,6 +5,8 @@ NULL
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
 
+suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula",
+                                 "neutralMass", "molNeutralized", "adduct", "fragments_mz", "fragments_formula")
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
 
@@ -124,9 +126,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     annTbl <- annotations(fGroups)
     
     # NOTE: rt is always included
-    metaDataCols <- c("name", "rt",
-                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass",
-                                  "molNeutralized", "adduct", "fragments_mz", "fragments_formula"), names(suspects)))
+    metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(suspects)))
     
     emptyResult <- function()
     {

@@ -81,12 +81,12 @@ bslib::layout_column_wrap(
             full_screen = TRUE,
             bslib::nav(
                 "Suspect",
-                bslib::card_body_fill(htmltools::img(id = "struct_view-suspect"))
+                bslib::card_body(
+                    style = "display: flex; flex-wrap: nowrap; justify-content: flex-start; height: 100%; padding-top: 10px; align-items: flex-start; gap: 15px;",
+                    utils$genSuspInfoTable(),
+                    htmltools::img(id = "struct_view-suspect", style = "min-width: 20%; max-height: 65%;"),
+                )
             ),
-            bslib::nav(
-                "Info",
-                "Info here?"
-            )
         )),
         maybeIncl(utils$hasComponents(), callIncl(bslib::navs_tab_card,
             title = "Selected component",

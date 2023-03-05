@@ -368,7 +368,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
         if (col == idcol)
             next
         colDefs[[col]] <- reactable::colDef(minWidth = if (col == "property") minPropWidth else minValWidth,
-                                            align = if (col == "property") "left" else "right")
+                                            align = if (col == "property") "left" else "right", html = TRUE)
         if (col %chin% c("property", "value", "common"))
             colDefs[[col]]$name <- ""
     }
@@ -458,6 +458,7 @@ reportHTMLUtils$methods(
     const structEl = document.getElementById('struct_view-suspect');
     const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
+    Reactable.setFilter('suspInfoTab', 'name', rd.susp_name);
     if (rowInfo.level === 1 && document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
 }"
@@ -647,7 +648,28 @@ reportHTMLUtils$methods(
         makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, colDefs = colDefs,
                         groupDefs = groupDefs, onClick = onClick)
     },
-    
+
+    genSuspInfoTable = function()
+    {
+        tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
+        mcn <- mergedConsensusNames(objects$fGroups)
+        tab <- subsetDTColumnsIfPresent(tab, c(paste0("susp_", suspMetaDataCols())))
+        
+        setnames(tab, sub("^susp_", "", names(tab)))
+        
+        tab <- unique(tab, by = "name")
+        
+        for (col in intersect(c("neutralMass", "mz"), names(tab)))
+            set(tab, j = col, value = round(tab[[col]], 5))
+        if (!is.null(tab[["rt"]]))
+            set(tab, j = "rt", value = round(tab$rt, 2))
+        if (!is.null(tab[["formula"]]))
+            set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
+        
+        ptab <- makePropTab(tab, NULL, "name")
+        makePropReactable(ptab, "suspInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+    },
+        
     genFeaturesTable = function()
     {
         tab <- as.data.table(getFeatures(objects$fGroups))

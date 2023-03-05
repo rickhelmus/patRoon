@@ -59,7 +59,7 @@ function updateView(sel)
     })
     
     if (getViews().includes("TPs"))
-        showParentSimTab(sel === "TPs");
+        showFeatureTab("Parent similarity", sel === "TPs");
 }
 
 function showFGCols(column, show)
@@ -245,31 +245,32 @@ function toggleCompFilters(e)
     applyFilterToggle("compoundsTab", "spectrum", true);
 }
 
-function showParentSimTab(enable)
+function showFeatureTab(tabName, enable)
 {
-    const tabsEl = document.getElementById("fGroupSelTabs");
-    let parSimTab = tabsEl.querySelectorAll('[data-value="Parent similarity"]')[0];
-    let parSimTabLi = parSimTab.parentElement;
+    const featTabsEl = document.getElementById("fGroupSelTabs");
+    let tabEl = featTabsEl.querySelectorAll('[data-value="' + tabName + '"]')[0];
+    let tabLiEl = tabEl.parentElement;
     if (enable)
     {
-        $(parSimTabLi).show();
+        $(tabLiEl).show();
     }
     else
     {
-        $(parSimTabLi).hide();
+        $(tabLiEl).hide();
         // UNDONE: seems active class is not always applied on the same elements?
-        if (parSimTabLi.classList.contains("active") || parSimTab.classList.contains("active"))
+        if (tabLiEl.classList.contains("active") || tabEl.classList.contains("active"))
         {
             // Activate features tab, assuming it is always available
-            let featTab = tabsEl.querySelectorAll('[data-value="Features"]')[0];
+            let featTab = featTabsEl.querySelectorAll('[data-value="Features"]')[0];
             $(featTab).tab("show");
             
             // remove active classes, seems to be that this needs to be done last
-            parSimTabLi.classList.remove("active");
-            parSimTab.classList.remove("active");
+            tabLiEl.classList.remove("active");
+            tabEl.classList.remove("active");
         }
     }
 }
+
 
 $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495

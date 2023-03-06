@@ -191,8 +191,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
 {
     const tabEl = '%s';
     Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
-    
-    if (rowInfo.values)
+    if (rowInfo.values && rowInfo.values.group)
     {
         const grp = rowInfo.values.group;
         Reactable.setFilter('featuresTab', 'group', grp);    

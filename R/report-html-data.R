@@ -683,7 +683,10 @@ reportHTMLUtils$methods(
         # add data for 'missing' analyses
         missingTab <- rbindlist(sapply(unique(tab$group), function(grp)
         {
-            data.table(analysis = setdiff(analyses(objects$fGroups), tab[group == grp]$analysis))
+            mt <- data.table(analysis = setdiff(analyses(objects$fGroups), tab[group == grp]$analysis))
+            if (!is.null(tab[["set"]]))
+                mt[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+            return(mt)
         }, simplify = FALSE), idcol = "group")
         if (nrow(missingTab) > 0)
         {

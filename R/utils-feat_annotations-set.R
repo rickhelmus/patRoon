@@ -6,7 +6,8 @@ NULL
 featAnnSetSpecificScoreCols <- function()
 {
     return(c("score", "fragScore", "isoScore", "metFusionScore", "individualMoNAScore", "peakFingerprintScore",
-             "lossFingerprintScore", "libMatch", "formulaScore", "combMatch", "isoScore", "mSigma", "MSMSScore"))
+             "lossFingerprintScore", "libMatch", "formulaScore", "RF_SMILES", "RF_SIRFP", "combMatch", "isoScore",
+             "mSigma", "MSMSScore"))
 }
 
 makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, setAvgSpecificScores,

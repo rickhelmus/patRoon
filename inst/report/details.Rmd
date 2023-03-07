@@ -10,6 +10,26 @@ Details
 .rt-expander:after {
     border-top-color: dodgerblue;
 }
+
+.propTabAndImg {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;"
+}
+
+.parentSim {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:
+    flex-start;
+    max-height: 100%;
+    padding-top: 25px;
+    align-items: flex-start;
+    gap: 40px;"
+}
+
 </style>
 
 ##
@@ -82,8 +102,8 @@ bslib::layout_column_wrap(
             bslib::nav(
                 "Suspect",
                 bslib::card_body(
-                    style = "display: flex; flex-wrap: nowrap; justify-content: flex-start; padding-top: 10px; align-items: center; gap: 15px;",
-                    utils$genSuspInfoTable(),
+                    class = "propTabAndImg pt-2",
+                    utils$genSuspInfoTable("suspInfoTab"),
                     htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;"),
                 )
             ),
@@ -107,17 +127,28 @@ bslib::layout_column_wrap(
                 )
             ))
         )),
-        maybeIncl(utils$hasTPs(), bslib::navs_tab_card(
+        maybeIncl(utils$hasTPs(), callIncl(bslib::navs_tab_card,
             title = "Selected parent",
             full_screen = TRUE,
             bslib::nav(
                 "Chromatogram",
                 bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
             ),
-            bslib::nav(
-                "Suspect",
-                bslib::card_body_fill(htmltools::img(id = "struct_view-tp"))
-            ),
+            maybeIncl(utils$hasSuspects(), bslib::nav(
+                "Suspects",
+                bslib::card_body(class = "mx-auto", htmltools::strong("Parent")),
+                bslib::card_body(
+                    class = "propTabAndImg",
+                    utils$genSuspInfoTable("parentInfoTab"),
+                    htmltools::img(id = "struct_view-parent", style = "min-width: 20%;"),
+                ),
+                bslib::card_body(class = "mx-auto", htmltools::strong("Transformation product")),
+                bslib::card_body(
+                    class = "propTabAndImg",
+                    utils$genSuspInfoTable("TPInfoTab"),
+                    htmltools::img(id = "struct_view-tp", style = "min-width: 20%;"),
+                )
+            )),
             bslib::nav(
                 "Transformations",
                 bslib::card_body_fill(utils$genTPGraphs())
@@ -210,7 +241,7 @@ bslib::layout_column_wrap(
             maybeIncl(utils$hasTPs(), bslib::nav(
                 "Parent similarity",
                 bslib::card_body(
-                    style = "display: flex; flex-wrap: wrap; justify-content: flex-start; max-height: 100%; padding-top: 25px; align-items: flex-start; gap: 40px;",
+                    class = "parentSim",
                     utils$genTPSimTable(),
                     # hide img if image is unavailable: https://stackoverflow.com/a/22051972
                     htmltools::img(id = "similarity_spec", style = "display: none;",

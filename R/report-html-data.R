@@ -617,7 +617,6 @@ reportHTMLUtils$methods(
         onClick <- "function(tabEl, rowInfo)
 {
     const chromEl = document.getElementById('chrom_view-tp');
-    const structEl = document.getElementById('struct_view-tp');
     const specSimEl = document.getElementById('similarity_spec');
     let rd;
     
@@ -631,7 +630,18 @@ reportHTMLUtils$methods(
     
     let plots = Reactable.getState(tabEl).meta.plots;
     chromEl.src = plots.chromsLarge[rd.parent_group];
-    structEl.src = plots.structs[rd.parent_susp_InChIKey];
+    
+    if (document.getElementById('parentInfoTab'))
+    {
+        document.getElementById('struct_view-parent').src = plots.structs[rd.parent_susp_InChIKey];
+        Reactable.setFilter('parentInfoTab', 'name', rd.parent_susp_name);
+        if (rowInfo.level !== 0) // only update TP if not parent row was selected  
+        {
+            document.getElementById('struct_view-tp').src = plots.structs[rd.susp_InChIKey];
+            Reactable.setFilter('TPInfoTab', 'name', rd.susp_name);
+        }
+    }
+    
     if (rowInfo.level === 2)
     {
         specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
@@ -648,7 +658,7 @@ reportHTMLUtils$methods(
                         groupDefs = groupDefs, onClick = onClick)
     },
 
-    genSuspInfoTable = function()
+    genSuspInfoTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
         mcn <- mergedConsensusNames(objects$fGroups)
@@ -666,9 +676,9 @@ reportHTMLUtils$methods(
             set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
         
         ptab <- makePropTab(tab, NULL, "name")
-        makePropReactable(ptab, "suspInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+        makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150)
     },
-        
+
     genFeaturesTable = function()
     {
         tab <- as.data.table(getFeatures(objects$fGroups))

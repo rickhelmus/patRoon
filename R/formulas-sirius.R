@@ -4,6 +4,10 @@
 #' @include utils-sirius.R
 NULL
 
+#' @export
+formulasSIRIUS <- setClass("formulasSIRIUS", slots = c(fingerprints = "list"),
+                           contains = "formulas")
+
 # callback for executeMultiProcess()
 processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 {
@@ -12,7 +16,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                                 adduct = character(), score = numeric(), MSMSScore = numeric(),
                                                 isoScore = numeric(), explainedPeaks = integer(),
                                                 explainedIntensity = numeric(), fragInfo = list())
-    
+    fingerprints <- data.table()
     
     resultPath <- patRoon:::getSiriusResultPath(outPath, msFName)
     summary <- file.path(resultPath, "formula_candidates.tsv")
@@ -99,9 +103,12 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                              "explainedIntensity"))
             
             forms <- patRoon:::rankFormulaTable(forms)
+            
+            if (nrow(forms) > 0)
+                fingerprints <- loadSIRIUSFingerprints(resultPath, forms$neutral_formula, adduct)
         }
     }
-    return(forms)
+    return(list(formtab = forms, fingerprints = fingerprints))
 }
 
 #' Generate formula with SIRIUS
@@ -139,7 +146,8 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
                                                               adduct = NULL, projectPath = NULL, elements = "CHNOP",
                                                               profile = "qtof", database = NULL, noise = NULL,
-                                                              cores = NULL, topMost = 100, extraOptsGeneral = NULL,
+                                                              cores = NULL, getFingerprints = FALSE, topMost = 100,
+                                                              token = NULL, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
                                                               absAlignMzDev = 0.002, verbose = TRUE,
@@ -154,7 +162,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
+    checkmate::assertString(token, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(getFingerprints, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
            fixed = list(add = ac))
@@ -162,6 +172,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::assertFlag(dryRun, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (getFingerprints && calculateFeatures)
+        stop("Fingerprints can currently only be loaded if calculateFeatures is set to FALSE", call. = FALSE)
     
     if (length(fGroups) == 0)
         return(formulas(algorithm = "sirius"))
@@ -175,26 +188,35 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
-                          database, noise, cores, FALSE, NULL, topMost, projectPath, NULL, extraOptsGeneral,
-                          extraOptsFormula, verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
-                          splitBatches, dryRun)
-        
-    if (calculateFeatures)
+                          database, noise, cores, if (getFingerprints) "fingerprint" else "none", NULL, topMost,
+                          projectPath, token, extraOptsGeneral, extraOptsFormula, verbose, "formulasSIRIUS",
+                          patRoon:::processSIRIUSFormulas, NULL, splitBatches, dryRun)
+    
+    groupFormulas <- fingerprints <- list()
+    
+    if (length(formTable) > 0)
     {
-        if (length(formTable) > 0)
+        # omit empty result tables and extract formulae/fingerprints
+        
+        hasResults <- function(r) !is.null(r[["formtab"]]) && nrow(r$formtab) > 0
+        if (calculateFeatures)
         {
-            formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
+            formTable <- lapply(formTable, function(fta)
+            {
+                fta <- fta[sapply(fta, hasResults)]
+                return(lapply(fta, "[[", "formtab"))
+            })
             groupFormulas <- generateGroupFormulasByConsensus(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn, gNames)
         }
         else
-            groupFormulas <- list()
-    }
-    else
-    {
-        groupFormulas <- pruneList(formTable, checkZeroRows = TRUE)
-        formTable <- list()
+        {
+            formTable <- formTable[sapply(formTable, hasResults)]
+            fingerprints <- lapply(formTable, "[[", "fingerprints")
+            groupFormulas <- lapply(formTable, "[[", "formtab")
+            formTable <- list()
+        }
     }
     
     groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
@@ -215,7 +237,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
     
-    return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
+    return(formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = formTable, fingerprints = fingerprints,
+                          algorithm = "sirius"))
 })
 
 #' @template featAnnSets-gen_args

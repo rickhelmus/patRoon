@@ -42,6 +42,28 @@ getFormulaFromSIRIUSResFile <- function(ffile, ext)
     return(gsub(pat, "\\1", basename(ffile)))
 }
 
+loadSIRIUSFingerprints <- function(resultPath, formulas, adduct)
+{
+    fingerprints <- data.table()
+    if (file.exists(file.path(resultPath, "fingerprints")))
+    {
+        fpFiles <- getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
+        fpForms <- getFormulaFromSIRIUSResFile(fpFiles, "fpt")
+        # obtain neutral formula of FP results from candidate list
+        formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
+        fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
+        for (i in seq_along(fpFiles))
+        {
+            if (fpForms[i] %chin% formulas) # only consider FPs of candidates
+                fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
+        }
+        # add absoluteIndices
+        fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
+        fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
+    }
+    return(fingerprints)
+}
+
 makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, adduct, out)
 {
     msFile <- file(out, "w")
@@ -164,12 +186,23 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         formArgs <- c(formArgs, extraOptsFormula)
 
     isV5 <- isSIRIUS5() # UNDONE: what if SIRUS is only available on the workers?
-    cmpArgs <- if (withFingerID && isV5)
-        c("fingerprint", "structure", "--database", fingerIDDatabase)
-    else if (withFingerID)
-        c("structure", "--database", fingerIDDatabase)
-    else
-        character()
+    cmpArgs <- character()
+    if (withFingerID != "none")
+    {
+        if (withFingerID == "fingerprint")
+        {
+            if (!isV5)
+                stop("Can only obtain fingerprints with SIRIUS5", call. = FALSE)    
+            cmpArgs <- "fingerprint"
+        }
+        else
+        {
+            cmpArgs <- if (isV5)
+                c("fingerprint", "structure", "--database", fingerIDDatabase)
+            else
+                c("structure", "--database", fingerIDDatabase)
+        }
+    }
     
     batchn <- 1
     if (splitBatches) 
@@ -205,7 +238,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         ret <- executeMultiProcess(cmdQueue, finishHandler = SIRMPFinishHandler,
                                    prepareHandler = SIRMPPrepareHandler, printOutput = verbose && singular,
                                    printError = verbose && singular, showProgress = !singular,
-                                   logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
+                                   logSubDir = paste0("sirius_", if (withFingerID == "structure") "compounds" else "formulas"))
         
         return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames[doWhich]))
     }, simplify = FALSE)

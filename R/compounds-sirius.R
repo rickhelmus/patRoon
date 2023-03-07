@@ -91,26 +91,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         }
         
         if (nrow(results) > 0)
-        {
-            # get SIRIUS fingerprints
-            fingerprints <- data.table()
-            if (file.exists(file.path(resultPath, "fingerprints")))
-            {
-                fpFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
-                fpForms <- patRoon:::getFormulaFromSIRIUSResFile(fpFiles, "fpt")
-                # obtain neutral formula of FP results from candidate list
-                formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
-                fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
-                for (i in seq_along(fpFiles))
-                {
-                    if (fpForms[i] %chin% results$neutral_formula) # only consider FPs if a candidate structure is available
-                        fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
-                }
-                # add absoluteIndices
-                fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
-                fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
-            }
-        }
+            fingerprints <- loadSIRIUSFingerprints(resultPath, results$neutral_formula, adduct)
     }
     
     ret <- list(comptab = results, scRanges = scRanges, fingerprints = fingerprints)
@@ -175,11 +156,6 @@ setMethod("predictRespFactor", "compoundsSIRIUS", function(obj, fGroups, calibra
 #'   \option{--fingerid-db} option.
 #' @param topMostFormulas Do not return more than this number of candidate formulae. Note that only compounds for these
 #'   formulae will be searched. Sets the \option{--candidates} commandline option.
-#' @param token A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
-#'   version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
-#'   \command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
-#'   \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
-#'   information. If \code{NULL} then the log in is skipped.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @templateVar ident TRUE
@@ -238,7 +214,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     printf("Processing %d feature groups with SIRIUS-CSI:FingerID...\n", gCount)
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
-                        formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMostFormulas, projectPath,
+                        formulaDatabase, noise, cores, "structure", fingerIDDatabase, topMostFormulas, projectPath,
                         token, extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
                         patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
                         splitBatches, dryRun)

@@ -7,6 +7,11 @@
 #'   commandline option.
 #' @param cores The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
 #'   used.
+#' @param token A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
+#'   version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
+#'   \command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
+#'   \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
+#'   information. If \code{NULL} then the log in is skipped.
 #' @param extraOptsGeneral,extraOptsFormula a \code{character} vector with any extra commandline parameters for
 #'   \command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula
 #'   options. Otherwise commandline options specified in \code{extraOptsGeneral} are added prior to the \code{formula}

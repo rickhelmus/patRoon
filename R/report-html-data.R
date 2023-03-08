@@ -916,7 +916,7 @@ reportHTMLUtils$methods(
             tab[, (rcols) := lapply(.SD, round, 2), .SDcols = rcols]
         
         ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL, "suspID")
-        makePropReactable(ptab, "suspAnnTab", "suspID", minPropWidth = 100, minValWidth = 100)
+        makePropReactable(ptab, "suspAnnTab", "suspID", minPropWidth = 150, minValWidth = 100)
     },
         
     genTPSimTable = function()

@@ -513,6 +513,9 @@ reportHTMLUtils$methods(
         profileRelEl.src = pl.profileRel;
         profileAbsEl.src = pl.profileAbs;
     }
+    if (document.getElementById('componentInfoTab'))
+        Reactable.setFilter('componentInfoTab', 'name', rd.component);
+
 }"
         
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
@@ -679,6 +682,21 @@ reportHTMLUtils$methods(
         makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150)
     },
 
+    genComponentInfoTable = function()
+    {
+        tab <- componentInfo(objects$components)
+        tab <- removeDTColumnsIfPresent(tab, c("links", "size"))
+        
+        for (col in intersect(c("neutral_mass", "mz_increment"), names(tab)))
+            set(tab, j = col, value = round(tab[[col]], 5))
+        for (col in intersect(c("cmp_ret", "cmp_retsd", "cmp_ppm", "ret_increment", "ret_min", "ret_max", "ret_range"),
+                              names(tab)))
+            set(tab, j = col, value = round(tab[[col]], 2))
+        
+        ptab <- makePropTab(tab, NULL, "name")
+        makePropReactable(ptab, "componentInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+    },
+        
     genFeaturesTable = function()
     {
         tab <- as.data.table(getFeatures(objects$fGroups))

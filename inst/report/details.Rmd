@@ -125,6 +125,13 @@ bslib::layout_column_wrap(
                     htmltools::img(id = "profileRel_view-component"),
                     htmltools::img(id = "profileAbs_view-component")
                 )
+            )),
+            maybeIncl(utils$hasComponentInfo(), bslib::nav(
+                "Component info",
+                bslib::card_body(
+                    class = "pt-2",
+                    utils$genComponentInfoTable(),
+                )
             ))
         )),
         maybeIncl(utils$hasTPs(), callIncl(bslib::navs_tab_card,

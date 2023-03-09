@@ -301,16 +301,10 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     return(rt)
 }
 
-getAnnReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
-
-makeAnnSubReact <- function(title, ...)
+makeReactableCompact <- function(tab, id, ...)
 {
-    # Nested table: based from reactable cookbook
-    return(htmltools::div(style = list(margin = "10px 20px"),
-                          htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
-                          reactable::reactable(pagination = FALSE, compact = TRUE, bordered = TRUE, wrap = FALSE,
-                                               fullWidth = FALSE, resizable = TRUE, striped = TRUE,
-                                               height = 200, ...)))
+    makeReactable(tab, id = id, compact = TRUE, fullWidth = FALSE, striped = TRUE, sortable = FALSE,
+                  rowStyle = list(fontSize = "11pt"), ...)
 }
 
 makePropTab <- function(tab, sets, idcol = FALSE)
@@ -372,52 +366,68 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
             colDefs[[col]]$name <- ""
     }
     
-    return(makeReactable(tab, id, columns = colDefs, compact = TRUE, fullWidth = FALSE, striped = TRUE, sortable = FALSE,
-                         rowStyle = list(fontSize = "11pt"), ...))
+    return(makeReactableCompact(tab, id = id, columns = colDefs, ...))
 }
 
-makeAnnDetailsReact <- function(title, infoTable)
+titleTab <- function(title, tab)
 {
-    return(makeAnnSubReact(title, infoTable, columns = list(
-        property = reactable::colDef(minWidth = 150),
-        value = reactable::colDef(html = TRUE, minWidth = 250)
-    )))
+    return(htmltools::div(
+        style = list(margin = "10px 20px"),
+        htmltools::div(style = list("text-align" = "center", "font-weight" = "bold"), title),
+        tab
+    ))
+}
+    
+makeAnnDetailsReact <- function(title, tab, sets)
+{
+    tab <- copy(tab)
+    for (col in names(tab))
+    {
+        if (is.na(tab[[col]]) | (is.character(tab[[col]]) & !nzchar(tab[[col]])))
+            set(tab, j = col, value = NULL)
+    }
+    ptab <- makePropTab(tab, sets, FALSE)
+    return(titleTab(title, makePropReactable(ptab, id = NULL, idcol =  FALSE, minPropWidth = 150,
+                                             minValWidth = 150, height = 200)))
 }
 
 makeAnnPLReact <- function(apl)
 {
-    if (is.null(apl) || nrow(apl) == 0)
-        return(htmltools::div(align = "center", "No annotation available."))
+    rtab <- if (is.null(apl) || nrow(apl) == 0)
+        htmltools::div(align = "center", "No annotation available.")
+    else
+    {
+        isPrec <- apl$precursor
+        
+        apl[, c("ID", "annotated", "precursor") := NULL]
+        apl[, c("mz", "intensity") := .(round(mz, 5), round(intensity))]
+        apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
+        apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
+        if (!is.null(apl[["ion_formula_MF"]]))
+            apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
+        
+        colDefs <- pruneList(list(
+            ion_formula = reactable::colDef(html = TRUE, minWidth = 125),
+            neutral_loss = reactable::colDef(html = TRUE, minWidth = 125),
+            ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
+        ))
+        
+        makeReactableCompact(apl, id = NULL, columns = colDefs, height = 200,
+                             rowClass = function(index) if (isPrec[index]) "fw-light" else "")
+    }
     
-    isPrec <- apl$precursor
-    
-    apl[, c("ID", "annotated", "precursor") := NULL]
-    apl[, c("mz", "intensity") := .(round(mz, 5), round(intensity))]
-    apl[, ion_formula := subscriptFormulaHTML(ion_formula)]
-    apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
-    if (!is.null(apl[["ion_formula_MF"]]))
-        apl[, ion_formula_MF := subscriptFormulaHTML(ion_formula_MF)]
-    
-    colDefs <- pruneList(list(
-        ion_formula = reactable::colDef(html = TRUE, minWidth = 125),
-        neutral_loss = reactable::colDef(html = TRUE, minWidth = 125),
-        ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
-    ))
-    
-    return(makeAnnSubReact("Peak list annotations", apl, columns = colDefs,
-                           rowClass = function(index) if (isPrec[index]) "fw-light" else ""))
+    return(titleTab("Peak list annotations", rtab))
 }
 
-makeAnnScoreReact <- function(annRow, scCols)
+makeAnnScoreReact <- function(annRow, sets)
 {
-    scores <- annRow[, scCols, with = FALSE]
-    scores <- setnames(transpose(scores, keep.names = "score"), 2, "value")
-    return(makeAnnSubReact("Scorings", scores, columns = list(
-        score = reactable::colDef(minWidth = 150),
-        value = reactable::colDef(format = reactable::colFormat(digits = 2),
-                                  minWidth = 100)
-    )))
+    annRow[, (names(annRow)) := lapply(.SD, round, 2), .SDcols = names(annRow)]
+    ptab <- makePropTab(annRow, sets, FALSE)
+    return(titleTab("Scorings", makePropReactable(ptab, id = NULL, idcol = FALSE, minPropWidth = 150,
+                                                  minValWidth = 100, height = 200)))
 }
+
+getAnnReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
 
 makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL, scoreTabFunc = NULL, ...)
 {
@@ -795,9 +805,19 @@ reportHTMLUtils$methods(
         
         getFormDetails <- function(index)
         {
-            fit <- getFormInfoTable(formulas[[tab$group[index]]][formIndices[index]], mcn, TRUE)
-            fit <- fit[!property %in% names(tab)]
-            return(makeAnnDetailsReact("Formula properties", fit))
+            ft <- formulas[[tab$group[index]]][formIndices[index]]
+            ft <- ft[, setdiff(names(ft), names(tab)), with = FALSE]
+            takeCols <- getAllMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
+                                               "error", "error_frag_median", "error_frag_median_abs",
+                                               "explainedPeaks", "explainedIntensity"), names(ft), mcn)
+            ft <- ft[, takeCols, with = FALSE]
+            for (col in getAllMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
+                set(ft, j = col, value = subscriptFormulaHTML(ft[[col]]))
+            massCols <- getAllMergedConsCols(c("neutralMass", "ion_formula_mz"), names(ft), mcn)
+            numCols <- names(ft)[sapply(ft, is.numeric)]
+            for (col in numCols)
+                set(ft, j = col, value = round(ft[[col]], if (col %chin% massCols) 5 else 2))
+            return(makeAnnDetailsReact("Formula properties", ft, sets(objects$fGroups)))
         }
         
         getAnnPLDetails <- function(index)
@@ -810,8 +830,8 @@ reportHTMLUtils$methods(
         getScoreDetails <- function(index)
         {
             fRow <- formulas[[tab$group[index]]][formIndices[index]]
-            sc <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
-            return(makeAnnScoreReact(fRow, sc))
+            cols <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
+            return(makeAnnScoreReact(fRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
         colDefs <- pruneList(list(
@@ -879,11 +899,52 @@ reportHTMLUtils$methods(
         
         getCompDetails <- function(index)
         {
-            cit <- getCompInfoTable(compounds[[tab$group[index]]][cmpIndices[index]], mcn, TRUE)
-            cit <- cit[!property %in% names(tab)]
-            if (!is.null(tab[["compoundName"]]))
-                cit <- cit[property != "compoundName2"] # already in main table compoundName column
-            return(makeAnnDetailsReact("Compound properties", cit))
+            ct <- data.table::copy(compounds[[tab$group[index]]][cmpIndices[index]])
+            ct <- ct[, setdiff(names(ct), names(tab)), with = FALSE]
+            takeCols <- c(
+                "compoundName",
+                "identifier",
+                "relatedCIDs",
+                "database",
+                "explainedPeaks",
+                "neutral_formula",
+                "SMILES",
+                "InChI",
+                "InChIKey",
+                "XlogP", "AlogP", "LogP",
+                
+                # PubChemLite
+                "FP", "compoundName2", # UNDONE: update?
+                
+                # CompTox
+                "CASRN", "QCLevel",
+                
+                # FOR-IDENT
+                "tonnage", "categories",
+                
+                # TP DB
+                "parent", "transformation", "enzyme", "evidencedoi"
+            )
+            ct <- ct[, getAllMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
+            
+            if (!is.null(tab[["compoundName"]]) && !is.null(tab[["compoundName2"]]))
+                set(ct, j = "compoundName2", value = NULL) # already in main table compoundName column
+            
+            set(ct, j = "neutral_formula", value = subscriptFormulaHTML(ct$neutral_formula))
+            
+            numCols <- names(ct)[sapply(ct, is.numeric)]
+            for (col in numCols)
+                set(ct, j = col, value = round(ct[[col]], 2))
+            
+            for (col in getAllMergedConsCols(c("identifier", "relatedCIDs"), names(ct), mcn))
+            {
+                # get db: handle consensus results
+                cn <- sub("identifier|relatedCIDs", "", col)
+                db <- if (nzchar(cn)) ct[[paste0("database", cn)]] else ct$database
+                set(ct, j = col, value = makeDBIdentLink(db, ct[[col]]))
+            }
+            
+            return(makeAnnDetailsReact("Compound properties", ct, sets(objects$fGroups)))
         }
         
         getAnnPLDetails <- function(index)
@@ -897,8 +958,8 @@ reportHTMLUtils$methods(
         getScoreDetails <- function(index)
         {
             cRow <- compounds[[tab$group[index]]][cmpIndices[index]]
-            sc <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
-            return(makeAnnScoreReact(cRow, sc))
+            cols <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
+            return(makeAnnScoreReact(cRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
         setcolorder(tab, intersect(c("compoundName", "structure"), names(tab)))

@@ -210,64 +210,6 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     return(ctext)
 }
 
-getCompInfoTable <- function(resultRow, mConsNames, addHTMLURL)
-{
-    compCols <- names(resultRow)
-    takeCols <- c(
-        "compoundName",
-        "identifier",
-        "relatedCIDs",
-        "explainedPeaks",
-        "neutral_formula",
-        "SMILES",
-        "InChI",
-        "InChIKey",
-        "XlogP", "AlogP", "LogP",
-        
-        # PubChemLite
-        "FP", "compoundName2", # UNDONE: update?
-        
-        # CompTox
-        "CASRN", "QCLevel",
-        
-        # FOR-IDENT
-        "tonnage", "categories",
-        
-        # TP DB
-        "parent", "transformation", "enzyme", "evidencedoi"
-    )
-    
-    dbcols <- getAllMergedConsCols("database", compCols, mConsNames)
-    
-    return(rbindlist(lapply(takeCols, function(col)
-    {
-        cols <- getAllMergedConsCols(col, compCols, mConsNames)
-        tab <- rbindlist(lapply(cols, function(cl)
-        {
-            val <- resultRow[[cl]]
-            if (is.na(val) || (is.character(val) && !nzchar(val)))
-                return(NULL)
-            if (is.numeric(val))
-                val <- as.character(round(val, 2))
-            else if (addHTMLURL && col %in% c("identifier", "relatedCIDs"))
-            {
-                # assume column order for algo consensus specific IDs and DBs are the same
-                val <- makeDBIdentLink(resultRow[[dbcols[match(cl, cols)]]], val)
-            }
-            return(data.table(property = cl, value = val))
-        }))
-        
-        # merge equal consensus columns
-        if (nrow(tab) > 0 && length(cols) > 1 && allSame(tab[property %in% cols]$value))
-        {
-            tab[property == cols[1], property := col]
-            tab <- tab[!property %in% cols[-1]]
-        }
-        return(tab)
-    })))
-}
-
-
 buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 {
     # Via personal communication Steffen/Emma, see https://github.com/Treutler/MetFamily/blob/22b9f46b2716b805c24c03d260045605c0da8b3e/ClusteringMS2SpectraGUI.R#L2433

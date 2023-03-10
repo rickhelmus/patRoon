@@ -157,6 +157,11 @@ bslib::layout_column_wrap(
                 )
             )),
             bslib::nav(
+                "Intensity",
+                class = "mt-2",
+                bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
+            ),
+            bslib::nav(
                 "Transformations",
                 bslib::card_body_fill(utils$genTPGraphs())
             )
@@ -192,6 +197,11 @@ bslib::layout_column_wrap(
                     })
                 ),
                 bslib::card_body_fill(utils$genFeaturesTable())
+            ),
+            bslib::nav(
+                "Intensity",
+                class = "mt-2",
+                bslib::card_body_fill(htmltools::img(id = "int_plot"))
             ),
             maybeIncl(utils$hasFormulas(), bslib::nav(
                 "Formulas",

@@ -105,6 +105,28 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, outPath, EICs, selfContain
     }, simplify = FALSE)
 }
 
+genHTMLReportPlotsIntPlots <- function(fGroups, outPath, selfContained)
+{
+    cat("Generate intensity plots...\n")
+    # UNDONE: parallel option
+    
+    mainArgs <- list(average = TRUE, normalize = TRUE)
+    if (isFGSet(fGroups))
+        mainArgs <- c(mainArgs, list(sets = TRUE))
+    else
+        mainArgs <- c(mainArgs, list(col = "black"))
+    
+    doApply("sapply", TRUE, names(fGroups), function(grp)
+    {
+        doProgress()
+        makeHTMLReportPlot(paste0("int_plot-", grp, ".svg"), outPath, selfContained, {
+            # UNDONE: params (eg normalize)
+            par(mar = c(4.1, 4.1, 1, 0.1))
+            do.call(plotInt, c(list(fGroups[, grp]), mainArgs))
+        }, width = 8, height = 4, bg = "transparent", pointsize = 16)
+    }, simplify = FALSE)
+}
+
 genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained)
 {
     scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
@@ -409,6 +431,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
+    
+    ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, outPath, selfContained)
 
     gNames <- names(fGroups)
     if (!is.null(compounds))

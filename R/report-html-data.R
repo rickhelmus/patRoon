@@ -194,7 +194,8 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     if (rowInfo.values && rowInfo.values.group)
     {
         const grp = rowInfo.values.group;
-        Reactable.setFilter('featuresTab', 'group', grp);    
+        Reactable.setFilter('featuresTab', 'group', grp);
+        document.getElementById('int_plot').src = Reactable.getState(tabEl).meta.plots.intPlots[grp];
         if (document.getElementById('formulasTab'))
             Reactable.setFilter('formulasTab', 'group', grp);
         if (document.getElementById('compoundsTab'))
@@ -380,11 +381,15 @@ titleTab <- function(title, tab)
     
 makeAnnDetailsReact <- function(title, tab, sets)
 {
-    tab <- copy(tab)
-    for (col in names(tab))
+    if (nrow(tab) > 0)
     {
-        if (is.na(tab[[col]]) | (is.character(tab[[col]]) & !nzchar(tab[[col]])))
-            set(tab, j = col, value = NULL)
+        tab <- copy(tab)
+        cols <- copy(names(tab))
+        for (col in cols)
+        {
+            if (is.na(tab[[col]]) | (is.character(tab[[col]]) & !nzchar(tab[[col]])))
+                set(tab, j = col, value = NULL)
+        }
     }
     ptab <- makePropTab(tab, sets, FALSE)
     return(titleTab(title, makePropReactable(ptab, id = NULL, idcol =  FALSE, minPropWidth = 150,
@@ -630,6 +635,7 @@ reportHTMLUtils$methods(
         onClick <- "function(tabEl, rowInfo)
 {
     const chromEl = document.getElementById('chrom_view-tp');
+    const intEl = document.getElementById('int_plot-parent');
     const specSimEl = document.getElementById('similarity_spec');
     let rd;
     
@@ -643,6 +649,7 @@ reportHTMLUtils$methods(
     
     let plots = Reactable.getState(tabEl).meta.plots;
     chromEl.src = plots.chromsLarge[rd.parent_group];
+    intEl.src = plots.intPlots[rd.parent_group];
     
     if (document.getElementById('parentInfoTab'))
     {

@@ -194,8 +194,16 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     if (rowInfo.values && rowInfo.values.group)
     {
         const grp = rowInfo.values.group;
+        const plots = Reactable.getState(tabEl).meta.plots;
         Reactable.setFilter('featuresTab', 'group', grp);
-        document.getElementById('int_plot').src = Reactable.getState(tabEl).meta.plots.intPlots[grp];
+        document.getElementById('int_plot').src = plots.intPlots[grp];
+        if (document.getElementById('spectrumMS'))
+        {
+            document.getElementById('spectrumMS').src = plots.MSPeakLists[grp].MS;
+            Reactable.setFilter('MSPLTab', 'group', grp);
+            document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
+            Reactable.setFilter('MSMSPLTab', 'group', grp);
+        }
         if (document.getElementById('formulasTab'))
             Reactable.setFilter('formulasTab', 'group', grp);
         if (document.getElementById('compoundsTab'))
@@ -204,7 +212,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
         const ccd = document.getElementById('comps_cluster-dendro');
         if (ccd)
         {
-            ccd.src = Reactable.getState(tabEl).meta.plots.compsCluster[grp].dendro;
+            ccd.src = plots.compsCluster[grp].dendro;
             Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
         }
     }
@@ -779,7 +787,39 @@ reportHTMLUtils$methods(
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
                       meta = list(featQualCols = fqn))
     },
+    
+    genMSPLTable = function(MSLevel)
+    {
+        MSPeakLists <- objects$MSPeakLists[, names(objects$fGroups)]
         
+        id <- if (MSLevel == 2) "MSMSPLTab" else "MSPLTab"
+        theight <- 350
+        
+        if (length(MSPeakLists) == 0)
+        {
+            # dummy table to show empty results
+            return(makeAnnReactable(data.table(ID = integer()), id, height = theight))
+        }
+        
+        tab <- as.data.table(MSPeakLists)
+        tab <- tab[type == if (MSLevel == 2) "MSMS" else "MS"][, type := NULL]
+        isPrec <- tab$precursor
+        tab[, precursor := NULL]
+        
+        colDefs <- list(
+            group = reactable::colDef(show = FALSE),
+            mz = reactable::colDef(format = reactable::colFormat(digits = 5)),
+            intensity = reactable::colDef(format = reactable::colFormat(digits = 0))
+        )
+        
+        colDefs <- setReactNumRangeFilters(id, tab, colDefs)
+        if (!is.null(tab[["set"]]))
+            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter(id, values, name))
+        
+        return(makeAnnReactable(tab, id, columns = colDefs, height = theight, filterable = TRUE,
+                                rowClass = function(index) if (isPrec[index]) "fw-bold" else ""))
+    },
+    
     genFormulasTable = function()
     {
         formulas <- objects$formulas[names(objects$fGroups)]

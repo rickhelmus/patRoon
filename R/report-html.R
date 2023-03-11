@@ -16,6 +16,7 @@ reportHTMLUtils$methods(
     hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
     hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
     hasTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
+    hasMSPL = function() !is.null(objects[["MSPeakLists"]]),
     hasFormulas = function() !is.null(objects[["formulas"]]),
     hasCompounds = function() !is.null(objects[["compounds"]]),
     hasCompsCluster = function() !is.null(objects[["compsCluster"]]),

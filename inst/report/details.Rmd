@@ -104,7 +104,7 @@ bslib::layout_column_wrap(
                 bslib::card_body(
                     class = "propTabAndImg pt-2",
                     utils$genSuspInfoTable("suspInfoTab"),
-                    htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;"),
+                    htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;")
                 )
             ),
         )),
@@ -147,13 +147,13 @@ bslib::layout_column_wrap(
                 bslib::card_body(
                     class = "propTabAndImg",
                     utils$genSuspInfoTable("parentInfoTab"),
-                    htmltools::img(id = "struct_view-parent", style = "min-width: 20%;"),
+                    htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
                 ),
                 bslib::card_body(class = "mx-auto", htmltools::strong("Transformation product")),
                 bslib::card_body(
                     class = "propTabAndImg",
                     utils$genSuspInfoTable("TPInfoTab"),
-                    htmltools::img(id = "struct_view-tp", style = "min-width: 20%;"),
+                    htmltools::img(id = "struct_view-tp", style = "min-width: 20%;")
                 )
             )),
             bslib::nav(
@@ -203,6 +203,18 @@ bslib::layout_column_wrap(
                 class = "mt-2",
                 bslib::card_body_fill(htmltools::img(id = "int_plot"))
             ),
+            maybeIncl(utils$hasMSPL(), bslib::nav(
+                "MS peak lists",
+                bslib::card_body(
+                    style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
+                    htmltools::strong("MS"),
+                    htmltools::strong("MS/MS"),
+                    htmltools::img(id = "spectrumMS", style = "min-width: 20%;"),
+                    htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;"),
+                    utils$genMSPLTable(1),
+                    utils$genMSPLTable(2)
+                )
+            )),
             maybeIncl(utils$hasFormulas(), bslib::nav(
                 "Formulas",
                 bslib::card_body(

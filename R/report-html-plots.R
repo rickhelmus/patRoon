@@ -149,6 +149,43 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
     return(list())
 }
 
+genHTMLReportPlotsMSPeakLists <- function(MSPeakLists, outPath, selfContained)
+{
+    cat("Generate MS spectra...\n")
+    
+    if (length(MSPeakLists) == 0)
+        return(list())
+    
+    # UNDONE: parallel option
+    return(doApply("sapply", TRUE, groupNames(MSPeakLists), function(grp)
+    {
+        ret <- list()
+        
+        args <- list(MSPeakLists, groupName = grp, title = "")
+        
+        ret$MS <- makeHTMLReportPlot(sprintf("spec-%s-MS.svg", grp), outPath, selfContained, {
+            mar <- par("mar")
+            par(mar = c(mar[1], mar[2], 0.2, 0.2))
+            do.call(plotSpectrum, c(list(MSLevel = 1), args))
+        }, width = 7, height = 4)
+        
+        ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
+        {
+            makeHTMLReportPlot(sprintf("spec-%s-MSMS.svg", grp), outPath, selfContained, {
+                mar <- par("mar")
+                par(mar = c(mar[1], mar[2], 0.2, 0.2))
+                do.call(plotSpectrum, c(list(MSLevel = 2), args))
+            }, width = 7, height = 4)
+        }
+        else
+            ""
+        
+        doProgress()
+        
+        return(ret)
+    }, simplify = FALSE))
+}
+
 genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfContained)
 {
     cat("Generate formula annotation plots...\n")
@@ -439,7 +476,9 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         compounds <- compounds[gNames]
     
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, outPath, selfContained)
-    
+
+    if (!is.null(MSPeakLists))
+        ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(MSPeakLists[, gNames], outPath, selfContained)    
     if (!is.null(formulas))
         ret$formulas <- genHTMLReportPlotsFormulas(formulas[gNames], MSPeakLists, outPath, selfContained)
     if (!is.null(compounds))

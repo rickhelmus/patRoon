@@ -119,7 +119,7 @@ reactSelectFilter <- function(id, values, name)
 {
     # from examples
     htmltools::tags$select(
-        onchange = sprintf("Reactable.setFilter('detailsTabComponents', '%s', event.target.value || undefined)", name),
+        onchange = sprintf("Reactable.setFilter('%s', '%s', event.target.value || undefined)", id, name),
         tags$option(value = "", "All"),
         lapply(unique(values), tags$option),
         "aria-label" = paste("Filter", name),

@@ -181,46 +181,12 @@ makeReactable <- function(tab, id, bordered = TRUE, ...)
                                 pagination = FALSE, ...))
 }
 
-makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., onClick = NULL)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ...)
 {
     # sync column order
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
-    oc <- htmlwidgets::JS(sprintf("function(rowInfo, column)
-{
-    const tabEl = '%s';
-    if (rowInfo.values && rowInfo.values.group) // don't process clicks of parent rows 
-    {
-        Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
-
-        const grp = rowInfo.values.group;
-        const plots = Reactable.getState(tabEl).meta.plots;
-        Reactable.setFilter('featuresTab', 'group', grp);
-        document.getElementById('int_plot').src = plots.intPlots[grp];
-        if (document.getElementById('spectrumMS'))
-        {
-            document.getElementById('spectrumMS').src = plots.MSPeakLists[grp].MS;
-            Reactable.setFilter('MSPLTab', 'group', grp);
-            document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
-            Reactable.setFilter('MSMSPLTab', 'group', grp);
-        }
-        if (document.getElementById('formulasTab'))
-            Reactable.setFilter('formulasTab', 'group', grp);
-        if (document.getElementById('compoundsTab'))
-            Reactable.setFilter('compoundsTab', 'group', grp);
-        
-        const ccd = document.getElementById('comps_cluster-dendro');
-        if (ccd)
-        {
-            ccd.src = plots.compsCluster[grp].dendro;
-            Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
-        }
-        
-        %s;
-    }
-}", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
- 
     # add EICs
     tab[, c("chrom_small", "chrom_large") := group]
     tabn <- names(tab)
@@ -289,13 +255,19 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     
     colDefs <- setReactNumRangeFilters(id, tab, colDefs)
 
+    onClick = htmlwidgets::JS("function(rowInfo, column)
+{
+    updateRowSelection(rowInfo.values, rowInfo.index);
+}")
+    
     headThemeStyle <- list(padding = "2px 4px")
-    rt <- makeReactable(tab, id, highlight = TRUE, onClick = oc, defaultExpanded = TRUE, columns = colDefs,
-                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs, filterable = FALSE,
+    rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, defaultExpanded = TRUE, columns = colDefs,
+                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
+                        filterable = FALSE,
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
-                        meta = list(selectedRow = NULL, plots = plots, colToggles = colToggles),
+                        meta = list(selectedRow = 0, plots = plots, colToggles = colToggles),
                         rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
@@ -478,18 +450,8 @@ reportHTMLUtils$methods(
         tab <- getFGTable(objects$fGroups, NULL)
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
-        
-        onClick <- "function(tabEl, rowInfo)
-{
-    const structEl = document.getElementById('struct_view-suspect');
-    const rd = rowInfo.values;
-    structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
-    Reactable.setFilter('suspInfoTab', 'name', rd.susp_name);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
-}"
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, groupBy = "susp_name", onClick = onClick)
+                        plots = plots, groupBy = "susp_name")
     },
     genFGTableComponents = function()
     {
@@ -525,28 +487,8 @@ reportHTMLUtils$methods(
         if (length(cmpGrpCols) > 0)
             groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFGColSepStyle())))
         
-        onClick <- "function(tabEl, rowInfo)
-{
-    let chromEl = document.getElementById('chrom_view-component');
-    let specEl = document.getElementById('spectrum_view-component');
-    let profileRelEl = document.getElementById('profileRel_view-component');
-    let profileAbsEl = document.getElementById('profileAbs_view-component');
-    const rd = rowInfo.values;
-    const pl = Reactable.getState(tabEl).meta.plots.components.components[rd.component];
-    chromEl.src = pl.chrom;
-    specEl.src = pl.spec;
-    if (profileRelEl != undefined)
-    {
-        profileRelEl.src = pl.profileRel;
-        profileAbsEl.src = pl.profileAbs;
-    }
-    if (document.getElementById('componentInfoTab'))
-        Reactable.setFilter('componentInfoTab', 'name', rd.component);
-
-}"
-        
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, groupBy = "component", onClick = onClick)
+                        plots = plots, groupBy = "component")
     },
     genFGTableTPs = function()
     {
@@ -643,37 +585,9 @@ reportHTMLUtils$methods(
             colDefs$parent_susp_InChIKey <- reactable::colDef(show = FALSE)
         # same for cmpIndex
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
-        
-        onClick <- "function(tabEl, rowInfo)
-{
-    const chromEl = document.getElementById('chrom_view-tp');
-    const intEl = document.getElementById('int_plot-parent');
-    const specSimEl = document.getElementById('similarity_spec');
-    let rd = rowInfo.values;
-    
-    let plots = Reactable.getState(tabEl).meta.plots;
-    chromEl.src = plots.chromsLarge[rd.parent_group];
-    intEl.src = plots.intPlots[rd.parent_group];
-    
-    if (document.getElementById('parentInfoTab'))
-    {
-        document.getElementById('struct_view-parent').src = plots.structs[rd.parent_susp_InChIKey];
-        Reactable.setFilter('parentInfoTab', 'name', rd.parent_susp_name);
-        document.getElementById('struct_view-tp').src = plots.structs[rd.susp_InChIKey];
-        Reactable.setFilter('TPInfoTab', 'name', rd.susp_name);
-    }
-    
-    specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
-    specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
-    Reactable.setFilter('similarityTab', 'cmpID', rd.component + '-' + rd.cmpIndex);
-    
-    showTPGraph(rd.component);
-}"
-    
+
         makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, colDefs = colDefs,
-                        groupDefs = groupDefs, onClick = onClick)
+                        groupDefs = groupDefs)
     },
 
     genSuspInfoTable = function(id)

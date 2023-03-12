@@ -64,6 +64,90 @@ function updateView(sel)
         showFeatureTab("Parent similarity", sel === "TPs");
 }
 
+function updateRowSelection(rowValues, rowIndex)
+{
+    if (!rowValues || !rowValues.group)
+        return; // don't process clicks of parent rows 
+    
+    const tabEl = getSelFGTableElement();
+    const grp = rowValues.group;
+    const plots = Reactable.getState(tabEl).meta.plots;
+    
+    Reactable.setMeta(tabEl, { selectedRow: rowIndex });
+
+    Reactable.setFilter('featuresTab', 'group', grp);
+    document.getElementById('int_plot').src = plots.intPlots[grp];
+    if (document.getElementById('spectrumMS'))
+    {
+        document.getElementById('spectrumMS').src = plots.MSPeakLists[grp].MS;
+        Reactable.setFilter('MSPLTab', 'group', grp);
+        document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
+        Reactable.setFilter('MSMSPLTab', 'group', grp);
+    }
+    if (document.getElementById('formulasTab'))
+        Reactable.setFilter('formulasTab', 'group', grp);
+    if (document.getElementById('compoundsTab'))
+        Reactable.setFilter('compoundsTab', 'group', grp);
+    
+    const ccd = document.getElementById('comps_cluster-dendro');
+    if (ccd)
+    {
+        ccd.src = plots.compsCluster[grp].dendro;
+        Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
+    }
+
+    if (tabEl === "detailsTabSuspects")
+    {
+        const structEl = document.getElementById('struct_view-suspect');
+        structEl.src = plots.structs[rowValues.susp_InChIKey];
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
+        if (document.getElementById('suspAnnTab'))
+            Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+    }
+    else if (tabEl === "detailsTabComponents")
+    {
+        let chromEl = document.getElementById('chrom_view-component');
+        let specEl = document.getElementById('spectrum_view-component');
+        let profileRelEl = document.getElementById('profileRel_view-component');
+        let profileAbsEl = document.getElementById('profileAbs_view-component');
+        const pl = plots.components.components[rowValues.component];
+        chromEl.src = pl.chrom;
+        specEl.src = pl.spec;
+        if (profileRelEl != undefined)
+        {
+            profileRelEl.src = pl.profileRel;
+            profileAbsEl.src = pl.profileAbs;
+        }
+        if (document.getElementById('componentInfoTab'))
+            Reactable.setFilter('componentInfoTab', 'name', rowValues.component);
+    }
+    else if (tabEl === "detailsTabTPs")
+    {
+        const chromEl = document.getElementById('chrom_view-tp');
+        const intEl = document.getElementById('int_plot-parent');
+        const specSimEl = document.getElementById('similarity_spec');
+        
+        chromEl.src = plots.chromsLarge[rowValues.parent_group];
+        intEl.src = plots.intPlots[rowValues.parent_group];
+        
+        if (document.getElementById('parentInfoTab'))
+        {
+            document.getElementById('struct_view-parent').src = plots.structs[rowValues.parent_susp_InChIKey];
+            Reactable.setFilter('parentInfoTab', 'name', rowValues.parent_susp_name);
+            document.getElementById('struct_view-tp').src = plots.structs[rowValues.susp_InChIKey];
+            Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
+        }
+        
+        specSimEl.src = plots.TPs[rowValues.component][rowValues.cmpIndex];
+        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        if (document.getElementById('suspAnnTab'))
+            Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+        Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);
+        
+        showTPGraph(rowValues.component);
+    }
+}
+
 function showFGCols(column, show)
 {
     const tabIDs = getFGTableIDs();

@@ -190,9 +190,10 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     oc <- htmlwidgets::JS(sprintf("function(rowInfo, column)
 {
     const tabEl = '%s';
-    Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
-    if (rowInfo.values && rowInfo.values.group)
+    if (rowInfo.values && rowInfo.values.group) // don't process clicks of parent rows 
     {
+        Reactable.setMeta(tabEl, { selectedRow: rowInfo.index });
+
         const grp = rowInfo.values.group;
         const plots = Reactable.getState(tabEl).meta.plots;
         Reactable.setFilter('featuresTab', 'group', grp);
@@ -215,9 +216,9 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
             ccd.src = plots.compsCluster[grp].dendro;
             Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
         }
-    }
         
-    %s;
+        %s;
+    }
 }", id, if (!is.null(onClick)) paste0("(", onClick, ")(tabEl, rowInfo, column);") else ""))
  
     # add EICs
@@ -478,10 +479,10 @@ reportHTMLUtils$methods(
         onClick <- "function(tabEl, rowInfo)
 {
     const structEl = document.getElementById('struct_view-suspect');
-    const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
+    const rd = rowInfo.values;
     structEl.src = Reactable.getState(tabEl).meta.plots.structs[rd.susp_InChIKey];
     Reactable.setFilter('suspInfoTab', 'name', rd.susp_name);
-    if (rowInfo.level === 1 && document.getElementById('suspAnnTab'))
+    if (document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
 }"
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
@@ -527,7 +528,7 @@ reportHTMLUtils$methods(
     let specEl = document.getElementById('spectrum_view-component');
     let profileRelEl = document.getElementById('profileRel_view-component');
     let profileAbsEl = document.getElementById('profileAbs_view-component');
-    const rd = (rowInfo.level === 0) ? rowInfo.subRows[0] : rowInfo.values;
+    const rd = rowInfo.values;
     const pl = Reactable.getState(tabEl).meta.plots.components.components[rd.component];
     chromEl.src = pl.chrom;
     specEl.src = pl.spec;
@@ -645,15 +646,7 @@ reportHTMLUtils$methods(
     const chromEl = document.getElementById('chrom_view-tp');
     const intEl = document.getElementById('int_plot-parent');
     const specSimEl = document.getElementById('similarity_spec');
-    let rd;
-    
-    // check level: handle clicking on expandable rows
-    if (rowInfo.level === 0)
-        rd = rowInfo.subRows[0]._subRows[0];
-    else if (rowInfo.level === 1)
-        rd = rowInfo.subRows[0];
-    else
-        rd = rowInfo.values;
+    let rd = rowInfo.values;
     
     let plots = Reactable.getState(tabEl).meta.plots;
     chromEl.src = plots.chromsLarge[rd.parent_group];
@@ -663,21 +656,15 @@ reportHTMLUtils$methods(
     {
         document.getElementById('struct_view-parent').src = plots.structs[rd.parent_susp_InChIKey];
         Reactable.setFilter('parentInfoTab', 'name', rd.parent_susp_name);
-        if (rowInfo.level !== 0) // only update TP if not parent row was selected  
-        {
-            document.getElementById('struct_view-tp').src = plots.structs[rd.susp_InChIKey];
-            Reactable.setFilter('TPInfoTab', 'name', rd.susp_name);
-        }
+        document.getElementById('struct_view-tp').src = plots.structs[rd.susp_InChIKey];
+        Reactable.setFilter('TPInfoTab', 'name', rd.susp_name);
     }
     
-    if (rowInfo.level === 2)
-    {
-        specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
-        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
-        if (document.getElementById('suspAnnTab'))
-            Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
-        Reactable.setFilter('similarityTab', 'cmpID', rd.component + '-' + rd.cmpIndex);
-    }
+    specSimEl.src = plots.TPs[rd.component][rd.cmpIndex];
+    specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rd.susp_name + '-' + rd.group);
+    Reactable.setFilter('similarityTab', 'cmpID', rd.component + '-' + rd.cmpIndex);
     
     showTPGraph(rd.component);
 }"

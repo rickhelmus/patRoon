@@ -257,7 +257,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ...)
 
     onClick = htmlwidgets::JS("function(rowInfo, column)
 {
-    updateRowSelection(rowInfo.values, rowInfo.index);
+    updateFeatTabRowSel(rowInfo.values, rowInfo.index);
 }")
     
     headThemeStyle <- list(padding = "2px 4px")

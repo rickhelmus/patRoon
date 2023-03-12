@@ -62,9 +62,12 @@ function updateView(sel)
         showFeatureTab("Suspect annotation", sel === "Suspects" || sel === "TPs");
     if (getViews().includes("TPs"))
         showFeatureTab("Parent similarity", sel === "TPs");
+    
+    const r = Reactable.getInstance(tid).rowsById[Reactable.getState(tid).meta.selectedRow];
+    updateFeatTabRowSel(r.values, r.index);
 }
 
-function updateRowSelection(rowValues, rowIndex)
+function updateFeatTabRowSel(rowValues, rowIndex)
 {
     if (!rowValues || !rowValues.group)
         return; // don't process clicks of parent rows 

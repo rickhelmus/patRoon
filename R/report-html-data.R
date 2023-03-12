@@ -301,7 +301,10 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ..., on
     const sel = state.meta.selectedRow;
     let ret = { cursor: 'pointer' };
     if (sel != null && rowInfo.index === sel)
+    {
         ret.background = '#eee';
+        ret.fontWeight = 'bold';
+    }
     return ret;
 }"), ...)
     

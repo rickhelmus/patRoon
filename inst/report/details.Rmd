@@ -157,7 +157,7 @@ bslib::layout_column_wrap(
                 )
             )),
             bslib::nav(
-                "Intensity",
+                "Intensities",
                 class = "mt-2",
                 bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
             ),
@@ -199,7 +199,7 @@ bslib::layout_column_wrap(
                 bslib::card_body_fill(utils$genFeaturesTable())
             ),
             bslib::nav(
-                "Intensity",
+                "Intensities",
                 class = "mt-2",
                 bslib::card_body_fill(htmltools::img(id = "int_plot"))
             ),

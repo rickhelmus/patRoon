@@ -73,7 +73,9 @@ Active logins are now necessary to use webservices such as CSI:FingerID, see e.g
 - Feature components: add `adduct_abundance` column
 - `plotSpectrum()` for sets workflows better handles missing data from one or more sets when making a comparison, which avoids empty plots in such cases.
 - Fixed: `calculatePeakQualities()` would throw errors for empty feature results (reported by Louise Malm)
-- Ensure that analysis information doesn't include duplicate analysis names.
+- Analysis information
+    - Ensure no duplicate analysis names are present.
+    - Allow NA values for blanks
 
 
 # patRoon 2.1

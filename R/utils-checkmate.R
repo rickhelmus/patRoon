@@ -77,7 +77,7 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     assertListVal(x, "path", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, add = add)
-    assertListVal(x, "blank", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    assertListVal(x, "blank", checkmate::assertCharacter, any.missing = TRUE, add = add)
 
     checkmate::assert(
         checkmate::checkNull(x[["conc"]]),
@@ -137,6 +137,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
             x[["conc"]] <- as.numeric(x[["conc"]])
         if (!is.null(x[["norm_conc"]]))
             x[["norm_conc"]] <- as.numeric(x[["norm_conc"]])
+        x$blank[is.na(x$blank)] <- ""
     }
     
     return(x)

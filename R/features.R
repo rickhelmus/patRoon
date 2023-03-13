@@ -369,9 +369,15 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     doCalcs <- function(ft, eic)
     {
         ft <- copy(ft)
-        eic <- as.matrix(eic) # MetaClean expects matrices
-        ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
-        ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        
+        if (nrow(ft) == 0)
+            ft[, c(featQualityNames, featScoreNames) := numeric()]
+        else
+        {
+            eic <- as.matrix(eic) # MetaClean expects matrices
+            ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
+            ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        }
         patRoon:::doProgress()
         return(ft)
     }

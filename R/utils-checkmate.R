@@ -108,6 +108,8 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
 
         if (verifyCentroided)
             verifyDataCentroided(x)
+        
+        checkmate::assertVector(x$analysis, unique = TRUE, .var.name = paste0(.var.name, "$analysis"), add = add)
     }
 
     invisible(NULL)

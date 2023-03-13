@@ -71,7 +71,7 @@
 <line x1='167.07' y1='280.80' x2='167.07' y2='252.62' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='157.35' y1='280.80' x2='157.35' y2='167.47' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='147.34' y1='280.80' x2='147.34' y2='143.91' style='stroke-width: 1.50; stroke: #FF0000;' />
-<line x1='137.48' y1='280.80' x2='137.48' y2='143.91' style='stroke-width: 0.75; stroke: #33A02C;' />
+<line x1='137.48' y1='280.80' x2='137.48' y2='143.91' style='stroke-width: 1.50; stroke: #FF0000;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <line x1='59.04' y1='417.69' x2='59.04' y2='143.91' style='stroke-width: 0.75;' />
@@ -117,11 +117,9 @@
 <line x1='623.39' y1='80.64' x2='639.59' y2='80.64' style='stroke-width: 0.75; stroke: #FF0000;' />
 <line x1='623.39' y1='91.44' x2='639.59' y2='91.44' style='stroke-width: 0.75; stroke: #1F78B4;' />
 <line x1='623.39' y1='102.24' x2='639.59' y2='102.24' style='stroke-width: 0.75; stroke: #B2DF8A;' />
-<line x1='623.39' y1='113.04' x2='639.59' y2='113.04' style='stroke-width: 0.75; stroke: #33A02C;' />
 <text x='647.69' y='72.94' style='font-size: 9.00px; fill: #A6CEE3; font-family: sans;' textLength='30.52px' lengthAdjust='spacingAndGlyphs'>positive</text>
 <text x='647.69' y='83.74' style='font-size: 9.00px; fill: #FF0000; font-family: sans;' textLength='38.02px' lengthAdjust='spacingAndGlyphs'>precursor</text>
 <text x='647.69' y='94.54' style='font-size: 9.00px; fill: #1F78B4; font-family: sans;' textLength='29.52px' lengthAdjust='spacingAndGlyphs'>overlap</text>
-<text x='647.69' y='105.34' style='font-size: 9.00px; fill: #B2DF8A; font-family: sans;' textLength='28.52px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
-<text x='647.69' y='116.14' style='font-size: 9.00px; fill: #33A02C; font-family: sans;' textLength='24.51px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
+<text x='647.69' y='105.34' style='font-size: 9.00px; fill: #B2DF8A; font-family: sans;' textLength='34.03px' lengthAdjust='spacingAndGlyphs'>negative</text>
 </g>
 </svg>

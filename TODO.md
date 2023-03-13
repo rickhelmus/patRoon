@@ -20,9 +20,13 @@
 
 ## Predict
 
-- show() for compoundsSIRIUS?
+- show() for annotation classes with predictions?
+- use RF to also score formulas?
+    - general score mechanism currently not there
+- re-rank after addCompoundScore()
+    - would make sense, but might break eg suspect annotation ranks
 - docs
-    - SIRIUS compound class
+    - SIRIUS formulas/compound class
 
 ## General
 

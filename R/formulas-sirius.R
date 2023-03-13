@@ -111,6 +111,39 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     return(list(formtab = forms, fingerprints = fingerprints))
 }
 
+
+#' @rdname formulas-class
+#' @export
+setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
+{
+    obj <- callNextMethod()
+    obj@fingerprints <- obj@fingerprints[names(obj@fingerprints) %chin% groupNames(obj)] # sync fingerprints
+    return(obj)
+})
+
+#' @export
+setMethod("predictRespFactor", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq)
+{
+    # UNDONE: verify args
+    
+    resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+    
+    if (nrow(resp) == 0)
+        return(obj) # nothing to do
+    
+    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
+                     sort = FALSE, all.x = TRUE))
+    })
+
+    # UNDONE: do something equilavent for formula rankings?    
+    # obj <- addCompoundScore(obj, "RF_SIRFP", FALSE, 1)
+    
+    return(obj)
+})
+
+
 #' Generate formula with SIRIUS
 #'
 #' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to generate chemical formulae candidates.

@@ -371,19 +371,23 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     return(ret)
 }
 
-predictRespFactorsSIRFPs <- function(compounds, gInfo, calibrants, eluent, organicModifier, pHAq)
+predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq)
 {
-    compounds <- compounds[rownames(gInfo)]
+    featAnnSIR <- featAnnSIR[rownames(gInfo)]
     
-    allFPs <- rbindlist(lapply(compounds@fingerprints, transpose, keep.names = "neutral_formula",
-                               make.names = "absoluteIndex"), idcol = "group")
+    FPs <- featAnnSIR@fingerprints[sapply(featAnnSIR@fingerprints, nrow) > 0]
+    if (length(FPs) == 0)
+        return(data.table())
+    
+    allFPs <- rbindlist(lapply(FPs, transpose, keep.names = "neutral_formula", make.names = "absoluteIndex"),
+                        idcol = "group")
     fpColRange <- seq(3, ncol(allFPs))
     setnames(allFPs, fpColRange, paste0("Un", names(allFPs)[fpColRange]))
     allFPs[, id := as.character(seq_len(nrow(allFPs)))]
     allFPs[, ionization := mapply(group, neutral_formula, FUN = function(g, f)
     {
         # UNDONE: need to check for empty fragInfo?
-        return(compounds[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
+        return(featAnnSIR[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
     })]
     
     # convert to MS2Quant format

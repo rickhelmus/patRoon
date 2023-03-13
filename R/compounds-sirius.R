@@ -98,6 +98,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
     return(ret)
 }
 
+
 #' @rdname compounds-class
 #' @export
 setMethod("delete", "compoundsSIRIUS", function(obj, i = NULL, j = NULL, ...)
@@ -121,12 +122,13 @@ setMethod("predictRespFactor", "compoundsSIRIUS", function(obj, fGroups, calibra
     {
         resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
         
+        if (nrow(resp) == 0)
+            return(obj) # nothing to do
+        
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
-            ann <- copy(ann)
-            ann <- merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
-                         sort = FALSE)
-            return(ann)
+            return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
+                         sort = FALSE, all.x = TRUE))
         })
         
         obj <- addCompoundScore(obj, "RF_SIRFP", FALSE, 1)

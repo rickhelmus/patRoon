@@ -235,16 +235,7 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, M
 
 #' @rdname compounds-class
 #' @export
-setMethod("predictRespFactor", "compoundsSet", function(obj, fGroups, calibrants, ...)
-{
-    # UNDONE: verify args: fGroupsSet, calibrants is a list with dfs
-    
-    unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
-    obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactor, MoreArgs = list(...))
-    obj <- updateSetConsensus(obj)
-    
-    return(obj)
-})
+setMethod("predictRespFactor", "compoundsSet", doFeatAnnPredictRFSets)
 
 #' @rdname compounds-class
 #' @export

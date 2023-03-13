@@ -198,6 +198,10 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
     return(callNextMethod())
 })
 
+#' @rdname compounds-class
+#' @export
+setMethod("predictRespFactor", "formulasSet", doFeatAnnPredictRFSets)
+
 #' @rdname formulas-class
 #' @export
 setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,

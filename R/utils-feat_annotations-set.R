@@ -486,3 +486,13 @@ doFeatAnnMCNSetsCons <- function(obj, sets)
     return(obj@mergedConsensusNames)
 }
 
+doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
+{
+    # UNDONE: verify args: fGroupsSet, calibrants is a list with dfs
+    
+    unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
+    obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactor, MoreArgs = list(...))
+    obj <- updateSetConsensus(obj)
+    
+    return(obj)
+}

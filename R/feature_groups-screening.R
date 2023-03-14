@@ -205,7 +205,8 @@ setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrant
     # avoid duplicate calculations if there happen to be suspects with the same SMILES
     inp <- unique(inp, by = c("group", "SMILES"))
     resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq)
-    scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE)
+    scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE,
+                 all.x = TRUE)
     
     obj@screenInfo <- scr
     

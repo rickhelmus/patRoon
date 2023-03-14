@@ -396,6 +396,13 @@ setMethod("predictRespFactor", "featureGroupsScreeningSet", function(obj, calibr
     
 })
 
+#' @export
+setMethod("predictConc", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
+{
+    # dummy method so that featureAnn can default to NULL
+    callNextMethod(fGroups, featureAnn)
+})
+
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,

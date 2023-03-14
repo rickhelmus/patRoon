@@ -383,6 +383,14 @@ setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm,
     return(fGroups)
 })
 
+#' @export
+setMethod("predictConc", "featureGroupsSet", function(fGroups, featureAnn)
+{
+    # UNDONE: check args
+    
+    return(doPredictConcSets(fGroups, featureAnn))
+})
+
 #' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
 #'   \code{\link{featureGroupsSet}} object.
 #' @rdname groupFeatures

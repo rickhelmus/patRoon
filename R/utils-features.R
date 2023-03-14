@@ -231,3 +231,59 @@ finalizeFeatureConcsTab <- function(concs)
     return(concs)
 >>>>>>> e50ad55e (various WIP [skip ci])
 }
+
+doPredictConcSets <- function(fGroups, featureAnn)
+{
+    if (is.null(featureAnn))
+    {
+        # just from screening info
+        usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+        usFGroups <- sapply(usFGroups, predictConc, simplify = FALSE)
+    }
+    else
+    {
+        usFeatAnns <- checkAndUnSetOther(sets(fGroups), featureAnn, "featureAnn")
+        usFeatAnns <- usFeatAnns[lengths(usFeatAnns) > 0]
+        
+        if (length(usFeatAnns) == 0)
+        {
+            cat("No feature annotations, nothing to do...\n")
+            return(fGroups)
+        }
+        
+        usFGroups <- sapply(names(usFeatAnns), unset, obj = fGroups, simplify = FALSE)
+        usFGroups <- Map(usFGroups, usFeatAnns, f = predictConc)
+    }
+    
+    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@concentrations) > 0)]
+    if (length(usFGroups) == 0)
+        return(fGroups)
+    
+    if (length(usFGroups) == 1)
+        fGroups@concentrations <- copy(usFGroups[[1]]@concentrations)
+    else
+    {
+        fGroups@concentrations <- Reduce(usFGroups, f = function(left, right)
+        {
+            cols <- intersect(c("group", "type", "candidate", "candidate_name"), c(names(left), names(right)))
+            ret <- merge(left@concentrations, right@concentrations, by = cols, all = TRUE)
+            
+            pat <- "\\.x$"
+            dupCols <- grep(pat, names(ret), value = TRUE)
+            dupCols <- sub(pat, "", dupCols)
+            for (col in dupCols)
+            {
+                # assume values in duplicate cols are either unique for a set or the same for both
+                l <- ret[[paste0(col, ".x")]]; r <- ret[[paste0(col, ".y")]]
+                ret[, (col) := fifelse(!is.na(l), l, r)]
+            }
+            return(ret)
+        })
+    }
+    
+    # add missing analyses
+    allAnaCols <- c(paste0(analyses(fGroups), "_conc_M"), paste0(analyses(fGroups), "_conc_ugL"))
+    fGroups@concentrations[, setdiff(allAnaCols, names(fGroups@concentrations)) := NA_real_][]
+    
+    return(fGroups)
+}

@@ -384,6 +384,18 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     return(obj)
 })
 
+#' @export
+setMethod("predictRespFactor", "featureGroupsScreeningSet", function(obj, calibrants, ...)
+{
+    # UNDONE: verify args: calibrants is a list with dfs
+    
+    obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactor, MoreArgs = list(...))
+    obj <- syncScreeningSetObjects(obj)
+    
+    return(obj)
+    
+})
+
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,

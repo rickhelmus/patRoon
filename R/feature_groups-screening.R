@@ -216,14 +216,19 @@ setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrant
 #' @export
 setMethod("predictConc", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
 {
-    scr <- screenInfo(fGroups)
-    if (is.null(scr[["RF_SMILES"]]))
-        stop("Object lacks predicted response factors. Please call predictRespFactor() first!", call. = FALSE)
-    
     if (!is.null(featureAnn) && length(featureAnn) > 0)
         fGroups <- callNextMethod()
     else
         fGroups@concentrations <- data.table()
+
+    scr <- screenInfo(fGroups)
+    
+    if (is.null(scr[["RF_SMILES"]]))
+    {
+        cat("Screening results lacks predicted response factors and will not be used for quantitation.",
+            "You can use predictRespFactor() to add suspect response factors\n")
+        return(fGroups)
+    }
     
     resp <- scr[, c("group", "SMILES", "RF_SMILES"), with = FALSE]
     resp[, type := "suspect"]

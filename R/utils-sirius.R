@@ -402,7 +402,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
     eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
     
-    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, allFPs)
+    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organicModifier, pHAq, allFPs)
     
     ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
                  pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],

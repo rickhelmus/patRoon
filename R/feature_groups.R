@@ -1382,11 +1382,8 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 #' @export
 setMethod("predictConc", "featureGroups", function(fGroups, featureAnn)
 {
-    # UNDONE: needs to be done per set
-    # UNDONE: check calibrant format
-    # UNDONE: check organicModifier
-    # UNDONE: cache results
-    # UNDONE: SIRIUS formulas as input, when it supports loading FPs
+    # UNDONE: check args
+    # UNDONE: cache results --> cache per SMILES/FP
     # UNDONE: clear out previous calculations
     
     if (length(fGroups) == 0)
@@ -1407,25 +1404,28 @@ setMethod("predictConc", "featureGroups", function(fGroups, featureAnn)
     
     concs <- data.table()
     
-    if (!is.null(annTab[["RF_SMILES"]]))
+    if (!is.null(annTab[["RF_SMILES"]]) && any(!is.na(annTab$RF_SMILES)))
     {
-        resp <- annTab[, c("group", "SMILES", "compoundName", "RF_SMILES"), with = FALSE]
+        resp <- annTab[!is.na(RF_SMILES), c("group", "SMILES", "compoundName", "RF_SMILES"), with = FALSE]
         resp[, type := "compound"]
         resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
         setnames(resp, c("SMILES", "compoundName", "RF_SMILES"), c("candidate", "candidate_name", "RF"))
         concs <- calcFeatureConcs(fGroups, resp)
     }
     
-    if (!is.null(annTab[["RF_SIRFP"]]))
+    if (!is.null(annTab[["RF_SIRFP"]]) && any(!is.na(annTab$RF_SIRFP)))
     {
-        resp <- annTab[, c("group", "neutral_formula", "compoundName", "RF_SIRFP"), with = FALSE]
+        resp <- annTab[!is.na(RF_SIRFP), c("group", "neutral_formula", "RF_SIRFP"), with = FALSE]
         resp[, type := "SIRIUS_FP"]
         resp[, candidate_MW := sapply(neutral_formula, formulaMW)]
-        setnames(resp, c("neutral_formula", "compoundName", "RF_SIRFP"), c("candidate", "candidate_name", "RF"))
+        setnames(resp, c("neutral_formula", "RF_SIRFP"), c("candidate", "RF"))
+        if (!is.null(annTab[["compoundName"]]))
+            resp[, candidate_name := annTab$compoundName]
         concs <- rbind(concs, calcFeatureConcs(fGroups, resp))
     }
 
-    fGroups@concentrations <- finalizeFeatureConcsTab(concs)
+    if (nrow(concs) > 0)
+        fGroups@concentrations <- finalizeFeatureConcsTab(concs)
     
     return(fGroups)
 })

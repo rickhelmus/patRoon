@@ -122,11 +122,15 @@ setMethod("predictRespFactor", "compoundsSIRIUS", function(obj, fGroups, calibra
     {
         resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
         
-        if (nrow(resp) == 0)
-            return(obj) # nothing to do
-        
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
+            if (nrow(resp) == 0)
+            {
+                ann <- copy(ann)
+                ann[, RF_SIRFP := NA_real_]
+                return(ann)
+            }
+            
             return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
                          sort = FALSE, all.x = TRUE))
         })

@@ -109,14 +109,15 @@ jobs:
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
-            IMAGE_NAME_DEPS: "patroonorg/patroondeps"
+            #IMAGE_NAME_DEPS: "patroonorg/patroondeps"
+            IMAGE_NAME_DEPS: "uva-hva.gitlab.host:4567/r.helmus/patroon/patroondeps"
         steps:
             - checkout
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login -u "$GL_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/deps/Dockerfile .
             - run:
                 name: Push Docker image

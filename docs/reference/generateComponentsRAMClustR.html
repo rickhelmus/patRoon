@@ -136,21 +136,21 @@ similar chromatographic retention profiles and annotate their relationships (<em
 
 <dt>st, sr, maxt, hmax, normalize</dt>
 <dd><p>Arguments to tune the behaviour of feature group clustering. See their documentation
-from <code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code>. When <code>st</code> is <code>NULL</code> it will be automatically calculated as the
+from <code>ramclustR</code>. When <code>st</code> is <code>NULL</code> it will be automatically calculated as the
 half of the median for all chromatographic peak widths.</p></dd>
 
 
 <dt>absMzDev</dt>
-<dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code>mzabs.error</code> argument to <code><a href="https://rdrr.io/pkg/RAMClustR/man/do.findmain.html" class="external-link">do.findmain</a></code></p></dd>
+<dd><p>Maximum absolute <em>m/z</em> deviation. Sets the <code>mzabs.error</code> argument to <code>do.findmain</code></p></dd>
 
 
 <dt>relMzDev</dt>
 <dd><p>Maximum relative mass deviation (<acronym>ppm</acronym>). Sets the <code>ppm.error</code> argument to
-<code><a href="https://rdrr.io/pkg/RAMClustR/man/do.findmain.html" class="external-link">do.findmain</a></code>.</p></dd>
+<code>do.findmain</code>.</p></dd>
 
 
 <dt>minSize</dt>
-<dd><p>The minimum size of a component. Smaller components than this size will be removed. See note below. Sets the <code>minModuleSize</code> argument to <code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code>.</p></dd>
+<dd><p>The minimum size of a component. Smaller components than this size will be removed. See note below. Sets the <code>minModuleSize</code> argument to <code>ramclustR</code>.</p></dd>
 
 
 <dt>relMinReplicates</dt>
@@ -162,12 +162,12 @@ within a component are not taken in to account. See note below.</p></dd>
 
 <dt>RCExperimentVals</dt>
 <dd><p>A named <code>list</code> containing two more <code>list</code>s: <code>design</code> and <code>instrument</code>.
-These are used to construct the <code>ExpDes</code> argument passed to <code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code>.</p></dd>
+These are used to construct the <code>ExpDes</code> argument passed to <code>ramclustR</code>.</p></dd>
 
 
 <dt>extraOptsRC, extraOptsFM</dt>
 <dd><p>Named <code>list</code> with further arguments to be passed to
-<code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code> and <code><a href="https://rdrr.io/pkg/RAMClustR/man/do.findmain.html" class="external-link">do.findmain</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
+<code>ramclustR</code> and <code>do.findmain</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt>...</dt>
@@ -184,8 +184,8 @@ These are used to construct the <code>ExpDes</code> argument passed to <code><a 
     <h2>Details</h2>
     <p>This function uses RAMClustR to generate components. This function is called when calling <code>generateComponents</code> with
   <code>algorithm="ramclustr"</code>.</p>
-<p>This method uses the <code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code> functions for generating the components, whereas
-  <code><a href="https://rdrr.io/pkg/RAMClustR/man/do.findmain.html" class="external-link">do.findmain</a></code> is used for annotation.</p>
+<p>This method uses the <code>ramclustR</code> functions for generating the components, whereas
+  <code>do.findmain</code> is used for annotation.</p>
     </div>
     <div id="note">
     <h2>Note</h2>

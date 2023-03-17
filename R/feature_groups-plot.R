@@ -832,7 +832,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
                                                   "Smaller retention time difference have wider edges."))
     if (nrow(edges) > 0)
     {
-        gr %>%
+        gr <- gr %>%
             visNetwork::visOptions(selectedBy = list(variable = "ISTD", multiple = TRUE),
                                    highlightNearest = list(enabled = TRUE, hover = TRUE, algorithm = "hierarchical"),
                                    nodesIdSelection = list(enabled = TRUE, main = "Select by feat group")) %>%

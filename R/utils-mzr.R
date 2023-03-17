@@ -52,11 +52,11 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
     EICs <- vector("list", nrow(ranges))
     cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
-    isCached <- if (!is.null(cachedData)) names(cachedData) %chin% hashes else rep(FALSE, nrow(ranges))
+    isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData)  else rep(FALSE, nrow(ranges))
     EICs[isCached] <- cachedData
 
     spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
-    rangesToDo <- ranges[!isCached]
+    rangesToDo <- ranges[isCached == FALSE]
     EICs[!isCached] <- loadEICs(spectra, rangesToDo$retmin, rangesToDo$retmax, rangesToDo$mzmin, rangesToDo$mzmax)
     
     for (i in which(!isCached))

@@ -17,6 +17,10 @@
 - plotGraph() for componentsNTSet? (wasn't done before...)
 - markup/split formulaDiff
 - adductPos/adductNeg args --> make options? makes things much easier and less complicated...
+- report IS like suspects?
+    - separate view?
+- suspect fg tab: remove fGroups without suspect hits
+    - also relevant for components/tps?
 
 
 ## Components

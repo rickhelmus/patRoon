@@ -94,7 +94,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE)
                 if (length(ret) > 0)
                 {
                     names(ret) <- df$hash
-                    ret <- ret[match(hashes, names(ret))] # sync order
+                    ret <- ret[intersect(hashes, names(ret))] # sync order
                 }
             }
         }

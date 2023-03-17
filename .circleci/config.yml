@@ -117,7 +117,7 @@ jobs:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    echo "$GL_PASS" | docker login -u "$GL_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/deps/Dockerfile .
             - run:
                 name: Push Docker image

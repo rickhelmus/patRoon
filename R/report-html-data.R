@@ -175,10 +175,11 @@ setReactSelRangeFilter <- function(id, colDef)
     return(colDef)
 }
 
-makeReactable <- function(tab, id, bordered = TRUE, ...)
+makeReactable <- function(tab, id, bordered = TRUE, pagination = FALSE, ...)
 {
     return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = bordered, wrap = FALSE,
-                                pagination = FALSE, ...))
+                                pagination = pagination, showPageSizeOptions = TRUE,
+                                pageSizeOptions = c(25, 50, 100, 250, 500), defaultPageSize = 50,...))
 }
 
 makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ...)
@@ -263,7 +264,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ...)
     headThemeStyle <- list(padding = "2px 4px")
     rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, defaultExpanded = TRUE, columns = colDefs,
                         defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
-                        filterable = FALSE,
+                        filterable = FALSE, pagination = TRUE,
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
@@ -433,7 +434,7 @@ makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL
         }
     }
     
-    return(makeReactable(tab, id, compact = TRUE, details = details,
+    return(makeReactable(tab, id, compact = TRUE, details = details, pagination = TRUE,
                          language = reactable::reactableLang(noData = "No annotations available"), ...))
 }
 
@@ -689,7 +690,7 @@ reportHTMLUtils$methods(
         colDefs$rGroup <- setReactSelRangeFilter("featuresTab", colDefs$rGroup)
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
-                      meta = list(featQualCols = fqn))
+                      meta = list(featQualCols = fqn), pagination = TRUE)
     },
     
     genMSPLTable = function(MSLevel)

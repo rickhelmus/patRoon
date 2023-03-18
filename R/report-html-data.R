@@ -115,6 +115,14 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
     )))
 }
 
+reactExactFilter <- function()
+{
+    htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    return rows.filter(row => row.values[columnId] === filterValue)
+}")
+}
+
 reactSelectFilter <- function(id, values, name)
 {
     # from examples
@@ -335,11 +343,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     if (!isFALSE(idcol))
     {
         # exact match filter
-        colDefs[[idcol]] <- reactable::colDef(show = FALSE,
-                                              filterMethod = htmlwidgets::JS("function(rows, columnId, filterValue)
-{
-    return rows.filter(row => row.values[columnId] === filterValue)
-}"))
+        colDefs[[idcol]] <- reactable::colDef(show = FALSE, filterMethod = reactExactFilter())
     }
     
     for (col in names(tab))
@@ -664,7 +668,7 @@ reportHTMLUtils$methods(
         setcolorder(tab, c("analysis", "rGroup", "ID", "chromatogram"))
 
         colDefs <- list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             rGroup = reactable::colDef("replicate group"),
             chromatogram = reactable::colDef(minWidth = 175, cell = function(value, index)
             {
@@ -712,7 +716,7 @@ reportHTMLUtils$methods(
         tab[, precursor := NULL]
         
         colDefs <- list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             mz = reactable::colDef(format = reactable::colFormat(digits = 5)),
             intensity = reactable::colDef(format = reactable::colFormat(digits = 0))
         )
@@ -787,7 +791,7 @@ reportHTMLUtils$methods(
         }
         
         colDefs <- pruneList(list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
@@ -917,7 +921,7 @@ reportHTMLUtils$methods(
         setcolorder(tab, intersect(c("compoundName", "structure"), names(tab)))
         
         colDefs <- pruneList(list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),

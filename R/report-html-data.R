@@ -747,7 +747,7 @@ reportHTMLUtils$methods(
         tab <- subsetDTColumnsIfPresent(tab, c("group", "neutral_formula", "neutralMass", "explainedPeaks",
                                                "explainedIntensity", "error"))
         
-        formIndices <- tab[, seq_len(.N), by = "group"][[2]]
+        tab[, candidate := seq_len(.N), by = "group"]
         
         tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         for (col in names(tab))
@@ -761,7 +761,7 @@ reportHTMLUtils$methods(
         
         getFormDetails <- function(index)
         {
-            ft <- formulas[[tab$group[index]]][formIndices[index]]
+            ft <- formulas[[tab$group[index]]][tab$candidate[index]]
             ft <- ft[, setdiff(names(ft), names(tab)), with = FALSE]
             takeCols <- getAllMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
                                                "error", "error_frag_median", "error_frag_median_abs",
@@ -778,20 +778,23 @@ reportHTMLUtils$methods(
         
         getAnnPLDetails <- function(index)
         {
-            apl <- annotatedPeakList(formulas, index = formIndices[index], groupName = tab$group[index],
+            apl <- annotatedPeakList(formulas, index = tab$candidate[index], groupName = tab$group[index],
                                      MSPeakLists = objects$MSPeakLists, onlyAnnotated = TRUE)
             return(makeAnnPLReact(apl))
         }
         
         getScoreDetails <- function(index)
         {
-            fRow <- formulas[[tab$group[index]]][formIndices[index]]
+            fRow <- formulas[[tab$group[index]]][tab$candidate[index]]
             cols <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
             return(makeAnnScoreReact(fRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
+        setcolorder(tab, "candidate")
+        
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            candidate = reactable::colDef("#", minWidth = 15),
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
@@ -822,7 +825,7 @@ reportHTMLUtils$methods(
         tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier", "database",
                                                "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
         
-        cmpIndices <- tab[, seq_len(.N), by = "group"][[2]]
+        tab[, candidate := seq_len(.N), by = "group"]
         cmpNames2 <- tab[["compoundName2"]]
         if (!is.null(cmpNames2))
             tab[, compoundName2 := NULL]
@@ -855,7 +858,7 @@ reportHTMLUtils$methods(
         
         getCompDetails <- function(index)
         {
-            ct <- data.table::copy(compounds[[tab$group[index]]][cmpIndices[index]])
+            ct <- data.table::copy(compounds[[tab$group[index]]][tab$candidate[index]])
             ct <- ct[, setdiff(names(ct), names(tab)), with = FALSE]
             takeCols <- c(
                 "compoundName",
@@ -905,7 +908,7 @@ reportHTMLUtils$methods(
         
         getAnnPLDetails <- function(index)
         {
-            apl <- annotatedPeakList(compounds, index = cmpIndices[index], groupName = tab$group[index],
+            apl <- annotatedPeakList(compounds, index = tab$candidate[index], groupName = tab$group[index],
                                      MSPeakLists = objects$MSPeakLists, formulas = objects$formulas,
                                      onlyAnnotated = TRUE)
             return(makeAnnPLReact(apl))
@@ -913,15 +916,16 @@ reportHTMLUtils$methods(
         
         getScoreDetails <- function(index)
         {
-            cRow <- compounds[[tab$group[index]]][cmpIndices[index]]
+            cRow <- compounds[[tab$group[index]]][tab$candidate[index]]
             cols <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
             return(makeAnnScoreReact(cRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
-        setcolorder(tab, intersect(c("compoundName", "structure"), names(tab)))
+        setcolorder(tab, intersect(c("candidate", "compoundName", "structure"), names(tab)))
         
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),

@@ -59,7 +59,21 @@ function updateView(sel)
     })
     
     if (document.getElementById("suspAnnTab"))
-        showFeatureTab("Suspect annotation", sel === "Suspects" || sel === "TPs");
+    {
+        const showSusps = sel === "Suspects" || sel === "TPs";
+        
+        showFeatureTab("Suspect annotation", showSusps);
+        
+        if (document.getElementById("compoundsTab"))
+        {
+            let suspCheckEl = document.getElementById("compounds-susp_only");
+            const d = (showSusps) ? "" : "none"
+            suspCheckEl.style.display = d;
+            Array.from(suspCheckEl.labels).forEach(l => l.style.display = d);
+            if (!showSusps)
+                toggleCompOnlySusp(false); // UNDONE: restore selection when going back to suspect view?
+        }
+    }
     if (getViews().includes("TPs"))
         showFeatureTab("Parent similarity", sel === "TPs");
     
@@ -335,6 +349,18 @@ function toggleCompFilters(e)
             col.filterable = e;
     })
     applyFilterToggle("compoundsTab", "spectrum", true);
+}
+
+function toggleCompOnlySusp(e)
+{
+    if (!e)
+        Reactable.setFilter("compoundsTab", "suspect", undefined);
+    else
+    {
+        const fgTab = getSelFGTableElement();
+        const curRow = Reactable.getState(fgTab).meta.selectedRow;
+        Reactable.setFilter("compoundsTab", "suspect", Reactable.getInstance(fgTab).rowsById[curRow].values.susp_name);
+    }
 }
 
 function showFeatureTab(tabName, enable)

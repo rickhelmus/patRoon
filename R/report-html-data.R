@@ -749,7 +749,6 @@ reportHTMLUtils$methods(
         
         tab[, candidate := seq_len(.N), by = "group"]
         
-        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         for (col in names(tab))
         {
             if (is.numeric(tab[[col]]))
@@ -758,6 +757,19 @@ reportHTMLUtils$methods(
         
         tab[, spectrum := plots$formulas[[group]]$spectra, by = "group"]
         tab[, scorings := plots$formulas[[group]]$scores, by = "group"]
+
+        if (hasSuspects())
+        {
+            scr <- screenInfo(objects$fGroups)
+            if (!is.null(scr[["formula"]]))
+            {
+                tab[neutral_formula %chin% scr$formula, suspect := {
+                    wrapStr(paste0(scr[match(neutral_formula, formula)]$name, collapse = ", "), 50)
+                }, by = "neutral_formula"]
+            }
+        }
+
+        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         
         getFormDetails <- function(index)
         {
@@ -790,11 +802,12 @@ reportHTMLUtils$methods(
             return(makeAnnScoreReact(fRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
-        setcolorder(tab, "candidate")
+        setcolorder(tab, intersect(c("candidate", "suspect"), names(tab)))
         
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             candidate = reactable::colDef("#", minWidth = 15),
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
@@ -838,9 +851,23 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["score"]]))
             tab[, score := round(score, 2)]
         
-        tab[, structure := plots$structs[InChIKey]][, InChIKey := NULL]
+        tab[, structure := plots$structs[InChIKey]]
         tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
         tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
+        
+        if (hasSuspects())
+        {
+            scr <- screenInfo(objects$fGroups)
+            if (!is.null(scr[["InChIKey"]]))
+            {
+                tab[InChIKey %chin% scr$InChIKey, suspect := {
+                    IK <- InChIKey[1]
+                    wrapStr(paste0(scr[match(IK, InChIKey)]$name, collapse = ", "), 50)
+                }, by = "InChIKey"]
+            }
+        }
+        
+        tab[, InChIKey := NULL]
         
         getCompCell <- function(value, index)
         {
@@ -921,12 +948,13 @@ reportHTMLUtils$methods(
             return(makeAnnScoreReact(cRow[, cols, with = FALSE], sets(objects$fGroups)))
         }
         
-        setcolorder(tab, intersect(c("candidate", "compoundName", "structure"), names(tab)))
+        setcolorder(tab, intersect(c("candidate", "compoundName", "suspect", "structure"), names(tab)))
         
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
             neutral_formula = reactable::colDef("formula", html = TRUE),
             neutralMass = reactable::colDef("neutral mass"),

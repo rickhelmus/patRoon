@@ -244,13 +244,15 @@ bslib::layout_column_wrap(
                             ),
                             
                             input(type = "checkbox", id = "compounds-filter", onChange = 'toggleCompFilters(this.checked)'),
-                            label("for" = "compounds-filter", class = "me-2", "Filters"),
+                            label("for" = "compounds-filter", "Filters"),
+                            input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleCompOnlySusp(this.checked)'),
+                            label("for" = "compounds-susp_only", "Suspect only"),
                             
-                            button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('compoundsTab')", "Download CSV"),
-                            button(type = "button", class = "btn btn-primary btn-sm me-2", id = "comp-expand",
+                            button(type = "button", class = "btn btn-primary btn-sm ms-2", onClick = "Reactable.downloadDataCSV('compoundsTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
                                    onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse"),
                             
-                            a(id = "openMF", target = "_blank", "MetFrag Web"),
+                            a(class = "ms-2", id = "openMF", target = "_blank", "MetFrag Web"),
                         )
                     })
                 ),

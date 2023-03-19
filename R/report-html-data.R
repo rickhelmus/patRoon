@@ -936,9 +936,23 @@ reportHTMLUtils$methods(
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)
-        
+
+        mfWebLinks <- sapply(names(objects$fGroups), function(grp)
+        {
+            if (is(compounds, "compoundsMF") && grp %chin% names(compounds))
+            {
+                # make link with used MF settings
+                set <- settings(compounds)
+            }
+            else
+                set <- NULL
+            
+            return(buildMFLandingURL(set, objects$MSPeakLists[[grp]][["MSMS"]],
+                                     groupInfo(objects$fGroups)[grp, "mzs"]))
+        })
+                
         return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
-                                getScoreDetails))
+                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks)))
     },
     
     genSuspAnnTable = function()

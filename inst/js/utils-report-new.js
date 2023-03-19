@@ -90,7 +90,10 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     if (document.getElementById('formulasTab'))
         Reactable.setFilter('formulasTab', 'group', grp);
     if (document.getElementById('compoundsTab'))
+    {
         Reactable.setFilter('compoundsTab', 'group', grp);
+        document.getElementById('openMF').href = Reactable.getState('compoundsTab').meta.mfWebLinks[grp];
+    }
     
     const ccd = document.getElementById('comps_cluster-dendro');
     if (ccd)

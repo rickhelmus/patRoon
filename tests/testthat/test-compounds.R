@@ -60,7 +60,8 @@ test_that("verify Library compound generation", {
     expect_length(compsLibEmptyPL, 0)
     expect_length(doGenComps(fGroups, plistsEmptyMS, "library", MSLibrary = mslibrary), 0)
     expect_length(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary["none"]), 0)
-    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))$libMatch), 0.25)
+    lmCol <- if (testWithSets()) "libMatch-positive" else "libMatch"
+    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[[lmCol]]), 0.25)
     expect_true(all(!is.na(as.data.table(compsLib, fragments = TRUE)$frag_ion_formula))) # check presence annotations
 })
 
@@ -185,7 +186,8 @@ test_that("basic subsetting", {
 
 test_that("as.data.table() works", {
     testFeatAnnADT(comps)
-    expect_range(as.data.table(comps, normalizeScores = "max")$fragScore, c(0, 1))
+    normScName <- if (testWithSets()) "isoScore-positive" else "fragScore"
+    expect_range(as.data.table(comps, normalizeScores = "max")[[normScName]], c(0, 1))
 })
 
 if (doMetFrag)

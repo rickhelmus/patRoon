@@ -14,7 +14,7 @@ BiocManager::install(c("mzR", "xcms", "CAMERA",
 
 remotes::install_github(c("rickhelmus/patRoonData",
                           "thomasp85/farver",
-                          "cbroeckl/RAMClustR",
+                          "cbroeckl/RAMClustR@73accadaded", # temp workaround for buggy commit
                           "blosloos/enviPick",
                           "blosloos/nontargetData",
                           "blosloos/nontarget",

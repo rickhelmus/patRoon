@@ -96,6 +96,12 @@
 <p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version.</p>
 </div>
 <div class="section level3">
+<h3 id="note-docker-images-moved-2-2">NOTE Docker images moved<a class="anchor" aria-label="anchor" href="#note-docker-images-moved-2-2"></a></h3>
+<p>The Docker images are now served by the GitLab server of the University of Amsterdam. To pull the latest images you can run the following command:</p>
+<pre><code>docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs</code></pre>
+<p>The changes are reflected in the installation section of the handbook.</p>
+</div>
+<div class="section level3">
 <h3 id="changes-2-2">Changes<a class="anchor" aria-label="anchor" href="#changes-2-2"></a></h3>
 <ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
@@ -624,12 +630,12 @@
 <p>This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.</p>
 <p><strong>IMPORTANT</strong>: The suspect screening interface has changed significantly. Please read the documentation (<code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and the handbook) for more details. If you want to quickly update your code without using any new functionality:</p>
 <p>Change your existing code, e.g.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></span></code></pre></div>
 <p>to</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Major changes</strong></p>

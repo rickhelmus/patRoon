@@ -64,14 +64,17 @@ function updateView(sel)
         
         showFeatureTab("Suspect annotation", showSusps);
         
-        if (document.getElementById("compoundsTab"))
+        for (ann of [ "formulas", "compounds" ])
         {
-            let suspCheckEl = document.getElementById("compounds-susp_only");
-            const d = (showSusps) ? "" : "none"
-            suspCheckEl.style.display = d;
-            Array.from(suspCheckEl.labels).forEach(l => l.style.display = d);
-            if (!showSusps)
-                toggleCompOnlySusp(false); // UNDONE: restore selection when going back to suspect view?
+            if (document.getElementById(ann + "Tab"))
+            {
+                let suspCheckEl = document.getElementById(ann + "-susp_only");
+                const d = (showSusps) ? "" : "none"
+                suspCheckEl.style.display = d;
+                Array.from(suspCheckEl.labels).forEach(l => l.style.display = d);
+                if (!showSusps)
+                    toggleAnnOnlySusp(ann, false); // UNDONE: restore selection when going back to suspect view?
+            }
         }
     }
     if (getViews().includes("TPs"))
@@ -351,15 +354,16 @@ function toggleCompFilters(e)
     applyFilterToggle("compoundsTab", "spectrum", true);
 }
 
-function toggleCompOnlySusp(e)
+function toggleAnnOnlySusp(wh, e)
 {
+    const tid = (wh === "formulas") ? "formulasTab" : "compoundsTab";
     if (!e)
-        Reactable.setFilter("compoundsTab", "suspect", undefined);
+        Reactable.setFilter(tid, "suspect", undefined);
     else
     {
         const fgTab = getSelFGTableElement();
         const curRow = Reactable.getState(fgTab).meta.selectedRow;
-        Reactable.setFilter("compoundsTab", "suspect", Reactable.getInstance(fgTab).rowsById[curRow].values.susp_name);
+        Reactable.setFilter(tid, "suspect", Reactable.getInstance(fgTab).rowsById[curRow].values.susp_name);
     }
 }
 

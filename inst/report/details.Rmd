@@ -223,6 +223,8 @@ bslib::layout_column_wrap(
                         div(class = "pb-1",
                             input(type = "checkbox", id = "formulas-filter", onChange = 'toggleFormFilters(this.checked)'),
                             label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
+                            input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
+                            label("for" = "formulas-susp_only", "Suspect only"),
                             button(type = "button", class = "btn btn-primary btn-sm",
                                    onClick = "Reactable.downloadDataCSV('formulasTab')", "Download CSV"),
                         )
@@ -245,7 +247,7 @@ bslib::layout_column_wrap(
                             
                             input(type = "checkbox", id = "compounds-filter", onChange = 'toggleCompFilters(this.checked)'),
                             label("for" = "compounds-filter", "Filters"),
-                            input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleCompOnlySusp(this.checked)'),
+                            input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
                             label("for" = "compounds-susp_only", "Suspect only"),
                             
                             button(type = "button", class = "btn btn-primary btn-sm ms-2", onClick = "Reactable.downloadDataCSV('compoundsTab')", "Download CSV"),

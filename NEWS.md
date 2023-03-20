@@ -4,6 +4,17 @@
 
 Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/ This release of `patRoon` adds support to make logging in more easy and adds several compatibility fixes for the latest `SIRIUS` version.
 
+## NOTE Docker images moved
+
+The Docker images are now served by the GitLab server of the University of Amsterdam. To pull the latest images you can run the following command:
+
+```
+docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs
+```
+
+The changes are reflected in the installation section of the handbook.
+
+
 ## Changes
 
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`

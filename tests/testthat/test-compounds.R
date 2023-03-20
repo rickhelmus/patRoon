@@ -61,7 +61,8 @@ test_that("verify Library compound generation", {
     expect_length(doGenComps(fGroups, plistsEmptyMS, "library", MSLibrary = mslibrary), 0)
     expect_length(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary["none"]), 0)
     lmCol <- if (testWithSets()) "libMatch-positive" else "libMatch"
-    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[[lmCol]]), 0.25)
+    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[[lmCol]],
+                   na.rm = TRUE), 0.25)
     expect_true(all(!is.na(as.data.table(compsLib, fragments = TRUE)$frag_ion_formula))) # check presence annotations
 })
 

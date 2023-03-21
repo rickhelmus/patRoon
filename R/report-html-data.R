@@ -452,7 +452,7 @@ reportHTMLUtils$methods(
     },
     genFGTableSuspects = function()
     {
-        tab <- getFGTable(objects$fGroups, NULL)
+        tab <- getFGTable(objects$fGroups, NULL)[!is.na(susp_name)]
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,

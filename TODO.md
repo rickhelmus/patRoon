@@ -19,10 +19,6 @@
 - adductPos/adductNeg args --> make options? makes things much easier and less complicated...
 - report IS like suspects?
     - separate view?
-- suspect fg tab: remove fGroups without suspect hits
-    - also relevant for components/tps?
-- highlight annotation results for suspects
-    - row highlight? filter with checkbox?
 - properly handle EIC topMost, since EIC arg to plotChroms() overrides this
 - Report all candidates instead of topMost, but generate placeholder plots if >topMost
 

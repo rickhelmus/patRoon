@@ -31,6 +31,8 @@ function getNavTab(which)
     let el;
     if (which === "Suspects")
         el = document.getElementById("struct_view-suspect");
+    else if (which === "ISTDs")
+        el = document.getElementById("struct_view-istd");
     else if (which === "Components")
         el = document.getElementById("chrom_view-component");
     else if (which === "TPs")
@@ -126,6 +128,12 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+    }
+    else if (tabEl === "detailsTabISTDs")
+    {
+        const structEl = document.getElementById('struct_view-istd');
+        structEl.src = plots.structs[rowValues.InChIKey];
+        Reactable.setFilter('istdInfoTab', 'name', rowValues.istd);
     }
     else if (tabEl === "detailsTabComponents")
     {

@@ -2,6 +2,16 @@
 #' @include report-html.R
 NULL
 
+roundFGTab <- function(ftab, fGroups)
+{
+    ftab <- copy(ftab)
+    for (col in names(ftab)[(sapply(ftab, is.numeric))])
+        set(ftab, j = col, value = round(ftab[[col]],
+                                         if (col %in% c("mz", "neutralMass", "susp_d_mz")) 5 else 2))
+    ftab[, (replicateGroups(fGroups)) := lapply(.SD, round, 0), .SDcols = replicateGroups(fGroups)]
+    return(ftab)    
+}
+
 getFGTable <- function(fGroups, colSusp)
 {
     tab <- if (isScreening(fGroups))
@@ -18,11 +28,8 @@ getFGTable <- function(fGroups, colSusp)
     tab[, ret := ret / 60]
     if (!is.null(tab[["susp_d_rt"]]))
         tab[, susp_d_rt := susp_d_rt / 60]
-    
-    for (col in names(tab)[(sapply(tab, is.numeric))])
-        set(tab, j = col, value = round(tab[[col]],
-                                        if (col %in% c("mz", "neutralMass", "susp_d_mz")) 5 else 2))
-    tab[, (replicateGroups(fGroups)) := lapply(.SD, round, 0), .SDcols = replicateGroups(fGroups)]
+
+    tab <- roundFGTab(tab, fGroups)
     
     if (nrow(internalStandards(fGroups)) > 0)
     {
@@ -72,6 +79,7 @@ getFeatGroupColDefs <- function(tab)
     setCD("susp_d_mz", "name", "\U0394 mz")
     setCD("susp_estIDLevel", "name", "estIDLevel") # UNDONE: tool-tip?
     setCD("susp_estIDLevel", "align", "right")
+    setCD("susp_sets", "name", "sets")
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)
     
@@ -104,7 +112,7 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
                                                            names(tab)),
                             headerStyle = if (isGrouped) colSepStyle else NULL),
         if (hasSusp) reactable::colGroup("screening",
-                                         columns = intersect(c("susp_d_rt", "susp_d_mz", "susp_estIDLevel", "sets"),
+                                         columns = intersect(c("susp_d_rt", "susp_d_mz", "susp_estIDLevel", "susp_sets"),
                                                              names(tab)),
                                          headerStyle = colSepStyle)
         # may still be suspects, but collapsed
@@ -458,6 +466,30 @@ reportHTMLUtils$methods(
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, groupBy = "susp_name")
     },
+    genFGTableISTDs = function()
+    {
+        istds <- data.table::copy(internalStandards(objects$fGroups))
+        istds <- subsetDTColumnsIfPresent(istds, c("name", "group", "InChIKey", "d_rt", "d_mz", "sets"))
+        # if (rmdVars$retMin) UNDONE
+        istds[, d_rt := d_rt / 60]
+        
+        # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. Rename the columns
+        # here, so that groupDefs etc are set like suspects.
+        rncols <- setdiff(names(istds), "group")
+        setnames(istds, rncols, paste0("susp_", rncols))
+        
+        ftab <- getFGTable(objects$fGroups, ",")
+        ftab <- removeDTColumnsIfPresent(ftab, c("susp_name", "susp_sets", grep("^ISTD_assigned",
+                                                                                names(ftab), value = TRUE)))
+        tab <- merge(ftab, istds, by = "group")
+        tab <- roundFGTab(tab, objects$fGroups)
+        
+        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
+        colDefs <- getFeatGroupColDefs(tab)
+        colDefs$susp_name$name <- "Internal standard" # HACK
+        makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
+                        plots = plots, groupBy = "susp_name")
+    },
     genFGTableComponents = function()
     {
         tab <- getFGTable(objects$fGroups, ",")
@@ -598,7 +630,6 @@ reportHTMLUtils$methods(
     genSuspInfoTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
-        mcn <- mergedConsensusNames(objects$fGroups)
         tab <- subsetDTColumnsIfPresent(tab, c(paste0("susp_", suspMetaDataCols())))
         
         setnames(tab, sub("^susp_", "", names(tab)))

@@ -55,6 +55,7 @@ bslib::layout_column_wrap(
                            style = list("margin-right" = "10px", "margin-top" = " 3px"),
                            option(value = "Plain", "Plain"),
                            maybeIncl(utils$hasSuspects(), option(value = "Suspects", "Suspects")),
+                           maybeIncl(utils$hasInternalStandards(), option(value = "ISTDs", "Internal standards")),
                            maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
                            maybeIncl(utils$hasTPs(), option(value = "TPs", "Transformation products"))
                     ),
@@ -87,6 +88,7 @@ bslib::layout_column_wrap(
         callIncl(bslib::card_body_fill,
             utils$genFGTablePlain(),
             maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
+            maybeIncl(utils$hasInternalStandards(), utils$genFGTableISTDs()),
             maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
             maybeIncl(utils$hasTPs(), utils$genFGTableTPs())
         ),
@@ -105,6 +107,18 @@ bslib::layout_column_wrap(
                     class = "propTabAndImg pt-2",
                     utils$genSuspInfoTable("suspInfoTab"),
                     htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;")
+                )
+            ),
+        )),
+        maybeIncl(utils$hasInternalStandards(), bslib::navs_tab_card(
+            title = "Selected internal standard",
+            full_screen = TRUE,
+            bslib::nav(
+                "Internal standard",
+                bslib::card_body(
+                    class = "propTabAndImg pt-2",
+                    utils$genSuspInfoTable("istdInfoTab"),
+                    htmltools::img(id = "struct_view-istd", style = "min-width: 20%;")
                 )
             ),
         )),

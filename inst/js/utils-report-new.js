@@ -133,7 +133,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     {
         const structEl = document.getElementById('struct_view-istd');
         structEl.src = plots.structs[rowValues.InChIKey];
-        Reactable.setFilter('istdInfoTab', 'name', rowValues.istd);
+        Reactable.setFilter('ISTDInfoTab', 'name', rowValues.susp_name);
     }
     else if (tabEl === "detailsTabComponents")
     {

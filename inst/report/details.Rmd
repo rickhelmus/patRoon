@@ -117,7 +117,7 @@ bslib::layout_column_wrap(
                 "Internal standard",
                 bslib::card_body(
                     class = "propTabAndImg pt-2",
-                    utils$genSuspInfoTable("istdInfoTab"),
+                    utils$genISTDInfoTable(),
                     htmltools::img(id = "struct_view-istd", style = "min-width: 20%;")
                 )
             ),

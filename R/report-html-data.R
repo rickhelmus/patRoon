@@ -630,7 +630,7 @@ reportHTMLUtils$methods(
     genSuspInfoTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
-        tab <- subsetDTColumnsIfPresent(tab, c(paste0("susp_", suspMetaDataCols())))
+        tab <- subsetDTColumnsIfPresent(tab, paste0("susp_", suspMetaDataCols()))
         
         setnames(tab, sub("^susp_", "", names(tab)))
         
@@ -647,6 +647,23 @@ reportHTMLUtils$methods(
         makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150)
     },
 
+    genISTDInfoTable = function()
+    {
+        tab <- data.table::copy(internalStandards(objects$fGroups))
+        tab <- subsetDTColumnsIfPresent(tab, suspMetaDataCols())
+        tab <- unique(tab, by = "name")
+        
+        for (col in intersect(c("neutralMass", "mz"), names(tab)))
+            set(tab, j = col, value = round(tab[[col]], 5))
+        if (!is.null(tab[["rt"]]))
+            set(tab, j = "rt", value = round(tab$rt, 2))
+        if (!is.null(tab[["formula"]]))
+            set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
+        
+        ptab <- makePropTab(tab, NULL, "name")
+        makePropReactable(ptab, "ISTDInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+    },
+    
     genComponentInfoTable = function()
     {
         tab <- componentInfo(objects$components)

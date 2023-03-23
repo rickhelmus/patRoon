@@ -159,15 +159,15 @@ subscriptFormula <- function(formulas, over = NULL, formulas2 = NULL, parse = TR
 subscriptFormulaHTML <- function(formulas)
 {
     # isotopes
-    ret <- gsub("\\[([[:digit:]-]+)\\]", "<sup>\\1</sup>", formulas)
+    formulas <- gsub("\\[([[:digit:]-]+)\\]", "<sup>\\1</sup>", formulas)
     
     # charges
-    ret <- gsub("(\\+|\\-)+", "<sup>\\1</sup>", formulas)
+    formulas <- gsub("(\\+|\\-)+", "<sup>\\1</sup>", formulas)
     
     # element counts
-    ret <- gsub("([[:alpha:]]+)([[:digit:]-]+)", "\\1<sub>\\2</sub>", ret)
+    formulas <- gsub("([[:alpha:]]+)([[:digit:]-]+)", "\\1<sub>\\2</sub>", formulas)
     
-    return(ret)
+    return(formulas)
 }
 
 verifyFormulas <- function(formulas)

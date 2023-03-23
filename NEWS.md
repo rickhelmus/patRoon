@@ -87,6 +87,7 @@ The changes are reflected in the installation section of the handbook.
 - Analysis information
     - Ensure no duplicate analysis names are present.
     - Allow NA values for blanks
+- Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations
 
 
 # patRoon 2.1

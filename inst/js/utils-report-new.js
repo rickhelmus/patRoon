@@ -124,7 +124,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     if (tabEl === "detailsTabSuspects")
     {
         const structEl = document.getElementById('struct_view-suspect');
-        structEl.src = plots.structs[rowValues.susp_InChIKey];
+        structEl.src = plots.structs[rowValues.susp_InChIKey] || "";
         Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
@@ -132,7 +132,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     else if (tabEl === "detailsTabISTDs")
     {
         const structEl = document.getElementById('struct_view-istd');
-        structEl.src = plots.structs[rowValues.InChIKey];
+        structEl.src = plots.structs[rowValues.InChIKey] || "";
         Reactable.setFilter('ISTDInfoTab', 'name', rowValues.susp_name);
     }
     else if (tabEl === "detailsTabComponents")

@@ -434,11 +434,12 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
                     inForms <- annPLForms$annotated
                     
                     # UNDONE: handle different formula assignments?
-                    ret[, ion_formula := fifelse(!is.na(ion_formula), ion_formula, annPLForms$ion_formula)]
-                    ret[, mergedBy := fcase(inMe & inForms, paste0(algorithm(obj), ",", algorithm(formulas)),
-                                            inMe, algorithm(obj),
-                                            inForms, algorithm(formulas))]
-                    ret[, annotated := inMe | inForms]
+                    set(ret, j = "ion_formula", value = fifelse(!is.na(ret$ion_formula), ret$ion_formula,
+                                                                annPLForms$ion_formula))
+                    set(ret, j = "mergedBy", value = fcase(inMe & inForms, paste0(algorithm(obj), ",", algorithm(formulas)),
+                                                           inMe, algorithm(obj),
+                                                           inForms, algorithm(formulas)))
+                    set(ret, j = "annotated", value = inMe | inForms)
                 }
             }
         }

@@ -230,7 +230,7 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, M
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::reportAssertions(ac)
     
-    return(doAnnotatePeakListSet(obj, index, groupName, MSPeakLists, formulas, ...))
+    return(callNextMethod())
 })
 
 #' @rdname compounds-class

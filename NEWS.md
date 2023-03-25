@@ -20,7 +20,7 @@ The changes are reflected in the installation section of the handbook.
 - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
 - `annotateSuspects()`
     - Fixes for consensus annotation results (issue #54)
-    - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the \code{or} keyword.
+    - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the `or` keyword.
     - Sets workflows now separate log files for each set.
     - Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the `specSimParams` argument replaces the `relMinMSMSIntensity` and `simMSMSMethod` arguments.
     - Fixed: annotation similarities didn't properly handle results from `generateCompoundsLibrary()` if the library did not contain peak formula annotations.
@@ -108,6 +108,7 @@ The changes are reflected in the installation section of the handbook.
     - The plot y limit is now determined from EIC data to improve accuracy
     - various optimizations to load (cached) EIC data
 - Fixed: `unset()` for `featureGroupsScreeningSet` resulted in loss of group quality scores and internal standard assignments
+- Several optimizations for `annotatedPeakLists()`, especially with sets workflows.
 
 
 # patRoon 2.1

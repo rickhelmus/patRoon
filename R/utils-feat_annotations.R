@@ -69,25 +69,31 @@ doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
 
     if (!is.null(annTable) && nrow(annTable) >= index)
     {
-        compr <- annTable[index]
-        fragInfo <- compr$fragInfo[[1]]
+        fragInfo <- annTable[index]$fragInfo[[1]]
         
         if (!is.null(fragInfo))
         {
             fi <- fragInfo[, -"mz"]
-            fi[, annotated := TRUE]
-            spec <- merge(spec, fi, all.x = TRUE, by.x = "ID", by.y = "PLID")
-            spec[is.na(annotated), annotated := FALSE]
+            set(fi, j = "annotated", value = TRUE)
+            
+            byx <- "ID"; byy <- "PLID"
+            # HACK: check for sets here. Not the prettiest way, but simplifies things a lot.
+            if (!is.null(spec[["set"]]))
+            {
+                byx <- c(byx, "set"); byy <- c(byy, "set")
+            }
+            spec <- merge(spec, fi, all.x = TRUE, by.x = byx, by.y = byy, sort = FALSE)
+            set(spec, i = which(is.na(spec$annotated)), j = "annotated", value = FALSE)
         }
     }
     
     if (is.null(spec[["annotated"]]))
-        spec[, annotated := FALSE]
+        set(spec, j = "annotated", value = FALSE)
     
     if (onlyAnnotated)
         spec <- spec[annotated == TRUE]
 
-    return(spec[])
+    return(spec)
 }
 
 doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)

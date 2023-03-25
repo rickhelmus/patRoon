@@ -194,8 +194,8 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::reportAssertions(ac)
-
-    return(doAnnotatePeakListSet(obj, index, groupName, MSPeakLists, formulas = NULL, analysis = analysis, ...))
+    
+    return(callNextMethod())
 })
 
 #' @rdname formulas-class

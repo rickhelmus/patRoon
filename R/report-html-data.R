@@ -760,7 +760,8 @@ reportHTMLUtils$methods(
     
     genMSPLTable = function(MSLevel)
     {
-        mdprintf("MS peak lists... ")
+        if (MSLevel == 1)
+            mdprintf("MS peak lists... ")
         
         MSPeakLists <- objects$MSPeakLists[, names(objects$fGroups)]
         

@@ -257,9 +257,9 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
         {
             makeHTMLReportPlot(sprintf("comp-scores-%s-%d.svg", grp, index), outPath, selfContained, {
                 mar <- par("mar")
-                par(mar = c(mar[1], mar[2], 0.2, 0.2))
+                par(mar = c(mar[1], mar[2], 0.4, 0.2))
                 plotScores(compounds, index, grp) # UNDONE: params
-            }, width = 7, height = 5, pointsize = 16)
+            }, width = 7, height = 4, pointsize = 16)
         })
         
         doProgress()

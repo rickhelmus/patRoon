@@ -375,7 +375,20 @@ titleTab <- function(title, tab)
         tab
     ))
 }
-    
+
+makeAnnKable <- function(tab, mark = NULL, ...)
+{
+    withr::local_options(list(knitr.kable.NA = ""))
+    kab <- knitr::kable(tab, format = "html", escape = FALSE, ...) %>%
+        kableExtra::kable_styling(font_size = 13, bootstrap_options = c("striped", "condensed"))
+    # BUG: row_spec needs to be before scroll_box
+    if (!is.null(mark))
+        kab <- kableExtra::row_spec(kab, mark, italic = TRUE)
+    kab <- kableExtra::scroll_box(kab, box_css = "border: 1px solid #ddd;",
+                                  extra_css = "overflow-x: hidden; overflow-y: auto; height: 200px;")
+    return(htmltools::span(dangerouslySetInnerHTML = list("__html" = kab)))
+}
+
 makeAnnDetailsReact <- function(title, tab, sets)
 {
     if (nrow(tab) > 0)
@@ -389,8 +402,7 @@ makeAnnDetailsReact <- function(title, tab, sets)
         }
     }
     ptab <- makePropTab(tab, sets, FALSE)
-    return(titleTab(title, makePropReactable(ptab, id = NULL, idcol =  FALSE, minPropWidth = 150,
-                                             minValWidth = 150, height = 200)))
+    return(titleTab(title, makeAnnKable(ptab, col.names = sub("common", "", names(ptab), fixed = TRUE))))
 }
 
 makeAnnPLReact <- function(apl)
@@ -414,8 +426,7 @@ makeAnnPLReact <- function(apl)
             ion_formula_MF = if (!is.null(apl[["ion_formula_MF"]])) reactable::colDef(html = TRUE, minWidth = 150) else NULL
         ))
         
-        makeReactableCompact(apl, id = NULL, columns = colDefs, height = 200,
-                             rowClass = function(index) if (isPrec[index]) "fw-light" else "")
+        makeAnnKable(apl, mark = if (any(isPrec)) which(isPrec) else NULL)
     }
     
     return(titleTab("Peak list annotations", rtab))
@@ -425,8 +436,7 @@ makeAnnScoreReact <- function(annRow, sets)
 {
     annRow[, (names(annRow)) := lapply(.SD, round, 2), .SDcols = names(annRow)]
     ptab <- makePropTab(annRow, sets, FALSE)
-    return(titleTab("Scorings", makePropReactable(ptab, id = NULL, idcol = FALSE, minPropWidth = 150,
-                                                  minValWidth = 100, height = 200)))
+    return(titleTab("Scorings", makeAnnKable(ptab)))
 }
 
 getAnnReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))

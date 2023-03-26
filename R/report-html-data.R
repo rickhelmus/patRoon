@@ -463,6 +463,7 @@ makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL
 reportHTMLUtils$methods(
     genFGTablePlain = function()
     {
+        mdprintf("Feature groups... ")
         tab <- getFGTable(objects$fGroups, ",")
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
@@ -691,6 +692,8 @@ reportHTMLUtils$methods(
         
     genFeaturesTable = function()
     {
+        mdprintf("Features... ")
+        
         tab <- as.data.table(getFeatures(objects$fGroups))
         tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
         tab <- removeDTColumnsIfPresent(tab, featureQualityNames(group = FALSE, scores = FALSE)) # only show scores
@@ -757,6 +760,8 @@ reportHTMLUtils$methods(
     
     genMSPLTable = function(MSLevel)
     {
+        mdprintf("MS peak lists... ")
+        
         MSPeakLists <- objects$MSPeakLists[, names(objects$fGroups)]
         
         id <- if (MSLevel == 2) "MSMSPLTab" else "MSPLTab"
@@ -789,6 +794,8 @@ reportHTMLUtils$methods(
     
     genFormulasTable = function()
     {
+        mdprintf("Formulas... ")
+        
         formulas <- objects$formulas[names(objects$fGroups)]
         
         mcn <- mergedConsensusNames(formulas)
@@ -882,6 +889,8 @@ reportHTMLUtils$methods(
     
     genCompoundsTable = function()
     {
+        mdprintf("Compounds... ")
+        
         compounds <- objects$compounds[names(objects$fGroups)]
         
         mcn <- mergedConsensusNames(compounds)

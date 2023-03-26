@@ -3,6 +3,7 @@ NULL
 
 printf <- function(...) cat(sprintf(...), sep = "")
 fprintf <- function(file, ..., append = FALSE) cat(sprintf(...), sep = "", file = file, append = append)
+mdprintf <- function(...) cat(sprintf(...), sep = "", file = stderr()) # for rmarkdown
 
 if (!exists("hasName")) # should be defined in latest R versions
     hasName <- function(x, name) return(name %in% names(x))

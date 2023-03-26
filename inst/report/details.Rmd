@@ -39,6 +39,8 @@ Details
 maybeIncl <- function(cond, tag) if (cond) tag else NULL
 callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))
 
+mdprintf("Generating report components: ")
+
 bslib::layout_column_wrap(
     width = 1,
     height = "100%",
@@ -300,4 +302,6 @@ bslib::layout_column_wrap(
         )
     )
 )
+
+mdprintf("Done!\n")
 ```

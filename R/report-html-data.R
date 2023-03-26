@@ -807,6 +807,8 @@ reportHTMLUtils$methods(
         
         tab[, candidate := seq_len(.N), by = "group"]
         
+        tab <- tab[candidate <= 25] # UNDONE
+        
         for (col in names(tab))
         {
             if (is.numeric(tab[[col]]))
@@ -897,6 +899,9 @@ reportHTMLUtils$methods(
                                                "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
         
         tab[, candidate := seq_len(.N), by = "group"]
+        
+        tab <- tab[candidate <= 25] # UNDONE
+        
         cmpNames2 <- tab[["compoundName2"]]
         if (!is.null(cmpNames2))
             tab[, compoundName2 := NULL]

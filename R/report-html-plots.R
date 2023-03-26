@@ -130,7 +130,13 @@ genHTMLReportPlotsIntPlots <- function(fGroups, outPath, selfContained)
 genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained)
 {
     scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
-    compStructInfo <- if (!is.null(compounds) && length(compounds) != 0) as.data.table(compounds)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
+    compStructInfo <- NULL
+    if (!is.null(compounds) && length(compounds) != 0)
+    {
+        compStructInfo <- as.data.table(compounds)[, c("group", "SMILES", "InChIKey"), with = FALSE]
+        compStructInfo[, index := seq_len(.N), by = "group"]
+        compStructInfo <- compStructInfo[index <= 25][, -c("group", "index")] # UNDONE
+    }
     
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
     if (nrow(structInfo) > 0)
@@ -198,6 +204,9 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, outPath, selfConta
     {
         ret <- list()
         
+        if (nrow(ann) > 25)
+            ann <- ann[seq_len(25)] # UNDONE
+        
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
             if (is.null(MSPeakLists[[grp]][["MSMS"]]))
@@ -231,6 +240,9 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, outPat
     return(doApply("Map", TRUE, groupNames(compounds), annotations(compounds), f = function(grp, ann)
     {
         ret <- list()
+
+        if (nrow(ann) > 25)
+            ann <- ann[seq_len(25)] # UNDONE
         
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {

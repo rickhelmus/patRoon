@@ -64,7 +64,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
     }, simplify = FALSE)
 }
 
-genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
+genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICsTopMost, selfContained)
 {
     cat("Generate small chromatograms...\n")
     # UNDONE: parallel option
@@ -75,7 +75,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
             # UNDONE: params
             par(mai = c(0, 0, 0, 0), lwd = 10)
             plotChroms(fGroups, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1,
-                       topMostByRGroup = TRUE, EICs = EICs, showFGroupRect = FALSE, showPeakArea = TRUE,
+                       topMostByRGroup = TRUE, EICs = EICsTopMost, showFGroupRect = FALSE, showPeakArea = TRUE,
                        title = "", onlyPresent = TRUE, bty = "n")
         }, width = 12, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -478,7 +478,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     cat(" Done!\n")
 
     ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
-    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
+    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICsTopMost, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
     
     ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, outPath, selfContained)

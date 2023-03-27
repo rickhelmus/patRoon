@@ -17,7 +17,6 @@
 - plotGraph() for componentsNTSet? (wasn't done before...)
 - markup/split formulaDiff
 - adductPos/adductNeg args --> make options? makes things much easier and less complicated...
-- properly handle EIC topMost, since EIC arg to plotChroms() overrides this
 - Report all candidates instead of topMost, but generate placeholder plots if >topMost
     --> seems to be too slow due to detail tab generation
     --> maybe someday generate details in JS instead

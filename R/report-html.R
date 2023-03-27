@@ -2,7 +2,8 @@
 NULL
 
 reportHTMLUtils <- setRefClass("reportHTMLUtils",
-                               fields = list(objects = "list", EICs = "list", plots = "list", properties = "list"))
+                               fields = list(objects = "list", EICs = "list", EICsTopMost = "list", plots = "list",
+                                             properties = "list"))
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
@@ -65,12 +66,11 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     cat("Loading all EICs... ")
     # UNDONE: params, handle sets
     # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
+    mainEICArgs <- list(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMostByRGroup = FALSE)
     if (isFGSet(fGroups))
-        EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
-                                  onlyPresent = FALSE, adductPos = "[M+H]+", adductNeg = "[M-H]-")
-    else
-        EICs <- getEICsForFGroups(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
-                                  onlyPresent = FALSE)
+        mainEICArgs <- c(mainEICArgs, list(adductPos = "[M+H]+", adductNeg = "[M-H]-"))
+    EICs <- do.call(getEICsForFGroups, c(mainEICArgs, list(topMost = NULL, onlyPresent = FALSE)))
+    EICsTopMost <- do.call(getEICsForFGroups, c(mainEICArgs, list(topMost = 1, onlyPresent = TRUE)))
     cat("Done!\n")
     
     reportEnv <- new.env()
@@ -85,6 +85,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
                                            EICs = EICs, plots = reportEnv$plots,
                                            properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs
+    reportEnv$EICsTopMost <- EICsTopMost
     
     reportEnv$objectsShow <- paste0(utils::capture.output({
         for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))

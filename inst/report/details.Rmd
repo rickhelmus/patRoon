@@ -59,7 +59,7 @@ bslib::layout_column_wrap(
                            maybeIncl(utils$hasSuspects(), option(value = "Suspects", "Suspects")),
                            maybeIncl(utils$hasInternalStandards(), option(value = "ISTDs", "Internal standards")),
                            maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
-                           maybeIncl(utils$hasTPs(), option(value = "TPs", "Transformation products"))
+                           maybeIncl(utils$hasComponentsTPs(), option(value = "TPs", "Transformation products"))
                     ),
                     
                     input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
@@ -92,7 +92,7 @@ bslib::layout_column_wrap(
             maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
             maybeIncl(utils$hasInternalStandards(), utils$genFGTableISTDs()),
             maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
-            maybeIncl(utils$hasTPs(), utils$genFGTableTPs())
+            maybeIncl(utils$hasComponentsTPs(), utils$genFGTableTPs())
         ),
     ),
     callIncl(bslib::layout_column_wrap,
@@ -150,7 +150,7 @@ bslib::layout_column_wrap(
                 )
             ))
         )),
-        maybeIncl(utils$hasTPs(), callIncl(bslib::navs_tab_card,
+        maybeIncl(utils$hasComponentsTPs(), callIncl(bslib::navs_tab_card,
             title = "Selected parent",
             full_screen = TRUE,
             bslib::nav(
@@ -177,10 +177,10 @@ bslib::layout_column_wrap(
                 class = "mt-2",
                 bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
             ),
-            bslib::nav(
+            maybeIncl(utils$hasTPs(), bslib::nav(
                 "Transformations",
                 bslib::card_body_fill(utils$genTPGraphs())
-            )
+            ))
         )),
         callIncl(bslib::navs_tab_card,
             title = "Selected feature group",
@@ -289,7 +289,7 @@ bslib::layout_column_wrap(
                     htmltools::div(style = "margin: 20px;", utils$genSuspAnnTable())
                 )
             )),
-            maybeIncl(utils$hasTPs(), bslib::nav(
+            maybeIncl(utils$hasComponentsTPs(), bslib::nav(
                 "Parent similarity",
                 bslib::card_body(
                     class = "parentSim",

@@ -226,7 +226,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                     if (!is.null(ret[["formula"]])) # eg TRUE for BT
                     {
                         parentForm <- pars[name == pname]$formula
-                        ret[, formulaDiff := sapply(formula, subtractFormula, formula2 = parentForm)]
+                        ret[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentForm)]
                     }
                     
                     return(ret)

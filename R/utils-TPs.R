@@ -134,18 +134,7 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
     TPTab[, parent_formula := fifelse(is.na(parent_ID),
                                       parents$formula[match(parent_name, parents$name)],
                                       formula[match(parent_name, name)])]
-    TPTab[, formulaDiff := mapply(formula, parent_formula, FUN = function(f, pf)
-    {
-        sfl <- splitFormulaToList(subtractFormula(f, pf))
-        ret <- ""
-        subfl <- sfl[sfl < 0]
-        if (length(subfl) > 0)
-            ret <- paste0("-", formulaListToString(abs(subfl)))
-        addfl <- sfl[sfl > 0]
-        if (length(addfl) > 0)
-            ret <- if (nzchar(ret)) paste0(ret, " +", formulaListToString(addfl)) else paste0("+", formulaListToString(addfl))
-        return(ret)
-    })]
+    TPTab[, formulaDiff := mapply(formula, parent_formula, FUN = getFormulaDiffText)]
     
     nodes <- data.table(id = union(TPTab$parent, TPTab$name))
     nodes[, isTP := id %chin% TPTab$name]

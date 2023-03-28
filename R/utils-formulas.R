@@ -170,6 +170,19 @@ subscriptFormulaHTML <- function(formulas)
     return(formulas)
 }
 
+getFormulaDiffText <- function(form1, form2)
+{
+    sfl <- splitFormulaToList(subtractFormula(form1, form2))
+    ret <- ""
+    subfl <- sfl[sfl < 0]
+    if (length(subfl) > 0)
+        ret <- paste0("-", formulaListToString(abs(subfl)))
+    addfl <- sfl[sfl > 0]
+    if (length(addfl) > 0)
+        ret <- if (nzchar(ret)) paste0(ret, " +", formulaListToString(addfl)) else paste0("+", formulaListToString(addfl))
+    return(ret)
+}
+
 verifyFormulas <- function(formulas)
 {
     data("isotopes", package = "enviPat", envir = environment())

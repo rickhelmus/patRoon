@@ -156,13 +156,13 @@ subscriptFormula <- function(formulas, over = NULL, formulas2 = NULL, parse = TR
 }
 
 # as above, but for HTML
-subscriptFormulaHTML <- function(formulas)
+subscriptFormulaHTML <- function(formulas, charges = TRUE)
 {
     # isotopes
     formulas <- gsub("\\[([[:digit:]-]+)\\]", "<sup>\\1</sup>", formulas)
     
-    # charges
-    formulas <- gsub("(\\+|\\-)+", "<sup>\\1</sup>", formulas)
+    if (charges)
+        formulas <- gsub("(\\+|\\-)+", "<sup>\\1</sup>", formulas)
     
     # element counts
     formulas <- gsub("([[:alpha:]]+)([[:digit:]-]+)", "\\1<sub>\\2</sub>", formulas)

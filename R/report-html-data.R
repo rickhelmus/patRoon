@@ -565,6 +565,9 @@ reportHTMLUtils$methods(
             tabTPs <- removeDTColumnsIfPresent(tabTPs, "susp_name")
         }
 
+        if (!is.null(tabTPs[["formulaDiff"]]))        
+            tabTPs[, formulaDiff := subscriptFormulaHTML(formulaDiff, charges = FALSE)] 
+
         parAggr <- function(parentCol) htmlwidgets::JS(sprintf("function(values, rows, groupRows)
 {
     const v = rows[0]['%s'];
@@ -626,7 +629,8 @@ reportHTMLUtils$methods(
             colDefs$TP_name <- reactable::colDef("name")
         colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
         colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
-        colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula")
+        if (!is.null(tabTPs[["formulaDiff"]]))
+            colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula", html = TRUE)
         
         # InChIKeys are only there for internal usage
         if (!is.null(tabTPs[["parent_susp_InChIKey"]]))

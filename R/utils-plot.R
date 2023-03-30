@@ -22,8 +22,7 @@ getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRU
 
 saveRCDKStructure <- function(molecule, format, out, width = 500L, height = 500L, transparent = TRUE)
 {
-    dep <- rcdk::get.depictor(width, height, style = "cow")
-    rJava::.jcall(dep, "V", "setFillToFit", TRUE)
+    dep <- rcdk::get.depictor(width, height, style = "cow", fillToFit = TRUE)
     mi <- rJava::.jnew("org/guha/rcdk/view/MoleculeImage", molecule, dep)
     writeBin(rJava::.jcall(mi, "[B", "getBytes", as.integer(width), as.integer(height), format), out)
 
@@ -35,6 +34,7 @@ saveRCDKStructure <- function(molecule, format, out, width = 500L, height = 500L
         writeLines(lines, out)
     }
 }
+
 getBrewerPal <- function(n, name)
 {
     maxn <- RColorBrewer::brewer.pal.info[name, "maxcolors"]

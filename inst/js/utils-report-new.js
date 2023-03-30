@@ -79,7 +79,7 @@ function updateView(sel)
             }
         }
     }
-    if (getViews().includes("TPs"))
+    if (getViews().includes("TPs") && document.getElementById("similarity_spec"))
         showFeatureTab("Parent similarity", sel === "TPs");
     
     const r = Reactable.getInstance(tid).rowsById[Reactable.getState(tid).meta.selectedRow];

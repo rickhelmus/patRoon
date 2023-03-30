@@ -157,7 +157,7 @@ bslib::layout_column_wrap(
                 "Chromatogram",
                 bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
             ),
-            maybeIncl(utils$hasSuspects(), bslib::nav(
+            maybeIncl(utils$hasComponentsFromTPs(), bslib::nav(
                 "Suspects",
                 bslib::card_body(class = "mx-auto", htmltools::strong("Parent")),
                 bslib::card_body(
@@ -289,7 +289,7 @@ bslib::layout_column_wrap(
                     htmltools::div(style = "margin: 20px;", utils$genSuspAnnTable())
                 )
             )),
-            maybeIncl(utils$hasComponentsTPs(), bslib::nav(
+            maybeIncl(utils$hasTPSims(), bslib::nav(
                 "Parent similarity",
                 bslib::card_body(
                     class = "parentSim",

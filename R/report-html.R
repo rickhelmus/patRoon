@@ -17,6 +17,9 @@ reportHTMLUtils$methods(
     hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
     hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
     hasComponentsTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
+    hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
+    hasTPSims = function() hasComponentsTPs() && (!is.null(as.data.table(objects$components)[["specSimilarity"]]) ||
+                                                      !is.null(as.data.table(objects$components)[["fragmentMatches"]])),
     hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
     hasMSPL = function() !is.null(objects[["MSPeakLists"]]),
     hasFormulas = function() !is.null(objects[["formulas"]]),

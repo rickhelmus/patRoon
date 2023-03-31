@@ -330,12 +330,14 @@ makePropTab <- function(tab, sets, idcol = FALSE)
             pat <- paste0("\\-", s, "$")
             sr <- trow[, grep(pat, setCols, value = TRUE), with = FALSE]
             if (nrow(sr) == 0) # set lacks data, make non-empty dummy table so it still gets added
-                sr <- setnames(data.table(NA), names(trow)[1])
+                sr <- data.table(dummy = NA)
             else
                 setnames(sr, sub(pat, "", names(sr)))
             return(sr)
         }, simplify = FALSE)
         ret <- rbindlist(c(setNames(list(commonRow), "common"), setRows), fill = TRUE, idcol = "row")
+        if (!is.null(ret[["dummy"]]))
+            ret[, dummy := NULL]
         return(transpose(ret, keep.names = "property", make.names = "row"))
     })
     

@@ -141,7 +141,7 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, outPath, selfContained
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
     if (nrow(structInfo) > 0)
     {
-        structInfo <- unique(structInfo, by = "InChIKey")
+        structInfo <- unique(structInfo[!is.na(SMILES)], by = "InChIKey")
         cat("Generate structures...\n")
         # UNDONE: parallel option
         return(doApply("Map", TRUE, structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
@@ -426,8 +426,8 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
     
 }
 
-generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath, EICs,
-                                    selfContained)
+generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath,
+                                    EICs, EICsTopMost, selfContained)
 {
     ret <- list()
     

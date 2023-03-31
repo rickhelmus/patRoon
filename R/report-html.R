@@ -81,7 +81,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                               TPs, path, EICs, selfContained)
+                                               TPs, path, EICs, EICsTopMost, selfContained)
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,

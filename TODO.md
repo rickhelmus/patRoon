@@ -19,6 +19,9 @@
 - Report all candidates instead of topMost, but generate placeholder plots if >topMost
     --> seems to be too slow due to detail tab generation
     --> maybe someday generate details in JS instead
+- Bug: ion_formula-positive not split in formula annotation table
+- Report molNeutralized for TPs
+- reset filters button
 
 
 ## Components

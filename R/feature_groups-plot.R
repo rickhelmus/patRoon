@@ -470,8 +470,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         # NOTE: plotChroms() for sets override default
         if (gCount == 1)
             title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", groupName[1],
-                             if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
-                             gInfo[1, "mzs"])
+                             if (retMin) gInfo[groupName[1], "rts"] / 60 else gInfo[groupName[1], "rts"],
+                             gInfo[groupName[1], "mzs"])
         else
             title <- sprintf("%d feature groups", gCount)
     }

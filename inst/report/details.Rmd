@@ -243,6 +243,8 @@ bslib::layout_column_wrap(
                             label("for" = "formulas-susp_only", "Suspect only"),
                             button(type = "button", class = "btn btn-primary btn-sm",
                                    onClick = "Reactable.downloadDataCSV('formulasTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm", id = "form-expand",
+                                   onClick = "Reactable.toggleAllRowsExpanded('formulasTab')", "Expand/collapse"),
                         )
                     })
                 ),

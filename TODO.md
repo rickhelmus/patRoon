@@ -8,6 +8,7 @@
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
 - new fromTPs slot: doc, make method and use in reporting?
 - get rid of magrittr dependency?
+- bug?: mergeScreeningSetInfos() fragments_formula shouldn't be in unCols?
 
 ## Reporting
 
@@ -19,8 +20,8 @@
 - Report all candidates instead of topMost, but generate placeholder plots if >topMost
     --> seems to be too slow due to detail tab generation
     --> maybe someday generate details in JS instead
-- Report molNeutralized for TPs
 - reset filters button
+- suspInfoTabs: keep not splitting set data in columns for layout purposes?
 
 
 ## Components

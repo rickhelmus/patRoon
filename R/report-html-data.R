@@ -647,7 +647,8 @@ reportHTMLUtils$methods(
     genSuspInfoTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
-        tab <- subsetDTColumnsIfPresent(tab, paste0("susp_", suspMetaDataCols()))
+        tab <- tab[, getAllSuspCols(paste0("susp_", suspMetaDataCols()), names(tab),
+                                    mergedConsensusNames(objects$fGroups)), with = FALSE]
         
         setnames(tab, sub("^susp_", "", names(tab)))
         

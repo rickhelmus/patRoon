@@ -11,20 +11,20 @@ reportHTMLUtils$methods(
     hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
     hasSets = function() isFGSet(objects$fGroups),
     hasFQualities = function() hasFGroupScores(objects$fGroups),
-    hasComponents = function() !is.null(objects[["components"]]) && !inherits(objects$components, "componentsTPs"),
+    hasObj = function(name) !is.null(objects[[name]]) && length(intersect(names(objects$fGroups), groupNames(objects[[name]]))) > 0,
+    hasComponents = function() hasObj("components") && !inherits(objects$components, "componentsTPs"),
     hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
     hasComponentsSpecClust = function() hasComponents() && inherits(objects$components, "componentsSpecClust"),
     hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
     hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
-    hasComponentsTPs = function() !is.null(objects[["components"]]) && inherits(objects$components, "componentsTPs"),
+    hasComponentsTPs = function() hasObj("components") && inherits(objects$components, "componentsTPs"),
     hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
-    hasTPSims = function() hasComponentsTPs() && (!is.null(as.data.table(objects$components)[["specSimilarity"]]) ||
-                                                      !is.null(as.data.table(objects$components)[["fragmentMatches"]])),
+    hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "fragmentMatches") %in% names(as.data.table(objects$components))),
     hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
-    hasMSPL = function() !is.null(objects[["MSPeakLists"]]),
-    hasFormulas = function() !is.null(objects[["formulas"]]),
-    hasCompounds = function() !is.null(objects[["compounds"]]),
-    hasCompsCluster = function() !is.null(objects[["compsCluster"]]),
+    hasMSPL = function() hasObj("MSPeakLists"),
+    hasFormulas = function() hasObj("formulas"),
+    hasCompounds = function() hasObj("compounds"),
+    hasCompsCluster = function() hasObj("compsCluster"),
     
     getFGSets = function() sets(objects$fGroups)
 )

@@ -20,9 +20,9 @@ NULL
 #'   c("effluent-A", "effluent-B"))}, will compare the features in replicate groups \samp{"influent-A/B"} against those
 #'   in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
 #'   if not specified.
-#' @param \dots passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
-#'   (\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
-#'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
+#' @param \dots passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \pkg{\link{VennDiagram}}
+#'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or \code{\link[UpSetR]{upset}}
+#'   (\code{plotUpSet}).
 #' @param sets \setsWF For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
 #'   \link[=analysis-information]{analysis information}).
 #'
@@ -160,27 +160,33 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
     }
 })
 
-#' @details \code{plotInt} Generates a line plot for the (averaged) intensity
-#'   of feature groups within all analyses
+#' @details \code{plotInt} Generates a line plot for the (averaged) intensity of feature groups within all analyses
 #' @param xnames Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.
-#' 
+#' @param plotArgs,linesArgs A \code{list} with further arguments passed to \code{\link[base]{plot}} and
+#'    \code{\link[graphics]{lines}}, respectively.
+#'
 #' @rdname feature-plotting
 #' @export
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, normalized = FALSE, xnames = TRUE,
-                                               showLegend = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
+                                               showLegend = FALSE, pch = 20, type = "b", lty = 3, col = NULL,
+                                               plotArgs = NULL, linesArgs = NULL)
 {
     aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend)
-    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, ..., doSets = FALSE)    
+    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE)
+    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, plotArgs, linesArgs,
+                   doSets = FALSE)    
 })
 
 #' @rdname feature-plotting
 #' @export
 setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normalized = FALSE, xnames = !sets,
-                                                  showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL, ...,
-                                                  sets = FALSE)
+                                                  showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL,
+                                                  plotArgs = NULL, linesArgs = NULL, sets = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend + sets)
-    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, ..., doSets = sets)    
+    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE)
+    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, plotArgs, linesArgs,
+                   doSets = sets)    
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

@@ -110,7 +110,7 @@ genHTMLReportPlotsIntPlots <- function(fGroups, outPath, selfContained)
     cat("Generate intensity plots...\n")
     # UNDONE: parallel option
     
-    mainArgs <- list(average = TRUE, normalize = TRUE)
+    mainArgs <- list(average = TRUE, normalize = TRUE, plotArgs = list(bty = "l"))
     if (isFGSet(fGroups))
         mainArgs <- c(mainArgs, list(sets = TRUE))
     else
@@ -339,12 +339,12 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
         if (isIntCl)
         {
             pl$profileRel <- makeHTMLReportPlot(paste0("compon-int_rel-", cn, ".svg"), outPath, selfContained, {
-                plotInt(components, index = cn, main = "normalized")
+                plotInt(components, index = cn, plotArgs = list(main = "normalized", bty = "l"))
             }, width = 7, height = 6, pointsize = 16)
             
             pl$profileAbs <- makeHTMLReportPlot(paste0("compon-int_abs-", cn, ".svg"), outPath, selfContained, {
                 plotInt(fGroups[, components[[cn]]$group], average = clusterProperties(components)$average,
-                        main = "absolute")
+                        plotArgs = list(main = "absolute", bty = "l"))
             }, width = 7, height = 6, pointsize = 16)
         }
         

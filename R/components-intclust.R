@@ -13,8 +13,7 @@ NULL
 #'
 #' @param obj A \code{componentsIntClust} object.
 #' @param col The colour used for plotting. Set to \code{NULL} for automatic colours.
-#' @param \dots Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}),
-#'   \code{\link[graphics]{plot}} (\code{plotInt}).
+#' @param \dots Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}).
 #'
 #' @template components-altered-note
 #'
@@ -64,9 +63,11 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
 #'   profiles of the feature groups within a given cluster.
 #' @param index Numeric component/cluster index or component name.
 #' @param pch,type,lty Passed to \code{\link{lines}}.
+#' @param plotArgs,linesArgs A \code{list} with further arguments passed to \code{\link[base]{plot}} and
+#'    \code{\link[graphics]{lines}}, respectively.
 #' @export
-setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
-                                                    lty = 3, col = NULL, ...)
+setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b", lty = 3, col = NULL,
+                                                    plotArgs = NULL, linesArgs = NULL)
 {
     verifyCompNotAltered(obj)
     
@@ -75,20 +76,24 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type =
         checkChoiceSilent(index, names(obj))
         , .var.name = "index")
     
+    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE)
+    
     if (is.character(index))
         index <- which(index == names(obj))
     
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
 
-    plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n")
+    do.call(plot, c(list(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity",
+                         xaxt = "n"), plotArgs))
     axis(1, seq_len(nsamp), colnames(plotm), las = 2)
 
     if (is.null(col))
         col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(plotm))
     px <- seq_len(nsamp)
     for (i in seq_len(nrow(plotm)))
-        lines(x = px, y = plotm[i, ], pch = pch, type = type, lty = lty, col = col[i], ...)
+        do.call(lines, c(list(x = px, y = plotm[i, ], pch = pch, type = type, lty = lty, col = col[i]),
+                         linesArgs))
 
     invisible(NULL)
 })

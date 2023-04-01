@@ -52,7 +52,7 @@ for (ci in indsWithFGroups)
         curPlotInd <- curPlotInd + 1
         allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_int_abs_%d.png", ci))
         fg <- fGroups[, unique(cTable[[ci]]$group)]
-        makeCachedPlot(allPlots[curPlotInd], "plotInt", list(fg, average = clProps$average, main = "absolute"),
+        makeCachedPlot(allPlots[curPlotInd], "plotInt", list(fg, average = clProps$average, plotArgs = list(main = "absolute")),
                        3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
     }
     

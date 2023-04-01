@@ -449,7 +449,8 @@ textPlot <- function(txt)
 
 noDataPlot <- function() textPlot("no data to plot")
 
-doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, type, lty, col, ..., doSets)
+doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, type, lty, col, plotArgs, linesArgs,
+                           doSets)
 {
     if (xnames && doSets)
     {
@@ -498,14 +499,16 @@ doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, ty
     
     maxX <- if (doSets) max(table(anaSets)) else length(snames)
     
-    plot(x = c(0, maxX), y = c(0, max(tab)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
+    do.call(plot, c(list(x = c(0, maxX), y = c(0, max(tab)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n"),
+                    plotArgs))
     
     if (xnames)
         axis(1, seq_len(maxX), snames, las = 2)
     else
         axis(1, seq_len(maxX), seq_len(maxX))
     
-    makeLine <- function(y, col) lines(x = seq_along(y), y = y, type = type, pch = pch, lty = lty, col = col, ...)
+    makeLine <- function(y, col) do.call(lines, c(list(x = seq_along(y), y = y, type = type, pch = pch, lty = lty,
+                                                       col = col), linesArgs))
     for (i in seq_along(tab))
     {
         if (doSets)

@@ -541,11 +541,11 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzEx
         if (isHClust)
         {
             screen(scr[4])
-            plotInt(components, index = cmpi, main = "normalized")
+            plotInt(components, index = cmpi, plotArgs = list(main = "normalized"))
 
             screen(scr[5])
             fg <- fGroups[, unique(cTable[[cmpi]]$group)]
-            plotInt(fg, average = clProps$average, main = "absolute")
+            plotInt(fg, average = clProps$average, plotArgs = list(main = "absolute"))
         }
 
         close.screen(scr)

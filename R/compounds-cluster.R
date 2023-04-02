@@ -192,12 +192,9 @@ setMethod("plot", c(x = "compoundsCluster", y = "missing"), function(x, ..., gro
     invisible(NULL)
 })
 
-setMethod("plotHash", "compoundsCluster", function(x, groupName, pal = "Paired",
-                                                   colourBranches = lengths(x)[groupName] < 50,
-                                                   showLegend = lengths(x)[groupName] < 20, ...)
+setMethod("plotHash", "compoundsCluster", function(x, groupName,  ...)
 {
-    makeHash(as.dendrogram(x@clusters[[groupName]]), x@cutClusters[[groupName]], pal,
-                           colourBranches, showLegend, ...)
+    makeHash(x@clusters[[groupName]], x@cutClusters[[groupName]], ...)
 })
 
 #' @describeIn compoundsCluster Calculates the maximum common substructure (MCS)

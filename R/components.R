@@ -534,13 +534,13 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5
 setMethod("plotChromsHash", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
     comp <- componentTable(obj)[[index]]
+    anas <- analyses(fGroups)
     if (!is.null(comp[["hsnr"]])) # homologues?
     {
         rGroups <- unique(comp$rGroup)
-        fGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
+        anas <- analysisInfo(fGroups)[analysisInfo(fGroups)$group %chin% rGroups, ]
     }
-    fGroups <- fGroups[, unique(comp$group)]
-    makeHash(comp, fGroups, rtWindow, ...)
+    makeHash(comp, plotChromsHash(fGroups, rtWindow = rtWindow, analyses = anas, groupName = comp$group, ...))
 })
 
 #' @describeIn components Generates a consensus from multiple \code{components}

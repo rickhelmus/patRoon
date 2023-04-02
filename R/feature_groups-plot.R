@@ -189,7 +189,7 @@ setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normaliz
                    doSets = sets)    
 })
 
-setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))
+setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(groupTable(obj), average, ...))
 
 #' @details \code{plotChord} Generates a chord diagram which can be used to
 #'   visualize shared presence of feature groups between analyses or replicate
@@ -628,7 +628,13 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
     if ("none" %in% annotate)
         annotate <- "none"
     args <- allArgs(FALSE)
-    makeHash(args[setdiff(names(args), "obj")], featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
+    if (!is.null(EICs))
+    {
+        # omit data we don't need: speeds up hashing quite a bit
+        EICs <- EICs[names(EICs) %chin% analysis]
+        EICs <- pruneList(lapply(EICs, function(e) e[names(e) %chin% groupName]), checkEmptyElements = TRUE)
+    }
+    makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
              analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])
 })
 

@@ -561,10 +561,16 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     }
     
     compTable <- annotations(obj)[[groupName]]
-    cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
+    cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index]
     
-    return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
-                    plotStruct, title, mincex, xlim, ylim, ...))
+    fRow <- NULL
+    if (!is.null(cRow) && !is.null(formulas) && !is.null(formulas[[groupName]]))
+    {
+        wh <- match(cRow$neutral_formula, formulas[[groupName]]$neutral_formula)
+        fRow <- if (is.na(wh)) NULL else formulas[[groupName]][wh]
+    }
+    
+    return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, mincex, xlim, ylim, ...))
 })
 
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)

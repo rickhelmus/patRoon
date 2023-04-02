@@ -333,8 +333,10 @@ setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analys
                                                                analysis = analysis[2])))))
     }
     
-    return(makeHash(index, annotatedPeakList(obj, index, groupName, analysis, MSPeakLists),
-                    title, mincex, xlim, ylim, ...))
+    formTable <- annotations(obj)[[groupName]]
+    fRow <- if (is.null(formTable) || nrow(formTable) == 0) NULL else formTable[index]
+    
+    return(makeHash(fRow, getSpec(MSPeakLists, groupName, 2, NULL), title, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn formulas Plots a barplot with scoring of a candidate formula.

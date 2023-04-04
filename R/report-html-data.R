@@ -860,7 +860,8 @@ reportHTMLUtils$methods(
             numCols <- names(ft)[sapply(ft, is.numeric)]
             for (col in numCols)
                 set(ft, j = col, value = round(ft[[col]], if (col %chin% massCols) 5 else 2))
-            return(makeAnnDetailsReact("Formula properties", ft, sets(objects$fGroups)))
+            return(makeAnnDetailsReact("Formula properties", ft,
+                                       if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
         getAnnPLDetails <- function(index)
@@ -874,7 +875,8 @@ reportHTMLUtils$methods(
         {
             fRow <- formulas[[tab$group[index]]][tab$candidate[index]]
             cols <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
-            return(makeAnnScoreReact(fRow[, cols, with = FALSE], sets(objects$fGroups)))
+            return(makeAnnScoreReact(fRow[, cols, with = FALSE],
+                                     if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
         setcolorder(tab, intersect(c("candidate", "suspect"), names(tab)))
@@ -1010,7 +1012,8 @@ reportHTMLUtils$methods(
                 set(ct, j = col, value = makeDBIdentLink(db, ct[[col]]))
             }
             
-            return(makeAnnDetailsReact("Compound properties", ct, sets(objects$fGroups)))
+            return(makeAnnDetailsReact("Compound properties", ct,
+                                       if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
         getAnnPLDetails <- function(index)
@@ -1025,7 +1028,8 @@ reportHTMLUtils$methods(
         {
             cRow <- compounds[[tab$group[index]]][tab$candidate[index]]
             cols <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
-            return(makeAnnScoreReact(cRow[, cols, with = FALSE], sets(objects$fGroups)))
+            return(makeAnnScoreReact(cRow[, cols, with = FALSE],
+                                     if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
         setcolorder(tab, intersect(c("candidate", "compoundName", "suspect", "structure"), names(tab)))

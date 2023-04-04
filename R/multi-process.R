@@ -96,7 +96,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
         else
             cachedSet <- NULL
         
-        allHashes <- lapply(commandQueue, "[[", "hash")
+        allHashes <- sapply(commandQueue, "[[", "hash")
         cachedResults <- lapply(allHashes, function(hash)
         {
             res <- NULL

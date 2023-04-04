@@ -33,6 +33,7 @@
 - plotChroms()
     - Changed arg order
     - adductPos/adductNeg & get EICs for missing features if all are absent in set
+- fixed set hashes from executeMultiProc were saved as list instead of vector --> re-generate cache.
 
 
 ## Features

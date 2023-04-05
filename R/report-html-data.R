@@ -813,6 +813,12 @@ reportHTMLUtils$methods(
             # dummy table to show empty results
             return(makeAnnReactable(data.table(formula = character()), "formulasTab"))
         }
+
+        hash <- makeHash(formulas, objects$MSPeakLists[, groupNames(formulas)])
+        # set fixDTs to FALSE, since it considerably slows down cache loading and we're not dealing with data.tables here
+        cd <- loadCacheData("reportHTMLFormulas", hash, fixDTs = FALSE)
+        if (!is.null(cd))
+            return(cd)
         
         tab <- as.data.table(formulas)
         
@@ -893,8 +899,10 @@ reportHTMLUtils$methods(
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
         
-        return(makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
-                                getScoreDetails))
+        ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
+                                getScoreDetails)
+        saveCacheData("reportHTMLFormulas", ret, hash)
+        return(ret)
     },
     
     genCompoundsTable = function()
@@ -911,6 +919,11 @@ reportHTMLUtils$methods(
             return(makeAnnReactable(data.table(compound = character()), "compoundsTab"))
         }
 
+        hash <- makeHash(compounds, objects$formulas[groupNames(compounds)], objects$MSPeakLists[, groupNames(compounds)])
+        cd <- loadCacheData("reportHTMLCompounds", hash, fixDTs = FALSE)
+        if (!is.null(cd))
+            return(cd)
+        
         tab <- as.data.table(compounds)
         
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
@@ -1062,9 +1075,11 @@ reportHTMLUtils$methods(
             return(buildMFLandingURL(set, objects$MSPeakLists[[grp]][["MSMS"]],
                                      groupInfo(objects$fGroups)[grp, "mzs"]))
         })
-                
-        return(makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks)))
+
+        ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
+                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks))
+        saveCacheData("reportHTMLCompounds", ret, hash)
+        return(ret)
     },
     
     genSuspAnnTable = function()

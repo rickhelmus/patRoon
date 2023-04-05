@@ -58,9 +58,11 @@ openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB
 #'   be loaded.
 #' @param simplify If \code{TRUE} and \code{length(hashes)==1} then the returned data is returned directly, otherwise
 #'   the data is in a \code{list}.
+#' @param fixDTs Should be \code{TRUE} if cached data consists of (nested) \code{data.table}s. Otherwise can be
+#'   \code{FALSE} to speed up loading.
 #' @rdname caching
 #' @export
-loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE)
+loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDTs = TRUE)
 {
     if (getCacheMode() == "save" || getCacheMode() == "none")
         return(NULL)
@@ -106,8 +108,9 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE)
         }
     }
 
-    ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
-
+    if (fixDTs)
+        ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
+    
     return(ret)
 }
 

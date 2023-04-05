@@ -58,8 +58,6 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
                                                                   pch = NULL, ...)
 {
     rGroups <- replicateGroups(x)
-    if (is.null(which))
-        which <- rGroups
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))

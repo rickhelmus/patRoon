@@ -158,6 +158,11 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
     }
 })
 
+setMethod("plotHash", "featureGroups", function(x, ...)
+{
+    return(makeHash(groupTable(x), ...))
+})
+
 #' @details \code{plotInt} Generates a line plot for the (averaged) intensity of feature groups within all analyses
 #' @param xnames Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.
 #' @param plotArgs,linesArgs A \code{list} with further arguments passed to \code{\link[base]{plot}} and
@@ -347,6 +352,11 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     }
     
     circlize::circos.clear()
+})
+
+setMethod("plotChordHash", "featureGroups", function(obj, ...)
+{
+    return(makeHash(groupTable(obj), ...))
 })
 
 #' @details \code{plotChroms} Plots extracted ion chromatograms (EICs) of feature groups.
@@ -685,6 +695,11 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
     callNextMethod(obj, which = which, ...)
 })
 
+setMethod("plotVennHash", "featureGroups", function(obj, ...)
+{
+    return(makeHash(groupTable(obj), ...))
+})
+
 #' @details \code{plotUpSet} plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining unique
 #'   and shared feature groups between given replicate groups.
 #'   
@@ -718,6 +733,11 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
         stop("Need at least two replicate groups with non-zero intensities")
     
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
+})
+
+setMethod("plotUpSetHash", "featureGroups", function(obj, ...)
+{
+    return(makeHash(groupTable(obj), ...))
 })
 
 #' @details \code{plotVolcano} Plots Fold change data in a 'Volcano plot'.

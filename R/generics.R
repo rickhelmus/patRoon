@@ -435,6 +435,9 @@ setGeneric("plotScoresHash", function(obj, ...) standardGeneric("plotScoresHash"
 setGeneric("plotStructureHash", function(obj, ...) standardGeneric("plotStructureHash"))
 setGeneric("plotChromsHash", function(obj, ...) standardGeneric("plotChromsHash"))
 setGeneric("plotIntHash", function(obj, ...) standardGeneric("plotIntHash"))
+setGeneric("plotChordHash", function(obj, ...) standardGeneric("plotChordHash"))
+setGeneric("plotVennHash", function(obj, ...) standardGeneric("plotVennHash"))
+setGeneric("plotUpSetHash", function(obj, ...) standardGeneric("plotUpSetHash"))
 
 
 #' @templateVar func [

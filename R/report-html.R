@@ -117,5 +117,19 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     if (openReport)
         utils::browseURL(paste0("file://", normalizePath(outputFile)))
     
+    myPlotFiles <- normalizePath(file.path(path, unlist(reportEnv$plots)))
+    allPlotFiles <- normalizePath(list.files(file.path(path, "report_files", "plots"), pattern = "\\.svg$",
+                                             full.names = TRUE))
+    oldPlotFiles <- setdiff(allPlotFiles, myPlotFiles)
+    opfDates <- lapply(file.info(oldPlotFiles)$mtime, as.Date)
+    opfAge <- lapply(opfDates, difftime, time1 = Sys.Date(), units = "days")
+    opfAge <- sapply(opfAge, as.numeric)
+    oldPlotFiles <- oldPlotFiles[opfAge >= 7] # UNDONE
+    if (length(oldPlotFiles) > 0)
+    {
+        file.remove(oldPlotFiles)
+        printf("Removed %d old plot files.\n", length(oldPlotFiles))
+    }
+    
     invisible(NULL)
 }

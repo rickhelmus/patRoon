@@ -22,6 +22,8 @@
     - sortof already there when toggling filters
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
 - get separate EICs for feature chromatograms
+- params: YaML or param objects?
+- make arg for file cleaning
 
 
 ## Components

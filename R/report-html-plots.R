@@ -438,14 +438,14 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     
     # UNDONE: params
     
-    ret$overview$chroms <- makeHTMLReportPlot("chroms.svg", outPath, selfContained, "plotChroms",
+    ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, selfContained, "plotChroms",
                                               list(fGroups, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE,
                                                    topMost = 1, topMostByRGroup = FALSE, EICs = EICs,
                                                    showPeakArea = TRUE, showFGroupRect = FALSE, colourBy = "fGroups",
                                                    showLegend = FALSE, onlyPresent = TRUE),
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     
-    ret$overview$retMZ <- makeHTMLReportPlot("retmz.svg", outPath, selfContained, "plot",
+    ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, selfContained, "plot",
                                              list(fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = TRUE),
                                              parParams = list(mai = c(0.9, 0.8, 0.1, 0.1)), width = 10, height = 4)
     
@@ -459,17 +459,17 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     {
         if (rGroupLenNonEmpty > 2)
         {
-            ret$overview$chord <- makeHTMLReportPlot("chord.svg", outPath, selfContained, "plotChord",
+            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, selfContained, "plotChord",
                                                      list(fGroups, average = TRUE), width = 7, height = 7)
         }
         if (rGroupLen < 6)
         {
-            ret$overview$venn <- makeHTMLReportPlot("venn.svg", outPath, selfContained, "plotVenn", list(fGroups),
+            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, selfContained, "plotVenn", list(fGroups),
                                                     width = 7, height = 7)
         }
         
         # UpSet
-        ret$overview$UpSet <- makeHTMLReportPlot("upset.svg", outPath, selfContained, "plotUpSet", list(fGroups),
+        ret$overview$UpSet <- makeHTMLReportPlot("upset", outPath, selfContained, "plotUpSet", list(fGroups),
                                                  doPrint = TRUE, width = 7, height = 7)
     }
     cat(" Done!\n")

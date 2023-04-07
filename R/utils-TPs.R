@@ -1,8 +1,9 @@
-getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkWhat = "SMILES")
+getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemProps, checkWhat = "SMILES")
 {
     if (is.data.frame(parents))
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
-                                      prefCalcChemProps = prefCalcChemProps, calcMZs = FALSE)
+                                      prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
+                                      calcMZs = FALSE)
     else if (inherits(parents, "compounds"))
     {
         compTab <- as.data.table(parents)
@@ -10,17 +11,19 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps, checkWhat = "S
             compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
         else
             setnames(compTab, "identifier", "name")
-        parents <- compTab[, c("name", "SMILES", "InChI", "InChIKey", "neutral_formula", "neutralMass"), with = FALSE]
+        parents <- compTab[, intersect(c("name", "SMILES", "InChI", "InChIKey", "neutral_formula", "neutralMass",
+                                         "molNeutralized"), names(compTab)), with = FALSE]
         setnames(parents, "neutral_formula", "formula")
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = FALSE,
-                                      prefCalcChemProps = prefCalcChemProps, calcMZs = FALSE)
+                                      prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
+                                      calcMZs = FALSE)
     }
     else # suspect screening
     {
         parents <- copy(screenInfo(parents))
         parents <- unique(parents, by = "name")
         # only keep columns that are relevant for suspect lists (ie when convertToSuspects is called)
-        keepCols <- c("name", "rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",
+        keepCols <- c("name", "rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "molNeutralized",
                       "fragments_mz", "fragments_formula", "adduct")
         parents <- parents[, intersect(keepCols, names(parents)), with = FALSE]
     }
@@ -78,7 +81,7 @@ doConvertToMFDB <- function(prodAll, parents, out, includeParents)
     prodAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
-                  "ALogP", "LogP", "XLogP", "parent")
+                  "molNeutralized", "ALogP", "LogP", "XLogP", "parent")
     
     fwrite(prodAll[, intersect(keepCols, names(prodAll)), with = FALSE], out)
 }
@@ -272,28 +275,31 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, match
     return(results)
 }
 
-prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, matchIDBy)
+prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, matchIDBy,
+                                    neutralizeTPs)
 {
     TPLibrary <- copy(as.data.table(TPLibrary))
     
-    # add chem infos where necessary
+    # prepare chem infos
     for (wh in c("parent", "TP"))
     {
-        if (!is.null(TPLibrary[[paste0(wh, "_SMILES")]])) # may not be there for formula library
+        cols <- c("SMILES", "InChI", "InChIKey", "formula", "neutralMass", "molNeutralized")
+        
+        # temporarily remove parent/TP prefix for prepareChemTable
+        whcols <- intersect(paste0(wh, "_", cols), names(TPLibrary))
+        setnames(TPLibrary, whcols, sub(paste0(wh, "_"), "", whcols))
+        TPLibrary <- prepareChemTable(TPLibrary, FALSE, neutralizeTPs)
+        
+        # put back prefix
+        regcols <- intersect(cols, names(TPLibrary))
+        # clean out NA columns
+        for (col in regcols)
         {
-            for (col in c("formula", "InChI", "InChIKey"))
-            {
-                whcol <- paste0(wh, "_", col)
-                if (is.null(TPLibrary[[whcol]]))
-                {
-                    whSMI <- paste0(wh, "_SMILES")
-                    TPLibrary[, (whcol) := switch(col,
-                                                  formula = babelConvert(get(whSMI), "smi", "formula"),
-                                                  InChI = babelConvert(get(whSMI), "smi", "inchi"),
-                                                  InChIKey = babelConvert(get(whSMI), "smi", "inchikey"))]
-                }
-            }
+            if (all(is.na(TPLibrary[[col]])))
+                TPLibrary[, (col) := NULL]
         }
+        regcols <- intersect(regcols, names(TPLibrary))
+        setnames(TPLibrary, regcols, paste0(wh, "_", regcols))
         
         if ("InChIKey1" %in% c(matchParentsBy, matchGenerationsBy))
         {
@@ -309,10 +315,6 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
             if (is.null(TPLibrary[[whcol]]))
                 stop(sprintf("Cannot match by %s: missing %s column in the library", mb, whcol), call. = FALSE)
         }
-        
-        whmcol <- paste0(wh, "_neutralMass")
-        if (is.null(TPLibrary[[whmcol]]))
-            TPLibrary[, (whmcol) := sapply(get(paste0(wh, "_formula")), getFormulaMass)]
     }
     
     if (!is.null(parents))

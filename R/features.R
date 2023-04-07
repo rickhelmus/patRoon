@@ -319,6 +319,8 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
+    checkPackage("MetaClean")
+    
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
@@ -342,12 +344,12 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     
     EICs <- getEICsForFeatures(obj)
     
-    checkPackage("MetaClean")
-    
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached
     # based on https://stackoverflow.com/a/36611896
-    withr::local_environment(list(SSgauss = xcms::SSgauss))
+    eg <- new.env()
+    eg$SSgauss <- xcms::SSgauss
+    withr::local_environment(eg)
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
@@ -367,9 +369,15 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     doCalcs <- function(ft, eic)
     {
         ft <- copy(ft)
-        eic <- as.matrix(eic) # MetaClean expects matrices
-        ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
-        ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        
+        if (nrow(ft) == 0)
+            ft[, c(featQualityNames, featScoreNames) := numeric()]
+        else
+        {
+            eic <- as.matrix(eic) # MetaClean expects matrices
+            ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
+            ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        }
         patRoon:::doProgress()
         return(ft)
     }

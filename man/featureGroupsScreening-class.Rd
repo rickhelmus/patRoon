@@ -44,8 +44,7 @@
   formulas,
   compounds,
   absMzDev = 0.005,
-  relMinMSMSIntensity = 0.05,
-  simMSMSMethod = "cosine",
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   checkFragments = c("mz", "formula", "compound"),
   formulasNormalizeScores = "max",
   compoundsNormalizeScores = "max",
@@ -82,10 +81,16 @@
 
 \S4method{annotateSuspects}{featureGroupsScreeningSet}(
   fGroups,
-  MSPeakLists = NULL,
-  formulas = NULL,
-  compounds = NULL,
-  ...
+  MSPeakLists,
+  formulas,
+  compounds,
+  absMzDev = 0.005,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  checkFragments = c("mz", "formula", "compound"),
+  formulasNormalizeScores = "max",
+  compoundsNormalizeScores = "max",
+  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+  logPath = file.path("log", "ident")
 )
 
 \S4method{filter}{featureGroupsScreeningSet}(
@@ -147,11 +152,8 @@ to exclude it from the annotation.}
 
 \item{absMzDev}{Maximum absolute \emph{m/z} deviation.}
 
-\item{relMinMSMSIntensity}{Minimum relative intensity (\samp{0-1}) threshold applied when calculating annotation
-similarities.}
-
-\item{simMSMSMethod}{Either \code{"cosine"} or \code{"jaccard"}: used to compare MS/MS peak lists for annotation
-similarity calculation.}
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
+See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
 \item{checkFragments}{Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
 suspect fragment matches (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns in the suspect
@@ -258,10 +260,6 @@ annotation data when \code{annotateSuspects} is run.}
 }}
 
 \note{
-The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is applied \emph{after} removing the
-  precursor ion from the peak lists (if present). Thus, intensity scales may be different when this filter is applied
-  when the most abundant peak resulted from the precursor ion.
-
 \code{filter} removes suspect hits with \code{NA} values when any of
   the filters related to minimum or maximum values are applied (unless
   \code{negate=TRUE}).
@@ -281,11 +279,11 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
   between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
-  \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the
-  \code{relMinMSMSIntensity} and \code{simMSMSMethod} arguments to \code{annotateSuspects}. Note for annotation with
-  \code{generateCompoundsLibrary} results: the method and default parameters for \code{annSimComp} calculation
-  slightly differs to those from the spectral similarity calculated with compound annotation (\code{libMatch} score),
-  hence small differences in results are typically observed.
+  \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the \code{specSimParams}
+  argument to \code{annotateSuspects}. Note for annotation with \code{generateCompoundsLibrary} results: the method
+  and default parameters for \code{annSimComp} calculation slightly differs to those from the spectral similarity
+  calculated with compound annotation (\code{libMatch} score), hence small differences in results are typically
+  observed.
 
   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
   \code{fragments_*} columns from the suspect list).
@@ -337,7 +335,6 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
     annMSMSSim:
         type: formula
         min: 0.7
-        higherThanNext: 0.2
     isoScore:
         min: 0.5
         higherThanNext: 0.2
@@ -375,6 +372,7 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
   \item For \code{suspectFragments}: if the number of fragments from the suspect list (\code{maxFrags} column) is
   less then the minimum rule value, the minimum is adjusted to the number of available fragments.
 
+  \item The \code{or} and \code{and} keywords can be used to combine multiple conditions.
   }
 
   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can
@@ -385,11 +383,6 @@ The \code{relMinMSMSIntensity} filter argument to \code{annotateSuspects} is app
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{featureGroups}}}   \itemize{     \item{\strong{\code{\link{featureGroupsScreening}}}}     \itemize{       \item{\code{\link{featureGroupsSetScreeningUnset}}}     }   } }
-}
-
-\section{Source}{
- Cosine spectral similarity calculation was based on the code from \code{SpectrumSimilarity()}
-  function of \pkg{OrgMassSpecR}.
 }
 
 \section{Sets workflows}{

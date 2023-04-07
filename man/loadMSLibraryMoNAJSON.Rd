@@ -11,6 +11,7 @@ Guessing adducts from neutral/ionic mass differences was inspired from
 loadMSLibraryMoNAJSON(
   file,
   prefCalcChemProps = TRUE,
+  neutralChemProps = FALSE,
   potAdducts = TRUE,
   potAdductsLib = TRUE,
   absMzDev = 0.002,
@@ -24,6 +25,11 @@ loadMSLibraryMoNAJSON(
 \acronym{InChIKey} are preferred over what is already present in the MS library. For efficiency reasons it is
 recommended to set this to \code{TRUE}. See the \verb{Validating and calculating chemical properties} section for
 more details.}
+
+\item{neutralChemProps}{If \code{TRUE} then the neutral form of the molecule is considered to calculate
+\acronym{SMILES}, formulae etc. Enabling this may improve feature matching when considering common adducts
+(\emph{e.g.} \code{[M+H]+}, \code{[M-H]-}). See the \verb{Validating and calculating chemical properties} section
+for more details.}
 
 \item{potAdducts, potAdductsLib}{If and how missing adducts (\code{Precursor_type} data) are guessed,
   \code{potAdducts} should be either: \itemize{
@@ -115,6 +121,11 @@ This function uses \code{C++} with \CRANpkg{Rcpp} and \CRANpkg{rapidjsonr} to ef
 
   \item Validation of \acronym{SMILES}, \acronym{InChI}, \acronym{InChIKey} and formula data (if present). Invalid
   entries will be set to \code{NA}.
+
+  \item If \code{neutralChemProps=TRUE} then chemical data (\acronym{SMILES}, formulae etc.) is neutralized by
+  (de-)protonation (using the \command{--neutralized} option of \command{OpenBabel}). An additional column
+  \code{molNeutralized} is added to mark those molecules that were neutralized. Note that neutralization requires
+  either \acronym{SMILES} or \acronym{InChI} data to be available.
 
   \item The \acronym{SMILES} and \acronym{InChI} data are used to calculate missing or invalid \acronym{SMILES},
   \acronym{InChI}, \acronym{InChIKey} and formula data. If \code{prefCalcChemProps=TRUE} then existing

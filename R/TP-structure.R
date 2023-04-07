@@ -38,7 +38,27 @@ setMethod("initialize", "transformationProductsStructure", function(.Object, cal
 {
     .Object <- callNextMethod(.Object, ...)
     
-    if (length(.Object) > 0 && calcSims)
+    if (length(.Object) == 0)
+        return(.Object)
+    
+    # remove neutralized TPs that became duplicates
+    rmNeutTPs <- 0
+    .Object@products <- lapply(products(.Object), function(pr)
+    {
+        if (!is.null(pr[["molNeutralized"]]))
+        {
+            prNN <- pr[molNeutralized == FALSE]
+            wh <- pr$molNeutralized & pr$InChIKey %chin% prNN$InChIKey
+            pr <- pr[!wh]
+            rmNeutTPs <<- rmNeutTPs + sum(wh)
+        }
+        return(pr)
+    })
+    
+    if (rmNeutTPs > 0)
+        printf(sprintf("Removed %d TPs that were duplicates after neutralization.\n", rmNeutTPs))
+    
+    if (calcSims)
     {
         hash <- makeHash(.Object)
         cd <- loadCacheData("TPsParentSims", hash)
@@ -129,19 +149,25 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     {
         if (removeParentIsomers || removeTPIsomers || removeDuplicates)
         {
-            # NOTE: obj@products should be first arg to Map to keep names...
-            obj@products <- Map(obj@products, parents(obj)$formula, f = function(prod, pform)
+            mark <- if (negate) function(x) !x else function(x) x
+            obj <- delete(obj, j = function(tab, par)
             {
+                tab <- copy(tab)
+                tab[, keep := TRUE]
+                
                 if (removeDuplicates)
-                    prod <- if (negate) prod[duplicated(SMILES)] else prod[!duplicated(SMILES)]
+                    tab[keep == TRUE, keep := mark(!duplicated(SMILES))]
                 if (removeParentIsomers)
-                    prod <- if (negate) prod[formula == pform] else prod[formula != pform]
+                {
+                    pform <- parents(obj)[match(par, name)]$formula
+                    tab[keep == TRUE, keep := mark(formula != pform)]
+                }
                 if (removeTPIsomers)
                 {
-                    df <- getDuplicatedStrings(prod$formula)
-                    prod <- if (negate) prod[formula %chin% df] else prod[!formula %chin% df]
+                    df <- getDuplicatedStrings(tab$formula)
+                    tab[keep == TRUE, keep := mark(!formula %chin% df)]
                 }
-                return(prod)
+                return(!tab$keep)
             })
         }
         
@@ -154,7 +180,7 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
                 function(x) is.na(x) | x < minSimilarity
             else
                 function(x) !is.na(x) & numGTE(x, minSimilarity)
-            obj@products <- lapply(obj@products, function(p) p[pred(similarity)])
+            obj <- delete(obj, j = function(tab, ...) !pred(tab$similarity))
         }
         
         obj@products <- pruneList(obj@products, checkZeroRows = TRUE)

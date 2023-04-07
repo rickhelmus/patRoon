@@ -28,8 +28,17 @@ NULL
 #'
 #' @templateVar seli parents
 #' @templateVar selOrderi names()
+#' @templateVar del TRUE
+#' @templateVar deli parents
+#' @templateVar delj transformation products
+#' @templateVar deljtype numeric index (row) or name of the TP
+#' @templateVar delfwhat parent
+#' @templateVar delfa the TP info table (a \code{data.table}), the parent name
+#' @templateVar delfr the TP indices (rows) (specified as an \code{integer} or \code{logical} vector) or names to be removed
 #' @templateVar dollarOpName parent
 #' @template sub_sel_del-args
+#' 
+#' @param \dots For \code{delete}: passed to the function specified as \code{j}. Otherwise ignored.
 #'
 #' @templateVar class transformationProducts
 #' @template class-hierarchy
@@ -69,15 +78,13 @@ setMethod("show", "transformationProducts", function(object)
 })
 
 #' @describeIn transformationProducts Subset on parents.
-#' @param \dots Unused.
 #' @export
 setMethod("[", c("transformationProducts", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, names(x))
-        x@products <- x@products[i]
-        x@parents <- x@parents[name %in% i]
+        x <- delete(x, setdiff(names(x), i))
     }
     
     return(x)
@@ -121,14 +128,14 @@ setMethod("convertToSuspects", "transformationProducts", function(obj, includePa
     # remove TPs that are equal for a parent that were predicted through different routes
     prodAll <- unique(prodAll, by = "name")
     
-    keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
+    keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "molNeutralized")
     prodAll <- prodAll[, intersect(keepCols, names(prodAll)), with = FALSE]
     prodAll <- prepareSuspectList(prodAll, NULL, FALSE, FALSE, FALSE, FALSE)
     
     if (includeParents)
         prodAll <- rbind(parents(obj), prodAll, fill = TRUE)
 
-    return(prodAll)
+    return(prodAll[])
 })
 
 setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)
@@ -139,6 +146,65 @@ setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
     ret <- screenInfo(fGroups)[name %in% TPNames, c("group", "name"), with = FALSE]
     setnames(ret, "name", "TP_name")
     return(ret)
+})
+
+#' @templateVar where transformationProducts
+#' @templateVar what transformation product data
+#' @template delete
+#' @export
+setMethod("delete", "transformationProducts", function(obj, i = NULL, j = NULL, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    i <- assertDeleteArgAndToChr(i, names(obj), add = ac)
+    checkmate::assert(
+        checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
+        checkmate::checkString(j, min.chars = 1, null.ok = TRUE),
+        checkmate::checkFunction(j, null.ok = TRUE),
+        .var.name = "j"
+    )
+    checkmate::reportAssertions(ac)
+    
+    if (length(i) == 0 || (!is.null(j) && length(j) == 0))
+        return(obj) # nothing to remove...
+    
+    # UNDONE: NULL for i and j will remove all?
+    
+    # i = NULL; j = vector: remove from all parents
+    # i = vector; j = NULL: remove all data for specified parents
+    # j = function: remove specific TPs from given parents (or all if i=NULL)
+    
+    if (!is.function(j))
+    {
+        if (is.null(j))
+            obj@products <- obj@products[setdiff(names(obj), i)]
+        else
+        {
+            obj@products[i] <- lapply(obj@products[i], function(tab)
+            {
+                if (is.character(j))
+                    return(tab[!name %chin% j])
+                inds <- j[j <= nrow(tab)]
+                return(if (length(inds) > 0) tab[-inds] else tab)
+            })
+        }
+    }
+    else
+    {
+        obj@products[i] <- Map(obj@products[i], i, f = function(tab, par)
+        {
+            rm <- j(tab, par, ...)
+            if (is.logical(rm))
+                return(tab[!rm])
+            if (is.character(rm))
+                return(tab[!name %chin% rm])
+            return(tab[setdiff(seq_len(nrow(tab)), rm)])
+        })
+    }
+    
+    obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
+    obj@parents <- obj@parents[name %in% names(obj@products), ]
+    
+    return(obj)
 })
 
 #' @describeIn transformationProducts Performs rule-based filtering. Useful to simplify and clean-up the data.
@@ -177,20 +243,24 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, v
         obj <- cache
     else
     {
-        obj@products <- lapply(obj@products, function(prod)
+        pred <- if (negate)
+            function(v, p) !v %in% p
+        else
+            function(v, p) v %in% p
+        
+        obj <- delete(obj, j = function(tab, ...)
         {
+            tab <- copy(tab)
+            tab[, keep := TRUE]
             for (prop in names(properties))
             {
-                if (is.null(prod[[prop]]))
+                if (is.null(tab[[prop]]))
                     stop(sprintf("Property %s not present.", prop), call. = FALSE)
-                prod <- if (negate) prod[!get(prop) %in% properties[[prop]]] else prod[get(prop) %in% properties[[prop]]]
+                tab[keep == TRUE, keep := pred(get(prop), properties[[prop]])]
             }
-            return(prod)
+            return(!tab$keep)
         })
-        
-        obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
-        obj@parents <- obj@parents[name %in% names(obj@products)]
-        
+
         saveCacheData("filterTPs", obj, hash)
     }
     

@@ -55,14 +55,11 @@ test_that("components generation works", {
     
     expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)
     
-    skip_on_os("windows")
-    
-    # BUG: cliqueMS gives different results on Windows/Linux.
     # NOTE: can't compare cliqueMS data as it has environments in them that change
     expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
 
-    expect_gt(length(unique(as.data.table(compsClMSNoAB)$adduct_ion)),
-              length(unique(as.data.table(compsClMS)$adduct_ion)))
+    expect_lt(min(as.data.table(compsClMSNoAB)$adduct_abundance, na.rm = TRUE),
+              min(as.data.table(compsClMS)$adduct_abundance, na.rm = TRUE))
 })
 
 test_that("verify components show", {
@@ -72,9 +69,6 @@ test_that("verify components show", {
     expect_known_show(compsSpec, testFile("components-spec", text = TRUE))
     expect_known_show(compsOpenMS, testFile("components-om", text = TRUE))
     
-    skip_on_os("windows")
-    
-    # BUG: cliqueMS gives different results on Windows/Linux, skip former for ref checking for now.
     expect_known_show(compsClMS, testFile("components-cm", text = TRUE))
 })
 
@@ -240,10 +234,10 @@ test_that("selectIons works", {
     
     expect_gt(length(selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = FALSE)), length(fGroupsSI))
     
-    # stop()s with empty components
-    expect_error(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    # ignore empty components
+    expect_equal(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
     # ... and components without annotations in general
-    expect_error(selectIons(fGroups, compsInt, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    expect_equal(selectIons(fGroups, compsNT, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
     
     skip_if(testWithSets())
     

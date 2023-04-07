@@ -34,7 +34,10 @@ out <- file.path(normalizePath("docs", mustWork = FALSE), "handbook_bd")
 withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", output_dir = out))
 
 # PDF versions
-withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd", "bookdown::pdf_book", output_dir = out))
+# OPENSSL_CONF workaround for PhamtomJS --> see https://stackoverflow.com/a/73063745
+withr::with_dir("vignettes/handbook/",
+                withr::with_envvar(c(OPENSSL_CONF = "/dev/null"),
+                                   bookdown::render_book("index.Rmd", "bookdown::pdf_book", output_dir = out)))
 rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document", output_dir = file.path("docs", "articles"))
 
 tinytex::tlmgr_install("makeindex")

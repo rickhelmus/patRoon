@@ -308,11 +308,12 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
 #' @export
 setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
                                                              MSMode = "both", adduct = NULL, ..., setThreshold = 0,
-                                                             setThresholdAnn = 0)
+                                                             setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasDA,
                         precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,
-                        setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+                        setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                        setAvgSpecificScores = setAvgSpecificScores)
 })
 
 # nocov end

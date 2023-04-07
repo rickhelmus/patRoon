@@ -161,6 +161,36 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 
 #' @rdname MSPeakLists-class
 #' @export
+setMethod("delete", "MSPeakListsSet", function(obj, ...)
+{
+    obj <- callNextMethod()
+    
+    # sync set objects
+    obj@setObjects <- Map(sets(obj), obj@setObjects, f = function(sn, so)
+    {
+        # remove removed analyses
+        so <- delete(so, k = !analyses(so) %chin% analyses(obj))
+        
+        # remove removed groups
+        so <- delete(so, i = !groupNames(so) %chin% groupNames(obj))
+        
+        # remove removed peaks
+        delete(so, j = function(PL, grp, ana, t)
+        {
+            setPL <- if (is.null(ana)) obj[[grp]][[t]] else obj[[ana, grp]][[t]]
+            if (is.null(setPL))
+                return(TRUE)
+            if (is.null(ana))
+                setPL <- setPL[set == sn]
+            return(!PL$ID %in% setPL$ID)
+        })
+    })
+    
+    return(obj)
+})
+
+#' @rdname MSPeakLists-class
+#' @export
 setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursorMSMS = TRUE,
                                                reAverage = FALSE, negate = FALSE, sets = NULL)
 {
@@ -208,7 +238,6 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
                        reAverage = reAverage, negate = negate)
             })
         }
-        obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
@@ -275,25 +304,11 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         binnedPLs <- Map(usObj, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
                                          specSimParams = specSimParams, mustExist = FALSE))
-        if (all(sapply(binnedPLs, is.null)))
-        {
-            # either no peak lists are available or no peak lists within the same sets were available. In the latter
-            # case nothing could be binned, hence, just mirror plot both spectra within binning
-            
-            topSpec <- copy(getSpec(obj, groupName[1], MSLevel, analysis[1]))
-            bottomSpec <- copy(getSpec(obj, groupName[2], MSLevel, analysis[2]))
-            
-            if (is.null(topSpec) || is.null(bottomSpec)) # really not there :-( ...
-                return(NULL)
-            
-            # topSpec[, mergedBy := "unique"]; bottomSpec[, mergedBy := "unique"]
-            setnames(topSpec, "set", "mergedBy"); setnames(bottomSpec, "set", "mergedBy")
-        }
-        else
-        {
-            topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
-            bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
-        }
+        if (all(unlist(lapply(binnedPLs, sapply, nrow)) == 0))
+            return(NULL)
+
+        topSpec <- rbindlist(sapply(binnedPLs, "[[", 1, simplify = FALSE), idcol = "set")
+        bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
         
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), mirror, FALSE, 2, "overlap")
         makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)

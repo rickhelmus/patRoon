@@ -14,12 +14,13 @@ BiocManager::install(c("mzR", "xcms", "CAMERA",
 
 remotes::install_github(c("rickhelmus/patRoonData",
                           "thomasp85/farver",
-                          "cbroeckl/RAMClustR",
+                          "cbroeckl/RAMClustR@73accadaded", # temp workaround for buggy commit
                           "blosloos/enviPick",
                           "blosloos/nontargetData",
                           "blosloos/nontarget",
                           "rickhelmus/KPIC2",
                           "rickhelmus/cliqueMS",
+                          "souravc83/fastAdaboost", # For Metaclean, removed from CRAN (9/22)
                           "KelseyChetnik/MetaClean", "KelseyChetnik/MetaCleanData",
                           "berlinguyinca/spectra-hash/splashR"),
                         upgrade = "never")

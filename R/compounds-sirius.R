@@ -199,10 +199,11 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                   projectPath = NULL, ..., setThreshold = 0,
-                                                                  setThresholdAnn = 0)
+                                                                  setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
     sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
     generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn, setArgs = sa)
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                         setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })

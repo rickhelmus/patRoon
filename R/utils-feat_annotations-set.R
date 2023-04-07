@@ -3,7 +3,14 @@
 #' @include compounds.R
 NULL
 
-makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, mConsNames)
+featAnnSetSpecificScoreCols <- function()
+{
+    return(c("score", "fragScore", "isoScore", "metFusionScore", "individualMoNAScore", "peakFingerprintScore",
+             "lossFingerprintScore", "libMatch", "formulaScore", "combMatch", "isoScore", "mSigma", "MSMSScore"))
+}
+
+makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, setAvgSpecificScores,
+                                    mConsNames)
 {
     # generate consensus by...
     # - checking setThreshold/setThresholdAnn
@@ -21,7 +28,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     
     sCount <- length(setObjects)
     
-    scoreCols <- if (sCount > 0) annScoreNames(setObjects[[1]], TRUE)
+    allScoreCols <- unique(unlist(lapply(setObjects, annScoreNames, TRUE)))
     
     cons <- sapply(allAnnGNames, function(gName)
     {
@@ -35,9 +42,12 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             ct[, c("set", "setsCount", "setsMergedCount", rname) := .(s, 1, 1, seq_len(.N))]
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
-            cols <- getAllMergedConsCols(c("rank", "mergedBy", "coverage", "explainedPeaks",
-                                           "ion_formula", "ion_formula_mz", "precursorType", "libPeaksCompared",
-                                           "libPeaksTotal"), names(ct), mConsNames)
+            cols <- getAllMergedConsCols(c(
+                "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
+                "libPeaksCompared", "libPeaksTotal"
+            ), names(ct), mConsNames)
+            if (!setAvgSpecificScores)
+                cols <- c(cols, getAllMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))
             if (length(cols) > 0)
                 setnames(ct, cols, paste0(cols, "-", s))
             
@@ -49,9 +59,10 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         
         Reduce(x = allResults, f = function(left, right)
         {
-            scoreColsLeft <- getAllMergedConsCols(scoreCols, names(left), mConsNames)
-            scoreColsRight <- getAllMergedConsCols(scoreCols, names(right), mConsNames)
+            scoreColsLeft <- intersect(allScoreCols, names(left))
+            scoreColsRight <- intersect(allScoreCols, names(right))
             scoreColsBoth <- intersect(scoreColsLeft, scoreColsRight)
+            
             # UNDONE: below cols are specific to compounds --> make method?
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
             combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
@@ -101,8 +112,9 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     # update average scores and convert absolute merge counts to coverage
     cons <- lapply(cons, function(ct)
     {
-        scCols <- getAllMergedConsCols(scoreCols, names(ct), mConsNames)
-        ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
+        scCols <- intersect(allScoreCols, names(ct))
+        if (length(scCols) > 0)
+            ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
         
         # re-sort by avg rank scores
         rnames <- getAllMergedConsCols("rank", names(ct), names(setObjects))
@@ -129,23 +141,53 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
     return(cons)
 }
 
-makeAnnSetScorings <- function(setObjects, origFGNames)
+makeAnnSetScorings <- function(setObjects, setAvgSpecificScores, origFGNames)
 {
     scTypes <- character()
-    if (length(setObjects) > 0)
-        scTypes <- unique(unlist(lapply(setObjects, slot, "scoreTypes")))
-    
     scRanges <- list()
+    
     if (length(setObjects) > 0)
     {
-        scRanges <- Reduce(x = lapply(setObjects, slot, "scoreRanges"), f = function(left, right)
+        allScTypes <- sapply(setObjects, slot, "scoreTypes", simplify = FALSE)
+        allScRanges <- sapply(setObjects, slot, "scoreRanges", simplify = FALSE)
+        
+        if (!setAvgSpecificScores)
+        {
+            # rename set specific scorings
+            renameSc <- function(v, sn)
+            {
+                wh <- grepl(paste0(featAnnSetSpecificScoreCols(), collapse = "|"), v)
+                v[wh] <- paste0(v[wh], "-", sn)
+                return(v)
+            }
+            allScTypes <- Map(allScTypes, names(allScTypes), f = renameSc)
+            allScRanges <- Map(allScRanges, names(allScRanges), f = function(sr, sn)
+            {
+                lapply(sr, function(r) setNames(r, renameSc(names(r), sn)))
+            })
+        }
+        
+        scTypes <- unique(unlist(allScTypes))
+            
+        scRanges <- Reduce(x = allScRanges, f = function(left, right)
         {
             # change ranges for overlap
             groupsLR <- intersect(names(left), names(right))
             ret <- Map(left[groupsLR], right[groupsLR], f = function(rangesL, rangesR)
             {
-                scLR <- names(rangesL) # should be same for left/right
-                Map(range, rangesL[scLR], rangesR[scLR])
+                # overlap
+                scLR <- intersect(names(rangesL), names(rangesR))
+                rret <- Map(range, rangesL[scLR], rangesR[scLR])
+                
+                # unique left
+                scL <- setdiff(names(rangesL), names(rangesR))
+                rret[scL] <- rangesL[scL]
+                
+                # unique right
+                scR <- setdiff(names(rangesR), names(rangesL))
+                rret[scR] <- rangesR[scR]
+                
+                return(rret)
             })
             
             # add unique from left
@@ -236,6 +278,7 @@ doUpdateSetConsensus <- function(obj)
     {
         obj@groupAnnotations <- makeFeatAnnSetConsensus(obj@setObjects, obj@origFGNames,
                                                         obj@setThreshold, obj@setThresholdAnn,
+                                                        obj@setAvgSpecificScores,
                                                         mergedConsensusNames(obj, FALSE))
     }
     else
@@ -265,7 +308,7 @@ initSetFragInfos <- function(setObjects, MSPeakListsSet)
     return(setObjects)
 }
 
-doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
+doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores, rankWeights)
 {
     # make consensus of shared setObjects
     # add unique setObjects
@@ -288,7 +331,8 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
         return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set), consArgs)))
     }, simplify = FALSE)
 
-    cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, labels)
+    cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, setAvgSpecificScores,
+                                    labels)
     cons <- lapply(cons, function(at)
     {
         at <- copy(at)
@@ -333,19 +377,25 @@ doFeatAnnUnset <- function(obj, set)
         })]
     })
     
+    pat <- paste0("\\-", set, "$")
+    
     # restore sets specific columns
     ann <- lapply(ann, function(a)
     {
-        pat <- paste0("\\-", set, "$")
         cols <- grep(pat, names(a), value = TRUE)
         setnames(a, cols, sub(pat, "", cols))
         a[, rank := NULL] # no need for this anymore
         return(a)
     })
+
+    # restore scorings
+    scTypes <- sub(pat, "", obj@scoreTypes)
+    scRanges <- lapply(obj@scoreRanges, function(sc) setNames(sc, gsub(pat, "", names(sc))))
+        
+    ret <- list(annotations = ann, scoreTypes = scTypes, scoreRanges = scRanges)
+    saveCacheData("featAnnUnset", ret, hash)
     
-    saveCacheData("featAnnUnset", ann, hash)
-    
-    return(ann)
+    return(ret)
 }
 
 doFeatAnnDeleteSets <- function(obj, i, j, ...)
@@ -400,9 +450,10 @@ doFeatAnnSubsetSets <- function(x, i, j, ..., sets = NULL, updateConsensus = FAL
             rmSets <- setdiff(oldSets, sets(x))
             if (length(rmSets) > 0)
             {
+                pat <- paste0("\\-(", paste0(rmSets, collapse = "|"), ")$")
                 x@groupAnnotations <- lapply(x@groupAnnotations, function(ct)
                 {
-                    cols <- grep(paste0("\\-(", paste0(rmSets, collapse = "|"), ")$"), names(ct), value = TRUE)
+                    cols <- grep(pat, names(ct), value = TRUE)
                     if (length(cols) == 0)
                         return(ct) # set already not present
                     
@@ -426,6 +477,14 @@ doFeatAnnSubsetSets <- function(x, i, j, ..., sets = NULL, updateConsensus = FAL
                 
                 # remove results from removed sets --> those are now without set assignment
                 x <- delete(x, j = function(at, ...) !nzchar(at$set))
+                
+                # update scorings
+                x@scoreTypes <- x@scoreTypes[!grepl(pat, x@scoreTypes)]
+                x@scoreRanges <- lapply(x@scoreRanges, function(sr)
+                {
+                    sr <- sr[!grepl(pat, names(sr))]
+                    return(sr)
+                })
             }
         }
     }
@@ -471,7 +530,6 @@ doFeatAnnFilterSets <- function(obj, ..., sets = NULL, updateConsensus = FALSE, 
             # filter set objects and re-generate annotation consensus
             
             obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
-            obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
             
             # synchronize other objects
             cat("Synchronizing set objects...\n")

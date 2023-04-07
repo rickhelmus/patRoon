@@ -40,7 +40,7 @@ setMethod("initialize", "compoundsMF",
 setMethod("settings", "compoundsMF", function(compoundsMF) compoundsMF@settings)
 
 
-unifyMFNames <- function(mfr)
+unifyMFNames <- function(mfr, scoreTypesMF)
 {
     unNames <- c(NoExplPeaks = "explainedPeaks",
                  Score = "score",
@@ -149,6 +149,7 @@ unifyMFNames <- function(mfr)
                  ForIdentCategories = "categories",
 
                  # database generated from TP prediction
+                 molNeutralized = "molNeutralized",
                  parent = "parent",
                  ALogP = "ALogP",
                  LogP = "LogP",
@@ -161,8 +162,10 @@ unifyMFNames <- function(mfr)
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
     setnames(mfr, names(unNames), unNames)
+    
+    scoreTypesMF <- intersect(scoreTypesMF, names(mfr))
 
-    return(mfr[, unNames, with = FALSE]) # filter out any other columns
+    return(mfr[, union(unNames, scoreTypesMF), with = FALSE]) # filter out any other columns
 }
 
 # MetFragCL gives bracketed fragment formulas including charge and weird (de)protonation adducts
@@ -285,7 +288,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     
     baseHash <- makeHash(method, topMost)
     if (!is.null(extDB))
-        baseHash <- makeHash(baseHash, extDB)
+        baseHash <- makeHash(baseHash, makeFileHash(extDB))
 
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "metfrag")
 
@@ -328,16 +331,20 @@ processMFResults <- function(comptab, runData, lfile = "")
     {
         compsc <- compoundScorings("metfrag")
         compsc <- compsc[compsc$metfrag %in% names(comptab), ]
+        allScoreCols <- union(compsc$metfrag, runData$mfSettings$MetFragScoreTypes)
 
-        if (nrow(compsc) > 0)
+        if (length(allScoreCols) > 0)
         {
             # fix up score and suspect list columns: dash --> 0
             # NOTE: do as.numeric as values with '-' will cause the column to be a character
-            comptab[, (compsc$metfrag) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
-                    .SDcols = compsc$metfrag]
+            comptab[, (allScoreCols) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
+                    .SDcols = allScoreCols]
 
-            scRanges <- setNames(lapply(compsc$metfrag, function(sc) range(comptab[[sc]])),
-                                 compsc$name)
+            scRanges <- sapply(allScoreCols, function(sc) range(comptab[[sc]]), simplify = FALSE)
+            namesInGenSC <- match(names(scRanges), compsc$metfrag)
+            notNA <- !is.na(namesInGenSC)
+            if (any(notNA))
+                names(scRanges)[notNA] <- compsc$name[notNA]
         }
 
         if (!is.null(runData$topMost) && nrow(comptab) > runData$topMost)
@@ -358,7 +365,7 @@ processMFResults <- function(comptab, runData, lfile = "")
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
         # unify column names & filter unnecessary columns
-        comptab <- unifyMFNames(comptab)
+        comptab <- unifyMFNames(comptab, runData$mfSettings$MetFragScoreTypes)
 
         if (!is.null(comptab[["CASRN"]]))
             comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
@@ -777,10 +784,15 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     isMFScore <- scoreTypes %in% compsScores$metfrag
     if (any(isMFScore))
         scoreTypes[isMFScore] <- compsScores[match(scoreTypes[isMFScore], compsScores$metfrag), "name"]
+    
+    scoreRanges <- lapply(results, "[[", "scRanges")
+    
+    # Ensure that scoreTypes doesn't contain anything 'extra', e.g. this can happen when the user specified scores not
+    # present in the database.
+    scoreTypes <- if (length(scoreRanges) > 0) intersect(scoreTypes, unlist(lapply(scoreRanges, names))) else character()
 
     return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
-                       scoreRanges = lapply(results, "[[", "scRanges"),
-                       settings = mfSettings))
+                       scoreRanges = scoreRanges, settings = mfSettings))
 })
 
 #' @template featAnnSets-gen_args
@@ -790,10 +802,11 @@ setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPe
                                                                    timeoutRetries = 2, errorRetries = 2, topMost = 100,
                                                                    dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
                                                                    adduct = NULL, ..., setThreshold = 0,
-                                                                   setThresholdAnn = 0)
+                                                                   setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsMetFrag, method = method, timeout = timeout,
                          timeoutRetries = timeoutRetries, errorRetries = errorRetries, topMost = topMost,
                          dbRelMzDev = dbRelMzDev, fragRelMzDev = fragRelMzDev, fragAbsMzDev = fragAbsMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn)
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                         setAvgSpecificScores = setAvgSpecificScores)
 })

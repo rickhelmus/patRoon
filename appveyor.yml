@@ -4,7 +4,7 @@
 init:
     - ps: |
         $ErrorActionPreference = "Stop"
-        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+        Invoke-WebRequest https://raw.githubusercontent.com/rickhelmus/r-appveyor/rtools42/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 
 install:
@@ -40,12 +40,13 @@ install:
             Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-1-1/OpenBabel-3.1.1-x64.exe -OutFile "C:\deps\openbabel311.exe"
         }
         C:\deps\openbabel311.exe /S
-    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  - C:\RLibrary
-  - C:\Program Files\Pandoc\
-  - C:\deps
+  #- C:\RLibrary
+  #- C:\Program Files\Pandoc\
+  #- C:\deps
 
 # Adapt as necessary starting from here
 
@@ -65,6 +66,7 @@ before_test:
 platform: x64
 environment:
     R_ARCH: x64
+    R_VERSION: stable
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: FALSE
     R_CHECK_ARGS: --no-build-vignettes --no-manual --no-multiarch
@@ -80,9 +82,11 @@ build_script:
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontargetData
     - travis-tool.sh install_github blosloos/nontarget
-    - travis-tool.sh install_github cbroeckl/RAMClustR
+    - travis-tool.sh install_github cbroeckl/RAMClustR@73accadaded # temp workaround for buggy commit
     - travis-tool.sh install_github rickhelmus/KPIC2
     - travis-tool.sh install_github rickhelmus/cliqueMS
+    #- travis-tool.sh install_github souravc83/fastAdaboost # For Metaclean, removed from CRAN (9/22) --> crashes
+    - Rscript -e "install.packages('fastAdaboost', repos = 'https://mran.revolutionanalytics.com/snapshot/2022-07-01')"
     - travis-tool.sh install_github KelseyChetnik/MetaClean
     - travis-tool.sh install_github KelseyChetnik/MetaCleanData
     - travis-tool.sh install_github berlinguyinca/spectra-hash/splashR

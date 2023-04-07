@@ -48,13 +48,13 @@ if (length(components) > 0)
         plots <- list()
         fg <- rmdVars$fGroups[, parentRow$parent_group]
         
-        plots[["int"]] <- file.path(plotPathFull, sprintf("int-parent_%d.png", grpi))
+        plots[["int"]] <- file.path(plotPathFull, sprintf("int-parent_%s.png", parentRow$name))
         makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3,
                        bg = NA, cacheDB = rmdVars$cacheDB)
         
         if (!is.null(parentRow[["parent_SMILES"]]))
         {
-            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
+            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%s.png", parentRow$name))
             makeStructPlot(parentRow$parent_SMILES, plots[["struct"]])
         }
         
@@ -66,9 +66,10 @@ if (length(components) > 0)
     message("Generating TP plots...")
     prog <- openProgBar(0, length(components))
     cmpTab <- as.data.table(components)
+    cmpTab[, cmpInd := seq_len(.N), by = "name"]
     # isFGScrAnnotated <- isScreening(rmdVars$fGroups) && screenInfo(rmdVars$fGroups)[[""]]
     
-    TPPlotName <- function(cmp, grp) paste0(cmp, "_", grp)
+    TPPlotName <- function(cmp, i) paste0(cmp, "_", i)
     
     TPPlots <- setNames(Map(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), f = function(ctRow, i)
     {
@@ -76,14 +77,14 @@ if (length(components) > 0)
         plots <- list()
         fg <- rmdVars$fGroups[, ctRow$group]
         
-        plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%d.png", grpi))
+        plots[["int"]] <- file.path(plotPathFull, sprintf("int-TP_%s-%d.png", ctRow$name, ctRow$cmpInd))
         makeCachedPlot(plots[["int"]], "plotInt", c(list(fg), plotIntMainArgs), 3.3, 3.3, bg = NA,
                        cacheDB = rmdVars$cacheDB)
         
         SMI <- ctRow[["SMILES"]]
         if (!is.null(SMI))
         {
-            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-parent_%d.png", grpi))
+            plots[["struct"]] <- file.path(plotPathFull, sprintf("struct-TP_%s-%d.png", ctRow$name, ctRow$cmpInd))
             makeStructPlot(SMI, plots[["struct"]])
         }
         
@@ -125,8 +126,7 @@ if (length(components) > 0)
             
             if (length(plSpecArgs) > 0)
             {
-                plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%d_%d.png",
-                                                                   match(ctRow$parent_group, names(rmdVars$fGroups)), grpi))
+                plots[["spec"]] <- file.path(plotPathFull, sprintf("spec-sim_%s-%d.png", ctRow$name, ctRow$cmpInd))
                 makeCachedPlot(plots[["spec"]], "plotSpectrum", c(plSpecArgs, list(groupName = c(ctRow$parent_group, ctRow$group),
                                                                                    specSimParams = rmdVars$specSimParams, title = "")),
                                5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
@@ -136,7 +136,7 @@ if (length(components) > 0)
         setTxtProgressBar(prog, i)
         
         return(plots)
-    }), TPPlotName(cmpTab$name, cmpTab$group))
+    }), TPPlotName(cmpTab$name, cmpTab$cmpInd))
     
     prepPlots <- function(pl)
     {
@@ -291,9 +291,9 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
     splitCmp <- split(cmp, seq_len(nrow(cmp)))
     
     trCols <- intersect(c("formula", "retDir", "TP_retDir", "retDiff", "mzDiff", "formulaDiff", "set", "CID", "SMILES",
-                          "similarity", "mergedBy", "coverage"),
+                          "molNeutralized", "similarity", "mergedBy", "coverage"),
                         names(cmp))
-    ret[, TP := sapply(splitCmp, function(cr)
+    ret[, TP := mapply(splitCmp, seq_len(nrow(cmp)), FUN = function(cr, ci)
     {
         tpInfo <- cr[, c("TP_name", "group", trCols), with = FALSE]
         if (rmdVars$retMin)
@@ -320,8 +320,8 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         
         tp <- makeInfoBox(paste0(names(tpInfo), ": ", tpInfo, collapse = "<br>"))
         
-        if (!is.null(TPPlots[[TPPlotName(cName, cr$group)]][["struct"]]))
-            tp <- paste0(imgTags(TPPlots[[TPPlotName(cName, cr$group)]][["struct"]]), "<br>", tp)
+        if (!is.null(TPPlots[[TPPlotName(cName, ci)]][["struct"]]))
+            tp <- paste0(imgTags(TPPlots[[TPPlotName(cName, ci)]][["struct"]]), "<br>", tp)
         
         return(tp)
     })]
@@ -354,16 +354,19 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         })]
     }
     
-    ret[, spectrum := sapply(splitCmp, function(cr)
+    ret[, spectrum := mapply(splitCmp, seq_along(splitCmp), FUN = function(cr, ci)
     {
-        if (!is.null(TPPlots[[TPPlotName(cName, cr$group)]][["spec"]]))
-            return(paste0(imgTags(TPPlots[[TPPlotName(cName, cr$group)]][["spec"]])))
+        if (!is.null(TPPlots[[TPPlotName(cName, ci)]][["spec"]]))
+            return(imgTags(TPPlots[[TPPlotName(cName, ci)]][["spec"]]))
         return("")
     })]
     if (!any(nzchar(ret$spectrum)))
         set(ret, j = "spectrum", value = NULL)
 
-    ret[, "intensity profile" := imgTags(sapply(TPPlots[TPPlotName(cName, cmp$group)], "[[", "int"))]
+    ret[, "intensity profile" := mapply(splitCmp, seq_along(splitCmp), FUN = function(cr, ci)
+    {
+        return(imgTags(TPPlots[[TPPlotName(cName, ci)]][["int"]]))
+    })]
     return(ret)
 }), fill = TRUE) # fill: spectrum can be absent depending on candidate
 

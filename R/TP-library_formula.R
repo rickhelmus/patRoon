@@ -50,7 +50,8 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #'
 #' @export
 generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1, skipInvalid = TRUE,
-                                      prefCalcChemProps = TRUE, matchParentsBy = "name", matchGenerationsBy = "name")
+                                      prefCalcChemProps = TRUE, neutralChemProps = FALSE, matchParentsBy = "name",
+                                      matchGenerationsBy = "name")
 {
     # NOTE: this is mainly a simplified version of generateTPsLibrary
     
@@ -72,21 +73,22 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps, fixed = list(add = ac))
     aapply(checkmate::assertChoice, . ~ matchParentsBy + matchGenerationsBy, null.ok = FALSE,
            fixed = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"), add = ac))
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, matchParentsBy,
+    hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, neutralChemProps, matchParentsBy,
                      matchGenerationsBy)
     cd <- loadCacheData("TPsLibFormula", hash)
     if (!is.null(cd))
         return(cd)
     
     if (!is.null(parents))
-        parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, checkWhat = "formula")
+        parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps, checkWhat = "formula")
     
-    prep <- prepareDataForTPLibrary(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, "formula")
+    prep <- prepareDataForTPLibrary(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, "formula",
+                                    FALSE)
     
     ret <- transformationProductsLibraryFormula(parents = prep$parents, products = prep$products)
     saveCacheData("TPsLibFormula", ret, hash)
@@ -120,7 +122,7 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
 #'
 #' @export
 genFormulaTPLibrary <- function(parents, transformations = NULL, minMass = 40, generations = 1, skipInvalid = TRUE,
-                                prefCalcChemProps = TRUE)
+                                prefCalcChemProps = TRUE, neutralChemProps = FALSE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -135,10 +137,10 @@ genFormulaTPLibrary <- function(parents, transformations = NULL, minMass = 40, g
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::assertNumber(minMass, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, checkWhat = "formula")
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps, checkWhat = "formula")
     transformations <- getTPLogicTransformations(transformations)
     
     genLibItems <- function(parNames, parFormulas, parNeutralMasses, gen)

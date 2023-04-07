@@ -138,31 +138,33 @@ makeScoresPlot <- function(scoreTable, mcn)
         }
     }
     
+    isMerged <- length(mcn) > 1 && uniqueN(scores$merged) > 1
+    
     oldp <- par(no.readonly = TRUE)
     maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
     omai <- par("mai")
     par(mai = c(maxStrW, 0.5, omai[3], 0))
     
-    if (length(mcn) > 1)
+    if (isMerged)
         cols <- getBrewerPal(length(unique(scores$merged)), "Paired")
     else
         cols <- getBrewerPal(nrow(scores), "Paired")
     
     bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
     
-    if (length(mcn) > 1)
+    if (isMerged)
     {
         scSplit <- split(scores, by = "type", keep.by = FALSE)
         scSplit <- sapply(names(scSplit), function(mb) setnames(scSplit[[mb]], "score", mb), simplify = FALSE) # assign column names
         
         plotTab <- Reduce(function(left, right)
         {
-            merge(left, right, by = "merged", all = TRUE)
+            merge(left, right, by = "merged", all = TRUE, sort = FALSE)
         }, scSplit)
         
         plot.new()
         
-        makeLegend <- function(x, y, ...) legend(x, y, unique(scores$merged), col = cols, lwd = 1, xpd = NA, ncol = 1,
+        makeLegend <- function(x, y, ...) legend(x, y, unique(plotTab$merged), col = cols, lwd = 1, xpd = NA, ncol = 1,
                                                  cex = 0.75, bty = "n", ...)
         
         # auto legend positioning: https://stackoverflow.com/a/34624632/9264518
@@ -227,9 +229,9 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         if (min(plotData$intensity) < 0) # mirror plot?
         {
             # extend both vertical directions 
-            if (nrow(plotData) > 1)
+            if (max(plotData$intensity) > 0)
                 ylim <- range(plotData$intensity) * expand
-            else
+            else # only bottom plot
                 ylim <- c(min(plotData$intensity), abs(min(plotData$intensity)))
         }
         else

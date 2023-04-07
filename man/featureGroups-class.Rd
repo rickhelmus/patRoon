@@ -526,6 +526,8 @@ feature group names of the internal standards assigned to it (filled in by the \
 by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.}
 
 \item{\code{annotations,ISTDAssignments}}{\setsWF As the \code{featureGroups} slots, but contains the data per set.}
+
+\item{\code{annotationsChanged}}{Set internally by \code{adducts()<-} and applied as soon as \code{reGroup=TRUE}.}
 }}
 
 \section{S4 class hierarchy}{
@@ -607,7 +609,7 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
   \item \code{adducts}, \code{adducts<-} require the \code{set} argument. The order of the data that is
   returned/changed follows that of the \code{annotations} slot. Furthermore, \code{adducts<-} will perform a
   re-grouping of features when its \code{reGroup} parameter is set to \code{TRUE}. The implications for this are
-  discussed below.
+  discussed below. Note that no adducts are changed \emph{until} \code{reGroup=TRUE}.
 
   \item the subset operator (\code{[}) has specific arguments to choose (feature presence in) sets. See the argument
   descriptions.

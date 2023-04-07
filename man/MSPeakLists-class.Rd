@@ -28,6 +28,7 @@
 \alias{show,MSPeakListsSet-method}
 \alias{[,MSPeakListsSet,ANY,ANY,missing-method}
 \alias{as.data.table,MSPeakListsSet-method}
+\alias{delete,MSPeakListsSet-method}
 \alias{filter,MSPeakListsSet-method}
 \alias{plotSpectrum,MSPeakListsSet-method}
 \alias{spectrumSimilarity,MSPeakListsSet-method}
@@ -109,6 +110,8 @@
 \S4method{[}{MSPeakListsSet,ANY,ANY,missing}(x, i, j, ..., reAverage = FALSE, sets = NULL, drop = TRUE)
 
 \S4method{as.data.table}{MSPeakListsSet}(x, fGroups = NULL, averaged = TRUE)
+
+\S4method{delete}{MSPeakListsSet}(obj, ...)
 
 \S4method{filter}{MSPeakListsSet}(
   obj,

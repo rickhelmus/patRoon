@@ -9,7 +9,7 @@ setMethod("initialize", "transformationProductsCTS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cts", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
+runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutralizeTPs, calcLogP)
 {
     CTSURL <- "https://qed.epa.gov/cts/rest/metabolizer/run"
     # CTSURL <- "https://qed.epacdx.net/cts/rest/metabolizer/run" # older version??
@@ -47,7 +47,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
     
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
-    ret <- prepareChemTable(ret, prefCalcChemProps = FALSE, verbose = FALSE)
+    ret <- prepareChemTable(ret, prefCalcChemProps = FALSE, neutralChemProps = neutralizeTPs, verbose = FALSE)
     
     if (calcLogP != "none")
     {
@@ -114,8 +114,8 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, calcLogP)
 #'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
-                           prefCalcChemProps = TRUE, calcLogP = "rcdk", calcSims = FALSE, fpType = "extended",
-                           fpSimMethod = "tanimoto", parallel = TRUE)
+                           prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE, calcLogP = "rcdk",
+                           calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto", parallel = TRUE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -133,12 +133,13 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_abioticreduction_hydrolysis", 
                                             "combined_photolysis_abiotic_hydrolysis"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + calcSims + parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims +
+               parallel, fixed = list(add = ac))
     checkmate::assertChoice(calcLogP, c("rcdk", "obabel", "none"), add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps)
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
     
     if (nrow(parents) == 0)
         results <- list()
@@ -165,7 +166,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         names(parsSplit) <- parents$name
         
         baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, prefCalcChemProps,
-                             calcLogP, calcSims, fpType, fpSimMethod)
+                             neutralChemProps, neutralizeTPs, calcLogP, calcSims, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))
@@ -186,8 +187,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
             lapfunc <- if (parallel) future.apply::future_sapply else sapply
             newResults <- withProg(length(parsTBD), parallel,
                                    do.call(lapfunc, list(parsSplit[parsTBD], patRoon:::runCTS,
-                                                         transLibrary, generations, errorRetries, calcLogP,
-                                                         simplify = FALSE)))
+                                                         transLibrary, generations, errorRetries,
+                                                         neutralizeTPs, calcLogP, simplify = FALSE)))
 
             for (pn in names(newResults))
             {

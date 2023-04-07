@@ -70,7 +70,7 @@ unique across different sets.
 which is then grouped in the 'usual way' with \code{\link{groupFeatures}}.
 
 \item \code{\link{featureGroups}} objects: In this case the features from the input objects are first neutralized and
-all features are then (re-)grouped with \code{groupFeatures}.
+feature groups between sets are then combined with \code{groupFeatures}.
 
 }
 

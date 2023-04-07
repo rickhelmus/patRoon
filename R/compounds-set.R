@@ -19,7 +19,7 @@ NULL
 #' @rdname compounds-class
 #' @export
 compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", setThresholdAnn = "numeric",
-                                                   origFGNames = "character"),
+                                                   setAvgSpecificScores = "logical", origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
 
 #' @rdname compounds-class
@@ -33,7 +33,7 @@ setMethod("updateSetConsensus", "compoundsSet", function(obj)
     obj <- doUpdateSetConsensus(obj)
     
     # update scoreTypes/scoreRanges
-    sc <- makeAnnSetScorings(setObjects(obj), obj@origFGNames)
+    sc <- makeAnnSetScorings(setObjects(obj), obj@setAvgSpecificScores, obj@origFGNames)
     obj@scoreTypes <- sc$scTypes
     obj@scoreRanges <- sc$scRanges
     
@@ -150,7 +150,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         usObj <- sapply(theSets, unset, obj = obj, simplify = FALSE)
         
         # check which sets actually contain requested data
-        theSets <- theSets[sapply(theSets, function(s) all(groupName %in% groupNames(usObj[[s]])))]
+        theSets <- theSets[sapply(theSets, function(s) any(groupName %in% groupNames(usObj[[s]])))]
         if (length(theSets) == 0)
             return(NULL)
         usObj <- usObj[theSets]
@@ -169,8 +169,9 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         {
             # convert candidate index to non set version by using the ranks
             usInds <- lapply(theSets, function(s) obj[[groupName[nr]]][[paste0("rank-", s)]][index[nr]])
-            binPLs <- sapply(binnedPLs, "[[", nr, simplify = FALSE)
-            annPLs <- Map(usObj, usInds, usMSPL, usForm, f = annotatedPeakList,
+            skip <- sapply(usInds, is.null)
+            binPLs <- sapply(binnedPLs[!skip], "[[", nr, simplify = FALSE)
+            annPLs <- Map(usObj[!skip], usInds[!skip], usMSPL[!skip], usForm[!skip], f = annotatedPeakList,
                           MoreArgs = list(groupName = groupName[nr]))
             annPLs <- Map(mergeBinnedAndAnnPL, binPLs, annPLs, MoreArgs = list(which = nr))
             annPLs <- rbindlist(annPLs, idcol = "set", fill = TRUE)
@@ -236,7 +237,8 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, M
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                 uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
-                                                filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0)
+                                                filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0,
+                                                setAvgSpecificScores = FALSE)
 {
     allAnnObjs <- c(list(obj), list(...))
     
@@ -244,7 +246,7 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     checkmate::assertList(allAnnObjs, types = "compoundsSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
-    checkmate::assertFlag(filterSets, add = ac)
+    aapply(checkmate::assertFlag, . ~ filterSets + setAvgSpecificScores, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     checkmate::reportAssertions(ac)
 
@@ -252,14 +254,14 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, rankWeights)
-    sc <- makeAnnSetScorings(cons$setObjects, cons$origFGNames)
+    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores, rankWeights)
+    sc <- makeAnnSetScorings(cons$setObjects, setAvgSpecificScores, cons$origFGNames)
     
 
     ret <- compoundsConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
-                                 setThresholdAnn = setThresholdAnn, origFGNames = cons$origFGNames,
-                                 groupAnnotations = cons$groupAnnotations, scoreTypes = sc$scTypes,
-                                 scoreRanges = sc$scRanges, algorithm = cons$algorithm,
+                                 setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
+                                 origFGNames = cons$origFGNames, groupAnnotations = cons$groupAnnotations,
+                                 scoreTypes = sc$scTypes, scoreRanges = sc$scRanges, algorithm = cons$algorithm,
                                  mergedConsensusNames = cons$mergedConsensusNames)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterSets)
@@ -269,10 +271,11 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
 
 
 generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn,
-                                 setArgs = list())
+                                 setAvgSpecificScores, setArgs = list())
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1.0, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
+    checkmate::assertFlag(setAvgSpecificScores)
     verifyNoAdductIonizationArg(adduct)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
@@ -284,12 +287,14 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, 
                       f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...), sa)))
     setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
 
-    cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, NULL)
-    sc <- makeAnnSetScorings(setObjects, names(fGroupsSet))
+    cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, setAvgSpecificScores,
+                                    NULL)
+    sc <- makeAnnSetScorings(setObjects, setAvgSpecificScores, names(fGroupsSet))
     
     return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                        origFGNames = names(fGroupsSet), groupAnnotations = cons, scoreTypes = sc$scTypes,
-                        scoreRanges = sc$scRanges, algorithm = makeSetAlgorithm(setObjects)))
+                        setAvgSpecificScores = setAvgSpecificScores, origFGNames = names(fGroupsSet),
+                        groupAnnotations = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
+                        algorithm = makeSetAlgorithm(setObjects)))
 }
 
 
@@ -303,8 +308,8 @@ setMethod("unset", "compoundsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
     uann <- doFeatAnnUnset(obj, set)
-    return(compoundsUnset(groupAnnotations = uann, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
-                          algorithm = paste0(algorithm(obj), "_unset")))
+    return(compoundsUnset(groupAnnotations = uann$annotations, scoreTypes = uann$scoreTypes,
+                          scoreRanges = uann$scoreRanges, algorithm = paste0(algorithm(obj), "_unset")))
 })
 
 #' @rdname compounds-class

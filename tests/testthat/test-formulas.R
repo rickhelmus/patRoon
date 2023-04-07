@@ -176,8 +176,9 @@ test_that("delete and filter", {
 
 test_that("as.data.table() works", {
     testFeatAnnADT(formsGF)
-    
-    expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
+
+    normScName <- if (testWithSets()) "isoScore-positive" else "isoScore"
+    expect_range(na.omit(as.data.table(formsGF, normalizeScores = "max")[[normScName]]), c(0, 1))
     expect_setequal(as.data.table(formsGF, average = TRUE)$group, groupNames(formsGF))
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
                  length(groupNames(formsGF)))
@@ -287,6 +288,7 @@ if (testWithSets())
 {
     fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
     formsGFOneEmptySet <- doGenForms(fgOneEmptySet, plists, "genform")
+    formsGFAvgSpecCols <- doGenForms(fGroups, plists, "genform", setAvgSpecificScores = TRUE)
 }
 
 test_that("sets functionality", {
@@ -302,6 +304,11 @@ test_that("sets functionality", {
     
     expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThreshold = 1), 0)
     expect_length(doGenForms(fgOneEmptySet, plists, "genform", setThresholdAnn = 1), length(formsGFOneEmptySet))
+    
+    # setAvgSpecificScores=FALSE (default)
+    checkmate::expect_names(names(as.data.table(formsGF)),
+                            must.include = paste0("isoScore-", sets(formsGFAvgSpecCols)[1]))
+    checkmate::expect_names(names(as.data.table(formsGFAvgSpecCols)), must.include = "isoScore")
     
     expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists,
                                                            perSet = FALSE))

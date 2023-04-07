@@ -132,7 +132,7 @@ setGeneric("linkTPsToFGroups", function(TPs, fGroups) standardGeneric("linkTPsTo
 ### suspect screening
 
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                      skipInvalid = TRUE, prefCalcChemProps = TRUE,
+                                      skipInvalid = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                       onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,

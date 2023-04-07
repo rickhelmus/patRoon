@@ -466,7 +466,7 @@ predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrit
     
     gNames <- names(fGroups)
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
-    rmf <- gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]]
+    rmf <- gNames[preds[preds$Pred_Class %in% c("BAD", "Fail"), "EIC"]]
     saveCheckSession(list(removeFully = rmf, removePartially = list()), session, fGroups[, rmf], "featureGroups")
     
     invisible(NULL)

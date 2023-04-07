@@ -69,7 +69,19 @@ setMethod("mergedConsensusNames", "compoundsConsensus", function(obj) obj@merged
 setMethod("defaultExclNormScores", "compounds", function(obj) c("score", "individualMoNAScore", "annoTypeCount",
                                                                 "annotHitCount", "libMatch"))
 
-setMethod("annScoreNames", "compounds", function(obj, onlyNums) compScoreNames(onlyNums))
+setMethod("annScoreNames", "compounds", function(obj, onlyNums)
+{
+    ret <- callNextMethod()
+    if (onlyNums && length(ret) > 0)
+    {
+        # exclude suspect presence 'scores'
+        suspScores <- compoundScorings("metfrag")
+        suspScores <- suspScores[suspScores$suspect_list == TRUE, ]
+        suspCols <- getAllMergedConsCols(suspScores, ret, mergedConsensusNames(obj))
+        ret <- setdiff(ret, suspCols)
+    }
+    return(ret)
+})
 
 
 #' @describeIn compounds Show summary information for this object.
@@ -201,7 +213,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
             ct[, formulaScore := calculateScores(ct, forms)]
 
         # update overall scoring
-        if (any(ct$formulaScore > 0))
+        if (updateScore && any(ct$formulaScore > 0))
         {
             normFormScores <- ct$formulaScore / max(ct$formulaScore)
             ct[, score := score + formulaScoreWeight * normFormScores]
@@ -336,12 +348,15 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         return(NULL)
     
     mcn <- mergedConsensusNames(obj, FALSE)
+    mcnAll <- mergedConsensusNames(obj, TRUE)
+    if (length(mcn) == 0)
+        mcn <- mcnAll # HACK: only split set scores if not consensus
     
     if (normalizeScores != "none")
-        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcn,
+        annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcnAll,
                                        normalizeScores == "minmax", excludeNormScores)
     
-    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcn)
+    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
     

@@ -18,9 +18,10 @@ doScreeningShow <- function(obj)
     printf("Suspects annotated: %s\n", if (!is.null(screenInfo(obj)[["estIDLevel"]])) "yes" else "no")
 }
 
-prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, calcMZs = TRUE)
+prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, neutralChemProps,
+                               calcMZs = TRUE)
 {
-    hash <- makeHash(suspects, adduct, skipInvalid, calcMZs)
+    hash <- makeHash(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, neutralChemProps, calcMZs)
     cd <- loadCacheData("screenSuspectsPrepList", hash)
     if (!is.null(cd))
         suspects <- cd
@@ -52,14 +53,21 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         changedNames <- which(sanNames != suspects$name)
         if (length(changedNames) > 0)
         {
-            warning(paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
-                           paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n")))
+            many <- length(changedNames) > 100
+            if (many)
+                changedNames <- changedNames[seq_len(100)]
+            msg <- paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
+                          paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n"))
+            if (many)
+                msg <- paste0(msg, "\n", "(only the first 100 occurences are shown).")
+            warning(msg, call. = FALSE)
             suspects[, name_orig := name]
             suspects[, name := sanNames]
         }
         
         if (checkDesc)
-            suspects <- prepareChemTable(suspects, prefCalcChemProps = prefCalcChemProps)
+            suspects <- prepareChemTable(suspects, prefCalcChemProps = prefCalcChemProps,
+                                         neutralChemProps = neutralChemProps)
         
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
@@ -73,7 +81,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             else
             {
                 unAdducts <- sapply(unique(suspects[is.na(mz)]$adduct), as.adduct)
-                suspects[is.na(mz), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
+                suspects[is.na(mz) & !is.na(adduct), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
             }
         }
         else if (is.null(suspects[["mz"]]))
@@ -113,8 +121,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     
     # NOTE: rt is always included
     metaDataCols <- c("name", "rt",
-                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
-                                  "fragments_mz", "fragments_formula"), names(suspects)))
+                      intersect(c("name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass",
+                                  "molNeutralized", "adduct", "fragments_mz", "fragments_formula"), names(suspects)))
     
     emptyResult <- function()
     {
@@ -308,31 +316,21 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
     return(obj)
 }
 
-annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
+annotatedMSMSSimilarity <- function(annPL, specSimParams)
 {
-    if (is.null(annPL[["ion_formula"]]))
-        return(0)
-
-    # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
-    annPL <- annPL[precursor == FALSE]
-    
-    if (nrow(annPL) > 0)
-    {
-        maxInt <- max(annPL$intensity)
-        annPL <- annPL[(intensity / maxInt) >= relMinIntensity]
-    }
-    
-    if (nrow(annPL) == 0 || sum(!is.na(annPL$ion_formula)) == 0)
+    if (is.null(annPL)) # mainly to handle formula candidates w/out MS/MS
         return(0)
     
-    if (method == "cosine")
-    {
-        annPL[, intensityAnn := ifelse(!annotated, 0, intensity)]
-        return(as.vector((annPL$intensityAnn %*% annPL$intensity) /
-                             (sqrt(sum(annPL$intensityAnn^2)) * sqrt(sum(annPL$intensity^2)))))
-    }
-    else # jaccard
-        return(sum(!is.na(annPL$ion_formula)) / nrow(annPL))
+    annPL <- prepSpecSimilarityPL(annPL, specSimParams$removePrecursor, specSimParams$relMinIntensity,
+                                  specSimParams$minPeaks)
+    
+    if (nrow(annPL) == 0 || !any(annPL$annotated))
+        return(0)
+    
+    annPLAnn <- annPL[annotated == TRUE]
+    
+    return(drop(specDistRect(list(annPLAnn), list(annPL), specSimParams$method, "none", 0, 0,
+                             specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)))
 }
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
@@ -471,13 +469,14 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
             else
                 doLog(indent, "Checking ID level type '%s'\n", type)
             
-            if (type == "or")
+            if (type %in% c("or", "and"))
             {
                 if (!is.list(val) || checkmate::testNamed(val))
-                    stop("Specify a list with 'or'")
-                levelOK <- any(mapply(val, seq_along(val), FUN = function(IDL, i)
+                    stop(sprintf("Specify a list with '%s'", type))
+                checkf <- if (type == "or") any else all
+                levelOK <- checkf(mapply(val, seq_along(val), FUN = function(IDL, i)
                 {
-                    doLog(indent + 1, "check OR condition %d/%d\n", i, length(val))
+                    doLog(indent + 1, "check %s condition %d/%d\n", toupper(type), i, length(val))
                     return(checkLevelOK(IDL, indent + 2))
                 }))
             }

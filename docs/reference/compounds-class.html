@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0</span>
       </span>
     </div>
 
@@ -234,7 +234,8 @@ consensus(
   labels = NULL,
   filterSets = FALSE,
   setThreshold = 0,
-  setThresholdAnn = 0
+  setThresholdAnn = 0,
+  setAvgSpecificScores = FALSE
 )
 
 # S4 method for compoundsSet
@@ -448,6 +449,11 @@ workflows</code> section below.</p></dd>
 <code><a href="generateCompounds.html">generateCompounds</a></code>.</p></dd>
 
 
+<dt>setAvgSpecificScores</dt>
+<dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific annotation scores (<em>e.g.</em> MS/MS and
+isotopic pattern match scores) are averaged for the set consensus. See <code><a href="generateCompounds.html">generateCompounds</a></code>.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
@@ -515,9 +521,9 @@ the <code>rank</code> columns.</p></li>
     <h2>Slots</h2>
     
 
-<dl><dt><code>setThreshold,setThresholdAnn</code></dt>
-<dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were passed when this object
-was created by <code><a href="generateCompounds.html">generateCompounds</a></code>.</p></dd>
+<dl><dt><code>setThreshold,setThresholdAnn,setAvgSpecificScores</code></dt>
+<dd><p>(<strong>sets workflow</strong>) A copy of the equally named arguments that were
+passed when this object was created by <code><a href="generateCompounds.html">generateCompounds</a></code>.</p></dd>
 
 
 <dt><code>origFGNames</code></dt>
@@ -608,7 +614,7 @@ create this object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -20,8 +20,7 @@ assertScoreRange <- function(x, scNames, .var.name = checkmate::vname(x), add = 
     checkmate::assertList(x, null.ok = TRUE, types = "numeric", .var.name = .var.name, add = add)
     if (!is.null(x))
     {
-        checkmate::assertNames(names(x), type = "unique", subset.of = scNames, .var.name = .var.name,
-                               add = add)
+        checkmate::assertNames(names(x), type = "unique", subset.of = scNames, .var.name = .var.name, add = add)
         checkmate::qassertr(x, "N2", .var.name = .var.name)
     }
 }
@@ -78,7 +77,7 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     assertListVal(x, "path", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, add = add)
     assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, add = add)
-    assertListVal(x, "blank", checkmate::assertCharacter, any.missing = FALSE, add = add)
+    assertListVal(x, "blank", checkmate::assertCharacter, any.missing = TRUE, add = add)
 
     checkmate::assert(
         checkmate::checkNull(x[["conc"]]),
@@ -109,6 +108,8 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
 
         if (verifyCentroided)
             verifyDataCentroided(x)
+        
+        checkmate::assertVector(x$analysis, unique = TRUE, .var.name = paste0(.var.name, "$analysis"), add = add)
     }
 
     invisible(NULL)
@@ -136,6 +137,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
             x[["conc"]] <- as.numeric(x[["conc"]])
         if (!is.null(x[["norm_conc"]]))
             x[["norm_conc"]] <- as.numeric(x[["norm_conc"]])
+        x$blank[is.na(x$blank)] <- ""
     }
     
     return(x)

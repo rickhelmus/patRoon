@@ -211,7 +211,7 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
     if (!setequal(analyses(old), analyses(obj)))
         obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)), keepFeatures = TRUE)
     
-    if (nrow(chromPeaks(obj@xdata)) != length(obj@features)) # sync features
+    if (nrow(xcms::chromPeaks(obj@xdata)) != length(obj@features)) # sync features
         obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj@features))
 
     return(obj)

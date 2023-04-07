@@ -3,7 +3,6 @@
 [![CircleCI](https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg)](https://circleci.com/gh/rickhelmus/patRoon)
 [![Build status](https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true)](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
-[![Docker image](https://img.shields.io/docker/image-size/patroonorg/patroonrs/latest)][DockerImg]
 [![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
 
@@ -12,6 +11,8 @@ analysis. The name is derived from a Dutch word that means _pattern_ and may als
 specTROmetry nOn-target aNalysis_.
 
 ## Project news
+
+**March 2023** The Docker images moved to a new host. Please see the see [installation details in the handbook][handbook-inst] to obtain the latest images.
 
 **May 2022** `patRoon 2.1` is now available. This new release integrates prediction of transformation products with
 [CTS], adds several feature intensity normalization methods, adds new functionality and improvements for reporting TP
@@ -147,5 +148,5 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [ghweb]: https://rickhelmus.github.io/patRoon/
 [patRoonDeps]: https://github.com/rickhelmus/patRoonDeps
 [miniCRAN]: https://cran.r-project.org/web/packages/miniCRAN/index.html
-[DockerImg]: https://hub.docker.com/r/patroonorg/patroonrs
+[DockerImg]: https://uva-hva.gitlab.host/R.Helmus/patroon/container_registry/2
 [CTS]: https://qed.epa.gov/cts/

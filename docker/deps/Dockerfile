@@ -7,7 +7,7 @@ ENV SETUPDIR=/usr/local/setup
 RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev ghostscript \
-        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache && \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache bzip2 && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.7.0/OpenMS-2.7.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.7.0-Debian-Linux-x86_64.deb && \
@@ -22,7 +22,7 @@ COPY --chown=rstudio docker/install_deps.R DESCRIPTION .
 COPY --chown=rstudio docker/rstudio/ccache.conf /home/rstudio/.ccache/
 COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 
-ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=250
 
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega https://github.com/ipb-halle/MetFragRelaunched/releases/download/v.2.5.0/MetFragCommandLine-2.5.0.jar && \

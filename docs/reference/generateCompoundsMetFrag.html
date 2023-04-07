@@ -18,7 +18,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0</span>
       </span>
     </div>
 
@@ -137,7 +137,8 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span></span>
+<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setAvgSpecificScores <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -279,6 +280,11 @@ to <code>NULL</code> to ignore.</p></dd>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
 
+
+<dt>setAvgSpecificScores</dt>
+<dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific scorings (<em>e.g.</em> MS/MS match) are also
+averaged.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -364,7 +370,7 @@ annotations for the feature group of the candidate.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

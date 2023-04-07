@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0</span>
       </span>
     </div>
 
@@ -93,14 +93,27 @@
 <h2 class="page-header" data-toc-text="2.2" id="patroon-22">patRoon 2.2<a class="anchor" aria-label="anchor" href="#patroon-22"></a></h2>
 <div class="section level3">
 <h3 id="note-usage-of-sirius-version-2-2">NOTE Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#note-usage-of-sirius-version-2-2"></a></h3>
-<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compability fixes for the latest <code>SIRIUS</code> version.</p>
+<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version.</p>
+</div>
+<div class="section level3">
+<h3 id="note-docker-images-moved-2-2">NOTE Docker images moved<a class="anchor" aria-label="anchor" href="#note-docker-images-moved-2-2"></a></h3>
+<p>The Docker images are now served by the GitLab server of the University of Amsterdam. To pull the latest images you can run the following command:</p>
+<pre><code>docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs</code></pre>
+<p>The changes are reflected in the installation section of the handbook.</p>
 </div>
 <div class="section level3">
 <h3 id="changes-2-2">Changes<a class="anchor" aria-label="anchor" href="#changes-2-2"></a></h3>
 <ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
-<li>Fixes for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> with consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
-<li>SIRUS:
+<li>
+<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>
+<ul><li>Fixes for consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the  keyword.</li>
+<li>Sets workflows now separate log files for each set.</li>
+<li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
+<li>Fixed: annotation similarities didn’t properly handle results from <code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code> if the library did not contain peak formula annotations.</li>
+</ul></li>
+<li>SIRUS
 <ul><li>Fixed: Features with data offsets are now properly loaded.</li>
 <li>
 <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> to interactively obtain a SIRIUS login refresh token.</li>
@@ -125,8 +138,73 @@
 <li>TP libraries may contain a <code>retDir</code> column that specifies the retention time direction of the TP compared to its parent (alternative to specifying <code>log P</code> values).</li>
 <li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
 <li>New argument <code>matchGenerationsBy</code> to the <code>library</code> (and <code>library_formula</code>) algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>, which controls how parents/TPs are matched when searching multiple transformation generations.</li>
-<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show MS/MS similarity plots of wrong feature groups</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show plots of wrong results</li>
+<li>Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component</li>
+<li>Added <code>maxExpGenerations</code> argument to <code>generateTPsBiotransformer</code> to avoid excessive TP hierarchy expansions.</li>
 </ul></li>
+<li>GenForm: <code>thrMS</code>, <code>thrMSMS</code>, <code>thrComb</code> and <code>maxCandidates</code> arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> for <code>featureGroups</code> with <code>regression=TRUE</code>:
+<ul><li>added column with p values</li>
+<li>treat missing features as <code>NA</code>
+</li>
+</ul></li>
+<li>
+<code><a href="../reference/featureGroups-class.html">selectIons()</a></code> does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.</li>
+<li>Fixed: code generated by <code><a href="../reference/newProject.html">newProject()</a></code> for sets mode used <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> instead of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> to specify positive+negative suspect lists to <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code>
+</li>
+<li>Annotation scores
+<ul><li>
+<strong>IMPORTANT</strong>: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> argument to <code>TRUE</code>.</li>
+<li>Fixed: <code>scoreTypes</code> slot could contain scorings not actually used, e.g. if the <code>scoreTypes</code> argument to <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> contained scorings not actually present in the used database.</li>
+<li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
+<li>Fixed: <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code>: <code>updateScore</code> argument was ignored and treated always as <code>TRUE</code>
+</li>
+</ul></li>
+<li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> marked passing peaks to be removed instead of the other way around (issue <a href="https://github.com/rickhelmus/patRoon/issues/59" class="external-link">#59</a>)</li>
+<li>Fixed: newProject(): properly call <code><a href="https://rstudio.github.io/rstudioapi/reference/rstudio-editors.html" class="external-link">rstudioapi::getSourceEditorContext()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/62" class="external-link">#62</a>)</li>
+<li>
+<code>newProject</code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
+<li>
+<code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
+<li>Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>featureGroups</code> adds replicate group column when executed with <code>features=TRUE</code>.</li>
+<li>
+<code><a href="../reference/generics.html">delete()</a></code> method for <code>transformationProducts</code>
+</li>
+<li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
+<li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> would fail if the adduct column contains partially <code>NA</code> data.</li>
+<li>Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors</li>
+<li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
+</li>
+<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.
+<ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
+</ul></li>
+<li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> didn’t properly detect changes in local database files when considering cached data.</li>
+<li>Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.</li>
+<li>
+<code><a href="../reference/generics.html">plotChord()</a></code> method for <code>featureGroups</code>: significantly optimized some old code</li>
+<li>
+<code><a href="../reference/generics.html">plotScores()</a></code>
+<ul><li>split bars for sets</li>
+<li>only split bars if results are present for &gt;1 sets and/or consensus algorithms</li>
+</ul></li>
+<li>Fixed: <code><a href="../reference/featureGroups-class.html">selectIons()</a></code> didn’t properly handle empty components objects</li>
+<li>
+<code><a href="../reference/clearCache.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> used wrong variable name for suspect list under some conditions (issue <a href="https://github.com/rickhelmus/patRoon/issues/69" class="external-link">#69</a>)</li>
+<li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was somethimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
+<li>Feature components: add <code>adduct_abundance</code> column</li>
+<li>
+<code><a href="../reference/generics.html">plotSpectrum()</a></code> for sets workflows better handles missing data from one or more sets when making a comparison, which avoids empty plots in such cases.</li>
+<li>Fixed: <code><a href="../reference/generics.html">calculatePeakQualities()</a></code> would throw errors for empty feature results (reported by Louise Malm)</li>
+<li>Analysis information
+<ul><li>Ensure no duplicate analysis names are present.</li>
+<li>Allow NA values for blanks</li>
+</ul></li>
+<li>Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -553,12 +631,12 @@
 <p>This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.</p>
 <p><strong>IMPORTANT</strong>: The suspect screening interface has changed significantly. Please read the documentation (<code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and the handbook) for more details. If you want to quickly update your code without using any new functionality:</p>
 <p>Change your existing code, e.g.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></span></code></pre></div>
 <p>to</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Major changes</strong></p>
@@ -1136,7 +1214,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

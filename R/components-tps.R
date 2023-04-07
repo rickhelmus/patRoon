@@ -211,8 +211,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             {
                 # limit columns a bit to not bloat components too much
                 # UNDONE: column selection OK?
-                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "CID", "mass", "retDir", "trans_add",
-                              "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage")
+                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "molNeutralized", "CID", "mass",
+                              "retDir", "trans_add", "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage")
                 prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
                 prods <- unique(prods, by = "name") # omit duplicates from different routes
                 
@@ -254,7 +254,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         if (!is.null(TPs))
         {
             pars <- parents(TPs)
-            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass")
+            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "molNeutralized")
             cols <- intersect(names(pars), cols)
             cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
             targetCols <- paste0("parent_", cols)
@@ -476,10 +476,11 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #'   and rendered with \pkg{\link{visNetwork}}.
 #'
 #' @inheritParams plotGraph,componentsNT-method
-#' @inherit plotGraph,componentsNT-method references
 #' 
 #' @template plotGraph
 #'
+#' @references \addCitations{igraph}{1}
+#' 
 #' @export
 setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE)
 {
@@ -662,13 +663,15 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                 {
                     # calculate per set spectrum similarities
                     simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
-                    grpsInSet <- intersect(cmp$group, groupNames(unsetMSPeakLists[[s]]))
+                    # NOTE: do _not_ use intersect below, since we want to keep duplicate group names (ie if multiple
+                    # TPs are assigned to a same feat group) so that similarities are are returned for all.
+                    grpsInSet <- cmp$group[cmp$group %in% groupNames(unsetMSPeakLists[[s]])]
                     
                     if (length(grpsInSet) > 0 && !is.null(unsetMSPeakLists[[s]][[parentFG]][["MSMS"]]))
                     {
                         sims <- genTPSpecSimilarities(unsetMSPeakLists[[s]], parentFG, grpsInSet,
                                                       specSimParams = specSimParams)
-                        cmp[match(grpsInSet, group), (simColNames) := sims]
+                        cmp[group %in% grpsInSet, (simColNames) := sims]
                     }
                     else
                         cmp[, (simColNames) := NA_real_]

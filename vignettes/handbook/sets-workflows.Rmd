@@ -222,7 +222,7 @@ compounds <- compoundsSets
 ```
 
 ```{r setsProcData,eval=runData}
-as.data.table(compounds)[1:5, c("group", "score", "compoundName", "set")]
+as.data.table(compounds)[1:5, c("group", "score-positive", "score-negative", "compoundName", "set")]
 ```
 
 In addition, some the data processing functionality contains additional functionality for a sets workflow:
@@ -279,7 +279,7 @@ fGroups <- makeSet(fGroupsPos, fGroupsNeg, groupAlgo = "openms",
 
 ```
 
-In this case `makeSet` combines the positive and negative (un-grouped) features, neutralizes them and re-groups them all together (with the algorithm specified by `groupAlgo`).
+In this case `makeSet` takes the positive and negative features, neutralizes them and creates new feature groups by grouping the original set specific groups (with the algorithm specified by `groupAlgo`).
 
 While this option involves some extra steps, an advantage is that allows processing the feature data before they are combined, e.g.:
 

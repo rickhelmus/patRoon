@@ -1,6 +1,6 @@
 set_dock_env: &set_dock_env
     environment:
-        IMAGE_NAME: "patroonorg/patroonrs"
+        IMAGE_NAME: "uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs"
         DOCKER_BUILDKIT: 1
         BUILDKIT_PROGRESS: plain
 
@@ -18,7 +18,7 @@ jobs:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME}" --tag "${IMAGE_NAME}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/rstudio/Dockerfile .
             - run:
                 name: Push Docker image
@@ -35,7 +35,7 @@ jobs:
             - run:
                 name: Perform tests
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
@@ -72,7 +72,7 @@ jobs:
                 name: Generate docs & site
                 no_output_timeout: 60m
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
@@ -99,7 +99,7 @@ jobs:
                 name: Run coverage
                 no_output_timeout: 60m
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker run -e CODECOV_TOKEN -e CI -e CIRCLECI -e CIRCLE_BRANCH -e CIRCLE_BUILD_NUM -e CIRCLE_PROJECT_USERNAME -e CIRCLE_PROJECT_REPONAME -e CIRCLE_PR_NUMBER -e CIRCLE_SHA1 --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_covr.R"
     deps:
@@ -109,14 +109,15 @@ jobs:
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
-            IMAGE_NAME_DEPS: "patroonorg/patroondeps"
+            #IMAGE_NAME_DEPS: "patroonorg/patroondeps"
+            IMAGE_NAME_DEPS: "uva-hva.gitlab.host:4567/r.helmus/patroon/patroondeps"
         steps:
             - checkout
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/deps/Dockerfile .
             - run:
                 name: Push Docker image

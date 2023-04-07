@@ -327,7 +327,8 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                                                      avgSpecParams = getDefAvgPListParams(minIntensityPre = 0,
                                                                                           minIntensityPost = 2,
                                                                                           topMost = 10),
-                                                     collapse = TRUE, suspects = NULL, prefCalcChemProps = TRUE)
+                                                     collapse = TRUE, suspects = NULL, prefCalcChemProps = TRUE,
+                                                     neutralChemProps = FALSE)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
@@ -335,7 +336,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgSpecParams, add = ac)
-    aapply(checkmate::assertFlag, . ~ prefCalcChemProps + collapse, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ prefCalcChemProps + neutralChemProps + collapse, fixed = list(add = ac))
     if (!is.null(suspects))
         assertSuspectList(suspects, FALSE, FALSE, add = ac)
     checkmate::reportAssertions(ac)
@@ -350,7 +351,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         return(suspects)
     }
 
-    hash <- makeHash(obj, adduct, spectrumType, avgSpecParams, collapse, suspects, prefCalcChemProps)
+    hash <- makeHash(obj, adduct, spectrumType, avgSpecParams, collapse, suspects, prefCalcChemProps, neutralChemProps)
     cd <- loadCacheData("convertToSuspectsMSLibrary", hash)
     if (!is.null(cd))
         return(cd)
@@ -391,7 +392,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         ret <- if (is.data.table(suspects)) copy(suspects) else as.data.table(suspects)
         # checkDesc = TRUE: we want to be able to calculate InChIKey1 values
         ret <- prepareSuspectList(ret, NULL, FALSE, checkDesc = TRUE, prefCalcChemProps = prefCalcChemProps,
-                                  calcMZs = FALSE)
+                                  neutralChemProps = neutralChemProps, calcMZs = FALSE)
         ret[, InChIKey1 := getIKBlock1(InChIKey)]
         
         if (any(is.na(ret$InChIKey1)))
@@ -451,6 +452,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
                      InChIKey = "InChIKey",
                      formula = "formula",
                      neutralMass = "neutralMass",
+                     molNeutralized = "molNeutralized",
                      fragments_mz = "fragments_mz")
         if (!is.null(adduct))
             mapCols <- c(mapCols, Precursor_type = "adduct")

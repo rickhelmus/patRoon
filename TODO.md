@@ -4,7 +4,6 @@
 
 - add showProgress option for future MP
 - ppm spectral averaging (Ricardo)
-- FIX: MetaClean is not an optional dependency --> featureQualities()
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 
 
@@ -16,6 +15,14 @@
     - reportHTML: report normalized intensities in featInfo?
     - normInts(): default normFunc OK? and others?
         - update newProject() for any changes
+- Screening
+    - sets: warn that re-grouping (adduct()<- / selectIons) will discard screening results
+        - or somehow handle this? re-screen? although original suspects will be lost...
+    - function that copies suspect adduct to annotations slot?
+        - can only work with exactly one match
+            - could throw a warning when this happens
+        - tricky with sets
+            - doc that screenSuspects need to be re-run?
 
 
 ## TPs

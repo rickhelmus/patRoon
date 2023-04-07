@@ -431,3 +431,17 @@ testFeatAnnADT <- function(obj)
                                   "DBE_AI", "AI")], "N+")
     checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
 }
+
+getOldNewRefs <- function(ref)
+{
+    oldref <- tempfile(fileext = ".Rds")
+    ref <- file.path("tests", "testthat", testFile(ref))
+    executeCommand("git", c("show", paste0("HEAD:", ref)), stdout = oldref)
+    return(list(old = readRDS(oldref), new = readRDS(ref)))
+}
+
+compareRef <- function(ref)
+{
+    on <- getOldNewRefs(ref)
+    waldo::compare(on$old, on$new, tolerance = 0.00001)
+}

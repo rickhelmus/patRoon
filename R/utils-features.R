@@ -20,6 +20,7 @@ isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
 featureQualities <- function()
 {
+    checkPackage("MetaClean")
     list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
          FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
          Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
@@ -33,6 +34,7 @@ featureQualities <- function()
 
 featureGroupQualities <- function()
 {
+    checkPackage("MetaClean")
     list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
@@ -124,4 +126,31 @@ maybeAutoNormalizeFGroups <- function(fGroups)
         return(fGroups) # no features or already normalized
     printf("Automatically normalizing feature groups, see ?normInts for more options.\n")
     return(normInts(fGroups, featNorm = "none", groupNorm = TRUE))
+}
+
+getAnnotationsFromSetFeatures <- function(fGroups)
+{
+    if (length(fGroups) > 0)
+    {
+        anaInfo <- analysisInfo(fGroups)
+        ftind <- groupFeatIndex(fGroups)
+        fTable <- featureTable(fGroups)
+        
+        ret <- rbindlist(sapply(sets(fGroups), function(s)
+        {
+            anaInds <- which(anaInfo$set == s)
+            anas <- anaInfo[anaInds, "analysis"]
+            grps <- names(fGroups)[sapply(ftind[anaInds], function(x) any(x != 0))]
+            firstFeats <- rbindlist(lapply(ftind[anaInds, grps, with = FALSE], function(x)
+            {
+                firstAna <- which(x != 0)[1]
+                return(fTable[[anas[firstAna]]][x[firstAna]])
+            }))
+            
+            return(data.table(group = grps, adduct = firstFeats$adduct))
+        }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
+        ret[, neutralMass := groupInfo(fGroups)[ret$group, "mzs"]]
+    }
+    else
+        ret <- data.table()
 }

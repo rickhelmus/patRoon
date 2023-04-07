@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 Docker image | patRoon handbook</title>
   <meta name="description" content="2.2 Docker image | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 Docker image | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2022-09-20" />
+<meta name="date" content="2023-03-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,7 +52,7 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.9/grViz.js"></script>
@@ -60,13 +60,13 @@
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
-<script src="libs/visNetwork-binding-2.1.0/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -107,7 +107,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
+code span.bu { color: #008000; } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -120,7 +120,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
+code span.im { color: #008000; font-weight: bold; } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -346,18 +346,18 @@ div.csl-indent {
 <p>Docker images are provided to easily install a reproducible environment with <code>R</code>, <code>patRoon</code> and nearly all of its dependencies. This section assumes you have a basic understanding of <a href="https://www.docker.com/">Docker</a> and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of <code>patRoon</code> were originally only used for automated testing, however, since these contain a complete working environment of <code>patRoon</code> they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), <code>R</code> dependencies and <code>MetFrag</code> libraries. Furthermore, the Docker image also contains <a href="https://rstudio.com/">RStudio</a> server, which makes using <code>patRoon</code> even easier.</p>
 <p>Below are some example shell commands on how to run the image.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="docker-image.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run an interactive R console session</span></span>
-<span id="cb2-2"><a href="docker-image.html#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> patroonorg/patroonrs</span>
+<span id="cb2-2"><a href="docker-image.html#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs</span>
 <span id="cb2-3"><a href="docker-image.html#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="docker-image.html#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># run a linux shell, from which R can be launched</span></span>
-<span id="cb2-5"><a href="docker-image.html#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> patroonorg/patroonrs bash</span>
+<span id="cb2-5"><a href="docker-image.html#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs bash</span>
 <span id="cb2-6"><a href="docker-image.html#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="docker-image.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># run rstudio server, accessible from localhost:8787</span></span>
 <span id="cb2-8"><a href="docker-image.html#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># login with rstudio/yourpasswordhere</span></span>
-<span id="cb2-9"><a href="docker-image.html#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-p</span> 8787:8787 <span class="at">-u</span> 0 <span class="at">-e</span> PASSWORD=yourpasswordhere patroonorg/patroonrs /init</span>
+<span id="cb2-9"><a href="docker-image.html#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-p</span> 8787:8787 <span class="at">-u</span> 0 <span class="at">-e</span> PASSWORD=yourpasswordhere uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs /init</span>
 <span id="cb2-10"><a href="docker-image.html#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="docker-image.html#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># same as above, but mount a local directory (~/myvolume) as local volume so it can be used for persistent storage</span></span>
 <span id="cb2-12"><a href="docker-image.html#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># please ensure that ~/myvolume exists!</span></span>
-<span id="cb2-13"><a href="docker-image.html#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-p</span> 8787:8787 <span class="at">-u</span> 0 <span class="at">-e</span> PASSWORD=yourpasswordhere <span class="at">-v</span> ~/myvolume:/home/rstudio/myvolume patroonorg/patroonrs /init</span></code></pre></div>
+<span id="cb2-13"><a href="docker-image.html#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-p</span> 8787:8787 <span class="at">-u</span> 0 <span class="at">-e</span> PASSWORD=yourpasswordhere <span class="at">-v</span> ~/myvolume:/home/rstudio/myvolume uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs /init</span></code></pre></div>
 <p>Note that the first two commands run as the default user <code>rstudio</code>, while the last two as <code>root</code>. The last commands launch <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging in with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). The last command also links a local volume in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent work from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see their documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
 </div>
             </section>

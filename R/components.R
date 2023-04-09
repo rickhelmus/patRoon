@@ -498,7 +498,7 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 #' @param rtWindow Retention window: see the \code{plotChroms} method for the
 #'   \code{\link{featureGroups}} class.
 #' @export
-setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -506,14 +506,13 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5
         checkChoiceSilent(index, names(obj))
     , .var.name = "index")
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
+    assertEICParams(EICParams)
     checkmate::reportAssertions(ac)
 
     comp <- componentTable(obj)[[index]]
 
     isHom <- !is.null(comp[["hsnr"]]) # homologues?
 
-    topMost <- if (!isHom) 1 else NULL
     showPeakArea <- isHom
     showFGroupRect <- !isHom
     colourBy = if (!isHom) "fGroup" else "rGroup"
@@ -523,15 +522,20 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5
         rGroups <- unique(comp$rGroup)
         fGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
     }
+    else
+    {
+        EICParams$topMost <- 1
+        EICParams$topMostByRGroup <- FALSE
+    }
 
     fGroups <- fGroups[, unique(comp$group)]
 
     if (length(fGroups) > 0)
-        plotChroms(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
-                   showFGroupRect = showFGroupRect, topMost = topMost, ...)
+        plotChroms(fGroups, EICParams = EICParams, colourBy = colourBy, showPeakArea = showPeakArea,
+                   showFGroupRect = showFGroupRect, ...)
 })
 
-setMethod("plotChromsHash", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+setMethod("plotChromsHash", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 {
     comp <- componentTable(obj)[[index]]
     anas <- analyses(fGroups)
@@ -540,7 +544,7 @@ setMethod("plotChromsHash", "components", function(obj, index, fGroups, rtWindow
         rGroups <- unique(comp$rGroup)
         anas <- analysisInfo(fGroups)[analysisInfo(fGroups)$group %chin% rGroups, ]
     }
-    makeHash(comp, plotChromsHash(fGroups, rtWindow = rtWindow, analyses = anas, groupName = comp$group, ...))
+    makeHash(comp, plotChromsHash(fGroups, EICParams = EICParams, analyses = anas, groupName = comp$group, ...))
 })
 
 #' @describeIn components Generates a consensus from multiple \code{components}

@@ -414,6 +414,25 @@ assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate:
     checkmate::assertChoice(x, ch, .var.name = .var.name, add = add)
 }
 
+assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mzExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, null.ok = TRUE, .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "topMostByRGroup", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "onlyPresent", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "setsAdductPos", checkAndToAdduct, .var.name = .var.name)
+    assertListVal(x, "setsAdductNeg", checkAndToAdduct, .var.name = .var.name)
+    
+    if (!is.null(x[["topMost"]]) && !isTRUE(x$onlyPresent))
+        stop("onlyPresent must be TRUE if topMost is set", call. = FALSE)
+    
+    invisible(NULL)
+}
+
 assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
@@ -470,7 +489,7 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
 assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
-    
+
     assertListVal(x, "method", checkmate::assertChoice, choices = c("cosine", "jaccard"), .var.name = .var.name,
                   add = add)
     assertListVal(x, "removePrecursor", checkmate::assertFlag, .var.name = .var.name, add = add)
@@ -480,7 +499,8 @@ assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertListVal(x, "relMinIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
     assertListVal(x, "minPeaks", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "shift", checkmate::assertChoice, c("none", "precursor", "both"), .var.name = .var.name, add = add)
+    assertListVal(x, "shift", checkmate::assertChoice, choices = c("none", "precursor", "both"), .var.name = .var.name,
+                  add = add)
     assertListVal(x, "setCombineMethod", checkmate::assertChoice, choices = c("mean", "min", "max"),
                   .var.name = .var.name, add = add)
 }

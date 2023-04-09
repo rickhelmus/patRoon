@@ -332,6 +332,21 @@ getEICs <- function(file, ranges)
     return(doGetEICs(file, as.data.table(ranges)))
 }
 
+#' @export
+getDefEICParams <- function(...)
+{
+    def <- list(rtWindow = 30,
+                mzExpWindow = 0.001,
+                topMost = NULL,
+                topMostByRGroup = FALSE,
+                onlyPresent = TRUE,
+                setsAdductPos = "[M+H]+",
+                setsAdductNeg = "[M-H]-"
+    )
+    
+    return(modifyList(def, list(...), keep.null = TRUE))
+}
+
 #' Obtains a SIRIUS refresh token
 #'
 #' This function is used to obtain a \command{SIRIUS} refresh token with your login details, which allows

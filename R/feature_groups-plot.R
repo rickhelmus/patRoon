@@ -394,39 +394,32 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj), rtWindow = 30,
-                                                  mzExpWindow = 0.001, topMost = NULL, topMostByRGroup = FALSE,
-                                                  onlyPresent = TRUE, retMin = FALSE, showPeakArea = FALSE,
-                                                  showFGroupRect = TRUE, title = NULL,
-                                                  colourBy = c("none", "rGroups", "fGroups"),
+setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                  retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                  title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                   showLegend = TRUE, annotate = c("none", "ret", "mz"),
-                                                  showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
+                                                  EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
+                                                  ylim = NULL, EICs = NULL, ...)
 {
     # NOTE: keep args in sync with sets method
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
            fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ retMin + topMostByRGroup + showPeakArea + showFGroupRect + showLegend +
-               onlyPresent + showProgress,
+    aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend + showProgress,
            fixed = list(add = ac))
-    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
-    
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
-    
+    assertEICParams(EICParams, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    
     checkmate::reportAssertions(ac)
 
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
     
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, analysis, groupName, rtWindow, mzExpWindow, topMost, topMostByRGroup,
-                                  onlyPresent)
+        EICs <- getEICsForFGroups(obj, analysis, groupName, EICParams)
     else
     {
         # omit data we don't need
@@ -463,7 +456,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
     names(fillColors) <- names(EICColors)
     
-    plotRTRange <- c(min(featTab$retmin) - rtWindow, max(featTab$retmax) + rtWindow)
+    plotRTRange <- c(min(featTab$retmin) - EICParams$rtWindow, max(featTab$retmax) + EICParams$rtWindow)
     if (retMin)
         plotRTRange <- plotRTRange / 60
     RTRangeGrp <- split(featTab[, .(retmin = min(retmin), retmax = max(retmax)), by = "group"], by = "group", keep.by = FALSE)
@@ -532,7 +525,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                 next
             
             featRow <- featTabGrp[analysis == ana]
-            if (onlyPresent && nrow(featRow) == 0)
+            if (EICParams$onlyPresent && nrow(featRow) == 0)
                 next
             
             if (colourBy == "rGroups")
@@ -599,37 +592,12 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     }
 })
 
-#' @export
-setMethod("plotChroms", "featureGroupsSet", function(obj, analysis = analyses(obj), groupName = names(obj),
-                                                     rtWindow = 30, mzExpWindow = 0.001, topMost = NULL,
-                                                     topMostByRGroup = FALSE, onlyPresent = TRUE, ..., EICs = NULL,
-                                                     adductPos = "[M+H]+", adductNeg = "[M-H]-")
-{
-    ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
-           fixed = list(add = ac))
-    checkmate::reportAssertions(ac)
-
-    adductPos <- checkAndToAdduct(adductPos, .var.name = "adductPos")
-    adductNeg <- checkAndToAdduct(adductNeg, .var.name = "adductNeg")
-        
-    if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, analysis = analysis, groupName = groupName, rtWindow = rtWindow,
-                                  mzExpWindow = mzExpWindow, topMost = topMost, topMostByRGroup = topMostByRGroup,
-                                  onlyPresent = onlyPresent, adductPos = adductPos, adductNeg = adductNeg)
-    
-    callNextMethod(obj, analysis = analysis, groupName = groupName, rtWindow = rtWindow, mzExpWindow = mzExpWindow,
-                   topMost = topMost, topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent, ..., EICs = EICs)
-})
-
 setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
-                                                      rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE,
-                                                      topMost = NULL, topMostByRGroup = FALSE, EICs = NULL,
-                                                      showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                      retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                      showLegend = TRUE, onlyPresent = TRUE,
-                                                      annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                                      xlim = NULL, ylim = NULL, ...)
+                                                      showLegend = TRUE, annotate = c("none", "ret", "mz"),
+                                                      EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
+                                                      ylim = NULL, EICs = NULL, ...)
 {
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)

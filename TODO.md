@@ -22,6 +22,7 @@
     - sortof already there when toggling filters
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
 - get separate EICs for feature chromatograms
+    - also separate EICs for old report functions? Seems to be a bug now
 - params: YaML or param objects?
 - make arg for file cleaning
 
@@ -36,6 +37,9 @@
     - Changed arg order
     - adductPos/adductNeg & get EICs for missing features if all are absent in set
 - fixed set hashes from executeMultiProc were saved as list instead of vector --> re-generate cache.
+- EIC params
+    - getDefEICParams() ref docs
+    - mention when eg topMost is ignored
 
 
 ## Features

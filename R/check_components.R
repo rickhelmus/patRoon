@@ -168,7 +168,7 @@ checkComponentsInterface$methods(
 #' @rdname check-GUI
 #' @aliases checkComponents
 #' @export
-setMethod("checkComponents", "components", function(components, fGroups, session, rtWindow, clearSession)
+setMethod("checkComponents", "components", function(components, fGroups, session, EICParams, clearSession)
 {
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
     checkmate::assertFlag(clearSession)
@@ -182,7 +182,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(session, mustExist = FALSE, add = ac)
-    checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    assertEICParams(EICParams, add = ac)
     checkmate::reportAssertions(ac)
     
     if (clearSession && file.exists(session))
@@ -192,8 +192,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     cmpNames <- names(components)
     
-    EICs <- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
-                              topMostByRGroup = FALSE, onlyPresent = TRUE)
+    EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE)))
     
     curSession <- NULL
     if (file.exists(session))

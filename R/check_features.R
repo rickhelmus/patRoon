@@ -4,7 +4,7 @@
 
 
 checkFeaturesInterface <- setRefClass("checkFeaturesInterface", contains = "checkUIInterface",
-                                      fields = c(fGroups = "featureGroups", rtWindow = "numeric",
+                                      fields = c(fGroups = "featureGroups", EICParams = "list",
                                                  EICsTopMost = "list", EICsTopMostRG = "list", EICsAll = "list",
                                                  EICPreviews = "list"))
 
@@ -228,11 +228,12 @@ checkFeaturesInterface$methods(
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
-                                                        topMostByRGroup = TRUE, onlyPresent = TRUE)
+                    EICsTopMostRG <<- getEICsForFGroups(fGroups,
+                                                        EICParams = modifyList(EICParams, list(topMost = 1,
+                                                                                               topMostByRGroup = TRUE)))
                 else
-                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = NULL,
-                                                  topMostByRGroup = FALSE, onlyPresent = TRUE)
+                    EICsAll <<- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL),
+                                                                                  keep.null = TRUE))
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode
@@ -257,12 +258,11 @@ checkFeaturesInterface$methods(
                 fg <- fg[setdiff(getSecondarySelections(rValues$currentPrimSel), rp)]
         }
         
+        ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
+                              topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup")
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
-            plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
-                       showFGroupRect = FALSE, title = "",
-                       topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
-                       topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup",
-                       retMin = rValues$settings$retUnit == "min")
+            plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
+                       showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
         })
     },
     
@@ -343,14 +343,14 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
 #' @rdname check-GUI
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow, clearSession)
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams, clearSession)
 {
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
     
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(session, mustExist = FALSE, add = ac)
-    checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    assertEICParams(EICParams, add = ac)
     checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -361,8 +361,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
-                                     topMostByRGroup = FALSE, onlyPresent = TRUE)
+    EICsTopMost <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = 1,
+                                                                                     topMostByRGroup = FALSE)))
     EICsTopMostRG <- EICsAll <- list()
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
@@ -380,7 +380,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkFeaturesInterface$new(fGroups = fGroups, rtWindow = rtWindow, EICsTopMost = EICsTopMost,
+    int <- checkFeaturesInterface$new(fGroups = fGroups, EICParams = EICParams, EICsTopMost = EICsTopMost,
                                       EICsTopMostRG = EICsTopMostRG, EICsAll = EICsAll,
                                       EICPreviews = EICPreviews, primarySelections = gNames,
                                       curSession = curSession, session = session)

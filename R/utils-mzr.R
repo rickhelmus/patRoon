@@ -65,15 +65,16 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     return(EICs)
 }
 
-setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, rtWindow, mzExpWindow, topMost,
-                                                        topMostByRGroup, onlyPresent)
+setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, EICParams)
 {
     anaInfo <- analysisInfo(fGroups)
     anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
     featTab <- as.data.table(getFeatures(fGroups))
     
-    if (!is.null(topMost))
-        topMost <- min(topMost, nrow(anaInfo))
+    topMost <- if (!is.null(EICParams$topMost))
+        min(EICParams$topMost, nrow(anaInfo))
+    else
+        NULL
     
     # subset relevant things in advance    
     featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
@@ -84,12 +85,12 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
         ret <- featTab[group == fg][, -"group"]
         
         # add missing analyses if needed
-        if (!onlyPresent && any(!analysis %chin% ret$analysis))
+        if (!EICParams$onlyPresent && any(!analysis %chin% ret$analysis))
         {
             ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
                                          retmin = min(ret$retmin), retmax = max(ret$retmax),
-                                         mzmin = min(ret$mzmin) - mzExpWindow, mzmax = max(ret$mzmax) + mzExpWindow))
-            
+                                         mzmin = min(ret$mzmin) - EICParams$mzExpWindow,
+                                         mzmax = max(ret$mzmax) + EICParams$mzExpWindow))
         }
         
         # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
@@ -99,7 +100,7 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
         
         if (!is.null(topMost))
         {
-            if (topMostByRGroup)
+            if (EICParams$topMostByRGroup)
             {
                 ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
                 ret[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
@@ -112,20 +113,21 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
             }
         }
         
-        ret[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
+        ret[, c("retmin", "retmax") := .(retmin - EICParams$rtWindow, retmax + EICParams$rtWindow)]
         return(ret)
     }, simplify = FALSE))
 })
 
-setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., onlyPresent, adductPos, adductNeg)
+setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, groupName, EICParams)
 {
-    ret <- callNextMethod(fGroups, onlyPresent = onlyPresent, ...)
+    ret <- callNextMethod()
     
     anaInfo <- analysisInfo(fGroups)
     featTab <- as.data.table(getFeatures(fGroups))
     
     # HACK: since feature tables store the character form, it's easier to keep it all the same
-    adductPos <- as.character(adductPos); adductNeg <- as.character(adductNeg)
+    EICParams$setsAdductPos <- as.character(EICParams$setsAdductPos)
+    EICParams$setsAdductNeg <- as.character(EICParams$setsAdductNeg)
     
     # 'ionize' m/zs
     return(Map(names(ret), ret, f = function(grp, ranges)
@@ -133,7 +135,7 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., onlyPre
         featTabGrp <- featTab[group == grp]
         ranges[, adduct := featTabGrp[match(ranges$analysis, analysis)]$adduct]
         
-        if (!onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
+        if (!EICParams$onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
         {
             # First try to get adduct from other features in the same set: assume that adduct per set for a single
             # feature group is always the same
@@ -151,9 +153,9 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., onlyPre
                 if (nrow(t) == 0)
                     NA # all features were removed
                 else if (as.adduct(t$adduct[1])@charge > 0)
-                    adductPos
+                    EICParams$setsAdductPos
                 else
-                    adductNeg
+                    EICParams$setsAdductNeg
             })]
             
             if (any(is.na(ranges$adduct)))
@@ -175,7 +177,7 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, ..., onlyPre
     }))
 })
 
-setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, groupName, ...)
+setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, groupName, EICParams)
 {
     if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
         return(list())
@@ -185,7 +187,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
 
     verifyDataCentroided(anaInfo)
 
-    EICInfoTab <- getEICFGroupInfo(fGroups, analysis = analysis, groupName = groupName, ...)
+    EICInfoTab <- getEICFGroupInfo(fGroups, analysis, groupName, EICParams)
     EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
     EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
     anaInfoEICs <- anaInfo[anaInfo$analysis %in% names(EICInfo), ]

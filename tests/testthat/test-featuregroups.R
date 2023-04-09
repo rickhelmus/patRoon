@@ -497,8 +497,9 @@ test_that("plotting works", {
 
     expect_doppel("eic-def", function() plotChroms(subFGroups))
     expect_doppel("eic-rtmin", function() plotChroms(subFGroups, retMin = TRUE))
-    expect_doppel("eic-tm1", function() plotChroms(subFGroups, topMost = 1))
-    expect_doppel("eic-tm1rg", function() plotChroms(subFGroups, topMost = 1, topMostByRGroup = TRUE))
+    expect_doppel("eic-tm1", function() plotChroms(subFGroups, EICParams = getDefEICParams(topMost = 1)))
+    expect_doppel("eic-tm1rg", function() plotChroms(subFGroups,
+                                                     EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE)))
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
     expect_doppel("eic-cbr", function() plotChroms(subFGroups, colourBy = "rGroups"))
     expect_doppel("eic-cbf", function() plotChroms(subFGroups, colourBy = "fGroups"))
@@ -508,7 +509,7 @@ test_that("plotting works", {
     # manually.
     expect_doppel("eic-sub", function() plotChroms(subFGroups[1, 1]))
     expect_doppel("eic-sub2", function() plotChroms(subFGroups, analysis = analyses(subFGroups)[1],
-                                                   groupName = names(subFGroups)[1]))
+                                                    groupName = names(subFGroups)[1]))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 rGroups

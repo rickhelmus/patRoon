@@ -2,8 +2,7 @@
 NULL
 
 reportHTMLUtils <- setRefClass("reportHTMLUtils",
-                               fields = list(objects = "list", EICs = "list", EICsTopMost = "list", plots = "list",
-                                             properties = "list"))
+                               fields = list(objects = "list", EICs = "list", plots = "list", properties = "list"))
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
@@ -32,8 +31,9 @@ reportHTMLUtils$methods(
 # UNDONE: method
 #' @export
 reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                          compsCluster = NULL, components = NULL, TPs = NULL, selfContained = FALSE, clearPath = FALSE,
-                          openReport = TRUE, noDate = FALSE)
+                          compsCluster = NULL, components = NULL, TPs = NULL,
+                          EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
+                          selfContained = FALSE, clearPath = FALSE, openReport = TRUE, noDate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
@@ -68,20 +68,22 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    # UNDONE: params, handle sets
-    # EICs <- getEICsForFGroups(fGroups, 30, 0.002, 1, TRUE, TRUE)
-    mainEICArgs <- list(fGroups, rtWindow = 30, mzExpWindow = 0.001, topMostByRGroup = FALSE)
-    if (isFGSet(fGroups))
-        mainEICArgs <- c(mainEICArgs, list(adductPos = "[M+H]+", adductNeg = "[M-H]-"))
-    EICs <- do.call(getEICsForFGroups, c(mainEICArgs, list(topMost = NULL, onlyPresent = FALSE)))
-    EICsTopMost <- do.call(getEICsForFGroups, c(mainEICArgs, list(topMost = 1, onlyPresent = TRUE)))
+    EICs <- list(
+        large = getEICsForFGroups(fGroups, EICParams = EICParams),
+        small = getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
+                                                                                  onlyPresent = TRUE))),
+        # UNDONE: make onlyPresent configurable, check if feature EICs are needed
+        features = getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
+                                                                                     onlyPresent = FALSE),
+                                                                     keep.null = TRUE))
+    )
     cat("Done!\n")
     
     reportEnv <- new.env()
     
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                               TPs, path, EICs, EICsTopMost, selfContained)
+                                               TPs, path, EICs, selfContained)
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,
@@ -89,7 +91,6 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
                                            EICs = EICs, plots = reportEnv$plots,
                                            properties = list(selfContained = selfContained))
     reportEnv$EICs <- EICs
-    reportEnv$EICsTopMost <- EICsTopMost
     
     reportEnv$objectsShow <- paste0(utils::capture.output({
         for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))

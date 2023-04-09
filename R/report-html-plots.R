@@ -81,14 +81,13 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, outPath, EICs, selfContained)
     {
         doProgress()
         makeHTMLReportPlot("chrom_large-", outPath, selfContained, "plotChroms",
-                           list(fGroups, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1,
-                                topMostByRGroup = TRUE, EICs = EICs, colourBy = "rGroups", title = "",
-                                onlyPresent = TRUE, bty = "l"), parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
+                           list(fGroups, groupName = grp, retMin = TRUE, EICs = EICs$large, colourBy = "rGroups",
+                                title = "", bty = "l"), parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
 }
 
-genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICsTopMost, selfContained)
+genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICs, selfContained)
 {
     cat("Generate small chromatograms...\n")
     # UNDONE: parallel option
@@ -96,9 +95,8 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, outPath, EICsTopMost, selfCon
     {
         doProgress()
         makeHTMLReportPlot("chrom_small", outPath, selfContained, "plotChroms",
-                           list(fGroups, groupName = grp, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE, topMost = 1,
-                                topMostByRGroup = TRUE, EICs = EICsTopMost, showFGroupRect = FALSE, showPeakArea = TRUE,
-                                title = "", onlyPresent = TRUE, bty = "n"),
+                           list(fGroups, groupName = grp, retMin = TRUE, EICs = EICs$small, showFGroupRect = FALSE,
+                                showPeakArea = TRUE, title = "", bty = "n"),
                            parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
                            pointsize = 16)
     }, simplify = FALSE)
@@ -117,10 +115,10 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, outPath, EICs, selfContain
         sapply(anas[whana], function(ana)
         {
             makeHTMLReportPlot("chrom_feat", outPath, selfContained, "plotChroms",
-                               list(fGroups, analysis = ana, groupName = grp, rtWindow = 30, mzExpWindow = 0.005,
-                                    retMin = TRUE, EICs = EICs, showFGroupRect = FALSE, showPeakArea = TRUE, title = "",
-                                    onlyPresent = FALSE, bty = "l"), parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
-                               width = 6, height = 4, bg = "transparent", pointsize = 20, scaling = 1)
+                               list(fGroups, analysis = ana, groupName = grp, retMin = TRUE, EICs = EICs$features,
+                                    showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "l"),
+                               parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
+                               pointsize = 20, scaling = 1)
         })
     }, simplify = FALSE)
 }
@@ -331,7 +329,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, outPath, EICs, sel
         
         # UNDONE: params
         pl$chrom <- makeHTMLReportPlot("compon-chrom", outPath, selfContained, "plotChroms",
-                                       list(components, cn, fGroups, retMin = TRUE, title = "", EICs = EICs),
+                                       list(components, cn, fGroups, retMin = TRUE, title = "", EICs = EICs$large),
                                        parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4,
                                        bg = "transparent", pointsize = 16)
         
@@ -430,7 +428,7 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
 }
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, outPath,
-                                    EICs, EICsTopMost, selfContained)
+                                    EICs, selfContained)
 {
     ret <- list()
     
@@ -439,10 +437,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     # UNDONE: params
     
     ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, selfContained, "plotChroms",
-                                              list(fGroups, rtWindow = 30, mzExpWindow = 0.005, retMin = TRUE,
-                                                   topMost = 1, topMostByRGroup = FALSE, EICs = EICs,
-                                                   showPeakArea = TRUE, showFGroupRect = FALSE, colourBy = "fGroups",
-                                                   showLegend = FALSE, onlyPresent = TRUE),
+                                              list(fGroups, retMin = TRUE, EICs = EICs$small, showPeakArea = TRUE,
+                                                   showFGroupRect = FALSE, colourBy = "fGroups", showLegend = FALSE),
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     
     ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, selfContained, "plot",
@@ -475,7 +471,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     cat(" Done!\n")
 
     ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, outPath, EICs, selfContained)
-    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICsTopMost, selfContained)
+    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, outPath, EICs, selfContained)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, outPath, EICs, selfContained)
     
     ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, outPath, selfContained)
@@ -559,7 +555,7 @@ reportHTMLUtils$methods(
     },
     genIntClustHeatMap = function()
     {
-        plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configfurable
+        plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configurable?
     },
     genComponNTGraph = function(s)
     {

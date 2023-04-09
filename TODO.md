@@ -21,8 +21,8 @@
 - reset filters button?
     - sortof already there when toggling filters
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
-- get separate EICs for feature chromatograms
-    - also separate EICs for old report functions? Seems to be a bug now
+- separate EICs for old report functions? And for reportHTMLNew with components?
+    - or maybe filter EICs with EICParams if provided?
 - params: YaML or param objects?
 - make arg for file cleaning
 

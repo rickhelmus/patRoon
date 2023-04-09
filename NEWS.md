@@ -111,6 +111,7 @@ The changes are reflected in the installation section of the handbook.
 - Fixed: `unset()` for `featureGroupsScreeningSet` resulted in loss of group quality scores and internal standard assignments
 - Several optimizations for `annotatedPeakLists()`, especially with sets workflows.
 - `plotInt()`: `plotArgs` and `linesArgs` to pass additional arguments to `plot()`/`lines()`. The latter replaces the dots argument.
+- Small fixes and improvements for verification of parameter lists
 
 
 # patRoon 2.1

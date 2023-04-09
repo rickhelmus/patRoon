@@ -185,6 +185,11 @@ setMethod("plot", c(x = "componentsClust", y = "missing"), function(x, pal = "Pa
     invisible(NULL)
 })
 
+setMethod("plotHash", "componentsClust", function(x, ...)
+{
+    makeHash(x@clust, x@cutClusters, ...)
+})
+
 #' @templateVar class componentsClust
 #' @template plotsil
 #' @export

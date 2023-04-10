@@ -422,9 +422,9 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         EICs <- getEICsForFGroups(obj, analysis, groupName, EICParams)
     else
     {
-        # omit data we don't need
-        EICs <- EICs[names(EICs) %chin% analysis]
-        EICs <- pruneList(lapply(EICs, function(e) e[names(e) %chin% groupName]), checkEmptyElements = TRUE)
+        # sync as much as possible with given EICParams
+        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
+                           topMostByRGroup = EICParams$topMostByRGroup, onlyPresent = EICParams$onlyPresent)
     }
     
     if (length(obj) == 0 || length(EICs) == 0)
@@ -607,8 +607,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
     if (!is.null(EICs))
     {
         # omit data we don't need: speeds up hashing quite a bit
-        EICs <- EICs[names(EICs) %chin% analysis]
-        EICs <- pruneList(lapply(EICs, function(e) e[names(e) %chin% groupName]), checkEmptyElements = TRUE)
+        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
+                           topMostByRGroup = EICParams$topMostByRGroup, onlyPresent = EICParams$onlyPresent)
     }
     makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
              analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])

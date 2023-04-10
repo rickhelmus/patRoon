@@ -154,3 +154,52 @@ getAnnotationsFromSetFeatures <- function(fGroups)
     else
         ret <- data.table()
 }
+
+filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
+                       onlyPresent = FALSE)
+{
+    if (!is.null(analysis))
+        EICs <- EICs[names(EICs) %chin% analysis]
+    if (!is.null(groupName))
+        EICs <- lapply(EICs, function(e) e[names(e) %chin% groupName])
+
+    if (onlyPresent)
+    {
+        gTable <- groupTable(fGroups)
+        EICs <- Map(names(EICs), EICs, f = function(ana, aeic)
+        {
+            anaInd <- match(ana, analyses(fGroups))
+            absentFGs <- names(gTable)[gTable[anaInd] == 0]
+            return(aeic[!names(aeic) %chin% absentFGs])
+        })
+    }
+    
+    if (!is.null(topMost))
+    {
+        gTable <- copy(groupTable(fGroups))
+        gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group")]]
+        for (fg in names(fGroups))
+        {
+            anasWithFG <- mapply(names(EICs), EICs, FUN = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
+            anasWithFG <- pruneList(anasWithFG, checkEmptyElements = TRUE)
+            tab <- gTable[, c(fg, "analysis", "rGroup"), with = FALSE]
+            tab <- tab[analysis %chin% anasWithFG]
+            if (nrow(tab) > 0)
+            {
+                rmAnas <- if (topMostByRGroup)
+                {
+                    tab[, rank := frank(-get(fg), ties.method = "first"), by = "rGroup"]
+                    tab[rank > topMost]$analysis
+                }
+                else if (nrow(tab) > topMost)
+                {
+                    setorderv(tab, fg, order = -1L)
+                    tab[seq(topMost + 1, nrow(tab))]$analysis
+                }
+                EICs[rmAnas] <- lapply(EICs[rmAnas], "[[<-", fg, NULL)
+            }
+        }
+    }
+
+    return(pruneList(EICs, checkEmptyElements = TRUE))
+}

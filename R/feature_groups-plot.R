@@ -436,7 +436,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     gInfo <- groupInfo(obj)
     gCount <- length(groupName)
     anaInfo <- analysisInfo(obj)
-    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis & anaInfo$analysis %chin% names(EICs), ]
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     rGroups <- unique(anaInfo$group)
     

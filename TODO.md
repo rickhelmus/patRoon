@@ -14,15 +14,12 @@
 
 - Put CSV/PDF functions also in separate files
 - plotGraph() for componentsNTSet? (wasn't done before...)
-- adductPos/adductNeg args --> make options? makes things much easier and less complicated...
 - Report all candidates instead of topMost, but generate placeholder plots if >topMost
     --> seems to be too slow due to detail tab generation
     --> maybe someday generate details in JS instead
 - reset filters button?
     - sortof already there when toggling filters
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
-- separate EICs for old report functions? And for reportHTMLNew with components?
-    - or maybe filter EICs with EICParams if provided?
 - params: YaML or param objects?
 - make arg for file cleaning
 

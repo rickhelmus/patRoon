@@ -68,22 +68,16 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    EICs <- list(
-        large = getEICsForFGroups(fGroups, EICParams = EICParams),
-        small = getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
-                                                                                  onlyPresent = TRUE))),
-        # UNDONE: make onlyPresent configurable, check if feature EICs are needed
-        features = getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
-                                                                                     onlyPresent = FALSE),
-                                                                     keep.null = TRUE))
-    )
+    # UNDONE: make onlyPresent configurable, check if feature EICs are needed
+    EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL, onlyPresent = FALSE),
+                                                              keep.null = TRUE))
     cat("Done!\n")
     
     reportEnv <- new.env()
     
     reportEnv$properties <- list(noDate = noDate)
     reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                               TPs, path, EICs, selfContained)
+                                               TPs, path, EICs, EICParams, selfContained)
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,

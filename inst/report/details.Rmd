@@ -177,7 +177,7 @@ bslib::layout_column_wrap(
                 class = "mt-2",
                 bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
             ),
-            maybeIncl(utils$hasTPs(), bslib::nav(
+            maybeIncl(utils$hasTPGraphs(), bslib::nav(
                 "Transformations",
                 bslib::card_body_fill(utils$genTPGraphs())
             ))

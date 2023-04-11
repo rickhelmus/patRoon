@@ -100,6 +100,8 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type =
 
 setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 {
+    if (is.character(index))
+        index <- which(index == names(obj))
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     return(makeHash(plotm, ...))
 })

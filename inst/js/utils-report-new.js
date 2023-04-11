@@ -88,7 +88,7 @@ function updateView(sel)
 
 function updateFeatTabRowSel(rowValues, rowIndex)
 {
-    if (!rowValues || !rowValues.group)
+    if (rowIndex == undefined)
         return; // don't process clicks of parent rows 
     
     const tabEl = getSelFGTableElement();
@@ -169,8 +169,11 @@ function updateFeatTabRowSel(rowValues, rowIndex)
             Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
         }
         
-        specSimEl.src = plots.TPs[rowValues.component][rowValues.cmpIndex];
-        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        if (plots.TPs.length > 0)
+        {
+            specSimEl.src = plots.TPs[rowValues.component][rowValues.cmpIndex];
+            specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        }
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
         Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);

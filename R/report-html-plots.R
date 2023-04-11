@@ -422,7 +422,7 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
             return(makeHTMLReportPlot("spec_sim", outPath, selfContained, "plotSpectrum",
                                       c(plSpecArgs, list(groupName = c(cmpInfoRow$parent_group, ctRow$group),
                                                          specSimParams = specSimParams, title = "")),
-                                      parParams = list(mar = c(mar[1], mar[2], 0.2, 0.2)), width = 10, height = 5,
+                                      parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 10, height = 5,
                                       pointsize = 16))
         })
         
@@ -528,16 +528,20 @@ reportHTMLUtils$methods(
     {
         cInfo <- componentInfo(objects$components)
         pars <- parents(objects$TPs)
+
+        # NOTE: bit less height to avoid scrollbar in card
+        # UNDONE: params
+        mainArgs <- list(objects$TPs, components = objects$components, width = "100%", height = "97%")
+        if (inherits(objects$TPs, "transformationProductsStructure"))
+            mainArgs <- c(mainArgs, list(structuresMax = 10))
+        
         hwidgets <- lapply(seq_len(nrow(cInfo)), function(i)
         {
             DOMID <- paste0('TPGraph_', cInfo$name[i])
             TPInd <- match(cInfo$parent_name[i], pars$name, nomatch = NA)
             if (is.na(TPInd))
                 return(htmltools::div(id = DOMID))
-        
-            # NOTE: bit less height to avoid scrollbar in card    
-            gr <- plotGraph(objects$TPs, which = TPInd, components = objects$components, structuresMax = 10,
-                            width = "100%", height = "97%") # UNDONE: params
+            gr <- do.call(plotGraph, c(mainArgs, list(which = TPInd)))
             gr$elementId <- DOMID
             return(htmlwidgets::onRender(gr, htmlwidgets::JS("function(el, x)
 {

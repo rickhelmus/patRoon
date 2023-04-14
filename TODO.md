@@ -22,6 +22,8 @@
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
 - params: YaML or param objects?
 - make arg for file cleaning
+- file cleaning doesn't work with selfContained=T: need a way to get original plot paths
+- maybe: mark if MS/MS, formulas, compounds are available in FG table
 
 
 ## Components

@@ -1,0 +1,28 @@
+general:
+    path: report
+    retMin: true
+    plotFileRetention: 7 # days until unused plot files are removed
+    selfContained: false # UNDONE?
+    noDate: false
+summary: [ chord, venn, upset ]
+chromatograms:
+    large: true
+    small: true
+    features: all
+MSPeakLists:
+    spectra: true
+formulas:
+    include: true
+    normalizeScores: max
+    exclNormScores: [ ]
+    topMost: 25
+compounds:
+    normalizeScores: max
+    exclNormScores: [ score, individualMoNAScore, annoTypeCount, annotHitCount, libMatch ]
+    onlyUsedScorings: true
+    topMost: 25
+TPs:
+    graphs: true
+    graphStructuresMax: 25
+internalStandards:
+    graph: true

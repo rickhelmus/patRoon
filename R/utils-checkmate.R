@@ -566,6 +566,67 @@ assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, ad
     checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
 }
 
+assertReportSettings <- function(settings)
+{
+    checkmate::assertList(settings, any.missing = FALSE)
+    assertHasNames(settings, c("general", "summary", "chromatograms", "MSPeakLists", "formulas", "compounds", "TPs",
+                               "internalStandards"))
+    
+    ac <- checkmate::makeAssertCollection()
+    
+    checkmate::assertList(settings$general)
+    checkmate::assertPathForOutput(settings$general$path, overwrite = TRUE, add = ac)
+    checkmate::assertFlag(settings$general$retMin, add = ac)
+    checkmate::assertCount(settings$general$plotFileRetention, positive = FALSE, add = ac)
+    checkmate::assertFlag(settings$general$selfContained, add = ac)
+    checkmate::assertFlag(settings$general$noDate, add = ac)
+    
+    checkmate::assertSubset(settings$summary, c("chord", "venn", "upset"), add = ac)
+    
+    checkmate::assertList(settings$chromatograms)
+    checkmate::assertFlag(settings$chromatograms$large, add = ac)
+    checkmate::assertFlag(settings$chromatograms$small, add = ac)
+    checkmate::assert(
+        checkmate::checkFlag(settings$chromatograms$features),
+        checkmate::checkChoice(settings$chromatograms$features, "all"),
+        .var.name = "settings$chromatograms$features",
+        add = ac
+    )
+    
+    checkmate::assertList(settings$MSPeakLists)
+    checkmate::assertFlag(settings$MSPeakLists$spectra, add = ac)
+    
+    checkmate::assertList(settings$formulas)
+    checkmate::assertFlag(settings$formulas$include, add = ac)
+    assertNormalizationMethod(settings$formulas$normalizeScores, add = ac)
+    checkmate::assert(
+        checkmate::checkCharacter(settings$formulas$exclNormScores, min.chars = 1, any.missing = FALSE),
+        checkmate::checkList(settings$formulas$exclNormScores, types = "character", any.missing = FALSE),
+        .var.name = "settings$formulas$exclNormScores",
+        add = ac
+    )
+    checkmate::assertCount(settings$formulas$topMost, positive = TRUE, add = ac)
+    
+    checkmate::assertList(settings$compounds)
+    assertNormalizationMethod(settings$compounds$normalizeScores, add = ac)
+    checkmate::assert(
+        checkmate::checkCharacter(settings$compounds$exclNormScores, min.chars = 1, any.missing = FALSE),
+        checkmate::checkList(settings$compounds$exclNormScores, types = "character", any.missing = FALSE),
+        .var.name = "settings$compounds$exclNormScores",
+        add = ac
+    )
+    checkmate::assertCount(settings$compounds$topMost, positive = TRUE, add = ac)
+    
+    checkmate::assertList(settings$TPs)
+    checkmate::assertFlag(settings$TPs$graphs, add = ac)
+    checkmate::assertCount(settings$TPs$graphStructuresMax, add = ac)
+    
+    checkmate::assertList(settings$internalStandards)
+    checkmate::assertFlag(settings$internalStandards$graph, add = ac)
+    
+    checkmate::reportAssertions(ac)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

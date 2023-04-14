@@ -2,7 +2,7 @@
 NULL
 
 reportHTMLUtils <- setRefClass("reportHTMLUtils",
-                               fields = list(objects = "list", EICs = "list", plots = "list", properties = "list"))
+                               fields = list(objects = "list", EICs = "list", plots = "list", settings = "list"))
 
 reportHTMLUtils$methods(
     hasSuspects = function() isScreening(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
@@ -31,29 +31,37 @@ reportHTMLUtils$methods(
 
 # UNDONE: method
 #' @export
-reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas = NULL, compounds = NULL,
+reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                           compsCluster = NULL, components = NULL, TPs = NULL,
-                          EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                          selfContained = FALSE, clearPath = FALSE, openReport = TRUE, noDate = FALSE)
+                          settingsFile = system.file("report", "settings.yml", package = "patRoon"),
+                          path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
+                          clearPath = FALSE, openReport = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ selfContained + clearPath + openReport + noDate,
-           fixed = list(add = ac))
+    if (!is.null(path))
+        checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ clearPath + openReport, fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds + compsCluster + components + TPs,
            c("MSPeakLists", "formulas", "compounds", "compoundsCluster", "components", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertFileExists(settingsFile, "r", add = ac)
     # assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (is.null(MSPeakLists) && (!is.null(formulas) || !is.null(compounds)))
+        stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
+
+    settings <- readYAML(settingsFile)
+    assertReportSettings(settings)
+    
+    if (is.null(path))
+        path <- settings$general$path
     
     if (length(fGroups) == 0)
     {
         cat("No feature groups, nothing to report...\n")
         return(invisible(NULL))
     }
-    
-    if (is.null(MSPeakLists) && (!is.null(formulas) || !is.null(compounds)))
-        stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
     
     prepareReportPath(path, clearPath)
     
@@ -76,15 +84,15 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     
     reportEnv <- new.env()
     
-    reportEnv$properties <- list(noDate = noDate)
+    reportEnv$settings <- settings
     reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                               TPs, path, EICs, EICParams, selfContained)
+                                               TPs, settings, path, EICs, EICParams)
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,
                                                           TPs = TPs),
                                            EICs = EICs, plots = reportEnv$plots,
-                                           properties = list(selfContained = selfContained))
+                                           settings = settings)
     reportEnv$EICs <- EICs
     
     reportEnv$objectsShow <- paste0(utils::capture.output({
@@ -107,7 +115,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     withr::with_options(list(patRoon.cache.fileName = normalizePath(getOption("patRoon.cache.fileName")),
                              patRoon.progress.opts = list(file = stderr())),
                         rmarkdown::render(file.path(workPath, "report.Rmd"), output_file = outputFile,
-                                          output_options = list(self_contained = selfContained),
+                                          output_options = list(self_contained = settings$general$selfContained),
                                           quiet = TRUE, envir = reportEnv))
     
     if (openReport)
@@ -120,7 +128,7 @@ reportHTMLNew <- function(fGroups, path = "report", MSPeakLists = NULL, formulas
     opfDates <- lapply(file.info(oldPlotFiles)$mtime, as.Date)
     opfAge <- lapply(opfDates, difftime, time1 = Sys.Date(), units = "days")
     opfAge <- sapply(opfAge, as.numeric)
-    oldPlotFiles <- oldPlotFiles[opfAge >= 7] # UNDONE
+    oldPlotFiles <- oldPlotFiles[opfAge >= settings$general$plotFileRetention]
     if (length(oldPlotFiles) > 0)
     {
         file.remove(oldPlotFiles)

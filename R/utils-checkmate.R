@@ -50,8 +50,12 @@ assertChoiceSilent <- checkmate::makeAssertionFunction(checkChoiceSilent)
 
 assertListVal <- function(x, field, assertFunc, mustExist = TRUE, ..., .var.name = checkmate::vname(x))
 {
-    if (mustExist && !field %in% names(x))
-        stop(sprintf("Field '%s' is missing from %s.", field, .var.name), call. = FALSE)
+    if (!field %in% names(x))
+    {
+        if (mustExist)
+            stop(sprintf("Field '%s' is missing from %s.", field, .var.name), call. = FALSE)
+        return(invisible(NULL))
+    }
     assertFunc(x[[field]], ..., .var.name = sprintf("%s[[\"%s\"]]", .var.name, field))
 }
 

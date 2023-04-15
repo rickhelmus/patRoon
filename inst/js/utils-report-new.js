@@ -36,7 +36,7 @@ function getNavTab(which)
     else if (which === "Components")
         el = document.getElementById("chrom_view-component");
     else if (which === "TPs")
-        el = document.getElementById("chrom_view-tp");
+        el = document.getElementById("int_plot-parent");
 
     for (var i=0; i<6; i++)
         el = el.parentElement;
@@ -158,7 +158,8 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         const intEl = document.getElementById('int_plot-parent');
         const specSimEl = document.getElementById('similarity_spec');
         
-        chromEl.src = plots.chromsLarge[rowValues.parent_group];
+        if (chromEl)
+            chromEl.src = plots.chromsLarge[rowValues.parent_group];
         intEl.src = plots.intPlots[rowValues.parent_group];
         
         if (document.getElementById('parentInfoTab'))
@@ -338,7 +339,7 @@ function toggleFeatFilters(e)
             col.filterable = e;
     })
     
-    applyFilterToggle("featuresTab", "chromatogram", true);
+    applyFilterToggle("featuresTab", "group", true);
 }
 
 function toggleFormFilters(e)

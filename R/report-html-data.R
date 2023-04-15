@@ -198,33 +198,47 @@ makeReactable <- function(tab, id, bordered = TRUE, pagination = FALSE, ...)
                                 pageSizeOptions = c(25, 50, 100, 250, 500), defaultPageSize = 50,...))
 }
 
-makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, ...)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, ...)
 {
     # sync column order
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
-    # add EICs
-    tab[, c("chrom_small", "chrom_large") := group]
-    tabn <- names(tab)
-    setcolorder(tab, c(tabn[seq_len(match("group", tabn))], "chrom_small", "chrom_large")) # move after group column
-    colDefs$chrom_small <- reactable::colDef("chromatogram", filterable = FALSE, searchable = FALSE,
-                                             cell = function(value, index)
+    if (settings$chromatograms$small || settings$chromatograms$large)
     {
-        htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"), class = "noZoomImg")
-    })
-    colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, filterable = FALSE,
-                                             searchable = FALSE, cell = function(value, index)
-    {
-        htmltools::img(src = plots$chromsLarge[[value]])
-    })
-    
-    for (i in seq_along(groupDefs))
-    {
-        if (groupDefs[[i]]$name == "feature")
+        cols <- character()
+        if (settings$chromatograms$small)
+            cols <- "chrom_small"
+        if (settings$chromatograms$large)
+            cols <- c(cols, "chrom_large")
+        
+        # add EICs
+        tab[, (cols) := group]
+        tabn <- names(tab)
+        setcolorder(tab, c(tabn[seq_len(match("group", tabn))], cols)) # move after group column
+
+        if (settings$chromatograms$small)
         {
-            groupDefs[[i]]$columns <- c(groupDefs[[i]]$columns, "chrom_small", "chrom_large")
-            break
+            cell <- function(value, index) htmltools::img(src = plots$chromsSmall[[value]],
+                                                          style = list("max-height" = "20px"), class = "noZoomImg")
+            colDefs$chrom_small <- reactable::colDef("chromatogram", filterable = FALSE, searchable = FALSE,
+                                                     cell = cell)
+            
+        }
+        if (settings$chromatograms$large)
+        {
+            colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, filterable = FALSE,
+                                                     searchable = FALSE,
+                                                     cell = function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
+        }
+        
+        for (i in seq_along(groupDefs))
+        {
+            if (groupDefs[[i]]$name == "feature")
+            {
+                groupDefs[[i]]$columns <- c(groupDefs[[i]]$columns, cols)
+                break
+            }
         }
     }
     
@@ -469,7 +483,8 @@ reportHTMLUtils$methods(
         tab <- getFGTable(objects$fGroups, ",")
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
-        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots)
+        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
+                        settings = settings)
     },
     genFGTableSuspects = function()
     {
@@ -477,7 +492,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, groupBy = "susp_name")
+                        plots = plots, settings = settings, groupBy = "susp_name")
     },
     genFGTableISTDs = function()
     {
@@ -501,7 +516,7 @@ reportHTMLUtils$methods(
         colDefs <- getFeatGroupColDefs(tab)
         colDefs$susp_name$name <- "Internal standard" # HACK
         makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, groupBy = "susp_name")
+                        plots = plots, settings = settings, groupBy = "susp_name")
     },
     genFGTableComponents = function()
     {
@@ -538,7 +553,7 @@ reportHTMLUtils$methods(
             groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFGColSepStyle())))
         
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, groupBy = "component")
+                        plots = plots, settings = settings, groupBy = "component")
     },
     genFGTableTPs = function()
     {
@@ -640,7 +655,7 @@ reportHTMLUtils$methods(
         # same for cmpIndex
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
 
-        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, groupBy = groupBy, colDefs = colDefs,
+        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, groupBy = groupBy, colDefs = colDefs,
                         groupDefs = groupDefs)
     },
 
@@ -729,20 +744,20 @@ reportHTMLUtils$methods(
         
         tab[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
         
-        # add EICs
-        tab[, chromatogram := ""] # dummy value, not needed
-        tabn <- names(tab)
-        
-        setcolorder(tab, c("analysis", "rGroup", "ID", "chromatogram"))
-
         colDefs <- list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
-            rGroup = reactable::colDef("replicate group"),
-            chromatogram = reactable::colDef(minWidth = 175, cell = function(value, index)
+            rGroup = reactable::colDef("replicate group")
+        )
+        if (!isFALSE(settings$chromatograms$features))
+        {
+            # add EICs
+            tab[, chromatogram := ""] # dummy value, not needed
+            
+            colDefs$chromatogram = reactable::colDef(minWidth = 175, cell = function(value, index)
             {
                 htmltools::img(src = plots$chromsFeatures[[tab$group[index]]][[tab$analysis[index]]])
             })
-        )
+        }
         if (!is.null(tab[["set"]]))
         {
             colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("featuresTab",
@@ -760,6 +775,8 @@ reportHTMLUtils$methods(
         
         colDefs$analysis <- setReactSelRangeFilter("featuresTab", reactable::colDef())
         colDefs$rGroup <- setReactSelRangeFilter("featuresTab", colDefs$rGroup)
+
+        setcolorder(tab, intersect(c("analysis", "rGroup", "ID", "chromatogram"), names(tab)))
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
                       meta = list(featQualCols = fqn), pagination = TRUE)

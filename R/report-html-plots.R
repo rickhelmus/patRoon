@@ -75,6 +75,9 @@ makeHTMLReportPlot <- function(outPrefix, outPath, selfContained, func, args, pa
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams)
 {
+    if (!settings$chromatograms$large)
+        return(list())
+    
     cat("Generate large chromatograms...\n")
     # UNDONE: parallel option
     doApply("sapply", TRUE, names(fGroups), function(grp)
@@ -90,6 +93,9 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
 
 genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICParams)
 {
+    if (!settings$chromatograms$small)
+        return(list())
+    
     cat("Generate small chromatograms...\n")
     # UNDONE: parallel option
     doApply("sapply", TRUE, names(fGroups), function(grp)
@@ -107,19 +113,24 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
 
 genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, EICParams)
 {
+    if (isFALSE(settings$chromatograms$features))
+        return(list())
+    
     anas <- analyses(fGroups)
     cat("Generate individual feature chromatograms...\n")
     # UNDONE: parallel option
     doApply("sapply", TRUE, names(fGroups), function(grp)
     {
         doProgress()
-        # whana <- fGroups[[grp]] > 0
-        whana <- rep(TRUE, length(anas))
-        sapply(anas[whana], function(ana)
+        mapply(anas, seq_along(anas), FUN = function(ana, anai)
         {
+            if (settings$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
+                return("")
             makeHTMLReportPlot("chrom_feat", outPath, settings$general$selfContained, "plotChroms",
                                list(fGroups, analysis = ana, groupName = grp, retMin = TRUE, EICs = EICs,
-                                    EICParams = modifyList(EICParams, list(topMost = NULL, onlyPresent = FALSE),
+                                    EICParams = modifyList(EICParams,
+                                                           list(topMost = NULL,
+                                                                onlyPresent = settings$chromatograms$features != "all"),
                                                            keep.null = TRUE), showFGroupRect = FALSE,
                                     showPeakArea = TRUE, title = "", bty = "l"),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",

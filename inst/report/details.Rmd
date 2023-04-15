@@ -71,8 +71,9 @@ bslib::layout_column_wrap(
                     maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "fg-cols-qual",
                                                            onChange = 'showFGCols("qualities", this.checked)')),
                     maybeIncl(utils$hasFQualities(), label("for" = "fg-cols-qual", "Quality scores")),
-                    input(type = "checkbox", id = "fg-large-chroms", onChange = 'showFGCols("chrom_large", this.checked)'),
-                    label("for" = "fg-large-chroms", "Large chromatograms"),
+                    maybeIncl(settings$chromatograms$large, input(type = "checkbox", id = "fg-large-chroms",
+                                                                  onChange = 'showFGCols("chrom_large", this.checked)')),
+                    maybeIncl(settings$chromatograms$large, label("for" = "fg-large-chroms", "Large chromatograms")),
                     input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
                     label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                     
@@ -153,10 +154,10 @@ bslib::layout_column_wrap(
         maybeIncl(utils$hasComponentsTPs(), callIncl(bslib::navs_tab_card,
             title = "Selected parent",
             full_screen = TRUE,
-            bslib::nav(
+            maybeIncl(settings$chromatograms$large, bslib::nav(
                 "Chromatogram",
                 bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
-            ),
+            )),
             maybeIncl(utils$hasComponentsFromTPs(), bslib::nav(
                 "Suspects",
                 bslib::card_body(class = "mx-auto", htmltools::strong("Parent")),

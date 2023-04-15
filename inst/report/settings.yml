@@ -6,9 +6,9 @@ general:
     noDate: false
 summary: [ chord, venn, upset ]
 chromatograms:
-    large: true
+    large: true # used for feature group table and parent chromatogram view
     small: true
-    features: all
+    features: false
 MSPeakLists:
     spectra: true
 formulas:

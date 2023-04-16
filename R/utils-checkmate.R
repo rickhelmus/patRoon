@@ -575,7 +575,7 @@ assertAndPrepareReportSettings <- function(settings)
     }
     
     checkmate::assertList(settings, any.missing = FALSE)
-    assertHasNames(settings, c("general", "summary", "chromatograms", "MSPeakLists", "formulas", "compounds", "TPs",
+    assertHasNames(settings, c("general", "summary", "features", "MSPeakLists", "formulas", "compounds", "TPs",
                                "internalStandards"))
     
     ac <- checkmate::makeAssertCollection()
@@ -589,15 +589,17 @@ assertAndPrepareReportSettings <- function(settings)
     
     checkmate::assertSubset(settings$summary, c("chord", "venn", "upset"), add = ac)
     
-    checkmate::assertList(settings$chromatograms)
-    checkmate::assertFlag(settings$chromatograms$large, add = ac)
-    checkmate::assertFlag(settings$chromatograms$small, add = ac)
+    checkmate::assertList(settings$features)
+    checkmate::assertList(settings$features$chromatograms)
+    checkmate::assertFlag(settings$features$chromatograms$large, add = ac)
+    checkmate::assertFlag(settings$features$chromatograms$small, add = ac)
     checkmate::assert(
-        checkmate::checkFlag(settings$chromatograms$features),
-        checkmate::checkChoice(settings$chromatograms$features, "all"),
-        .var.name = "settings$chromatograms$features",
+        checkmate::checkFlag(settings$features$chromatograms$features),
+        checkmate::checkChoice(settings$features$chromatograms$features, "all"),
+        .var.name = "settings$features$chromatograms$features",
         add = ac
     )
+    checkmate::assertFlag(settings$features$intensityPlots, add = ac)
     
     checkmate::assertList(settings$MSPeakLists)
     checkmate::assertFlag(settings$MSPeakLists$spectra, add = ac)

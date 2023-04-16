@@ -75,7 +75,7 @@ makeHTMLReportPlot <- function(outPrefix, outPath, selfContained, func, args, pa
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams)
 {
-    if (!settings$chromatograms$large)
+    if (!settings$features$chromatograms$large)
         return(list())
     
     cat("Generate large chromatograms...\n")
@@ -93,7 +93,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
 
 genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICParams)
 {
-    if (!settings$chromatograms$small)
+    if (!settings$features$chromatograms$small)
         return(list())
     
     cat("Generate small chromatograms...\n")
@@ -113,7 +113,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
 
 genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, EICParams)
 {
-    if (isFALSE(settings$chromatograms$features))
+    if (isFALSE(settings$features$chromatograms$features))
         return(list())
     
     anas <- analyses(fGroups)
@@ -124,13 +124,13 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
         doProgress()
         mapply(anas, seq_along(anas), FUN = function(ana, anai)
         {
-            if (settings$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
+            if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
                 return("")
             makeHTMLReportPlot("chrom_feat", outPath, settings$general$selfContained, "plotChroms",
                                list(fGroups, analysis = ana, groupName = grp, retMin = TRUE, EICs = EICs,
                                     EICParams = modifyList(EICParams,
                                                            list(topMost = NULL,
-                                                                onlyPresent = settings$chromatograms$features != "all"),
+                                                                onlyPresent = settings$features$chromatograms$features != "all"),
                                                            keep.null = TRUE), showFGroupRect = FALSE,
                                     showPeakArea = TRUE, title = "", bty = "l"),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
@@ -141,6 +141,9 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
 
 genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath)
 {
+    if (!settings$features$intensityPlots)
+        return(list())
+    
     cat("Generate intensity plots...\n")
     # UNDONE: parallel option
     

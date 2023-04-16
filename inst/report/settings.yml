@@ -5,10 +5,12 @@ general:
     selfContained: false # UNDONE?
     noDate: false
 summary: [ chord, venn, upset ]
-chromatograms:
-    large: true # used for feature group table and parent chromatogram view
-    small: true
-    features: false
+features:
+    chromatograms:
+        large: true # used for feature group table and parent chromatogram view
+        small: true
+        features: false
+    intensityPlots: false # UNDONE?
 MSPeakLists:
     spectra: true
 formulas:

@@ -29,17 +29,28 @@ function getNavTab(which)
     // class or ID can be set for bslib::nav_tab_card()
 
     let el;
-    if (which === "Suspects")
+    if (which == "Plain")
+        el = undefined;
+    else if (which === "Suspects")
         el = document.getElementById("struct_view-suspect");
     else if (which === "ISTDs")
         el = document.getElementById("struct_view-istd");
     else if (which === "Components")
         el = document.getElementById("chrom_view-component");
     else if (which === "TPs")
-        el = document.getElementById("int_plot-parent");
+    {
+        // For TPs it's a bit more complicated as all the tabs of the panel are optional
+        // NOTE: we don't have to check TP graphs, as struct_view-parent will then always be present
+        el = document.getElementById("chrom_view-tp") ||
+             document.getElementById("struct_view-parent") ||
+             document.getElementById("int_plot-parent");
+    }
 
-    for (var i=0; i<6; i++)
-        el = el.parentElement;
+    if (el != undefined)
+    {
+        for (var i=0; i<6; i++)
+            el = el.parentElement;
+    }
     
     return el;
 }
@@ -54,10 +65,9 @@ function updateView(sel)
     
     getViews().forEach(function(v)
     {
-        if (v === "Plain")
-            return;
         let el = getNavTab(v);
-        el.classList.toggle("d-none", v !== sel)
+        if (el)
+            el.classList.toggle("d-none", v !== sel)
     })
     
     if (document.getElementById("suspAnnTab"))
@@ -98,7 +108,11 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     Reactable.setMeta(tabEl, { selectedRow: rowIndex });
 
     Reactable.setFilter('featuresTab', 'group', grp);
-    document.getElementById('int_plot').src = plots.intPlots[grp];
+    
+    let intEl = document.getElementById('int_plot');
+    if (intEl)
+        intEl.src = plots.intPlots[grp];
+    
     if (document.getElementById('MSPLTab'))
     {
         Reactable.setFilter('MSPLTab', 'group', grp);
@@ -163,7 +177,8 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         
         if (chromEl)
             chromEl.src = plots.chromsLarge[rowValues.parent_group];
-        intEl.src = plots.intPlots[rowValues.parent_group];
+        if (intEl)
+            intEl.src = plots.intPlots[rowValues.parent_group];
         
         if (document.getElementById('parentInfoTab'))
         {

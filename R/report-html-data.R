@@ -204,12 +204,12 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
-    if (settings$chromatograms$small || settings$chromatograms$large)
+    if (settings$features$chromatograms$small || settings$features$chromatograms$large)
     {
         cols <- character()
-        if (settings$chromatograms$small)
+        if (settings$features$chromatograms$small)
             cols <- "chrom_small"
-        if (settings$chromatograms$large)
+        if (settings$features$chromatograms$large)
             cols <- c(cols, "chrom_large")
         
         # add EICs
@@ -217,7 +217,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         tabn <- names(tab)
         setcolorder(tab, c(tabn[seq_len(match("group", tabn))], cols)) # move after group column
 
-        if (settings$chromatograms$small)
+        if (settings$features$chromatograms$small)
         {
             cell <- function(value, index) htmltools::img(src = plots$chromsSmall[[value]],
                                                           style = list("max-height" = "20px"), class = "noZoomImg")
@@ -225,7 +225,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
                                                      cell = cell)
             
         }
-        if (settings$chromatograms$large)
+        if (settings$features$chromatograms$large)
         {
             colDefs$chrom_large <- reactable::colDef("chromatogram", minWidth = 400, show = FALSE, filterable = FALSE,
                                                      searchable = FALSE,
@@ -725,7 +725,7 @@ reportHTMLUtils$methods(
 
         anaInfo <- analysisInfo(objects$fGroups)
         
-        if (settings$chromatograms$features == "all")
+        if (settings$features$chromatograms$features == "all")
         {
             # add data for 'missing' analyses
             missingTab <- rbindlist(sapply(unique(tab$group), function(grp)
@@ -751,7 +751,7 @@ reportHTMLUtils$methods(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             rGroup = reactable::colDef("replicate group")
         )
-        if (!isFALSE(settings$chromatograms$features))
+        if (!isFALSE(settings$features$chromatograms$features))
         {
             # add EICs
             tab[, chromatogram := ""] # dummy value, not needed

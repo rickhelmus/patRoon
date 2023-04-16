@@ -45,9 +45,10 @@ doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$larg
 mdprintf("Generating report components: ")
 
 bslib::layout_column_wrap(
+    id = "detailsLayout",
     width = 1,
     height = "100%",
-    style = "padding-bottom: 10px; padding-right: 10px;",
+    style = "padding-bottom: 10px; padding-right: 10px; grid-template-rows: 1fr 1fr;",
     bslib::card(
         full_screen = TRUE,
         bslib::card_header("Feature groups"),
@@ -64,7 +65,7 @@ bslib::layout_column_wrap(
                            maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
                            maybeIncl(utils$hasComponentsTPs(), option(value = "TPs", "Transformation products"))
                     ),
-                    
+
                     input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
                           checked = TRUE),
                     label("for" = "fg-cols-info", "Group info"),
@@ -82,11 +83,30 @@ bslib::layout_column_wrap(
                     
                     button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFGTableElement())", "Download CSV"),
                     button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
-                           onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",  style = list(display = "none"), "Expand/collapse"),
+                           onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",
+                           style = list(display = "none"), "Expand/collapse"),
                     
                     div(class = "float-right",
                         label("for" = "fg-search", "Search"),
-                        input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)")
+                        input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)"),
+                        
+                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "ratio group",
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio21",
+                                  autocomplete = "off", onChange = 'setDetailsRatio(2, 1)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio21", "2:1"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio32",
+                                  autocomplete = "off", onChange = 'setDetailsRatio(3, 2)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio32", "3:2"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio11",
+                                  autocomplete = "off", onChange = 'setDetailsRatio(1, 1)', checked = TRUE),
+                            label(class = "btn btn-outline-primary", "for" = "ratio11", "1:1"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio23",
+                                  autocomplete = "off", onChange = 'setDetailsRatio(2, 3)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio23", "2:3"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio12",
+                                  autocomplete = "off", onChange = 'setDetailsRatio(1, 2)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio12", "1:2")
+                        ),
                     )
                 )
             })

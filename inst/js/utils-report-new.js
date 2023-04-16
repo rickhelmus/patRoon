@@ -55,6 +55,12 @@ function getNavTab(which)
     return el;
 }
 
+function setDetailsRatio(fr1, fr2)
+{
+    let el = document.getElementById("detailsLayout");
+    el.style["grid-template-rows"] = `${fr1}fr ${fr2}fr`;
+}
+
 function updateView(sel)
 {
     tid = "detailsTab" + sel;

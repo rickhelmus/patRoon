@@ -52,7 +52,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     settings <- readYAML(settingsFile)
-    assertReportSettings(settings)
+    settings <- assertAndPrepareReportSettings(settings)
     
     if (is.null(path))
         path <- settings$general$path

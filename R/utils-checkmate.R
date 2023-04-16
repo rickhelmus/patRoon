@@ -566,8 +566,14 @@ assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, ad
     checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
 }
 
-assertReportSettings <- function(settings)
+assertAndPrepareReportSettings <- function(settings)
 {
+    emptyListToVec <- function(val, evec)
+    {
+        # yaml package always returns empty sequences as lists --> convert to empty vector
+        return(if (is.list(val) && length(val) == 0) evec else val)
+    }
+    
     checkmate::assertList(settings, any.missing = FALSE)
     assertHasNames(settings, c("general", "summary", "chromatograms", "MSPeakLists", "formulas", "compounds", "TPs",
                                "internalStandards"))
@@ -599,22 +605,14 @@ assertReportSettings <- function(settings)
     checkmate::assertList(settings$formulas)
     checkmate::assertFlag(settings$formulas$include, add = ac)
     assertNormalizationMethod(settings$formulas$normalizeScores, add = ac)
-    checkmate::assert(
-        checkmate::checkCharacter(settings$formulas$exclNormScores, min.chars = 1, any.missing = FALSE),
-        checkmate::checkList(settings$formulas$exclNormScores, types = "character", any.missing = FALSE),
-        .var.name = "settings$formulas$exclNormScores",
-        add = ac
-    )
+    settings$formulas$exclNormScores <- emptyListToVec(settings$formulas$exclNormScores, character())
+    checkmate::assertCharacter(settings$formulas$exclNormScores, min.chars = 1, any.missing = FALSE, add = ac)
     checkmate::assertCount(settings$formulas$topMost, positive = TRUE, add = ac)
     
     checkmate::assertList(settings$compounds)
     assertNormalizationMethod(settings$compounds$normalizeScores, add = ac)
-    checkmate::assert(
-        checkmate::checkCharacter(settings$compounds$exclNormScores, min.chars = 1, any.missing = FALSE),
-        checkmate::checkList(settings$compounds$exclNormScores, types = "character", any.missing = FALSE),
-        .var.name = "settings$compounds$exclNormScores",
-        add = ac
-    )
+    settings$compounds$exclNormScores <- emptyListToVec(settings$compounds$exclNormScores, character())
+    checkmate::assertCharacter(settings$compounds$exclNormScores, min.chars = 1, any.missing = FALSE, add = ac)
     checkmate::assertCount(settings$compounds$topMost, positive = TRUE, add = ac)
     
     checkmate::assertList(settings$TPs)
@@ -625,6 +623,8 @@ assertReportSettings <- function(settings)
     checkmate::assertFlag(settings$internalStandards$graph, add = ac)
     
     checkmate::reportAssertions(ac)
+    
+    return(settings)
 }
 
 # from https://github.com/mllg/checkmate/issues/115

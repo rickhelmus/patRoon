@@ -20,7 +20,7 @@ reportHTMLUtils$methods(
     hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
     hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "fragmentMatches") %in% names(as.data.table(objects$components))),
     hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
-    hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")),
+    hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")) && settings$TPs$graphs,
     hasMSPL = function() hasObj("MSPeakLists"),
     hasFormulas = function() hasObj("formulas") && settings$formulas$include,
     hasCompounds = function() hasObj("compounds"),

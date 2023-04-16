@@ -544,10 +544,9 @@ reportHTMLUtils$methods(
         pars <- parents(objects$TPs)
 
         # NOTE: bit less height to avoid scrollbar in card
-        # UNDONE: params
         mainArgs <- list(objects$TPs, components = objects$components, width = "100%", height = "97%")
         if (inherits(objects$TPs, "transformationProductsStructure"))
-            mainArgs <- c(mainArgs, list(structuresMax = 10))
+            mainArgs <- c(mainArgs, list(structuresMax = settings$TPs$graphStructuresMax))
         
         hwidgets <- lapply(seq_len(nrow(cInfo)), function(i)
         {

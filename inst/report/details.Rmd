@@ -222,12 +222,12 @@ bslib::layout_column_wrap(
             ),
             maybeIncl(utils$hasMSPL(), bslib::nav(
                 "MS peak lists",
-                bslib::card_body(
+                callIncl(bslib::card_body,
                     style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
                     htmltools::strong("MS"),
                     htmltools::strong("MS/MS"),
-                    htmltools::img(id = "spectrumMS", style = "min-width: 20%;"),
-                    htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;"),
+                    maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMS", style = "min-width: 20%;")),
+                    maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;")),
                     utils$genMSPLTable(1),
                     utils$genMSPLTable(2)
                 )

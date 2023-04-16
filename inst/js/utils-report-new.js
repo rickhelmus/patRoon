@@ -99,12 +99,16 @@ function updateFeatTabRowSel(rowValues, rowIndex)
 
     Reactable.setFilter('featuresTab', 'group', grp);
     document.getElementById('int_plot').src = plots.intPlots[grp];
-    if (document.getElementById('spectrumMS'))
+    if (document.getElementById('MSPLTab'))
     {
-        document.getElementById('spectrumMS').src = plots.MSPeakLists[grp].MS;
         Reactable.setFilter('MSPLTab', 'group', grp);
-        document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
         Reactable.setFilter('MSMSPLTab', 'group', grp);
+        let specEl = document.getElementById('spectrumMS');
+        if (specEl) // not present if !settings$MSPeakLists$spectra
+        {
+            specEl.src = plots.MSPeakLists[grp].MS;
+            document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
+        }
     }
     if (document.getElementById('formulasTab'))
         Reactable.setFilter('formulasTab', 'group', grp);

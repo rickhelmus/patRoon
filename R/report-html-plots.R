@@ -191,6 +191,9 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath)
 
 genHTMLReportPlotsMSPeakLists <- function(MSPeakLists, settings, outPath)
 {
+    if (!settings$MSPeakLists$spectra)
+        return(list())
+    
     cat("Generate MS spectra...\n")
     
     if (length(MSPeakLists) == 0)

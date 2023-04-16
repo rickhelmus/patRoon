@@ -26,6 +26,8 @@
 - report all/detected features instead of just chroms
     - rename yml option?
 - store plot data elsewhere (ie not in metadata for all fg tables)?
+- option to plot intensities?
+    - may complicate getNavTab() for TPs
 
 
 ## Components

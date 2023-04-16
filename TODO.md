@@ -24,6 +24,8 @@
 - file cleaning doesn't work with selfContained=T: need a way to get original plot paths
 - maybe: mark if MS/MS, formulas, compounds are available in FG table
 - report all/detected features instead of just chroms
+    - rename yml option?
+- store plot data elsewhere (ie not in metadata for all fg tables)?
 
 
 ## Components

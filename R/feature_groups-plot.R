@@ -607,8 +607,10 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
     if (!is.null(EICs))
     {
         # omit data we don't need: speeds up hashing quite a bit
-        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
-                           topMostByRGroup = EICParams$topMostByRGroup, onlyPresent = EICParams$onlyPresent)
+        # NOTE: only apply analysis/group filters, as the rest will slow down things considerably. Hence, this could
+        # result in cache misses.
+        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
+                           topMostByRGroup = FALSE, onlyPresent = FALSE)
     }
     makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
              analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])

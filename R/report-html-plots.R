@@ -170,7 +170,7 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath)
     {
         compStructInfo <- as.data.table(compounds)[, c("group", "SMILES", "InChIKey"), with = FALSE]
         compStructInfo[, index := seq_len(.N), by = "group"]
-        compStructInfo <- compStructInfo[index <= 25][, -c("group", "index")] # UNDONE
+        compStructInfo <- compStructInfo[index <= settings$compounds$topMost][, -c("group", "index")]
     }
     
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))

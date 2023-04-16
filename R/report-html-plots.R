@@ -84,8 +84,8 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
     {
         doProgress()
         makeHTMLReportPlot("chrom_large-", outPath, settings$general$selfContained, "plotChroms",
-                           list(fGroups, groupName = grp, retMin = TRUE, EICs = EICs, EICParams = EICParams,
-                                colourBy = "rGroups", title = "", bty = "l"),
+                           list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
+                                EICParams = EICParams, colourBy = "rGroups", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -102,7 +102,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
     {
         doProgress()
         makeHTMLReportPlot("chrom_small", outPath, settings$general$selfContained, "plotChroms",
-                           list(fGroups, groupName = grp, retMin = TRUE, EICs = EICs,
+                           list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
                                 EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
                                                                        onlyPresent = TRUE)),
                                 showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
@@ -127,10 +127,9 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
             if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
                 return("")
             makeHTMLReportPlot("chrom_feat", outPath, settings$general$selfContained, "plotChroms",
-                               list(fGroups, analysis = ana, groupName = grp, retMin = TRUE, EICs = EICs,
-                                    EICParams = modifyList(EICParams,
-                                                           list(topMost = NULL,
-                                                                onlyPresent = settings$features$chromatograms$features != "all"),
+                               list(fGroups, analysis = ana, groupName = grp, retMin = settings$features$retMin,
+                                    EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
+                                                                                        onlyPresent = settings$features$chromatograms$features != "all"),
                                                            keep.null = TRUE), showFGroupRect = FALSE,
                                     showPeakArea = TRUE, title = "", bty = "l"),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
@@ -355,8 +354,8 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
         pl <- list()
         
         pl$chrom <- makeHTMLReportPlot("compon-chrom", outPath, settings$general$selfContained, "plotChroms",
-                                       list(components, cn, fGroups, retMin = TRUE, title = "", EICs = EICs,
-                                            EICParams = EICParams),
+                                       list(components, cn, fGroups, retMin = settings$features$retMin, title = "",
+                                            EICs = EICs, EICParams = EICParams),
                                        parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4,
                                        bg = "transparent", pointsize = 16)
 
@@ -461,10 +460,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     
     cat("Genarate summary plots...")
     
-    # UNDONE: params
-    
     ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, settings$general$selfContained, "plotChroms",
-                                              list(fGroups, retMin = TRUE, EICs = EICs,
+                                              list(fGroups, retMin = settings$features$retMin, EICs = EICs,
                                                    EICParams = modifyList(EICParams, list(topMost = 1,
                                                                                           topMostByRGroup = FALSE,
                                                                                           onlyPresent = TRUE)),
@@ -473,7 +470,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     
     ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, settings$general$selfContained, "plot",
-                                             list(fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = TRUE),
+                                             list(fGroups, colourBy = "fGroups", showLegend = FALSE,
+                                                  retMin = settings$features$retMin),
                                              parParams = list(mai = c(0.9, 0.8, 0.1, 0.1)), width = 10, height = 4)
     
     rGroupLenNonEmpty <- length(replicateGroups(removeEmptyAnalyses(fGroups)))

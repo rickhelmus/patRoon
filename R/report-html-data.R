@@ -12,7 +12,7 @@ roundFGTab <- function(ftab, fGroups)
     return(ftab)    
 }
 
-getFGTable <- function(fGroups, colSusp)
+getFGTable <- function(fGroups, colSusp, retMin)
 {
     tab <- if (isScreening(fGroups))
         as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
@@ -24,11 +24,13 @@ getFGTable <- function(fGroups, colSusp)
                                            featureQualityNames(scores = TRUE),
                                            grep("^ISTD_assigned", names(tab), value = TRUE)))
     
-    # if (rmdVars$retMin) UNDONE
-    tab[, ret := ret / 60]
-    if (!is.null(tab[["susp_d_rt"]]))
-        tab[, susp_d_rt := susp_d_rt / 60]
-
+    if (retMin)
+    {
+        tab[, ret := ret / 60]
+        if (!is.null(tab[["susp_d_rt"]]))
+            tab[, susp_d_rt := susp_d_rt / 60]
+    }
+    
     tab <- roundFGTab(tab, fGroups)
     
     if (nrow(internalStandards(fGroups)) > 0)
@@ -480,7 +482,7 @@ reportHTMLUtils$methods(
     genFGTablePlain = function()
     {
         mdprintf("Feature groups... ")
-        tab <- getFGTable(objects$fGroups, ",")
+        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
@@ -488,7 +490,7 @@ reportHTMLUtils$methods(
     },
     genFGTableSuspects = function()
     {
-        tab <- getFGTable(objects$fGroups, NULL)[!is.na(susp_name)]
+        tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin)[!is.na(susp_name)]
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
@@ -498,15 +500,15 @@ reportHTMLUtils$methods(
     {
         istds <- data.table::copy(internalStandards(objects$fGroups))
         istds <- subsetDTColumnsIfPresent(istds, c("name", "group", "InChIKey", "d_rt", "d_mz", "sets"))
-        # if (rmdVars$retMin) UNDONE
-        istds[, d_rt := d_rt / 60]
+        if (settings$features$retMin)
+            istds[, d_rt := d_rt / 60]
         
         # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. Rename the columns
         # here, so that groupDefs etc are set like suspects.
         rncols <- setdiff(names(istds), "group")
         setnames(istds, rncols, paste0("susp_", rncols))
         
-        ftab <- getFGTable(objects$fGroups, ",")
+        ftab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
         ftab <- removeDTColumnsIfPresent(ftab, c("susp_name", "susp_sets", grep("^ISTD_assigned",
                                                                                 names(ftab), value = TRUE)))
         tab <- merge(ftab, istds, by = "group")
@@ -520,7 +522,7 @@ reportHTMLUtils$methods(
     },
     genFGTableComponents = function()
     {
-        tab <- getFGTable(objects$fGroups, ",")
+        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
         groupDefs <- getFGGroupDefs(tab, "component", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         
@@ -559,7 +561,7 @@ reportHTMLUtils$methods(
     {
         fromTPs <- objects$components@fromTPs
         
-        tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",")
+        tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin)
         
         tabCompon <- as.data.table(objects$components)
         tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
@@ -597,11 +599,16 @@ reportHTMLUtils$methods(
 }", level))
 
         # NOTE: below values may be in components but then from suspect list
-        # UNDONE: convert RT to minutes if needed
         tabTPs[, c("parent_ret", "parent_mz") := groupInfo(objects$fGroups)[parent_group, ]]
         
-        for (col in intersect(c("parent_ret", "retDiff", "specSimilarity"), names(tabTPs)))
+        for (col in intersect(c("parent_ret", "retDiff"), names(tabTPs)))
+        {
+            if (settings$features$retMin)
+                tabTPs[, (col) := get(col) / 60]
             tabTPs[, (col) := round(get(col), 2)]
+        }
+        if (!is.null(tabTPs[["specSimilarity"]]))
+            tabTPs[, specSimilarity := round(specSimilarity, 2)]
         for (col in c("parent_mz", "mzDiff"))
             tabTPs[, (col) := round(get(col), 5)]
 
@@ -672,7 +679,11 @@ reportHTMLUtils$methods(
         for (col in intersect(c("neutralMass", "mz"), names(tab)))
             set(tab, j = col, value = round(tab[[col]], 5))
         if (!is.null(tab[["rt"]]))
+        {
+            if (settings$features$retMin)
+                set(tab, j = "rt", value = tab$rt / 60)
             set(tab, j = "rt", value = round(tab$rt, 2))
+        }
         if (!is.null(tab[["formula"]]))
             set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
         
@@ -689,7 +700,11 @@ reportHTMLUtils$methods(
         for (col in intersect(c("neutralMass", "mz"), names(tab)))
             set(tab, j = col, value = round(tab[[col]], 5))
         if (!is.null(tab[["rt"]]))
+        {
+            if (settings$features$retMin)
+                set(tab, j = "rt", value = tab$rt / 60)
             set(tab, j = "rt", value = round(tab$rt, 2))
+        }
         if (!is.null(tab[["formula"]]))
             set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
         
@@ -706,7 +721,11 @@ reportHTMLUtils$methods(
             set(tab, j = col, value = round(tab[[col]], 5))
         for (col in intersect(c("cmp_ret", "cmp_retsd", "cmp_ppm", "ret_increment", "ret_min", "ret_max", "ret_range"),
                               names(tab)))
+        {
+            if (col != "cmp_ppm" && settings$features$retMin)
+                set(tab, j = col, value = tab[[col]] / 60)
             set(tab, j = col, value = round(tab[[col]], 2))
+        }
         
         ptab <- makePropTab(tab, NULL, "name")
         makePropReactable(ptab, "componentInfoTab", "name", minPropWidth = 120, minValWidth = 150)
@@ -719,7 +738,10 @@ reportHTMLUtils$methods(
         tab <- as.data.table(getFeatures(objects$fGroups))
         tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
         tab <- removeDTColumnsIfPresent(tab, featureQualityNames(group = FALSE, scores = FALSE)) # only show scores
-      
+
+        if (settings$features$retMin)
+            tab[, c("ret", "retmin", "retmax") := .(ret / 60, retmin / 60, retmax / 60)]
+        
         for (col in names(tab)[sapply(tab, is.numeric)])
             set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax")) 5 else 2))
 

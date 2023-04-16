@@ -1,11 +1,11 @@
 general:
     path: report
-    retMin: true
     plotFileRetention: 7 # days until unused plot files are removed
     selfContained: false # UNDONE?
     noDate: false
 summary: [ chord, venn, upset ]
 features:
+    retMin: true
     chromatograms:
         large: true # used for feature group table and parent chromatogram view
         small: true

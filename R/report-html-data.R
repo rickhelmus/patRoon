@@ -255,11 +255,11 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     {
         if (rowInfo.level === 0)
         {
-            ret.background = 'black';
-            ret.color = 'white';
+            ret.background = 'lightcyan';
+            //ret.color = 'white';
         }
         else if (gby.length > 1 && rowInfo.level === 1 && column.id !== gby[0])
-            ret.background = 'LightGrey';
+            ret.background = '#f7ffff';
     }
     
     if ([ %s ].includes(column.id))

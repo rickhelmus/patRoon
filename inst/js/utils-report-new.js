@@ -160,7 +160,6 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     {
         const chromEl = document.getElementById('chrom_view-tp');
         const intEl = document.getElementById('int_plot-parent');
-        const specSimEl = document.getElementById('similarity_spec');
         
         if (chromEl)
             chromEl.src = plots.chromsLarge[rowValues.parent_group];
@@ -174,11 +173,13 @@ function updateFeatTabRowSel(rowValues, rowIndex)
             Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
         }
         
-        if (plots.TPs.length > 0)
+        if (Object.keys(plots.TPs).length > 0)
         {
+            const specSimEl = document.getElementById('similarity_spec');
             specSimEl.src = plots.TPs[rowValues.component][rowValues.cmpIndex];
             specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
         }
+        
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
         Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);

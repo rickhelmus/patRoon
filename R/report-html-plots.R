@@ -228,6 +228,9 @@ genHTMLReportPlotsMSPeakLists <- function(MSPeakLists, settings, outPath)
 
 genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, settings, outPath)
 {
+    if (!settings$formulas$include)
+        return(list())
+    
     cat("Generate formula annotation plots...\n")
     
     if (length(formulas) == 0)
@@ -238,8 +241,8 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, settings, outPath)
     {
         ret <- list()
         
-        if (nrow(ann) > 25)
-            ann <- ann[seq_len(25)] # UNDONE
+        if (nrow(ann) > settings$formulas$topMost)
+            ann <- ann[seq_len(settings$formulas$topMost)]
         
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
@@ -251,9 +254,9 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, settings, outPath)
         
         ret$scores <- sapply(seq_len(nrow(ann)), function(index)
         {
-            # UNDONE: params
             makeHTMLReportPlot("form-scores", outPath, settings$general$selfContained, "plotScores",
-                               list(formulas, index, grp), width = 6, height = 5)
+                               list(formulas, index, grp, normalizeScores = settings$formulas$normalizeScores,
+                                    excludeNormScores = settings$formulas$exclNormScores), width = 6, height = 5)
         })
         
         doProgress()
@@ -274,8 +277,8 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, settin
     {
         ret <- list()
 
-        if (nrow(ann) > 25)
-            ann <- ann[seq_len(25)] # UNDONE
+        if (nrow(ann) > settings$compounds$topMost)
+            ann <- ann[seq_len(settings$compounds$topMost)]
         
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
@@ -286,10 +289,10 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, settin
         
         ret$scores <- sapply(seq_len(nrow(ann)), function(index)
         {
-            # UNDONE: params
             makeHTMLReportPlot("comp-scores", outPath, settings$general$selfContained, "plotScores",
-                               list(compounds, index, grp), parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)),
-                               width = 7, height = 4, pointsize = 16)
+                               list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
+                                    excludeNormScores = settings$compounds$exclNormScores),
+                               parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
         })
         
         doProgress()

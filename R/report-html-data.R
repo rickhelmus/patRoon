@@ -834,7 +834,7 @@ reportHTMLUtils$methods(
             return(makeAnnReactable(data.table(formula = character()), "formulasTab"))
         }
 
-        hash <- makeHash(formulas, objects$MSPeakLists[, groupNames(formulas)])
+        hash <- makeHash(formulas, objects$MSPeakLists[, groupNames(formulas)], settings$formulas)
         # set fixDTs to FALSE, since it considerably slows down cache loading and we're not dealing with data.tables here
         cd <- loadCacheData("reportHTMLFormulas", hash, fixDTs = FALSE)
         if (!is.null(cd))
@@ -848,7 +848,7 @@ reportHTMLUtils$methods(
         
         tab[, candidate := seq_len(.N), by = "group"]
         
-        tab <- tab[candidate <= 25] # UNDONE
+        tab <- tab[candidate <= settings$formulas$topMost]
         
         for (col in names(tab))
         {
@@ -939,7 +939,8 @@ reportHTMLUtils$methods(
             return(makeAnnReactable(data.table(compound = character()), "compoundsTab"))
         }
 
-        hash <- makeHash(compounds, objects$formulas[groupNames(compounds)], objects$MSPeakLists[, groupNames(compounds)])
+        hash <- makeHash(compounds, objects$formulas[groupNames(compounds)], objects$MSPeakLists[, groupNames(compounds)],
+                         settings$compounds)
         cd <- loadCacheData("reportHTMLCompounds", hash, fixDTs = FALSE)
         if (!is.null(cd))
             return(cd)
@@ -952,7 +953,7 @@ reportHTMLUtils$methods(
         
         tab[, candidate := seq_len(.N), by = "group"]
         
-        tab <- tab[candidate <= 25] # UNDONE
+        tab <- tab[candidate <= settings$compounds$topMost]
         
         cmpNames2 <- tab[["compoundName2"]]
         if (!is.null(cmpNames2))

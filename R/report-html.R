@@ -22,7 +22,7 @@ reportHTMLUtils$methods(
     hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
     hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")),
     hasMSPL = function() hasObj("MSPeakLists"),
-    hasFormulas = function() hasObj("formulas"),
+    hasFormulas = function() hasObj("formulas") && settings$formulas$include,
     hasCompounds = function() hasObj("compounds"),
     hasCompsCluster = function() hasObj("compsCluster"),
     

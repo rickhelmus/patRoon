@@ -72,6 +72,11 @@ html, body {
 
 </style>
 
+```{r results='asis'}
+# add plot paths as JS global
+printf("<script>const reportPlots = JSON.parse('%s');</script>\n", jsonlite::toJSON(plots))
+```
+
 Summary
 ================
 

@@ -300,7 +300,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
-                        meta = list(selectedRow = 0, plots = plots, colToggles = colToggles),
+                        meta = list(selectedRow = 0, colToggles = colToggles),
                         rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;

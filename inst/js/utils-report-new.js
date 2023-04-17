@@ -109,7 +109,6 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     
     const tabEl = getSelFGTableElement();
     const grp = rowValues.group;
-    const plots = Reactable.getState(tabEl).meta.plots;
     
     Reactable.setMeta(tabEl, { selectedRow: rowIndex });
 
@@ -117,7 +116,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     
     let intEl = document.getElementById('int_plot');
     if (intEl)
-        intEl.src = plots.intPlots[grp];
+        intEl.src = reportPlots.intPlots[grp];
     
     if (document.getElementById('MSPLTab'))
     {
@@ -126,8 +125,8 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         let specEl = document.getElementById('spectrumMS');
         if (specEl) // not present if !settings$MSPeakLists$spectra
         {
-            specEl.src = plots.MSPeakLists[grp].MS;
-            document.getElementById('spectrumMSMS').src = plots.MSPeakLists[grp].MSMS;
+            specEl.src = reportPlots.MSPeakLists[grp].MS;
+            document.getElementById('spectrumMSMS').src = reportPlots.MSPeakLists[grp].MSMS;
         }
     }
     if (document.getElementById('formulasTab'))
@@ -141,14 +140,14 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     const ccd = document.getElementById('comps_cluster-dendro');
     if (ccd)
     {
-        ccd.src = plots.compsCluster[grp].dendro;
+        ccd.src = reportPlots.compsCluster[grp].dendro;
         Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
     }
 
     if (tabEl === "detailsTabSuspects")
     {
         const structEl = document.getElementById('struct_view-suspect');
-        structEl.src = plots.structs[rowValues.susp_InChIKey] || "";
+        structEl.src = reportPlots.structs[rowValues.susp_InChIKey] || "";
         Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
@@ -156,7 +155,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     else if (tabEl === "detailsTabISTDs")
     {
         const structEl = document.getElementById('struct_view-istd');
-        structEl.src = plots.structs[rowValues.InChIKey] || "";
+        structEl.src = reportPlots.structs[rowValues.InChIKey] || "";
         Reactable.setFilter('ISTDInfoTab', 'name', rowValues.susp_name);
     }
     else if (tabEl === "detailsTabComponents")
@@ -165,7 +164,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         let specEl = document.getElementById('spectrum_view-component');
         let profileRelEl = document.getElementById('profileRel_view-component');
         let profileAbsEl = document.getElementById('profileAbs_view-component');
-        const pl = plots.components.components[rowValues.component];
+        const pl = reportPlots.components.components[rowValues.component];
         chromEl.src = pl.chrom;
         specEl.src = pl.spec;
         if (profileRelEl != undefined)
@@ -182,22 +181,22 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         const intEl = document.getElementById('int_plot-parent');
         
         if (chromEl)
-            chromEl.src = plots.chromsLarge[rowValues.parent_group];
+            chromEl.src = reportPlots.chromsLarge[rowValues.parent_group];
         if (intEl)
-            intEl.src = plots.intPlots[rowValues.parent_group];
+            intEl.src = reportPlots.intPlots[rowValues.parent_group];
         
         if (document.getElementById('parentInfoTab'))
         {
-            document.getElementById('struct_view-parent').src = plots.structs[rowValues.parent_susp_InChIKey];
+            document.getElementById('struct_view-parent').src = reportPlots.structs[rowValues.parent_susp_InChIKey];
             Reactable.setFilter('parentInfoTab', 'name', rowValues.parent_susp_name);
-            document.getElementById('struct_view-tp').src = plots.structs[rowValues.susp_InChIKey];
+            document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey];
             Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
         }
         
-        if (Object.keys(plots.TPs).length > 0)
+        if (Object.keys(reportPlots.TPs).length > 0)
         {
             const specSimEl = document.getElementById('similarity_spec');
-            specSimEl.src = plots.TPs[rowValues.component][rowValues.cmpIndex];
+            specSimEl.src = reportPlots.TPs[rowValues.component][rowValues.cmpIndex];
             specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
         }
         

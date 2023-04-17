@@ -1245,20 +1245,23 @@ newProject <- function(destPath = NULL)
                 return(FALSE)
             }
             
-            checkAnas <- if (input$ionization != "both")
-                input$analysisTableFile
-            else
-                c(input$analysisTableFilePos, input$analysisTableFileNeg)
-            for (f in checkAnas)
+            if (input$generateAnaInfo == "table")
             {
-                p <- file.path(input$destinationPath, f)
-                if (file.exists(p))
+                checkAnas <- if (input$ionization != "both")
+                    input$analysisTableFile
+                else
+                    c(input$analysisTableFilePos, input$analysisTableFileNeg)
+                for (f in checkAnas)
                 {
-                    ov <- rstudioapi::showQuestion("Analysis table file already exists",
-                                                   sprintf("Analysis table file already exists: '%s'.\nOverwrite?", p),
-                                                   "Yes", "No")
-                    if (!ov)
-                        return(FALSE)
+                    p <- file.path(input$destinationPath, f)
+                    if (file.exists(p))
+                    {
+                        ov <- rstudioapi::showQuestion("Analysis table file already exists",
+                                                       sprintf("Analysis table file already exists: '%s'.\nOverwrite?", p),
+                                                       "Yes", "No")
+                        if (!ov)
+                            return(FALSE)
+                    }
                 }
             }
             

@@ -187,7 +187,7 @@ test_that("basic subsetting", {
 
 test_that("as.data.table() works", {
     testFeatAnnADT(comps)
-    normScName <- if (testWithSets()) "isoScore-positive" else "fragScore"
+    normScName <- if (testWithSets()) "fragScore-positive" else "fragScore"
     expect_range(as.data.table(comps, normalizeScores = "max")[[normScName]], c(0, 1))
 })
 

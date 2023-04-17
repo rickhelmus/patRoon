@@ -160,6 +160,8 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
 {
     if (!is.null(analysis))
         EICs <- EICs[names(EICs) %chin% analysis]
+    else
+        analysis <- analyses(fGroups)
     if (!is.null(groupName))
         EICs <- lapply(EICs, function(e) e[names(e) %chin% groupName])
 
@@ -180,8 +182,9 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
         gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group")]]
         for (fg in names(fGroups))
         {
-            anasWithFG <- mapply(names(EICs), EICs, FUN = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
+            anasWithFG <- Map(names(EICs), EICs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
             anasWithFG <- pruneList(anasWithFG, checkEmptyElements = TRUE)
+            anasWithFG <- unlist(anasWithFG)
             tab <- gTable[analysis %chin% anasWithFG, c(fg, "analysis", "rGroup"), with = FALSE]
             if (nrow(tab) > 0)
             {

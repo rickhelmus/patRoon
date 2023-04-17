@@ -1348,7 +1348,7 @@ newProject <- function(destPath = NULL)
             if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
             {
                 df <- rhandsontable::hot_to_r(input[[name]])
-                rValues[[rvName]][, c("exclude", "group", "blank") := .(df$exclude, df$group, df$blank)]
+                rValues[[rvName]][, c("exclude", "group", "blank", "norm_conc") := .(df$exclude, df$group, df$blank, df$norm_conc)]
             }
         }
         observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))

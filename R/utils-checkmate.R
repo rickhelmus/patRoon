@@ -263,7 +263,7 @@ assertLogicTransformations <- function(x, null.ok = FALSE, .var.name = checkmate
                   .var.name = .var.name, add = add)
     assertListVal(x, "add", checkmate::assertCharacter, .var.name = .var.name, add = add)
     assertListVal(x, "sub", checkmate::assertCharacter, .var.name = .var.name, add = add)
-    assertListVal(x, "retDir", checkmate::assertSubset, c(-1, 0, 1), .var.name = .var.name, add = add)
+    assertListVal(x, "retDir", checkmate::assertSubset, choices = c(-1, 0, 1), .var.name = .var.name, add = add)
 }
 
 assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)

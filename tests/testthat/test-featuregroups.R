@@ -560,7 +560,7 @@ test_that("plotting empty objects works", {
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_ggplot(plotUpSet(fGConsOneEmpty))
     
-    expect_error(plotGraph(fgNormISTDEmpty), "No feature groups")
+    expect_HTML(plotGraph(fgNormISTDEmpty))
 })
 
 if (testWithSets())
@@ -633,5 +633,5 @@ test_that("sets functionality", {
     
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))
-    expect_error(plotGraph(fgNormISTDEmpty, set = "positive"), "No feature groups")
+    expect_HTML(plotGraph(fgNormISTDEmpty, set = "positive"))
 })

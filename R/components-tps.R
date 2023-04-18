@@ -117,7 +117,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
-        return(componentsTPs(componentInfo = data.table(), components = list()), fromTPs = !is.null(TPs))
+        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
     }
     
     gInfoParents <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)

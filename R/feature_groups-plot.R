@@ -789,29 +789,34 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
     if (onlyPresent)
         ISTDAssign <- pruneList(lapply(ISTDAssign, function(ia) ia[ia %chin% gNames]), checkEmptyElements = TRUE)
     
-    nodes <- data.table(id = union(names(ISTDAssign), unlist(ISTDAssign)))
-    nodes[, group := fifelse(id %chin% names(ISTDAssign), "fGroup", "ISTD")]
-    nodes[group == "ISTD", ISTD := paste0(ISTDs[group == id]$name, collapse = ","), by = "id"]
-    nodes[group == "fGroup", ISTD := paste0(ISTDs[group %in% ISTDAssign[[id]]]$name, collapse = ","), by = id]
-    nodes[, label := id]
-    
-    gInfo <- groupInfo(obj)
-    sInfo <- if (isScreening(obj)) screenInfo(obj) else NULL
-    nodes[id %chin% gNames, title := mapply(id, group, FUN = function(grp, type)
+    nodes <- data.table(id = character(), label = character(), group = character())
+    edges <- data.table()
+    if (length(ISTDAssign) > 0)
     {
-        istds <- if (type == "ISTD")
-            getStrListWithMax(ISTDs[group == grp]$name, 6, "/")
-        else
-            getStrListWithMax(ISTDs[group %chin% ISTDAssign[[grp]]]$name, 3, "/")
-        ret <- sprintf("<b>%s</b><br>RT: %.2f<br>m/z: %.4f<br>ISTD: %s", grp, gInfo[grp, "rts"], gInfo[grp, "mzs"],
-                       istds)
-        if (!is.null(sInfo) && grp %chin% sInfo$group)
-            ret <- paste0(ret, "<br>", "Suspect(s): ", getStrListWithMax(sInfo[group == grp]$name, 3, "/"))
-        return(ret)
-    })]
-    nodes[is.na(title), title := sprintf("<b>%s</b> (removed)", id)]
-    
-    edges <- rbindlist(Map(names(ISTDAssign), ISTDAssign, f = function(grp, ia) data.table(from = ia, to = grp)))
+        nodes <- data.table(id = union(names(ISTDAssign), unlist(ISTDAssign)))
+        nodes[, group := fifelse(id %chin% names(ISTDAssign), "fGroup", "ISTD")]
+        nodes[group == "ISTD", ISTD := paste0(ISTDs[group == id]$name, collapse = ","), by = "id"]
+        nodes[group == "fGroup", ISTD := paste0(ISTDs[group %in% ISTDAssign[[id]]]$name, collapse = ","), by = id]
+        nodes[, label := id]
+        
+        gInfo <- groupInfo(obj)
+        sInfo <- if (isScreening(obj)) screenInfo(obj) else NULL
+        nodes[id %chin% gNames, title := mapply(id, group, FUN = function(grp, type)
+        {
+            istds <- if (type == "ISTD")
+                getStrListWithMax(ISTDs[group == grp]$name, 6, "/")
+            else
+                getStrListWithMax(ISTDs[group %chin% ISTDAssign[[grp]]]$name, 3, "/")
+            ret <- sprintf("<b>%s</b><br>RT: %.2f<br>m/z: %.4f<br>ISTD: %s", grp, gInfo[grp, "rts"], gInfo[grp, "mzs"],
+                           istds)
+            if (!is.null(sInfo) && grp %chin% sInfo$group)
+                ret <- paste0(ret, "<br>", "Suspect(s): ", getStrListWithMax(sInfo[group == grp]$name, 3, "/"))
+            return(ret)
+        })]
+        nodes[is.na(title), title := sprintf("<b>%s</b> (removed)", id)]
+        
+        edges <- rbindlist(Map(names(ISTDAssign), ISTDAssign, f = function(grp, ia) data.table(from = ia, to = grp)))
+    }
     
     # based on default defined in visInteraction() --> decreased font-size
     titleStyle <- paste("position: fixed; visibility:hidden; padding: 5px; white-space: nowrap; font-family: verdana;",

@@ -40,6 +40,7 @@
 - EIC params
     - getDefEICParams() ref docs
     - mention when eg topMost is ignored
+- formulaDiff format changed
 
 
 ## Features

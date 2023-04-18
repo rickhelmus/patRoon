@@ -9,13 +9,6 @@ getHTMLReportPlotPath <- function(outPath)
     return(plotPath)
 }
 
-getHTMLReportFinalPlotPath <- function(out, selfContained)
-{
-    if (selfContained)
-        return(knitr::image_uri(out))
-    return(file.path("report_files", "plots", basename(out)))
-}
-
 makeHTMLReportPlotOld <- function(out, outPath, selfContained, code, ...)
 {
     if (FALSE)
@@ -46,8 +39,7 @@ makeHTMLReportPlotOld <- function(out, outPath, selfContained, code, ...)
     # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
 }
 
-makeHTMLReportPlot <- function(outPrefix, outPath, selfContained, func, args, parParams = list(), cache = TRUE,
-                               doPrint = FALSE, ...)
+makeHTMLReportPlot <- function(outPrefix, outPath, func, args, parParams = list(), cache = TRUE, doPrint = FALSE, ...)
 {
     out <- if (cache)
     {
@@ -70,7 +62,7 @@ makeHTMLReportPlot <- function(outPrefix, outPath, selfContained, func, args, pa
         }, ...)
     }
     
-    return(getHTMLReportFinalPlotPath(ppath, selfContained))
+    return(ppath)
 }
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams)
@@ -83,7 +75,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
     doApply("sapply", TRUE, names(fGroups), function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("chrom_large-", outPath, settings$general$selfContained, "plotChroms",
+        makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
                                 EICParams = EICParams, colourBy = "rGroups", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
@@ -101,7 +93,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
     doApply("sapply", TRUE, names(fGroups), function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("chrom_small", outPath, settings$general$selfContained, "plotChroms",
+        makeHTMLReportPlot("chrom_small", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
                                 EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
                                                                        onlyPresent = TRUE)),
@@ -126,7 +118,7 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
         {
             if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
                 return("")
-            makeHTMLReportPlot("chrom_feat", outPath, settings$general$selfContained, "plotChroms",
+            makeHTMLReportPlot("chrom_feat", outPath, "plotChroms",
                                list(fGroups, analysis = ana, groupName = grp, retMin = settings$features$retMin,
                                     EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
                                                                                         onlyPresent = settings$features$chromatograms$features != "all"),
@@ -155,9 +147,9 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath)
     doApply("sapply", TRUE, names(fGroups), function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("int_plot", outPath, settings$general$selfContained, "plotInt", 
-                           c(list(fGroups[, grp]), mainArgs), parParams = list(mar = c(4.1, 4.1, 1, 0.1)),
-                           width = 8, height = 4, bg = "transparent", pointsize = 16)
+        makeHTMLReportPlot("int_plot", outPath, "plotInt", c(list(fGroups[, grp]), mainArgs),
+                           parParams = list(mar = c(4.1, 4.1, 1, 0.1)), width = 8, height = 4, bg = "transparent",
+                           pointsize = 16)
     }, simplify = FALSE)
 }
 
@@ -185,7 +177,7 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath)
             if (!file.exists(pf))
                 saveRCDKStructure(getMoleculesFromSMILES(smi)[[1]], "svg", pf, 100, 100)
             doProgress()
-            return(getHTMLReportFinalPlotPath(pf, settings$general$selfContained))
+            return(pf)
         }))
     }
     return(list())
@@ -209,14 +201,12 @@ genHTMLReportPlotsMSPeakLists <- function(MSPeakLists, settings, outPath)
         args <- list(MSPeakLists, groupName = grp, title = "")
         pp <- list(mar = c(4.1, 4.1, 0.2, 0.2))
         
-        ret$MS <- makeHTMLReportPlot("spec-MS", outPath, settings$general$selfContained, "plotSpectrum",
-                                     c(list(MSLevel = 1), args), parParams = pp,
+        ret$MS <- makeHTMLReportPlot("spec-MS", outPath, "plotSpectrum", c(list(MSLevel = 1), args), parParams = pp,
                                      width = 7, height = 4)
         
         ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
         {
-            makeHTMLReportPlot("spec-MSMS", outPath, settings$general$selfContained, "plotSpectrum",
-                               c(list(MSLevel = 2), args), parParams = pp,
+            makeHTMLReportPlot("spec-MSMS", outPath, "plotSpectrum", c(list(MSLevel = 2), args), parParams = pp,
                                width = 7, height = 4)
         }
         else
@@ -250,13 +240,14 @@ genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, settings, outPath)
         {
             if (is.null(MSPeakLists[[grp]][["MSMS"]]))
                 return("")
-            makeHTMLReportPlot("form-spec", outPath, settings$general$selfContained, "plotSpectrum",
-                               list(formulas, index, grp, MSPeakLists = MSPeakLists), width = 7, height = 4)
+            makeHTMLReportPlot("form-spec", outPath, "plotSpectrum", list(formulas, index, grp,
+                                                                          MSPeakLists = MSPeakLists),
+                               width = 7, height = 4)
         })
         
         ret$scores <- sapply(seq_len(nrow(ann)), function(index)
         {
-            makeHTMLReportPlot("form-scores", outPath, settings$general$selfContained, "plotScores",
+            makeHTMLReportPlot("form-scores", outPath, "plotScores",
                                list(formulas, index, grp, normalizeScores = settings$formulas$normalizeScores,
                                     excludeNormScores = settings$formulas$exclNormScores), width = 6, height = 5)
         })
@@ -284,14 +275,14 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, settin
         
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
-            makeHTMLReportPlot("comp-spec", outPath, settings$general$selfContained, "plotSpectrum",
+            makeHTMLReportPlot("comp-spec", outPath, "plotSpectrum",
                                list(compounds, index, grp, MSPeakLists, formulas, FALSE, title = ""),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4, pointsize = 16)
         })
         
         ret$scores <- sapply(seq_len(nrow(ann)), function(index)
         {
-            makeHTMLReportPlot("comp-scores", outPath, settings$general$selfContained, "plotScores",
+            makeHTMLReportPlot("comp-scores", outPath, "plotScores",
                                list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
                                     excludeNormScores = settings$compounds$exclNormScores),
                                parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
@@ -315,12 +306,12 @@ genHTMLReportPlotsCompsCluster <- function(compsCluster, settings, outPath)
     {
         ret <- list()
         
-        ret$dendro <- makeHTMLReportPlot("comp-clust-dendro", outPath, settings$general$selfContained, "plot",
-                                         list(compsCluster, groupName = grp), width = 12, height = 4, pointsize = 16)
+        ret$dendro <- makeHTMLReportPlot("comp-clust-dendro", outPath, "plot", list(compsCluster, groupName = grp),
+                                         width = 12, height = 4, pointsize = 16)
         
         ret$mcs <- sapply(sort(unique(ct)), function(cli)
         {
-            makeHTMLReportPlot("comp-clust-mcs", outPath, settings$general$selfContained, "plotStructure",
+            makeHTMLReportPlot("comp-clust-mcs", outPath, "plotStructure",
                                list(compsCluster, groupName = grp, cluster = cli, 100, 100), width = 5, height = 4)
         })
         
@@ -342,8 +333,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
     ret <- list()
     
     if (isIntCl || inherits(components, "componentsSpecClust"))
-        ret$dendro <- makeHTMLReportPlot("compon-dendro.svg", outPath, settings$general$selfContained, "plot",
-                                         list(components))
+        ret$dendro <- makeHTMLReportPlot("compon-dendro.svg", outPath, "plot", list(components))
     
     # UNDONE: parallel option
     ret$components <- pruneList(doApply("Map", TRUE, names(components), componentTable(components), f = function(cn, ct)
@@ -353,24 +343,24 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
         
         pl <- list()
         
-        pl$chrom <- makeHTMLReportPlot("compon-chrom", outPath, settings$general$selfContained, "plotChroms",
+        pl$chrom <- makeHTMLReportPlot("compon-chrom", outPath, "plotChroms",
                                        list(components, cn, fGroups, retMin = settings$features$retMin, title = "",
                                             EICs = EICs, EICParams = EICParams),
                                        parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4,
                                        bg = "transparent", pointsize = 16)
 
-        pl$spec <- makeHTMLReportPlot("compon-spec", outPath, settings$general$selfContained, "plotSpectrum",
-                                      list(components, cn), parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
-                                      width = 7, height = 4, pointsize = 16)
+        pl$spec <- makeHTMLReportPlot("compon-spec", outPath, "plotSpectrum", list(components, cn),
+                                      parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4,
+                                      pointsize = 16)
         
         if (isIntCl)
         {
-            pl$profileRel <- makeHTMLReportPlot("compon-int_rel", outPath, settings$general$selfContained, "plotInt",
+            pl$profileRel <- makeHTMLReportPlot("compon-int_rel", outPath, "plotInt",
                                                 list(components, index = cn,
                                                      plotArgs = list(main = "normalized", bty = "l")),
                                                 width = 7, height = 6, pointsize = 16)
             
-            pl$profileAbs <- makeHTMLReportPlot("compon-int_abs", outPath, settings$general$selfContained, "plotInt",
+            pl$profileAbs <- makeHTMLReportPlot("compon-int_abs", outPath, "plotInt",
                                                 list(fGroups[, components[[cn]]$group],
                                                      average = clusterProperties(components)$average,
                                                      plotArgs = list(main = "absolute", bty = "l")),
@@ -440,7 +430,7 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
             
             # UNDONE
             specSimParams <- getDefSpecSimParams()
-            return(makeHTMLReportPlot("spec_sim", outPath, settings$general$selfContained, "plotSpectrum",
+            return(makeHTMLReportPlot("spec_sim", outPath, "plotSpectrum",
                                       c(plSpecArgs, list(groupName = c(cmpInfoRow$parent_group, ctRow$group),
                                                          specSimParams = specSimParams, title = "")),
                                       parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 10, height = 5,
@@ -460,7 +450,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     
     cat("Genarate summary plots...")
     
-    ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, settings$general$selfContained, "plotChroms",
+    ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, "plotChroms",
                                               list(fGroups, retMin = settings$features$retMin, EICs = EICs,
                                                    EICParams = modifyList(EICParams, list(topMost = 1,
                                                                                           topMostByRGroup = FALSE,
@@ -469,7 +459,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                                    showLegend = FALSE),
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     
-    ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, settings$general$selfContained, "plot",
+    ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, "plot",
                                              list(fGroups, colourBy = "fGroups", showLegend = FALSE,
                                                   retMin = settings$features$retMin),
                                              parParams = list(mai = c(0.9, 0.8, 0.1, 0.1)), width = 10, height = 4)
@@ -484,18 +474,17 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     {
         if ("chord" %in% settings$summary && rGroupLenNonEmpty > 2)
         {
-            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, settings$general$selfContained, "plotChord",
-                                                     list(fGroups, average = TRUE), width = 7, height = 7)
+            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, average = TRUE),
+                                                     width = 7, height = 7)
         }
         if ("venn" %in% settings$summary && rGroupLen < 6)
         {
-            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, settings$general$selfContained, "plotVenn",
-                                                    list(fGroups), width = 7, height = 7)
+            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups), width = 7, height = 7)
         }
         
         if ("upset" %in% settings$summary)
-            ret$overview$UpSet <- makeHTMLReportPlot("upset", outPath, settings$general$selfContained, "plotUpSet",
-                                                     list(fGroups), doPrint = TRUE, width = 7, height = 7)
+            ret$overview$UpSet <- makeHTMLReportPlot("upset", outPath, "plotUpSet", list(fGroups), doPrint = TRUE,
+                                                     width = 7, height = 7)
     }
     cat(" Done!\n")
 

@@ -82,17 +82,25 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
                                                               keep.null = TRUE))
     cat("Done!\n")
     
+    allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,
+                                        settings, path, EICs, EICParams)
+    
     reportEnv <- new.env()
     
     reportEnv$settings <- settings
-    reportEnv$plots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                               TPs, settings, path, EICs, EICParams)
+    
+    reportEnv$plots <- rapply(allPlots, function(p)
+    {
+        if (settings$general$selfContained)
+            return(knitr::image_uri(p))
+        return(file.path("report_files", "plots", basename(p))) # make paths relative for correct HTML links
+    }, how = "replace")
+    
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
                                                           formulas = formulas, compounds = compounds,
                                                           compsCluster = compsCluster, components = components,
                                                           TPs = TPs),
-                                           EICs = EICs, plots = reportEnv$plots,
-                                           settings = settings)
+                                           EICs = EICs, plots = reportEnv$plots, settings = settings)
     reportEnv$EICs <- EICs
     
     reportEnv$objectsShow <- paste0(utils::capture.output({
@@ -121,7 +129,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     if (openReport)
         utils::browseURL(paste0("file://", normalizePath(outputFile)))
     
-    myPlotFiles <- normalizePath(file.path(path, unlist(reportEnv$plots)))
+    myPlotFiles <- unlist(allPlots)
     allPlotFiles <- normalizePath(list.files(file.path(path, "report_files", "plots"), pattern = "\\.svg$",
                                              full.names = TRUE))
     oldPlotFiles <- setdiff(allPlotFiles, myPlotFiles)

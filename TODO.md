@@ -21,7 +21,6 @@
     - sortof already there when toggling filters
 - suspInfoTabs: keep not splitting set data in columns for layout purposes?
 - make arg for file cleaning
-- file cleaning doesn't work with selfContained=T: need a way to get original plot paths
 - maybe: mark if MS/MS, formulas, compounds are available in FG table
 - report all/detected features instead of just chroms
     - rename yml option?

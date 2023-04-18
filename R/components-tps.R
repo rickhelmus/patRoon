@@ -99,7 +99,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                                specSimParams)
 {
     if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
-        return(componentsTPs(componentInfo = data.table(), components = list()), fromTPs = !is.null(TPs))
+        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
     
     hash <- makeHash(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLists, formulas, compounds, minRTDiff,
                      specSimParams)

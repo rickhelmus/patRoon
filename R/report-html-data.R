@@ -125,6 +125,13 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
     )))
 }
 
+reactSelFilterButton <- function(id, name, target, ocFunc, title)
+{
+    htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
+                           "data-bs-target" = target,
+                           onclick = sprintf("%s('%s', '%s')", ocFunc, id, name), title)
+}
+
 reactExactFilter <- function()
 {
     htmlwidgets::JS("function(rows, columnId, filterValue)
@@ -153,12 +160,8 @@ setReactNumRangeFilters <- function(id, tab, colDefs)
             next
         if (is.null(colDefs[[col]]))
             colDefs[[col]] <- reactable::colDef()
-        colDefs[[col]]$filterInput <- function(values, name)
-        {
-            htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
-                                   "data-bs-target" = "#filterRangeModal",
-                                   onclick = sprintf("filtRangeModalInit('%s', '%s')", id, name), "Range")
-        }
+        colDefs[[col]]$filterInput <- function(values, name) reactSelFilterButton(id, name, "#filterRangeModal",
+                                                                                  "filtRangeModalInit", "Range")
         colDefs[[col]]$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
         {
             if (filterValue[0] == '')
@@ -179,12 +182,8 @@ setReactSelRangeFilter <- function(id, colDef)
 {
     if (is.null(colDef))
         colDef <- reactable::colDef()
-    colDef$filterInput <- function(values, name)
-    {
-        htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
-                               "data-bs-target" = "#filterSelModal",
-                               onclick = sprintf("filtSelModalInit('%s', '%s')", id, name), "Select")
-    }
+    colDef$filterInput <- function(values, name) reactSelFilterButton(id, name, "#filterSelModal",
+                                                                      "filtColSelModalInit", "Select")
     colDef$filterMethod <- htmlwidgets::JS("function(rows, columnId, filterValue)
     {
         return rows.filter(r => filterValue.has(r.values[columnId]));
@@ -200,8 +199,21 @@ makeReactable <- function(tab, id, bordered = TRUE, pagination = FALSE, ...)
                                 pageSizeOptions = c(25, 50, 100, 250, 500), defaultPageSize = 50,...))
 }
 
-makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, ...)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, objects, ...)
 {
+    addToGroupDefs <- function(gd, grp, col)
+    {
+        for (i in seq_along(gd))
+        {
+            if (gd[[i]]$name == grp)
+            {
+                gd[[i]]$columns <- c(gd[[i]]$columns, col)
+                break
+            }
+        }
+        return(gd)
+    }
+    
     # sync column order
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
@@ -234,15 +246,47 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
                                                      cell = function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
         }
         
-        for (i in seq_along(groupDefs))
-        {
-            if (groupDefs[[i]]$name == "feature")
-            {
-                groupDefs[[i]]$columns <- c(groupDefs[[i]]$columns, cols)
-                break
-            }
-        }
+        groupDefs <- addToGroupDefs(groupDefs, "feature", cols)
     }
+    
+    if (any(c("MSPeakLists", "formulas", "compounds") %in% names(objects)))
+    {
+        tab[, annotations := group]
+        tab[, hasMSMS := sapply(group, function(g) !is.null(objects$MSPeakLists) &&
+                                    !is.null(objects$MSPeakLists[[g]]) && !is.null(objects$MSPeakLists[[g]][["MSMS"]]))]
+        tab[, hasFormulas := sapply(group, function(g) !is.null(objects$formulas) && !is.null(objects$formulas[[g]]))]
+        tab[, hasCompounds := sapply(group, function(g) !is.null(objects$compounds) && !is.null(objects$compounds[[g]]))]
+        
+        annTag <- function(bg, fg, ...) htmltools::span(style = list("border-radius" = "30px", padding = "4px 5px",
+                                                                     "margin-right" = "2px", "font-size" = "smaller",
+                                                                     "background-color" = bg, color = fg), ...)
+        colDefs$annotations <- reactable::colDef(width = 150, cell = function(value, index)
+        {
+            tags <- list()
+            if (tab$hasMSMS[index])
+                tags <- c(tags, list(annTag("#033c73", "white", "MS", htmltools::tags$sup("2"))))
+            if (tab$hasFormulas[index])
+                tags <- c(tags, list(annTag("#2d9ddd", "white", "Form")))
+            if (tab$hasCompounds[index])
+                tags <- c(tags, list(annTag("grey", "white", "Comp")))
+            return(do.call(htmltools::tagList, tags))
+        }, filterInput = function(values, name) reactSelFilterButton(id, name, "#filterSelModal",
+                                                                     "filtFeatAnnSelModalInit", "Select"),
+        filterMethod = htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    const MSMS = filterValue.has('MS/MS'), forms = filterValue.has('Formulas'), comps = filterValue.has('Compounds'),
+                 none = filterValue.has('None');
+    return rows.filter(function(row)
+    {
+        const rMSMS = row.values.hasMSMS, rforms = row.values.hasFormulas, rcomps = row.values.hasCompounds;
+        return((none && !MSMS && !rforms && !rcomps) || MSMS && rMSMS || forms && rforms || comps && rcomps);
+    })                                       
+}"))
+        groupDefs <- addToGroupDefs(groupDefs, "feature", "annotations")
+        
+        colDefs[c("hasMSMS", "hasFormulas", "hasCompounds")] <- list(reactable::colDef(show = FALSE))
+    }
+    
     
     colSepStyle <- getFGColSepStyle()
     grpStartCols <- getFGColGrpStartCols(groupDefs)
@@ -486,7 +530,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
-                        settings = settings)
+                        settings = settings, objects = objects)
     },
     genFGTableSuspects = function()
     {
@@ -494,7 +538,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, groupBy = "susp_name")
+                        plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
     },
     genFGTableISTDs = function()
     {
@@ -518,7 +562,7 @@ reportHTMLUtils$methods(
         colDefs <- getFeatGroupColDefs(tab)
         colDefs$susp_name$name <- "Internal standard" # HACK
         makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, groupBy = "susp_name")
+                        plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
     },
     genFGTableComponents = function()
     {
@@ -555,7 +599,7 @@ reportHTMLUtils$methods(
             groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFGColSepStyle())))
         
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, groupBy = "component")
+                        plots = plots, settings = settings, objects = objects, groupBy = "component")
     },
     genFGTableTPs = function()
     {
@@ -662,8 +706,8 @@ reportHTMLUtils$methods(
         # same for cmpIndex
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
 
-        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, groupBy = groupBy, colDefs = colDefs,
-                        groupDefs = groupDefs)
+        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
+                        groupBy = groupBy, colDefs = colDefs, groupDefs = groupDefs)
     },
 
     genSuspInfoTable = function(id)

@@ -280,7 +280,20 @@ function filtNumClear()
     document.getElementById("filtNumApply").click();
 }
 
-function filtSelModalInit(tab, col)
+function filtColSelModalInit(tab, col)
+{
+    // UNDONE: this always adds all (unique) values, including those that are e.g. filtered out due to group selection    
+    const vals = new Set(Reactable.getState(tab).data.map(row => row[col]));
+    
+    filtSelModalInit(tab, col, vals);
+}
+
+function filtFeatAnnSelModalInit(tab)
+{
+    filtSelModalInit(tab, "annotations", [ "None", "MS/MS", "Formulas", "Compounds" ]);
+}
+
+function filtSelModalInit(tab, col, vals)
 {
     const mname = "filter_" + col;
     const curF = Reactable.getState(tab).meta[mname];
@@ -288,9 +301,7 @@ function filtSelModalInit(tab, col)
     let lg = document.getElementById("filterSelectListGroup");
     while (lg.firstChild)
         lg.removeChild(lg.firstChild);
-    
-    // UNDONE: this always adds all (unique) values, including those that are e.g. filtered out due to group selection    
-    const vals = new Set(Reactable.getState(tab).data.map(row => row[col]));
+
     let checkEls = [ ];
     vals.forEach(function(label)
     {

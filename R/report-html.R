@@ -78,7 +78,8 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
 
     cat("Loading all EICs... ")
     # UNDONE: make onlyPresent configurable, check if feature EICs are needed
-    EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL, onlyPresent = FALSE),
+    EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
+                                                                              onlyPresent = settings$features$chromatograms$features != "all"),
                                                               keep.null = TRUE))
     cat("Done!\n")
     

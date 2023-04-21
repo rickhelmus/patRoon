@@ -22,10 +22,26 @@ getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRU
 
 saveRCDKStructure <- function(molecule, format, out, width = 500L, height = 500L, transparent = TRUE)
 {
-    dep <- rcdk::get.depictor(width, height, style = "cow", fillToFit = TRUE)
-    mi <- rJava::.jnew("org/guha/rcdk/view/MoleculeImage", molecule, dep)
-    writeBin(rJava::.jcall(mi, "[B", "getBytes", as.integer(width), as.integer(height), format), out)
-
+    if (!"fillToFit" %in% formalArgs(rcdk::get.depictor))
+    {
+        stopifnot(format == "svg")
+        # HACK: until https://github.com/CDK-R/cdkr/pull/142 is merged we fallback to some direct CDK hackery
+        depg <- rJava::.jnew("org/openscience/cdk/depict/DepictionGenerator")
+        depg <- rJava::.jcall(depg, "Lorg/openscience/cdk/depict/DepictionGenerator;", "withZoom", 1.3)
+        depg <- rJava::.jcall(depg, "Lorg/openscience/cdk/depict/DepictionGenerator;", "withSize", as.numeric(width),
+                              as.numeric(height))
+        depg <- rJava::.jcall(depg, "Lorg/openscience/cdk/depict/DepictionGenerator;", "withFillToFit")
+        depg <- rJava::.jcall(depg, "Lorg/openscience/cdk/depict/DepictionGenerator;", "withAtomColors")
+        dep <- rJava::.jcall(depg, "Lorg/openscience/cdk/depict/Depiction;", "depict", molecule)
+        cat(dep$toSvgStr(), file = out)    
+    }
+    else
+    {
+        dep <- rcdk::get.depictor(width, height, style = "cow", fillToFit = TRUE)
+        mi <- rJava::.jnew("org/guha/rcdk/view/MoleculeImage", molecule, dep)
+        writeBin(rJava::.jcall(mi, "[B", "getBytes", as.integer(width), as.integer(height), format), out)
+    }
+    
     if (transparent)
     {
         # HACK: make it transparent

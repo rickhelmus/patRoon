@@ -346,6 +346,9 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     updateFeatTabRowSel(rowInfo.values, rowInfo.index);
 }")
     
+    CSVCols <- setdiff(names(tab), c("chrom_small", "chrom_large", "annotations", "hasMSMS", "hasFormulas",
+                                     "hasCompounds"))
+    
     headThemeStyle <- list(padding = "2px 4px")
     rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, defaultExpanded = TRUE, columns = colDefs,
                         defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
@@ -353,7 +356,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
-                        meta = list(selectedRow = 0, colToggles = colToggles),
+                        meta = list(selectedRow = 0, colToggles = colToggles, CSVCols = CSVCols),
                         rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
@@ -637,9 +640,6 @@ reportHTMLUtils$methods(
             tabTPs <- removeDTColumnsIfPresent(tabTPs, "susp_name")
         }
 
-        if (!is.null(tabTPs[["formulaDiff"]]))        
-            tabTPs[, formulaDiff := subscriptFormulaHTML(formulaDiff, charges = FALSE)] 
-
         parAggr <- function(parentCol) htmlwidgets::JS(sprintf("function(values, rows, groupRows)
 {
     const v = rows[0]['%s'];
@@ -707,7 +707,8 @@ reportHTMLUtils$methods(
         colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
         colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
         if (!is.null(tabTPs[["formulaDiff"]]))
-            colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula", html = TRUE)
+            colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula",
+                                                     cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value, charges = FALSE))))
         
         # InChIKeys are only there for internal usage
         if (!is.null(tabTPs[["parent_susp_InChIKey"]]))
@@ -856,8 +857,10 @@ reportHTMLUtils$methods(
 
         setcolorder(tab, intersect(c("analysis", "rGroup", "ID", "chromatogram"), names(tab)))
         
+        CSVCols <- setdiff(names(tab), "chromatogram")
+        
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
-                      meta = list(featQualCols = fqn), pagination = TRUE)
+                      meta = list(featQualCols = fqn, CSVCols = CSVCols), pagination = TRUE)
     },
     
     genMSPLTable = function(MSLevel)
@@ -945,8 +948,6 @@ reportHTMLUtils$methods(
             }
         }
 
-        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
-        
         getFormDetails <- function(index)
         {
             ft <- formulas[[tab$group[index]]][tab$candidate[index]]
@@ -986,7 +987,8 @@ reportHTMLUtils$methods(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             candidate = reactable::colDef("#", minWidth = 15),
             suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
-            neutral_formula = reactable::colDef("formula", html = TRUE),
+            neutral_formula = reactable::colDef("formula",
+                                                cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
             scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)
@@ -994,8 +996,9 @@ reportHTMLUtils$methods(
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
         
+        CSVCols <- setdiff(names(tab), c("spectrum", "scorings"))
         ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
-                                getScoreDetails)
+                                getScoreDetails, meta = list(CSVCols = CSVCols))
         saveCacheData("reportHTMLFormulas", ret, hash)
         return(ret)
     },
@@ -1022,8 +1025,11 @@ reportHTMLUtils$methods(
         
         tab <- as.data.table(compounds)
         
+        if (!is.null(tab[["database"]]))
+            databases <- tab$database
+        
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
-        tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier", "database",
+        tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier",
                                                "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
         
         tab[, candidate := seq_len(.N), by = "group"]
@@ -1034,10 +1040,6 @@ reportHTMLUtils$methods(
         if (!is.null(cmpNames2))
             tab[, compoundName2 := NULL]
         
-        if (!is.null(tab[["identifier"]]))
-            tab[, identifier := sapply(identifier, makeDBIdentLink, db = database[1])][, database := NULL]
-        
-        tab[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
         tab[, neutralMass := round(neutralMass, 5)]
         if (!is.null(tab[["score"]]))
             tab[, score := round(score, 2)]
@@ -1148,8 +1150,9 @@ reportHTMLUtils$methods(
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
-            identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(html = TRUE) else NULL,
-            neutral_formula = reactable::colDef("formula", html = TRUE),
+            identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(cell = function(value, index) htmltools::span(dangerouslySetInnerHTML = list("__html" = makeDBIdentLink(databases[index], value)))) else NULL,
+            neutral_formula = reactable::colDef("formula",
+                                                cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
             structure = reactable::colDef(cell = getAnnReactImgCell, minWidth = 125),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
@@ -1172,8 +1175,10 @@ reportHTMLUtils$methods(
                                      groupInfo(objects$fGroups)[grp, "mzs"]))
         })
 
+        CSVCols <- setdiff(names(tab), c("structure", "spectrum", "scorings"))
+        
         ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks))
+                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols))
         saveCacheData("reportHTMLCompounds", ret, hash)
         return(ret)
     },

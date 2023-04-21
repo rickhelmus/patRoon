@@ -23,7 +23,6 @@
 - make arg for file cleaning
 - report all/detected features instead of just chroms
     - rename yml option?
-- CSV export: select columns
 
 
 ## Components

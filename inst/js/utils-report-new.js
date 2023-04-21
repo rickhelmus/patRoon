@@ -441,6 +441,12 @@ function showFeatureTab(tabName, enable)
     }
 }
 
+function downloadCSV(tab, out)
+{
+    const cols = Reactable.getState(tab).meta.CSVCols;
+    Reactable.downloadDataCSV(tab, out, { columnIds: cols });
+}
+
 
 $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495

@@ -81,7 +81,8 @@ bslib::layout_column_wrap(
                     input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
                     label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                     
-                    button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV(getSelFGTableElement())", "Download CSV"),
+                    button(type = "button", class = "btn btn-primary btn-sm",
+                           onClick = "downloadCSV(getSelFGTableElement(), 'featureGroups.csv')", "Download CSV"),
                     button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
                            onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",
                            style = list(display = "none"), "Expand/collapse"),
@@ -230,7 +231,8 @@ bslib::layout_column_wrap(
                             input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
                             label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
                             
-                            button(type = "button", class = "btn btn-primary btn-sm", onClick = "Reactable.downloadDataCSV('featuresTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm",
+                                   onClick = "downloadCSV('featuresTab', 'features.csv')", "Download CSV"),
                             button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
                                    onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse")
                         )
@@ -266,7 +268,7 @@ bslib::layout_column_wrap(
                             input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
                             label("for" = "formulas-susp_only", "Suspect only"),
                             button(type = "button", class = "btn btn-primary btn-sm",
-                                   onClick = "Reactable.downloadDataCSV('formulasTab')", "Download CSV"),
+                                   onClick = "downloadCSV('formulasTab', 'formulas.csv')", "Download CSV"),
                             button(type = "button", class = "btn btn-primary btn-sm", id = "form-expand",
                                    onClick = "Reactable.toggleAllRowsExpanded('formulasTab')", "Expand/collapse"),
                         )
@@ -292,7 +294,8 @@ bslib::layout_column_wrap(
                             input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
                             label("for" = "compounds-susp_only", "Suspect only"),
                             
-                            button(type = "button", class = "btn btn-primary btn-sm ms-2", onClick = "Reactable.downloadDataCSV('compoundsTab')", "Download CSV"),
+                            button(type = "button", class = "btn btn-primary btn-sm ms-2",
+                                   onClick = "downloadCSV('compoundsTab', 'compounds.csv')", "Download CSV"),
                             button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
                                    onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse"),
                             

@@ -81,6 +81,15 @@ getFeatGroupColDefs <- function(tab)
     setCD("susp_d_mz", "name", "\U0394 mz")
     setCD("susp_estIDLevel", "name", "estIDLevel") # UNDONE: tool-tip?
     setCD("susp_estIDLevel", "align", "right")
+    IDLCols <- getBrewerPal(5, "YlOrBr")
+    setCD("susp_estIDLevel", "cell", function(value)
+    {
+        nidl <- numericIDLevel(value)
+        htmltools::span(style = list("border-radius" = "30px", display = "inline-block", width = "2em",
+                                     "background-color" = IDLCols[nidl], color = if (nidl <= 2) "black" else "white",
+                                     "text-align" = "center", "font-weight" = "bold"),
+                        value)
+    })
     setCD("susp_sets", "name", "sets")
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)

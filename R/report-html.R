@@ -35,12 +35,12 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
                           compsCluster = NULL, components = NULL, TPs = NULL,
                           settingsFile = system.file("report", "settings.yml", package = "patRoon"),
                           path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                          clearPath = FALSE, openReport = TRUE)
+                          clearPath = FALSE, openReport = TRUE, parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
         checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ clearPath + openReport, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ clearPath + openReport + parallel, fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds + compsCluster + components + TPs,
            c("MSPeakLists", "formulas", "compounds", "compoundsCluster", "components", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
@@ -84,7 +84,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     cat("Done!\n")
     
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,
-                                        settings, path, EICs, EICParams)
+                                        settings, path, EICs, EICParams, parallel)
     
     reportEnv <- new.env()
     

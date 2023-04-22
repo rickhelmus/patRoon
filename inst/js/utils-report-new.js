@@ -196,7 +196,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         if (Object.keys(reportPlots.TPs).length > 0)
         {
             const specSimEl = document.getElementById('similarity_spec');
-            specSimEl.src = reportPlots.TPs[rowValues.component][rowValues.cmpIndex];
+            specSimEl.src = reportPlots.TPs[rowValues.component][rowValues.cmpIndex - 1];
             specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
         }
         

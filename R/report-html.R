@@ -130,10 +130,12 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     if (openReport)
         utils::browseURL(paste0("file://", normalizePath(outputFile)))
     
-    myPlotFiles <- unlist(allPlots)
+    usedPlotFiles <- unlist(allPlots)
+    Sys.setFileTime(usedPlotFiles, Sys.time()) # update file times in case plot files already exist and were re-used
+    
     allPlotFiles <- normalizePath(list.files(file.path(path, "report_files", "plots"), pattern = "\\.svg$",
                                              full.names = TRUE))
-    oldPlotFiles <- setdiff(allPlotFiles, myPlotFiles)
+    oldPlotFiles <- setdiff(allPlotFiles, usedPlotFiles)
     opfDates <- lapply(file.info(oldPlotFiles)$mtime, as.Date)
     opfAge <- lapply(opfDates, difftime, time1 = Sys.Date(), units = "days")
     opfAge <- sapply(opfAge, as.numeric)

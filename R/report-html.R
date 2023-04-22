@@ -35,7 +35,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
                           compsCluster = NULL, components = NULL, TPs = NULL,
                           settingsFile = system.file("report", "settings.yml", package = "patRoon"),
                           path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                          clearPath = FALSE, openReport = TRUE, parallel = TRUE)
+                          specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE, parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -45,7 +45,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
            c("MSPeakLists", "formulas", "compounds", "compoundsCluster", "components", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFileExists(settingsFile, "r", add = ac)
-    # assertSpecSimParams(specSimParams, add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(MSPeakLists) && (!is.null(formulas) || !is.null(compounds)))
@@ -84,7 +84,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     cat("Done!\n")
     
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,
-                                        settings, path, EICs, EICParams, parallel)
+                                        settings, path, EICs, EICParams, specSimParams, parallel)
     
     reportEnv <- new.env()
     

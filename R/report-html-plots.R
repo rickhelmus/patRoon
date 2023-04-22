@@ -365,8 +365,8 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
     return(ret)
 }
 
-genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, compounds, settings, outPath, EICs,
-                                  parallel)
+genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, compounds, settings, specSimParams,
+                                  outPath, EICs, parallel)
 {
     if (is.null(MSPeakLists) || length(components) == 0 || length(MSPeakLists) == 0)
         return(list())
@@ -418,8 +418,6 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
             if (length(plSpecArgs) == 0)
                 return("")
             
-            # UNDONE
-            specSimParams <- getDefSpecSimParams()
             return(makeHTMLReportPlot("spec_sim", outPath, "plotSpectrum",
                                       c(plSpecArgs, list(groupName = c(cmpInfoRow$parent_group, ctRow$group),
                                                          specSimParams = specSimParams, title = "")),
@@ -434,7 +432,7 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
 }
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings,
-                                    outPath, EICs, EICParams, parallel)
+                                    outPath, EICs, EICParams, specSimParams, parallel)
 {
     ret <- list()
     
@@ -504,8 +502,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
             ret$components <- genHTMLReportPlotsComponents(fGroups, components, settings, outPath, EICs, EICParams,
                                                            parallel)
         else
-            ret$TPs <- genHTMLReportPlotsTPs(fGroups, components, MSPeakLists, formulas, compounds, settings, outPath,
-                                             EICs, parallel)
+            ret$TPs <- genHTMLReportPlotsTPs(fGroups, components, MSPeakLists, formulas, compounds, settings,
+                                             specSimParams, outPath, EICs, parallel)
     }
     return(ret)
 }

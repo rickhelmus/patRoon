@@ -336,14 +336,16 @@ expect_ggplot <- function(object)
 }
 
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
-makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
+# makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
+makeReportHTML <- function(fGroups, ...) reportHTMLNew(fGroups, path = getWorkPath(), openReport = FALSE, overrideSettings = list(general = list(noDate = TRUE)), ...)
 
 expect_reportHTML <- function(object)
 {
     # generate report twice: without and with cache
     
     rpFile <- getWorkPath("report.html")
-    unlink(getWorkPath("report.html")) # in case it already exists
+    unlink(rpFile) # in case it already exists
+    unlink(getWorkPath("report_files"), recursive = TRUE)
     
     clearCache("reportPlots") # reset cached plots
     act <- quasi_label(rlang::enquo(object))

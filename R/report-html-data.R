@@ -832,7 +832,7 @@ reportHTMLUtils$methods(
             # add EICs
             tab[, chromatogram := ""] # dummy value, not needed
             
-            colDefs$chromatogram = reactable::colDef(minWidth = 175, cell = function(value, index)
+            colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = function(value, index)
             {
                 htmltools::img(src = plots$chromsFeatures[[tab$group[index]]][[tab$analysis[index]]])
             })

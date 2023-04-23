@@ -111,7 +111,7 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
     doApply("sapply", parallel, names(fGroups), function(grp)
     {
         doProgress()
-        mapply(anas, seq_along(anas), FUN = function(ana, anai)
+        Map(anas, seq_along(anas), f = function(ana, anai)
         {
             if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
                 return("")

@@ -43,9 +43,10 @@ makeHash <- function(..., checkDT = TRUE)
 }
 
 #' @details \code{makeFileHash} Generates a hash from the contents of one or more files.
+#' @param length Maximum file length to hash. Passed to \code{\link{digest}}.
 #' @rdname caching
 #' @export 
-makeFileHash <- function(...) digest::digest(sapply(list(...), digest::digest, file = TRUE, algo = "xxhash64"))
+makeFileHash <- function(..., length = Inf) digest::digest(sapply(list(...), digest::digest, file = TRUE, algo = "xxhash64", length = length))
 
 # storing/retrieving R objects: http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/
 

@@ -3,7 +3,8 @@ NULL
 
 loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
 {
-    hash <- makeHash(makeFileHash(path), rtRange)
+    # NOTE: limit length as this function may be called frequently
+    hash <- makeHash(makeFileHash(path, length = 8192), rtRange)
     ret <- loadCacheData("specData", hash, cacheDB)
     if (!is.null(ret) && length(ret$spectra) > 1 && is.data.table(ret$spectra[[1]]))
         ret <- NULL # old (pre v1.1) format, ignore cache to avoid crashes with Rcpp interface
@@ -39,7 +40,7 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
 
 doGetEICs <- function(file, ranges, cacheDB = NULL)
 {
-    anaHash <- makeFileHash(file)
+    anaHash <- makeFileHash(file, length = 8192) # NOTE: limit length as this function may be called frequently
     
     # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
     hashes <- ranges[, makeHash(anaHash, .SD), by = seq_len(nrow(ranges)),
@@ -191,8 +192,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
     EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
     EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
     anaInfoEICs <- anaInfo[anaInfo$analysis %in% names(EICInfo), ]
-    anaPaths <- mapply(anaInfoEICs$analysis, anaInfoEICs$path, FUN = getMzMLOrMzXMLAnalysisPath,
-                       MoreArgs = list(mustExist = TRUE))
+    anaPaths <- getMzMLOrMzXMLAnalysisPath(anaInfoEICs$analysis, anaInfoEICs$path, mustExist = TRUE)
 
     # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before
     # that, it's more efficient to first figure out for which feature groups EICs have to be generated per analysis.
@@ -215,8 +215,7 @@ setMethod("getEICsForFeatures", "features", function(features)
     verifyDataCentroided(anaInfo)
     
     cacheDB <- openCacheDBScope()
-    anaPaths <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath,
-                       MoreArgs = list(mustExist = TRUE))
+    anaPaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
     EICs <- Map(anaPaths, fTable, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
     
     return(pruneList(EICs))
@@ -254,10 +253,10 @@ verifyDataCentroided <- function(anaInfo)
     
     printf("Verifying if your data is centroided...\n")
     
-    isCentroided <- mapply(anaInfo$analysis, anaInfo$path, FUN = function(ana, path)
+    filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
+    
+    isCentroided <- sapply(filePaths, function(fpath)
     {
-        fpath <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
-        
         # hash <- makeFileHash(fpath) complete file hash is most accurate, but slow with many analyses. For now assume
         # user keeps centroided data centroided, and only check again if it wasn't
         hash <- makeHash(fpath)

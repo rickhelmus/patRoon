@@ -38,6 +38,7 @@
     - getDefEICParams() ref docs
     - mention when eg topMost is ignored
 - formulaDiff format changed
+- optims for hashing/loading of EIC/MS data
 
 
 ## Features

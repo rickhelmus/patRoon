@@ -108,7 +108,7 @@ getMSFilePaths <- function(files, paths, from, mustExist = FALSE)
                      paste0(files[!found], collapse = ", ")),
              call. = FALSE)
     
-    return(msFilePaths[msFilesNoExt %in% files])
+    return(msFilePaths[match(files, msFilesNoExt, nomatch = 0)])
 }
 
 convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)

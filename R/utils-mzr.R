@@ -199,6 +199,7 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
     # Furthermore, collect all retention ranges for EICs as these also have to be checked on a per group basis.
     cacheDB <- openCacheDBScope()
     EICs <- Map(anaPaths, EICInfo, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
+    names(EICs) <- anaInfoEICs$analysis
     EICs <- Map(EICs, lapply(EICInfo, "[[", "group"), f = setNames)
     
     return(pruneList(EICs))
@@ -217,6 +218,7 @@ setMethod("getEICsForFeatures", "features", function(features)
     cacheDB <- openCacheDBScope()
     anaPaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
     EICs <- Map(anaPaths, fTable, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
+    names(EICs) <- anaInfo$analysis
     
     return(pruneList(EICs))
 })

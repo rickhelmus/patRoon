@@ -35,7 +35,8 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
                           compsCluster = NULL, components = NULL, TPs = NULL,
                           settingsFile = system.file("report", "settings.yml", package = "patRoon"),
                           path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                          specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE, parallel = TRUE)
+                          specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE, parallel = TRUE,
+                          overrideSettings = list())
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -46,12 +47,14 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
            null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFileExists(settingsFile, "r", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertList(overrideSettings, any.missing = FALSE, names = "unique", add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(MSPeakLists) && (!is.null(formulas) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     settings <- readYAML(settingsFile)
+    settings <- modifyList(settings, overrideSettings, keep.null = TRUE)
     settings <- assertAndPrepareReportSettings(settings)
     
     if (is.null(path))

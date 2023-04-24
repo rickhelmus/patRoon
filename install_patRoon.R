@@ -312,6 +312,11 @@ utils <- setRefClass("utilsInst", methods = list(
     
     downloadFile = function(instPath, what, url, doUnzip, destF = basename(url))
     {
+        # increase timeout for large files, thanks to https://stackoverflow.com/a/68944877
+        otimeout <- getOption("timeout")
+        options(timeout = max(600, otimeout))
+        on.exit(options(timeout = otimeout))
+        
         dest <- file.path(instPath, destF)
         if (download.file(url, dest, mode = "wb") != 0)
         {

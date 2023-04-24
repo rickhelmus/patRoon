@@ -91,6 +91,7 @@ The changes are reflected in the installation section of the handbook.
     - Ensure no duplicate analysis names are present.
     - Allow NA values for blanks
 - Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations
+- Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue #76).
 
 
 # patRoon 2.1

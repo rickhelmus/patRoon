@@ -315,7 +315,7 @@ utils <- setRefClass("utilsInst", methods = list(
         # increase timeout for large files, thanks to https://stackoverflow.com/a/68944877
         otimeout <- getOption("timeout")
         options(timeout = max(600, otimeout))
-        on.exit(options(timeout = otimeout))
+        on.exit(options(timeout = otimeout), add = TRUE)
         
         dest <- file.path(instPath, destF)
         if (download.file(url, dest, mode = "wb") != 0)

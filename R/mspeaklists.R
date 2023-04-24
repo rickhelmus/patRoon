@@ -142,7 +142,7 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
     gCount <- length(gNames)
     
     if (gCount == 0 || length(obj@avgPeakListArgs) == 0)
-        avgPLists <- list()
+        avgPLists <- makeEmptyListNamed(list())
     else if (is.null(avgPLists))
     {
         prog <- openProgBar(0, gCount)

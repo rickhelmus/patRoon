@@ -75,7 +75,7 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
     gNames <- intersect(obj@origFGNames, gNames) # sort to original order
     
     if (length(gNames) == 0)
-        avgPLists <- list()
+        avgPLists <- makeEmptyListNamed(list())
     else if (is.null(avgPLists))
     {
         avgPLists <- sapply(gNames, function(gName)

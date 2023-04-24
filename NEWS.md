@@ -113,6 +113,7 @@ The changes are reflected in the installation section of the handbook.
 - `plotInt()`: `plotArgs` and `linesArgs` to pass additional arguments to `plot()`/`lines()`. The latter replaces the dots argument.
 - Small fixes and improvements for verification of parameter lists
 - Fixed: `convertMSFiles()` if the `analysisInfo` argument is set and `outPath` is set with a length >1 then the wrong output path could be used.
+- Fixed: in rare case `MSPeakLists` without any results could lead to errors.
 
 
 # patRoon 2.1

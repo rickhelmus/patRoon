@@ -95,9 +95,14 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     
     reportEnv$plots <- rapply(allPlots, function(p)
     {
-        if (settings$general$selfContained)
-            return(knitr::image_uri(p))
-        return(file.path("report_files", "plots", basename(p))) # make paths relative for correct HTML links
+        wh <- which(nzchar(p))
+        if (length(wh) == 0)
+        {} # nothing
+        else if (settings$general$selfContained)
+            p[wh] <- knitr::image_uri(p[wh])
+        else
+            p[wh] <- file.path("report_files", "plots", basename(p[wh])) # make paths relative for correct HTML links
+        return(p)
     }, how = "replace")
     
     reportEnv$utils <- reportHTMLUtils$new(objects = list(fGroups = fGroups, MSPeakLists = MSPeakLists,
@@ -134,6 +139,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
         utils::browseURL(paste0("file://", normalizePath(outputFile)))
     
     usedPlotFiles <- unlist(allPlots)
+    usedPlotFiles <- usedPlotFiles[nzchar(usedPlotFiles)]
     Sys.setFileTime(usedPlotFiles, Sys.time()) # update file times in case plot files already exist and were re-used
     
     allPlotFiles <- normalizePath(list.files(file.path(path, "report_files", "plots"), pattern = "\\.svg$",

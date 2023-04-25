@@ -9,6 +9,8 @@
 - new fromTPs slot: doc, make method and use in reporting?
 - get rid of magrittr dependency?
 - bug?: mergeScreeningSetInfos() fragments_formula shouldn't be in unCols?
+- BUG: checkFeatures() (and components?): manual table sorting messes up with feature gets selected
+    - also true for eg fGroup selection?
 
 ## Reporting
 

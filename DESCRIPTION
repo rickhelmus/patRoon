@@ -92,6 +92,8 @@ Imports:
     rmarkdown,
     flexdashboard,
     DT,
+    bslib,
+    reactable,
     magrittr,
     kableExtra,
     R.utils,

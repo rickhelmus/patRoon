@@ -495,7 +495,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     if (!is.null(compounds))
         ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, settings, outPath, parallel)
     if (!is.null(compsCluster))
-        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster[gNames], settings, outPath)
+        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster[gNames], settings, outPath, parallel)
     if (!is.null(components))
     {
         if (!inherits(components, "componentsTPs"))

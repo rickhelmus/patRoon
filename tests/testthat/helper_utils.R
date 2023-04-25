@@ -337,26 +337,44 @@ expect_ggplot <- function(object)
 
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
 # makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
-makeReportHTML <- function(fGroups, ...) reportHTMLNew(fGroups, path = getWorkPath(), openReport = FALSE, overrideSettings = list(general = list(noDate = TRUE)), ...)
+makeReportHTML <- function(fGroups, reportPlots = NULL, ...)
+{
+    reportHTMLNew(fGroups, path = getWorkPath(), openReport = FALSE,
+                  overrideSettings = list(
+                      general = list(noDate = TRUE), # for reproducibility
+                      # limits to speed up a bit
+                      formulas = list(topMost = 5),
+                      compounds = list(topMost = 5)
+                  ),
+                  ...)
+}
 
 expect_reportHTML <- function(object)
 {
-    # generate report twice: without and with cache
+    # generate report twice: without and with cached results
     
     rpFile <- getWorkPath("report.html")
     unlink(rpFile) # in case it already exists
     unlink(getWorkPath("report_files"), recursive = TRUE)
     
-    clearCache("reportPlots") # reset cached plots
+    clearCache("reportPlots|reportHTML") # reset cached plots
     act <- quasi_label(rlang::enquo(object))
     
     expect(file.exists(rpFile), "failed to generate report")
 
+    uniqueLines <- function(path)
+    {
+        # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
+        lines <- readLines(path)
+        lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
+        return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
+    }
+    
     if (file.exists(rpFile))
     {
-        rpHash <- makeFileHash(rpFile)
+        rpLines <- uniqueLines(rpFile)
         act <- quasi_label(rlang::enquo(object))
-        expect(rpHash == makeFileHash(rpFile), "cached report differs")
+        expect(all.equal(rpLines, uniqueLines(rpFile)), "cached report differs")
     }
 
     invisible(act$val)

@@ -157,3 +157,12 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     
     invisible(NULL)
 }
+
+#' @export
+genReportSettingsFile <- function(out)
+{
+    checkmate::assertPathForOutput(out, overwrite = TRUE)
+    defFile <- system.file("report", "settings.yml", package = "patRoon")
+    file.copy(defFile, out, overwrite = TRUE)
+    invisible(NULL)
+}

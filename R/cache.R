@@ -9,16 +9,6 @@ getCacheMode <- function()
 getCacheFile <- function() getOption("patRoon.cache.fileName")
 getMaxCacheEntries <- function() 100000 # UNDONE
 
-#' makeHash
-#'
-#' @description Make a hash string of given arguments.
-#'
-#' @param ... Arguments/objects to be used for hashing.
-#' @param checkDT Logical, set to `TRUE` for striping DT self references as they
-#' sometimes lead hashing issues.
-#'
-#' @export
-#'
 makeHash <- function(..., checkDT = TRUE)
 {
     args <- list(...)
@@ -28,7 +18,7 @@ makeHash <- function(..., checkDT = TRUE)
         # strip DT self refs as they sometimes mess up hashing
         args <- recursiveApplyDT(args, function(dt) prepareDTForComparison(copy(dt)), sapply, simplify = FALSE)
     }
-
+    
     return(digest::digest(args, algo = "xxhash64"))
 }
 
@@ -40,17 +30,6 @@ openCacheDB <- function(file = getCacheFile()) DBI::dbConnect(RSQLite::SQLite(),
 closeCacheDB <- function(db) DBI::dbDisconnect(db)
 openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB(file), function(x) closeCacheDB(x))
 
-#' loadCacheData
-#'
-#' @description Loads cached objects.
-#'
-#' @param category The category of the objects to be loaded from cache.
-#' @param hashes The hash strings of the objects to be loaded.
-#' @param dbArg Alternative connection to database. Default is `NULL` and uses
-#' the cache options as defined by "patRoon.cache.fileName".
-#'
-#' @export
-#'
 loadCacheData <- function(category, hashes, dbArg = NULL)
 {
     if (getCacheMode() == "save" || getCacheMode() == "none")
@@ -62,7 +41,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
         db <- dbArg
 
     RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
-
+    
     ret <- NULL
 
     if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
@@ -89,7 +68,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
     }
 
     ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
-
+    
     return(ret)
 }
 
@@ -111,23 +90,11 @@ dbWithWriteTransaction <- function(conn, code)
         if (inherits(e, "error"))
             stop(e)
     }
-
+    
     tryCatch({res <- force(code);  DBI::dbExecute(conn, "COMMIT"); res },
              db_abort = rollback, error = rollback, interrupt = rollback)
 }
 
-#' saveCacheData
-#'
-#' @description Caches objects.
-#'
-#' @param category The category of the object to be cached.
-#' @param data The object to be cached.
-#' @param hash The hash string of the object to be cached.
-#' @param dbArg Alternative connection to database. Default is `NULL` and uses
-#' the cache options as defined by "patRoon.cache.fileName".
-#'
-#' @export
-#'
 saveCacheData <- function(category, data, hash, dbArg = NULL)
 {
     if (getCacheMode() == "load" || getCacheMode() == "none")
@@ -141,19 +108,19 @@ saveCacheData <- function(category, data, hash, dbArg = NULL)
     RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
 
     df <- data.frame(d = I(list(fst::compress_fst(serialize(data, NULL, xdr = FALSE)))))
-
+    
     dbWithWriteTransaction(db, {
         DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
-
+        
         # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
         DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
         DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
-
+        
         # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
         # too many rows
         if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
             DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
-    })
+    })    
 }
 
 loadCacheSet <- function(category, setHash, dbArg = NULL)
@@ -206,14 +173,14 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 clearCache <- function(what = NULL, file = NULL, vacuum = TRUE)
 {
     checkmate::assertString(what, na.ok = FALSE, null.ok = TRUE)
-
+    
     if (!is.null(file))
         checkmate::assertFile(file, "r")
     else
         file <- getCacheFile()
-
+    
     checkmate::assertFlag(vacuum)
-
+    
     if (!file.exists(file))
         printf("No cache file found, nothing to do ...\n")
     else if (!is.null(what) && what == "all")

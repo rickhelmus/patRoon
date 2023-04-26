@@ -24,6 +24,12 @@
 - make arg for file cleaning
 - report all/detected features instead of just chroms
     - rename yml option?
+- rename plotFileRetention
+    - keepOld? keepPlots?
+- make noDate hidden option?
+- test with bslib pre-release (eg for deprecated functions)
+- tests
+    - verify plot file creation?
 
 
 ## Components

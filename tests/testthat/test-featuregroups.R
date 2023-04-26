@@ -452,6 +452,8 @@ test_that("reporting works", {
 
     expect_reportHTML(makeReportHTML(subFGroups))
 
+    skip("not relevant anymore")
+    
     # skip if pngquant is not specified and not in PATH
     # assign condition to variable as expression seems to be to complicated for skip...
     havePngQuant <- (!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||

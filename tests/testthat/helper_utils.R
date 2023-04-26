@@ -337,16 +337,19 @@ expect_ggplot <- function(object)
 
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
 # makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
-makeReportHTML <- function(fGroups, reportPlots = NULL, ...)
+makeReportHTML <- function(fGroups, path = getWorkPath(), reportPlots = NULL, overrideSettings = list(), ...)
 {
-    reportHTMLNew(fGroups, path = getWorkPath(), openReport = FALSE,
-                  overrideSettings = list(
-                      general = list(noDate = TRUE), # for reproducibility
-                      # limits to speed up a bit
-                      formulas = list(topMost = 5),
-                      compounds = list(topMost = 5)
-                  ),
-                  ...)
+    overrideSettings <- modifyList(
+        list(
+            general = list(noDate = TRUE), # for reproducibility
+            # limits to speed up a bit
+            formulas = list(topMost = 5),
+            compounds = list(topMost = 5)
+        ),
+        overrideSettings, keep.null = TRUE
+    )
+    
+    reportHTMLNew(fGroups, path = path, openReport = FALSE, overrideSettings = overrideSettings, ...)
 }
 
 expect_reportHTML <- function(object)

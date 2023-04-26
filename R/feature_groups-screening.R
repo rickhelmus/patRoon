@@ -625,7 +625,7 @@ numericIDLevel <- function(level)
 genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
 {
     aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
-    checkmate::assertPathForOutput(basename(out), overwrite = TRUE)
+    checkmate::assertPathForOutput(out, overwrite = TRUE)
     
     defFile <- system.file("misc", "IDLevelRules.yml", package = "patRoon")
     

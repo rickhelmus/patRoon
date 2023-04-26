@@ -92,6 +92,52 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rcpp_parse_chromatograms
+Rcpp::List rcpp_parse_chromatograms(std::string file_path, Rcpp::IntegerVector index);
+RcppExport SEXP _patRoon_rcpp_parse_chromatograms(SEXP file_pathSEXP, SEXP indexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type file_path(file_pathSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type index(indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_parse_chromatograms(file_path, index));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_parse_chromatograms_headers
+Rcpp::List rcpp_parse_chromatograms_headers(std::string file_path);
+RcppExport SEXP _patRoon_rcpp_parse_chromatograms_headers(SEXP file_pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type file_path(file_pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_parse_chromatograms_headers(file_path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_parse_spectra
+Rcpp::List rcpp_parse_spectra(std::string file_path, Rcpp::IntegerVector index);
+RcppExport SEXP _patRoon_rcpp_parse_spectra(SEXP file_pathSEXP, SEXP indexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type file_path(file_pathSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type index(indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_parse_spectra(file_path, index));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_parse_spectra_headers
+Rcpp::List rcpp_parse_spectra_headers(std::string file_path);
+RcppExport SEXP _patRoon_rcpp_parse_spectra_headers(SEXP file_pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type file_path(file_pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_parse_spectra_headers(file_path));
+    return rcpp_result_gen;
+END_RCPP
+}
 // specDistMatrix
 Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector method, Rcpp::CharacterVector shift, Rcpp::NumericVector precMZs, Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow);
 RcppExport SEXP _patRoon_specDistMatrix(SEXP specListSEXP, SEXP methodSEXP, SEXP shiftSEXP, SEXP precMZsSEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
@@ -210,6 +256,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
+    {"_patRoon_rcpp_parse_chromatograms", (DL_FUNC) &_patRoon_rcpp_parse_chromatograms, 2},
+    {"_patRoon_rcpp_parse_chromatograms_headers", (DL_FUNC) &_patRoon_rcpp_parse_chromatograms_headers, 1},
+    {"_patRoon_rcpp_parse_spectra", (DL_FUNC) &_patRoon_rcpp_parse_spectra, 2},
+    {"_patRoon_rcpp_parse_spectra_headers", (DL_FUNC) &_patRoon_rcpp_parse_spectra_headers, 1},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},

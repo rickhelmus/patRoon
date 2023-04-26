@@ -1,4 +1,5 @@
-PKG_CPPFLAGS=-DSTRICT_R_HEADERS
+PKG_CPPFLAGS=-DSTRICT_R_HEADERS -I"$(R_HOME)/include"
+PKG_LIBS = -L"$(R_HOME)/bin/x64" -lz
 
 SRC=$(wildcard GenForm-svn/*.cpp)
 OBJECTS_GF=$(SRC:.cpp=.o)

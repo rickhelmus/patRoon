@@ -29,22 +29,6 @@ writeFeatureXML <- function(featList, fPath, out, hulls) {
     invisible(.Call(`_patRoon_writeFeatureXML`, featList, fPath, out, hulls))
 }
 
-rcpp_parse_chromatograms <- function(file_path, index = NA_integer_) {
-    .Call(`_patRoon_rcpp_parse_chromatograms`, file_path, index)
-}
-
-rcpp_parse_chromatograms_headers <- function(file_path) {
-    .Call(`_patRoon_rcpp_parse_chromatograms_headers`, file_path)
-}
-
-rcpp_parse_spectra <- function(file_path, index = NA_integer_) {
-    .Call(`_patRoon_rcpp_parse_spectra`, file_path, index)
-}
-
-rcpp_parse_spectra_headers <- function(file_path) {
-    .Call(`_patRoon_rcpp_parse_spectra_headers`, file_path)
-}
-
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {
     .Call(`_patRoon_specDistMatrix`, specList, method, shift, precMZs, mzWeight, intWeight, mzWindow)
 }

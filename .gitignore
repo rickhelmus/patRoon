@@ -14,6 +14,7 @@ doc
 /*.Rcheck/
 # RStudio files
 .Rproj.user/
+patRoon.Rproj
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf

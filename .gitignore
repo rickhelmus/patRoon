@@ -13,7 +13,6 @@ doc
 # Output files from R CMD check
 /*.Rcheck/
 # RStudio files
-patRoon.Rproj
 .Rproj.user/
 patRoon.Rproj
 # produced vignettes

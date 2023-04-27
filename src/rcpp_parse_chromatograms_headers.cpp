@@ -2,8 +2,8 @@
 #include "external_libraries.hpp"
 #include "xml_utils.h"
 #include <string>
-#include <vector>
 #include <Rcpp.h>
+
 
 // [[Rcpp::export]]
 Rcpp::List rcpp_parse_chromatograms_headers(std::string file_path) {

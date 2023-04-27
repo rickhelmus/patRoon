@@ -2,19 +2,7 @@
 #include "external_libraries.hpp"
 #include "xml_utils.h"
 #include <string>
-#include <vector>
-#include <list>
 #include <Rcpp.h>
-#include <cstdio>
-#include <cstring>
-#include <iomanip>
-#include <sstream>
-#include <stdexcept>
-#include <zlib.h>
-#include <algorithm>
-#include <iterator>
-
-
 
 // [[Rcpp::export]]
 Rcpp::List rcpp_parse_spectra(std::string file_path, Rcpp::IntegerVector index = NA_INTEGER) {

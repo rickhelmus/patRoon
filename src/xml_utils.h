@@ -177,7 +177,7 @@ namespace xml_utils {
 
   // // other functions // //
 
-  // in file xml_encoding_decoding_test_function.cpp
+  // used for testing encoding, zlib compression and decompression and decading
   Rcpp::List encoding_decoding_test_function(Rcpp::NumericVector input);
 
 } // xml_utils

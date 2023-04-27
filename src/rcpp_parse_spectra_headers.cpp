@@ -2,7 +2,6 @@
 #include "external_libraries.hpp"
 #include "xml_utils.h"
 #include <string>
-#include <vector>
 #include <Rcpp.h>
 
 // [[Rcpp::export]]

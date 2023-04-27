@@ -6,7 +6,7 @@ if (!is.null(compounds) && !is.null(rmdVars$compoundsTopMost))
     compounds <- filter(compounds, topMost = rmdVars$compoundsTopMost)
 ```
 
-<script>`r readAllFile(system.file("js", "utils-report.js", package = "patRoon"))`</script>
+<script>`r readAllFile(system.file("js", "utils-report-classic.js", package = "patRoon"))`</script>
 
 Annotation {data-orientation=rows}
 ===

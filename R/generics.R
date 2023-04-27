@@ -413,19 +413,25 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICGrid = c(2, 1), EICParams = getDefEICParams(rRtWindow = 20, topMost = 1,
                                                                                 topMostByRGroup = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
-setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-                                  formulas = NULL, formulasTopMost = 5,
-                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
-                                  compounds = NULL, compoundsNormalizeScores = "max",
-                                  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
-                                                              "annotHitCount", "libMatch"),
-                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
-                                  includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
-                                  MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
-                                  retMin = TRUE, EICParams = getDefEICParams(rtWindow = 20, topMost = 1,
-                                                                             topMostByRGroup = TRUE),
-                                  TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
-                                  clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
+setGeneric("reportHTMLClassic", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+                                         formulas = NULL, formulasTopMost = 5,
+                                         formulasNormalizeScores = "max", formulasExclNormScores = NULL,
+                                         compounds = NULL, compoundsNormalizeScores = "max",
+                                         compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
+                                                                     "annotHitCount", "libMatch"),
+                                         compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
+                                         includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
+                                         MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
+                                         retMin = TRUE, EICParams = getDefEICParams(rtWindow = 20, topMost = 1,
+                                                                                    topMostByRGroup = TRUE),
+                                         TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
+                                         clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTMLClassic"))
+setGeneric("reportHTML", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
+                                  components = NULL, TPs = NULL,
+                                  settingsFile = system.file("report", "settings.yml", package = "patRoon"),
+                                  path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
+                                  specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
+                                  parallel = TRUE, overrideSettings = list()) standardGeneric("reportHTML"))
 
 setGeneric("groupNamesResults", function(obj) standardGeneric("groupNamesResults"))
 

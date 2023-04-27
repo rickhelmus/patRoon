@@ -746,12 +746,12 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @rdname reporting
 #' @aliases reportHTML
 #' @export
-setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
+setMethod("reportHTMLClassic", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
                                                   formulasNormalizeScores, formulasExclNormScores,
                                                   compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
-                                                  MSPeakLists, specSimParams, TPs, retMin, EICParams = getDefEICParams(),
+                                                  MSPeakLists, specSimParams, TPs, retMin, EICParams,
                                                   TPGraphStructuresMax, selfContained, optimizePng, clearPath,
                                                   openReport, noDate)
 {
@@ -796,11 +796,11 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     unlink(workPath, TRUE)
     mkdirp(workPath)
 
-    file.copy(system.file("report", "main.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "featinfo.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "annotation.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "components.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "TPs.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-classic", "main.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-classic", "featinfo.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-classic", "annotation.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-classic", "components.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-classic", "TPs.Rmd", package = "patRoon"), workPath)
 
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd
     if (!R.utils::isAbsolutePath(path))

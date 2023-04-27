@@ -109,14 +109,10 @@ reportHTMLUtils$methods(
     plotImg = function(p) paste0("<img src='", p, "'></img>")
 )
 
-# UNDONE: method
 #' @export
-reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                          compsCluster = NULL, components = NULL, TPs = NULL,
-                          settingsFile = system.file("report", "settings.yml", package = "patRoon"),
-                          path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                          specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE, parallel = TRUE,
-                          overrideSettings = list())
+setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
+                                                  TPs, settingsFile, path, EICParams, specSimParams, clearPath,
+                                                  openReport, parallel, overrideSettings)
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -236,7 +232,7 @@ reportHTMLNew <- function(fGroups, MSPeakLists = NULL, formulas = NULL, compound
     }
     
     invisible(NULL)
-}
+})
 
 #' @export
 genReportSettingsFile <- function(out)

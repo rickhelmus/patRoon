@@ -332,7 +332,9 @@ prepareChemTable <- function(chemData, prefCalcChemProps, neutralChemProps, verb
         form <- tryCatch(rcdk::get.formula(formula[1]), error = function(...) NULL)
         if (is.null(form))
             list(NA_character_, NA_real_)
-        else
+        else if (grepl("[", formula[1], fixed = TRUE))
+            list(formula[1], form@mass) # don't normalize formulae with isotopes, as RCDK won't preserve them
+        else            
             list(form@string, form@mass)
     }, by = "formula"]
     

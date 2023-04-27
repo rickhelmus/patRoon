@@ -15,6 +15,7 @@ doc
 # RStudio files
 patRoon.Rproj
 .Rproj.user/
+patRoon.Rproj
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -33,3 +34,4 @@ vignettes/*.pdf
 **/GenForm.exe
 inst/doc
 src/patRoon.dll
+src/patRoon.so

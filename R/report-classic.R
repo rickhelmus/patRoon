@@ -1,7 +1,7 @@
 #' @include main.R
 NULL
 
-#' Report feature group data
+#' Report feature group data (classic interface)
 #'
 #' Functionality to report data produced by most workflow steps such as
 #' features, feature groups, calculated chemical formulae and tentatively
@@ -60,7 +60,7 @@ NULL
 #'   within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
 #'   will not be reported.
 #'
-#' @name reporting
+#' @name reporting-classic
 NULL
 
 
@@ -559,7 +559,7 @@ reportComponentPlots <- function(fGroups, path, components, EICParams, retMin, E
 #'   \file{.csv} file will be generated with information about its detected
 #'   features.
 #'
-#' @rdname reporting
+#' @rdname reporting-classic
 #' @aliases reportCSV
 #' @export
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, formulas,
@@ -622,7 +622,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, 
 #' @param EICGrid An integer vector in the form \code{c(columns, rows)} that is
 #'   used to determine the plotting grid when reporting EICs in PDF files.
 #'
-#' @rdname reporting
+#' @rdname reporting-classic
 #' @aliases reportPDF
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
@@ -743,7 +743,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
 #'   \addCitations{knitr}{3}
 #'
-#' @rdname reporting
+#' @rdname reporting-classic
 #' @aliases reportHTML
 #' @export
 setMethod("reportHTMLClassic", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,

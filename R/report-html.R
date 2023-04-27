@@ -1,6 +1,17 @@
 #' @include main.R
 NULL
 
+#' Report workflow data
+#'
+#' Functionality to report data produced by most workflow steps such as features, feature groups, formula and compound
+#' annotations, and TPs.
+#'
+#' The reporting functionality is typically used at the very end of the workflow. It is used to overview the data
+#' generated during the workflow, such as features, their annotations and TP screening results.
+#' @name reporting
+NULL
+
+
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings,
                                     outPath, EICs, EICParams, specSimParams, parallel)
 {
@@ -109,6 +120,31 @@ reportHTMLUtils$methods(
     plotImg = function(p) paste0("<img src='", p, "'></img>")
 )
 
+#' @details \code{reportHTML} reports all workflow data in an interactive \acronym{HTML} file. The reports include both
+#'   tabular data (\emph{e.g.} retention times, annotation properties, screening results) and varios plots (\emph{e.g.}
+#'   chromatograms, (annotated) mass spectra and many more). This function uses functionality from other \R packages,
+#'   such as \link{rmarkdown}, \link{flexdashboard}, \link{knitr} and \link{bslib}.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that should be used for reporting data.
+#' @param MSPeakLists,formulas,compounds,compsCluster,components,TPs Further objects (\code{\link{MSPeakLists}},
+#'   \code{\link{formulas}}, \code{\link{compounds}}, \code{\link{compoundsCluster}}, \code{\link{components}},
+#'   \code{\link{transformationProducts}}) that should be reported. Specify \code{NULL} to skip reporting a particular
+#'   object. Note that \code{MSPeakLists} must be set if either \code{formulas} or \code{compounds} is set.
+#' @param path The destination file path for files generated during reporting. Will be generated if needed.
+#' @param clearPath If \code{TRUE} then the report destination path will be (recursively) removed prior to reporting.
+#' @param openReport If set to \code{TRUE} then the output report file will be opened with the system browser.
+#'
+#' @template specSimParams-arg
+#'
+#' @note No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
+#'   etc) which is \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).
+#'
+#' @references Creating MetFrag landing page URLs based on code from
+#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
+#'   \addCitations{knitr}{3}
+#'
+#' @aliases reportHTML
+#' @rdname reporting
 #' @export
 setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
                                                   TPs, settingsFile, path, EICParams, specSimParams, clearPath,

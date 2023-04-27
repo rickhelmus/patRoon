@@ -15,6 +15,7 @@ doc
 # RStudio files
 patRoon.Rproj
 .Rproj.user/
+patRoon.Rproj
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf

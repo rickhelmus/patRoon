@@ -349,7 +349,7 @@ makeReportHTML <- function(fGroups, path = getWorkPath(), reportPlots = NULL, ov
         overrideSettings, keep.null = TRUE
     )
     
-    reportHTMLNew(fGroups, path = path, openReport = FALSE, overrideSettings = overrideSettings, ...)
+    reportHTML(fGroups, path = path, openReport = FALSE, overrideSettings = overrideSettings, ...)
 }
 
 expect_reportHTML <- function(object)

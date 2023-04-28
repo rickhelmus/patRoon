@@ -283,6 +283,7 @@ checkFeaturesInterface$methods(
 #'   when, for instance, feature group data is re-created with different parameters.
 #'
 #' @param sessionIn,sessionOut The file names for the input and output sessions.
+#' @param rtWindow The retention time window (seconds) used to relate 'old' with 'new' feature groups.
 #' @param mzWindow The \emph{m/z} window (in Da) used to relate 'old' with 'new' feature groups.
 #' @param overWrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
 #'   function will stop with an error message.

@@ -452,17 +452,13 @@ NULL
 #'
 #'   This should be the 'new' object for \code{importCheckFeaturesSession} for which the session needs to be imported.
 #' @param session The session file name.
-#' @param rtWindow For \code{checkFeatures} and \code{checkComponents}: the retention time (in seconds) that will be
-#'   subtracted/added to respectively the minimum and maximum retention time of the plotted feature groups. Thus,
-#'   setting this value to a positive value will 'zoom out' on the retention time axis.
-#'
-#'   For \code{importCheckFeaturesSession}: the retention time window (seconds) used to relate 'old' with 'new' feature
-#'   groups.
 #' @param clearSession If \code{TRUE} the session will be completely cleared before starting the GUI. This effectively
 #'   removes all selections for data removal.
 #'
+#' @template EICParams-arg
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
-#' 
+#'
 #' @name check-GUI
 NULL
 

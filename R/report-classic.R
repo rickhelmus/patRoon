@@ -39,10 +39,6 @@ NULL
 #'   reported.
 #' @param retMin If \code{TRUE} then report retention times in minutes
 #'   (otherwise seconds).
-#' @param EICRtWindow,EICMzExpWindow,EICTopMost,EICTopMostByRGroup,EICOnlyPresent
-#'   Plotting parameters passed to \code{\link{plotChroms}} (\emph{i.e.}
-#'   \code{rtWindow}, \code{mzExpWindow}, \code{topMost}, \code{topMostByRGroup}
-#'   and \code{onlyPresent} arguments).
 #' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
 #'   argument to \code{\link{generateCompoundsMetFrag}} for more details).
@@ -52,6 +48,8 @@ NULL
 #' @param clearPath If \code{TRUE} then the destination path will be
 #'   (recursively) removed prior to reporting.
 #'
+#' @template EICParams-arg
+#' 
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar excludeParam compoundsExclNormScores,formulasExclNormScores
 #' @template norm-args

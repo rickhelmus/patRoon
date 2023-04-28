@@ -332,16 +332,61 @@ getEICs <- function(file, ranges)
     return(doGetEICs(file, as.data.table(ranges)))
 }
 
+#' Extracted Ion Chromatogram parameters
+#'
+#' Parameters for creation of extracted ion chromatograms.
+#'
+#' To configure the creation of extracted ion chromatograms (EICs) several parameters exist:
+#'
+#' \itemize{
+#'
+#' \item \code{rtWindow} Retention time (in seconds) that will be subtracted/added to respectively the minimum and
+#' maximum retention time of the feature. Thus, setting this value to \samp{>0} will 'zoom out' on the retention time
+#' axis.
+#' 
+#' \item \code{topMost} Only create EICs for this number of top most intense features. If \code{NULL} then EICs are
+#' created for all features.
+#' 
+#' \item \code{topMostByRGroup} If set to \code{TRUE} and \code{topMost} is set: only create EICs for the top most
+#' features in each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will
+#' be plotted for the most intense feature of each replicate group.
+#' 
+#' \item \code{onlyPresent} If \code{TRUE} then EICs are created only for analyses in which a feature was detected. If
+#' \code{onlyPresent=FALSE} then EICs are generated for \strong{all} analyses. The latter is handy to evaluate if a peak
+#' was 'missed' during feature detection or removed during \emph{e.g.} filtering.
+#' 
+#' }
+#' 
+#' if \code{onlyPresent=FALSE} then the following parameters are also relevant: \itemize{
+#'
+#' \item \code{mzExpWindow} To create EICs for analyses in which no feature was found, the \emph{m/z} value is derived
+#' from the min/max values of all features in the feature group. The value of \code{mzExpWindow} further expands this
+#' window.
+#' 
+#' \item \code{setsAdductPos},\code{setsAdductNeg} \setsWF In sets workflows the adduct must be known to calculate the
+#' ionized \emph{m/z}. If a feature is completely absent in a particular set then it follows no adduct annotations are
+#' available and the value of \code{setsAdductPos} (positive ionization data) or \code{setsAdductNeg} (negative
+#' ionization data) will be used instead.
+#'
+#' }
+#'
+#' These parameters are passed as a named \code{list} as the \code{EICParams} argument to functions that use EICs. The
+#' \code{getDefEICParams} function can be used to generate such parameter list with defaults.
+#'
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @name EICParams
 #' @export
 getDefEICParams <- function(...)
 {
-    def <- list(rtWindow = 30,
-                mzExpWindow = 0.001,
-                topMost = NULL,
-                topMostByRGroup = FALSE,
-                onlyPresent = TRUE,
-                setsAdductPos = "[M+H]+",
-                setsAdductNeg = "[M-H]-"
+    def <- list(
+        rtWindow = 30,
+        topMost = NULL,
+        topMostByRGroup = FALSE,
+        onlyPresent = TRUE,
+        mzExpWindow = 0.001,
+        setsAdductPos = "[M+H]+",
+        setsAdductNeg = "[M-H]-"
     )
     
     return(modifyList(def, list(...), keep.null = TRUE))

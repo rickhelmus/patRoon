@@ -491,12 +491,9 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
     return(makeHash(obj[[index]], markFGroup, xlim, ylim, ...))
 })
 
-#' @describeIn components Plot an extracted ion chromatogram (EIC) for all
-#'   feature groups within a single component.
-#' @param fGroups The \code{\link{featureGroups}} object that was used to
-#'   generate the components.
-#' @param rtWindow Retention window: see the \code{plotChroms} method for the
-#'   \code{\link{featureGroups}} class.
+#' @describeIn components Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.
+#' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
+#' @template EICParams-arg
 #' @export
 setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 {

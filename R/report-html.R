@@ -138,6 +138,7 @@ reportHTMLUtils$methods(
 #' @param overrideSettings A \code{list} with settings that override those from the report settings file. Example:
 #'   \code{overrideSettings=list(compounds=list(topMost=25))}.
 #'
+#' @template EICParams-arg
 #' @template specSimParams-arg
 #' @template parallel-arg
 #'

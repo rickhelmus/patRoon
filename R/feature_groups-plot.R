@@ -365,31 +365,18 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 #'   Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster and (if
 #'   \code{onlyPresent=FALSE}) allows plotting chromatograms for feature groups where none of the specified analyses
 #'   contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).
-#' @param rtWindow Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
-#'   retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
-#'   retention time axis.
-#' @param mzExpWindow In case the \emph{m/z} window to plot an EIC for a particular analysis is not known (\emph{i.e.}
-#'   no feature was detected of the feature group to be plot and \code{onlyPresent=FALSE}) then the EIC \emph{m/z} range
-#'   is estimated from the range for the complete feature group and expanded by the offset defined by
-#'   \code{mzExpWindow}.
-#' @param topMost Only plot EICs from features within this number of top most intense analyses. If \code{NULL} then all
-#'   analyses are used for plotted.
-#' @param topMostByRGroup If set to \code{TRUE} and \code{topMost} is set: only plot EICs for the top most features in
-#'   each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
-#'   plotted for the most intense feature of each replicate group.
 #' @param EICs Internal parameter for now and should be kept at \code{NULL} (default).
 #' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic peak ranges by filling (shading) their
 #'   areas.
 #' @param showFGroupRect Set to \code{TRUE} to mark the full retention/intensity range of all features within a feature
 #'   group by drawing a rectangle around it.
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param onlyPresent If \code{TRUE} then EICs will only be generated for analyses in which a particular feature group
-#'   was detected. Disabling this option might be useful to see if any features were 'missed'.
 #' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
 #'   each plotted feature group.
 #' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
 #'   to \code{"none"} to disable any annotation.
 #'
+#' @template EICParams-arg
 #' @template plot-lim
 #'
 #' @rdname feature-plotting

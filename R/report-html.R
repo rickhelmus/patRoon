@@ -123,7 +123,7 @@ reportHTMLUtils$methods(
 #' @details \code{reportHTML} reports all workflow data in an interactive \acronym{HTML} file. The reports include both
 #'   tabular data (\emph{e.g.} retention times, annotation properties, screening results) and varios plots (\emph{e.g.}
 #'   chromatograms, (annotated) mass spectra and many more). This function uses functionality from other \R packages,
-#'   such as \link{rmarkdown}, \link{flexdashboard}, \link{knitr} and \link{bslib}.
+#'   such as \CRANpkg{rmarkdown}, \CRANpkg{flexdashboard}, \CRANpkg{knitr} and \CRANpkg{bslib}.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be used for reporting data.
 #' @param MSPeakLists,formulas,compounds,compsCluster,components,TPs Further objects (\code{\link{MSPeakLists}},

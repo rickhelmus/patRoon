@@ -1,3 +1,15 @@
+#' Utilities to caching of workflow data.
+#'
+#' Several utiulity functions related to cache workflow data. The most important function is \code{clearCache}; other
+#' functions are primarily for internal use.
+#'
+#' @param category The category of the objects to be loaded from cache.
+#' @param dbArg Alternative connection to database. Default is \code{NULL} and uses the cache options as defined by
+#'   \option{patRoon.cache.fileName}. Mainly used internally to improve performance.
+#'
+#' @name caching
+NULL
+
 getCacheMode <- function()
 {
     ret <- getOption("patRoon.cache.mode", default = "both")
@@ -9,16 +21,14 @@ getCacheMode <- function()
 getCacheFile <- function() getOption("patRoon.cache.fileName")
 getMaxCacheEntries <- function() 100000 # UNDONE
 
-#' makeHash
+#' @details \code{makeHash} Make a hash string of given arguments.
 #'
-#' @description Make a hash string of given arguments.
+#' @param \dots Arguments/objects to be used for hashing.
+#' @param checkDT \code{logical}, set to \code{TRUE} with (a \code{list} with) \code{data.table}s to ensure reproducible
+#'   hashing. Otherwise can be set to \code{FALSE} to improve performance.
 #'
-#' @param ... Arguments/objects to be used for hashing.
-#' @param checkDT Logical, set to `TRUE` for striping DT self references as they
-#' sometimes lead hashing issues.
-#'
+#' @rdname caching
 #' @export
-#'
 makeHash <- function(..., checkDT = TRUE)
 {
     args <- list(...)
@@ -32,6 +42,9 @@ makeHash <- function(..., checkDT = TRUE)
     return(digest::digest(args, algo = "xxhash64"))
 }
 
+#' @details \code{makeFileHash} Generates a hash from the contents of one or more files.
+#' @rdname caching
+#' @export 
 makeFileHash <- function(...) digest::digest(sapply(list(...), digest::digest, file = TRUE, algo = "xxhash64"))
 
 # storing/retrieving R objects: http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/
@@ -40,17 +53,11 @@ openCacheDB <- function(file = getCacheFile()) DBI::dbConnect(RSQLite::SQLite(),
 closeCacheDB <- function(db) DBI::dbDisconnect(db)
 openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB(file), function(x) closeCacheDB(x))
 
-#' loadCacheData
-#'
-#' @description Loads cached objects.
-#'
-#' @param category The category of the objects to be loaded from cache.
-#' @param hashes The hash strings of the objects to be loaded.
-#' @param dbArg Alternative connection to database. Default is `NULL` and uses
-#' the cache options as defined by "patRoon.cache.fileName".
-#'
+#' @details \code{loadCacheData} Loads cached data from a database.
+#' @param hashes A \code{character} with one more hashes (\emph{e.g.} obtained with \code{makeHash}) of the objects to
+#'   be loaded.
+#' @rdname caching
 #' @export
-#'
 loadCacheData <- function(category, hashes, dbArg = NULL)
 {
     if (getCacheMode() == "save" || getCacheMode() == "none")
@@ -116,18 +123,14 @@ dbWithWriteTransaction <- function(conn, code)
              db_abort = rollback, error = rollback, interrupt = rollback)
 }
 
-#' saveCacheData
-#'
-#' @description Caches objects.
+#' @details \code{saveCacheData} caches data in a database.   
 #'
 #' @param category The category of the object to be cached.
 #' @param data The object to be cached.
-#' @param hash The hash string of the object to be cached.
-#' @param dbArg Alternative connection to database. Default is `NULL` and uses
-#' the cache options as defined by "patRoon.cache.fileName".
+#' @param hash The hash string of the object to be cached (\emph{e.g.} obtained with \code{makeHash}).
 #'
+#' @rdname caching
 #' @export
-#'
 saveCacheData <- function(category, data, hash, dbArg = NULL)
 {
     if (getCacheMode() == "load" || getCacheMode() == "none")
@@ -184,15 +187,9 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
     saveCacheData(category, dataHashes, setHash, dbArg)
 }
 
-# UNDONE: include in general cache doc?
-
-#' Clearing of cached data
-#'
-#' Remove (part of) the cache database used to store (intermediate) processing results.
-#'
-#' This function will either remove one or more tables within the cache \code{sqlite} database or simply wipe the whole
-#' cache file. Removing tables will \code{VACUUM} the database (unless \code{vacuum=FALSE}), which may take some time
-#' for large cache files.
+#' @details \code{clearCache} will either remove one or more tables within the cache \code{sqlite} database or simply
+#'   wipe the whole cache file. Removing tables will \code{VACUUM} the database (unless \code{vacuum=FALSE}), which may
+#'   take some time for large cache files.
 #'
 #' @param what This argument describes what should be done. When \code{what = NULL} this function will list which tables
 #'   are present along with an indication of their size (database rows). If \code{what = "all"} then the complete file
@@ -202,6 +199,7 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 #' @param vacuum If \code{TRUE} then the \code{VACUUM} operation will be run on the cache database to reduce the file
 #'   size. Setting this to \code{FALSE} might be handy to avoid long processing times on large cache databases.
 #'
+#' @rdname caching
 #' @export
 clearCache <- function(what = NULL, file = NULL, vacuum = TRUE)
 {

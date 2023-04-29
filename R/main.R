@@ -456,6 +456,8 @@ NULL
 #'   removes all selections for data removal.
 #'
 #' @template EICParams-arg
+#' 
+#' @note The \code{topMost} and \code{topMostByRGroup} EIC parameters (\code{\link{EICParams}}) are ignored.
 #'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'

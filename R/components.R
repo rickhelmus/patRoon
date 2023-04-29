@@ -494,6 +494,8 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.
 #' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
 #' @template EICParams-arg
+#' @note For \code{plotChroms}: The \code{topMost} and \code{topMostByRGroup} EIC parameters are ignored unless the
+#'   components are from homologous series.
 #' @export
 setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 {

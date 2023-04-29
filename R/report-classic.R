@@ -3,60 +3,48 @@ NULL
 
 #' Report feature group data (classic interface)
 #'
-#' Functionality to report data produced by most workflow steps such as
-#' features, feature groups, calculated chemical formulae and tentatively
-#' identified compounds.
+#' Functionality to report data produced by most workflow steps such as features, feature groups, calculated chemical
+#' formulae and tentatively identified compounds.
 #'
-#' These functions are usually called at the very end of the workflow. It is
-#' used to report various data on features and feature groups. In addition,
-#' these functions may be used for reporting formulae and/or compounds that were
-#' generated for the specified feature groups. Data can be reported in tabular
-#' form (\emph{i.e.} \file{.csv} files) by \code{reportCSV} or graphically by
-#' \code{reportPDF} and \code{reportHTML}. The latter functions will plot for
-#' instance chromatograms and annotated mass spectra, which are useful to get a
-#' graphical overview of results.
+#' These functions are usually called at the very end of the workflow. It is used to report various data on features and
+#' feature groups. In addition, these functions may be used for reporting formulae and/or compounds that were generated
+#' for the specified feature groups. Data can be reported in tabular form (\emph{i.e.} \file{.csv} files) by
+#' \code{reportCSV} or graphically by \code{reportPDF} and \code{reportHTML}. The latter functions will plot for
+#' instance chromatograms and annotated mass spectra, which are useful to get a graphical overview of results.
 #'
-#' All functions have a wide variety of arguments that influence the reporting
-#' process. Nevertheless, most parameters are optional and only required to be
-#' given for fine tuning. In addition, only those objects (\emph{e.g.} formulae,
+#' All functions have a wide variety of arguments that influence the reporting process. Nevertheless, most parameters
+#' are optional and only required to be given for fine tuning. In addition, only those objects (\emph{e.g.} formulae,
 #' compounds, clustering) that are desired to be reported need to be specified.
 #'
-#' @param fGroups The \code{\link{featureGroups}} object that should be used for
-#'   reporting data.
-#' @param path The destination file path for files generated during reporting.
-#'   Will be generated if needed.
+#' @param fGroups The \code{\link{featureGroups}} object that should be used for reporting data.
+#' @param path The destination file path for files generated during reporting. Will be generated if needed.
 #' @param reportFGroups If \code{TRUE} then feature group data will be reported.
-#' @param formulas,compounds,compsCluster,components Further objects
-#'   (\code{\link{formulas}}, \code{\link{compounds}},
-#'   \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
-#'   reported. Specify \code{NULL} to skip reporting a particular object.
-#' @param reportFormulaSpectra If \code{TRUE} then explained MS/MS spectra (if
-#'   available) for candidate formulae will be reported. Specifying
-#'   \code{formulas} and setting this argument to \code{FALSE} still allows
-#'   further annotation of compound MS/MS spectra.
-#' @param MSPeakLists A \code{\link{MSPeakLists}} object that is
-#'   \emph{mandatory} when spectra for formulae and/or compounds will be
-#'   reported.
-#' @param retMin If \code{TRUE} then report retention times in minutes
-#'   (otherwise seconds).
-#' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
-#'   that actually have been used to rank data (see the \code{scoreTypes}
-#'   argument to \code{\link{generateCompoundsMetFrag}} for more details).
-#' @param formulasTopMost,compoundsTopMost Only this amount of top ranked
-#'   candidate formulae/compounds are reported. Lower values may significantly
-#'   speed up reporting. Set to \code{NULL} to ignore.
-#' @param clearPath If \code{TRUE} then the destination path will be
-#'   (recursively) removed prior to reporting.
+#' @param formulas,compounds,compsCluster,components Further objects (\code{\link{formulas}}, \code{\link{compounds}},
+#'   \code{\link{compoundsCluster}}, \code{\link{components}}) that should be reported. Specify \code{NULL} to skip
+#'   reporting a particular object.
+#' @param reportFormulaSpectra If \code{TRUE} then explained MS/MS spectra (if available) for candidate formulae will be
+#'   reported. Specifying \code{formulas} and setting this argument to \code{FALSE} still allows further annotation of
+#'   compound MS/MS spectra.
+#' @param MSPeakLists A \code{\link{MSPeakLists}} object that is \emph{mandatory} when spectra for formulae and/or
+#'   compounds will be reported.
+#' @param retMin If \code{TRUE} then report retention times in minutes (otherwise seconds).
+#' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted that actually have been used to rank
+#'   data (see the \code{scoreTypes} argument to \code{\link{generateCompoundsMetFrag}} for more details).
+#' @param formulasTopMost,compoundsTopMost Only this amount of top ranked candidate formulae/compounds are reported.
+#'   Lower values may significantly speed up reporting. Set to \code{NULL} to ignore.
+#' @param clearPath If \code{TRUE} then the destination path will be (recursively) removed prior to reporting.
 #'
 #' @template EICParams-arg
-#' 
+#'
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar excludeParam compoundsExclNormScores,formulasExclNormScores
 #' @template norm-args
 #'
-#' @note Any formulae and compounds for feature groups which are not present
-#'   within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
-#'   will not be reported.
+#' @note Any formulae and compounds for feature groups which are not present within \code{fGroups} (\emph{i.e.} because
+#'   it has been subset afterwards) will not be reported.
+#'
+#'   The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
+#'   \emph{e.g.}, when generating overview plots.
 #'
 #' @name reporting-classic
 NULL

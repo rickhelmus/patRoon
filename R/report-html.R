@@ -239,6 +239,9 @@ reportHTMLUtils$methods(
 #' @note No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
 #'   etc) which are \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).
 #'
+#'   The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
+#'   \emph{e.g.}, when generating overview plots.
+#'
 #' @references Creating MetFrag landing page URLs based on code from
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
 #'   \addCitations{knitr}{3}
@@ -292,7 +295,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    # UNDONE: make onlyPresent configurable, check if feature EICs are needed
+    # UNDONE: check if/which EICs are needed from settings
     EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
                                                                               onlyPresent = settings$features$chromatograms$features != "all"),
                                                               keep.null = TRUE))

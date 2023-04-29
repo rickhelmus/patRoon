@@ -379,7 +379,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas
 #'
 #' @rdname reporting
 #' @export
-genReportSettingsFile <- function(out = "report_settings.yml")
+genReportSettingsFile <- function(out = "report.yml")
 {
     checkmate::assertPathForOutput(out, overwrite = TRUE)
     defFile <- system.file("report", "settings.yml", package = "patRoon")

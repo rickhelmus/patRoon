@@ -292,6 +292,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
 #'
 #' @param x,obj A \code{componentsTPs} object.
 #'
+#' @slot fromTPs A \code{logical} that is \code{TRUE} when the componentization was performed with
+#'   \code{\link{transformationProducts}} data.
+#'
 #' @seealso \code{\link{components}} for other relevant methods and \code{\link{generateComponents}}
 #'
 #' @templateVar class componentsTPs

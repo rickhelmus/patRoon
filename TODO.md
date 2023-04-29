@@ -6,7 +6,6 @@
 - ppm spectral averaging (Ricardo)
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
-- new fromTPs slot: doc, make method and use in reporting?
 - get rid of magrittr dependency?
 - bug?: mergeScreeningSetInfos() fragments_formula shouldn't be in unCols?
 - BUG: checkFeatures() (and components?): manual table sorting messes up with feature gets selected
@@ -44,6 +43,7 @@
 - fixed set hashes from executeMultiProc were saved as list instead of vector --> re-generate cache.
 - formulaDiff format changed
 - optims for hashing/loading of EIC/MS data
+- new fromTPs slot
 
 
 ## Features

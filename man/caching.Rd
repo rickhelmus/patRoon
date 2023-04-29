@@ -7,7 +7,7 @@
 \alias{loadCacheData}
 \alias{saveCacheData}
 \alias{clearCache}
-\title{Utilities to caching of workflow data.}
+\title{Utilities for caching of workflow data.}
 \usage{
 makeHash(..., checkDT = TRUE)
 
@@ -48,7 +48,7 @@ the table names that should be removed.}
 size. Setting this to \code{FALSE} might be handy to avoid long processing times on large cache databases.}
 }
 \description{
-Several utiulity functions related to cache workflow data. The most important function is \code{clearCache}; other
+Several utility functions for caching workflow data. The most important function is \code{clearCache}; other
 functions are primarily for internal use.
 }
 \details{

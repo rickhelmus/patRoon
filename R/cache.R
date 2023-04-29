@@ -1,6 +1,6 @@
-#' Utilities to caching of workflow data.
+#' Utilities for caching of workflow data.
 #'
-#' Several utiulity functions related to cache workflow data. The most important function is \code{clearCache}; other
+#' Several utility functions for caching workflow data. The most important function is \code{clearCache}; other
 #' functions are primarily for internal use.
 #'
 #' @param category The category of the objects to be loaded from cache.

@@ -30,6 +30,8 @@
 - Only generate relevant EICs based on report settings
 - tests
     - verify plot file creation?
+- classic --> legacy
+- get rid of pngquant: installation scripts, CI, handbook, more?
 
 
 ## Components
@@ -45,6 +47,8 @@
 - formulaDiff format changed
 - optims for hashing/loading of EIC/MS data
 - new fromTPs slot
+- handbook: EICParams? or at least update plotChroms etc?
+- update tutorial, including script*.R files
 
 
 ## Features

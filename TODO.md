@@ -27,6 +27,7 @@
     - keepOld? keepPlots?
 - make noDate hidden option?
 - test with bslib pre-release (eg for deprecated functions)
+- Only generate relevant EICs based on report settings
 - tests
     - verify plot file creation?
 

@@ -295,7 +295,6 @@ setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    # UNDONE: check if/which EICs are needed from settings
     EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
                                                                               onlyPresent = settings$features$chromatograms$features != "all"),
                                                               keep.null = TRUE))

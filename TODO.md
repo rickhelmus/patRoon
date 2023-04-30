@@ -32,7 +32,6 @@
     - verify plot file creation?
 - classic --> legacy
 - get rid of pngquant: installation scripts, CI, handbook, more?
-- update newProject()
 
 
 ## Components

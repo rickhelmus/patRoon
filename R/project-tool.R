@@ -622,7 +622,7 @@ getScriptCode <- function(input, analyses)
         addAssignment("fGroups", "fGroups[results = componentsTP]")
     }
     
-    if (length(input$report) > 0)
+    if (length(input$reportGen) > 0)
     {
         # UNDONE: for now TP components are always reported instead of others
         componVal <- if (input$doTPs)
@@ -633,33 +633,56 @@ getScriptCode <- function(input, analyses)
             "NULL"
         
         addHeader("reporting")
-        addCall(NULL, "reportCSV", condition = "CSV" %in% input$report, list(
-            list(value = "fGroups"),
-            list(name = "path", value = "report", quote = TRUE),
-            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
-            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
-            list(name = "components", value = componVal)
-        ))
-        addCall(NULL, "reportPDF", condition = "PDF" %in% input$report, list(
-            list(value = "fGroups"),
-            list(name = "path", value = "report", quote = TRUE),
-            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
-            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
-            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = componVal)
-        ))
-        addCall(NULL, "reportHTML", condition = "HTML" %in% input$report, list(
-            list(value = "fGroups"),
-            list(name = "path", value = "report", quote = TRUE),
-            list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
-            list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
-            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "components", value = componVal),
-            list(name = "TPs", value = "TPs", condition = input$doTPs),
-            list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
-            list(name = "selfContained", value = FALSE),
-            list(name = "openReport", value = TRUE)
-        ))
+        
+        if ("HTML" %in% input$reportGen)
+        {
+            addComment("Advanced report settings can be edited in the report.yml file.")
+            addCall(NULL, "reportHTML", list(
+                list(value = "fGroups"),
+                list(name = "MSPeakLists", value = "mslists", isNULL = !doMSPL),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+                list(name = "components", value = componVal),
+                list(name = "TPs", value = "TPs", condition = input$doTPs),
+                list(name = "settingsFile", value = "report.yml", quote = TRUE),
+                list(name = "openReport", value = TRUE)
+            ))
+        }
+        
+        if ("legacy" %in% input$reportGen)
+        {
+            if ("HTML" %in% input$reportGen)
+                addNL()
+
+            addComment("Generate reports with legacy interface.")
+            addCall(NULL, "reportCSV", condition = "CSV" %in% input$reportLegacy, list(
+                list(value = "fGroups"),
+                list(name = "path", value = "report", quote = TRUE),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+                list(name = "components", value = componVal)
+            ))
+            addCall(NULL, "reportPDF", condition = "PDF" %in% input$reportLegacy, list(
+                list(value = "fGroups"),
+                list(name = "path", value = "report", quote = TRUE),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+                list(name = "components", value = componVal)
+            ))
+            addCall(NULL, "reportHTMLClassic", condition = "HTML" %in% input$reportLegacy, list(
+                list(value = "fGroups"),
+                list(name = "path", value = "report", quote = TRUE),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
+                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
+                list(name = "components", value = componVal),
+                list(name = "TPs", value = "TPs", condition = input$doTPs),
+                list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
+                list(name = "selfContained", value = FALSE),
+                list(name = "openReport", value = TRUE)
+            ))
+        }
     }
     
     addNL()
@@ -693,6 +716,9 @@ doCreateProject <- function(input, analyses)
         (input$ionization == "both" && nzchar(input$suspectListPos))
     if (doSusps && input$annotateSus && input$genIDLevelFile)
         genIDLevelRulesFile(file.path(input$destinationPath, "idlevelrules.yml"))
+    
+    if ("HTML" %in% input$reportGen)
+        genReportSettingsFile(file.path(input$destinationPath, "report.yml"))
     
     code <- getScriptCode(input, analyses)
     if (input$outputScriptTo == "curFile")
@@ -1149,11 +1175,16 @@ getNewProjectUI <- function(destPath)
             miniUI::miniTabPanel(
                 "Reporting", icon = icon("file-medical-alt"),
                 miniUI::miniContentPanel(
-                    fillCol(
-                        checkboxGroupInput("report", "Report generation",
-                                           c("CSV (text tables)" = "CSV", "PDF (basic plots)" = "PDF",
-                                             "HTML (easy browsable plots, bit slower than PDF)" = "HTML"),
-                                           c("CSV", "HTML"), width = "100%")
+                    fillRow(
+                        # flex = NA,
+                        checkboxGroupInput("reportGen", "Report generation", c("HTML reports" = "HTML",
+                                                                               "Legacy interface" = "legacy"),
+                                           "HTML", width = "100%"),
+                        conditionalPanel(
+                            condition = "input.reportGen.includes('legacy')",
+                            checkboxGroupInput("reportLegacy", "Legacy report formats", c("CSV", "PDF", "HTML"),
+                                               "CSV", width = "100%")
+                        )
                     )
                 )
             )
@@ -1327,6 +1358,8 @@ newProject <- function(destPath = NULL)
             else if (input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "suspects" &&
                      !nzchar(input$TPSuspectList))
                 rstudioapi::showDialog("No parent suspect list", "Please select a parent suspect list!", "")
+            else if ("legacy" %in% input$reportGen && length(input$reportLegacy) == 0)
+                rstudioapi::showDialog("No legacy format", "Please select at least one legacy reporting format!", "")
             else
             {
                 anas <- if (input$ionization != "both") rValues$analyses else list(pos = rValues$analysesPos,

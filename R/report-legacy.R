@@ -1,7 +1,7 @@
 #' @include main.R
 NULL
 
-#' Report feature group data (classic interface)
+#' Report feature group data (legacy interface)
 #'
 #' Functionality to report data produced by most workflow steps such as features, feature groups, calculated chemical
 #' formulae and tentatively identified compounds.
@@ -46,7 +46,7 @@ NULL
 #'   The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
 #'   \emph{e.g.}, when generating overview plots.
 #'
-#' @name reporting-classic
+#' @name reporting-legacy
 NULL
 
 
@@ -545,7 +545,7 @@ reportComponentPlots <- function(fGroups, path, components, EICParams, retMin, E
 #'   \file{.csv} file will be generated with information about its detected
 #'   features.
 #'
-#' @rdname reporting-classic
+#' @rdname reporting-legacy
 #' @aliases reportCSV
 #' @export
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, formulas,
@@ -608,7 +608,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, 
 #' @param EICGrid An integer vector in the form \code{c(columns, rows)} that is
 #'   used to determine the plotting grid when reporting EICs in PDF files.
 #'
-#' @rdname reporting-classic
+#' @rdname reporting-legacy
 #' @aliases reportPDF
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
@@ -729,10 +729,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
 #'   \addCitations{knitr}{3}
 #'
-#' @rdname reporting-classic
+#' @rdname reporting-legacy
 #' @aliases reportHTML
 #' @export
-setMethod("reportHTMLClassic", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
+setMethod("reportHTMLLegacy", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
                                                   formulasNormalizeScores, formulasExclNormScores,
                                                   compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
@@ -782,11 +782,11 @@ setMethod("reportHTMLClassic", "featureGroups", function(fGroups, path, reportPl
     unlink(workPath, TRUE)
     mkdirp(workPath)
 
-    file.copy(system.file("report-classic", "main.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report-classic", "featinfo.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report-classic", "annotation.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report-classic", "components.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report-classic", "TPs.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-legacy", "main.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-legacy", "featinfo.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-legacy", "annotation.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-legacy", "components.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report-legacy", "TPs.Rmd", package = "patRoon"), workPath)
 
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd
     if (!R.utils::isAbsolutePath(path))

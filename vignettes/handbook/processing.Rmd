@@ -976,9 +976,9 @@ The legacy interface was the default reporting interface for `patRoon` versions 
 
 * `reportCSV()`: exports workflow data to comma-separated value (csv) files
 * `reportPDF()`: generates simple reports by plotting workflow data in portable document files (PDFs)
-* `reportHTMLClassic()`: generates interactive and easily explorable reports
+* `reportHTMLLegacy()`: generates interactive and easily explorable reports
 
-Like the `reportHTML()` function described above, the arguments to these functions control which data will be reported. However, these functions do not use a report settings file, and all configuration happens through function arguments. Some common arguments are listed below; for a complete listing see the reference manual (`` ?`reporting-classic` ``).
+Like the `reportHTML()` function described above, the arguments to these functions control which data will be reported. However, these functions do not use a report settings file, and all configuration happens through function arguments. Some common arguments are listed below; for a complete listing see the reference manual (`` ?`reporting-legacy` ``).
 
 Argument                              | Functions                     | Remarks
 ------------------------------------- | ----------------------------- | ----------------------------------------------------------

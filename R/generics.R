@@ -413,7 +413,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICGrid = c(2, 1), EICParams = getDefEICParams(rRtWindow = 20, topMost = 1,
                                                                                 topMostByRGroup = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
-setGeneric("reportHTMLClassic", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+setGeneric("reportHTMLLegacy", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
                                          formulas = NULL, formulasTopMost = 5,
                                          formulasNormalizeScores = "max", formulasExclNormScores = NULL,
                                          compounds = NULL, compoundsNormalizeScores = "max",
@@ -425,7 +425,7 @@ setGeneric("reportHTMLClassic", function(fGroups, path = "report", reportPlots =
                                          retMin = TRUE, EICParams = getDefEICParams(rtWindow = 20, topMost = 1,
                                                                                     topMostByRGroup = TRUE),
                                          TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
-                                         clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTMLClassic"))
+                                         clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTMLLegacy"))
 setGeneric("reportHTML", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
                                   components = NULL, TPs = NULL,
                                   settingsFile = system.file("report", "settings.yml", package = "patRoon"),

@@ -670,7 +670,7 @@ getScriptCode <- function(input, analyses)
                 list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
                 list(name = "components", value = componVal)
             ))
-            addCall(NULL, "reportHTMLClassic", condition = "HTML" %in% input$reportLegacy, list(
+            addCall(NULL, "reportHTMLLegacy", condition = "HTML" %in% input$reportLegacy, list(
                 list(value = "fGroups"),
                 list(name = "path", value = "report", quote = TRUE),
                 list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),

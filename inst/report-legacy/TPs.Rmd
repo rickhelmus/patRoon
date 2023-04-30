@@ -1,4 +1,4 @@
-<script>`r readAllFile(system.file("js", "utils-report-classic.js", package = "patRoon"))`</script>
+<script>`r readAllFile(system.file("js", "utils-report-legacy.js", package = "patRoon"))`</script>
 
 Transformation Products {data-orientation=rows}
 ===

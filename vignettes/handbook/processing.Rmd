@@ -667,28 +667,27 @@ Generic           | Classes                                              | Remar
 `plotChroms()`    | `featureGroups`, `components`                        | Plot extracted ion chromatograms (EICs)
 `plotSpectrum()`  | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
 `plotStructure()` | `compounds`                                          | Draws candidate structures
-`plotScores()`    | `formulas`, `compounds`                              | Barplot for candidate scoring
+`plotScores()`    | `formulas`, `compounds`                              | Barplot with candidate scoring
 `plotGraph()`     | `componentsNT`                                       | Draws interactive graphs of linked homologous series
 
 The most common plotting functions are `plotChroms()`, which plots chromatographic data for features, and `plotSpectrum()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
 
-Argument                                      | Generic                   | Remarks
---------------------------------------------- | ------------------------- | -------------------------------------------------------------------
-`rtWindow`                                    | `plotChroms()`                   | Extra time (in s) +/- retention limits of plotted features (useful to zoom out)
+Argument                                      | Generic                          | Remarks
+--------------------------------------------- | -------------------------------- | -------------------------------------------------------------------
 `retMin`                                      | `plotChroms()`                   | If `TRUE` plot retention times in minutes
-`topMost`                                     | `plotChroms()`                   | Only draw this amount of highest intensity features in each group.
-`topMostByRGroup`                             | `plotChroms()`                   | If `TRUE` then the `topMost` parameter specifies the top most intense features in each replicate group to draw (e.g. `topMost=1` would draw the most intense feature for each replicate group). 
+`EICParams`                                   | `plotChroms()`                   | Advanced parameters to control the creation of extracted ion chromatograms (described below)
 `showPeakArea`, `showFGroupRect`              | `plotChroms()`                   | Fill peak areas / draw rectangles around feature groups?
 `title`                                       | `plotChroms()`, `plotSpectrum()` | Override plot title
 `colourBy`                                    | `plotChroms()`                   | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
 `showLegend`                                  | `plotChroms()`                   | Display a legend? (only if `colourBy!="none"`)
-`onlyPresent`                                 | `plotChroms()`                   | Only plot EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
 `xlim`, `ylim`                                | `plotChroms()`, `plotSpectrum()` | Override x/y axis ranges, i.e. to manually set plotting range.
 `groupName`, `analysis`, `precursor`, `index` | `plotSpectrum()`                 | What to plot. See examples below.
 `MSLevel`                                     | `plotSpectrum()`                 | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
-`formulas`                                    | `plotSpectrum()`                 | Whether `formula` annotation should be added (only `compounds`)
+`formulas`                                    | `plotSpectrum()`                 | Whether `formula` annotations should be added (only `compounds`)
 `plotStruct`                                  | `plotSpectrum()`                 | Whether the structure should be added to the plot (only `compounds`)
 `mincex`                                      | `plotSpectrum()`                 | Minimum annotation font size (only `formulas`/`compounds`)
+
+
 
 Note that we can use [subsetting](#subset) to select which feature data we want to plot, e.g.
 
@@ -712,17 +711,9 @@ Some other common and less common plotting operations are shown below.
 plot(fGroups) # simple scatter plot of retention and m/z values
 
 plotChroms(fGroups) # plot EICs for all features
-# get overview of all feature groups
-plotChroms(fGroups,
-           colourBy = "fGroup", # unique colour for each group
-           topMost = 1, # only most intense feature in each group
-           showPeakArea = TRUE, # show integrated areas
-           showFGroupRect = FALSE,
-           showLegend = FALSE) # no legend (too busy for many feature groups)
 plotChroms(fGroups[, 1], # only plot all features of first group
            colourBy = "rGroup") # and mark them individually per replicate group
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
-
 
 plotSpectrum(mslists, "M120_R268_30") # non-annotated MS spectrum
 plotSpectrum(mslists, "M120_R268_30", MSLevel = 2) # non-annotated MS/MS spectrum
@@ -743,6 +734,39 @@ plotSpectrum(components, index = 7) # component spectrum
 plotGraph(componNT)
 ```
 
+#### Extracted Ion Chromatogram parameters
+
+The `EICParams` argument to `plotChroms()` is used to specify more advanced parameters for the creation of extracted ion chromatograms (EICs). Some parameters of interest:
+
+Parameter         | Description
+----------------- | -------------------------------------------------
+`rtWindow`        | Expands the EIC retention time range +/- the feature peak width (in seconds). This is e.g. useful to zoom out.
+`topMost`         | Only consider this amount of highest intensity features in a group.
+`topMostByRGroup` | If `TRUE` then the `topMost` parameter concerns the top most intense features in a replicate group (e.g. `topMost=1` would draw the most intense feature for each replicate group).
+`onlyPresent`     | Only create EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
+
+The parameters are configured by giving a named `list` to the `EICParams` argument. To obtain such a `list` with default settings, the `getDefEICParams()` function can be used:
+
+```{r eval=TRUE}
+getDefEICParams()
+```
+
+Any arguments specified to this function will alter the values of the returned parameter list. Some examples:
+
+```{r EICParams, eval=runData}
+# investigate if any features were not detected in a feature group
+plotChroms(fGroups[, 10], EICParams = getDefEICParams(onlyPresent = FALSE))
+
+# get overview of all feature groups
+plotChroms(fGroups,
+           colourBy = "fGroup", # unique colour for each group
+           EICParams = getDefEICParams(topMost = 1), # only most intense feature in each group
+           showPeakArea = TRUE, # show integrated areas
+           showFGroupRect = FALSE,
+           showLegend = FALSE) # no legend (too busy for many feature groups)
+```
+
+The reference manual (`?EICParams`) gives a full detail on all parameters. 
 
 ### Overlapping and unique data {#visComp}
 
@@ -897,7 +921,7 @@ Some additional parameters exist to the functions described in this section. As 
 
 The previous sections showed various functionality to inspect and visualize results. An easy way to do this automatically is by using the _reporting_ functionality of `patRoon`. There are currently two interfaces: a legacy interface that is described in the next subsection, and the modernized version discussed here.
 
-The reports are generated by the `reportHTML()` function, which accepts various data objects from the workflow. The output is an `HTML` file, which can be opened with a regular web browser, and allows you to interactively explore and visualize the data.
+The reports are generated by the `reportHTML()` function, which combines the data generated during the workflow. The output `HTML` file can be opened with a regular web browser, and allows you to interactively explore and visualize the data. The reports combine chromatograms, mass spectra, tables with feature and annotation properties and many other useful ways to easily explore your data.
 
 Which data is reported is controlled by the following function arguments:
 
@@ -910,7 +934,9 @@ Argument                   | Description
 `components`               | Any componentization results, _e.g._ with [adduct annotations](#componentsChrom) and from [transformation product screening](#TPs).
 `TPs`                      | Output from object from [generated transformation products](#genTPs).
 
-Most of these arguments are optional, and if not specified this part of the workflow is simply not reported. This also means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data. Some examples:
+Most of these arguments are optional, and if not specified this part of the workflow is simply not reported. This also means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data. More advanced arguments to `reportHTML()` are discussed in the reference manual (`?reporting`).
+
+Some examples:
 
 ```{r eval=FALSE}
 reportHTML(fGroups) # only report feature groups
@@ -943,8 +969,6 @@ When the [newProject tool](#newProject) is used to create a new `patRoon` projec
 ```{r eval=FALSE}
 genReportSettingsFile()
 ```
-
-More advanced arguments to `reportHTML()` are discussed in the reference manual (`?reporting`).
 
 ### Legacy interface
 

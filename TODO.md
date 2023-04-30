@@ -47,8 +47,7 @@
 - optims for hashing/loading of EIC/MS data
 - new fromTPs slot
 - update tutorial, including script*.R files
-    - EICParams
-    - reportHTML()
+    - re-read
 
 
 ## Features

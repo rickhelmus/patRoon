@@ -57,8 +57,5 @@ compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 # reporting
 # -------------------------
 
-reportCSV(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-          components = NULL)
-reportHTML(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-           components = NULL, reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-           selfContained = FALSE, openReport = TRUE)
+reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
+           components = NULL, settingsFile = "report.yml", openReport = TRUE)

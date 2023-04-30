@@ -242,7 +242,7 @@ Finally, we can have a quick look at our data by plotting some nice extracted io
 
 ```{r plotChroms,fig.width=7}
 plotChroms(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
-           topMost = 1, showLegend = FALSE)
+           EICParams = getDefEICParams(topMost = 1), showLegend = FALSE)
 ```
 
 Note that we only plot the most intense feature of a feature group here (as set by `topMost=1`). See the reference docs for many more parameters to these functions (e.g. `?plotChroms`).
@@ -336,14 +336,17 @@ plotSpectrum(compounds, 1, "M120_R268_286", mslists, plotStruct = TRUE)
 
 # Reporting
 
-The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (`reportPDF()` and `reportHTML()`) or tabular csv data (`reportCSV()`).
+The last step of the workflow is typically to report all the data. The `reportHTML()` function combines all workflow data in an easy to use interactive `HTML` document.
 
 ```{r eval=FALSE}
-reportCSV(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-          components = NULL)
-reportHTML(fGroups, path = "report", formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-           components = NULL, reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-           selfContained = FALSE, openReport = TRUE)
+reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
+           components = NULL, settingsFile = "report.yml", openReport = TRUE)
+```
+
+> **_NOTE_** If you did _not_ use `newProject()` and created the project manually then you *first* need to generate a new report settings file:
+
+```{r eval=FALSE}
+genReportSettingsFile() # only run this if the project was created manually without  newProject() 
 ```
 
 The output of `reportHTML()` can be viewed [here](../examples/report.html).
@@ -352,10 +355,10 @@ Note that these functions can be called at any time during the workflow. This ma
 
 ```{r eval=FALSE}
 # only report feature groups (i.e. the bare minimum)
-reportCSV(fGroups, path = "report", reportFeatures = FALSE)
+reportHTML(fGroups)
 
 # report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting
-reportHTML(fGroups, path = "report", formulas = formulas, MSPeakLists = mslists)
+reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas)
 ```
 
 ```{r echo=FALSE,eval=pkgdown::in_pkgdown()}
@@ -370,7 +373,7 @@ setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
 reportHTML(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
-           components = NULL, MSPeakLists = mslists, optimizePng = TRUE, openReport = FALSE)
+           components = NULL, MSPeakLists = mslists, openReport = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 # devtools::clean_source(tempScript, quiet = TRUE)
 callr::rscript(tempScript, show = FALSE)

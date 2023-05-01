@@ -188,16 +188,14 @@ test_that("reporting works", {
     expect_file(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsRC),
                 getWorkPath("components.pdf"))
 
-    # UNDONE: setting reportPlots="none" in combination with plotting components
-    # crashes pandoc2, using "eics" for now...
-    expect_reportHTML(makeReportHTML(fGroupsSimple, reportPlots = "eics", components = compsRC))
+    expect_reportHTML(makeReportHTML(fGroupsSimple, components = compsRC))
 })
 
 test_that("reporting empty object works", {
     expect_error(reportCSV(fGroupsSimple, getWorkPath(), components = compsEmpty), NA)
     expect_error(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
-    expect_reportHTML(makeReportHTML(fGroupsSimple, reportPlots = "none", components = compsEmpty))
-    expect_error(makeReportHTML(fGroupsEmpty, reportPlots = "eics", components = compsRC), NA)
+    expect_reportHTML(makeReportHTML(fGroupsSimple, components = compsEmpty))
+    expect_error(makeReportHTML(fGroupsEmpty, components = compsRC), NA)
 })
 
 test_that("plotting works", {

@@ -337,7 +337,7 @@ expect_ggplot <- function(object)
 
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
 # makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
-makeReportHTML <- function(fGroups, path = getWorkPath(), reportPlots = NULL, overrideSettings = list(), ...)
+makeReportHTML <- function(fGroups, path = getWorkPath(), overrideSettings = list(), ...)
 {
     overrideSettings <- modifyList(
         list(

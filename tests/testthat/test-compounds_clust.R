@@ -70,7 +70,7 @@ test_that("reporting works", {
     for (grp in names(clusters(compsClust)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s-clusters.pdf", class(fGroups), grp))) # UNDONE: check col name
 
-    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none", compounds = compounds, MSPeakLists = plists, compsCluster = compsClust))
+    expect_reportHTML(makeReportHTML(fGroups, compounds = compounds, MSPeakLists = plists, compsCluster = compsClust))
 })
 
 test_that("reporting empty object works", {
@@ -78,5 +78,5 @@ test_that("reporting empty object works", {
 
     expect_error(reportCSV(fGroups, getWorkPath(), compsCluster = compsClustEmpty), NA)
     expect_error(reportPDF(fGroups, getWorkPath(), compsCluster = compsClustEmpty), NA)
-    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none", compsCluster = compsClustEmpty))
+    expect_reportHTML(makeReportHTML(fGroups, compsCluster = compsClustEmpty))
 })

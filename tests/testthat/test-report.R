@@ -22,5 +22,5 @@ test_that("removal of old plot files works", {
 
 test_that("repeated reportHTML() calls work", {
     for (i in seq_len(15))
-        expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none"))
+        expect_reportHTML(makeReportHTML(fGroups))
 })

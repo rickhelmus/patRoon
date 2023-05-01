@@ -243,8 +243,7 @@ test_that("reporting works", {
     for (grp in reportGroups)
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
 
-    expect_reportHTML(makeReportHTML(fGroups[, reportGroups], reportPlots = "formulas",
-                                     formulas = formsGFWithMSMS, MSPeakLists = plists))
+    expect_reportHTML(makeReportHTML(fGroups[, reportGroups], formulas = formsGFWithMSMS, MSPeakLists = plists))
 })
 
 test_that("reporting empty objects works", {
@@ -254,10 +253,8 @@ test_that("reporting empty objects works", {
                            MSPeakLists = plistsEmpty), NA)
     expect_error(reportPDF(fGroupsEmpty, getWorkPath(), reportFGroups = FALSE, formulas = formsGF,
                            MSPeakLists = plists), NA)
-    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
-                                     formulas = formsGFEmpty, MSPeakLists = plistsEmpty))
-    expect_error(makeReportHTML(fGroupsEmpty, reportPlots = "none",
-                                formulas = formsGF, MSPeakLists = plists), NA)
+    expect_reportHTML(makeReportHTML(fGroups, formulas = formsGFEmpty, MSPeakLists = plistsEmpty))
+    expect_error(makeReportHTML(fGroupsEmpty, formulas = formsGF, MSPeakLists = plists), NA)
 })
 
 anPLGroup2 <- screenInfo(fGroups)[name == "DEET"]$group

@@ -331,9 +331,3 @@
 
 - filter on stability/persistence/toxicity of TP?
 
-
-## Reporting
-
-- add more options to reportPlots argument of reportHTML()?
-- onlyAnnotated argument
-

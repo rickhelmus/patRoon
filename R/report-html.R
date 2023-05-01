@@ -295,9 +295,18 @@ setMethod("reportHTML", "featureGroups", function(fGroups, MSPeakLists, formulas
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    EICs <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL,
-                                                                              onlyPresent = settings$features$chromatograms$features != "all"),
-                                                              keep.null = TRUE))
+    EICParams$onlyPresent <- settings$features$chromatograms$features != "all"
+    if (!settings$features$chromatograms$large && isFALSE(settings$features$chromatograms$features) &&
+        settings$features$chromatograms$small)
+    {
+        # plot only small chromatograms (and summary overview), get minimum set of EICs
+        EICParams$topMost <- 1
+        EICParams$topMostByRGroup <- FALSE
+    }
+    else
+        EICParams["topMost"] <- list(NULL)
+    
+    EICs <- getEICsForFGroups(fGroups, EICParams = EICParams)
     cat("Done!\n")
     
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,

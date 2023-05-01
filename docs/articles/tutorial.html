@@ -119,7 +119,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2023-04-26</h4>
+            <h4 data-toc-skip class="date">2023-05-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -154,8 +154,8 @@ detailed overview of <code>patRoon</code>. Instead, it serves as a quick
 introduction on how to use <code>patRoon</code> to setup and perform a
 full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-dfd8ae970cdba6082ce1" style="width:750px;height:100px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-dfd8ae970cdba6082ce1">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-71b6a6539230882b9fad" style="width:750px;height:100px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-71b6a6539230882b9fad">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -330,11 +330,8 @@ code.</p>
 <span><span class="co"># reporting</span></span>
 <span><span class="co"># -------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>          components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,</span>
-<span>           selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<span>           components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -605,7 +602,7 @@ have a look at generated feature groups and their intensities
 extracted ion chromatograms (EICs) for all feature groups:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>           topMost <span class="op">=</span> <span class="fl">1</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>           EICParams <span class="op">=</span> <span class="fu">getDefEICParams</span><span class="op">(</span>topMost <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Verifying if your data is centroided...</span></span></code></pre>
 <p><img src="tutorial_files/figure-html/plotChroms-1.png" width="672"></p>
 <p>Note that we only plot the most intense feature of a feature group
@@ -849,28 +846,31 @@ data from the previous step.</p>
 <div class="section level2">
 <h2 id="reporting">Reporting<a class="anchor" aria-label="anchor" href="#reporting"></a>
 </h2>
-<p>The last step of the workflow is typically reporting data: during
-this step all the collected data is transformed to graphical plots
-(<code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code>) or tabular csv
-data (<code><a href="../reference/reporting.html">reportCSV()</a></code>).</p>
+<p>The last step of the workflow is typically to report all the data.
+The <code><a href="../reference/reporting.html">reportHTML()</a></code> function combines all workflow data in an
+easy to use interactive <code>HTML</code> document.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>          components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,</span>
-<span>           selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<span>           components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong><em>NOTE</em></strong> If you did <em>not</em> use
+<code><a href="../reference/newProject.html">newProject()</a></code> and created the project manually then you
+<em>first</em> need to generate a new report settings file:</p>
+</blockquote>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">genReportSettingsFile</span><span class="op">(</span><span class="op">)</span> <span class="co"># only run this if the project was created manually without  newProject() </span></span></code></pre></div>
 <p>The output of <code><a href="../reference/reporting.html">reportHTML()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the
 workflow. This may be especially useful if you want evaluate results
 during optimization or exploring the various algorithms and their
 parameters. In this case you can simply cherry pick the data that you
 want to report, for instance:</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># only report feature groups (i.e. the bare minimum)</span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, reportFeatures <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting</span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="final-script">Final script<a class="anchor" aria-label="anchor" href="#final-script"></a>
@@ -878,7 +878,7 @@ want to report, for instance:</p>
 <p>In the previous sections the different parts of the processing script
 were discussed and where necessary modified. As a reference, the final
 script look similar ot this:</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Script automatically generated on Mon Jul 26 14:32:58 2021</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon" class="external-link">patRoon</a></span><span class="op">)</span></span>
@@ -938,11 +938,8 @@ script look similar ot this:</p>
 <span><span class="co"># reporting</span></span>
 <span><span class="co"># -------------------------</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportCSV</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>          components <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, path <span class="op">=</span> <span class="st">"report"</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>,</span>
-<span>           components <span class="op">=</span> <span class="cn">NULL</span>, reportPlots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span><span class="op">)</span>,</span>
-<span>           selfContained <span class="op">=</span> <span class="cn">FALSE</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/reporting.html">reportHTML</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<span>           components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <!-- UNDONE: next steps section -->
 </div>
   </div>

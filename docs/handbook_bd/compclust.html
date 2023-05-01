@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-04-26" />
+<meta name="date" content="2023-05-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -249,7 +249,10 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
 <li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
-<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a></li>
+<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a>
+<ul>
+<li class="chapter" data-level="5.9.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.9.1</b> Legacy interface</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
 <ul>
@@ -345,8 +348,8 @@ div.csl-indent {
 <h2><span class="header-section-number">8.8</span> Compound clustering<a href="compclust.html#compclust" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>When large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> or <a href="http://www.chemspider.com/">ChemSpider</a> are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that ‘fit’ in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
 <p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by <a href="https://github.com/CDK-R/cdkr">rcdk</a>.</p>
-<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="compclust.html#cb260-1" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
-<span id="cb260-2"><a href="compclust.html#cb260-2" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">makeHCluster</span>(compounds)</span></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="compclust.html#cb267-1" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
+<span id="cb267-2"><a href="compclust.html#cb267-2" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">makeHCluster</span>(compounds)</span></code></pre></div>
 <p>This function accepts several arguments to fine tune the clustering process:</p>
 <ul>
 <li><code>method</code>: the clustering method (e.g. <code>"complete"</code> (default), <code>"ward.D2"</code>), see <code>?hclust</code> for options</li>
@@ -355,16 +358,16 @@ div.csl-indent {
 </ul>
 <p>For all arguments see the reference manual (<code>?makeHClust</code>).</p>
 <p>The resulting object is of type <code>compoundsCluster</code>. Several methods are defined to modify and inspect these results:</p>
-<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="compclust.html#cb261-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span></span>
-<span id="cb261-2"><a href="compclust.html#cb261-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotStructure</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)</span>
-<span id="cb261-3"><a href="compclust.html#cb261-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb261-4"><a href="compclust.html#cb261-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot dendrogram</span></span>
-<span id="cb261-5"><a href="compclust.html#cb261-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
-<span id="cb261-6"><a href="compclust.html#cb261-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb261-7"><a href="compclust.html#cb261-7" aria-hidden="true" tabindex="-1"></a><span class="co"># re-assign clusters for a feature group</span></span>
-<span id="cb261-8"><a href="compclust.html#cb261-8" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(compsClust, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
-<span id="cb261-9"><a href="compclust.html#cb261-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ditto, but automatic cluster determination</span></span>
-<span id="cb261-10"><a href="compclust.html#cb261-10" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(compsClust, <span class="at">minModuleSize =</span> <span class="dv">3</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="compclust.html#cb268-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span></span>
+<span id="cb268-2"><a href="compclust.html#cb268-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotStructure</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb268-3"><a href="compclust.html#cb268-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb268-4"><a href="compclust.html#cb268-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot dendrogram</span></span>
+<span id="cb268-5"><a href="compclust.html#cb268-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
+<span id="cb268-6"><a href="compclust.html#cb268-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb268-7"><a href="compclust.html#cb268-7" aria-hidden="true" tabindex="-1"></a><span class="co"># re-assign clusters for a feature group</span></span>
+<span id="cb268-8"><a href="compclust.html#cb268-8" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(compsClust, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
+<span id="cb268-9"><a href="compclust.html#cb268-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ditto, but automatic cluster determination</span></span>
+<span id="cb268-10"><a href="compclust.html#cb268-10" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(compsClust, <span class="at">minModuleSize =</span> <span class="dv">3</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span></code></pre></div>
 <p>For a complete overview see the reference manual (<code>?compoundsCluster</code>).</p>
 </div>
             </section>

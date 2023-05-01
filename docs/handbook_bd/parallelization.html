@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-04-26" />
+<meta name="date" content="2023-05-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -249,7 +249,10 @@ div.csl-indent {
 <li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
 <li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
-<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a></li>
+<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a>
+<ul>
+<li class="chapter" data-level="5.9.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.9.1</b> Legacy interface</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
 <ul>
@@ -385,11 +388,11 @@ div.csl-indent {
 </tbody>
 </table>
 <p>The parallelization is achieved with the <a href="https://github.com/HenrikBengtsson/future">future</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools">future.apply</a> <code>R</code> packages. To enable parallelization of these functions the <code>parallel</code> argument must be set to <code>TRUE</code> and the future framework must be properly configured in advance. For example:</p>
-<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="parallelization.html#cb276-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setup three workers to run in parallel</span></span>
-<span id="cb276-2"><a href="parallelization.html#cb276-2" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;multisession&quot;</span>, <span class="at">workers =</span> <span class="dv">3</span>)</span>
-<span id="cb276-3"><a href="parallelization.html#cb276-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb276-4"><a href="parallelization.html#cb276-4" aria-hidden="true" tabindex="-1"></a><span class="co"># find features with enviPick in parallel</span></span>
-<span id="cb276-5"><a href="parallelization.html#cb276-5" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">parallel =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="parallelization.html#cb283-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setup three workers to run in parallel</span></span>
+<span id="cb283-2"><a href="parallelization.html#cb283-2" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;multisession&quot;</span>, <span class="at">workers =</span> <span class="dv">3</span>)</span>
+<span id="cb283-3"><a href="parallelization.html#cb283-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb283-4"><a href="parallelization.html#cb283-4" aria-hidden="true" tabindex="-1"></a><span class="co"># find features with enviPick in parallel</span></span>
+<span id="cb283-5"><a href="parallelization.html#cb283-5" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">parallel =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>It is important to properly configure the right future plan. Please see the documentation of the <a href="https://github.com/HenrikBengtsson/future">future</a> package for more details.</p>
 </div>
 <div id="multiprocessing" class="section level3 hasAnchor" number="8.12.2">
@@ -456,7 +459,7 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td><code>pngquant</code></td>
-<td><code>reportHTML(...)</code></td>
+<td><code>reportHTMLLegacy(...)</code></td>
 <td>Only if <code>optimizePng=TRUE</code></td>
 </tr>
 <tr class="odd">
@@ -493,49 +496,49 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<p>Which method is used is controlled by the <code>patRoon.MP.method</code> package option. Note that <code>reportHTML()</code> will always use the classic method for <code>pngquant</code>.</p>
+<p>Which method is used is controlled by the <code>patRoon.MP.method</code> package option. Note that <code>reportHTMLLegacy()</code> will always use the classic method for <code>pngquant</code>.</p>
 <div id="classic-multiprocessing-interface" class="section level4 hasAnchor" number="8.12.2.1">
 <h4><span class="header-section-number">8.12.2.1</span> Classic multiprocessing interface<a href="parallelization.html#classic-multiprocessing-interface" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The classic interface is the ‘original’ method implemented in <code>patRoon</code>, and is therefore well tested and optimized. It is easier to setup, works well with all tools, and is therefore the default method. It is enabled as follows:</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="parallelization.html#cb277-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;classic&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="parallelization.html#cb284-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;classic&quot;</span>)</span></code></pre></div>
 <p>The number of parallel processes is configured through the <code>patRoon.MP.maxProcs</code> option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, you may want to lower this, for instance, to keep your computer more responsive while processing or limit the RAM used by the data processing workflow.</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="parallelization.html#cb278-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>) <span class="co"># do not execute more than two tools in parallel. </span></span></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="parallelization.html#cb285-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>) <span class="co"># do not execute more than two tools in parallel. </span></span></code></pre></div>
 <p>This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved with the <code>withOpt()</code> function.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="parallelization.html#cb279-1" aria-hidden="true" tabindex="-1"></a><span class="co"># do not execute more than two tools in parallel.</span></span>
-<span id="cb279-2"><a href="parallelization.html#cb279-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>)</span>
-<span id="cb279-3"><a href="parallelization.html#cb279-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb279-4"><a href="parallelization.html#cb279-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ... but execute up to four GenForm processes</span></span>
-<span id="cb279-5"><a href="parallelization.html#cb279-5" aria-hidden="true" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.maxProcs =</span> <span class="dv">4</span>, {</span>
-<span id="cb279-6"><a href="parallelization.html#cb279-6" aria-hidden="true" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
-<span id="cb279-7"><a href="parallelization.html#cb279-7" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="parallelization.html#cb286-1" aria-hidden="true" tabindex="-1"></a><span class="co"># do not execute more than two tools in parallel.</span></span>
+<span id="cb286-2"><a href="parallelization.html#cb286-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>)</span>
+<span id="cb286-3"><a href="parallelization.html#cb286-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb286-4"><a href="parallelization.html#cb286-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ... but execute up to four GenForm processes</span></span>
+<span id="cb286-5"><a href="parallelization.html#cb286-5" aria-hidden="true" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.maxProcs =</span> <span class="dv">4</span>, {</span>
+<span id="cb286-6"><a href="parallelization.html#cb286-6" aria-hidden="true" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
+<span id="cb286-7"><a href="parallelization.html#cb286-7" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 <p>The <code>withOpt</code> function will temporarily change the given option(s) while executing a given code block and restore it afterwards (it is very similar to the <code>with_options()</code> function from the <a href="https://cran.r-project.org/web/packages/withr/index.html">withr</a> <code>R</code> package). Furthermore, notice how <code>withOpt()</code> does not require you to prefix the option names with <code>patRoon.</code>.</p>
 </div>
 <div id="multiprocessing-with-futures" class="section level4 hasAnchor" number="8.12.2.2">
 <h4><span class="header-section-number">8.12.2.2</span> Multiprocessing with futures<a href="parallelization.html#multiprocessing-with-futures" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The primary goal of the “future” method is to allow parallel processing on one or more external computers. Since it uses the <a href="https://github.com/HenrikBengtsson/future">future</a> <code>R</code> package, many approaches are supported, such as local parallelization (similar to the <code>classic</code> method), cluster computing via multiple networked computers and more advanced HPC approaches such as <code>slurm</code> via the <a href="https://github.com/HenrikBengtsson/future.batchtools">future.batchtools</a> <code>R</code> package. This parallelization method can be activated as follows:</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="parallelization.html#cb280-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
-<span id="cb280-2"><a href="parallelization.html#cb280-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb280-3"><a href="parallelization.html#cb280-3" aria-hidden="true" tabindex="-1"></a><span class="co"># set a future plan</span></span>
-<span id="cb280-4"><a href="parallelization.html#cb280-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb280-5"><a href="parallelization.html#cb280-5" aria-hidden="true" tabindex="-1"></a><span class="co"># example 1: start a local cluster with four nodes</span></span>
-<span id="cb280-6"><a href="parallelization.html#cb280-6" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
-<span id="cb280-7"><a href="parallelization.html#cb280-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb280-8"><a href="parallelization.html#cb280-8" aria-hidden="true" tabindex="-1"></a><span class="co"># example 2: start a networked cluster with four nodes on PC with hostname &quot;otherpc&quot;</span></span>
-<span id="cb280-9"><a href="parallelization.html#cb280-9" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="fu">rep</span>(<span class="st">&quot;otherpc&quot;</span>, <span class="dv">4</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="parallelization.html#cb287-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
+<span id="cb287-2"><a href="parallelization.html#cb287-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb287-3"><a href="parallelization.html#cb287-3" aria-hidden="true" tabindex="-1"></a><span class="co"># set a future plan</span></span>
+<span id="cb287-4"><a href="parallelization.html#cb287-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb287-5"><a href="parallelization.html#cb287-5" aria-hidden="true" tabindex="-1"></a><span class="co"># example 1: start a local cluster with four nodes</span></span>
+<span id="cb287-6"><a href="parallelization.html#cb287-6" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
+<span id="cb287-7"><a href="parallelization.html#cb287-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb287-8"><a href="parallelization.html#cb287-8" aria-hidden="true" tabindex="-1"></a><span class="co"># example 2: start a networked cluster with four nodes on PC with hostname &quot;otherpc&quot;</span></span>
+<span id="cb287-9"><a href="parallelization.html#cb287-9" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="fu">rep</span>(<span class="st">&quot;otherpc&quot;</span>, <span class="dv">4</span>)) </span></code></pre></div>
 <p>Please see the documentation of the respective packages (<em>e.g.</em> <a href="https://github.com/HenrikBengtsson/future">future</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools">future.batchtools</a>) for more details on how to configure the workers.</p>
 <p>The <code>withOpt()</code> function introduced in the previous subsection can also be used to temporarily switch between parallelization approaches, for instance:</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="parallelization.html#cb281-1" aria-hidden="true" tabindex="-1"></a><span class="co"># default to future parallelization</span></span>
-<span id="cb281-2"><a href="parallelization.html#cb281-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
-<span id="cb281-3"><a href="parallelization.html#cb281-3" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
-<span id="cb281-4"><a href="parallelization.html#cb281-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb281-5"><a href="parallelization.html#cb281-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ... do workflow</span></span>
-<span id="cb281-6"><a href="parallelization.html#cb281-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb281-7"><a href="parallelization.html#cb281-7" aria-hidden="true" tabindex="-1"></a><span class="co"># do classic parallelization for GenForm</span></span>
-<span id="cb281-8"><a href="parallelization.html#cb281-8" aria-hidden="true" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.method =</span> <span class="st">&quot;classic&quot;</span>, {</span>
-<span id="cb281-9"><a href="parallelization.html#cb281-9" aria-hidden="true" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
-<span id="cb281-10"><a href="parallelization.html#cb281-10" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb281-11"><a href="parallelization.html#cb281-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb281-12"><a href="parallelization.html#cb281-12" aria-hidden="true" tabindex="-1"></a><span class="co"># .. do more workflow</span></span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="parallelization.html#cb288-1" aria-hidden="true" tabindex="-1"></a><span class="co"># default to future parallelization</span></span>
+<span id="cb288-2"><a href="parallelization.html#cb288-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
+<span id="cb288-3"><a href="parallelization.html#cb288-3" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
+<span id="cb288-4"><a href="parallelization.html#cb288-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-5"><a href="parallelization.html#cb288-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ... do workflow</span></span>
+<span id="cb288-6"><a href="parallelization.html#cb288-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-7"><a href="parallelization.html#cb288-7" aria-hidden="true" tabindex="-1"></a><span class="co"># do classic parallelization for GenForm</span></span>
+<span id="cb288-8"><a href="parallelization.html#cb288-8" aria-hidden="true" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.method =</span> <span class="st">&quot;classic&quot;</span>, {</span>
+<span id="cb288-9"><a href="parallelization.html#cb288-9" aria-hidden="true" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
+<span id="cb288-10"><a href="parallelization.html#cb288-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb288-11"><a href="parallelization.html#cb288-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-12"><a href="parallelization.html#cb288-12" aria-hidden="true" tabindex="-1"></a><span class="co"># .. do more workflow</span></span></code></pre></div>
 </div>
 <div id="logging" class="section level4 hasAnchor" number="8.12.2.3">
 <h4><span class="header-section-number">8.12.2.3</span> Logging<a href="parallelization.html#logging" class="anchor-section" aria-label="Anchor link to header"></a></h4>

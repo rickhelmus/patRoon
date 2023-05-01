@@ -108,7 +108,7 @@ Dependency                          | Remarks
 [BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar).
 [SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
 [OpenBabel]                         | Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChI and formulae. While optional, highly recommended.
-[pngquant]                          | Used to reduce size of HTML reports, definitely optional.
+[pngquant]                          | Used to reduce size of HTML reports (only legacy interface), definitely optional.
 
 Most of these dependencies are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage if needed.
 

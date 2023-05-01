@@ -28,8 +28,9 @@
 - test with bslib pre-release (eg for deprecated functions)
 - tests
     - verify plot file creation?
-- get rid of pngquant: installation scripts, CI, handbook, more?
-
+- get rid of pngquant
+    - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
+- reportHTML --> report, reportHTMLLegacy --> reportHTML?
 
 ## Components
 

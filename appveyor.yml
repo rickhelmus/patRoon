@@ -58,10 +58,6 @@ before_test:
       }
   - ps: $env:Path += ";C:\Program Files\Pandoc\"
   - pandoc -v
-  - ps: >-
-      if (-Not (Test-Path "C:\ProgramData\chocolatey\bin\pngquant.exe")) {
-        cinst pngquant --ignore-checksums
-      }
 
 platform: x64
 environment:

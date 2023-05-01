@@ -6,7 +6,7 @@ ENV SETUPDIR=/usr/local/setup
 
 RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
-        libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev ghostscript \
+        libxml2-dev openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev ghostscript \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache bzip2 && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.7.0/OpenMS-2.7.0-Debian-Linux-x86_64.deb && \

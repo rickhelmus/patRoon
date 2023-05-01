@@ -133,7 +133,6 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/
 [PubChemLiteTR]: https://doi.org/10.5281/zenodo.5644560
 [future]: https://github.com/HenrikBengtsson/future
-[pngquant]: https://pngquant.org/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
 [handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
 [handbook-inst]: https://rickhelmus.github.io/patRoon/handbook_bd/installation.html

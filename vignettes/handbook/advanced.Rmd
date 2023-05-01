@@ -648,7 +648,7 @@ Tool                  | Used by                                      | Notes
 `GenForm`             | `generateFormulas(agorithm="genform", ...)`  |
 `SIRIUS`              | `generateFormulas(agorithm="sirius", ...)`, `generateCompounds(agorithm="sirius", ...)`  | Only if `splitBatches=TRUE`
 `MetFrag`             | `generateCompounds(agorithm="metfrag", ...)` |
-`pngquant`            | `reportHTML(...)`                            | Only if `optimizePng=TRUE`
+`pngquant`            | `reportHTMLLegacy(...)`                      | Only if `optimizePng=TRUE`
 `BioTransformer`      | `generateTPs(algorithm = "biotransformer")`  | Disabled by default (see `?generateTPs` for details).
 
 Multiprocessing is either performed by executing processes in the background with the [processx] `R` package (_classic interface_) or by futures, which were introduced in the previous section. An overview of the characteristics of both parallelization techniques is shown below.
@@ -659,7 +659,7 @@ requires little or no configuration                 | configuration needed to se
 works with all tools                                | doesn't work with `pngquant` and slower with `GenForm`
 only supports parallelization on the local computer | allows both local and cluster computing
 
-Which method is used is controlled by the `patRoon.MP.method` package option. Note that `reportHTML()` will always use the classic method for `pngquant`.
+Which method is used is controlled by the `patRoon.MP.method` package option. Note that `reportHTMLLegacy()` will always use the classic method for `pngquant`.
 
 #### Classic multiprocessing interface
 

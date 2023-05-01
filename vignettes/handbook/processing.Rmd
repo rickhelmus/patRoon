@@ -983,25 +983,25 @@ Like the `reportHTML()` function described above, the arguments to these functio
 Argument                              | Functions                     | Remarks
 ------------------------------------- | ----------------------------- | ----------------------------------------------------------
 `fGroups`, `formulas`, `compounds`, `formulas`, `components`, `compsCluster`, `TPs` | All | Objects to plot. Only `fGroups` is mandatory.
-`MSPeakLists`                         | `reportPDF()`, `reportHTML()` | The `MSPeakLists` object that was used to generate annotation data. Only needs to be specified if `formulas` or `compounds` are reported.
+`MSPeakLists`                         | `reportPDF()`, `reportHTMLLegacy()` | The `MSPeakLists` object that was used to generate annotation data. Only needs to be specified if `formulas` or `compounds` are reported.
 `path`                                | All                           | Directory path where report files will be stored (`"report"` by default).
-`formulasTopMost`, `compoundsTopMost` | `reportPDF()`, `reportHTML()` | Report no more than this amount of highest ranked candidates.
-`selfContained`                       | `reportHTML()`                | Outputs to a single and self contained `.html` file. Handy to share reports, but not recommended for large amounts of data.
+`formulasTopMost`, `compoundsTopMost` | `reportPDF()`, `reportHTMLLegacy()` | Report no more than this amount of highest ranked candidates.
+`selfContained`                       | `reportHTMLLegacy()`          | Outputs to a single and self contained `.html` file. Handy to share reports, but not recommended for large amounts of data.
 
 Some typical examples:
 
 ```{r reporting,eval=FALSE}
-reportHTML(fGroups) # simple interactive report with feature data
+reportHTMLLegacy(fGroups) # simple interactive report with feature data
 # generate PDFs with feature and compound annotation data
 reportPDF(fGroups, compounds = compounds, MSPeakLists = mslists)
 reportCSV(fGroups, path = "myReport") # change destination path
 
 # generate report with all workflow types and increase maximum number of
 # compound candidates to top 10
-reportHTML(fGroups, formulas = formulas, compounds = compounds,
-           components = components, MSPeakLists = mslists,
-           compsCluster = compsClust,
-           compoundsTopMost = 10)
+reportHTMLLegacy(fGroups, formulas = formulas, compounds = compounds,
+                 components = components, MSPeakLists = mslists,
+                 compsCluster = compsClust,
+                 compoundsTopMost = 10)
 ```
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}

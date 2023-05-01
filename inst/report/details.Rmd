@@ -42,7 +42,7 @@ callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fi
 doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$large || utils$hasComponentsFromTPs() ||
                                                 settings$features$chromatograms$intensityPlots)
 
-mdprintf("Generating report components: ")
+mdprintf("Generating report parts: ")
 
 bslib::layout_column_wrap(
     id = "detailsLayout",

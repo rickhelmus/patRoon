@@ -13,24 +13,16 @@
 
 ## Reporting
 
-- Put CSV/PDF functions also in separate files
-- Report all candidates instead of topMost, but generate placeholder plots if >topMost
-    --> seems to be too slow due to detail tab generation
-    --> maybe someday generate details in JS instead
-- reset filters button?
-    - sortof already there when toggling filters
-- suspInfoTabs: keep not splitting set data in columns for layout purposes?
-- make arg for file cleaning
 - report all/detected features instead of just chroms
     - rename yml option?
 - rename plotFileRetention
     - keepOld? keepPlots?
 - test with bslib pre-release (eg for deprecated functions)
-- tests
-    - verify plot file creation?
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 - reportHTML --> report, reportHTMLLegacy --> reportHTML?
+- deprecate reportHTML
+    - also mention in docs
 
 ## Components
 

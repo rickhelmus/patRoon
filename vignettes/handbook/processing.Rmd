@@ -953,7 +953,7 @@ reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = comp
 The report itself is primarily configured through a _report settings file_, which is an easily editable [YAML] file. The default file is as follows:
 
 ```yaml
-`r readAllFile(system.file("report", "settings.yml", package = "patRoon"))`
+`r patRoon:::readAllFile(system.file("report", "settings.yml", package = "patRoon"))`
 ```
 
 A detailed description for all the settings can be found in the reference manual (`?reporting`). The table below summarizes the most interesting options:

@@ -141,6 +141,8 @@
 <li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show plots of wrong results</li>
 <li>Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component</li>
 <li>Added <code>maxExpGenerations</code> argument to <code>generateTPsBiotransformer</code> to avoid excessive TP hierarchy expansions.</li>
+<li>
+<code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).</li>
 </ul></li>
 <li>GenForm: <code>thrMS</code>, <code>thrMSMS</code>, <code>thrComb</code> and <code>maxCandidates</code> arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.</li>
 <li>
@@ -198,7 +200,7 @@
 </ul></li>
 <li>Fixed: <code><a href="../reference/featureGroups-class.html">selectIons()</a></code> didn’t properly handle empty components objects</li>
 <li>
-<code><a href="../reference/clearCache.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
+<code><a href="../reference/caching.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
 <li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was somethimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
 <li>Feature components: add <code>adduct_abundance</code> column</li>
 <li>
@@ -210,6 +212,7 @@
 </ul></li>
 <li>Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations</li>
 <li>Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue <a href="https://github.com/rickhelmus/patRoon/issues/76" class="external-link">#76</a>).</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>/<code><a href="../reference/check-GUI.html">checkComponents()</a></code>: disabling a feature/featureGroup in a sorted table would lead to wrong selections</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -1069,7 +1072,7 @@
 <li>Workaround for homologous series generation with nontarget (see <a href="https://github.com/blosloos/nontarget/issues/6" class="external-link uri">https://github.com/blosloos/nontarget/issues/6</a>)</li>
 <li>Improvements to terminate background commandline processes when e.g. R is terminated.</li>
 <li>
-<code><a href="../reference/clearCache.html">clearCache()</a></code> now supports removal of caches via regular expressions.</li>
+<code><a href="../reference/caching.html">clearCache()</a></code> now supports removal of caches via regular expressions.</li>
 <li>Added/Improved <code>topMost</code> and <code>extraOpts</code> arguments for SIRIUS formula/compound generation.</li>
 <li>Annotated fragments from SIRIUS compounds now correctly contain charged molecular form.</li>
 <li>
@@ -1111,7 +1114,7 @@
 </ul></li>
 </ul></li>
 <li>
-<code>file</code> argument for <code><a href="../reference/clearCache.html">clearCache()</a></code>
+<code>file</code> argument for <code><a href="../reference/caching.html">clearCache()</a></code>
 </li>
 <li>Updates on MS peak lists
 <ul><li>More consistent naming for algorithm specific MS peak list generators (i.e. <code>generateMSPeakListsX</code> where X is the algo).</li>

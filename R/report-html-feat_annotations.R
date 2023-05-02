@@ -383,7 +383,7 @@ reportHTMLUtils$methods(
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             candidate = reactable::colDef("#", minWidth = 15),
-            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
@@ -546,7 +546,7 @@ reportHTMLUtils$methods(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
-            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)") else NULL,
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(cell = function(value, index) htmltools::span(dangerouslySetInnerHTML = list("__html" = makeDBIdentLink(databases[index], value)))) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),

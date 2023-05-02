@@ -9,7 +9,15 @@ reactExactFilter <- function()
 {
     htmlwidgets::JS("function(rows, columnId, filterValue)
 {
-    return rows.filter(row => row.values[columnId] === filterValue)
+    return rows.filter(row => row.values[columnId] === filterValue);
+}")
+}
+
+reactSuspectFilter <- function()
+{
+    htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    return rows.filter(row => row.values[columnId] && row.values[columnId].split(', ').includes(filterValue));
 }")
 }
 

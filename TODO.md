@@ -23,6 +23,8 @@
 - reportHTML --> report, reportHTMLLegacy --> reportHTML?
 - deprecate reportHTML
     - also mention in docs
+- BUG: broken suspect image for formula TPs
+
 
 ## Components
 

@@ -340,7 +340,7 @@ reportHTMLUtils$methods(
             if (!is.null(scr[["formula"]]))
             {
                 tab[neutral_formula %chin% scr$formula, suspect := {
-                    wrapStr(paste0(scr[match(neutral_formula, formula)]$name, collapse = ", "), 50)
+                    paste0(unique(scr[formula == neutral_formula]$name), collapse = ", ")
                 }, by = "neutral_formula"]
             }
         }
@@ -452,7 +452,7 @@ reportHTMLUtils$methods(
             {
                 tab[InChIKey %chin% scr$InChIKey, suspect := {
                     IK <- InChIKey[1]
-                    wrapStr(paste0(scr[match(IK, InChIKey)]$name, collapse = ", "), 50)
+                    paste0(unique(scr[InChIKey == IK]$name), collapse = ", ")
                 }, by = "InChIKey"]
             }
         }

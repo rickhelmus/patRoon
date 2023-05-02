@@ -41,6 +41,7 @@ checkComponentsInterface$methods(
     UISettingsFileName = function() "check_components.yml",
     
     getSecondarySelections = function(primSel) components[[primSel]]$group,
+    getSecondarySelectionsFromTab = function(tab) tab[["group"]],
 
     init = function(rValues)
     {

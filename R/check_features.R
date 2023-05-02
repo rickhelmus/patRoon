@@ -82,6 +82,7 @@ checkFeaturesInterface$methods(
         fti <- groupFeatIndex(fGroups)[[primSel]]
         return(analyses(fGroups)[fti != 0])
     },
+    getSecondarySelectionsFromTab = function(tab) tab[["analysis"]],
     
     init = function(rValues)
     {

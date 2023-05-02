@@ -18,6 +18,7 @@ checkUIInterface$methods(
     UISettingsFileName = function() stop("VIRTUAL"),
     
     getSecondarySelections = function(primSel) stop("VIRTUAL"),
+    getSecondarySelectionsFromTab = function(tab) stop("VIRTUAL"),
     
     init = function(rValues) rValues,
     
@@ -457,7 +458,7 @@ runCheckUI <- function(UIInterface)
             {
                 tbl <- rhandsontable::hot_to_r(input$secondaryHot)
                 oldsel <- rValues$removePartially[[rValues$currentPrimSel]]
-                newsel <- UIInterface$getSecondarySelections(rValues$currentPrimSel)[!tbl$keep]
+                newsel <- UIInterface$getSecondarySelectionsFromTab(tbl)[!tbl$keep]
                 if (length(newsel) == 0)
                     newsel <- NULL
                 rValues$removePartially[[rValues$currentPrimSel]] <- newsel

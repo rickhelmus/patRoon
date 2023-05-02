@@ -86,7 +86,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #' @param transLibrary A \code{character} specifying which transformation library should be used. Currently supported
 #'   are: \code{"hydrolysis"}, \code{"abiotic_reduction"}, \code{"photolysis_unranked"}, \code{"photolysis_ranked"},
 #'   \code{"mammalian_metabolism"}, \code{"combined_abioticreduction_hydrolysis"},
-#'   \code{"combined_photolysis_abiotic_hydrolysis"}.
+#'   \code{"combined_photolysis_abiotic_hydrolysis"}, \code{"pfas_environmental"}, \code{"pfas_metabolism"}.
 #' @param generations An \code{integer} that specifies the number of transformation generations to predict.
 #' @param errorRetries The maximum number of connection retries. Sets the \code{times} argument to the
 #'   \code{\link[httr:RETRY]{http::RETRY}} function.
@@ -131,7 +131,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     checkmate::assertChoice(transLibrary, c("hydrolysis", "abiotic_reduction", "photolysis_unranked", 
                                             "photolysis_ranked", "mammalian_metabolism",
                                             "combined_abioticreduction_hydrolysis", 
-                                            "combined_photolysis_abiotic_hydrolysis"), add = ac)
+                                            "combined_photolysis_abiotic_hydrolysis",
+                                            "pfas_environmental", "pfas_metabolism"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims +
                parallel, fixed = list(add = ac))

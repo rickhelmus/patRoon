@@ -29,7 +29,7 @@ suspect (hits) are used as parents, whereas in the latter case all candidates ar
 \item{transLibrary}{A \code{character} specifying which transformation library should be used. Currently supported
 are: \code{"hydrolysis"}, \code{"abiotic_reduction"}, \code{"photolysis_unranked"}, \code{"photolysis_ranked"},
 \code{"mammalian_metabolism"}, \code{"combined_abioticreduction_hydrolysis"},
-\code{"combined_photolysis_abiotic_hydrolysis"}.}
+\code{"combined_photolysis_abiotic_hydrolysis"}, \code{"pfas_environmental"}, \code{"pfas_metabolism"}.}
 
 \item{generations}{An \code{integer} that specifies the number of transformation generations to predict.}
 

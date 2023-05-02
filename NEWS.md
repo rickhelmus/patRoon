@@ -47,6 +47,7 @@ The changes are reflected in the installation section of the handbook.
     - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
     - Added `maxExpGenerations` argument to `generateTPsBiotransformer` to avoid excessive TP hierarchy expansions.
 - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
+    - `generateTPsCTS()`: support new PFAS libraries (set `pfas_environmental` or `pfas_metabolism` as the `transLibrary` argument).
 - `as.data.table()` for `featureGroups` with `regression=TRUE`:
     - added column with p values
     - treat missing features as `NA`

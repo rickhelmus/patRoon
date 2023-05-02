@@ -129,12 +129,25 @@ function updateFeatTabRowSel(rowValues, rowIndex)
             document.getElementById('spectrumMSMS').src = reportPlots.MSPeakLists[grp].MSMS;
         }
     }
-    if (document.getElementById('formulasTab'))
-        Reactable.setFilter('formulasTab', 'group', grp);
-    if (document.getElementById('compoundsTab'))
+
+    for (ann of [ "formulas", "compounds" ])
     {
-        Reactable.setFilter('compoundsTab', 'group', grp);
-        document.getElementById('openMF').href = Reactable.getState('compoundsTab').meta.mfWebLinks[grp];
+        if (document.getElementById(ann + "Tab"))
+        {
+            Reactable.setFilter(ann + "Tab", "group", grp);
+            
+            // update susp only filter if needed
+            const suspCheckEl = document.getElementById(ann + "-susp_only");
+            if (suspCheckEl.style.display != "none" && suspCheckEl.checked)
+            {
+                // NOTE: we have to give the rowIndex below, as it's otherwise taken from the table's metadata,
+                // which doesn't seem to be updated at this point...
+                toggleAnnOnlySusp(ann, true, rowIndex);
+            }
+
+            if (ann === "compounds")
+                document.getElementById('openMF').href = Reactable.getState('compoundsTab').meta.mfWebLinks[grp];
+        }
     }
     
     const ccd = document.getElementById('comps_cluster-dendro');
@@ -402,7 +415,7 @@ function toggleCompFilters(e)
     applyFilterToggle("compoundsTab", "spectrum", true);
 }
 
-function toggleAnnOnlySusp(wh, e)
+function toggleAnnOnlySusp(wh, e, r = undefined)
 {
     const tid = (wh === "formulas") ? "formulasTab" : "compoundsTab";
     if (!e)
@@ -410,7 +423,7 @@ function toggleAnnOnlySusp(wh, e)
     else
     {
         const fgTab = getSelFGTableElement();
-        const curRow = Reactable.getState(fgTab).meta.selectedRow;
+        const curRow = r || Reactable.getState(fgTab).meta.selectedRow;
         Reactable.setFilter(tid, "suspect", Reactable.getInstance(fgTab).rowsById[curRow].values.susp_name);
     }
 }

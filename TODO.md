@@ -61,8 +61,6 @@
 
 ## TPs
 
-- Reporting
-    - Split formulaDiff like plotGraph()?
 - newProject()
     - selector for CTS transLibrary?
 - plotGraph()
@@ -294,12 +292,6 @@
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
             - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
-- expand reporting
-    - eg include suspect name in EICs
-        - already now in featInfo
-    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
-    - optionally report with collapsed suspects
-
 
 
 ## components

@@ -38,6 +38,7 @@
 - new fromTPs slot
 - update tutorial, including script*.R files
     - re-read
+- restructure NEWS for 2.2
 
 
 ## Features

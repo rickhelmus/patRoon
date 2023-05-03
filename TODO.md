@@ -8,8 +8,6 @@
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
 - get rid of magrittr dependency?
 - bug?: mergeScreeningSetInfos() fragments_formula shouldn't be in unCols?
-- BUG: checkFeatures() (and components?): manual table sorting messes up with feature gets selected
-    - also true for eg fGroup selection?
 
 ## Reporting
 
@@ -23,7 +21,6 @@
 - reportHTML --> report, reportHTMLLegacy --> reportHTML?
 - deprecate reportHTML
     - also mention in docs
-- BUG: broken suspect image for formula TPs
 
 
 ## Components

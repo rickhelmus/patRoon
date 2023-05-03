@@ -200,9 +200,9 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         
         if (document.getElementById('parentInfoTab'))
         {
-            document.getElementById('struct_view-parent').src = reportPlots.structs[rowValues.parent_susp_InChIKey];
+            document.getElementById('struct_view-parent').src = reportPlots.structs[rowValues.parent_susp_InChIKey] || "";
             Reactable.setFilter('parentInfoTab', 'name', rowValues.parent_susp_name);
-            document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey];
+            document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
             Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
         }
         
@@ -215,7 +215,8 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
-        Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);
+        if (document.getElementById('similarityTab'))
+            Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);
         
         showTPGraph(rowValues.component);
     }

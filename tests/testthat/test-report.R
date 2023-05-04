@@ -20,7 +20,7 @@ test_that("removal of old plot files works", {
     expect_false(file.exists(file.path(plotPath, "unused_old.svg")))
 })
 
-test_that("repeated reportHTML() calls work", {
+test_that("repeated report() calls work", {
     for (i in seq_len(15))
         expect_reportHTML(makeReportHTML(fGroups))
 })

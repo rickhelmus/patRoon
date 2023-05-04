@@ -637,7 +637,7 @@ getScriptCode <- function(input, analyses)
         if ("HTML" %in% input$reportGen)
         {
             addComment("Advanced report settings can be edited in the report.yml file.")
-            addCall(NULL, "reportHTML", list(
+            addCall(NULL, "report", list(
                 list(value = "fGroups"),
                 list(name = "MSPeakLists", value = "mslists", isNULL = !doMSPL),
                 list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
@@ -670,7 +670,7 @@ getScriptCode <- function(input, analyses)
                 list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
                 list(name = "components", value = componVal)
             ))
-            addCall(NULL, "reportHTMLLegacy", condition = "HTML" %in% input$reportLegacy, list(
+            addCall(NULL, "reportHTML", condition = "HTML" %in% input$reportLegacy, list(
                 list(value = "fGroups"),
                 list(name = "path", value = "report", quote = TRUE),
                 list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),

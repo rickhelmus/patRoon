@@ -1,4 +1,5 @@
 general:
+    format: html
     path: report
     plotFileRetention: 7 # days until unused plot files are removed
     selfContained: false # UNDONE?

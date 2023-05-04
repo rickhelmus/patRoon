@@ -57,5 +57,5 @@ compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 # reporting
 # -------------------------
 
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
-           components = NULL, settingsFile = "report.yml", openReport = TRUE)
+report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
+       components = NULL, settingsFile = "report.yml", openReport = TRUE)

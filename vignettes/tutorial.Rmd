@@ -336,11 +336,11 @@ plotSpectrum(compounds, 1, "M120_R268_286", mslists, plotStruct = TRUE)
 
 # Reporting
 
-The last step of the workflow is typically to report all the data. The `reportHTML()` function combines all workflow data in an easy to use interactive `HTML` document.
+The last step of the workflow is typically to report all the data. The `report()` function combines all workflow data in an easy to use interactive `HTML` document.
 
 ```{r eval=FALSE}
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
-           components = NULL, settingsFile = "report.yml", openReport = TRUE)
+report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
+       components = NULL, settingsFile = "report.yml", openReport = TRUE)
 ```
 
 > **_NOTE_** If you did _not_ use `newProject()` and created the project manually then you *first* need to generate a new report settings file:
@@ -349,22 +349,22 @@ reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = comp
 genReportSettingsFile() # only run this if the project was created manually without  newProject() 
 ```
 
-The output of `reportHTML()` can be viewed [here](../examples/report.html).
+The output of `report()` can be viewed [here](../examples/report.html).
 
 Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms and their parameters. In this case you can simply cherry pick the data that you want to report, for instance:
 
 ```{r eval=FALSE}
 # only report feature groups (i.e. the bare minimum)
-reportHTML(fGroups)
+report(fGroups)
 
 # report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas)
+report(fGroups, MSPeakLists = mslists, formulas = formulas)
 ```
 
 ```{r echo=FALSE,eval=pkgdown::in_pkgdown()}
 # do the actual reporting here
 
-# ugly work around for nested rmarkdown call made by reportHTML; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
+# ugly work around for nested rmarkdown call made by report; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
 save(fGroups, formulas, compounds, mslists, file = tempF)
 writeLines(sprintf('
@@ -372,8 +372,8 @@ library(patRoon)
 setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
-reportHTML(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
-           components = NULL, MSPeakLists = mslists, openReport = FALSE)
+report(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
+       components = NULL, MSPeakLists = mslists, openReport = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 # devtools::clean_source(tempScript, quiet = TRUE)
 callr::rscript(tempScript, show = FALSE)

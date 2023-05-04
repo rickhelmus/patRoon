@@ -18,8 +18,7 @@
 - test with bslib pre-release (eg for deprecated functions)
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
-- reportHTML --> report, reportHTMLLegacy --> reportHTML?
-- deprecate reportHTML
+- deprecate reportHTML?
     - also mention in docs
 
 

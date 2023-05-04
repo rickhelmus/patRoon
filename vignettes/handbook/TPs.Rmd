@@ -343,10 +343,10 @@ The [fourth example](#TPsEx4) demonstrates such a workflow.
 
 ### Reporting TP components
 
-The TP components can be reported with the `reportHTML` function. This is done by setting the `components` function argument (i.e. equally to all other component types). The results will be displayed with a customized format that allows easy exploring of each parent with its TPs. In addition, the `TPs` argument can be set to include additional data such as transformation pathways.
+The TP components can be reported with the `report` function. This is done by setting the `components` function argument (i.e. equally to all other component types). The results will be displayed with a customized format that allows easy exploring of each parent with its TPs. In addition, the `TPs` argument can be set to include additional data such as transformation pathways.
 
 ```{r eval=FALSE}
-reportHTML(fGroups, components = componTP, TPs = TPs)
+report(fGroups, components = componTP, TPs = TPs)
 ```
 
 ## Example workflows {#TPsExamples}
@@ -418,8 +418,8 @@ componTP <- generateComponents(fGroupsScrAnn, "tp", TPs = TPs, MSPeakLists = msl
 fGroupsScrAnn <- fGroupsScrAnn[results = componTP]
 
 # step 7
-reportHTML(fGroupsScrAnn, MSPeakLists = mslistsScr, compounds = compoundsScr,
-           components = componTP, TPs = TPs)
+report(fGroupsScrAnn, MSPeakLists = mslistsScr, compounds = compoundsScr,
+       components = componTP, TPs = TPs)
 ```
 
 ### Non-target screening of predicted TPs {#TPsEx3}
@@ -458,7 +458,7 @@ componTP <- filter(componTP, retDirMatch = TRUE, formulas = formulas)
 
 # step 7
 fGroupsScr <- fGroupsScr[results = componTP]
-reportHTML(fGroupsScr, MSPeakLists = mslists, formulas = formulas, components = componTP)
+report(fGroupsScr, MSPeakLists = mslists, formulas = formulas, components = componTP)
 ```
 
 ### Non-target screening of TPs by annotation similarities {#TPsEx4}
@@ -498,5 +498,5 @@ componTP <- filter(componTP, minSpecSimBoth = 0.75, minFragMatches = 1)
 
 # step 6
 fGroups <- fGroups[results = componTP]
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
+report(fGroups, MSPeakLists = mslists, formulas = formulas, components = componTP)
 ```

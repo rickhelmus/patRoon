@@ -248,6 +248,7 @@ Collate:
     'report-html-features.R'
     'report-html-utils.R'
     'report-legacy.R'
+    'report.R'
     'utils-TPs.R'
     'utils-checkmate.R'
     'utils-exported.R'

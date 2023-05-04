@@ -21,7 +21,7 @@ mslists <- generateMSPeakLists(fGroups, "mzr")
 formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+")
 
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
+report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
 ```
 
 This example uses the example data from [patRoonData] to obtain a feature group dataset, which is cleaned-up afterwards. Then, feature groups are annotated and all the results are reported.
@@ -43,7 +43,7 @@ mslists <- generateMSPeakLists(fGroups, "mzr")
 formulas <- generateFormulas(fGroups, mslists, "genform")
 compounds <- generateCompounds(fGroups, mslists, "metfrag")
 
-reportHTML(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
+report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
 ```
 
 This workflow will do all the steps for positive _and_ negative data.

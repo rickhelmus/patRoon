@@ -4,12 +4,13 @@ NULL
 #' Report feature group data (legacy interface)
 #'
 #' Functionality to report data produced by most workflow steps such as features, feature groups, calculated chemical
-#' formulae and tentatively identified compounds.
+#' formulae and tentatively identified compounds. This is the legacy interface, for the updated interface see
+#' \link{reporting}.
 #'
 #' These functions are usually called at the very end of the workflow. It is used to report various data on features and
 #' feature groups. In addition, these functions may be used for reporting formulae and/or compounds that were generated
 #' for the specified feature groups. Data can be reported in tabular form (\emph{i.e.} \file{.csv} files) by
-#' \code{reportCSV} or graphically by \code{reportPDF} and \code{reportHTMLLegacy}. The latter functions will plot for
+#' \code{reportCSV} or graphically by \code{reportPDF} and \code{reportHTML}. The latter functions will plot for
 #' instance chromatograms and annotated mass spectra, which are useful to get a graphical overview of results.
 #'
 #' All functions have a wide variety of arguments that influence the reporting process. Nevertheless, most parameters
@@ -45,6 +46,8 @@ NULL
 #'
 #'   The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
 #'   \emph{e.g.}, when generating overview plots.
+#'
+#' @seealso reporting
 #'
 #' @name reporting-legacy
 NULL
@@ -599,14 +602,12 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, 
         reportComponentTable(components, path, retMin)
 })
 
-#' @details \code{reportPDF} will report graphical data (\emph{e.g.}
-#'   chromatograms and mass spectra) within PDF files. Compared
-#'   to \code{reportHTMLLegacy} this function may be faster and yield smaller report
-#'   files, however, its functionality is a bit more basic and generated data is
-#'   more 'scattered' around.
+#' @details \code{reportPDF} will report graphical data (\emph{e.g.} chromatograms and mass spectra) within PDF files.
+#'   Compared to \code{reportHTML} this function may be faster and yield smaller report files, however, its
+#'   functionality is a bit more basic and generated data is more 'scattered' around.
 #'
-#' @param EICGrid An integer vector in the form \code{c(columns, rows)} that is
-#'   used to determine the plotting grid when reporting EICs in PDF files.
+#' @param EICGrid An integer vector in the form \code{c(columns, rows)} that is used to determine the plotting grid when
+#'   reporting EICs in PDF files.
 #'
 #' @rdname reporting-legacy
 #' @aliases reportPDF
@@ -686,7 +687,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 })
 
 
-#' @details \code{reportHTMLLegacy} will report graphical data (\emph{e.g.} chromatograms and mass spectra) and summary
+#' @details \code{reportHTML} will report graphical data (\emph{e.g.} chromatograms and mass spectra) and summary
 #'   information in an easy browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and \link{knitr}.
 #'
 #' @param reportPlots A character vector specifying what should be plotted. Valid options are: \code{"chord"},
@@ -714,15 +715,15 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   \link[=patRoon-package]{patRoon options}).
 #' @param openReport If set to \code{TRUE} then the output report file will be opened with the system browser.
 #' @param noDate If \code{TRUE} then the current date is not added to the report. This is mainly used for testing and
-#'   its main purpose is to guarantees equal report files when `reportHTMLLegacy()` is called multiple times with equal
+#'   its main purpose is to guarantees equal report files when \code{reportHTML()} is called multiple times with equal
 #'   arguments.
 #'
 #' @template specSimParams-arg
 #'
-#' @templateVar what \code{reportHTMLLegacy}
+#' @templateVar what \code{reportHTML}
 #' @template uses-multiProc
 #'
-#' @section Parallelization: Currently, \code{reportHTMLLegacy} only uses \code{"classic"} multiprocessing, regardless of the
+#' @section Parallelization: Currently, \code{reportHTML} only uses \code{"classic"} multiprocessing, regardless of the
 #'   \option{patRoon.MP.method} option.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
@@ -730,9 +731,9 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   \addCitations{knitr}{3}
 #'
 #' @rdname reporting-legacy
-#' @aliases reportHTMLLegacy
+#' @aliases reportHTML
 #' @export
-setMethod("reportHTMLLegacy", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
+setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
                                                   formulasNormalizeScores, formulasExclNormScores,
                                                   compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                   compoundsOnlyUsedScorings, compoundsTopMost,

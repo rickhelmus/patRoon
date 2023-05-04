@@ -11,10 +11,9 @@
 
 ## Reporting
 
-- report all/detected features instead of just chroms
-    - rename yml option?
 - rename plotFileRetention
     - keepOld? keepPlots?
+- keep feature chroms enabled by default?
 - test with bslib pre-release (eg for deprecated functions)
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)

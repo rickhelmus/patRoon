@@ -1,8 +1,8 @@
 general:
     format: html
     path: report
-    plotFileRetention: 7 # days until unused plot files are removed
-    selfContained: false # UNDONE?
+    plotFileRetention: 7
+    selfContained: false
     noDate: false
 summary: [ chord, venn, upset ]
 features:
@@ -10,8 +10,8 @@ features:
     chromatograms:
         large: true # used for feature group table and parent chromatogram view
         small: true
-        features: false
-    intensityPlots: false # UNDONE?
+        features: true
+    intensityPlots: false
 MSPeakLists:
     spectra: true
 formulas:

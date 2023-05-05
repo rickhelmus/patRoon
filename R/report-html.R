@@ -111,8 +111,8 @@ reportHTMLUtils$methods(
 )
 
 
-doRreportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
-                          EICParams, specSimParams, openReport, parallel)
+doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
+                         EICParams, specSimParams, openReport, parallel)
 {
     workPath <- file.path(tempdir(TRUE), "report")
     unlink(workPath, TRUE)

@@ -23,6 +23,12 @@ knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
 ```
 
 <style>
+
+/* mitigate margin-top introduced by upcoming bslib */
+.section.level1, .section.level2 {
+    margin-top: 0;
+}
+
 pre, code {
     white-space: pre !important;
     overflow-x: auto !important;

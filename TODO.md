@@ -14,7 +14,6 @@
 - rename plotFileRetention
     - keepOld? keepPlots?
 - keep feature chroms enabled by default?
-- test with bslib pre-release (eg for deprecated functions)
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 - deprecate reportHTML?

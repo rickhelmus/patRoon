@@ -208,3 +208,14 @@ makeHTMLReportPlot <- function(outPrefix, outPath, func, args, parParams = list(
     
     return(ppath)
 }
+
+bsCardBodyNoFill <- function(...)
+{
+    if (packageVersion("bslib") > "0.4.2")
+    {
+        # this was the default for bslib 0.4.2
+        bslib::card_body(fillable = FALSE, fill = FALSE, ...)
+    }
+    else
+        bslib::card_body(...)
+}

@@ -52,7 +52,7 @@ bslib::layout_column_wrap(
     bslib::card(
         full_screen = TRUE,
         bslib::card_header("Feature groups"),
-        bslib::card_body(
+        bsCardBodyNoFill(
             class = "mt-2",
             htmltools::withTags({
                 callIncl(div, class = "pb-1",
@@ -130,7 +130,7 @@ bslib::layout_column_wrap(
             full_screen = TRUE,
             bslib::nav(
                 "Suspect",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "propTabAndImg pt-2",
                     utils$genSuspInfoTable("suspInfoTab"),
                     htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;")
@@ -142,7 +142,7 @@ bslib::layout_column_wrap(
             full_screen = TRUE,
             bslib::nav(
                 "Internal standard",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "propTabAndImg pt-2",
                     utils$genISTDInfoTable(),
                     htmltools::img(id = "struct_view-istd", style = "min-width: 20%;")
@@ -169,7 +169,7 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasComponentInfo(), bslib::nav(
                 "Component info",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "pt-2",
                     utils$genComponentInfoTable(),
                 )
@@ -184,14 +184,14 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasComponentsFromTPs(), bslib::nav(
                 "Suspects",
-                bslib::card_body(class = "mx-auto", htmltools::strong("Parent")),
-                bslib::card_body(
+                bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Parent")),
+                bsCardBodyNoFill(
                     class = "propTabAndImg",
                     utils$genSuspInfoTable("parentInfoTab"),
                     htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
                 ),
-                bslib::card_body(class = "mx-auto", htmltools::strong("Transformation product")),
-                bslib::card_body(
+                bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Transformation product")),
+                bsCardBodyNoFill(
                     class = "propTabAndImg",
                     utils$genSuspInfoTable("TPInfoTab"),
                     htmltools::img(id = "struct_view-tp", style = "min-width: 20%;")
@@ -213,7 +213,7 @@ bslib::layout_column_wrap(
             full_screen = TRUE,
             bslib::nav(
                 "Features",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "mt-2",
                     htmltools::withTags({
                         callIncl(div, class = "pb-1",
@@ -247,7 +247,7 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasMSPL(), bslib::nav(
                 "MS peak lists",
-                callIncl(bslib::card_body,
+                callIncl(bsCardBodyNoFill,
                     style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
                     htmltools::strong("MS"),
                     htmltools::strong("MS/MS"),
@@ -259,7 +259,7 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasFormulas(), bslib::nav(
                 "Formulas",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "mt-2",
                     htmltools::withTags({
                         div(class = "pb-1",
@@ -278,7 +278,7 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasCompounds(), bslib::nav(
                 "Compounds",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "mt-2",
                     htmltools::withTags({
                         div(class = "pb-1",
@@ -320,7 +320,7 @@ bslib::layout_column_wrap(
             )),
             maybeIncl(utils$hasTPSims(), bslib::nav(
                 "Parent similarity",
-                bslib::card_body(
+                bsCardBodyNoFill(
                     class = "parentSim",
                     utils$genTPSimTable(),
                     # hide img if image is unavailable: https://stackoverflow.com/a/22051972

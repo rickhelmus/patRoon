@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='432.00pt' height='288.00pt' viewBox='0 0 432.00 288.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw0MzIuMDB8MC4wMHwyODguMDA='>
+    <rect x='0.00' y='0.00' width='432.00' height='288.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw0MzIuMDB8MC4wMHwyODguMDA=)'>
+<line x1='120.12' y1='189.60' x2='395.98' y2='189.60' style='stroke-width: 0.75;' />
+<line x1='120.12' y1='189.60' x2='120.12' y2='201.60' style='stroke-width: 0.75;' />
+<line x1='175.29' y1='189.60' x2='175.29' y2='201.60' style='stroke-width: 0.75;' />
+<line x1='230.47' y1='189.60' x2='230.47' y2='201.60' style='stroke-width: 0.75;' />
+<line x1='285.64' y1='189.60' x2='285.64' y2='201.60' style='stroke-width: 0.75;' />
+<line x1='340.81' y1='189.60' x2='340.81' y2='201.60' style='stroke-width: 0.75;' />
+<line x1='395.98' y1='189.60' x2='395.98' y2='201.60' style='stroke-width: 0.75;' />
+<text x='120.12' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='34.45px' lengthAdjust='spacingAndGlyphs'>-0.4</text>
+<text x='175.29' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='34.45px' lengthAdjust='spacingAndGlyphs'>-0.2</text>
+<text x='230.47' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='27.79px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='285.64' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='27.79px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='340.81' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='27.79px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='395.98' y='232.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='27.79px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<line x1='98.40' y1='182.76' x2='98.40' y2='13.08' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='182.76' x2='86.40' y2='182.76' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='158.52' x2='86.40' y2='158.52' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='134.28' x2='86.40' y2='134.28' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='110.04' x2='86.40' y2='110.04' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='85.80' x2='86.40' y2='85.80' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='61.56' x2='86.40' y2='61.56' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='37.32' x2='86.40' y2='37.32' style='stroke-width: 0.75;' />
+<line x1='98.40' y1='13.08' x2='86.40' y2='13.08' style='stroke-width: 0.75;' />
+<text transform='translate(69.60,182.76) rotate(-90)' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(69.60,110.04) rotate(-90)' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='66.70px' lengthAdjust='spacingAndGlyphs'>150000</text>
+<text transform='translate(69.60,13.08) rotate(-90)' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='66.70px' lengthAdjust='spacingAndGlyphs'>350000</text>
+<polyline points='98.40,4.80 98.40,189.60 427.20,189.60 ' style='stroke-width: 0.75;' />
+<text x='262.80' y='280.80' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='185.58px' lengthAdjust='spacingAndGlyphs'>Retention time (min.)</text>
+<text transform='translate(21.60,97.20) rotate(-90)' text-anchor='middle' style='font-size: 20.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='74.47px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
+</g>
+<defs>
+  <clipPath id='cpOTguNDB8NDI3LjIwfDQuODB8MTg5LjYw'>
+    <rect x='98.40' y='4.80' width='328.80' height='184.80' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpOTguNDB8NDI3LjIwfDQuODB8MTg5LjYw)'>
+<polyline points='232.02,182.76 234.77,182.76 235.69,180.89 236.60,182.76 237.52,169.69 238.43,161.98 239.35,153.35 240.26,147.93 241.18,147.66 242.10,143.87 243.01,141.90 243.93,156.71 244.84,152.99 245.76,154.32 246.67,149.81 247.59,182.76 248.51,177.60 249.42,146.81 250.34,150.79 251.25,154.59 252.17,156.71 253.08,159.20 254.00,160.63 254.92,159.56 255.83,162.41 256.74,160.19 257.66,162.26 258.57,162.20 263.18,27.20 267.77,105.97 272.36,148.41 276.96,149.53 281.55,114.59 286.15,80.25 290.74,54.46 295.33,31.00 299.93,13.90 304.52,15.78 309.12,12.22 313.71,11.23 318.30,18.77 322.90,12.64 327.49,1.30 332.09,9.10 336.68,2.28 341.27,2.35 345.86,-2.60 350.46,15.16 355.06,-5.34 359.65,-0.070 364.24,-0.76 368.83,40.34 373.43,182.76 378.02,172.57 382.62,182.76 387.21,179.07 391.80,180.31 396.40,179.45 400.99,182.76 414.77,182.76 ' style='stroke-width: 0.75; stroke: #0000FF;' />
+<polygon points='248.51,177.60 249.42,146.81 250.34,150.79 251.25,154.59 252.17,156.71 253.08,159.20 254.00,160.63 254.92,159.56 255.83,162.41 256.74,160.19 257.66,162.26 258.57,162.20 263.18,27.20 267.77,105.97 272.36,148.41 276.96,149.53 276.96,182.76 272.36,182.76 267.77,182.76 263.18,182.76 258.57,182.76 257.66,182.76 256.74,182.76 255.83,182.76 254.92,182.76 254.00,182.76 253.08,182.76 252.17,182.76 251.25,182.76 250.34,182.76 249.42,182.76 248.51,182.76 ' style='stroke-width: 0.75; stroke: none; fill: #0000FF; fill-opacity: 0.35;' />
+</g>
+</svg>

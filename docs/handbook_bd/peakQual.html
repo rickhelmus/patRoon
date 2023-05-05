@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-05-03" />
+<meta name="date" content="2023-05-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -376,7 +376,7 @@ div.csl-indent {
 #&gt; 3:  0.6140008   0.9171568         0.9015949                     0.9683740   7.471384
 #&gt; 4:  0.8227904   0.8907734         0.9403958                     0.9948720   8.450124
 #&gt; 5:  0.9848653   0.8667116         0.5754979                     0.9978621   8.739507</code></pre>
-<p>The feature quality values can also be reviewed interactively with reports generated with <code>reportHTML</code> (see <a href="report.html#report">Reporting</a>) and with <code>checkFeatures</code> (see <a href="intReview.html#intReview">here</a>). The <code>filter</code> function can be used filter out low scoring features and feature groups:</p>
+<p>The feature quality values can also be reviewed interactively with reports generated with <code>report</code> (see <a href="report.html#report">Reporting</a>) and with <code>checkFeatures</code> (see <a href="intReview.html#intReview">here</a>). The <code>filter</code> function can be used filter out low scoring features and feature groups:</p>
 <div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="peakQual.html#cb244-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep features with at least 0.3 Modality score and 0.5 symmetry score</span></span>
 <span id="cb244-2"><a href="peakQual.html#cb244-2" aria-hidden="true" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">filter</span>(fList, <span class="at">qualityRange =</span> <span class="fu">list</span>(<span class="at">ModalityScore =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="cn">Inf</span>),</span>
 <span id="cb244-3"><a href="peakQual.html#cb244-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">SymmetryScore =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="cn">Inf</span>)))</span>

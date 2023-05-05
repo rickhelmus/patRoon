@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-05-03" />
+<meta name="date" content="2023-05-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -357,7 +357,7 @@ div.csl-indent {
 <span id="cb155-8"><a href="initiating-a-sets-workflow.html#cb155-8" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
 <span id="cb155-9"><a href="initiating-a-sets-workflow.html#cb155-9" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
 <span id="cb155-10"><a href="initiating-a-sets-workflow.html#cb155-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-11"><a href="initiating-a-sets-workflow.html#cb155-11" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
+<span id="cb155-11"><a href="initiating-a-sets-workflow.html#cb155-11" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <p>This example uses the example data from <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> to obtain a feature group dataset, which is cleaned-up afterwards. Then, feature groups are annotated and all the results are reported.</p>
 <p>Converting this to a <em>sets workflow</em>:</p>
 <div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="initiating-a-sets-workflow.html#cb156-1" aria-hidden="true" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
@@ -374,10 +374,10 @@ div.csl-indent {
 <span id="cb156-12"><a href="initiating-a-sets-workflow.html#cb156-12" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>)</span>
 <span id="cb156-13"><a href="initiating-a-sets-workflow.html#cb156-13" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>)</span>
 <span id="cb156-14"><a href="initiating-a-sets-workflow.html#cb156-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb156-15"><a href="initiating-a-sets-workflow.html#cb156-15" aria-hidden="true" tabindex="-1"></a><span class="fu">reportHTML</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
+<span id="cb156-15"><a href="initiating-a-sets-workflow.html#cb156-15" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <p>This workflow will do all the steps for positive <em>and</em> negative data.</p>
-<div id="htmlwidget-c80dac48554bee7f7f15" style="width:250px;height:300px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-c80dac48554bee7f7f15">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5af70c49aef17619295f" style="width:250px;height:300px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-5af70c49aef17619295f">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Only a few modifications were necessary:</p>
 <ul>
 <li>The <a href="preparations.html#anaInfo">analysis information</a> is obtained for positive and negative data (i.e. per set)</li>

@@ -6,7 +6,7 @@ makeReportHTML(fGroups, path = getWorkPath("reportNoChroms"), overrideSettings =
 
 test_that("basic reportHTML() usage", {
     expect_lt(file.size(getWorkPath("reportNoChroms/report.html")), file.size(getWorkPath("report.html")))
-    checkmate::expect_file_exists({ genReportSettingsFile("test_settings.yml"); "test_settings.yml"})
+    checkmate::expect_file_exists({ genReportSettingsFile(getWorkPath("test_settings.yml")); getWorkPath("test_settings.yml")})
 })
 
 plotPath <- getWorkPath("reportCleanup/report_files/plots")

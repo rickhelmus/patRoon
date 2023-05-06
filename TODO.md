@@ -11,8 +11,6 @@
 
 ## Reporting
 
-- rename plotFileRetention
-    - keepOld? keepPlots?
 - keep feature chroms enabled by default?
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
@@ -33,9 +31,8 @@
 - formulaDiff format changed
 - optims for hashing/loading of EIC/MS data
 - new fromTPs slot
-- update tutorial, including script*.R files
-    - re-read
 - restructure NEWS for 2.2
+- ref update
 
 
 ## Features

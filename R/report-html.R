@@ -202,7 +202,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     opfDates <- lapply(file.info(oldPlotFiles)$mtime, as.Date)
     opfAge <- lapply(opfDates, difftime, time1 = Sys.Date(), units = "days")
     opfAge <- sapply(opfAge, as.numeric)
-    oldPlotFiles <- oldPlotFiles[opfAge >= settings$general$plotFileRetention]
+    oldPlotFiles <- oldPlotFiles[opfAge >= settings$general$keepUnusedPlots]
     if (length(oldPlotFiles) > 0)
     {
         file.remove(oldPlotFiles)

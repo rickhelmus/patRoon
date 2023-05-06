@@ -48,7 +48,7 @@ NULL
 #'
 #'      \item \code{path}: the destination path (ignored if the \code{path} argument is specified).
 #'
-#'      \item \code{plotFileRetention}: the number of days that unused plot files are kept (see \verb{Plot file caching}).
+#'      \item \code{keepUnusedPlots}: the number of days that unused plot files are kept (see \verb{Plot file caching}).
 #'
 #'      \item \code{selfContained}: If \code{true} then the output \file{report.html} embeds all graphics and script
 #'      dependencies. Otherwise these files are read from the \code{report_files/} directory. Self-contained reports are
@@ -127,8 +127,8 @@ NULL
 #' @section Plot file caching: When a new report is generated the plot files are stored inside the \code{report_files}
 #'   sub-directory inside the destination path of the report. The plot files are kept so they can be reused to speed-up
 #'   re-creation of reports (\emph{e.g.} with different report settings). After the report is generated, any unused plot
-#'   files are be removed unless they were recently created (controlled by the \code{plotFileRetention} setting, see
-#'   previous section). The \code{clearPath} argument can be used to completely remove any old files.
+#'   files are removed unless they were recently created (controlled by the \code{keepUnusedPlots} setting, see previous
+#'   section). The \code{clearPath} argument can be used to completely remove any old files.
 #'
 #' @note No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
 #'   etc) which are \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).

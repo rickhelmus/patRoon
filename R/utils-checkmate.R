@@ -583,7 +583,7 @@ assertAndPrepareReportSettings <- function(settings)
     checkmate::assertList(settings$general)
     checkmate::assertSubset(settings$general$format, choices = "html", add = ac)
     checkmate::assertPathForOutput(settings$general$path, overwrite = TRUE, add = ac)
-    checkmate::assertCount(settings$general$plotFileRetention, positive = FALSE, add = ac)
+    checkmate::assertCount(settings$general$keepUnusedPlots, positive = FALSE, add = ac)
     checkmate::assertFlag(settings$general$selfContained, add = ac)
     checkmate::assertFlag(settings$general$noDate, add = ac)
     

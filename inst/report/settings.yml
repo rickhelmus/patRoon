@@ -1,7 +1,7 @@
 general:
     format: html
     path: report
-    plotFileRetention: 7
+    keepUnusedPlots: 7
     selfContained: false
     noDate: false
 summary: [ chord, venn, upset ]

@@ -102,136 +102,183 @@
 <p>The changes are reflected in the installation section of the handbook.</p>
 </div>
 <div class="section level3">
-<h3 id="changes-2-2">Changes<a class="anchor" aria-label="anchor" href="#changes-2-2"></a></h3>
-<ul><li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
-</li>
-<li>
-<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>
-<ul><li>Fixes for consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
-<li>Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the <code>or</code> keyword.</li>
-<li>Sets workflows now separate log files for each set.</li>
-<li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
-<li>Fixed: annotation similarities didn’t properly handle results from <code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code> if the library did not contain peak formula annotations.</li>
+<h3 id="important-new-functionality-and-changes-2-2">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-2"></a></h3>
+<ul><li>Features
+<ul><li>
+<code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
 </ul></li>
-<li>SIRUS
-<ul><li>Fixed: Features with data offsets are now properly loaded.</li>
+<li>Feature annotations
+<ul><li>
+<strong>IMPORTANT</strong>: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> argument to <code>TRUE</code>.</li>
+</ul></li>
+<li>TPs
+<ul><li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
+</ul></li>
+<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.
+<ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-new-functionality-2-2">Other new functionality<a class="anchor" aria-label="anchor" href="#other-new-functionality-2-2"></a></h3>
+<ul><li>
+<code>newProject</code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
+<li>Features
+<ul><li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> for <code>featureGroups</code>
+<ul><li>if <code>regression=TRUE</code>: add column with p values</li>
+<li>if <code>features=TRUE</code>: add replicate group column</li>
+</ul></li>
 <li>
+<code><a href="../reference/generics.html">plotChroms()</a></code>: <code>analysis</code> and <code>groupName</code> arguments</li>
+</ul></li>
+<li>Feature annotation
+<ul><li>
+<code><a href="../reference/generics.html">delete()</a></code> function for MS peak lists</li>
+<li>GenForm: <code>thrMS</code>, <code>thrMSMS</code>, <code>thrComb</code> and <code>maxCandidates</code> arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.</li>
+<li>SIRUS
+<ul><li>
 <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> to interactively obtain a SIRIUS login refresh token.</li>
 <li>
 <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> to log in using the given refresh token.</li>
 <li>code generation to obtain SIRIUS reference token with <code><a href="../reference/newProject.html">newProject()</a></code>
 </li>
-<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>).</li>
 </ul></li>
-<li>Updated PubChem transformations to September release (0.1.3)</li>
-<li>Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
-<li>Updated MetFrag to 2.5.0</li>
-<li>Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.</li>
-<li>Fix: multiprocessing with classic: don’t try to capture output when logging is disabled</li>
+</ul></li>
+<li>Suspects
+<ul><li>Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the <code>or</code> keyword.</li>
+</ul></li>
+<li>Componentization
+<ul><li>Feature components: add <code>adduct_abundance</code> column</li>
 <li>
-<code><a href="../reference/generics.html">delete()</a></code> function for MS peak lists</li>
-<li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/reporting.html">reportHTML()</a></code> is effective again</li>
-<li>Fixed: blank filter didn’t properly handle differing blank assignments per analysis</li>
-<li>TPs
+<code><a href="../reference/generics.html">plotInt()</a></code> method for components: <code>index</code> argument can now also be component name</li>
+</ul></li>
+<li>TPs <code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).
 <ul><li>
 <code><a href="../reference/generateTPsLibrary.html">generateTPsLibrary()</a></code>: the <code>matchParentsBy</code> argument now also accepts <code>"formula"</code> and <code>"name"</code>.</li>
 <li>TP libraries may contain a <code>retDir</code> column that specifies the retention time direction of the TP compared to its parent (alternative to specifying <code>log P</code> values).</li>
-<li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
 <li>New argument <code>matchGenerationsBy</code> to the <code>library</code> (and <code>library_formula</code>) algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>, which controls how parents/TPs are matched when searching multiple transformation generations.</li>
-<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show plots of wrong results</li>
-<li>Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component</li>
 <li>Added <code>maxExpGenerations</code> argument to <code>generateTPsBiotransformer</code> to avoid excessive TP hierarchy expansions.</li>
 <li>
+<code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).</li>
+<li>
 <code><a href="../reference/generateComponentsTPs.html">generateComponentsTPs()</a></code> the <code>formulaDiff</code> column now splits elemental losses and gains, similar as the <code><a href="../reference/generics.html">plotGraph()</a></code> method already did for TPs.</li>
-</ul></li>
-<li>GenForm: <code>thrMS</code>, <code>thrMSMS</code>, <code>thrComb</code> and <code>maxCandidates</code> arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.</li>
-<li>
-<code><a href="../reference/generics.html">as.data.table()</a></code> for <code>featureGroups</code> with <code>regression=TRUE</code>:
-<ul><li>added column with p values</li>
-<li>treat missing features as <code>NA</code>
-</li>
-</ul></li>
-<li>
-<code><a href="../reference/featureGroups-class.html">selectIons()</a></code> does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.</li>
-<li>Fixed: code generated by <code><a href="../reference/newProject.html">newProject()</a></code> for sets mode used <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> instead of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> to specify positive+negative suspect lists to <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code>
-</li>
-<li>Annotation scores
-<ul><li>
-<strong>IMPORTANT</strong>: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> argument to <code>TRUE</code>.</li>
-<li>Fixed: <code>scoreTypes</code> slot could contain scorings not actually used, e.g. if the <code>scoreTypes</code> argument to <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> contained scorings not actually present in the used database.</li>
-<li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
-<li>Fixed: <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code>: <code>updateScore</code> argument was ignored and treated always as <code>TRUE</code>
-</li>
-</ul></li>
-<li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
-<li>Fixed: <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> marked passing peaks to be removed instead of the other way around (issue <a href="https://github.com/rickhelmus/patRoon/issues/59" class="external-link">#59</a>)</li>
-<li>Fixed: newProject(): properly call <code><a href="https://rstudio.github.io/rstudioapi/reference/rstudio-editors.html" class="external-link">rstudioapi::getSourceEditorContext()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/62" class="external-link">#62</a>)</li>
-<li>
-<code>newProject</code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
-<li>
-<code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
-<li>Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.</li>
-<li>
-<code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>featureGroups</code> adds replicate group column when executed with <code>features=TRUE</code>.</li>
 <li>
 <code><a href="../reference/generics.html">delete()</a></code> method for <code>transformationProducts</code>
 </li>
-<li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
-<li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> would fail if the adduct column contains partially <code>NA</code> data.</li>
-<li>Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors</li>
-<li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
-</li>
-<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.
-<ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
 </ul></li>
-<li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> didn’t properly detect changes in local database files when considering cached data.</li>
-<li>Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.</li>
+<li>
+<code><a href="../reference/generics.html">plotInt()</a></code> methods: <code>plotArgs</code> and <code>linesArgs</code> to pass additional arguments to <code><a href="../reference/generics.html">plot()</a></code>/<code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines()</a></code>. The latter replaces the dots argument.</li>
+<li>
+<code><a href="../reference/generics.html">plotGraph()</a></code> methods
+<ul><li>
+<code>width</code> and <code>height</code> arguments.</li>
+<li>methods for <code>transformationProductsStructure</code> now draw structures in SVG format to improve quality</li>
+</ul></li>
+<li>
+<code><a href="../reference/caching.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-changes-2-2">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-2-2"></a></h3>
+<ul><li>Features
+<ul><li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> for <code>featureGroups</code> with <code>regression=TRUE</code>: treat missing features as <code>NA</code>
+</li>
 <li>
 <code><a href="../reference/generics.html">plotChord()</a></code> method for <code>featureGroups</code>: significantly optimized some old code</li>
 <li>
+<code><a href="../reference/generics.html">plotChroms()</a></code> / EIC loading
+<ul><li>refactor and minor improvements</li>
+<li>The plot y limit is now determined from EIC data to improve accuracy</li>
+<li>various optimizations to load (cached) EIC data</li>
+</ul></li>
+</ul></li>
+<li>Feature annotations
+<ul><li>
 <code><a href="../reference/generics.html">plotScores()</a></code>
 <ul><li>split bars for sets</li>
 <li>only split bars if results are present for &gt;1 sets and/or consensus algorithms</li>
 </ul></li>
-<li>Fixed: <code><a href="../reference/featureGroups-class.html">selectIons()</a></code> didn’t properly handle empty components objects</li>
-<li>
-<code><a href="../reference/clearCache.html">clearCache()</a></code>: <code>vacuum</code> option to speed up clearing large cache files.</li>
-<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> used wrong variable name for suspect list under some conditions (issue <a href="https://github.com/rickhelmus/patRoon/issues/69" class="external-link">#69</a>)</li>
-<li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was somethimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
-<li>Feature components: add <code>adduct_abundance</code> column</li>
 <li>
 <code><a href="../reference/generics.html">plotSpectrum()</a></code> for sets workflows better handles missing data from one or more sets when making a comparison, which avoids empty plots in such cases.</li>
+<li>Several optimizations for <code>annotatedPeakLists()</code>, especially with sets workflows.</li>
+</ul></li>
+<li>Suspects
+<ul><li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
+</ul></li>
+<li>
+<code><a href="../reference/generics.html">plotGraph()</a></code> methods: show empty plot instead of throwing an error if results are empty</li>
+<li>Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.</li>
+<li>Updated PubChem transformations to April 2023 release (0.1.5)</li>
+<li>Updated MetFrag to 2.5.0</li>
+<li>Validation of formula data in e.g. suspect lists is now much faster when <code>prefCalcChemProps=FALSE</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixes-2-2">Fixes<a class="anchor" aria-label="anchor" href="#fixes-2-2"></a></h3>
+<ul><li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code>
+<ul><li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/reporting.html">reportHTML()</a></code> is effective again</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> could show plots of wrong TP results</li>
+</ul></li>
+<li>
+<code><a href="../reference/newProject.html">newProject()</a></code>
+<ul><li>Fixed: code generated by <code><a href="../reference/newProject.html">newProject()</a></code> for sets mode used <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> instead of <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> to specify positive+negative suspect lists to <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code>
+</li>
+<li>Fixed: newProject(): properly call <code><a href="https://rstudio.github.io/rstudioapi/reference/rstudio-editors.html" class="external-link">rstudioapi::getSourceEditorContext()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/62" class="external-link">#62</a>)</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> used wrong variable name for suspect list under some conditions (issue <a href="https://github.com/rickhelmus/patRoon/issues/69" class="external-link">#69</a>)</li>
+<li>Fixed: only check if <code>analysis.csv</code> already exists when needed</li>
+<li>Fixed: <code>norm_conc</code> field for analysis information was ignored (reported by Geert Franken)</li>
+</ul></li>
+<li>Features
+<ul><li>Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.</li>
+<li>Fixed: blank filter didn’t properly handle differing blank assignments per analysis</li>
+<li>
+<code><a href="../reference/featureGroups-class.html">selectIons()</a></code> does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> marked passing peaks to be removed instead of the other way around (issue <a href="https://github.com/rickhelmus/patRoon/issues/59" class="external-link">#59</a>)</li>
+<li>Fixed: <code><a href="../reference/featureGroups-class.html">selectIons()</a></code> didn’t properly handle empty components objects</li>
+<li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was sometimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
 <li>Fixed: <code><a href="../reference/generics.html">calculatePeakQualities()</a></code> would throw errors for empty feature results (reported by Louise Malm)</li>
 <li>Analysis information
 <ul><li>Ensure no duplicate analysis names are present.</li>
 <li>Allow NA values for blanks</li>
 </ul></li>
+<li>
+<code><a href="../reference/generics.html">plotChroms()</a></code> / EIC loading: group rectangle with topMost set didn’t consider retention times and intensities from other features</li>
+<li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
+</li>
+</ul></li>
+<li>Feature annotation
+<ul><li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>
+<li>Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors</li>
+<li>Fixed: <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> didn’t properly detect changes in local database files when considering cached data.</li>
+<li>Fixed: in rare case <code>MSPeakLists</code> without any results could lead to errors.</li>
+<li>Fixed: <code>scoreTypes</code> slot could contain scorings not actually used, e.g. if the <code>scoreTypes</code> argument to <code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code> contained scorings not actually present in the used database.</li>
+<li>Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()</li>
+<li>Fixed: <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code>: <code>updateScore</code> argument was ignored and treated always as <code>TRUE</code>
+</li>
+<li>SIRUS
+<ul><li>Fixed: Features with data offsets are now properly loaded.</li>
+<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>). Suspects</li>
+</ul></li>
+<li>Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.</li>
+<li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
+<li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> would fail if the adduct column contains partially <code>NA</code> data.</li>
 <li>Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations</li>
-<li>Fixed: <code>chromPeaks()</code> from <code>xcms</code> was sometimes not found (issue <a href="https://github.com/rickhelmus/patRoon/issues/68" class="external-link">#68</a>)</li>
-<li>
-<code><a href="../reference/generics.html">plotGraph()</a></code>
-<ul><li>now has <code>width</code> and <code>height</code> arguments.</li>
-<li>methods for <code>transformationProductsStructure</code> now draw structures in SVG format to improve quality</li>
-<li>show empty plot instead of throwing an error if results are empty</li>
-</ul></li>
-<li>
-<code><a href="../reference/generics.html">plotInt()</a></code> method for components: <code>index</code> argument can now also be component name</li>
-<li>
-<code><a href="../reference/generics.html">plotChroms()</a></code> / EIC loading
-<ul><li>refactor and minor improvements</li>
-<li>Fixed: group rectangle with topMost set didn’t consider retention times and intensities from other features</li>
-<li>
-<code>analysis</code> and <code>groupName</code> arguments</li>
-<li>The plot y limit is now determined from EIC data to improve accuracy</li>
-<li>various optimizations to load (cached) EIC data</li>
-</ul></li>
 <li>Fixed: <code><a href="../reference/generics.html">unset()</a></code> for <code>featureGroupsScreeningSet</code> resulted in loss of group quality scores and internal standard assignments</li>
-<li>Several optimizations for <code>annotatedPeakLists()</code>, especially with sets workflows.</li>
+<li>Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
 <li>
-<code><a href="../reference/generics.html">plotInt()</a></code>: <code>plotArgs</code> and <code>linesArgs</code> to pass additional arguments to <code><a href="../reference/generics.html">plot()</a></code>/<code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines()</a></code>. The latter replaces the dots argument.</li>
+<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>
+<ul><li>Fixes for consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
+<li>Sets workflows now separate log files for each set.</li>
+<li>Fixed: annotation similarities didn’t properly handle results from <code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code> if the library did not contain peak formula annotations.</li>
+</ul></li>
+</ul></li>
+<li>TPs
+<ul><li>Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component</li>
+</ul></li>
+<li>Fix: multiprocessing with classic: don’t try to capture output when logging is disabled</li>
 <li>Small fixes and improvements for verification of parameter lists</li>
 <li>Fixed: <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> if the <code>analysisInfo</code> argument is set and <code>outPath</code> is set with a length &gt;1 then the wrong output path could be used.</li>
-<li>Fixed: in rare case <code>MSPeakLists</code> without any results could lead to errors.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -1091,7 +1138,7 @@
 <li>Workaround for homologous series generation with nontarget (see <a href="https://github.com/blosloos/nontarget/issues/6" class="external-link uri">https://github.com/blosloos/nontarget/issues/6</a>)</li>
 <li>Improvements to terminate background commandline processes when e.g. R is terminated.</li>
 <li>
-<code><a href="../reference/clearCache.html">clearCache()</a></code> now supports removal of caches via regular expressions.</li>
+<code><a href="../reference/caching.html">clearCache()</a></code> now supports removal of caches via regular expressions.</li>
 <li>Added/Improved <code>topMost</code> and <code>extraOpts</code> arguments for SIRIUS formula/compound generation.</li>
 <li>Annotated fragments from SIRIUS compounds now correctly contain charged molecular form.</li>
 <li>
@@ -1133,7 +1180,7 @@
 </ul></li>
 </ul></li>
 <li>
-<code>file</code> argument for <code><a href="../reference/clearCache.html">clearCache()</a></code>
+<code>file</code> argument for <code><a href="../reference/caching.html">clearCache()</a></code>
 </li>
 <li>Updates on MS peak lists
 <ul><li>More consistent naming for algorithm specific MS peak list generators (i.e. <code>generateMSPeakListsX</code> where X is the algo).</li>

@@ -15,105 +15,129 @@ docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs
 The changes are reflected in the installation section of the handbook.
 
 
-## Changes
+## Important new functionality and changes
 
-- Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
-- `annotateSuspects()`
-    - Fixes for consensus annotation results (issue #54)
-    - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the `or` keyword.
-    - Sets workflows now separate log files for each set.
-    - Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the `specSimParams` argument replaces the `relMinMSMSIntensity` and `simMSMSMethod` arguments.
-    - Fixed: annotation similarities didn't properly handle results from `generateCompoundsLibrary()` if the library did not contain peak formula annotations.
-- SIRUS
-    - Fixed: Features with data offsets are now properly loaded.
-    - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
-    - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
-    - code generation to obtain SIRIUS reference token with `newProject()`
-    - Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with `annotateSuspects()` (issue #54).
-- Updated PubChem transformations to September release (0.1.3)
-- Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue #54) 
-- Updated MetFrag to 2.5.0
-- Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
-- Fix: multiprocessing with classic: don't try to capture output when logging is disabled
-- `delete()` function for MS peak lists
-- Fixed: `EICOnlyPresent` argument to `reportHTML()` is effective again
-- Fixed: blank filter didn't properly handle differing blank assignments per analysis
+- Features
+    - `makeSet()` method for `featureGroups` (and related functions `adducts()` and `selectIons()`): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot `annotationsChanged` to `featureGroupsSet` for internal usage by the `adducts()<-` method.
+- Feature annotations
+    - **IMPORTANT**: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` argument to `TRUE`.
 - TPs
+    - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
+- Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether neutralization occurred is reported by the new `molNeutralized` column.
+    - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
+
+
+
+## Other new functionality
+
+- `newProject`: added possibility to exclude analyses out of folder (issue #60, #63)
+- Features
+    - `as.data.table()` for `featureGroups`
+        - if `regression=TRUE`: add column with p values
+        - if `features=TRUE`: add replicate group column
+    - `plotChroms()`: `analysis` and `groupName` arguments
+- Feature annotation
+    - `delete()` function for MS peak lists
+    - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
+    - SIRUS
+        - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
+        - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
+        - code generation to obtain SIRIUS reference token with `newProject()`
+- Suspects
+    - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the `or` keyword.
+- Componentization
+    - Feature components: add `adduct_abundance` column
+    - `plotInt()` method for components: `index` argument can now also be component name
+- TPs
+    `generateTPsCTS()`: support new PFAS libraries (set `"pfas_environmental"` or `"pfas_metabolism"` as the `transLibrary` argument).
     - `generateTPsLibrary()`: the `matchParentsBy` argument now also accepts `"formula"` and `"name"`.
     - TP libraries may contain a `retDir` column that specifies the retention time direction of the TP compared to its parent (alternative to specifying `log P` values).
-    - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
     - New argument `matchGenerationsBy` to the `library` (and `library_formula`) algorithm for `generateTPs()`, which controls how parents/TPs are matched when searching multiple transformation generations.
-    - Fixed: `reportHTML()` could show plots of wrong results
-    - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
     - Added `maxExpGenerations` argument to `generateTPsBiotransformer` to avoid excessive TP hierarchy expansions.
     - `generateTPsCTS()`: support new PFAS libraries (set `"pfas_environmental"` or `"pfas_metabolism"` as the `transLibrary` argument).
     - `generateComponentsTPs()` the `formulaDiff` column now splits elemental losses and gains, similar as the `plotGraph()` method already did for TPs.
-- GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
-- `as.data.table()` for `featureGroups` with `regression=TRUE`:
-    - added column with p values
-    - treat missing features as `NA`
-- `selectIons()` does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.
+    - `delete()` method for `transformationProducts`
+- `plotInt()` methods: `plotArgs` and `linesArgs` to pass additional arguments to `plot()`/`lines()`. The latter replaces the dots argument.
+- `plotGraph()` methods
+    - `width` and `height` arguments.
+    - methods for `transformationProductsStructure` now draw structures in SVG format to improve quality
+- `clearCache()`: `vacuum` option to speed up clearing large cache files.
+
+## Minor changes
+
+- Features
+    - `as.data.table()` for `featureGroups` with `regression=TRUE`: treat missing features as `NA`
+    - `plotChord()` method for `featureGroups`: significantly optimized some old code
+    - `plotChroms()` / EIC loading
+        - refactor and minor improvements
+        - The plot y limit is now determined from EIC data to improve accuracy
+        - various optimizations to load (cached) EIC data
+- Feature annotations
+    - `plotScores()`
+        - split bars for sets
+        - only split bars if results are present for >1 sets and/or consensus algorithms
+    - `plotSpectrum()` for sets workflows better handles missing data from one or more sets when making a comparison, which avoids empty plots in such cases.
+    - Several optimizations for `annotatedPeakLists()`, especially with sets workflows.
+- Suspects
+    - Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the `specSimParams` argument replaces the `relMinMSMSIntensity` and `simMSMSMethod` arguments.
+- `plotGraph()` methods: show empty plot instead of throwing an error if results are empty
+- Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.
+- Updated PubChem transformations to April 2023 release (0.1.5)
+- Updated MetFrag to 2.5.0
+- Validation of formula data in e.g. suspect lists is now much faster when `prefCalcChemProps=FALSE`
+
+
+## Fixes
+
+- `reportHTML()`
+    - Fixed: `EICOnlyPresent` argument to `reportHTML()` is effective again
+    - Fixed: `reportHTML()` could show plots of wrong TP results
 - `newProject()`
-    - Fixed: code generated for sets mode used `c()` instead of `list()` to specify positive+negative suspect lists to `screenSuspects()`
-    - Fixed: properly call `rstudioapi::getSourceEditorContext()` (issue #62)
-    - added possibility to exclude analyses out of folder (issue #60, #63)
-    - Fixed: used wrong variable name for suspect list under some conditions (issue #69) 
+    - Fixed: code generated by `newProject()` for sets mode used `c()` instead of `list()` to specify positive+negative suspect lists to `screenSuspects()`
+    - Fixed: newProject(): properly call `rstudioapi::getSourceEditorContext()` (issue #62)
+    - Fixed: `newProject()` used wrong variable name for suspect list under some conditions (issue #69) 
     - Fixed: only check if `analysis.csv` already exists when needed
     - Fixed: `norm_conc` field for analysis information was ignored (reported by Geert Franken)
-- Annotation scores
-    - **IMPORTANT**: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` argument to `TRUE`.
+- Features
+    - Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
+    - Fixed: blank filter didn't properly handle differing blank assignments per analysis
+    - `selectIons()` does not throw an error anymore if there is no suitable adduct/isotope information in the given components, which would result in incorrect behavior with sets mode if e.g. no annotations were found for one of the sets.
+    - Fixed: `predictCheckFeaturesSession()` marked passing peaks to be removed instead of the other way around (issue #59)
+    - Fixed: `selectIons()` didn't properly handle empty components objects
+    - Fixed: `chromPeaks()` from `xcms` was sometimes not found (issue #68)
+    - Fixed: `calculatePeakQualities()` would throw errors for empty feature results (reported by Louise Malm)
+    - Analysis information
+        - Ensure no duplicate analysis names are present.
+        - Allow NA values for blanks
+    - `plotChroms()` / EIC loading: group rectangle with topMost set didn't consider retention times and intensities from other features
+    - Fixed: The `traceSNRFiltering` argument could not be set for `findFeaturesOpenMS()`
+- Feature annotation
+    - Fixed regression where the `filter()` method for `MSPeakLists` where precursor isolation (`isolatePrec` argument) also applied to MS/MS data (issue #56).
+    - Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors
+    - Fixed: `generateCompoundsMetFrag()` didn't properly detect changes in local database files when considering cached data.
+    - Fixed: in rare case `MSPeakLists` without any results could lead to errors.
     - Fixed: `scoreTypes` slot could contain scorings not actually used, e.g. if the `scoreTypes` argument to `generateCompoundsMetFrag()` contained scorings not actually present in the used database.
     - Custom MetFrag scorings specified that were not in compoundScorings() are now saved in compounds results and recognized by e.g. score normalization and plotScores()
     - Fixed: `addFormulaScoring()`: `updateScore` argument was ignored and treated always as `TRUE`
-- Fixed regression where the `filter()` method for `MSPeakLists` where precursor isolation (`isolatePrec` argument) also applied to MS/MS data (issue #56).
-- Fixed: `predictCheckFeaturesSession()` marked passing peaks to be removed instead of the other way around (issue #59)
-- `makeSet()` method for `featureGroups` (and related functions `adducts()` and `selectIons()`): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot `annotationsChanged` to `featureGroupsSet` for internal usage by the `adducts()<-` method.
-- Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.
-- `as.data.table()` method for `featureGroups` adds replicate group column when executed with `features=TRUE`.
-- `delete()` method for `transformationProducts`
-- remove bogus `higherThanNext` setting from estimated ID level 4a
-- Fixed: `screenSuspects()` would fail if the adduct column contains partially `NA` data.
-- Fixed: filtered sets data (peak lists/annotations) could sometimes lead to errors
-- Validation of formula data in e.g. suspect lists is now much faster when `prefCalcChemProps=FALSE`
-- Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether neutralization occurred is reported by the new `molNeutralized` column.
-    - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
-- Fixed: `generateCompoundsMetFrag()` didn't properly detect changes in local database files when considering cached data.
-- Loosened strictness of centroided data verification to speed it up, especially when dealing with many analyses.
-- `plotChord()` method for `featureGroups`: significantly optimized some old code
-- `plotScores()`
-    - split bars for sets
-    - only split bars if results are present for >1 sets and/or consensus algorithms
-- Fixed: `selectIons()` didn't properly handle empty components objects
-- `clearCache()`: `vacuum` option to speed up clearing large cache files.
-- Fixed: `chromPeaks()` from `xcms` was somethimes not found (issue #68)
-- Feature components: add `adduct_abundance` column
-- `plotSpectrum()` for sets workflows better handles missing data from one or more sets when making a comparison, which avoids empty plots in such cases.
-- Fixed: `calculatePeakQualities()` would throw errors for empty feature results (reported by Louise Malm)
-- Analysis information
-    - Ensure no duplicate analysis names are present.
-    - Allow NA values for blanks
-- Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations
-- Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue #76).
-- Fixed: `checkFeatures()`/`checkComponents()`: disabling a feature/featureGroup in a sorted table would lead to wrong selections
-- `annotateSuspects()`: log if the suspect formula/compound data could not be matched with feature annotations
-- Fixed: `chromPeaks()` from `xcms` was sometimes not found (issue #68) 
-- `plotGraph()`
-    - now has `width` and `height` arguments.
-    - methods for `transformationProductsStructure` now draw structures in SVG format to improve quality
-    - show empty plot instead of throwing an error if results are empty
-- `plotInt()` method for components: `index` argument can now also be component name
-- `plotChroms()` / EIC loading
-    - refactor and minor improvements
-    - Fixed: group rectangle with topMost set didn't consider retention times and intensities from other features
-    - `analysis` and `groupName` arguments
-    - The plot y limit is now determined from EIC data to improve accuracy
-    - various optimizations to load (cached) EIC data
-- Fixed: `unset()` for `featureGroupsScreeningSet` resulted in loss of group quality scores and internal standard assignments
-- Several optimizations for `annotatedPeakLists()`, especially with sets workflows.
-- `plotInt()`: `plotArgs` and `linesArgs` to pass additional arguments to `plot()`/`lines()`. The latter replaces the dots argument.
+    - SIRUS
+        - Fixed: Features with data offsets are now properly loaded.
+        - Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with `annotateSuspects()` (issue #54).
+Suspects
+    - Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.
+    - remove bogus `higherThanNext` setting from estimated ID level 4a
+    - Fixed: `screenSuspects()` would fail if the adduct column contains partially `NA` data.
+    - Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations
+    - Fixed: `unset()` for `featureGroupsScreeningSet` resulted in loss of group quality scores and internal standard assignments
+    - Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue #54)
+    - `annotateSuspects()`
+        - Fixes for consensus annotation results (issue #54)
+        - Sets workflows now separate log files for each set.
+        - Fixed: annotation similarities didn't properly handle results from `generateCompoundsLibrary()` if the library did not contain peak formula annotations.
+- TPs
+    - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
+- Fix: multiprocessing with classic: don't try to capture output when logging is disabled
 - Small fixes and improvements for verification of parameter lists
 - Fixed: `convertMSFiles()` if the `analysisInfo` argument is set and `outPath` is set with a length >1 then the wrong output path could be used.
-- Fixed: in rare case `MSPeakLists` without any results could lead to errors.
 
 
 # patRoon 2.1

@@ -20,27 +20,27 @@ The changes are reflected in the installation section of the handbook.
 - Features
     - `makeSet()` method for `featureGroups` (and related functions `adducts()` and `selectIons()`): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot `annotationsChanged` to `featureGroupsSet` for internal usage by the `adducts()<-` method.
 - Feature annotations
-    - **IMPORTANT**: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` argument to `TRUE`.
+    - **IMPORTANT**: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` arguments of `generateFormulas()`/`generateCompounds()` to `TRUE`.
 - TPs
     - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
-- Chemical data from e.g. suspects and TPs can now be 'neutralized' by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether neutralization occurred is reported by the new `molNeutralized` column.
+- Chemical data from e.g. suspects and TPs can now be automatically 'neutralized' by addition/subtraction of protons, by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether a structure was neutralized is marked by the new `molNeutralized` column.
     - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
 
 
 
 ## Other new functionality
 
-- `newProject`: added possibility to exclude analyses out of folder (issue #60, #63)
+- `newProject()`: added possibility to exclude analyses out of folder (issue #60, #63)
 - Features
     - `as.data.table()` for `featureGroups`
         - if `regression=TRUE`: add column with p values
         - if `features=TRUE`: add replicate group column
     - `plotChroms()`: `analysis` and `groupName` arguments
 - Feature annotation
-    - `delete()` function for MS peak lists
+    - A `delete()` method function was added to modify MS peak lists
     - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
     - SIRUS
-        - `getSIRIUSToken()` to interactively obtain a SIRIUS login refresh token.
+        - `getSIRIUSToken()` function to interactively obtain a SIRIUS login refresh token.
         - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
         - code generation to obtain SIRIUS reference token with `newProject()`
 - Suspects
@@ -49,14 +49,14 @@ The changes are reflected in the installation section of the handbook.
     - Feature components: add `adduct_abundance` column
     - `plotInt()` method for components: `index` argument can now also be component name
 - TPs
-    `generateTPsCTS()`: support new PFAS libraries (set `"pfas_environmental"` or `"pfas_metabolism"` as the `transLibrary` argument).
+    - `generateTPsCTS()`: support new PFAS libraries (set `"pfas_environmental"` or `"pfas_metabolism"` as the `transLibrary` argument).
     - `generateTPsLibrary()`: the `matchParentsBy` argument now also accepts `"formula"` and `"name"`.
     - TP libraries may contain a `retDir` column that specifies the retention time direction of the TP compared to its parent (alternative to specifying `log P` values).
     - New argument `matchGenerationsBy` to the `library` (and `library_formula`) algorithm for `generateTPs()`, which controls how parents/TPs are matched when searching multiple transformation generations.
     - Added `maxExpGenerations` argument to `generateTPsBiotransformer` to avoid excessive TP hierarchy expansions.
     - `generateTPsCTS()`: support new PFAS libraries (set `"pfas_environmental"` or `"pfas_metabolism"` as the `transLibrary` argument).
     - `generateComponentsTPs()` the `formulaDiff` column now splits elemental losses and gains, similar as the `plotGraph()` method already did for TPs.
-    - `delete()` method for `transformationProducts`
+    - A `delete()` method function was added to modify `transformationProducts`
 - `plotInt()` methods: `plotArgs` and `linesArgs` to pass additional arguments to `plot()`/`lines()`. The latter replaces the dots argument.
 - `plotGraph()` methods
     - `width` and `height` arguments.

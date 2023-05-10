@@ -24,13 +24,8 @@
 
 ## NEWS/docs
 
-- plotChroms()
-    - Changed arg order
-    - adductPos/adductNeg & get EICs for missing features if all are absent in set
 - fixed set hashes from executeMultiProc were saved as list instead of vector --> re-generate cache.
-- formulaDiff format changed
-- optims for hashing/loading of EIC/MS data
-- new fromTPs slot
+    - just mention re-generation of cache is needed
 - restructure NEWS for 2.2
 - ref update
 

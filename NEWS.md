@@ -1,10 +1,29 @@
 # patRoon 2.2
 
+This release adds significant new functionality, several important changes and many bug fixes thanks to user feedback.
+
+Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it **is important** to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+
+
 ## Important new functionality and changes
+
+### New reporting interface
+
+The most significant change in this release is the addition of redesigned reporting functionality. Some key functionality and changes:
+
+* The `html` interface was completely redesigned to provide a modern, responsive and easier to use interface, which is powered by the `bslib` `R` package.
+* All workflow data (features, annotations, TPs etc) is now centralized, which significantly eases browsing through the data.
+* The generation of plots and other reporting data was optimized, and can be further speed up by parallelization.
+* Caching of report data was significantly optimized, which makes re-generating reports with partially changed data/parameters much faster.
+* Due to these optimizations, the default number of annotation candidates was increased from 5 to 25.
+* The configuration of reporting parameters was simplified and is now achieved through a `YAML` file.
+
+The new reporting interface is used with the new `report()` method function. The handbook and reference manuals were all updated to reflect these changes. The now 'legacy' report interface (`reportCSV()`, `reportPDF()` and `reportHTML()`) is still available for backwards compatibility and since the new interface currently only supports the HTML format.
 
 ### Usage of SIRIUS version 5
 
-Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/ This release of `patRoon` adds support to make logging in more easy and adds several compatibility fixes for the latest `SIRIUS` version.
+Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/ This release of `patRoon` adds support to make logging in more easy and adds several compatibility fixes for the latest `SIRIUS` version. The new utility function `getSIRIUSToken()` can be used to obtain a necessary login token. The new `token` argument for `generateCompoundsSIRIUS()` can be used to automatically log in. The `newPorject()` function was extended to use this new functionality.   
+
 
 ### Docker images moved
 
@@ -16,16 +35,20 @@ docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs
 
 The changes are reflected in the installation section of the handbook.
 
+### TP formula libraries
+
+A new algorithm for `generateTPs()` was added: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
+
 ### Other
 
+Other important changes include:
+
 - Features
-    - Common parameters that influence creation of extracted ion chromatograms (EICs), such as `topMost` and `onlyPresent`, are now combined in a parameter list. The parameter list is specified with the new `EICParams` argument to functions such as `plotChroms()` and `report()`. A list with default parameter values is generated with the `getDefEICParams()` function. More information can be found in the reference manual: `?EICParams`.
+    - Common parameters for creation of extracted ion chromatograms (EICs), such as `topMost` and `onlyPresent`, are now combined in a parameter list. The parameter list is specified with the new `EICParams` argument to functions such as `plotChroms()` and `report()`. A list with default parameter values is generated with the `getDefEICParams()` function. More information can be found in the reference manual: `?EICParams`.
     - The order of some of the arguments to the `plotChroms()` method for `featureGroups` was changed.
     - `makeSet()` method for `featureGroups` (and related functions `adducts()` and `selectIons()`): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot `annotationsChanged` to `featureGroupsSet` for internal usage by the `adducts()<-` method.
 - Feature annotations
     - For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now _not_ averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new `setAvgSpecificScores` arguments of `generateFormulas()`/`generateCompounds()` to `TRUE`.
-- TPs
-    - A new algorithm for `generateTPs()`: `library_formula`. This algorithm is similar to the `library` algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The `genFormulaTPLibrary()` utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (`?generateTPsLibraryFormula`).
 - Chemical data from e.g. suspects and TPs can now be automatically 'neutralized' by addition/subtraction of protons, by setting the `neutralChemProps`/`neutralizeTPs` arguments. Whether a structure was neutralized is marked by the new `molNeutralized` column.
     - If `neutralizeTPs` is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.
 
@@ -42,10 +65,6 @@ The changes are reflected in the installation section of the handbook.
 - Feature annotation
     - A `delete()` method function was added to modify MS peak lists
     - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.
-    - SIRUS
-        - `getSIRIUSToken()` function to interactively obtain a SIRIUS login refresh token.
-        - `token` argument for `generateCompoundsSIRIUS()` to log in using the given refresh token.
-        - code generation to obtain SIRIUS reference token with `newProject()`
 - Suspects
     - Multiple conditions for ID level estimation can now be combined with the `and` keyword in the `YAML` configuration file. This is especially useful when combined with the `or` keyword.
 - Componentization

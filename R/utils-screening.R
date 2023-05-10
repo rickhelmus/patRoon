@@ -566,6 +566,22 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
     }
     
     doLog(0, "Estimating identification level for '%s' to feature group '%s'\n---\n", suspectName, suspectFGroup)
+    
+    if (is.null(fRow))
+    {
+        if (is.null(suspectFormula))
+            doLog(0, "NOTE: there is no formula data for available this suspect.\n")
+        else
+            doLog(0, "NOTE: the suspect formula could not be matched with the formula annotations.\n")
+    }
+    if (is.null(cRow))
+    {
+        if (is.null(suspectInChIKey1))
+            doLog(0, "NOTE: there is no compound data (eg InChIKey) available for this suspect.\n")
+        else
+            doLog(0, "NOTE: the suspect compound could not be matched with the compound annotations.\n")
+    }
+    
     for (lvl in names(IDLevelRules))
     {
         doLog(0, "Checking level '%s'\n", lvl)

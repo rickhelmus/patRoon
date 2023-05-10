@@ -94,6 +94,7 @@ The changes are reflected in the installation section of the handbook.
 - Formulae with isotopes in e.g. suspect lists are now not normalized anymore, as this would remove the isotope designations
 - Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue #76).
 - Fixed: `checkFeatures()`/`checkComponents()`: disabling a feature/featureGroup in a sorted table would lead to wrong selections
+- `annotateSuspects()`: log if the suspect formula/compound data could not be matched with feature annotations
 
 
 # patRoon 2.1

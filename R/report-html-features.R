@@ -311,7 +311,8 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
     {
         doProgress()
         makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
-                           list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
+                           list(fGroups, groupName = grp, retMin = settings$features$retMin,
+                                intMax = settings$features$chromatograms$intMax, EICs = EICs,
                                 EICParams = EICParams, colourBy = "rGroups", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
@@ -331,7 +332,8 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
                            list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
                                 EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
                                                                        onlyPresent = TRUE)),
-                                showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
+                                showFGroupRect = FALSE, showPeakArea = TRUE, title = "",
+                                intMax = settings$features$chromatograms$intMax, bty = "n"),
                            parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
                            pointsize = 16)
     }, simplify = FALSE)
@@ -356,7 +358,8 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
                                     EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
                                                                                         onlyPresent = settings$features$chromatograms$features != "all"),
                                                                         keep.null = TRUE), showFGroupRect = FALSE,
-                                    showPeakArea = TRUE, title = "", bty = "l"),
+                                    showPeakArea = TRUE, title = "", intMax = settings$features$chromatograms$intMax,
+                                    bty = "l"),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
                                pointsize = 20, scaling = 1)
         })

@@ -15,7 +15,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                                                                           topMostByRGroup = FALSE,
                                                                                           onlyPresent = TRUE)),
                                                    showPeakArea = TRUE, showFGroupRect = FALSE, colourBy = "fGroups",
-                                                   showLegend = FALSE),
+                                                   showLegend = FALSE, intMax = settings$features$chromatograms$intMax),
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     
     ret$overview$retMZ <- makeHTMLReportPlot("retmz", outPath, "plot",

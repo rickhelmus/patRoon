@@ -11,6 +11,7 @@ features:
         large: true # used for feature group table and parent chromatogram view
         small: true
         features: true
+        intMax: eic
     intensityPlots: false
 MSPeakLists:
     spectra: true

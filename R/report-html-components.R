@@ -9,7 +9,6 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
     if (length(components) == 0)
         return(list())
     
-    cInfo <- componentInfo(components)
     isIntCl <- inherits(components, "componentsIntClust")
     ret <- list()
     
@@ -25,7 +24,8 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
         
         pl$chrom <- makeHTMLReportPlot("compon-chrom", outPath, "plotChroms",
                                        list(components, cn, fGroups, retMin = settings$features$retMin, title = "",
-                                            EICs = EICs, EICParams = EICParams),
+                                            intMax = settings$features$chromatograms$intMax, EICs = EICs,
+                                            EICParams = EICParams),
                                        parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4,
                                        bg = "transparent", pointsize = 16)
         

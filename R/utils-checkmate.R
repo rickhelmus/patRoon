@@ -600,6 +600,7 @@ assertAndPrepareReportSettings <- function(settings)
         .var.name = "settings$features$chromatograms$features",
         add = ac
     )
+    checkmate::assertChoice(settings$features$chromatograms$intMax, c("eic", "feature"), add = ac)
     checkmate::assertFlag(settings$features$intensityPlots, add = ac)
     
     checkmate::assertList(settings$MSPeakLists)

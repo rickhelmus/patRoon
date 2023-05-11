@@ -168,11 +168,17 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         
         if (settings$features$chromatograms$small)
         {
-            cell <- function(value, index) htmltools::img(src = plots$chromsSmall[[value]],
-                                                          style = list("max-height" = "20px"), class = "noZoomImg")
+            cell <- function(value, index)
+            {
+                tag <- htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"))
+                if (settings$features$chromatograms$large)
+                    tag <- htmltools::tagAppendAttributes(tag, "data-srcZoom" = plots$chromsLarge[[value]])
+                else
+                    tag <- htmltools::tagAppendAttributes(tag, class = "noZoomImg")
+                return(tag)
+            }
             colDefs$chrom_small <- reactable::colDef("chromatogram", filterable = FALSE, searchable = FALSE,
                                                      cell = cell)
-            
         }
         if (settings$features$chromatograms$large)
         {

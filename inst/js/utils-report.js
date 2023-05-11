@@ -466,11 +466,12 @@ $(document).ready(function() {
     // Image zooming, based on https://stackoverflow.com/a/57694495
     $('body').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
     $('body').on('click', 'img:not(.zoomImg, .noZoomImg)', function() {
-       $('.zoomImg').attr('src', $(this).attr('src'));
-       $('.zoomDiv').css({opacity: '1', width: '70%'});
+        const src = $(this).attr('data-srcZoom') || $(this).attr('src');
+        $('.zoomImg').attr('src', src);
+        $('.zoomDiv').css({opacity: '1', width: '70%'});
     });
     $('img.zoomImg').click(function() {
-       $('.zoomDiv').css({opacity: '0', width: '0%'});
+        $('.zoomDiv').css({opacity: '0', width: '0%'});
     });
     
     updateView("Plain");

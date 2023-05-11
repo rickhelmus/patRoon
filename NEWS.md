@@ -66,7 +66,7 @@ Other important changes include:
     - `as.data.table()` for `featureGroups`
         - if `regression=TRUE`: add column with p values
         - if `features=TRUE`: add replicate group column
-    - `plotChroms()`: `analysis` and `groupName` arguments
+    - `plotChroms()`: `analysis`, `groupName` and `intMax` arguments
 - Feature annotation
     - A `delete()` method function was added to modify MS peak lists
     - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates` arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.

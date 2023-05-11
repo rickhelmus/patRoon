@@ -373,6 +373,8 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
 #' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
 #'   each plotted feature group.
+#' @param intMax Method used to determine the maximum intensity plot limit. Should be \code{"eic"} (from EIC data) or
+#'   \code{"feature"} (from feature data). Ignored if the \code{ylim} parameter is specified.
 #' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
 #'   to \code{"none"} to disable any annotation.
 #'
@@ -385,11 +387,9 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                                                   retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                   title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                   showLegend = TRUE, annotate = c("none", "ret", "mz"),
-                                                  EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
-                                                  ylim = NULL, EICs = NULL, ...)
+                                                  intMax = "eic", EICParams = getDefEICParams(), showProgress = FALSE,
+                                                  xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
-    # NOTE: keep args in sync with sets method
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
            fixed = list(add = ac))
@@ -398,10 +398,14 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+    checkmate::assertChoice(intMax, c("eic", "feature"), add = ac)
     assertEICParams(EICParams, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (intMax == "feature" && !EICParams$onlyPresent)
+        stop("intMax must be 'eic' when EICParams$onlyPresent == FALSE", call. = FALSE)
+    
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
     
@@ -443,26 +447,38 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
     names(fillColors) <- names(EICColors)
     
-    plotRTRange <- c(min(featTab$retmin) - EICParams$rtWindow, max(featTab$retmax) + EICParams$rtWindow)
-    if (retMin)
-        plotRTRange <- plotRTRange / 60
-    RTRangeGrp <- split(featTab[, .(retmin = min(retmin), retmax = max(retmax)), by = "group"], by = "group", keep.by = FALSE)
-    plotIntMax <- max(unlist(lapply(EICs, function(aeic) Map(names(aeic), aeic, f = function(grp, eic)
+    if (is.null(xlim))
     {
-        rtr <- unlist(RTRangeGrp[[grp]])
-        if (!is.null(rtr))
+        xlim <- c(min(featTab$retmin) - EICParams$rtWindow, max(featTab$retmax) + EICParams$rtWindow)
+        if (retMin)
+            xlim <- xlim / 60
+    }
+    if (is.null(ylim))
+    {
+        if (intMax == "eic")
         {
-            if (!is.null(xlim))
+            RTRangeGrp <- split(featTab[, .(retmin = min(retmin), retmax = max(retmax)), by = "group"], by = "group", keep.by = FALSE)
+            plotIntMax <- max(unlist(lapply(EICs, function(aeic) Map(names(aeic), aeic, f = function(grp, eic)
             {
-                xl <- if (retMin) xlim * 60 else xlim
-                rtr <- c(max(rtr[1], xl[1]), min(rtr[2], xl[2]))
-            }
-            eici <- eic[eic$time %between% rtr, "intensity"]
-            if (length(eici) > 0)
-                return(max(eici))
+                rtr <- unlist(RTRangeGrp[[grp]])
+                if (!is.null(rtr))
+                {
+                    if (!is.null(xlim))
+                    {
+                        xl <- if (retMin) xlim * 60 else xlim
+                        rtr <- c(max(rtr[1], xl[1]), min(rtr[2], xl[2]))
+                    }
+                    eici <- eic[eic$time %between% rtr, "intensity"]
+                    if (length(eici) > 0)
+                        return(max(eici))
+                }
+                return(0)
+            }))))
         }
-        return(0)
-    }))))
+        else # "feature"
+            plotIntMax <- max(featTab$intensity)
+        ylim <- c(0, plotIntMax * 1.1)
+    }
 
     if (is.null(title))
     {
@@ -491,11 +507,6 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         lw <- min(lw, 0.5) # don't make it too wide
         withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
     }
-    
-    if (is.null(xlim))
-        xlim <- plotRTRange
-    if (is.null(ylim))
-        ylim <- c(0, plotIntMax * 1.1)
     
     plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
          ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
@@ -588,8 +599,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
                                                       retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                       showLegend = TRUE, annotate = c("none", "ret", "mz"),
-                                                      EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
-                                                      ylim = NULL, EICs = NULL, ...)
+                                                      intMax = "eic", EICParams = getDefEICParams(),
+                                                      showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)

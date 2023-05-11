@@ -16,6 +16,7 @@
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 - deprecate reportHTML?
     - also mention in docs
+- use intMax param? Make it a setting?
 
 
 ## Components

@@ -449,9 +449,14 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     RTRangeGrp <- split(featTab[, .(retmin = min(retmin), retmax = max(retmax)), by = "group"], by = "group", keep.by = FALSE)
     plotIntMax <- max(unlist(lapply(EICs, function(aeic) Map(names(aeic), aeic, f = function(grp, eic)
     {
-        rtr <- RTRangeGrp[[grp]]
+        rtr <- unlist(RTRangeGrp[[grp]])
         if (!is.null(rtr))
         {
+            if (!is.null(xlim))
+            {
+                xl <- if (retMin) xlim * 60 else xlim
+                rtr <- c(max(rtr[1], xl[1]), min(rtr[2], xl[2]))
+            }
             eici <- eic[eic$time %between% rtr, "intensity"]
             if (length(eici) > 0)
                 return(max(eici))

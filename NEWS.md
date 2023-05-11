@@ -11,7 +11,7 @@ Users of previous `patRoon` versions should inform themselves with the important
 
 The most significant change in this release is the addition of redesigned reporting functionality. Some key functionality and changes:
 
-* The `html` interface was completely redesigned to provide a modern, responsive and easier to use interface, which is powered by the `bslib` `R` package.
+* The `html` interface was completely redesigned to provide a modern, responsive and easier to use interface, which is powered by the `bslib` and `reactable` `R` packages.
 * The browsing and exploring of reported data is made significantly easier by centralizing all workflow data (features, annotations, TPs etc). Furthermore, tabular data can be easily filtered and can be grouped by properties such as suspects, parents, replicate groups etc.
 * All plots are now stored as `SVG` vector graphics, which are generally smaller in size, faster to create and can be zoomed in without loss of quality.
 * The generation of plots and other reporting data was optimized, and can be further speed up by parallelization.
@@ -19,6 +19,7 @@ The most significant change in this release is the addition of redesigned report
 * Due to these optimizations, the default number of annotation candidates was increased from 5 to 25.
 * Chromatograms are (by default) plotted also for individual features. In addition, it is also possible to add plots of EICs in analyses where no feature was found, which makes it easy to spot any features that were not detected (or filtered out).
 * The configuration of reporting parameters was simplified and is now achieved through a `YAML` file.
+* And many other improvements...
 
 An example can be seen from the [report output of the tutorial](https://rickhelmus.github.io/patRoon/examples/report.html).
 

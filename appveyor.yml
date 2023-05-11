@@ -27,13 +27,13 @@ install:
             Invoke-WebRequest https://github.com/ipb-halle/MetFragRelaunched/releases/download/v.2.5.0/MetFragCommandLine-2.5.0.jar -OutFile "C:\deps\MetFragCommandLine-2.5.0.jar"
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\sirius-5.5.7.zip)) {
-            Invoke-WebRequest https://github.com/boecker-lab/sirius/releases/download/v5.5.7/sirius-5.5.7-win64-headless.zip -OutFile "C:\deps\sirius-5.5.7.zip"
+        if (-Not (Test-Path C:\deps\sirius-5.6.3.zip)) {
+            Invoke-WebRequest https://github.com/boecker-lab/sirius/releases/download/v5.6.3/sirius-5.6.3-win64-headless.zip -OutFile "C:\deps\sirius-5.6.3.zip"
             if (Test-Path c:\deps\sirius)
             {
                 rm -r -fo c:\deps\sirius
             }
-            7z x -aoa -oC:\deps\ C:\deps\sirius-5.5.7.zip
+            7z x -aoa -oC:\deps\ C:\deps\sirius-5.6.3.zip
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\openbabel311.exe)) {

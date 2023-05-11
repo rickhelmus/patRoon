@@ -550,7 +550,7 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://github.com/boecker-lab/sirius/releases/download/v5.5.7/sirius-5.5.7-win64.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://github.com/boecker-lab/sirius/releases/download/v5.6.3/sirius-5.6.3-win64.zip",
                                      TRUE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-gui"))))

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.10 Fold changes | patRoon handbook</title>
   <meta name="description" content="8.10 Fold changes | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.10 Fold changes | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-05-08" />
+<meta name="date" content="2023-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -134,6 +134,10 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
 <style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
 div.csl-bib-body { }
@@ -367,14 +371,14 @@ div.csl-indent {
 #&gt; $PVTestFunc
 #&gt; function (x, y) 
 #&gt; t.test(x, y, paired = TRUE)$p.value
-#&gt; &lt;bytecode: 0x55f67e910c78&gt;
-#&gt; &lt;environment: 0x55f67e9105b0&gt;
+#&gt; &lt;bytecode: 0x55aca8224cb0&gt;
+#&gt; &lt;environment: 0x55aca8228418&gt;
 #&gt; 
 #&gt; $PVAdjFunc
 #&gt; function (pv) 
 #&gt; p.adjust(pv, &quot;BH&quot;)
-#&gt; &lt;bytecode: 0x55f67e910968&gt;
-#&gt; &lt;environment: 0x55f67e9105b0&gt;</code></pre>
+#&gt; &lt;bytecode: 0x55aca82287d0&gt;
+#&gt; &lt;environment: 0x55aca8228418&gt;</code></pre>
 <p>In this example we generate a <code>list</code> with parameters in order to make a comparison between two replicate groups: <code>before</code> and <code>after</code>. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (<code>?featureGroups</code>).</p>
 <p>The <code>as.data.table</code> function for feature groups is used to perform the FC calculations.</p>
 <div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="FCCalc.html#cb275-1" aria-hidden="true" tabindex="-1"></a>myFCParams <span class="ot">&lt;-</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="st">&quot;standard-pos&quot;</span>)) <span class="co"># compare solvent/standard</span></span>

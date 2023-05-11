@@ -91,37 +91,60 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2" id="patroon-22">patRoon 2.2<a class="anchor" aria-label="anchor" href="#patroon-22"></a></h2>
+<p>This release adds significant new functionality, several important changes and many bug fixes thanks to user feedback.</p>
+<p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it <strong>is important</strong> to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
 <div class="section level3">
-<h3 id="note-usage-of-sirius-version-2-2">NOTE Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#note-usage-of-sirius-version-2-2"></a></h3>
-<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version.</p>
+<h3 id="important-new-functionality-and-changes-2-2">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-2"></a></h3>
+<div class="section level4">
+<h4 id="new-reporting-interface-2-2">New reporting interface<a class="anchor" aria-label="anchor" href="#new-reporting-interface-2-2"></a></h4>
+<p>The most significant change in this release is the addition of redesigned reporting functionality. Some key functionality and changes:</p>
+<ul><li>The <code>html</code> interface was completely redesigned to provide a modern, responsive and easier to use interface, which is powered by the <code>bslib</code> and <code>reactable</code> <code>R</code> packages.</li>
+<li>The browsing and exploring of reported data is made significantly easier by centralizing all workflow data (features, annotations, TPs etc). Furthermore, tabular data can be easily filtered and can be grouped by properties such as suspects, parents, replicate groups etc.</li>
+<li>All plots are now stored as <code>SVG</code> vector graphics, which are generally smaller in size, faster to create and can be zoomed in without loss of quality.</li>
+<li>The generation of plots and other reporting data was optimized, and can be further speed up by parallelization.</li>
+<li>Caching of report data was significantly optimized, which makes re-generating reports with partially changed data/parameters much faster.</li>
+<li>Due to these optimizations, the default number of annotation candidates was increased from 5 to 25.</li>
+<li>Chromatograms are (by default) plotted also for individual features. In addition, it is also possible to add plots of EICs in analyses where no feature was found, which makes it easy to spot any features that were not detected (or filtered out).</li>
+<li>The configuration of reporting parameters was simplified and is now achieved through a <code>YAML</code> file.</li>
+<li>And many other improvements…</li>
+</ul><p>An example can be seen from the <a href="https://rickhelmus.github.io/patRoon/examples/report.html">report output of the tutorial</a>.</p>
+<p>The new reporting interface is used with the new <code>report()</code> method function. All the documentation was updated to reflect these changes. The now ‘legacy’ report interface (<code><a href="../reference/reporting.html">reportCSV()</a></code>, <code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code>) is still available for backwards compatibility and may still be of interest as the new interface currently only supports the HTML format.</p>
 </div>
-<div class="section level3">
-<h3 id="note-docker-images-moved-2-2">NOTE Docker images moved<a class="anchor" aria-label="anchor" href="#note-docker-images-moved-2-2"></a></h3>
+<div class="section level4">
+<h4 id="usage-of-sirius-version-2-2">Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#usage-of-sirius-version-2-2"></a></h4>
+<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version. The new utility function <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> can be used to obtain a necessary login token. The new <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> can be used to automatically log in. The <code>newPorject()</code> function was extended to use this new functionality.</p>
+</div>
+<div class="section level4">
+<h4 id="docker-images-moved-2-2">Docker images moved<a class="anchor" aria-label="anchor" href="#docker-images-moved-2-2"></a></h4>
 <p>The Docker images are now served by the GitLab server of the University of Amsterdam. To pull the latest images you can run the following command:</p>
 <pre><code>docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs</code></pre>
 <p>The changes are reflected in the installation section of the handbook.</p>
 </div>
-<div class="section level3">
-<h3 id="important-new-functionality-and-changes-2-2">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-2"></a></h3>
+<div class="section level4">
+<h4 id="tp-formula-libraries-2-2">TP formula libraries<a class="anchor" aria-label="anchor" href="#tp-formula-libraries-2-2"></a></h4>
+<p>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code> was added: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</p>
+</div>
+<div class="section level4">
+<h4 id="other-2-2">Other<a class="anchor" aria-label="anchor" href="#other-2-2"></a></h4>
+<p>Other important changes include:</p>
 <ul><li>Features
-<ul><li>
+<ul><li>Common parameters for creation of extracted ion chromatograms (EICs), such as <code>topMost</code> and <code>onlyPresent</code>, are now combined in a parameter list. The parameter list is specified with the new <code>EICParams</code> argument to functions such as <code><a href="../reference/generics.html">plotChroms()</a></code> and <code>report()</code>. A list with default parameter values is generated with the <code>getDefEICParams()</code> function. More information can be found in the reference manual: <code>?EICParams</code>.</li>
+<li>The order of some of the arguments to the <code><a href="../reference/generics.html">plotChroms()</a></code> method for <code>featureGroups</code> was changed.</li>
+<li>
 <code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
 </ul></li>
 <li>Feature annotations
-<ul><li>
-<strong>IMPORTANT</strong>: For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> argument to <code>TRUE</code>.</li>
+<ul><li>For sets workflows, scorings that are considered set specific (e.g. MS/MS match) are now <em>not</em> averaged anymore. Instead, these scorings are stored per set, which improves estimation of set specific ID levels. The old behaviour can be enabled by setting the new <code>setAvgSpecificScores</code> arguments of <code><a href="../reference/generateFormulas.html">generateFormulas()</a></code>/<code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> to <code>TRUE</code>.</li>
 </ul></li>
-<li>TPs
-<ul><li>A new algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>: <code>library_formula</code>. This algorithm is similar to the <code>library</code> algorithm, but only works with chemical formulae. This is especially useful if only formula data is available for parents and/or TPs. The <code><a href="../reference/genFormulaTPLibrary.html">genFormulaTPLibrary()</a></code> utility function can be used to automatically generate a formula library from given transformation rules. More information can be found in the updated handbook and reference manual (<code><a href="../reference/generateTPsLibraryFormula.html">?generateTPsLibraryFormula</a></code>).</li>
-</ul></li>
-<li>Chemical data from e.g. suspects and TPs can now be ‘neutralized’ by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether neutralization occurred is reported by the new <code>molNeutralized</code> column.
+<li>Chemical data from e.g. suspects and TPs can now be automatically ‘neutralized’ by addition/subtraction of protons, by setting the <code>neutralChemProps</code>/<code>neutralizeTPs</code> arguments. Whether a structure was neutralized is marked by the new <code>molNeutralized</code> column.
 <ul><li>If <code>neutralizeTPs</code> is set and a neutralization of a TP results in a duplicate structure (i.e. in case the algorithm also generated the neutral form of the TP) then the neutralized TP is removed.</li>
 </ul></li>
 </ul></div>
+</div>
 <div class="section level3">
-<h3 id="other-new-functionality-2-2">Other new functionality<a class="anchor" aria-label="anchor" href="#other-new-functionality-2-2"></a></h3>
+<h3 id="minor-new-functionality-2-2">Minor new functionality<a class="anchor" aria-label="anchor" href="#minor-new-functionality-2-2"></a></h3>
 <ul><li>
-<code>newProject</code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
+<code><a href="../reference/newProject.html">newProject()</a></code>: added possibility to exclude analyses out of folder (issue <a href="https://github.com/rickhelmus/patRoon/issues/60" class="external-link">#60</a>, <a href="https://github.com/rickhelmus/patRoon/issues/63" class="external-link">#63</a>)</li>
 <li>Features
 <ul><li>
 <code><a href="../reference/generics.html">as.data.table()</a></code> for <code>featureGroups</code>
@@ -129,20 +152,11 @@
 <li>if <code>features=TRUE</code>: add replicate group column</li>
 </ul></li>
 <li>
-<code><a href="../reference/generics.html">plotChroms()</a></code>: <code>analysis</code> and <code>groupName</code> arguments</li>
+<code><a href="../reference/generics.html">plotChroms()</a></code>: <code>analysis</code>, <code>groupName</code> and <code>intMax</code> arguments</li>
 </ul></li>
 <li>Feature annotation
-<ul><li>
-<code><a href="../reference/generics.html">delete()</a></code> function for MS peak lists</li>
+<ul><li>A <code><a href="../reference/generics.html">delete()</a></code> method function was added to modify MS peak lists</li>
 <li>GenForm: <code>thrMS</code>, <code>thrMSMS</code>, <code>thrComb</code> and <code>maxCandidates</code> arguments, which can be used to tweak calculations for features with many candidates, e.g., to limit calculation times.</li>
-<li>SIRUS
-<ul><li>
-<code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> to interactively obtain a SIRIUS login refresh token.</li>
-<li>
-<code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> to log in using the given refresh token.</li>
-<li>code generation to obtain SIRIUS reference token with <code><a href="../reference/newProject.html">newProject()</a></code>
-</li>
-</ul></li>
 </ul></li>
 <li>Suspects
 <ul><li>Multiple conditions for ID level estimation can now be combined with the <code>and</code> keyword in the <code>YAML</code> configuration file. This is especially useful when combined with the <code>or</code> keyword.</li>
@@ -152,8 +166,10 @@
 <li>
 <code><a href="../reference/generics.html">plotInt()</a></code> method for components: <code>index</code> argument can now also be component name</li>
 </ul></li>
-<li>TPs <code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).
+<li>TPs
 <ul><li>
+<code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).</li>
+<li>
 <code><a href="../reference/generateTPsLibrary.html">generateTPsLibrary()</a></code>: the <code>matchParentsBy</code> argument now also accepts <code>"formula"</code> and <code>"name"</code>.</li>
 <li>TP libraries may contain a <code>retDir</code> column that specifies the retention time direction of the TP compared to its parent (alternative to specifying <code>log P</code> values).</li>
 <li>New argument <code>matchGenerationsBy</code> to the <code>library</code> (and <code>library_formula</code>) algorithm for <code><a href="../reference/generateTPs.html">generateTPs()</a></code>, which controls how parents/TPs are matched when searching multiple transformation generations.</li>
@@ -162,8 +178,7 @@
 <code><a href="../reference/generateTPsCTS.html">generateTPsCTS()</a></code>: support new PFAS libraries (set <code>"pfas_environmental"</code> or <code>"pfas_metabolism"</code> as the <code>transLibrary</code> argument).</li>
 <li>
 <code><a href="../reference/generateComponentsTPs.html">generateComponentsTPs()</a></code> the <code>formulaDiff</code> column now splits elemental losses and gains, similar as the <code><a href="../reference/generics.html">plotGraph()</a></code> method already did for TPs.</li>
-<li>
-<code><a href="../reference/generics.html">delete()</a></code> method for <code>transformationProducts</code>
+<li>A <code><a href="../reference/generics.html">delete()</a></code> method function was added to modify <code>transformationProducts</code>
 </li>
 </ul></li>
 <li>
@@ -204,6 +219,10 @@
 </ul></li>
 <li>Suspects
 <ul><li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
+</ul></li>
+<li>TPs
+<ul><li>The format of the <code>formulaDiff</code> column in TP component results was changed to more easily identify elemental losses/gains.</li>
+<li>The <code>fromTPs</code> slot was added to TP components and is <code>TRUE</code> if a <code>transformationProducts</code> object was used during componentization. This is primarily for internal use.</li>
 </ul></li>
 <li>
 <code><a href="../reference/generics.html">plotGraph()</a></code> methods: show empty plot instead of throwing an error if results are empty</li>
@@ -246,6 +265,8 @@
 <code><a href="../reference/generics.html">plotChroms()</a></code> / EIC loading: group rectangle with topMost set didn’t consider retention times and intensities from other features</li>
 <li>Fixed: The <code>traceSNRFiltering</code> argument could not be set for <code><a href="../reference/findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code>
 </li>
+<li>
+<code><a href="../reference/generics.html">plotChroms()</a></code> now better supports plotting chromatograms for analysis without feature data (ie when <code>onlyPresent=FALSE</code>) in sets workflows. This now correctly works for cases where a feature is completely absent in a set.</li>
 </ul></li>
 <li>Feature annotation
 <ul><li>Fixed regression where the <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakLists</code> where precursor isolation (<code>isolatePrec</code> argument) also applied to MS/MS data (issue <a href="https://github.com/rickhelmus/patRoon/issues/56" class="external-link">#56</a>).</li>

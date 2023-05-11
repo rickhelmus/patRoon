@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.9 Reporting | patRoon handbook</title>
   <meta name="description" content="5.9 Reporting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.9 Reporting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-05-08" />
+<meta name="date" content="2023-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -134,6 +134,10 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
 <style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
 div.csl-bib-body { }
@@ -412,24 +416,25 @@ div.csl-indent {
 <span id="cb152-11"><a href="report.html#cb152-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">large</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co"> # used for feature group table and parent chromatogram view</span></span>
 <span id="cb152-12"><a href="report.html#cb152-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">small</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb152-13"><a href="report.html#cb152-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">features</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb152-14"><a href="report.html#cb152-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">intensityPlots</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb152-15"><a href="report.html#cb152-15" aria-hidden="true" tabindex="-1"></a><span class="fu">MSPeakLists</span><span class="kw">:</span></span>
-<span id="cb152-16"><a href="report.html#cb152-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spectra</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb152-17"><a href="report.html#cb152-17" aria-hidden="true" tabindex="-1"></a><span class="fu">formulas</span><span class="kw">:</span></span>
-<span id="cb152-18"><a href="report.html#cb152-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">include</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb152-19"><a href="report.html#cb152-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
-<span id="cb152-20"><a href="report.html#cb152-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> </span><span class="kw">]</span></span>
-<span id="cb152-21"><a href="report.html#cb152-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb152-22"><a href="report.html#cb152-22" aria-hidden="true" tabindex="-1"></a><span class="fu">compounds</span><span class="kw">:</span></span>
-<span id="cb152-23"><a href="report.html#cb152-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
-<span id="cb152-24"><a href="report.html#cb152-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> score</span><span class="kw">,</span><span class="at"> individualMoNAScore</span><span class="kw">,</span><span class="at"> annoTypeCount</span><span class="kw">,</span><span class="at"> annotHitCount</span><span class="kw">,</span><span class="at"> libMatch </span><span class="kw">]</span></span>
-<span id="cb152-25"><a href="report.html#cb152-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">onlyUsedScorings</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb152-26"><a href="report.html#cb152-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb152-27"><a href="report.html#cb152-27" aria-hidden="true" tabindex="-1"></a><span class="fu">TPs</span><span class="kw">:</span></span>
-<span id="cb152-28"><a href="report.html#cb152-28" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graphs</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb152-29"><a href="report.html#cb152-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graphStructuresMax</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb152-30"><a href="report.html#cb152-30" aria-hidden="true" tabindex="-1"></a><span class="fu">internalStandards</span><span class="kw">:</span></span>
-<span id="cb152-31"><a href="report.html#cb152-31" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graph</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+<span id="cb152-14"><a href="report.html#cb152-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">intMax</span><span class="kw">:</span><span class="at"> eic</span></span>
+<span id="cb152-15"><a href="report.html#cb152-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">intensityPlots</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb152-16"><a href="report.html#cb152-16" aria-hidden="true" tabindex="-1"></a><span class="fu">MSPeakLists</span><span class="kw">:</span></span>
+<span id="cb152-17"><a href="report.html#cb152-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spectra</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb152-18"><a href="report.html#cb152-18" aria-hidden="true" tabindex="-1"></a><span class="fu">formulas</span><span class="kw">:</span></span>
+<span id="cb152-19"><a href="report.html#cb152-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">include</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb152-20"><a href="report.html#cb152-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
+<span id="cb152-21"><a href="report.html#cb152-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> </span><span class="kw">]</span></span>
+<span id="cb152-22"><a href="report.html#cb152-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb152-23"><a href="report.html#cb152-23" aria-hidden="true" tabindex="-1"></a><span class="fu">compounds</span><span class="kw">:</span></span>
+<span id="cb152-24"><a href="report.html#cb152-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
+<span id="cb152-25"><a href="report.html#cb152-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> score</span><span class="kw">,</span><span class="at"> individualMoNAScore</span><span class="kw">,</span><span class="at"> annoTypeCount</span><span class="kw">,</span><span class="at"> annotHitCount</span><span class="kw">,</span><span class="at"> libMatch </span><span class="kw">]</span></span>
+<span id="cb152-26"><a href="report.html#cb152-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">onlyUsedScorings</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb152-27"><a href="report.html#cb152-27" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb152-28"><a href="report.html#cb152-28" aria-hidden="true" tabindex="-1"></a><span class="fu">TPs</span><span class="kw">:</span></span>
+<span id="cb152-29"><a href="report.html#cb152-29" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graphs</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb152-30"><a href="report.html#cb152-30" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graphStructuresMax</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb152-31"><a href="report.html#cb152-31" aria-hidden="true" tabindex="-1"></a><span class="fu">internalStandards</span><span class="kw">:</span></span>
+<span id="cb152-32"><a href="report.html#cb152-32" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">graph</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
 <p>A detailed description for all the settings can be found in the reference manual (<code>?reporting</code>). The table below summarizes the most interesting options:</p>
 <table>
 <colgroup>

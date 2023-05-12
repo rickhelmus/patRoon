@@ -18,7 +18,16 @@
   ...
 )
 
-\S4method{plotInt}{componentsIntClust}(obj, index, pch = 20, type = "b", lty = 3, col = NULL, ...)
+\S4method{plotInt}{componentsIntClust}(
+  obj,
+  index,
+  pch = 20,
+  type = "b",
+  lty = 3,
+  col = NULL,
+  plotArgs = NULL,
+  linesArgs = NULL
+)
 }
 \arguments{
 \item{obj}{A \code{componentsIntClust} object.}
@@ -30,12 +39,14 @@
 
 \item{margins, cexCol}{Passed to \code{\link{heatmap.2}}}
 
-\item{\dots}{Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}),
-\code{\link[graphics]{plot}} (\code{plotInt}).}
+\item{\dots}{Further options passed to \code{\link{heatmap.2}} / \code{\link{heatmaply}} (\code{plotHeatMap}).}
 
 \item{index}{Numeric component/cluster index or component name.}
 
 \item{pch, type, lty}{Passed to \code{\link{lines}}.}
+
+\item{plotArgs, linesArgs}{A \code{list} with further arguments passed to \code{\link[base]{plot}} and
+\code{\link[graphics]{lines}}, respectively.}
 }
 \value{
 \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or

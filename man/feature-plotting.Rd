@@ -36,7 +36,8 @@
   type = "b",
   lty = 3,
   col = NULL,
-  ...
+  plotArgs = NULL,
+  linesArgs = NULL
 )
 
 \S4method{plotInt}{featureGroupsSet}(
@@ -49,7 +50,8 @@
   type = "b",
   lty = 3,
   col = NULL,
-  ...,
+  plotArgs = NULL,
+  linesArgs = NULL,
   sets = FALSE
 )
 
@@ -67,22 +69,19 @@
   obj,
   analysis = analyses(obj),
   groupName = names(obj),
-  rtWindow = 30,
-  mzExpWindow = 0.001,
   retMin = FALSE,
-  topMost = NULL,
-  topMostByRGroup = FALSE,
-  EICs = NULL,
   showPeakArea = FALSE,
   showFGroupRect = TRUE,
   title = NULL,
   colourBy = c("none", "rGroups", "fGroups"),
   showLegend = TRUE,
-  onlyPresent = TRUE,
   annotate = c("none", "ret", "mz"),
+  intMax = "eic",
+  EICParams = getDefEICParams(),
   showProgress = FALSE,
   xlim = NULL,
   ylim = NULL,
+  EICs = NULL,
   ...
 )
 
@@ -103,9 +102,9 @@
   ...
 )
 
-\S4method{plotGraph}{featureGroups}(obj, onlyPresent = TRUE)
+\S4method{plotGraph}{featureGroups}(obj, onlyPresent = TRUE, width = NULL, height = NULL)
 
-\S4method{plotGraph}{featureGroupsSet}(obj, onlyPresent = TRUE, set)
+\S4method{plotGraph}{featureGroupsSet}(obj, onlyPresent = TRUE, set, ...)
 }
 \arguments{
 \item{colourBy}{Sets the automatic colour selection: \code{"none"} for a single colour or
@@ -123,9 +122,9 @@ feature groups that are unique to a replicate group are plotted.}
 \item{pch, type, lty}{Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
 if \code{pch=NULL} then values are automatically assigned.}
 
-\item{\dots}{passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \code{\link[graphics]{lines}}
-(\code{plotInt}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
-(\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
+\item{\dots}{passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \pkg{\link{VennDiagram}}
+plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or \code{\link[UpSetR]{upset}}
+(\code{plotUpSet}).}
 
 \item{obj, x}{\code{featureGroups} object to be used for plotting.}
 
@@ -134,6 +133,9 @@ if \code{pch=NULL} then values are automatically assigned.}
   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.}
 
 \item{xnames}{Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.}
+
+\item{plotArgs, linesArgs}{A \code{list} with further arguments passed to \code{\link[base]{plot}} and
+\code{\link[graphics]{lines}}, respectively.}
 
 \item{sets}{\setsWF For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
   \link[=analysis-information]{analysis information}).
@@ -157,28 +159,10 @@ to disable outer groups.}
 \item{addIntraOuterGroupLinks}{If \code{TRUE} then links will be added within
 outer groups.}
 
-\item{analysis, groupName}{\code{character} vector with the analyses/group names that should be considered for
-plotting. Compared to subsetting the \code{featureGroups} object (\code{obj}) this is slightly faster and (if
+\item{analysis, groupName}{\code{character} vector with the analyses/group names to be considered for plotting.
+Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster and (if
 \code{onlyPresent=FALSE}) allows plotting chromatograms for feature groups where none of the specified analyses
-contain the feature (which is impossible otherwise since subsetting removes 'empty' feature groups).}
-
-\item{rtWindow}{Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
-retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
-retention time axis.}
-
-\item{mzExpWindow}{In case the \emph{m/z} window to plot an EIC for a particular analysis is not known (\emph{i.e.}
-no feature was detected of the feature group to be plot and \code{onlyPresent=FALSE}) then the EIC \emph{m/z} range
-is estimated from the range for the complete feature group and expanded by the offset defined by
-\code{mzExpWindow}.}
-
-\item{topMost}{Only plot EICs from features within this number of top most intense analyses. If \code{NULL} then all
-analyses are used for plotted.}
-
-\item{topMostByRGroup}{If set to \code{TRUE} and \code{topMost} is set: only plot EICs for the top most features in
-each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
-plotted for the most intense feature of each replicate group.}
-
-\item{EICs}{Internal parameter for now and should be kept at \code{NULL} (default).}
+contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).}
 
 \item{showPeakArea}{Set to \code{TRUE} to display integrated chromatographic peak ranges by filling (shading) their
 areas.}
@@ -188,18 +172,22 @@ group by drawing a rectangle around it.}
 
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{onlyPresent}{Only plot feature groups of internal standards that are still present in the \code{featureGroups}
-input object (which may be otherwise be removed by \emph{e.g.} subsetting or
-\code{\link[=filter,featureGroups-method]{filter}}).}
-
 \item{annotate}{If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
 each plotted feature group.}
+
+\item{intMax}{Method used to determine the maximum intensity plot limit. Should be \code{"eic"} (from EIC data) or
+\code{"feature"} (from feature data). Ignored if the \code{ylim} parameter is specified.}
+
+\item{EICParams}{A named \code{list} with parameters used for extracted ion chromatogram (EIC) creation. See the
+\link[=EICParams]{EIC parameters} documentation for more details.}
 
 \item{showProgress}{if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
 to \code{"none"} to disable any annotation.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{EICs}{Internal parameter for now and should be kept at \code{NULL} (default).}
 
 \item{which}{A character vector with replicate groups used for comparison. Set to \code{NULL} to ignore.
 
@@ -215,6 +203,12 @@ to \code{"none"} to disable any annotation.}
 
 \item{averageFunc, normalized}{Used for intensity data treatment, see the documentation for the
 \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.}
+
+\item{onlyPresent}{Only plot feature groups of internal standards that are still present in the \code{featureGroups}
+input object (which may be otherwise be removed by \emph{e.g.} subsetting or
+\code{\link[=filter,featureGroups-method]{filter}}).}
+
+\item{width, height}{Passed to \code{\link{visNetwork}}.}
 
 \item{set}{\setsWF The set for which data must be plotted.}
 }
@@ -240,8 +234,7 @@ Various plotting functions for feature group data.
   plot for all featue groups. Optionally highlights unique/overlapping
   presence amongst replicate groups.
 
-\code{plotInt} Generates a line plot for the (averaged) intensity
-  of feature groups within all analyses
+\code{plotInt} Generates a line plot for the (averaged) intensity of feature groups within all analyses
 
 \code{plotChord} Generates a chord diagram which can be used to
   visualize shared presence of feature groups between analyses or replicate

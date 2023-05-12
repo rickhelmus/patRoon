@@ -16,7 +16,7 @@
   components,
   fGroups,
   session = "checked-components.yml",
-  rtWindow = 30,
+  EICParams = getDefEICParams(),
   clearSession = FALSE
 )
 
@@ -32,7 +32,7 @@ importCheckFeaturesSession(
 \S4method{checkFeatures}{featureGroups}(
   fGroups,
   session = "checked-features.yml",
-  rtWindow = 30,
+  EICParams = getDefEICParams(),
   clearSession = FALSE
 )
 
@@ -49,17 +49,15 @@ predictCheckFeaturesSession(fGroups, session, model = NULL, overWrite = FALSE)
 
 \item{session}{The session file name.}
 
-\item{rtWindow}{For \code{checkFeatures} and \code{checkComponents}: the retention time (in seconds) that will be
-  subtracted/added to respectively the minimum and maximum retention time of the plotted feature groups. Thus,
-  setting this value to a positive value will 'zoom out' on the retention time axis.
-
-  For \code{importCheckFeaturesSession}: the retention time window (seconds) used to relate 'old' with 'new' feature
-  groups.}
+\item{EICParams}{A named \code{list} with parameters used for extracted ion chromatogram (EIC) creation. See the
+\link[=EICParams]{EIC parameters} documentation for more details.}
 
 \item{clearSession}{If \code{TRUE} the session will be completely cleared before starting the GUI. This effectively
 removes all selections for data removal.}
 
 \item{sessionIn, sessionOut}{The file names for the input and output sessions.}
+
+\item{rtWindow}{The retention time window (seconds) used to relate 'old' with 'new' feature groups.}
 
 \item{mzWindow}{The \emph{m/z} window (in Da) used to relate 'old' with 'new' feature groups.}
 
@@ -101,6 +99,8 @@ executed again. Furthermore, functionality is provided to import and export sess
   remove unwanted feature groups by \code{\link[=filter,featureGroups-method]{filter}}.
 }
 \note{
+The \code{topMost} and \code{topMostByRGroup} EIC parameters (\code{\link{EICParams}}) are ignored.
+
 \code{checkComponents}: Some componentization algorithms (\emph{e.g.} \code{\link{generateComponentsNontarget}}
   and \code{\link{generateComponentsTPs}}) may output components where the same feature group in a component is
   present multiple times, for instance, when multiple TPs are matched to the same feature group. If such a feature

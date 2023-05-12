@@ -25,7 +25,7 @@
   negate = FALSE
 )
 
-\S4method{plotGraph}{componentsTPs}(obj, onlyLinked = TRUE)
+\S4method{plotGraph}{componentsTPs}(obj, onlyLinked = TRUE, width = NULL, height = NULL)
 }
 \arguments{
 \item{x, obj}{A \code{componentsTPs} object.}
@@ -55,6 +55,8 @@ formula annotations. Set to \code{NULL} to ignore.}
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{onlyLinked}{If \code{TRUE} then only components with links are plotted.}
+
+\item{width, height}{Passed to \code{\link{visNetwork}}.}
 }
 \value{
 \code{filter} returns a filtered \code{componentsTPs} object.
@@ -77,6 +79,13 @@ other if one or more transformation products overlap. The graph is constructed w
 and rendered with \pkg{\link{visNetwork}}.
 
 }}
+\section{Slots}{
+
+\describe{
+\item{\code{fromTPs}}{A \code{logical} that is \code{TRUE} when the componentization was performed with
+\code{\link{transformationProducts}} data.}
+}}
+
 \note{
 The intensity values for components (used by \code{plotSpectrum}) are set
   to a dummy value (1) as no single intensity value exists for this kind of

@@ -2,249 +2,183 @@
 % Please edit documentation in R/report.R
 \name{reporting}
 \alias{reporting}
-\alias{reportCSV,featureGroups-method}
-\alias{reportCSV}
-\alias{reportPDF,featureGroups-method}
-\alias{reportPDF}
-\alias{reportHTML,featureGroups-method}
-\alias{reportHTML}
-\title{Report feature group data}
+\alias{report,featureGroups-method}
+\alias{report}
+\alias{genReportSettingsFile}
+\title{Report workflow data}
 \usage{
-\S4method{reportCSV}{featureGroups}(
+\S4method{report}{featureGroups}(
   fGroups,
-  path = "report",
-  reportFeatures = FALSE,
-  formulas = NULL,
-  formulasNormalizeScores = "max",
-  formulasExclNormScores = NULL,
-  compounds = NULL,
-  compoundsNormalizeScores = "max",
-  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
-    "annotHitCount", "libMatch"),
-  compsCluster = NULL,
-  components = NULL,
-  retMin = TRUE,
-  clearPath = FALSE
-)
-
-\S4method{reportPDF}{featureGroups}(
-  fGroups,
-  path = "report",
-  reportFGroups = TRUE,
-  formulas = NULL,
-  formulasTopMost = 5,
-  formulasNormalizeScores = "max",
-  formulasExclNormScores = NULL,
-  reportFormulaSpectra = TRUE,
-  compounds = NULL,
-  compoundsNormalizeScores = "max",
-  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
-    "annotHitCount", "libMatch"),
-  compoundsOnlyUsedScorings = TRUE,
-  compoundsTopMost = 5,
-  compsCluster = NULL,
-  components = NULL,
   MSPeakLists = NULL,
-  retMin = TRUE,
-  EICGrid = c(2, 1),
-  EICRtWindow = 20,
-  EICMzExpWindow = 0.001,
-  EICTopMost = 1,
-  EICTopMostByRGroup = TRUE,
-  EICOnlyPresent = TRUE,
-  clearPath = FALSE
-)
-
-\S4method{reportHTML}{featureGroups}(
-  fGroups,
-  path = "report",
-  reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL,
-  formulasTopMost = 5,
-  formulasNormalizeScores = "max",
-  formulasExclNormScores = NULL,
   compounds = NULL,
-  compoundsNormalizeScores = "max",
-  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
-    "annotHitCount", "libMatch"),
-  compoundsOnlyUsedScorings = TRUE,
-  compoundsTopMost = 5,
   compsCluster = NULL,
-  includeMFWebLinks = "compounds",
   components = NULL,
-  interactiveHeat = FALSE,
-  MSPeakLists = NULL,
-  specSimParams = getDefSpecSimParams(),
   TPs = NULL,
-  retMin = TRUE,
-  EICRtWindow = 20,
-  EICMzExpWindow = 0.001,
-  EICTopMost = 1,
-  EICTopMostByRGroup = TRUE,
-  EICOnlyPresent = TRUE,
-  TPGraphStructuresMax = 25,
-  selfContained = TRUE,
-  optimizePng = FALSE,
+  settingsFile = system.file("report", "settings.yml", package = "patRoon"),
+  path = NULL,
+  EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
+  specSimParams = getDefSpecSimParams(),
   clearPath = FALSE,
   openReport = TRUE,
-  noDate = FALSE
+  parallel = TRUE,
+  overrideSettings = list()
 )
+
+genReportSettingsFile(out = "report.yml")
 }
 \arguments{
-\item{fGroups}{The \code{\link{featureGroups}} object that should be used for
-reporting data.}
+\item{fGroups}{The \code{\link{featureGroups}} object that should be used for reporting data.}
 
-\item{path}{The destination file path for files generated during reporting.
-Will be generated if needed.}
+\item{MSPeakLists, formulas, compounds, compsCluster, components, TPs}{Further objects (\code{\link{MSPeakLists}},
+\code{\link{formulas}}, \code{\link{compounds}}, \code{\link{compoundsCluster}}, \code{\link{components}},
+\code{\link{transformationProducts}}) that should be reported. Specify \code{NULL} to skip reporting a particular
+object. Note that \code{MSPeakLists} must be set if either \code{formulas} or \code{compounds} is set.}
 
-\item{reportFeatures}{If set to \code{TRUE} then for each analysis a
-\file{.csv} file will be generated with information about its detected
-features.}
+\item{settingsFile}{The path to the report settings file used for report configuration (see \verb{Report settings}).}
 
-\item{formulas, compounds, compsCluster, components}{Further objects
-(\code{\link{formulas}}, \code{\link{compounds}},
-\code{\link{compoundsCluster}}, \code{\link{components}}) that should be
-reported. Specify \code{NULL} to skip reporting a particular object.}
+\item{path}{The destination file path for files generated during reporting. Will be generated if needed. If
+\code{path=NULL} then the destination path is taken from the report settings (see below).}
 
-\item{compoundsNormalizeScores, formulasNormalizeScores}{A \code{character} that specifies how normalization of
-annotation scorings occurs. Either
-\code{"none"} (no normalization),
-\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
-normalization). Note that normalization of negative scores (e.g. output by
-\command{SIRIUS}) is always performed as min-max. Furthermore, currently
-normalization for \code{compounds} takes the original min/max scoring
-values into account when candidates were generated. Thus, for
-\code{compounds} scoring, normalization is not affected when candidate
-results were removed after they were generated (\emph{e.g.} by use of
-\code{filter}).}
-
-\item{compoundsExclNormScores, formulasExclNormScores}{A
-  \code{character} vector specifying any compound scoring names that
-  should \emph{not} be normalized. Set to \code{NULL} to normalize all
-  scorings. Note that whether any normalization occurs is set by the
-  \code{compoundsExclNormScores,formulasExclNormScores} argument.
-
-  For \code{compounds}: By default \code{score} and
-  \code{individualMoNAScore} are set to mimic the behavior of the
-  \command{MetFrag} web interface.}
-
-\item{retMin}{If \code{TRUE} then report retention times in minutes
-(otherwise seconds).}
-
-\item{clearPath}{If \code{TRUE} then the destination path will be
-(recursively) removed prior to reporting.}
-
-\item{reportFGroups}{If \code{TRUE} then feature group data will be reported.}
-
-\item{formulasTopMost, compoundsTopMost}{Only this amount of top ranked
-candidate formulae/compounds are reported. Lower values may significantly
-speed up reporting. Set to \code{NULL} to ignore.}
-
-\item{reportFormulaSpectra}{If \code{TRUE} then explained MS/MS spectra (if
-available) for candidate formulae will be reported. Specifying
-\code{formulas} and setting this argument to \code{FALSE} still allows
-further annotation of compound MS/MS spectra.}
-
-\item{compoundsOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
-that actually have been used to rank data (see the \code{scoreTypes}
-argument to \code{\link{generateCompoundsMetFrag}} for more details).}
-
-\item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is
-\emph{mandatory} when spectra for formulae and/or compounds will be
-reported.}
-
-\item{EICGrid}{An integer vector in the form \code{c(columns, rows)} that is
-used to determine the plotting grid when reporting EICs in PDF files.}
-
-\item{EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent}{Plotting parameters passed to \code{\link{plotChroms}} (\emph{i.e.}
-\code{rtWindow}, \code{mzExpWindow}, \code{topMost}, \code{topMostByRGroup}
-and \code{onlyPresent} arguments).}
-
-\item{reportPlots}{A character vector specifying what should be plotted. Valid options are: \code{"chord"},
-\code{"venn"}, \code{"upset"} (plot a chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
-individual feature groups) and \code{"formulas"} (plot annotated formula spectra). Set to \code{"none"} to plot
-none of these.}
-
-\item{includeMFWebLinks}{A \code{character} specifying to which feature groups a web link should be added in the
-annotation page to \href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}. Options are:
-\code{"compounds"} (only to those with compounds results), \code{"MSMS"} (only to those with MSMS peak lists) or
-\code{"none"}.}
-
-\item{interactiveHeat}{If \code{TRUE} an interactive heatmap HTML widget will be generated to display hierarchical
-clustering results. Set to \code{FALSE} for a 'regular' static plot.}
+\item{EICParams}{A named \code{list} with parameters used for extracted ion chromatogram (EIC) creation. See the
+\link[=EICParams]{EIC parameters} documentation for more details.}
 
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
-\item{TPs}{A \code{\link{transformationProducts}} object that should used for plotting hierarchies. Ignored if
-\code{TPs=NULL} or \code{components} is not a \code{componentsTPs} object.}
-
-\item{TPGraphStructuresMax}{Maximum number of TP structures to plot in TP hierarchies, see the \code{TPs} argument.
-Sets the \code{structuresMax} argument to \code{\link[=plotGraph,featureGroups-method]{plotGraph}}.}
-
-\item{selfContained}{If \code{TRUE} the output will be a standalone HTML file which contains all graphics and script
-dependencies. When \code{FALSE}, the latter will be placed in an additional directory (\file{report_files}) which
-should remain present when viewing the output file. Especially on Windows, a non-self contained output might be
-desirable when reporting large amounts of data to prevent \command{pandoc} from running out of memory.}
-
-\item{optimizePng}{If \code{TRUE} then \command{pngquant} is used to reduce the size of generated graphics. A
-significant reduction in disk space usage may be seen, however, at the cost additional processing time. Multiple
-\command{pngquant} processes will be executed in parallel, which can be configured with
-\option{patRoon.MP.maxProcs} (parallelization will always happen with the \code{"classic"} method, see
-\link[=patRoon-package]{patRoon options}).}
+\item{clearPath}{If \code{TRUE} then the report destination path will be (recursively) removed prior to reporting.}
 
 \item{openReport}{If set to \code{TRUE} then the output report file will be opened with the system browser.}
 
-\item{noDate}{If \code{TRUE} then the current date is not added to the report. This is mainly used for testing and
-its main purpose is to guarentees equal report files when `reportHTML()` is called multiple times with equal
-arguments.}
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+see the parallelization section in the handbook for more details.}
+
+\item{overrideSettings}{A \code{list} with settings that override those from the report settings file. Example:
+\code{overrideSettings=list(compounds=list(topMost=25))}.}
+
+\item{out}{The output file path.}
 }
 \description{
-Functionality to report data produced by most workflow steps such as
-features, feature groups, calculated chemical formulae and tentatively
-identified compounds.
+Functionality to report data produced by most workflow steps such as features, feature groups, formula and compound
+annotations, and TPs.
 }
 \details{
-These functions are usually called at the very end of the workflow. It is
-used to report various data on features and feature groups. In addition,
-these functions may be used for reporting formulae and/or compounds that were
-generated for the specified feature groups. Data can be reported in tabular
-form (\emph{i.e.} \file{.csv} files) by \code{reportCSV} or graphically by
-\code{reportPDF} and \code{reportHTML}. The latter functions will plot for
-instance chromatograms and annotated mass spectra, which are useful to get a
-graphical overview of results.
+The reporting functionality is typically used at the very end of the workflow. It is used to overview the data
+generated during the workflow, such as features, their annotations and TP screening results.
 
-All functions have a wide variety of arguments that influence the reporting
-process. Nevertheless, most parameters are optional and only required to be
-given for fine tuning. In addition, only those objects (\emph{e.g.} formulae,
-compounds, clustering) that are desired to be reported need to be specified.
+\code{report} reports all workflow data in an interactive \acronym{HTML} file. The reports include both
+  tabular data (\emph{e.g.} retention times, annotation properties, screening results) and varios plots (\emph{e.g.}
+  chromatograms, (annotated) mass spectra and many more). This function uses functionality from other \R packages,
+  such as \CRANpkg{rmarkdown}, \CRANpkg{flexdashboard}, \CRANpkg{knitr} and \CRANpkg{bslib}.
 
-\code{reportCSV} generates tabular data (\emph{i.e.} \file{.csv}
-  files) for given data to be reported. This may also be useful to allow
-  import by other tools for post processing.
-
-\code{reportPDF} will report graphical data (\emph{e.g.}
-  chromatograms and mass spectra) within PDF files. Compared
-  to \code{reportHTML} this function may be faster and yield smaller report
-  files, however, its functionality is a bit more basic and generated data is
-  more 'scattered' around.
-
-\code{reportHTML} will report graphical data (\emph{e.g.} chromatograms and mass spectra) and summary
-  information in an easy browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and \link{knitr}.
+The \code{genReportSettingsFile} function generates a new template \file{YAML} file to configure report
+  settings (see the next section).
 }
 \note{
-Any formulae and compounds for feature groups which are not present
-  within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
-  will not be reported.
-}
-\section{Parallelization}{
- \code{reportHTML} uses multiprocessing to parallelize
-  computations. Please see the parallelization section in the handbook for
-  more details and \link[=patRoon-package]{patRoon options} for configuration
-  options.
+No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
+  etc) which are \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).
 
- Currently, \code{reportHTML} only uses \code{"classic"} multiprocessing, regardless of the
-  \option{patRoon.MP.method} option.
+  The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
+  \emph{e.g.}, when generating overview plots.
+}
+\section{Report settings}{
+ The report generation can be customized with a variety of settings that are read from a
+  \file{YAML} file. This is especially useful if you want to change more advanced settings or want to add or remove
+  the parts that are reported The report settings file is specified through the \code{settingsFile} argument. If not
+  specified then default settings will be used. To ease creation of a new template settings file, the
+  \code{genReportSettingsFile} function can be used.
+
+  The following settings are currently available: \itemize{
+
+  \item General \itemize{
+
+     \item \code{format}: the report format. Currently this can only be \code{"html"}.
+
+     \item \code{path}: the destination path (ignored if the \code{path} argument is specified).
+
+     \item \code{keepUnusedPlots}: the number of days that unused plot files are kept (see \verb{Plot file caching}).
+
+     \item \code{selfContained}: If \code{true} then the output \file{report.html} embeds all graphics and script
+     dependencies. Otherwise these files are read from the \code{report_files/} directory. Self-contained reports are
+     easily shared, since only the \file{report.html} needs to be copied. However, they may be slower to generate and
+     render, especially when the report contains a lot of data.
+
+     \item \code{noDate} Set to \code{true} to omit the date from the report. Mainly used for internal purposes.
+
+  }
+
+  \item \code{summary}: defines the plots on the summary page: \code{chord}, \code{venn} and/or \code{upset}.
+
+  \item \code{features} \itemize{
+
+     \item \code{retMin}: if \code{true} then retention times are reported in minutes.
+
+     \item \code{chromatograms} \itemize{
+
+         \item \code{large}: inclusion of large chromatograms (used in feature group table and TP parent chromatogram
+         view)
+
+         \item \code{small}: inclusion of small chromatograms (feature group table)
+
+         \item \code{features}: inclusion of chromatograms for individual features (features view). Set to \code{all}
+         to also include plots for analyses in which a feature was not found (or removed afterwards).
+
+     }
+
+     \item \code{intensityPlots}: inclusion of intensity trend plots.
+
+  }
+
+  \item \code{MSPeakLists} \itemize{
+
+     \item \code{spectra}: inclusion of MS and MS/MS spectra (not annotated).
+
+  }
+
+  \item \code{formulas} \itemize{
+
+     \item \code{include}: whether formula results are reported (formula view). If \code{false} then the input
+     \code{formulas} object is still used to amend \emph{e.g.} compound annotated spectra.
+
+     \item \code{normalizeScores}, \code{exclNormScores}: controls score normalization, sets the equally named
+     arguments to \emph{e.g.} \code{\link{plotScores}}.
+
+     \item \code{topMost} only report this number of top ranked candidates. This number can be lowered to speed-up
+     report generation.
+
+  }
+
+  \item \code{compounds} \itemize{
+
+     \item \code{normalizeScores}, \code{exclNormScores}, \code{topMost}: same as \code{formulas}, see above.
+
+  }
+
+  \item \code{TPs} \itemize{
+
+     \item \code{graphs}: inclusion of TP hierarchy graphs (generated with \code{\link{plotGraph}}).
+
+     \item \code{graphStructuresMax}: maximum number of structures to plot in hierarchy graphs (sets
+     \code{structuresMax} argument of \code{\link[=plotGraph,transformationProductsStructure-method]{plotGraph}}).
+
+  }
+
+  \item \code{internalStandards} \itemize{
+
+     \item \code{graph}: inclusion of internal standard network plot
+     (\code{\link[=plotGraph,featureGroups-method]{plotGraph}}).
+
+  }
+
+  }
+}
+
+\section{Plot file caching}{
+ When a new report is generated the plot files are stored inside the \code{report_files}
+  sub-directory inside the destination path of the report. The plot files are kept so they can be reused to speed-up
+  re-creation of reports (\emph{e.g.} with different report settings). After the report is generated, any unused plot
+  files are removed unless they were recently created (controlled by the \code{keepUnusedPlots} setting, see previous
+  section). The \code{clearPath} argument can be used to completely remove any old files.
 }
 
 \references{

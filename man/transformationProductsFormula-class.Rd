@@ -14,7 +14,9 @@
   which,
   components = NULL,
   prune = TRUE,
-  onlyCompletePaths = FALSE
+  onlyCompletePaths = FALSE,
+  width = NULL,
+  height = NULL
 )
 }
 \arguments{
@@ -32,6 +34,8 @@ matching the graph with screening results. The TPs that were found will be marke
 
 \item{onlyCompletePaths}{If \code{TRUE} and \code{components} is set, then only pathways are shown for which
 \emph{all} TPs were detected. See also the \code{prune} and \code{components} arguments.}
+
+\item{width, height}{Passed to \code{\link{visNetwork}}.}
 }
 \value{
 \code{plotGraph} returns the result of \code{\link{visNetwork}}.

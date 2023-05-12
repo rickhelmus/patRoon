@@ -14,9 +14,9 @@
 \alias{unset,componentsNTSet-method}
 \title{Components class for homologous series.}
 \usage{
-\S4method{plotGraph}{componentsNT}(obj, onlyLinked = TRUE)
+\S4method{plotGraph}{componentsNT}(obj, onlyLinked = TRUE, width = NULL, height = NULL)
 
-\S4method{plotGraph}{componentsNTSet}(obj, onlyLinked = TRUE, set)
+\S4method{plotGraph}{componentsNTSet}(obj, onlyLinked = TRUE, set, ...)
 
 \S4method{unset}{componentsNTSet}(obj, set)
 }
@@ -24,6 +24,8 @@
 \item{obj}{The \code{componentsNT} object to plot.}
 
 \item{onlyLinked}{If \code{TRUE} then only components with links are plotted.}
+
+\item{width, height}{Passed to \code{\link{visNetwork}}.}
 
 \item{set}{\setsWF The name of the set.}
 }

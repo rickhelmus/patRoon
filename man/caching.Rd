@@ -11,9 +11,9 @@
 \usage{
 makeHash(..., checkDT = TRUE)
 
-makeFileHash(...)
+makeFileHash(..., length = Inf)
 
-loadCacheData(category, hashes, dbArg = NULL)
+loadCacheData(category, hashes, dbArg = NULL, simplify = TRUE, fixDTs = TRUE)
 
 saveCacheData(category, data, hash, dbArg = NULL)
 
@@ -25,6 +25,8 @@ clearCache(what = NULL, file = NULL, vacuum = TRUE)
 \item{checkDT}{\code{logical}, set to \code{TRUE} with (a \code{list} with) \code{data.table}s to ensure reproducible
 hashing. Otherwise can be set to \code{FALSE} to improve performance.}
 
+\item{length}{Maximum file length to hash. Passed to \code{\link{digest}}.}
+
 \item{category}{The category of the object to be cached.}
 
 \item{hashes}{A \code{character} with one more hashes (\emph{e.g.} obtained with \code{makeHash}) of the objects to
@@ -32,6 +34,12 @@ be loaded.}
 
 \item{dbArg}{Alternative connection to database. Default is \code{NULL} and uses the cache options as defined by
 \option{patRoon.cache.fileName}. Mainly used internally to improve performance.}
+
+\item{simplify}{If \code{TRUE} and \code{length(hashes)==1} then the returned data is returned directly, otherwise
+the data is in a \code{list}.}
+
+\item{fixDTs}{Should be \code{TRUE} if cached data consists of (nested) \code{data.table}s. Otherwise can be
+\code{FALSE} to speed up loading.}
 
 \item{data}{The object to be cached.}
 

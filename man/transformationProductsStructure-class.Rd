@@ -40,7 +40,9 @@
   components = NULL,
   structuresMax = 25,
   prune = TRUE,
-  onlyCompletePaths = FALSE
+  onlyCompletePaths = FALSE,
+  width = NULL,
+  height = NULL
 )
 
 \S4method{plotVenn}{transformationProductsStructure}(obj, ..., commonParents = FALSE, labels = NULL, vennArgs = NULL)
@@ -114,6 +116,8 @@ done to avoid long times needed to construct the graph.}
 
 \item{onlyCompletePaths}{If \code{TRUE} and \code{components} is set, then only pathways are shown for which
 \emph{all} TPs were detected. See also the \code{prune} and \code{components} arguments.}
+
+\item{width, height}{Passed to \code{\link{visNetwork}}.}
 
 \item{commonParents}{Only consider TPs from parents that are common to all compared objects.}
 

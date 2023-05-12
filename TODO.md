@@ -14,20 +14,11 @@
 - keep feature chroms enabled by default?
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
-- deprecate reportHTML?
-    - also mention in docs
 
 
 ## Components
 
 - makeGraph(): throw or not throw an error with empty components and onlyLinked=T
-
-## NEWS/docs
-
-- fixed set hashes from executeMultiProc were saved as list instead of vector --> re-generate cache.
-    - just mention re-generation of cache is needed
-- restructure NEWS for 2.2
-- ref update
 
 
 ## Features

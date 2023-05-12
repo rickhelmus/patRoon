@@ -86,7 +86,7 @@
 
 \S4method{plotSpectrum}{components}(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
 
-\S4method{plotChroms}{components}(obj, index, fGroups, rtWindow = 5, ...)
+\S4method{plotChroms}{components}(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 
 \S4method{consensus}{components}(obj, ...)
 
@@ -173,11 +173,10 @@ should be a character with the name of the feature group. Setting this to
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate the components.}
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to generate the components.}
 
-\item{rtWindow}{Retention window: see the \code{plotChroms} method for the
-\code{\link{featureGroups}} class.}
+\item{EICParams}{A named \code{list} with parameters used for extracted ion chromatogram (EIC) creation. See the
+\link[=EICParams]{EIC parameters} documentation for more details.}
 
 \item{sets}{\setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).}
 
@@ -232,8 +231,7 @@ belongs.
 \item \code{plotSpectrum(components)}: Plot a \emph{pseudo} mass spectrum for a single
 component.
 
-\item \code{plotChroms(components)}: Plot an extracted ion chromatogram (EIC) for all
-feature groups within a single component.
+\item \code{plotChroms(components)}: Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.
 
 \item \code{consensus(components)}: Generates a consensus from multiple \code{components}
 objects. At this point results are simply combined and no attempt is made to
@@ -253,6 +251,9 @@ for each component. Use the \code{componentInfo} method for access.}
 \note{
 \code{filter} Applies only those filters for which a component has data available. For instance, filtering by
   adduct will only filter any results within a component if that component contains adduct information.
+
+For \code{plotChroms}: The \code{topMost} and \code{topMostByRGroup} EIC parameters are ignored unless the
+  components are from homologous series.
 }
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsFeatures}}}       \itemize{         \item{\code{\link{componentsCliqueMS}}}         \item{\code{\link{componentsOpenMS}}}       }       \item{\code{\link{componentsClust}}}       \itemize{         \item{\code{\link{componentsIntClust}}}         \item{\code{\link{componentsSpecClust}}}       }       \item{\code{\link{componentsSet}}}       \itemize{         \item{\code{\link{componentsNTSet}}}       }       \item{\code{\link{componentsUnset}}}       \item{\code{\link{componentsNT}}}       \itemize{         \item{\code{\link{componentsNTUnset}}}       }       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsTPs}}}     }   } }

@@ -107,6 +107,7 @@ Other important changes include:
     - Several optimizations for `annotatedPeakLists()`, especially with sets workflows.
 - Suspects
     - Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the `specSimParams` argument replaces the `relMinMSMSIntensity` and `simMSMSMethod` arguments.
+    - `annotateSuspects()`: log if the suspect formula/compound data could not be matched with feature annotations
 - TPs
     - The format of the `formulaDiff` column in TP component results was changed to more easily identify elemental losses/gains.
     - The `fromTPs` slot was added to TP components and is `TRUE` if a `transformationProducts` object was used during componentization. This is primarily for internal use.
@@ -128,6 +129,7 @@ Other important changes include:
     - Fixed: `newProject()` used wrong variable name for suspect list under some conditions (issue #69) 
     - Fixed: only check if `analysis.csv` already exists when needed
     - Fixed: `norm_conc` field for analysis information was ignored (reported by Geert Franken)
+    - Fixed: `checkFeatures()`/`checkComponents()`: disabling a feature/featureGroup in a sorted table would lead to wrong selections
 - Features
     - Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.
     - Fixed: blank filter didn't properly handle differing blank assignments per analysis
@@ -169,6 +171,7 @@ Suspects
 - Fix: multiprocessing with classic: don't try to capture output when logging is disabled
 - Small fixes and improvements for verification of parameter lists
 - Fixed: `convertMSFiles()` if the `analysisInfo` argument is set and `outPath` is set with a length >1 then the wrong output path could be used.
+- Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue #76).
 
 
 # patRoon 2.1

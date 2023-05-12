@@ -253,7 +253,7 @@ verifyDataCentroided <- function(anaInfo)
 {
     cacheDB <- openCacheDB()
     
-    printf("Verifying if your data is centroided...\n")
+    printf("Verifying if your data is centroided... ")
     
     filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
     
@@ -285,5 +285,6 @@ verifyDataCentroided <- function(anaInfo)
                 ". Please ensure that your MS data is centroided, for instance by using convertMSFiles()",
                 call. = FALSE)
     
+    printf("Done!\n")
     invisible(NULL)
 }

@@ -25,6 +25,8 @@ An example can be seen from the [report output of the tutorial](https://rickhelm
 
 The new reporting interface is used with the new `report()` method function. All the documentation was updated to reflect these changes. The now 'legacy' report interface (`reportCSV()`, `reportPDF()` and `reportHTML()`) is still available for backwards compatibility and may still be of interest as the new interface currently only supports the HTML format.
 
+The new reporting functionality obviously did not yet underwent years of usage and feedback. Hence, please report any bugs and suggestions you may have!
+
 ### Usage of SIRIUS version 5
 
 Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/ This release of `patRoon` adds support to make logging in more easy and adds several compatibility fixes for the latest `SIRIUS` version. The new utility function `getSIRIUSToken()` can be used to obtain a necessary login token. The new `token` argument for `generateCompoundsSIRIUS()` can be used to automatically log in. The `newPorject()` function was extended to use this new functionality.   

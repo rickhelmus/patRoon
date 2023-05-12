@@ -12,6 +12,8 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
+**May 2023** `patRoon 2.2` is now released. This most significant change is the addition of a new reporting interface, which brings a much improved HTML interface, many optimizations and other important new functionality. Furthermore, `patRoon 2.2` introduces improved `SIRIUS 5` support, a new TP screening algorithm using formula libraries and many other improvements, of which many thanks to the great user feedback. Please see the [Project NEWS][NEWS] for details.
+
 **March 2023** The Docker images moved to a new host. Please see the see [installation details in the handbook][handbook-inst] to obtain the latest images.
 
 **May 2022** `patRoon 2.1` is now available. This new release integrates prediction of transformation products with
@@ -44,7 +46,7 @@ Componentization & adduct annotation | Grouping of related features based on che
 Combining algorithms   | Combine data from different algorithms (e.g. features, annotations) and generate a consensus. | Native
 _Sets workflows_       | Simultaneous processing and combining +/- MS ionization data             | Native
 Transformation product (TP) screening | Automatic screening of TPs using library/_in-silico_ data, MS similarities and classifications. Tools to improve compound TP annotation. | [BioTransformer], [PubChemLite][PubChemLiteTR], Native
-Reporting              | Automatic reporting in _CSV_, _PDF_ and (interactive) _HTML_ formats. An example HTML report can be viewed [here][example]. | Native
+Reporting              | Automatic reporting of all important workflow data. An example HTML report can be viewed [here][example]. | Native
 Data clean-up & prioritization | Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and many more. | Native
 Data curation          | Several graphical interactive tools and functions to inspect and remove unwanted data. | Native
 
@@ -67,6 +69,7 @@ workflow steps are optional, fully configurable and algorithms can easily be mix
     * Code for loading MS and EIC data, MS similarity calculations and others were implemented in `C++` to reduce computational times.
 * The [RDCOMClient] `R` package is used to interface with Bruker DataAnalysis algorithms.
 * The [Shiny] `R` package was used to implement several GUI tools.
+* The reporting functionality relies on the excellent [R markdown][Rmd] and related packages such as [flexdashboard], [bslib] and [reactable].
 
 
 ## Installation
@@ -149,3 +152,7 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [miniCRAN]: https://cran.r-project.org/web/packages/miniCRAN/index.html
 [DockerImg]: https://uva-hva.gitlab.host/R.Helmus/patroon/container_registry/2
 [CTS]: https://qed.epa.gov/cts/
+[Rmd]: https://rmarkdown.rstudio.com/
+[flexdashboard]: https://pkgs.rstudio.com/flexdashboard/
+[bslib]: https://rstudio.github.io/bslib/
+[reactable]: https://glin.github.io/reactable/

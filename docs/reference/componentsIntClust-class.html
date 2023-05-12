@@ -108,7 +108,16 @@ from intensity profiles of feature groups.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for componentsIntClust</span></span>
-<span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">index</span>, pch <span class="op">=</span> <span class="fl">20</span>, type <span class="op">=</span> <span class="st">"b"</span>, lty <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">index</span>,</span>
+<span>  pch <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plotArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linesArgs <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -131,8 +140,7 @@ from intensity profiles of feature groups.</p>
 
 
 <dt>...</dt>
-<dd><p>Further options passed to <code>heatmap.2</code> / <code>heatmaply</code> (<code>plotHeatMap</code>),
-<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code> (<code>plotInt</code>).</p></dd>
+<dd><p>Further options passed to <code>heatmap.2</code> / <code>heatmaply</code> (<code>plotHeatMap</code>).</p></dd>
 
 
 <dt>index</dt>
@@ -141,6 +149,11 @@ from intensity profiles of feature groups.</p>
 
 <dt>pch, type, lty</dt>
 <dd><p>Passed to <code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>.</p></dd>
+
+
+<dt>plotArgs, linesArgs</dt>
+<dd><p>A <code>list</code> with further arguments passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> and
+<code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>, respectively.</p></dd>
 
 </dl></div>
     <div id="value">

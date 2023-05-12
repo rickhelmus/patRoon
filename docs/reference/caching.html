@@ -99,9 +99,9 @@ functions are primarily for internal use.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeHash</span><span class="op">(</span><span class="va">...</span>, checkDT <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">makeFileHash</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">makeFileHash</span><span class="op">(</span><span class="va">...</span>, length <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">loadCacheData</span><span class="op">(</span><span class="va">category</span>, <span class="va">hashes</span>, dbArg <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">loadCacheData</span><span class="op">(</span><span class="va">category</span>, <span class="va">hashes</span>, dbArg <span class="op">=</span> <span class="cn">NULL</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span>, fixDTs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">saveCacheData</span><span class="op">(</span><span class="va">category</span>, <span class="va">data</span>, <span class="va">hash</span>, dbArg <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -119,6 +119,10 @@ functions are primarily for internal use.</p>
 hashing. Otherwise can be set to <code>FALSE</code> to improve performance.</p></dd>
 
 
+<dt>length</dt>
+<dd><p>Maximum file length to hash. Passed to <code>digest</code>.</p></dd>
+
+
 <dt>category</dt>
 <dd><p>The category of the object to be cached.</p></dd>
 
@@ -131,6 +135,16 @@ be loaded.</p></dd>
 <dt>dbArg</dt>
 <dd><p>Alternative connection to database. Default is <code>NULL</code> and uses the cache options as defined by
 <span class="option">patRoon.cache.fileName</span>. Mainly used internally to improve performance.</p></dd>
+
+
+<dt>simplify</dt>
+<dd><p>If <code>TRUE</code> and <code>length(hashes)==1</code> then the returned data is returned directly, otherwise
+the data is in a <code>list</code>.</p></dd>
+
+
+<dt>fixDTs</dt>
+<dd><p>Should be <code>TRUE</code> if cached data consists of (nested) <code>data.table</code>s. Otherwise can be
+<code>FALSE</code> to speed up loading.</p></dd>
 
 
 <dt>data</dt>

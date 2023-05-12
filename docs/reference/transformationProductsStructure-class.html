@@ -117,7 +117,9 @@
 <span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  structuresMax <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  prune <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  height <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for transformationProductsStructure</span></span>
@@ -224,6 +226,10 @@ done to avoid long times needed to construct the graph.</p></dd>
 <dt>onlyCompletePaths</dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then only pathways are shown for which
 <em>all</em> TPs were detected. See also the <code>prune</code> and <code>components</code> arguments.</p></dd>
+
+
+<dt>width, height</dt>
+<dd><p>Passed to <code>visNetwork</code>.</p></dd>
 
 
 <dt>commonParents</dt>

@@ -118,7 +118,8 @@
 <span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
 <span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  plotArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linesArgs <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for featureGroupsSet</span></span>
@@ -132,7 +133,8 @@
 <span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
 <span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span>,</span>
+<span>  plotArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linesArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sets <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -152,22 +154,19 @@
 <span>  <span class="va">obj</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
 <span>  groupName <span class="op">=</span> <span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
-<span>  rtWindow <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  mzExpWindow <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  topMost <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  topMostByRGroup <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  EICs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showPeakArea <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  showFGroupRect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span><span class="op">)</span>,</span>
+<span>  intMax <span class="op">=</span> <span class="st">"eic"</span>,</span>
+<span>  EICParams <span class="op">=</span> <span class="fu"><a href="EICParams.html">getDefEICParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  showProgress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  EICs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -193,10 +192,10 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for featureGroups</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for featureGroupsSet</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -229,9 +228,9 @@ if <code>pch=NULL</code> then values are automatically assigned.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> (<code>plot</code> and <code>plotChroms</code>), <code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>
-(<code>plotInt</code>), <span class="pkg">VennDiagram</span> plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
-(<code>plotChord</code>) or <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> (<code>plotUpSet</code>).</p></dd>
+<dd><p>passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> (<code>plot</code> and <code>plotChroms</code>), <span class="pkg">VennDiagram</span>
+plotting functions (<code>plotVenn</code>), <code>chordDiagram</code> (<code>plotChord</code>) or <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>
+(<code>plotUpSet</code>).</p></dd>
 
 
 <dt>obj, x</dt>
@@ -245,6 +244,11 @@ if <code>pch=NULL</code> then values are automatically assigned.</p></dd>
 
 <dt>xnames</dt>
 <dd><p>Plot analysis (or replicate group if <code>average=TRUE</code>) names on the x axis.</p></dd>
+
+
+<dt>plotArgs, linesArgs</dt>
+<dd><p>A <code>list</code> with further arguments passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> and
+<code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>, respectively.</p></dd>
 
 
 <dt>sets</dt>
@@ -279,38 +283,10 @@ outer groups.</p></dd>
 
 
 <dt>analysis, groupName</dt>
-<dd><p><code>character</code> vector with the analyses/group names that should be considered for
-plotting. Compared to subsetting the <code>featureGroups</code> object (<code>obj</code>) this is slightly faster and (if
+<dd><p><code>character</code> vector with the analyses/group names to be considered for plotting.
+Compared to subsetting the <code>featureGroups</code> object (<code>obj</code>) upfront this is slightly faster and (if
 <code>onlyPresent=FALSE</code>) allows plotting chromatograms for feature groups where none of the specified analyses
-contain the feature (which is impossible otherwise since subsetting removes 'empty' feature groups).</p></dd>
-
-
-<dt>rtWindow</dt>
-<dd><p>Retention time (in seconds) that will be subtracted/added to respectively the minimum and maximum
-retention time of the plotted feature groups. Thus, setting this value to a positive value will 'zoom out' on the
-retention time axis.</p></dd>
-
-
-<dt>mzExpWindow</dt>
-<dd><p>In case the <em>m/z</em> window to plot an EIC for a particular analysis is not known (<em>i.e.</em>
-no feature was detected of the feature group to be plot and <code>onlyPresent=FALSE</code>) then the EIC <em>m/z</em> range
-is estimated from the range for the complete feature group and expanded by the offset defined by
-<code>mzExpWindow</code>.</p></dd>
-
-
-<dt>topMost</dt>
-<dd><p>Only plot EICs from features within this number of top most intense analyses. If <code>NULL</code> then all
-analyses are used for plotted.</p></dd>
-
-
-<dt>topMostByRGroup</dt>
-<dd><p>If set to <code>TRUE</code> and <code>topMost</code> is set: only plot EICs for the top most features in
-each replicate group. For instance, when <code>topMost=1</code> and <code>topMostByRGroup=TRUE</code>, then EICs will be
-plotted for the most intense feature of each replicate group.</p></dd>
-
-
-<dt>EICs</dt>
-<dd><p>Internal parameter for now and should be kept at <code>NULL</code> (default).</p></dd>
+contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).</p></dd>
 
 
 <dt>showPeakArea</dt>
@@ -327,15 +303,19 @@ group by drawing a rectangle around it.</p></dd>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
 
 
-<dt>onlyPresent</dt>
-<dd><p>Only plot feature groups of internal standards that are still present in the <code>featureGroups</code>
-input object (which may be otherwise be removed by <em>e.g.</em> subsetting or
-<code><a href="feature-filtering.html">filter</a></code>).</p></dd>
-
-
 <dt>annotate</dt>
 <dd><p>If set to <code>"ret"</code> and/or <code>"mz"</code> then retention and/or <em>m/z</em> values will be drawn for
 each plotted feature group.</p></dd>
+
+
+<dt>intMax</dt>
+<dd><p>Method used to determine the maximum intensity plot limit. Should be <code>"eic"</code> (from EIC data) or
+<code>"feature"</code> (from feature data). Ignored if the <code>ylim</code> parameter is specified.</p></dd>
+
+
+<dt>EICParams</dt>
+<dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
+<a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
 <dt>showProgress</dt>
@@ -346,6 +326,10 @@ to <code>"none"</code> to disable any annotation.</p></dd>
 <dt>xlim, ylim</dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
+<dt>EICs</dt>
+<dd><p>Internal parameter for now and should be kept at <code>NULL</code> (default).</p></dd>
 
 
 <dt>which</dt>
@@ -368,6 +352,16 @@ to <code>"none"</code> to disable any annotation.</p></dd>
 <dt>averageFunc, normalized</dt>
 <dd><p>Used for intensity data treatment, see the documentation for the
 <code><a href="featureGroups-class.html">as.data.table method</a></code>.</p></dd>
+
+
+<dt>onlyPresent</dt>
+<dd><p>Only plot feature groups of internal standards that are still present in the <code>featureGroups</code>
+input object (which may be otherwise be removed by <em>e.g.</em> subsetting or
+<code><a href="feature-filtering.html">filter</a></code>).</p></dd>
+
+
+<dt>width, height</dt>
+<dd><p>Passed to <code>visNetwork</code>.</p></dd>
 
 
 <dt>set</dt>
@@ -396,8 +390,7 @@ from the used plotting function (see <em>e.g.</em></p>
     <p><code>plot</code> Generates an <em>m/z</em> <em>vs</em> retention time
   plot for all featue groups. Optionally highlights unique/overlapping
   presence amongst replicate groups.</p>
-<p><code>plotInt</code> Generates a line plot for the (averaged) intensity
-  of feature groups within all analyses</p>
+<p><code>plotInt</code> Generates a line plot for the (averaged) intensity of feature groups within all analyses</p>
 <p><code>plotChord</code> Generates a chord diagram which can be used to
   visualize shared presence of feature groups between analyses or replicate
   groups. In addition, analyses/replicates sharing similar properties

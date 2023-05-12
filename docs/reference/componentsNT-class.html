@@ -100,10 +100,10 @@ package.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for componentsNT</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for componentsNTSet</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for componentsNTSet</span></span>
 <span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
@@ -117,6 +117,10 @@ package.</p>
 
 <dt>onlyLinked</dt>
 <dd><p>If <code>TRUE</code> then only components with links are plotted.</p></dd>
+
+
+<dt>width, height</dt>
+<dd><p>Passed to <code>visNetwork</code>.</p></dd>
 
 
 <dt>set</dt>

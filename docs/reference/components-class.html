@@ -150,7 +150,7 @@ findFGroup(obj, fGroup)
 plotSpectrum(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
 
 # S4 method for components
-plotChroms(obj, index, fGroups, rtWindow = 5, ...)
+plotChroms(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
 
 # S4 method for components
 consensus(obj, ...)
@@ -276,13 +276,12 @@ should be a character with the name of the feature group. Setting this to
 
 
 <dt>fGroups</dt>
-<dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
-generate the components.</p></dd>
+<dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to generate the components.</p></dd>
 
 
-<dt>rtWindow</dt>
-<dd><p>Retention window: see the <code>plotChroms</code> method for the
-<code><a href="featureGroups-class.html">featureGroups</a></code> class.</p></dd>
+<dt>EICParams</dt>
+<dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
+<a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
 <dt>sets</dt>
@@ -330,8 +329,7 @@ feature groups for which data is present in this object.</p></li>
 belongs.</p></li>
 <li><p><code>plotSpectrum(components)</code>: Plot a <em>pseudo</em> mass spectrum for a single
 component.</p></li>
-<li><p><code>plotChroms(components)</code>: Plot an extracted ion chromatogram (EIC) for all
-feature groups within a single component.</p></li>
+<li><p><code>plotChroms(components)</code>: Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.</p></li>
 <li><p><code>consensus(components)</code>: Generates a consensus from multiple <code>components</code>
 objects. At this point results are simply combined and no attempt is made to
 merge similar components.</p></li>
@@ -355,6 +353,8 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
     <h2>Note</h2>
     <p><code>filter</code> Applies only those filters for which a component has data available. For instance, filtering by
   adduct will only filter any results within a component if that component contains adduct information.</p>
+<p>For <code>plotChroms</code>: The <code>topMost</code> and <code>topMostByRGroup</code> EIC parameters are ignored unless the
+  components are from homologous series.</p>
     </div>
     <div id="s-class-hierarchy">
     <h2>S4 class hierarchy</h2>

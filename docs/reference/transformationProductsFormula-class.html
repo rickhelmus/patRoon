@@ -101,7 +101,9 @@
 <span>  <span class="va">which</span>,</span>
 <span>  components <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prune <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  onlyCompletePaths <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  height <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -130,6 +132,10 @@ matching the graph with screening results. The TPs that were found will be marke
 <dt>onlyCompletePaths</dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then only pathways are shown for which
 <em>all</em> TPs were detected. See also the <code>prune</code> and <code>components</code> arguments.</p></dd>
+
+
+<dt>width, height</dt>
+<dd><p>Passed to <code>visNetwork</code>.</p></dd>
 
 </dl></div>
     <div id="value">

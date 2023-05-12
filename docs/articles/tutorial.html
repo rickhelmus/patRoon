@@ -154,8 +154,8 @@ detailed overview of <code>patRoon</code>. Instead, it serves as a quick
 introduction on how to use <code>patRoon</code> to setup and perform a
 full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-78e9d3f6d424905a7c20" style="width:750px;height:100px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-78e9d3f6d424905a7c20">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-7009eaf79990e925ea7e" style="width:750px;height:100px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-7009eaf79990e925ea7e">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -330,7 +330,7 @@ code.</p>
 <span><span class="co"># reporting</span></span>
 <span><span class="co"># -------------------------</span></span>
 <span></span>
-<span><span class="fu">report</span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
 <span>       components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -451,7 +451,7 @@ afterwards.</p>
 with default parameters:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fList</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/findFeatures.html">findFeatures</a></span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span>, noiseThrInt <span class="op">=</span> <span class="fl">1000</span>, chromSNR <span class="op">=</span> <span class="fl">3</span>, chromFWHM <span class="op">=</span> <span class="fl">5</span>, minFWHM <span class="op">=</span> <span class="fl">1</span>, maxFWHM <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Verifying if your data is centroided...</span></span>
+<pre><code><span><span class="co">#&gt; Verifying if your data is centroided... Done!</span></span>
 <span><span class="co">#&gt; Finding features with OpenMS for 6 analyses ...</span></span>
 <span><span class="co">#&gt; ================================================================================</span></span>
 <span><span class="co">#&gt; Loading peak intensities for 'solvent-pos-1'...</span></span>
@@ -602,8 +602,8 @@ have a look at generated feature groups and their intensities
 extracted ion chromatograms (EICs) for all feature groups:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>           EICParams <span class="op">=</span> <span class="fu">getDefEICParams</span><span class="op">(</span>topMost <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Verifying if your data is centroided...</span></span></code></pre>
+<span>           EICParams <span class="op">=</span> <span class="fu"><a href="../reference/EICParams.html">getDefEICParams</a></span><span class="op">(</span>topMost <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Verifying if your data is centroided... Done!</span></span></code></pre>
 <p><img src="tutorial_files/figure-html/plotChroms-1.png" width="672"></p>
 <p>Note that we only plot the most intense feature of a feature group
 here (as set by <code>topMost=1</code>). See the reference docs for many
@@ -631,7 +631,7 @@ package to do so:</p>
 <code class="sourceCode R"><span><span class="va">avgPListParams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDefAvgPListParams.html">getDefAvgPListParams</a></span><span class="op">(</span>clusterMzWindow <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
 <span><span class="va">mslists</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateMSPeakLists.html">generateMSPeakLists</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="st">"mzr"</span>, maxMSRtWindow <span class="op">=</span> <span class="fl">5</span>, precursorMzWindow <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>                              avgFeatParams <span class="op">=</span> <span class="va">avgPListParams</span>, avgFGroupParams <span class="op">=</span> <span class="va">avgPListParams</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Verifying if your data is centroided...</span></span>
+<pre><code><span><span class="co">#&gt; Verifying if your data is centroided... Done!</span></span>
 <span><span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-1'...</span></span>
 <span><span class="co">#&gt; ================================================================================</span></span>
 <span><span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-2'...</span></span>
@@ -847,10 +847,10 @@ data from the previous step.</p>
 <h2 id="reporting">Reporting<a class="anchor" aria-label="anchor" href="#reporting"></a>
 </h2>
 <p>The last step of the workflow is typically to report all the data.
-The <code>report()</code> function combines all workflow data in an easy
+The <code><a href="../reference/reporting.html">report()</a></code> function combines all workflow data in an easy
 to use interactive <code>HTML</code> document.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">report</span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
 <span>       components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> If you did <em>not</em> use
@@ -858,8 +858,8 @@ to use interactive <code>HTML</code> document.</p>
 <em>first</em> need to generate a new report settings file:</p>
 </blockquote>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">genReportSettingsFile</span><span class="op">(</span><span class="op">)</span> <span class="co"># only run this if the project was created manually without  newProject() </span></span></code></pre></div>
-<p>The output of <code>report()</code> can be viewed <a href="../examples/report.html">here</a>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">genReportSettingsFile</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># only run this if the project was created manually without  newProject() </span></span></code></pre></div>
+<p>The output of <code><a href="../reference/reporting.html">report()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the
 workflow. This may be especially useful if you want evaluate results
 during optimization or exploring the various algorithms and their
@@ -867,10 +867,10 @@ parameters. In this case you can simply cherry pick the data that you
 want to report, for instance:</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># only report feature groups (i.e. the bare minimum)</span></span>
-<span><span class="fu">report</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting</span></span>
-<span><span class="fu">report</span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="final-script">Final script<a class="anchor" aria-label="anchor" href="#final-script"></a>
@@ -938,7 +938,7 @@ script look similar ot this:</p>
 <span><span class="co"># reporting</span></span>
 <span><span class="co"># -------------------------</span></span>
 <span></span>
-<span><span class="fu">report</span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
+<span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
 <span>       components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <!-- UNDONE: next steps section -->
 </div>

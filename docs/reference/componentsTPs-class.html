@@ -118,7 +118,7 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for componentsTPs</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyLinked <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -166,6 +166,10 @@ formula annotations. Set to <code>NULL</code> to ignore.</p></dd>
 <dt>onlyLinked</dt>
 <dd><p>If <code>TRUE</code> then only components with links are plotted.</p></dd>
 
+
+<dt>width, height</dt>
+<dd><p>Passed to <code>visNetwork</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -185,6 +189,16 @@ formula annotations. Set to <code>NULL</code> to ignore.</p></dd>
 other if one or more transformation products overlap. The graph is constructed with the <span class="pkg">igraph</span> package
 and rendered with <span class="pkg">visNetwork</span>.</p></li>
 </ul></div>
+    <div id="slots">
+    <h2>Slots</h2>
+    
+
+<dl><dt><code>fromTPs</code></dt>
+<dd><p>A <code>logical</code> that is <code>TRUE</code> when the componentization was performed with
+<code><a href="transformationProducts-class.html">transformationProducts</a></code> data.</p></dd>
+
+
+</dl></div>
     <div id="note">
     <h2>Note</h2>
     <p>The intensity values for components (used by <code>plotSpectrum</code>) are set

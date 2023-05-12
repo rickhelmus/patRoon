@@ -219,6 +219,8 @@
 </ul></li>
 <li>Suspects
 <ul><li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
+<li>
+<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>: log if the suspect formula/compound data could not be matched with feature annotations</li>
 </ul></li>
 <li>TPs
 <ul><li>The format of the <code>formulaDiff</code> column in TP component results was changed to more easily identify elemental losses/gains.</li>
@@ -247,6 +249,7 @@
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code> used wrong variable name for suspect list under some conditions (issue <a href="https://github.com/rickhelmus/patRoon/issues/69" class="external-link">#69</a>)</li>
 <li>Fixed: only check if <code>analysis.csv</code> already exists when needed</li>
 <li>Fixed: <code>norm_conc</code> field for analysis information was ignored (reported by Geert Franken)</li>
+<li>Fixed: <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>/<code><a href="../reference/check-GUI.html">checkComponents()</a></code>: disabling a feature/featureGroup in a sorted table would lead to wrong selections</li>
 </ul></li>
 <li>Features
 <ul><li>Fix: OpenMS featureXML files exported for feature grouping now contain analysis file names, which prevents warnings about MS runs not being annotated.</li>
@@ -300,6 +303,7 @@
 <li>Fix: multiprocessing with classic: don’t try to capture output when logging is disabled</li>
 <li>Small fixes and improvements for verification of parameter lists</li>
 <li>Fixed: <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> if the <code>analysisInfo</code> argument is set and <code>outPath</code> is set with a length &gt;1 then the wrong output path could be used.</li>
+<li>Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue <a href="https://github.com/rickhelmus/patRoon/issues/76" class="external-link">#76</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">

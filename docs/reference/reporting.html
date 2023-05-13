@@ -210,10 +210,12 @@ generated during the workflow, such as features, their annotations and TP screen
 <li><p><code>summary</code>: defines the plots on the summary page: <code>chord</code>, <code>venn</code> and/or <code>upset</code>.</p></li>
 <li><p><code>features</code></p><ul><li><p><code>retMin</code>: if <code>true</code> then retention times are reported in minutes.</p></li>
 <li><p><code>chromatograms</code></p><ul><li><p><code>large</code>: inclusion of large chromatograms (used in feature group table and TP parent chromatogram
-         view)</p></li>
-<li><p><code>small</code>: inclusion of small chromatograms (feature group table)</p></li>
+         view).</p></li>
+<li><p><code>small</code>: inclusion of small chromatograms (feature group table).</p></li>
 <li><p><code>features</code>: inclusion of chromatograms for individual features (features view). Set to <code>all</code>
          to also include plots for analyses in which a feature was not found (or removed afterwards).</p></li>
+<li><p><code>intMax</code>: Method to determine the maximum intensity plot range: <code>eic</code> or <code>feature</code>.
+         Sets the <code>intMax</code> argument to <code>plotChroms</code>.</p></li>
 </ul></li>
 <li><p><code>intensityPlots</code>: inclusion of intensity trend plots.</p></li>
 </ul></li>

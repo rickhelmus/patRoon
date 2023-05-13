@@ -32,6 +32,7 @@ setMethod("collapseComponents", "componentsNTSet", function(obj)
 })
 
 #' @rdname componentsNT-class
+#' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
 #' @export
 setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked = TRUE, set, ...) plotGraph(unset(obj, set), onlyLinked = onlyLinked, ...))
 

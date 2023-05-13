@@ -28,6 +28,8 @@
 \item{width, height}{Passed to \code{\link{visNetwork}}.}
 
 \item{set}{\setsWF The name of the set.}
+
+\item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 }
 \value{
 \code{plotGraph} returns the result of \code{\link{visNetwork}}.

@@ -1,6 +1,8 @@
 #include <fstream>
 #include <string>
 
+#include <Rcpp.h>
+
 #include "utils-xml.h"
 #include "utils.h"
 
@@ -31,4 +33,34 @@ void parseXMLFile(const char *file, const std::string &startTag,
             block.clear();
         }
     }
+}
+
+// [[Rcpp::export]]
+void addFilesToOpenMSIni(const std::string &file, const std::vector<std::string> &inFiles,
+                         const std::vector<std::string> &outFiles)
+{
+    pugi::xml_document doc;
+    const auto result = doc.load_file(file.c_str());
+    
+    if (!result)
+        Rcpp::stop("Failed to parse XML file ('%s'): %s", file, result.description());
+    
+    auto nodeEl = doc.child("PARAMETERS").child("NODE").child("NODE");
+
+    const auto addFiles = [&](const std::vector<std::string> &files, const char *itemName)
+    {
+        auto el = nodeEl.find_child_by_attribute("ITEMLIST", "name", itemName);
+        for (auto &f : files)
+        {
+            auto fileElAttr = el.append_child("LISTITEM").append_attribute("value");
+            fileElAttr.set_value(f.c_str());
+        }
+    };
+        
+    if (!inFiles.empty())
+        addFiles(inFiles, "in");
+    if (!outFiles.empty())
+        addFiles(outFiles, "out");
+    
+    doc.save_file(file.c_str());
 }

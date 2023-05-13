@@ -201,6 +201,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// addFilesToOpenMSIni
+void addFilesToOpenMSIni(const std::string& file, const std::vector<std::string>& inFiles, const std::vector<std::string>& outFiles);
+RcppExport SEXP _patRoon_addFilesToOpenMSIni(SEXP fileSEXP, SEXP inFilesSEXP, SEXP outFilesSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type inFiles(inFilesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type outFiles(outFilesSEXP);
+    addFilesToOpenMSIni(file, inFiles, outFiles);
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
@@ -217,6 +229,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},
     {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
+    {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
     {NULL, NULL, 0}
 };
 

@@ -102,13 +102,23 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
     sGroup <- analysisInfo(feat)
     fts <- featureTable(feat)
 
-    edtaFiles <- list()
-    featFiles <- list()
+    getIni <- function(cmd, inFiles, outFiles)
+    {
+        iniFile <- tempfile(fileext = ".ini")
+        executeCommand(cmd, c("-write_ini", iniFile), stdout = FALSE, stderr = FALSE)
+        addFilesToOpenMSIni(iniFile, inFiles, outFiles)
+        return(iniFile)
+    }
+    
+    featFiles <- character()
     for (datafile in sGroup$analysis)
     {
-        featFiles[[datafile]] <- tempfile(datafile, fileext = ".featureXML")
-        writeFeatureXML(fts[[datafile]], datafile, featFiles[[datafile]], FALSE)
+        featFiles[datafile] <- tempfile(datafile, fileext = ".featureXML")
+        writeFeatureXML(fts[[datafile]], datafile, featFiles[datafile], FALSE)
     }
+    
+    # NOTE: we use ini files to specify the input/output files below to avoid troubles on Windows with large number of
+    # analyses, see https://github.com/OpenMS/OpenMS/issues/6845
 
     if (rtalign)
     {
@@ -122,8 +132,10 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
             settings <- modifyList(settings, extraOptsRT)
         
         ftNonEmpty <- sapply(fts, nrow) > 0
-        executeCommand(getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS"),
-                       c(OpenMSArgListToOpts(settings), "-in", featFiles[ftNonEmpty], "-out", featFiles[ftNonEmpty]),
+        
+        cmd <- getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS")
+        iniFile <- getIni(cmd, featFiles[ftNonEmpty], featFiles[ftNonEmpty])
+        executeCommand(cmd, c(OpenMSArgListToOpts(settings), "-ini", iniFile),
                        stdout = if (verbose) "" else FALSE,
                        stderr = if (verbose) "" else FALSE)
     }
@@ -134,8 +146,9 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
     if (!is.null(extraOptsGroup))
         settings <- modifyList(settings, extraOptsGroup)
     
-    executeCommand(getCommandWithOptPath(if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled", "OpenMS"),
-                   c(OpenMSArgListToOpts(settings), "-in", featFiles, "-out", out),
+    cmd <- getCommandWithOptPath(if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled", "OpenMS")
+    iniFile <- getIni(cmd, featFiles, character())
+    executeCommand(cmd, c(OpenMSArgListToOpts(settings), "-ini", iniFile, "-out", out),
                    stdout = if (verbose) "" else FALSE,
                    stderr = if (verbose) "" else FALSE)
 }

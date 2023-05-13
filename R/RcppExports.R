@@ -57,3 +57,7 @@ calcSpecSimilarity <- function(sp1, sp2, method, shift, precDiff, mzWeight, intW
     .Call(`_patRoon_calcSpecSimilarity`, sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow)
 }
 
+addFilesToOpenMSIni <- function(file, inFiles, outFiles) {
+    invisible(.Call(`_patRoon_addFilesToOpenMSIni`, file, inFiles, outFiles))
+}
+

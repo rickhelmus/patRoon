@@ -5,7 +5,7 @@
 
 #include <Rcpp.h>
 
-#include "parse-xml.h"
+#include "utils-xml.h"
 
 namespace {
 

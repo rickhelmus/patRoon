@@ -1,7 +1,7 @@
 #include <fstream>
 #include <string>
 
-#include "parse-xml.h"
+#include "utils-xml.h"
 #include "utils.h"
 
 // startTag: uses partial match (prefix) as tag may contain attributes etc

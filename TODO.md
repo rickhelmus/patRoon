@@ -7,7 +7,6 @@
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
 - get rid of magrittr dependency?
-- bug?: mergeScreeningSetInfos() fragments_formula shouldn't be in unCols?
 
 ## Reporting
 

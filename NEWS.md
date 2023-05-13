@@ -168,6 +168,7 @@ Suspects
         - Fixes for consensus annotation results (issue #54)
         - Sets workflows now separate log files for each set.
         - Fixed: annotation similarities didn't properly handle results from `generateCompoundsLibrary()` if the library did not contain peak formula annotations.
+    - Fixed: In sets workflows the `fragments_formula` was not split per set in the screening results.
 - TPs
     - Fixed: Set specific spectral similarities were not assigned correctly during TP componentization if a feature group occurs multiple times in the same component
 - Fix: multiprocessing with classic: don't try to capture output when logging is disabled

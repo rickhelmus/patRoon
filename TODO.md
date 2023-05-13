@@ -14,19 +14,8 @@
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 
 
-## Components
-
-- makeGraph(): throw or not throw an error with empty components and onlyLinked=T
-
-
 ## Features
 
-- Normalization
-    - maybe: allow usage of normalized intensities with filter()?
-    - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
-    - reportHTML: report normalized intensities in featInfo?
-    - normInts(): default normFunc OK? and others?
-        - update newProject() for any changes
 - Screening
     - sets: warn that re-grouping (adduct()<- / selectIons) will discard screening results
         - or somehow handle this? re-screen? although original suspects will be lost...
@@ -41,36 +30,15 @@
 
 - newProject()
     - selector for CTS transLibrary?
-- plotGraph()
-    - keep duplicate selector?
 
 
 ## MS library
 
-- library
-    - fixup annotation formulas too?
-        - for now a little bit in C++ fixAnnFormula(), maybe implement verifyFormulas() in C++ someday?
-    - also verify formulas of adducts?
-        - would be nice in general to check for user input, but for now calculateMasses(err=FALSE) seems to suffice
-    - Column name harmonization
-        - More column names?
-        - Make option in as.data.table() to enable/disable name harmonization?
-    - sanitize input
-        - MoNA: take calculated SMILES? See e.g. "PR308903" and "PR308904"
-            - now prohibited since first value is always taken
-            - however, for these examples the SMILES are fixed by the InChI-->SMILES conversion in prepareChemTable()
-    - future
-        - plotSpectrum, plotVenn, same data format for MSPeakLists
-- compounds
-    - show mirror spectrum in report?
-        - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
-    - collapse with IK1?
-        - yes for now, as e.g. sets and consensus expects this (UID column)
 - prepareChemTable()
     - skip/warn if obabel is not available?
 
 
-# Lower priority
+# Low priority
 
 
 ## General
@@ -80,7 +48,6 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
     - Remove necessity to have different input/output formats? (at least OK for pwiz)
-- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
 - delete() for other classes
 - generalize makeLegend() to new plot util
 
@@ -98,13 +65,15 @@
 	    - check better for what is supported by SIRIUS?
 - import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
 - getEICsForFeatures method for kpic2?
-- optimize hashing? Or further avoid hashing big objects/objects with lists?
 - load OpenMS intensities in parallel
     - either with futures or with MP and cache intensities afterwards
 - XCMS: multiple features grouped in same analysis?
     - can be, but now handled by default method="medret" param. Make this configurable?
 - updatePICSet(): also sync peaks list? otherwise doc
 - Somehow integrate XCMS::fillChromPeaks
+- Normalization
+    - maybe: allow usage of normalized intensities with filter()?
+    - find another way to assign close/far ISTDs: if there are multiple close ones available, it makes more sense to not consider those that are a bit far away.
 
 
 ## Annotation
@@ -124,29 +93,15 @@
     - cliqueMS
         - change checkPackage GH link once PRs are merged
         - maxCharge --> chargeMax (same as OpenMS)? update docs
-        - apply sort fix? https://github.com/osenan/cliqueMS/issues/8
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
 - int and others: also use calculateComponentIntensities() for intensities?
-- plot doesnt work for componentsReduced that originates from cluster components
-    - maybe drop reduced mechanism?
 - intclust
     - optionally take areas instead of intensities
     - cache results
 - import check sessions?
     - needs way to match component names
     
-
-## TPs
-
-- predictTPsBioTransformer()
-    - do we still need to check for non-calculated formulae?
-- spectrumSimilarity
-    - defaults OK for sim params?
-        - precursor FALSE?
-        - thresholds not really handy for formulas/compounds
-            - at least doc that annotation results may disappear
-
 
 ## tests
 
@@ -160,29 +115,19 @@
     - syncing of XCMS/KPIC2 objects
     - check if featindex and groups slots are in sync with features
     - subsetting and groupScores
-    - as.data.table: normalization?
     - plotInt sets arg?
 - components: somehow verify adductConflictsUsePref
 
+## MS library
 
-## docs
-
-- ref docs
-    - delete()
-        - mention j=DT for fGroups method?
-    - order of sets sections
-- handbook
-    - TPs
-        - add MSPL filtering of annotated peaks (in examples)?
-    - update
-        - introduction
-            - mention changes of patRoon 2.0?
-- tutorial
-    - check if all is OK
-- TPs
-    - doc that merging TPs (same fGroup/TP) could be done with suspect screening
-    - logic: mention results can be filtered with TP components?
-    - mention how sets filter work for componentsTPs?
+- library
+    - fixup annotation formulas too?
+        - for now a little bit in C++ fixAnnFormula(), maybe implement verifyFormulas() in C++ someday?
+    - future
+        - plotSpectrum, plotVenn, same data format for MSPeakLists
+- compounds
+    - show mirror spectrum in report?
+        - Would need library data somehow --> perhaps compoundsLibrary can include averaged lib spectra
 
 
 # Future

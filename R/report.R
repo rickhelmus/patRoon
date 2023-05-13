@@ -68,12 +68,15 @@ NULL
 #'      \item \code{chromatograms} \itemize{
 #'
 #'          \item \code{large}: inclusion of large chromatograms (used in feature group table and TP parent chromatogram
-#'          view)
+#'          view).
 #'
-#'          \item \code{small}: inclusion of small chromatograms (feature group table)
+#'          \item \code{small}: inclusion of small chromatograms (feature group table).
 #'
 #'          \item \code{features}: inclusion of chromatograms for individual features (features view). Set to \code{all}
 #'          to also include plots for analyses in which a feature was not found (or removed afterwards).
+#'          
+#'          \item \code{intMax}: Method to determine the maximum intensity plot range: \code{eic} or \code{feature}.
+#'          Sets the \code{intMax} argument to \code{plotChroms}.
 #'
 #'      }
 #'

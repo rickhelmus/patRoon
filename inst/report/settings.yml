@@ -8,7 +8,7 @@ summary: [ chord, venn, upset ]
 features:
     retMin: true
     chromatograms:
-        large: true # used for feature group table and parent chromatogram view
+        large: true
         small: true
         features: false
         intMax: eic

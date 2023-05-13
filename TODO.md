@@ -11,7 +11,6 @@
 
 ## Reporting
 
-- keep feature chroms enabled by default?
 - get rid of pngquant
     - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 

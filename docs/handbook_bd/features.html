@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-05-13" />
+<meta name="date" content="2023-05-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -351,8 +351,8 @@ div.csl-indent {
 <div id="features" class="section level2 hasAnchor" number="4.3">
 <h2><span class="header-section-number">4.3</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-f66bbc5193ad6d4ca8d1" style="width:500px;height:70px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-f66bbc5193ad6d4ca8d1">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0feef3aae221f5442f91" style="width:500px;height:70px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-0feef3aae221f5442f91">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3 hasAnchor" number="4.3.1">
 <h3><span class="header-section-number">4.3.1</span> Finding and grouping features<a href="features.html#finding-and-grouping-features" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -599,7 +599,7 @@ div.csl-indent {
 #&gt; ================================================================================
 #&gt; Found 3/3 suspects (100.00%)</code></pre>
 <blockquote>
-<p><strong><em>NOTE</em></strong>: It is highly recommended to install <a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a> to automatically validate and amend chemical properties such as SMILES, InChI, formulae etc in the suspect list.</p>
+<p><strong><em>NOTE</em></strong>: It is highly recommended to install <a href="https://github.com/openbabel/openbabel">OpenBabel</a> to automatically validate and amend chemical properties such as SMILES, InChI, formulae etc in the suspect list.</p>
 </blockquote>
 <p>Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the <code>adduct</code> function argument to <code>screenSuspects</code> or by <a href="incorpAdductIso.html#incorpAdductIso">feature group adduct annotations</a>.</p>
 <p>Finally, when the adduct is known for a suspect it can be specified in the suspect list:</p>

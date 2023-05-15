@@ -42,7 +42,7 @@
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [JavaJDK]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [pngquant]: https://pngquant.org/
-[OpenBabel]: http://openbabel.org/wiki/Main_Page
+[OpenBabel]: https://github.com/openbabel/openbabel
 [Docker]: https://www.docker.com/
 [RStudio]: https://rstudio.com/
 [issues]: https://github.com/rickhelmus/patRoon/issues

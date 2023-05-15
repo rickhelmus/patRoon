@@ -1,3 +1,8 @@
+# DEVEL
+
+* `loadMSLibrary()`: improve compatibility with more `.msp` flavors (issue #72).
+
+
 # patRoon 2.2
 
 This release adds significant new functionality, several important changes and many bug fixes thanks to user feedback.

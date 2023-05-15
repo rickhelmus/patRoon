@@ -137,16 +137,35 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                 
                 if (key == "Num Peaks")
                 {
-                    for (int n = std::stoi(val); n; --n)
+                    bool getMZ = true;
+                    const char *separators = " \t,;:()[]{}"; // separators from NIST manual
+                    int numPeaks = std::stoi(val);
+                    while (numPeaks && std::getline(fs, line))
                     {
-                        // UNDONE: MSP also allows other formats than one space separated pair per line
-                        std::string m, i;
-                        fs >> m >> i;
-                        
-                        curRec.spectrum.mzs.push_back(stod(m));
-                        curRec.spectrum.intensities.push_back(stod(i));
+                        const auto lineLen = line.length();
+                        std::string::size_type startPos = 0, endPos = 0;
+                        do
+                        {
+                            endPos = line.find_first_of(separators, startPos);
+                            const std::string s = line.substr(startPos, endPos - startPos);
+                            startPos = endPos + 1;
+                            
+                            if (s[0] == '"')
+                                break; // annotation string --> not supported yet, they seem to be at the end of the line so just skip everything
+
+                            const double val = stod(s);
+                            if (getMZ)
+                                curRec.spectrum.mzs.push_back(val);
+                            else
+                            {
+                                curRec.spectrum.intensities.push_back(val);
+                                --numPeaks;
+                            }
+                            getMZ = !getMZ;
+                        } while (endPos != std::string::npos && (startPos + 1) < lineLen);
+                        // UNDONE: sort peaks?
                     }
-                    
+
                     // NOTE: Num Peaks is always the last entry, finish up record
                     
                     // Parse comments?
@@ -162,6 +181,13 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                         parseComment(com, "ChemSpiderID", curRec, "chemspider");
                         parseComment(com, "Ionization", curRec, "ionization");
                         parseComment(com, "Resolution", curRec, "resolution");
+                    }
+                    
+                    // ensure there is a DB_ID
+                    if (curRec.values.count("DB_ID") == 0)
+                    {
+                        addKey("DB_ID");
+                        curRec.values.insert({std::string("DB_ID"), std::string("ID") + std::to_string(records.size() + 1)});
                     }
                     
                     records.push_back(curRec);

@@ -22,7 +22,7 @@ The most significant change in this release is the addition of redesigned report
 * The generation of plots and other reporting data was optimized, and can be further speed up by parallelization.
 * Caching of report data was significantly optimized, which makes re-generating reports with partially changed data/parameters much faster.
 * Due to these optimizations, the default number of annotation candidates was increased from 5 to 25.
-* Chromatograms are (by default) plotted also for individual features. In addition, it is also possible to add plots of EICs in analyses where no feature was found, which makes it easy to spot any features that were not detected (or filtered out).
+* Chromatograms can now also be plotted for individual features. In addition, it is also possible to add plots of EICs in analyses where no feature was found, which makes it easy to spot any features that were not detected (or filtered out).
 * The configuration of reporting parameters was simplified and is now achieved through a `YAML` file.
 * And many other improvements...
 

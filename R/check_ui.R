@@ -61,7 +61,7 @@ getUISettings <- function(fileName, default)
 saveUISettings <- function(fileName, settings)
 {
     settings$version <- 1 # just store for now, in case if ever needed in the future
-    yaml::write_yaml(settings, getUISettingsPath(fileName), indent = 4)
+    writeYAML(settings, getUISettingsPath(fileName))
 }
 
 readCheckSession <- function(session, type)
@@ -88,7 +88,7 @@ saveCheckSession <- function(session, path, fGroups, type)
                                     function(grp) list(ret = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"]),
                                     simplify = FALSE)
     
-    yaml::write_yaml(session, path)
+    writeYAML(session, path)
 }
 
 importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow)

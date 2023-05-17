@@ -1,6 +1,7 @@
 # DEVEL
 
 * `loadMSLibrary()`: improve compatibility with more `.msp` flavors (issue #72).
+* `newProject()`: save/load parameters to reproduce subsequent project creations (issue #61)
 
 
 # patRoon 2.2

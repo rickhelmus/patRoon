@@ -566,6 +566,7 @@ getHighestAbsValue <- function(abs, rel, size)
 }
 
 readYAML <- function(f) yaml::read_yaml(f, eval.expr = FALSE)
+writeYAML <- function(...) yaml::write_yaml(..., indent = 4)
 
 # get a vector of all (merged) columns
 getAllMergedConsCols <- function(targetCols, allCols, mConsNames)

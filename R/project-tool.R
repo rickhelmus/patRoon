@@ -799,6 +799,10 @@ getNewProjectUI <- function(destPath)
                             radioButtons("ionization", "Ionization", c("positive", "negative", "both (sets)" = "both"))
                         )
                     )
+                ),
+                miniUI::miniButtonBlock(
+                    actionButton("loadParams", "Load parameters"),
+                    actionButton("saveParams", "Save parameters")
                 )
             ),
             
@@ -1192,6 +1196,95 @@ getNewProjectUI <- function(destPath)
     )
 }
 
+getNewProjectWidgetTypes <- function()
+{
+    list(
+        outputScriptTo = "radio",
+        scriptFile = "text",
+        createRStudioProj = "check",
+        ionization = "radio",
+        analysisTableFile = "text",
+        analysisTableFilePos = "text",
+        analysisTableFileNeg = "text",
+        convAlgo = "select",
+        convFrom = "select",
+        convTo = "select",
+        peakPicking = "check",
+        peakPickingVendor = "check",
+        DAMethod = "text",
+        DAMethodPos = "text",
+        DAMethodNeg = "text",
+        doDACalib = "check",
+        featFinder = "select",
+        featGrouper = "select",
+        suspectList = "text",
+        suspectListPos = "text",
+        suspectListNeg = "text",
+        exSuspList = "check",
+        preIntThr = "numeric",
+        intThr = "numeric",
+        repAbundance = "numeric",
+        maxRepRSD = "numeric",
+        blankThr = "numeric",
+        "retention-min" = "numeric",
+        "retention-max" = "numeric",
+        "mz-min" = "numeric",
+        "mz-max" = "numeric",
+        removeBlanks = "check",
+        featNorm = "select",
+        groupNorm = "check",
+        ISTDList = "text",
+        ISTDListPos = "text",
+        ISTDListNeg = "text",
+        components = "select",
+        selectIons = "check",
+        formulaGen = "select",
+        compIdent = "select",
+        peakListGen = "select",
+        DIA = "check",
+        precursorMzWindow = "numeric",
+        MSLibraryFormat = "select",
+        MSLibraryPath = "text",
+        annotateSus = "check",
+        genIDLevelFile = "check",
+        doTPs = "check",
+        TPGen = "select",
+        TPGenInput = "select",
+        TPSuspectList = "text",
+        TPDoMFDB = "check",
+        reportGen = "checkGroup",
+        reportLegacy = "checkGroup"
+    )
+}
+
+loadNewProjectParams <- function(file, input, session)
+{
+    wtypes <- getNewProjectWidgetTypes()
+    values <- readYAML(file)
+    for (param in names(values))
+    {
+        if (wtypes[[param]] == "radio")
+            updateRadioButtons(session, param, selected = values[[param]])
+        else if (wtypes[[param]] == "text")
+            updateTextInput(session, param, value = values[[param]])
+        else if (wtypes[[param]] == "check")
+            updateCheckboxInput(session, param, value = values[[param]])
+        else if (wtypes[[param]] == "checkGroup")
+            updateCheckboxGroupInput(session, param, selected = values[[param]])
+        else if (wtypes[[param]] == "select")
+            updateSelectInput(session, param, selected = values[[param]])
+        else if (wtypes[[param]] == "numeric")
+            updateNumericInput(session, param, value = values[[param]])
+    }
+}
+
+saveNewProjectParams <- function(file, input)
+{
+    values <- getNewProjectWidgetTypes()
+    values <- isolate(reactiveValuesToList(input))[names(values)]
+    writeYAML(values, file)
+}
+
 #' Easily create new \pkg{patRoon} projects
 #' 
 #' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
@@ -1348,7 +1441,7 @@ newProject <- function(destPath = NULL)
             else if (input$generateAnaInfo %in% c("table", "script") && !verifyAnalysesOK())
             {}
             else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
-                     !rstudioapi::showQuestion("Script file already exists:",
+                     !rstudioapi::showQuestion("Script file already exists",
                                                sprintf("Script file already exists: '%s'.\nOverwrite?",
                                                        file.path(input$destinationPath, input$scriptFile)),
                                                "Yes", "No"))
@@ -1373,6 +1466,18 @@ newProject <- function(destPath = NULL)
             dest <- rstudioapi::selectDirectory("Select destination directory", path = input$destinationPath)
             if (!is.null(dest))
                 updateTextInput(session, "destinationPath", value = dest)
+        })
+        
+        observeEvent(input$loadParams, {
+            sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)")
+            if (!is.null(sl))
+                loadNewProjectParams(sl, input, session)
+        })
+        
+        observeEvent(input$saveParams, {
+            sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)", existing = FALSE)
+            if (!is.null(sl))
+                saveNewProjectParams(sl, input)
         })
         
         doObserveAnaHot <- function(name, rvName)

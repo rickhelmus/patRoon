@@ -354,8 +354,6 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     fgSMILESTab[, conc_M := NA_real_]
     fgSMILESTab[, area := 1] # NOTE: we set the area to one to effectively get the response factor
     
-    # NOTE: we set the area to one to effectively get the response factor
-    
     # UNDONE: would be nice if we could just pass table directly
     quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, fgSMILESTab, fill = TRUE), quantFile)
     eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)

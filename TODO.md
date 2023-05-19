@@ -27,6 +27,25 @@
     - would make sense, but might break eg suspect annotation ranks
 - docs
     - SIRIUS formulas/compound class
+    - refs to OpenBabel for predictConc()
+    - concentrations slot
+- target RFs: those that are specified by user in a suspect list, to be used directly by predictConc()
+- assert args in predictRespFactor()/predictConc() methods, doFeatAnnPredictRFSets()
+- predictRespFactor()
+    - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
+    - cache
+    - make calibration DF format
+        - rename colnames for consistency (name, ret)
+        - make area more generic? or include both, where one is optional?
+        - conc_M --> auto calculate from mass conc
+- predictConc()
+    - clear out previous concentrations
+    - make mass conc unit configurable eg as factor, 1E6 for ug/l, 1E9 for ng/l etc?
+    - generalize conc columns (concMol, concMass?)
+    - cache?
+- MS2Quant
+    - PR to allow DFs in addition to CSVs
+
 
 ## General
 

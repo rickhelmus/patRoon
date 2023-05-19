@@ -229,7 +229,6 @@ finalizeFeatureConcsTab <- function(concs)
     setcolorder(concs, co)
     setorderv(concs, c("group", "type"))
     return(concs)
->>>>>>> e50ad55e (various WIP [skip ci])
 }
 
 doPredictConcSets <- function(fGroups, featureAnn)

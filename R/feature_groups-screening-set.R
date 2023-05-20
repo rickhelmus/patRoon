@@ -397,7 +397,7 @@ setMethod("predictRespFactor", "featureGroupsScreeningSet", function(obj, calibr
 })
 
 #' @export
-setMethod("predictConc", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
+setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
 {
     # dummy method so that featureAnn can default to NULL
     callNextMethod(fGroups, featureAnn)

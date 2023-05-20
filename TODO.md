@@ -29,14 +29,14 @@
     - would make sense, but might break eg suspect annotation ranks
 - docs
     - SIRIUS formulas/compound class
-    - refs to OpenBabel for predictConc()
+    - refs to OpenBabel for calculateConcs()
     - concentrations slot
-- target RFs: those that are specified by user in a suspect list, to be used directly by predictConc()
+- target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
 - predictRespFactor()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache
-- predictConc()
     - clear out previous concentrations
+- calculateConcs()
     - mass conc unit arg
     - generalize conc columns (concMol, concMass?)
     - cache?

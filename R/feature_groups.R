@@ -1380,7 +1380,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 })
 
 #' @export
-setMethod("predictConc", "featureGroups", function(fGroups, featureAnn)
+setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
 {
     # UNDONE: cache results --> cache per SMILES/FP
     # UNDONE: clear out previous calculations

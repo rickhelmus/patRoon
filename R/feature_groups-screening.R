@@ -222,7 +222,7 @@ setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrant
 })
 
 #' @export
-setMethod("predictConc", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
+setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
 {
     if (!is.null(featureAnn) && length(featureAnn) > 0)
         fGroups <- callNextMethod()

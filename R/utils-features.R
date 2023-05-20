@@ -246,7 +246,7 @@ doPredictConcSets <- function(fGroups, featureAnn)
     {
         # just from screening info
         usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-        usFGroups <- sapply(usFGroups, predictConc, simplify = FALSE)
+        usFGroups <- sapply(usFGroups, calculateConcs, simplify = FALSE)
     }
     else
     {
@@ -260,7 +260,7 @@ doPredictConcSets <- function(fGroups, featureAnn)
         }
         
         usFGroups <- sapply(names(usFeatAnns), unset, obj = fGroups, simplify = FALSE)
-        usFGroups <- Map(usFGroups, usFeatAnns, f = predictConc)
+        usFGroups <- Map(usFGroups, usFeatAnns, f = calculateConcs)
     }
     
     usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@concentrations) > 0)]

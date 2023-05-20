@@ -386,7 +386,9 @@ setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm,
 #' @export
 setMethod("predictConc", "featureGroupsSet", function(fGroups, featureAnn)
 {
-    # UNDONE: check args
+    # set null.ok to TRUE here to allow calculations from screening results. The non-sets methods called by
+    # doPredictConcSets will assert !NULL if needed.
+    checkmate::assertClass(featureAnn, c("formulasSet", "compoundsSet"), null.ok = TRUE)
     
     return(doPredictConcSets(fGroups, featureAnn))
 })

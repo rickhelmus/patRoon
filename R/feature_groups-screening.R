@@ -190,9 +190,17 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 })
 
 #' @export
-setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq)
+setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
+                                                                  massConcUnit = "ugL")
 {
-    # UNDONE: verify args
+    ac <- checkmate::makeAssertCollection()
+    assertQuantEluent(eluent, add = ac)
+    checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
+    checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
+    assertMassConcUnit(massConcUnit, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
 
     scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))

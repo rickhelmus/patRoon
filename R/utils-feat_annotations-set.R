@@ -488,7 +488,8 @@ doFeatAnnMCNSetsCons <- function(obj, sets)
 
 doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
 {
-    # UNDONE: verify args: fGroupsSet, calibrants is a list with dfs
+    checkmate::assertClass(fGroups, "featureGroupsSet")
+    checkmate::assertList(calibrants, any.missing = FALSE, types = "data.frame", len = length(sets(fGroups)))
     
     unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
     obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactor, MoreArgs = list(...))

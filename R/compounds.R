@@ -568,9 +568,19 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 
 #' @export
 setMethod("predictRespFactor", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                     updateScore = FALSE, scoreWeight = 1)
+                                                     massConcUnit = "ugL", updateScore = FALSE, scoreWeight = 1)
 {
-    # UNDONE: verify args
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    assertQuantEluent(eluent, add = ac)
+    checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
+    checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
+    assertMassConcUnit(massConcUnit, add = ac)
+    checkmate::assertFlag(updateScore, add = ac)
+    checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {

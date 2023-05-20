@@ -1382,9 +1382,10 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 #' @export
 setMethod("predictConc", "featureGroups", function(fGroups, featureAnn)
 {
-    # UNDONE: check args
     # UNDONE: cache results --> cache per SMILES/FP
     # UNDONE: clear out previous calculations
+    
+    checkmate::assertClass(featureAnn, c("formulas", "compounds"))
     
     if (length(fGroups) == 0)
     {

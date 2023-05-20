@@ -122,9 +122,18 @@ setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
 })
 
 #' @export
-setMethod("predictRespFactor", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq)
+setMethod("predictRespFactor", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                          massConcUnit = "ugL")
 {
-    # UNDONE: verify args
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    assertQuantEluent(eluent, add = ac)
+    checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
+    checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
+    assertMassConcUnit(massConcUnit, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
     
     resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
     

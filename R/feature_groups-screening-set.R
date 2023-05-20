@@ -387,7 +387,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @export
 setMethod("predictRespFactor", "featureGroupsScreeningSet", function(obj, calibrants, ...)
 {
-    # UNDONE: verify args: calibrants is a list with dfs
+    checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(obj))
     
     obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactor, MoreArgs = list(...))
     obj <- syncScreeningSetObjects(obj)

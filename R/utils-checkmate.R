@@ -684,6 +684,15 @@ assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
     return(calibration[])
 }
 
+checkQuantEluent <- function(x)
+{
+    ret <- checkmate::checkDataFrame(x, any.missing = FALSE, ncols = 2, types = "numeric")
+    if (isTRUE(ret))
+        ret <- checkHasNames(x, c("time", "B"))
+    return(ret)
+}
+assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

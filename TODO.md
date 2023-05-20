@@ -32,7 +32,6 @@
     - refs to OpenBabel for predictConc()
     - concentrations slot
 - target RFs: those that are specified by user in a suspect list, to be used directly by predictConc()
-- assert args in predictRespFactor()/predictConc() methods, doFeatAnnPredictRFSets()
 - predictRespFactor()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache

@@ -31,13 +31,14 @@
     - SIRIUS formulas/compound class
     - refs to OpenBabel for calculateConcs()
     - concentrations slot
+    - clarify that intrnsity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
 - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
 - predictRespFactor()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache
+    - somehow verify eluents variable? gives strange errors if eg time unit is wrong
 - calculateConcs()
     - cache?
-    - arg to specify usage of areas or intensities
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

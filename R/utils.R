@@ -650,6 +650,6 @@ doApply <- function(applyf, doPar, data, ...)
 calibrantsToMS2QuantFormat <- function(calibrants)
 {
     calibrants <- copy(calibrants)
-    setnames(calibrants, c("name", "rt", "concMol"), c("identifier", "retention_time", "conc_M"))
+    setnames(calibrants, c("name", "rt", "intensity", "concMol"), c("identifier", "retention_time", "area", "conc_M"))
     return(calibrants)
 }

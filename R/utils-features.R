@@ -217,10 +217,11 @@ massConcUnitBase <- function(mcu)
                   ngL = 1E-9))
 }
 
-calcFeatureConcs <- function(fGroups, resp, massConcUnit)
+calcFeatureConcs <- function(fGroups, resp, areas, massConcUnit)
 {
     # get concentration data from response factors
-    gt <- transpose(groupTable(fGroups)[, resp$group, with = FALSE])
+    
+    gt <- transpose(groupTable(fGroups, areas = areas)[, resp$group, with = FALSE])
     setnames(gt, analyses(fGroups))
     
     concs <- copy(resp)

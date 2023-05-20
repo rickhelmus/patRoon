@@ -222,8 +222,10 @@ setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrant
 })
 
 #' @export
-setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, massConcUnit = "ugL")
+setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE,
+                                                               massConcUnit = "ugL")
 {
+    checkmate::assertFlag(areas)
     assertMassConcUnit(massConcUnit)
     
     if (!is.null(featureAnn) && length(featureAnn) > 0)
@@ -245,7 +247,7 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
     resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
     setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
     
-    concs <- calcFeatureConcs(fGroups, resp, massConcUnit)
+    concs <- calcFeatureConcs(fGroups, resp, areas, massConcUnit)
     # assign and collapse candidate names
     concs[, candidate_name := paste0(unique(scr[SMILES == candidate &
                                              group == get("group", envir = parent.env(environment()))]$name), collapse = ","),

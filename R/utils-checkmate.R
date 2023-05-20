@@ -631,6 +631,55 @@ assertAndPrepareReportSettings <- function(settings)
     return(settings)
 }
 
+checkMassConcUnit <- function(x) checkmate::checkChoice(x, c("gL", "mgL", "ugL", "ngL"))
+assertMassConcUnit <- checkmate::makeAssertionFunction(checkMassConcUnit)
+
+assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
+{
+    checkmate::assertDataFrame(calibration, any.missing = FALSE)
+    
+    calibration <- if (is.data.table(calibration)) copy(calibration) else as.data.table(calibration)
+    
+    ac <- checkmate::makeAssertCollection()
+    
+    coln <- names(calibration)
+    
+    maybeTakeMS2QCol <- function(mcol, pcol)
+    {
+        if (!pcol %in% coln && mcol %in% coln)
+        {
+            printf("NOTE: using MS2Quant column '%s' for '%s'\n", mcol, pcol)
+            setnames(calibration, mcol, pcol)
+        }
+    }
+
+    maybeTakeMS2QCol("identifier", "name")
+    maybeTakeMS2QCol("retention_time", "rt")
+    maybeTakeMS2QCol("area", "intensity") # UNDONE?
+    maybeTakeMS2QCol("conc_M", "concMol")
+
+    if (!any(c("concMol", "concMass") %in% coln))
+        stop("The calibration table must contain a concMol or concMass column", call. = FALSE)
+    
+    assertHasNames(calibration, c("name", "SMILES", "rt", "intensity"), add = ac)
+    
+    for (col in c("name", "SMILES"))
+        assertListVal(calibration, col, checkmate::assertCharacter, any.missing = FALSE, add = add)
+    for (col in c("rt", "intensity", "concMol", "concMass"))
+        assertListVal(calibration, col, checkmate::assertNumeric, mustExist = !col %in% c("concMol", "concMass"),
+                      lower = if (col != "rt") 0 else -Inf, finite = TRUE, add = add)
+    
+    checkmate::reportAssertions(ac)
+    
+    if (!"concMol" %in% coln && "concMass" %in% coln)
+    {
+        calibration[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
+        calibration[, concMol := (concMass * massConcUnitBase(massConcUnit)) / MW]
+    }
+    
+    return(calibration[])
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

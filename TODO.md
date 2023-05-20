@@ -23,6 +23,8 @@
 - show() for annotation classes with predictions?
 - use RF to also score formulas?
     - general score mechanism currently not there
+- don't allow update scoring for SIRIUS compounds?
+    - currently not (why?)
 - re-rank after addCompoundScore()
     - would make sense, but might break eg suspect annotation ranks
 - docs

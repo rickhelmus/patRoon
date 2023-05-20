@@ -36,13 +36,9 @@
 - predictRespFactor()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache
-    - make calibration DF format
-        - rename colnames for consistency (name, ret)
-        - make area more generic? or include both, where one is optional?
-        - conc_M --> auto calculate from mass conc
 - predictConc()
     - clear out previous concentrations
-    - make mass conc unit configurable eg as factor, 1E6 for ug/l, 1E9 for ng/l etc?
+    - mass conc unit arg
     - generalize conc columns (concMol, concMass?)
     - cache?
 - MS2Quant

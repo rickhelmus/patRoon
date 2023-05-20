@@ -655,19 +655,23 @@ assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
 
     maybeTakeMS2QCol("identifier", "name")
     maybeTakeMS2QCol("retention_time", "rt")
-    maybeTakeMS2QCol("area", "intensity") # UNDONE?
     maybeTakeMS2QCol("conc_M", "concMol")
 
     if (!any(c("concMol", "concMass") %in% coln))
         stop("The calibration table must contain a concMol or concMass column", call. = FALSE)
+    if (!any(c("area", "intensity") %in% coln))
+        stop("The calibration table must contain at least either an area or intensity column", call. = FALSE)
     
     assertHasNames(calibration, c("name", "SMILES", "rt", "intensity"), add = ac)
     
     for (col in c("name", "SMILES"))
         assertListVal(calibration, col, checkmate::assertCharacter, any.missing = FALSE, add = add)
-    for (col in c("rt", "intensity", "concMol", "concMass"))
-        assertListVal(calibration, col, checkmate::assertNumeric, mustExist = !col %in% c("concMol", "concMass"),
+    for (col in c("rt", "area", "intensity", "concMol", "concMass"))
+    {
+        # NOTE: other mandatory columns are checked above
+        assertListVal(calibration, col, checkmate::assertNumeric, mustExist = col == "rt",
                       lower = if (col != "rt") 0 else -Inf, finite = TRUE, add = add)
+    }
     
     checkmate::reportAssertions(ac)
     

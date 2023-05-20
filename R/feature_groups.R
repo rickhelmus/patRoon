@@ -1383,7 +1383,6 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
 {
     # UNDONE: cache results --> cache per SMILES/FP
-    # UNDONE: clear out previous calculations
     
     checkmate::assertClass(featureAnn, c("formulas", "compounds"))
     
@@ -1395,6 +1394,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
     if (length(featureAnn) == 0)
     {
         cat("No feature annotations, nothing to do...\n")
+        fGroups@concentrations <- data.table()
         return(fGroups)
     }
     
@@ -1426,7 +1426,9 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
     }
 
     if (nrow(concs) > 0)
-        fGroups@concentrations <- finalizeFeatureConcsTab(concs)
+        concs <- finalizeFeatureConcsTab(concs)
+    
+    fGroups@concentrations <- concs
     
     return(fGroups)
 })

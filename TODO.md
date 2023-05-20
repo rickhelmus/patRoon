@@ -35,7 +35,6 @@
 - predictRespFactor()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache
-    - clear out previous concentrations
 - calculateConcs()
     - mass conc unit arg
     - generalize conc columns (concMol, concMass?)

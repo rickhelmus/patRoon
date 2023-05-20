@@ -646,3 +646,10 @@ doApply <- function(applyf, doPar, data, ...)
         applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
     withProg(length(data), doPar, do.call(applyf, list(data, ...)))
 }
+
+calibrantsToMS2QuantFormat <- function(calibrants)
+{
+    calibrants <- copy(calibrants)
+    setnames(calibrants, c("name", "rt", "concMol"), c("identifier", "retention_time", "conc_M"))
+    return(calibrants)
+}

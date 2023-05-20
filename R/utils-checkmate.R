@@ -662,8 +662,6 @@ assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
     if (!any(c("area", "intensity") %in% coln))
         stop("The calibration table must contain at least either an area or intensity column", call. = FALSE)
     
-    assertHasNames(calibration, c("name", "SMILES", "rt", "intensity"), add = ac)
-    
     for (col in c("name", "SMILES"))
         assertListVal(calibration, col, checkmate::assertCharacter, any.missing = FALSE, add = add)
     for (col in c("rt", "area", "intensity", "concMol", "concMass"))

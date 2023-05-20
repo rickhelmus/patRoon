@@ -226,7 +226,7 @@ calcFeatureConcs <- function(fGroups, resp, massConcUnit)
     concs <- copy(resp)
     concs[, (paste0(analyses(fGroups), "_concMol")) := lapply(gt, function(ints) RF * ints)]
     mcb <- massConcUnitBase(massConcUnit)
-    concs[, (paste0(analyses(fGroups), "_concMass")) := lapply(.SD, function(cm) cm * candidate_MW * mcb),
+    concs[, (paste0(analyses(fGroups), "_concMass")) := lapply(.SD, function(cm) cm * candidate_MW / mcb),
           .SDcols = (paste0(analyses(fGroups), "_concMol"))]
 
     return(concs[])

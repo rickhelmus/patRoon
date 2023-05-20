@@ -37,6 +37,7 @@
     - cache
 - calculateConcs()
     - cache?
+    - arg to specify usage of areas or intensities
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

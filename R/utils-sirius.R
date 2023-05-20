@@ -398,6 +398,8 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
                            SMILES = NA_character_, conc_M = NA_real_, area = 1)
     
+    calibrants <- calibrantsToMS2QuantFormat(calibrants)
+    
     # UNDONE: would be nice if we could just pass table directly
     quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
     eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)

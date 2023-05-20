@@ -217,17 +217,17 @@ massConcUnitBase <- function(mcu)
                   ngL = 1E-9))
 }
 
-calcFeatureConcs <- function(fGroups, resp)
+calcFeatureConcs <- function(fGroups, resp, massConcUnit)
 {
     # get concentration data from response factors
     gt <- transpose(groupTable(fGroups)[, resp$group, with = FALSE])
     setnames(gt, analyses(fGroups))
     
     concs <- copy(resp)
-    concs[, (paste0(analyses(fGroups), "_conc_M")) := lapply(gt, function(ints) RF * ints)]
-    # UNDONE: make unit configurable? (or maybe as factor, 1E6 for ug/l, 1E9 for ng/l etc)
-    concs[, (paste0(analyses(fGroups), "_conc_ugL")) := lapply(.SD, function(cm) cm * candidate_MW * 1E6),
-          .SDcols = (paste0(analyses(fGroups), "_conc_M"))]
+    concs[, (paste0(analyses(fGroups), "_concMol")) := lapply(gt, function(ints) RF * ints)]
+    mcb <- massConcUnitBase(massConcUnit)
+    concs[, (paste0(analyses(fGroups), "_concMass")) := lapply(.SD, function(cm) cm * candidate_MW * mcb),
+          .SDcols = (paste0(analyses(fGroups), "_concMol"))]
 
     return(concs[])
 }

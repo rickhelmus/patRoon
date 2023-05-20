@@ -36,8 +36,6 @@
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
     - cache
 - calculateConcs()
-    - mass conc unit arg
-    - generalize conc columns (concMol, concMass?)
     - cache?
 - MS2Quant
     - PR to allow DFs in addition to CSVs

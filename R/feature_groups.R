@@ -1380,11 +1380,12 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 })
 
 #' @export
-setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
+setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, massConcUnit = "ugL")
 {
     # UNDONE: cache results --> cache per SMILES/FP
     
     checkmate::assertClass(featureAnn, c("formulas", "compounds"))
+    assertMassConcUnit(massConcUnit)
     
     if (length(fGroups) == 0)
     {
@@ -1411,7 +1412,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
         resp[, type := "compound"]
         resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
         setnames(resp, c("SMILES", "compoundName", "RF_SMILES"), c("candidate", "candidate_name", "RF"))
-        concs <- calcFeatureConcs(fGroups, resp)
+        concs <- calcFeatureConcs(fGroups, resp, massConcUnit)
     }
     
     if (!is.null(annTab[["RF_SIRFP"]]) && any(!is.na(annTab$RF_SIRFP)))
@@ -1422,7 +1423,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn)
         setnames(resp, c("neutral_formula", "RF_SIRFP"), c("candidate", "RF"))
         if (!is.null(annTab[["compoundName"]]))
             resp[, candidate_name := annTab$compoundName]
-        concs <- rbind(concs, calcFeatureConcs(fGroups, resp))
+        concs <- rbind(concs, calcFeatureConcs(fGroups, resp, massConcUnit))
     }
 
     if (nrow(concs) > 0)

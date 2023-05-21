@@ -371,9 +371,9 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     return(ret)
 }
 
-predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq)
+getMS2QTFPs <- function(featAnnSIR)
 {
-    featAnnSIR <- featAnnSIR[rownames(gInfo)]
+    # get all SIRIUS fingerprints in a table that is compatible with MS2Quant/MS2Tox
     
     FPs <- featAnnSIR@fingerprints[sapply(featAnnSIR@fingerprints, nrow) > 0]
     if (length(FPs) == 0)
@@ -390,9 +390,24 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
         return(featAnnSIR[[g]][neutral_formula == f]$fragInfo[[1]]$ionization[1])
     })]
     
-    # convert to MS2Quant format
-    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
     allFPs[, predion := paste0(neutral_formula, "_", ionization)]
+    
+    # dummies for MS2Tox
+    allFPs[, foldernumber := 0]
+    allFPs[, predform := ""]
+    
+    return(allFPs[])
+}
+
+predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq)
+{
+    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
+    
+    featAnnSIR <- featAnnSIR[rownames(gInfo)]
+    
+    allFPs <- getMS2QTFPs(featAnnSIR)
+    if (nrow(allFPs) == 0)
+        return(data.table())
     
     # NOTE: we set the area to one to effectively get the response factor
     unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
@@ -410,6 +425,28 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
                  pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
                  by.x = "id", by.y = "identifier", sort = FALSE)
     setnames(ret, "conc_M", "RF_SIRFP")
+    ret[, id := NULL]
+    
+    return(ret[])
+}
+
+predictLC50SIRFPs <- function(featAnnSIR, gInfo, LC50Mode)
+{
+    # UNDONE: check support adducts
+    
+    featAnnSIR <- featAnnSIR[rownames(gInfo)]
+
+    allFPs <- getMS2QTFPs(featAnnSIR)
+    if (nrow(allFPs) == 0)
+        return(data.table())
+    
+    allFPs[, exactMass := sapply(neutral_formula, getFormulaMass)]
+    
+    pr <- MS2Tox::FishLC50Prediction(allFPs, LC50Mode)
+    
+    ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], pr[, c("id", "LC50_predicted")],
+                 by = "id", sort = FALSE)
+    setnames(ret, "LC50_predicted", "LC50_SIRFP")
     ret[, id := NULL]
     
     return(ret[])

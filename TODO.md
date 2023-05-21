@@ -39,6 +39,9 @@
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong
 - calculateConcs()
     - cache?
+- predictTox()
+    - cache
+    - which unit? MS2Tox outputs log mM
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

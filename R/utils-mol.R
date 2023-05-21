@@ -386,11 +386,11 @@ predictLC50SMILES <- function(SMILES, LC50Mode)
     }
     
     if (nrow(inp) == 0)
-        return(data.table(SMILES = character(), LC50_pred = character()))
+        return(data.table(SMILES = character(), LC50_SMILES = character()))
     
     pr <- MS2Tox::LC50fromSMILES(inp, LC50Mode)
     setDT(pr)
-    setnames(pr, "LC50_predicted", "LC50_pred")
+    setnames(pr, "LC50_predicted", "LC50_SMILES")
     
     return(pr)
 }

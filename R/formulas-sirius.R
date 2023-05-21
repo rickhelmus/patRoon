@@ -158,6 +158,37 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     return(obj)
 })
 
+#' @export
+setMethod("predictTox", "formulasSIRIUS", function(obj, fGroups, LC50Mode = "static")
+{
+    checkPackage("MS2Quant", "kruvelab/MS2Tox")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertChoice(LC50Mode, c("static", "flow"), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    LC50Tab <- predictLC50SIRFPs(obj, groupInfo(fGroups), LC50Mode)
+    
+    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        if (nrow(LC50Tab) == 0)
+        {
+            ann <- copy(ann)
+            ann[, LC50_SIRFP := NA_real_]
+            return(ann)
+        }
+        
+        return(merge(ann, LC50Tab[group == grp, c("neutral_formula", "LC50_SIRFP"), with = FALSE],
+                     by = "neutral_formula", sort = FALSE, all.x = TRUE))
+    })
+    
+    # UNDONE: do something equivalent for formula rankings?
+    # obj <- addCompoundScore(obj, "LC50_SIRFP", FALSE, 1)
+    
+    return(obj)
+})
+
 
 #' Generate formula with SIRIUS
 #'

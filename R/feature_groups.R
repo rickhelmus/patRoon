@@ -1404,7 +1404,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     
     annTab <- as.data.table(featureAnn)
     if (is.null(annTab[["RF_SMILES"]]) && is.null(annTab[["RF_SIRFP"]]))
-        stop("Feature annotations lack predicted response factors. Please call predictRespFactor() first!",
+        stop("Feature annotations lack predicted response factors. Please call predictRespFactors() first!",
              call. = FALSE)
     
     concs <- data.table()

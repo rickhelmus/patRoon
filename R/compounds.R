@@ -567,8 +567,8 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 })
 
 #' @export
-setMethod("predictRespFactor", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                     massConcUnit = "ugL", updateScore = FALSE, scoreWeight = 1)
+setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                      massConcUnit = "ugL", updateScore = FALSE, scoreWeight = 1)
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     

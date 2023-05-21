@@ -122,8 +122,8 @@ setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
 })
 
 #' @export
-setMethod("predictRespFactor", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                          massConcUnit = "ugL")
+setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
+                                                           massConcUnit = "ugL")
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     

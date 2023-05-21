@@ -235,7 +235,7 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, index, groupName, M
 
 #' @rdname compounds-class
 #' @export
-setMethod("predictRespFactor", "compoundsSet", doFeatAnnPredictRFSets)
+setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 
 #' @rdname compounds-class
 #' @export

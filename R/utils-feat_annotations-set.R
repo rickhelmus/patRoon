@@ -492,7 +492,7 @@ doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
     checkmate::assertList(calibrants, any.missing = FALSE, types = "data.frame", len = length(sets(fGroups)))
     
     unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
-    obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactor, MoreArgs = list(...))
+    obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- updateSetConsensus(obj)
     
     return(obj)

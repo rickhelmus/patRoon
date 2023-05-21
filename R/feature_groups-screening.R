@@ -190,8 +190,8 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 })
 
 #' @export
-setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
-                                                                  massConcUnit = "ugL")
+setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
+                                                                   massConcUnit = "ugL")
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
@@ -240,7 +240,7 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
     if (is.null(scr[["RF_SMILES"]]))
     {
         cat("Screening results lacks predicted response factors and will not be used for quantitation.",
-            "You can use predictRespFactor() to add suspect response factors\n")
+            "You can use predictRespFactors() to add suspect response factors\n")
         return(fGroups)
     }
     

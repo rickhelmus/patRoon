@@ -523,10 +523,10 @@ setGeneric("plotVenn", function(obj, ...) standardGeneric("plotVenn"))
 #' @template generics
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 
-#' @templateVar func predictRespFactor
+#' @templateVar func predictRespFactors
 #' @templateVar desc Prediction of response factors.
 #' @template generics
-setGeneric("predictRespFactor", function(obj, ...) standardGeneric("predictRespFactor"))
+setGeneric("predictRespFactors", function(obj, ...) standardGeneric("predictRespFactors"))
 
 
 #' @templateVar func delete

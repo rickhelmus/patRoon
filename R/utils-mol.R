@@ -372,14 +372,23 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
 predictLC50SMILES <- function(SMILES, LC50Mode)
 {
     # UNDONE: RCDK references in ref docs
-    
     inp <- data.table(SMILES = SMILES)
     
-    # UNDONE: handle RCDK failures with NAing?
-    inp[, exactMass := rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1])[[1]]), by = "SMILES"]
+    smp <- rcdk::get.smiles.parser()
+    inp[, exactMass := tryCatch(rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1], emptyIfFails = FALSE,
+                                                                            SMILESParser = smp)[[1]]),
+                                error = function(...) NA_real_), by = "SMILES"]
+    if (any(is.na(inp$exactMass)))
+    {
+        warning("Ignoring the following SMILES because mass calculation failed: ",
+                sprintf("%s (%d)", inp[is.na(exactMass)]$SMILES, which(is.na(inp$exactMass))))
+        inp <- inp[!is.na(exactMass)]
+    }
+    
+    if (nrow(inp) == 0)
+        return(data.table(SMILES = character(), LC50_pred = character()))
     
     pr <- MS2Tox::LC50fromSMILES(inp, LC50Mode)
-    
     setDT(pr)
     setnames(pr, "LC50_predicted", "LC50_pred")
     

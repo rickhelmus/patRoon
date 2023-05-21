@@ -125,6 +125,8 @@ setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
 setMethod("predictRespFactor", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
                                                           massConcUnit = "ugL")
 {
+    checkPackage("MS2Quant", "kruvelab/MS2Quant")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     assertQuantEluent(eluent, add = ac)

@@ -193,6 +193,8 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 setMethod("predictRespFactor", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
                                                                   massConcUnit = "ugL")
 {
+    checkPackage("MS2Quant", "kruvelab/MS2Quant")
+    
     ac <- checkmate::makeAssertCollection()
     assertQuantEluent(eluent, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)

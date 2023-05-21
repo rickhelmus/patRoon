@@ -570,6 +570,8 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 setMethod("predictRespFactor", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
                                                      massConcUnit = "ugL", updateScore = FALSE, scoreWeight = 1)
 {
+    checkPackage("MS2Quant", "kruvelab/MS2Quant")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     assertQuantEluent(eluent, add = ac)

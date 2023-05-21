@@ -130,7 +130,9 @@ Suggests:
     DiagrammeRsvg,
     rsvg,
     pkgload,
-    splashR
+    splashR,
+    MS2Quant,
+    MS2Tox
 LinkingTo:
     Rcpp,
     rapidjsonr

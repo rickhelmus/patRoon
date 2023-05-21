@@ -528,6 +528,10 @@ setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 #' @template generics
 setGeneric("predictRespFactors", function(obj, ...) standardGeneric("predictRespFactors"))
 
+#' @templateVar func predictTox
+#' @templateVar desc Prediction of toxicity values.
+#' @template generics
+setGeneric("predictTox", function(obj, ...) standardGeneric("predictTox"))
 
 #' @templateVar func delete
 #' @templateVar desc Deletes results.

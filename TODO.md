@@ -29,7 +29,7 @@
     - would make sense, but might break eg suspect annotation ranks
 - docs
     - SIRIUS formulas/compound class
-    - refs to OpenBabel for calculateConcs()
+    - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
     - concentrations slot
     - clarify that intrnsity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
 - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()

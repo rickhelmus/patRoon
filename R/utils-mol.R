@@ -368,3 +368,20 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     
     return(ret[])
 }
+
+predictLC50SMILES <- function(SMILES, LC50Mode)
+{
+    # UNDONE: RCDK references in ref docs
+    
+    inp <- data.table(SMILES = SMILES)
+    
+    # UNDONE: handle RCDK failures with NAing?
+    inp[, exactMass := rcdk::get.exact.mass(getMoleculesFromSMILES(SMILES[1])[[1]]), by = "SMILES"]
+    
+    pr <- MS2Tox::LC50fromSMILES(inp, LC50Mode)
+    
+    setDT(pr)
+    setnames(pr, "LC50_predicted", "LC50_pred")
+    
+    return(pr)
+}

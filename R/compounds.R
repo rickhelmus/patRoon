@@ -596,6 +596,29 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
 })
 
+#' @export
+setMethod("predictTox", "compounds", function(obj, fGroups, LC50Mode = "static", updateScore = FALSE, scoreWeight = 1)
+{
+    checkPackage("MS2Quant", "kruvelab/MS2Tox")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertChoice(LC50Mode, c("static", "flow"))
+    checkmate::assertFlag(updateScore, add = ac)
+    checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        ann <- copy(ann)
+        pr <- predictLC50SMILES(ann$SMILES, LC50Mode)
+        ann <- merge(ann, pr, by = "SMILES", sort = FALSE)
+        return(ann)
+    })
+    
+    return(addCompoundScore(obj, "LC50_pred", updateScore, scoreWeight))
+})
+
 
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 {

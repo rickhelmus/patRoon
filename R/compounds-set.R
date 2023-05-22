@@ -239,6 +239,10 @@ setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 
 #' @rdname compounds-class
 #' @export
+setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
+
+#' @rdname compounds-class
+#' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
                                                 uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
                                                 filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0,

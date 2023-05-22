@@ -224,6 +224,31 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
 })
 
 #' @export
+setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "static")
+{
+    checkPackage("MS2Tox", "kruvelab/MS2Tox")
+    
+    checkmate::assertChoice(LC50Mode, c("static", "flow"))
+    
+    scr <- screenInfo(obj)
+    if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
+        stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
+    if (any(is.na(scr$SMILES)))
+        warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
+    
+    # avoid duplicate calculations if there happen to be suspects with the same SMILES
+    inpSMILES <- unique(screenInfo(obj)$SMILES)
+    inpSMILES <- inpSMILES[!is.na(inpSMILES)]
+    
+    pr <- predictLC50SMILES(inpSMILES, LC50Mode)
+    scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
+    
+    obj@screenInfo <- scr
+    
+    return(obj)
+})
+
+#' @export
 setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE,
                                                                massConcUnit = "ugL")
 {

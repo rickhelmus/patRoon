@@ -1385,7 +1385,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     # UNDONE: cache results --> cache per SMILES/FP
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(featureAnn, c("formulas", "compounds"), add = ac)
+    checkmate::assertClass(featureAnn, "featureAnnotations", add = ac)
     checkmate::assertFlag(areas, add = ac)
     assertMassConcUnit(massConcUnit, add = ac)
     checkmate::reportAssertions(ac)

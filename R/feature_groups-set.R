@@ -388,7 +388,7 @@ setMethod("calculateConcs", "featureGroupsSet", function(fGroups, featureAnn)
 {
     # set null.ok to TRUE here to allow calculations from screening results. The non-sets methods called by
     # doPredictConcSets will assert !NULL if needed.
-    checkmate::assertClass(featureAnn, c("formulasSet", "compoundsSet"), null.ok = TRUE)
+    checkmate::assertClass(featureAnn, c("featureAnnotations", "workflowStepSet"), null.ok = TRUE)
     
     return(doPredictConcSets(fGroups, featureAnn))
 })

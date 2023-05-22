@@ -153,22 +153,21 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
 })
 
 #' @export
-setMethod("predictTox", "compoundsSIRIUS", function(obj, fGroups, type = "FP", LC50Mode = "static")
+setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static")
 {
     checkPackage("MS2Quant", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)
     checkmate::assertChoice(LC50Mode, c("static", "flow"), add = ac)
     checkmate::reportAssertions(ac)
     
     if (type == "SMILES" || type == "both")
-        obj <- callNextMethod(obj, fGroups = fGroups, updateScore = FALSE, scoreWeight = 1)
+        obj <- callNextMethod(obj, updateScore = FALSE, scoreWeight = 1)
     
     if (type == "FP" || type == "both")
     {
-        LC50Tab <- predictLC50SIRFPs(obj, groupInfo(fGroups), LC50Mode)
+        LC50Tab <- predictLC50SIRFPs(obj, LC50Mode)
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {

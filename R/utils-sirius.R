@@ -430,12 +430,10 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     return(ret[])
 }
 
-predictLC50SIRFPs <- function(featAnnSIR, gInfo, LC50Mode)
+predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)
 {
     # UNDONE: check support adducts
     
-    featAnnSIR <- featAnnSIR[rownames(gInfo)]
-
     allFPs <- getMS2QTFPs(featAnnSIR)
     if (nrow(allFPs) == 0)
         return(data.table())

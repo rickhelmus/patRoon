@@ -159,16 +159,13 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
 })
 
 #' @export
-setMethod("predictTox", "formulasSIRIUS", function(obj, fGroups, LC50Mode = "static")
+setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static")
 {
     checkPackage("MS2Quant", "kruvelab/MS2Tox")
     
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertChoice(LC50Mode, c("static", "flow"), add = ac)
-    checkmate::reportAssertions(ac)
+    checkmate::assertChoice(LC50Mode, c("static", "flow"))
     
-    LC50Tab <- predictLC50SIRFPs(obj, groupInfo(fGroups), LC50Mode)
+    LC50Tab <- predictLC50SIRFPs(obj, LC50Mode)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {

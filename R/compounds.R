@@ -597,12 +597,11 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
 })
 
 #' @export
-setMethod("predictTox", "compounds", function(obj, fGroups, LC50Mode = "static", updateScore = FALSE, scoreWeight = 1)
+setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", updateScore = FALSE, scoreWeight = 1)
 {
     checkPackage("MS2Quant", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     checkmate::assertFlag(updateScore, add = ac)
     checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)

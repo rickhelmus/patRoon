@@ -30,7 +30,7 @@
 - docs
     - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
-    - concentrations slot
+    - concentrations & toxicities slot
     - clarify that intrnsity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
 - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
 - predictRespFactors()

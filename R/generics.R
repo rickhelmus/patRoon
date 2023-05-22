@@ -76,6 +76,7 @@ setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
 setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateConcs"))
+setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
 #' @rdname kpic2-conv
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))

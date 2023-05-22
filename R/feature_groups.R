@@ -87,7 +87,8 @@ featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
-                                    ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table"),
+                                    ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table",
+                                    toxicities = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -95,7 +96,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     args <- list(...)
 
     # data.table's don't seem to initialize well (gives error that slot is init as list)
-    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs", "concentrations"))
+    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs", "concentrations",
+                "toxicities"))
     {
         if (is.null(args[[s]]))
             args[[s]] <- data.table()
@@ -1433,6 +1435,54 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
         concs <- finalizeFeatureConcsTab(concs)
     
     fGroups@concentrations <- concs
+    
+    return(fGroups)
+})
+
+#' @export
+setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(featureAnn, "featureAnnotations", add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+    {
+        cat("No feature groups, nothing to do...\n")
+        return(fGroups)
+    }
+    if (length(featureAnn) == 0)
+    {
+        cat("No feature annotations, nothing to do...\n")
+        fGroups@toxicities <- data.table()
+        return(fGroups)
+    }
+    
+    annTab <- as.data.table(featureAnn)
+    if (is.null(annTab[["LC50_SMILES"]]) && is.null(annTab[["LC50_SIRFP"]]))
+        stop("Feature annotations lack predicted LC50 values. Please call predictTox() first!", call. = FALSE)
+    
+    toxicities <- data.table()
+    
+    if (!is.null(annTab[["LC50_SMILES"]]) && any(!is.na(annTab$LC50_SMILES)))
+    {
+        LC50Tab <- annTab[!is.na(LC50_SMILES), c("group", "SMILES", "compoundName", "LC50_SMILES"), with = FALSE]
+        LC50Tab[, type := "compound"]
+        setnames(LC50Tab, c("SMILES", "compoundName", "LC50_SMILES"), c("candidate", "candidate_name", "LC50"))
+        toxicities <- LC50Tab # UNDONE
+    }
+    
+    if (!is.null(annTab[["LC50_SIRFP"]]) && any(!is.na(annTab$LC50_SIRFP)))
+    {
+        LC50Tab <- annTab[!is.na(LC50_SIRFP), c("group", "neutral_formula", "LC50_SIRFP"), with = FALSE]
+        LC50Tab[, type := "SIRIUS_FP"]
+        setnames(LC50Tab, c("neutral_formula", "LC50_SIRFP"), c("candidate", "LC50"))
+        if (!is.null(annTab[["compoundName"]]))
+            LC50Tab[, candidate_name := annTab$compoundName]
+        toxicities <- rbind(toxicities, LC50Tab) # UNDONE
+    }
+    
+    fGroups@toxicities <- toxicities
     
     return(fGroups)
 })

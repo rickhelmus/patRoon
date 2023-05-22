@@ -155,7 +155,7 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
 #' @export
 setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static")
 {
-    checkPackage("MS2Quant", "kruvelab/MS2Tox")
+    checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)

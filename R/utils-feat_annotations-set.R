@@ -497,3 +497,9 @@ doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
     
     return(obj)
 }
+
+doFeatAnnPredictToxSets <- function(obj, ...)
+{
+    obj@setObjects <- lapply(setObjects(obj), predictTox, MoreArgs = list(...))
+    return(updateSetConsensus(obj))
+}

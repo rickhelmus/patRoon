@@ -161,7 +161,7 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
 #' @export
 setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static")
 {
-    checkPackage("MS2Quant", "kruvelab/MS2Tox")
+    checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     

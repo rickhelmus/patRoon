@@ -589,7 +589,7 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
         ann <- copy(ann)
         inp <- data.table(group = grp, SMILES = ann$SMILES)
         resp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
-        ann <- merge(ann, resp[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE)
+        ann <- merge(ann, resp[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE, all.x = TRUE)
         return(ann)
     })
     
@@ -599,7 +599,7 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
 #' @export
 setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", updateScore = FALSE, scoreWeight = 1)
 {
-    checkPackage("MS2Quant", "kruvelab/MS2Tox")
+    checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
@@ -611,7 +611,7 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", updateSc
     {
         ann <- copy(ann)
         pr <- predictLC50SMILES(ann$SMILES, LC50Mode)
-        ann <- merge(ann, pr, by = "SMILES", sort = FALSE)
+        ann <- merge(ann, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
         return(ann)
     })
     

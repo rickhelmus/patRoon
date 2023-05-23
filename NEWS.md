@@ -2,6 +2,7 @@
 
 * `loadMSLibrary()`: improve compatibility with more `.msp` flavors (issue #72).
 * `newProject()`: save/load parameters to reproduce subsequent project creations (issue #61)
+* Fixed: in rare cases EICs were incorrectly loaded from cache
 
 
 # patRoon 2.2

@@ -125,8 +125,9 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         let specEl = document.getElementById('spectrumMS');
         if (specEl) // not present if !settings$MSPeakLists$spectra
         {
-            specEl.src = reportPlots.MSPeakLists[grp].MS;
-            document.getElementById('spectrumMSMS').src = reportPlots.MSPeakLists[grp].MSMS;
+            // NOTE: undefined if filtered away
+            specEl.src = reportPlots.MSPeakLists[grp].MS || "";
+            document.getElementById('spectrumMSMS').src = reportPlots.MSPeakLists[grp].MSMS || "";
         }
     }
 

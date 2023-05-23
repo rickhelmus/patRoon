@@ -55,7 +55,7 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
     cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
     isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(ranges))
     # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
-    EICs[isCached] <- cachedData[hashes]
+    EICs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
 
     spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
     rangesToDo <- ranges[isCached == FALSE]

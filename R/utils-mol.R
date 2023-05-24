@@ -407,9 +407,35 @@ predictLC50SMILES <- function(SMILES, LC50Mode)
     if (nrow(inp) == 0)
         return(data.table(SMILES = character(), LC50_SMILES = character()))
     
-    pr <- MS2Tox::LC50fromSMILES(inp, LC50Mode)
-    setDT(pr)
-    setnames(pr, "LC50_predicted", "LC50_SMILES")
+    hashes <- sapply(inp$SMILES, makeHash, LC50Mode)
+    cachedData <- loadCacheData("LC50_SMILES", hashes)
+    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    hashesTODO <- hashes[indsTODO]
     
-    return(pr)
+    LC50s <- NULL
+    if (length(indsTODO) > 0)
+    {
+        LC50s <- MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode)
+        setDT(LC50s)
+        setnames(LC50s, "LC50_predicted", "LC50_SMILES")
+        for (i in seq_len(nrow(LC50s)))
+            saveCacheData("LC50_SMILES", LC50s$LC50_SMILES[i], hashesTODO[i])
+    }
+
+    if (!is.null(cachedData))
+    {
+        cachedLC50s <- rbindlist(lapply(cachedData, function(cd) data.table(LC50_SMILES = cd)), idcol = "hash")
+        cachedLC50s[, SMILES := inp$SMILES[match(hash, hashes)]]
+        cachedLC50s[, hash := NULL]
+        
+        if (is.null(LC50s))
+            LC50s <- cachedLC50s
+        else
+        {
+            LC50s <- rbind(LC50s, cachedLC50s)
+            LC50s <- LC50s[match(inp$SMILES, SMILES)] # sync order
+        }
+    }
+    
+    return(LC50s)
 }

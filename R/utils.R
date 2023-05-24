@@ -647,9 +647,22 @@ doApply <- function(applyf, doPar, data, ...)
     withProg(length(data), doPar, do.call(applyf, list(data, ...)))
 }
 
-calibrantsToMS2QuantFormat <- function(calibrants)
+getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)
 {
     calibrants <- copy(calibrants)
     setnames(calibrants, c("name", "rt", "intensity", "concMol"), c("identifier", "retention_time", "area", "conc_M"))
-    return(calibrants)
+    
+    # UNDONE: would be nice if we could just pass table directly
+    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
+    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, allFPs)
+    
+    RFs <- as.data.table(pr$suspects_concentrations)
+    
+    # the area we set to one, we calculated the concentration for that response, so the inverse is the RF (=area/conc=1/conc)
+    RFs[, RF_pred := 1 / conc_M]
+    
+    RFs <- RFs[, c("identifier", "SMILES", "RF_pred"), with = FALSE]
+    
+    return(RFs[])
 }

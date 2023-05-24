@@ -409,25 +409,53 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     if (nrow(allFPs) == 0)
         return(data.table())
     
-    # NOTE: we set the area to one to effectively get the response factor
+    # NOTE: we set the area to one to easily get the response factor below
     unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
                            SMILES = NA_character_, conc_M = NA_real_, area = 1)
     
-    calibrants <- calibrantsToMS2QuantFormat(calibrants)
+    baseHash <- makeHash(calibrants, eluent, organicModifier, pHAq)
+    splFPs <- split(allFPs, seq_len(nrow(allFPs[, -c("id", "group")])))
+    hashes <- sapply(seq_len(nrow(allFPs)), function(i) makeHash(splFPs[[i]], unknowns$retention_time[i]))
     
-    # UNDONE: would be nice if we could just pass table directly
-    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
-    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    cachedData <- loadCacheData("RF_SIRFP", hashes)
+    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    hashesTODO <- hashes[indsTODO]
     
-    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organicModifier, pHAq, allFPs)
+    RFs <- NULL
+    if (length(indsTODO) > 0)
+    {
+        RFs <- getRFsMS2Quant(calibrants, unknowns[indsTODO], eluent, organicModifier, pHAq, allFPs[indsTODO])
+        RFs <- RFs[, c("identifier", "RF_pred"), with = FALSE]
+        setnames(RFs, "RF_pred", "RF_SIRFP")
+        for (i in seq_len(nrow(RFs)))
+            saveCacheData("RF_SIRFP", RFs$RF_SIRFP[i], hashesTODO[i])
+        
+        RFs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], RFs, by.x = "id", by.y = "identifier",
+                     sort = FALSE)
+    }
     
-    ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE],
-                 pr$suspects_concentrations[, c("identifier", "logRF_pred", "conc_M")],
-                 by.x = "id", by.y = "identifier", sort = FALSE)
-    setnames(ret, "conc_M", "RF_SIRFP")
-    ret[, id := NULL]
+    if (!is.null(cachedData))
+    {
+        cachedRFs <- rbindlist(lapply(cachedData, function(cd) data.table(RF_SIRFP = cd)), idcol = "hash")
+        cachedRFs[, neutral_formula := allFPs$neutral_formula[match(hash, hashes)]]
+        cachedRFs[, group := allFPs$group[match(hash, hashes)]]
+        cachedRFs[, hash := NULL]
+        
+        if (is.null(RFs))
+            RFs <- cachedRFs
+        else
+        {
+            RFs <- rbind(RFs, cachedRFs)
+            # restore order
+            boundHashes <- c(hashesTODO, names(cachedData))
+            RFs <- RFs[match(hashes, boundHashes)]
+        }
+    }
     
-    return(ret[])
+    if (!is.null(RFs[["id"]]))
+        RFs[, id := NULL]
+    
+    return(RFs[])
 }
 
 predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)

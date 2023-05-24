@@ -348,25 +348,44 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
 {
     # UNDONE: OpenBabel references in ref docs
     
+    baseHash <- makeHash(calibrants, eluent, organicModifier, pHAq)
+    
     fgSMILESTab <- copy(fgSMILESTab)
     fgSMILESTab[, identifier := group]
     fgSMILESTab[, retention_time := gInfo[group, "rts"]]
     fgSMILESTab[, conc_M := NA_real_]
-    fgSMILESTab[, area := 1] # NOTE: we set the area to one to effectively get the response factor
+    fgSMILESTab[, area := 1] # NOTE: we set the area to one to easily get the response factor
+    fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 
     
-    calibrants <- calibrantsToMS2QuantFormat(calibrants)
+    cachedData <- loadCacheData("RF_SMILES", fgSMILESTab$hash)
+    fgSMILESTabTODO <- if (!is.null(cachedData)) fgSMILESTab[!hash %in% names(cachedData)] else fgSMILESTab
     
-    # UNDONE: would be nice if we could just pass table directly
-    quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, fgSMILESTab, fill = TRUE), quantFile)
-    eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
+    RFs <- NULL 
+    if (nrow(fgSMILESTabTODO) > 0)
+    {
+        RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, NULL)
+        setnames(RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
+        for (i in seq_len(nrow(RFs)))
+            saveCacheData("RF_SMILES", RFs$RF_SMILES[i], fgSMILESTabTODO$hash[i])
+    }
     
-    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, NULL)
+    if (!is.null(cachedData))
+    {
+        cachedRFs <- rbindlist(lapply(cachedData, function(cd) data.table(RF_SMILES = cd)), idcol = "hash")
+        cachedRFs[, SMILES := fgSMILESTab$SMILES[match(hash, fgSMILESTab$hash)]]
+        cachedRFs[, group := fgSMILESTab$group[match(hash, fgSMILESTab$hash)]]
+        cachedRFs[, hash := NULL]
+        
+        if (is.null(RFs))
+            RFs <- cachedRFs
+        else
+        {
+            RFs <- rbind(RFs, cachedRFs)
+            RFs <- RFs[match(fgSMILESTab$SMILES, SMILES)] # sync order
+        }
+    }
     
-    ret <- as.data.table(pr$suspects_concentrations)
-    setnames(ret, c("identifier", "conc_M"), c("group", "RF_SMILES"))
-    ret[, c("area", "retention_time") := NULL]
-    
-    return(ret[])
+    return(RFs[])
 }
 
 predictLC50SMILES <- function(SMILES, LC50Mode)

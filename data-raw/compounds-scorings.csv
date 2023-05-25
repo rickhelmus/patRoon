@@ -15,7 +15,9 @@ referenceCount,ChemSpiderReferenceCount,,chemspider,FALSE,TRUE,
 RSCCount,ChemSpiderRSCCount,,chemspider,FALSE,TRUE,
 formulaScore,,,,FALSE,FALSE,Match with formula explanation: see addFormulaScoring()
 RF_SMILES,,,,FALSE,FALSE,Response factor predicted from SMILES: see predictRespFactor()
-RF_SIRFP,,,,FALSE,FALSE,Response factor predicted SIRIUS fingerprints: see predictRespFactor()
+RF_SIRFP,,,,FALSE,FALSE,Response factor predicted from SIRIUS fingerprints: see predictRespFactor()
+LC50_SMILES,,,,FALSE,FALSE,LC50 predicted from SMILES: see predictTox()
+LC50_SIRFP,,,,FALSE,FALSE,LC50 predicted from SIRIUS fingerprints: see predictTox()
 smartsInclusionScore,SmartsSubstructureInclusionScore,,,FALSE,FALSE,
 smartsExclusionScore,SmartsSubstructureExclusionScore,,,FALSE,FALSE,
 suspectListScore,SuspectListScore,,,FALSE,FALSE,Hit in custom suspect list file (set with ScoreSuspectLists in extraOpts)

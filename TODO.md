@@ -35,15 +35,20 @@
 - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
 - predictRespFactors()
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
-    - cache
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong
 - calculateConcs()
     - cache?
+    - sort by fGroup
 - predictTox()
-    - cache
     - which unit? MS2Tox outputs log mM
+- calculateTox()
+    - sort by fGroup
+- consensus
+    - predictXX() doesn't work on consensus results --> update score fails with NAs
+    - test more, eg sets
 - MS2Quant
     - PR to allow DFs in addition to CSVs
+- update compoundsScorings for sysdata.rda
 
 
 ## General

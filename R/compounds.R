@@ -615,7 +615,7 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", updateSc
         return(ann)
     })
     
-    return(addCompoundScore(obj, "LC50_pred", updateScore, scoreWeight))
+    return(addCompoundScore(obj, "LC50_SMILES", updateScore, scoreWeight))
 })
 
 
@@ -670,19 +670,26 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
+    uniqueCols <- c("neutral_formula", "SMILES", "InChI", "InChIKey1", "InChIKey2", "InChIKey", "neutralMass",
+                    "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP")
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
-                               uniqueCols = c("neutral_formula", "SMILES", "InChI", "InChIKey1",
-                                              "InChIKey2", "InChIKey", "neutralMass"))
+                               uniqueCols = uniqueCols)
     
     # rename & merge score types and ranges
     scoreTypes <- Reduce(union, mapply(allCompounds, labels, FUN = function(cmp, cn)
     {
-        paste0(cmp@scoreTypes, "-", cn)
+        fifelse(cmp@scoreTypes %chin% uniqueCols, cmp@scoreTypes, paste0(cmp@scoreTypes, "-", cn))
     }))
 
     scRanges <- Reduce(modifyList, Map(allCompounds, labels, f = function(cmp, cn)
     {
-        lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
+        lapply(cmp@scoreRanges, function(scrg)
+        {
+            n <- names(scrg)
+            wh <- !n %chin% uniqueCols
+            names(scrg)[wh] <- paste0(n[wh], "-", cn)
+            return(scrg)
+        })
     }))
 
     ret <- compoundsConsensus(groupAnnotations = cons, scoreTypes = scoreTypes, scoreRanges = scRanges,

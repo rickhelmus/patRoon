@@ -421,7 +421,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
-                               uniqueCols = c("neutral_formula", "error", "error_median", "dbe", "neutralMass"))
+                               uniqueCols = c("neutral_formula", "error", "error_median", "dbe", "neutralMass",
+                                              "RF_SIRFP", "LC50_SIRFP"))
     
     ret <- formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),

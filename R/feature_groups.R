@@ -1413,10 +1413,12 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     
     if (!is.null(annTab[["RF_SMILES"]]) && any(!is.na(annTab$RF_SMILES)))
     {
-        resp <- annTab[!is.na(RF_SMILES), c("group", "SMILES", "compoundName", "RF_SMILES"), with = FALSE]
+        resp <- annTab[!is.na(RF_SMILES), c("group", "SMILES", "RF_SMILES"), with = FALSE]
         resp[, type := "compound"]
         resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
-        setnames(resp, c("SMILES", "compoundName", "RF_SMILES"), c("candidate", "candidate_name", "RF"))
+        setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
+        if (!is.null(annTab[["compoundName"]]))
+            resp[, candidate_name := annTab$compoundName]
         concs <- calcFeatureConcs(fGroups, resp, areas, massConcUnit)
     }
     
@@ -1466,9 +1468,11 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
     
     if (!is.null(annTab[["LC50_SMILES"]]) && any(!is.na(annTab$LC50_SMILES)))
     {
-        LC50Tab <- annTab[!is.na(LC50_SMILES), c("group", "SMILES", "compoundName", "LC50_SMILES"), with = FALSE]
+        LC50Tab <- annTab[!is.na(LC50_SMILES), c("group", "SMILES", "LC50_SMILES"), with = FALSE]
         LC50Tab[, type := "compound"]
-        setnames(LC50Tab, c("SMILES", "compoundName", "LC50_SMILES"), c("candidate", "candidate_name", "LC50"))
+        setnames(LC50Tab, c("SMILES", "LC50_SMILES"), c("candidate", "LC50"))
+        if (!is.null(annTab[["compoundName"]]))
+            LC50Tab[, candidate_name := annTab$compoundName]
         toxicities <- LC50Tab # UNDONE
     }
     

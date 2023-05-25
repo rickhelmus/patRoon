@@ -414,7 +414,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
                            SMILES = NA_character_, conc_M = NA_real_, area = 1)
     
     baseHash <- makeHash(calibrants, eluent, organicModifier, pHAq)
-    splFPs <- split(allFPs, seq_len(nrow(allFPs[, -c("id", "group")])))
+    splFPs <- split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs)))
     hashes <- sapply(seq_len(nrow(allFPs)), function(i) makeHash(splFPs[[i]], unknowns$retention_time[i]))
     
     cachedData <- loadCacheData("RF_SIRFP", hashes)
@@ -460,20 +460,53 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
 
 predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)
 {
-    # UNDONE: check support adducts
+    # UNDONE: check supported adducts
     
     allFPs <- getMS2QTFPs(featAnnSIR)
     if (nrow(allFPs) == 0)
         return(data.table())
+
     
-    allFPs[, exactMass := sapply(neutral_formula, getFormulaMass)]
+    baseHash <- makeHash(LC50Mode)
+    hashes <- sapply(split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs))), makeHash)
     
-    pr <- MS2Tox::FishLC50Prediction(allFPs, LC50Mode)
+    cachedData <- loadCacheData("LC50_SIRFP", hashes)
+    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    hashesTODO <- hashes[indsTODO]
     
-    ret <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], pr[, c("id", "LC50_predicted")],
-                 by = "id", sort = FALSE)
-    setnames(ret, "LC50_predicted", "LC50_SIRFP")
-    ret[, id := NULL]
+    LC50s <- NULL
+    if (length(indsTODO) > 0)
+    {
+        allFPsTODO <- allFPs[indsTODO]
+        allFPsTODO[, exactMass := sapply(neutral_formula, getFormulaMass)]
+        LC50s <- MS2Tox::FishLC50Prediction(allFPsTODO, LC50Mode)
     
-    return(ret[])
+        LC50s <- merge(allFPsTODO[, c("group", "neutral_formula", "id"), with = FALSE],
+                       LC50s[, c("id", "LC50_predicted")], by = "id", sort = FALSE)
+        setnames(LC50s, "LC50_predicted", "LC50_SIRFP")
+        LC50s[, id := NULL]
+        
+        for (i in seq_len(nrow(LC50s)))
+            saveCacheData("LC50_SIRFP", LC50s$LC50_SIRFP[i], hashesTODO[i])
+    }
+    
+    if (!is.null(cachedData))
+    {
+        cachedLC50s <- rbindlist(lapply(cachedData, function(cd) data.table(LC50_SIRFP = cd)), idcol = "hash")
+        cachedLC50s[, neutral_formula := allFPs$neutral_formula[match(hash, hashes)]]
+        cachedLC50s[, group := allFPs$group[match(hash, hashes)]]
+        cachedLC50s[, hash := NULL]
+        
+        if (is.null(LC50s))
+            LC50s <- cachedLC50s
+        else
+        {
+            LC50s <- rbind(LC50s, cachedLC50s)
+            # restore order
+            boundHashes <- c(hashesTODO, names(cachedData))
+            LC50s <- LC50s[match(hashes, boundHashes)]
+        }
+    }
+    
+    return(LC50s[])
 }

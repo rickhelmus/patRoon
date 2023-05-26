@@ -101,13 +101,19 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath, par
     compStructInfo <- NULL
     if (!is.null(compounds) && length(compounds) != 0)
     {
-        compStructInfo <- as.data.table(compounds)[, c("group", "SMILES", "InChIKey"), with = FALSE]
+        compStructInfo <- subsetDTColumnsIfPresent(as.data.table(compounds), c("group", "SMILES", "InChIKey",
+                                                                               "InChIKey1"))
+        if (is.null(compStructInfo[["InChIKey"]])) # not present with eg SIRIUS
+        {
+            # fall back to first block. UNDONE: calculate InChIKey for SIRIUS results? Needs OpenBabel...
+            setnames(compStructInfo, "InChIKey1", "InChIKey")
+        }
         compStructInfo[, index := seq_len(.N), by = "group"]
         compStructInfo <- compStructInfo[index <= settings$compounds$topMost][, -c("group", "index")]
     }
     
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
-    if (nrow(structInfo) > 0)
+    if (nrow(structInfo) > 0 && any(!is.na(structInfo$SMILES)))
     {
         structInfo <- unique(structInfo[!is.na(SMILES)], by = "InChIKey")
         cat("Generate structures...\n")
@@ -427,7 +433,8 @@ reportHTMLUtils$methods(
         
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
         tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier",
-                                               "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey"))
+                                               "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey",
+                                               "UID"))
         
         tab[, candidate := seq_len(.N), by = "group"]
         
@@ -437,27 +444,33 @@ reportHTMLUtils$methods(
         if (!is.null(cmpNames2))
             tab[, compoundName2 := NULL]
         
-        tab[, neutralMass := round(neutralMass, 5)]
+        if (!is.null(tab[["neutralMass"]]))
+            tab[, neutralMass := round(neutralMass, 5)]
         if (!is.null(tab[["score"]]))
             tab[, score := round(score, 2)]
         
-        tab[, structure := plots$structs[InChIKey]]
+        if (is.null(tab[["InChIKey"]])) # SIRIUS
+            tab[, structure := plots$structs[UID]]
+        else
+            tab[, structure := plots$structs[InChIKey]]
+        
         tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
         tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
         
         if (hasSuspects())
         {
             scr <- screenInfo(objects$fGroups)
-            if (!is.null(scr[["InChIKey"]]))
+            if (!is.null(scr[["InChIKey"]]) && any(!is.na(scr$InChIKey)))
             {
-                tab[InChIKey %chin% scr$InChIKey, suspect := {
-                    IK <- InChIKey[1]
-                    paste0(unique(scr[InChIKey == IK]$name), collapse = ", ")
-                }, by = "InChIKey"]
+                scr <- data.table::copy(scr)
+                scr[, IK1 := getIKBlock1(InChIKey)]
+                tab[UID %chin% scr$UID, suspect := {
+                    paste0(unique(scr[IK1 == UID[1]]$name), collapse = ", ")
+                }, by = "UID"]
             }
         }
         
-        tab[, InChIKey := NULL]
+        tab <- removeDTColumnsIfPresent(tab, c("InChIKey", "UID"))
         
         getCompCell <- function(value, index)
         {
@@ -550,7 +563,7 @@ reportHTMLUtils$methods(
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(cell = function(value, index) htmltools::span(dangerouslySetInnerHTML = list("__html" = makeDBIdentLink(databases[index], value)))) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
-            neutralMass = reactable::colDef("neutral mass"),
+            neutralMass = if (!is.null(tab[["neutralMass"]])) reactable::colDef("neutral mass") else NULL,
             structure = reactable::colDef(cell = getAnnReactImgCell, minWidth = 125),
             spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
             scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)

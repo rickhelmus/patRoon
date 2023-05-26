@@ -6,8 +6,8 @@ NULL
 featAnnSetSpecificScoreCols <- function()
 {
     return(c("score", "fragScore", "isoScore", "metFusionScore", "individualMoNAScore", "peakFingerprintScore",
-             "lossFingerprintScore", "libMatch", "formulaScore", "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP",
-             "combMatch", "isoScore", "mSigma", "MSMSScore"))
+             "lossFingerprintScore", "libMatch", "formulaScore", "RF_SIRFP", "LC50_SIRFP", "combMatch", "isoScore",
+             "mSigma", "MSMSScore"))
 }
 
 makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn, setAvgSpecificScores,
@@ -500,6 +500,6 @@ doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
 
 doFeatAnnPredictToxSets <- function(obj, ...)
 {
-    obj@setObjects <- lapply(setObjects(obj), predictTox, MoreArgs = list(...))
+    obj@setObjects <- lapply(setObjects(obj), predictTox, ...)
     return(updateSetConsensus(obj))
 }

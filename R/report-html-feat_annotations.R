@@ -108,8 +108,10 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath, par
             # fall back to first block. UNDONE: calculate InChIKey for SIRIUS results? Needs OpenBabel...
             setnames(compStructInfo, "InChIKey1", "InChIKey")
         }
+
         compStructInfo[, index := seq_len(.N), by = "group"]
-        compStructInfo <- compStructInfo[index <= settings$compounds$topMost][, -c("group", "index")]
+        compStructInfo <- compStructInfo[index <= settings$compounds$topMost]
+        compStructInfo <- removeDTColumnsIfPresent(compStructInfo, c("group", "index", "InChIKey1"))
     }
     
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo))

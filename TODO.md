@@ -20,36 +20,32 @@
 
 ## Predict
 
-- show() for annotation classes with predictions?
-- use RF to also score formulas?
-    - general score mechanism currently not there
-- don't allow update scoring for SIRIUS compounds?
-    - currently not (why?)
-- re-rank after addCompoundScore()
-    - would make sense, but might break eg suspect annotation ranks
+- general
+    - show() for annotation classes with predictions?
+    - also score formulas?
+        - general score mechanism currently not there
+    - don't allow update scoring for SIRIUS compounds?
+        - currently not (why?)
+    - re-rank after addCompoundScore()
+        - would make sense, but might break eg suspect annotation ranks
+    - update compoundsScorings for sysdata.rda
+- quant
+    - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
+    - calculateConcs()
+        - sort by fGroup
+- tox
+    - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
+    - somehow verify eluents variable? gives strange errors if eg time unit is wrong
+    - calculateConcs()
+        - sort by fGroup
+    - which default unit?
 - docs
     - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
     - concentrations & toxicities slot
     - clarify that intrnsity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
-- target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
-- predictRespFactors()
-    - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
-    - somehow verify eluents variable? gives strange errors if eg time unit is wrong
-- calculateConcs()
-    - cache?
-    - sort by fGroup
-- predictTox()
-    - which unit? MS2Tox outputs log mM
-- calculateTox()
-    - sort by fGroup
-- consensus
-    - predictXX() doesn't work on consensus results --> update score fails with NAs
-    - test more, eg sets
 - MS2Quant
     - PR to allow DFs in addition to CSVs
-- update compoundsScorings for sysdata.rda
-
 
 ## General
 

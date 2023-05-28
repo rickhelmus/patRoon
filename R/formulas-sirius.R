@@ -123,7 +123,7 @@ setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
 
 #' @export
 setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                           massConcUnit = "ugL")
+                                                           concUnit = "ugL", calibConcUnit = concUnit)
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
@@ -132,12 +132,12 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     assertQuantEluent(eluent, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
-    assertMassConcUnit(massConcUnit, add = ac)
+    aapply(assertConcUnit, concUnit + calibConcUnit, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
+    calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
-    resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+    resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {
@@ -159,13 +159,14 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
 })
 
 #' @export
-setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static")
+setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", concUnit = "ugL")
 {
     checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
+    assertConcUnit(concUnit)
     
-    LC50Tab <- predictLC50SIRFPs(obj, LC50Mode)
+    LC50Tab <- predictLC50SIRFPs(obj, LC50Mode, concUnit)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {

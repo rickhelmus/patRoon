@@ -217,7 +217,49 @@ massConcUnitBase <- function(mcu)
                   ngL = 1E-9))
 }
 
-calcFeatureConcs <- function(fGroups, resp, areas, massConcUnit)
+convertConc <- function(conc, unitFrom, unitTo, MW)
+{
+    parseUnit <- function(unit)
+    {
+        logBase <- if (startsWith(unit, "log10 "))
+            10
+        else if (startsWith(unit, "log2 "))
+            2
+        else if (startsWith(unit, "log "))
+            exp(1)
+        else
+            0
+        if (logBase != 0)
+            unit <- sub("^log(2|10)? ", "", unit)
+        base <- switch(substring(unit, 1, 1),
+                       n = 1E-9,
+                       u = 1E-6,
+                       m = 1E-3,
+                       1)
+        molar <- endsWith(unit, "M")
+        return(list(logBase = logBase, base = base, molar = molar))
+    }
+    
+    unitFromP <- parseUnit(unitFrom); unitToP <- parseUnit(unitTo)
+    
+    if (unitFromP$logBase != 0 && unitToP$logBase == 0)
+        conc <- unitFromP$logBase^conc
+    else if (unitFromP$logBase == 0 && unitToP$logBase)
+        conc <- log(conc, unitToP$logBase)
+    else if (unitFromP$logBase != unitToP$logBase)
+        conc <- log(unitFromP$logBase^conc, unitToP$logBase)
+    
+    conc <- conc * (unitFromP$base / unitToP$base)
+    
+    if (unitFromP$molar && !unitToP$molar)
+        conc <- conc * MW
+    else if (!unitFromP$molar && unitToP$molar)
+        conc <- conc / MW
+    
+    return(conc)
+}
+
+calcFeatureConcs <- function(fGroups, resp, areas)
 {
     # get concentration data from response factors
     
@@ -225,10 +267,7 @@ calcFeatureConcs <- function(fGroups, resp, areas, massConcUnit)
     setnames(gt, analyses(fGroups))
     
     concs <- copy(resp)
-    concs[, (paste0(analyses(fGroups), "_concMol")) := lapply(gt, function(ints) ints / RF)]
-    mcb <- massConcUnitBase(massConcUnit)
-    concs[, (paste0(analyses(fGroups), "_concMass")) := lapply(.SD, function(cm) cm * candidate_MW / mcb),
-          .SDcols = (paste0(analyses(fGroups), "_concMol"))]
+    concs[, (analyses(fGroups)) := lapply(gt, function(ints) ints / RF)]
 
     return(concs[])
 }
@@ -241,13 +280,13 @@ finalizeFeatureConcsTab <- function(concs)
     return(concs)
 }
 
-doPredictConcSets <- function(fGroups, featureAnn)
+doCalcConcSets <- function(fGroups, featureAnn, areas)
 {
     if (is.null(featureAnn))
     {
         # just from screening info
         usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-        usFGroups <- sapply(usFGroups, calculateConcs, simplify = FALSE)
+        usFGroups <- sapply(usFGroups, calculateConcs, areas = areas, simplify = FALSE)
     }
     else
     {
@@ -261,7 +300,7 @@ doPredictConcSets <- function(fGroups, featureAnn)
         }
         
         usFGroups <- sapply(names(usFeatAnns), unset, obj = fGroups, simplify = FALSE)
-        usFGroups <- Map(usFGroups, usFeatAnns, f = calculateConcs)
+        usFGroups <- Map(usFGroups, usFeatAnns, f = calculateConcs, MoreArgs = list(areas = areas))
     }
     
     usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@concentrations) > 0)]
@@ -291,8 +330,9 @@ doPredictConcSets <- function(fGroups, featureAnn)
     }
     
     # add missing analyses
-    allAnaCols <- c(paste0(analyses(fGroups), "_conc_M"), paste0(analyses(fGroups), "_conc_ugL"))
-    fGroups@concentrations[, setdiff(allAnaCols, names(fGroups@concentrations)) := NA_real_][]
+    missingAnaCols <- setdiff(analyses(fGroups), names(fGroups@concentrations))
+    if (length(missingAnaCols) > 0)
+        fGroups@concentrations[, (missingAnaCols) := NA_real_][]
     
     return(fGroups)
 }

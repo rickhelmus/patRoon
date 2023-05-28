@@ -110,7 +110,7 @@ setMethod("delete", "compoundsSIRIUS", function(obj, i = NULL, j = NULL, ...)
 
 #' @export
 setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
-                                                            massConcUnit = "ugL", type = "FP")
+                                                            concUnit = "ugL", calibConcUnit = concUnit, type = "FP")
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
@@ -119,19 +119,20 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
     assertQuantEluent(eluent, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
-    assertMassConcUnit(massConcUnit, add = ac)
+    aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)
     checkmate::reportAssertions(ac)
     
-    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
+    calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
     if (type == "SMILES" || type == "both")
         obj <- callNextMethod(obj, fGroups = fGroups, calibrants = calibrants, eluent = eluent,
-                              organicModifier = organicModifier, pHAq = pHAq, updateScore = FALSE, scoreWeight = 1)
+                              organicModifier = organicModifier, pHAq = pHAq, concUnit = concUnit,
+                              calibConcUnit = calibConcUnit, updateScore = FALSE, scoreWeight = 1)
 
     if (type == "FP" || type == "both")
     {
-        resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq)
+        resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
@@ -153,21 +154,22 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
 })
 
 #' @export
-setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static")
+setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static", concUnit = "ugL")
 {
     checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)
     checkmate::assertChoice(LC50Mode, c("static", "flow"), add = ac)
+    assertConcUnit(concUnit, add = ac)
     checkmate::reportAssertions(ac)
     
     if (type == "SMILES" || type == "both")
-        obj <- callNextMethod(obj, updateScore = FALSE, scoreWeight = 1)
+        obj <- callNextMethod(obj, LC50Mode = LC50Mode, concUnit = concUnit, updateScore = FALSE, scoreWeight = 1)
     
     if (type == "FP" || type == "both")
     {
-        LC50Tab <- predictLC50SIRFPs(obj, LC50Mode)
+        LC50Tab <- predictLC50SIRFPs(obj, LC50Mode, concUnit = concUnit)
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {

@@ -384,13 +384,13 @@ setMethod("normInts", "featureGroupsSet", function(fGroups, featNorm, groupNorm,
 })
 
 #' @export
-setMethod("calculateConcs", "featureGroupsSet", function(fGroups, featureAnn)
+setMethod("calculateConcs", "featureGroupsSet", function(fGroups, featureAnn, areas = FALSE)
 {
     # set null.ok to TRUE here to allow calculations from screening results. The non-sets methods called by
-    # doPredictConcSets will assert !NULL if needed.
+    # doCalcConcSets will assert !NULL if needed.
     checkmate::assertClass(featureAnn, c("featureAnnotations", "workflowStepSet"), null.ok = TRUE)
     
-    return(doPredictConcSets(fGroups, featureAnn))
+    return(doCalcConcSets(fGroups, featureAnn, areas))
 })
 
 #' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a

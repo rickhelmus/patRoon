@@ -650,7 +650,7 @@ doApply <- function(applyf, doPar, data, ...)
 getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)
 {
     calibrants <- copy(calibrants)
-    setnames(calibrants, c("name", "rt", "intensity", "concMol"), c("identifier", "retention_time", "area", "conc_M"))
+    setnames(calibrants, c("name", "rt", "intensity", "conc"), c("identifier", "retention_time", "area", "conc_M"))
     
     # UNDONE: would be nice if we could just pass table directly
     quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)

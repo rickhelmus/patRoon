@@ -344,7 +344,7 @@ prepareChemTable <- function(chemData, prefCalcChemProps, neutralChemProps, verb
     return(chemData[])
 }
 
-predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, organicModifier, pHAq)
+predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, organicModifier, pHAq, concUnit)
 {
     # UNDONE: OpenBabel references in ref docs
     
@@ -384,11 +384,16 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
             RFs <- RFs[match(fgSMILESTab$SMILES, SMILES)] # sync order
         }
     }
+
+    # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
+    RFs[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
+    # NOTE: need to take the inverse before conversion
+    RFs[, RF_SMILES := 1/convertConc(1/RF_SMILES[1], "M", concUnit, MW[1]), by = "SMILES"]
     
     return(RFs[])
 }
 
-predictLC50SMILES <- function(SMILES, LC50Mode)
+predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
 {
     # UNDONE: RCDK references in ref docs
     inp <- data.table(SMILES = SMILES)
@@ -436,6 +441,11 @@ predictLC50SMILES <- function(SMILES, LC50Mode)
             LC50s <- LC50s[match(inp$SMILES, SMILES)] # sync order
         }
     }
+
+    # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
+    LC50s[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
+    # NOTE: need to take the inverse before conversion
+    LC50s[, LC50_SMILES := convertConc(LC50_SMILES[1], "log mM", concUnit, MW[1]), by = "SMILES"]
     
-    return(LC50s)
+    return(LC50s[])
 }

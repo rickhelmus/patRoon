@@ -29,16 +29,21 @@
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
     - update compoundsScorings for sysdata.rda
+    - only consider unique SIRIUS results with calcTox/calcConcs
+    - fGroupsScrSet methods: also update setObjects(?)
+    - are the new slots copied with eg screenSuspects?
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
+    - somehow verify eluents variable? gives strange errors if eg time unit is wrong
     - calculateConcs()
         - sort by fGroup
 - tox
     - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
-    - somehow verify eluents variable? gives strange errors if eg time unit is wrong
-    - calculateConcs()
+    - calculateTox()
         - sort by fGroup
     - which default unit?
+    - sets methods
+        - SIRIUS results: average? report each set?
 - docs
     - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc

@@ -191,7 +191,7 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSu
 
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
-                                                                   massConcUnit = "ugL")
+                                                                   concUnit = "ugL", calibConcUnit = concUnit)
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
@@ -199,10 +199,10 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     assertQuantEluent(eluent, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
-    assertMassConcUnit(massConcUnit, add = ac)
+    aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    calibrants <- assertAndPrepareQuantCalib(calibrants, massConcUnit)
+    calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
 
     scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
@@ -214,7 +214,7 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     inp <- inp[!is.na(SMILES)]
     # avoid duplicate calculations if there happen to be suspects with the same SMILES
     inp <- unique(inp, by = c("group", "SMILES"))
-    resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq)
+    resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq, concUnit)
     scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE,
                  all.x = TRUE)
     
@@ -224,11 +224,12 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
 })
 
 #' @export
-setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "static")
+setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "static", concUnit = "ugL")
 {
     checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
+    assertConcUnit(concUnit)
     
     scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
@@ -240,7 +241,7 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
     inpSMILES <- unique(screenInfo(obj)$SMILES)
     inpSMILES <- inpSMILES[!is.na(inpSMILES)]
     
-    pr <- predictLC50SMILES(inpSMILES, LC50Mode)
+    pr <- predictLC50SMILES(inpSMILES, LC50Mode, concUnit)
     scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
     
     obj@screenInfo <- scr
@@ -249,11 +250,9 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
 })
 
 #' @export
-setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE,
-                                                               massConcUnit = "ugL")
+setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE)
 {
     checkmate::assertFlag(areas)
-    assertMassConcUnit(massConcUnit)
     
     if (!is.null(featureAnn) && length(featureAnn) > 0)
         fGroups <- callNextMethod()
@@ -274,7 +273,7 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
     resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
     setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
     
-    concs <- calcFeatureConcs(fGroups, resp, areas, massConcUnit)
+    concs <- calcFeatureConcs(fGroups, resp, areas)
     # assign and collapse candidate names
     concs[, candidate_name := paste0(unique(scr[SMILES == candidate &
                                              group == get("group", envir = parent.env(environment()))]$name), collapse = ","),

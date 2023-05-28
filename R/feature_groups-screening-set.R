@@ -387,7 +387,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calibrants, ...)
 {
-    checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(obj))
+    checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(sets(obj)))
     
     obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- syncScreeningSetObjects(obj)
@@ -397,10 +397,10 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
 })
 
 #' @export
-setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
+setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL, areas = FALSE)
 {
     # dummy method so that featureAnn can default to NULL
-    callNextMethod(fGroups, featureAnn)
+    callNextMethod(fGroups, featureAnn, areas)
 })
 
 #' @rdname suspect-screening

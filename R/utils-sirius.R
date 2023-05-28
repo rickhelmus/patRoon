@@ -399,7 +399,7 @@ getMS2QTFPs <- function(featAnnSIR)
     return(allFPs[])
 }
 
-predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq)
+predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq, concUnit)
 {
     # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
     
@@ -454,11 +454,16 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     
     if (!is.null(RFs[["id"]]))
         RFs[, id := NULL]
+
+    # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
+    # NOTE: need to take the inverse before conversion
+    RFs[, RF_SIRFP := 1/convertConc(1/RF_SIRFP[1], "M", concUnit, formulaMW(neutral_formula[1])),
+        by = "neutral_formula"]
     
     return(RFs[])
 }
 
-predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)
+predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
 {
     # UNDONE: check supported adducts
     
@@ -466,7 +471,6 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)
     if (nrow(allFPs) == 0)
         return(data.table())
 
-    
     baseHash <- makeHash(LC50Mode)
     hashes <- sapply(split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs))), makeHash)
     
@@ -507,6 +511,11 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode)
             LC50s <- LC50s[match(hashes, boundHashes)]
         }
     }
-    
+
+    # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
+    # NOTE: need to take the inverse before conversion
+    LC50s[, LC50_SIRFP := convertConc(LC50_SIRFP[1], "log mM", concUnit, formulaMW(neutral_formula[1])),
+        by = "neutral_formula"]
+
     return(LC50s[])
 }

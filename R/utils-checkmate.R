@@ -631,10 +631,16 @@ assertAndPrepareReportSettings <- function(settings)
     return(settings)
 }
 
-checkMassConcUnit <- function(x) checkmate::checkChoice(x, c("gL", "mgL", "ugL", "ngL"))
-assertMassConcUnit <- checkmate::makeAssertionFunction(checkMassConcUnit)
+checkConcUnit <- function(x)
+{
+    bases <- c("n", "u", "m", "")
+    units <- c(paste0(bases, "gL"), paste0(bases, "M"))
+    units <- c(units, paste("log", units), paste("log10", units), paste("log2", units))
+    checkmate::checkChoice(x, units)
+}
+assertConcUnit <- checkmate::makeAssertionFunction(checkConcUnit)
 
-assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
+assertAndPrepareQuantCalib <- function(calibration, concUnit)
 {
     checkmate::assertDataFrame(calibration, any.missing = FALSE)
     
@@ -656,27 +662,20 @@ assertAndPrepareQuantCalib <- function(calibration, massConcUnit)
     maybeTakeMS2QCol("identifier", "name")
     maybeTakeMS2QCol("retention_time", "rt")
     maybeTakeMS2QCol("area", "intensity")
-    maybeTakeMS2QCol("conc_M", "concMol")
+    maybeTakeMS2QCol("conc_M", "conc")
 
-    if (!any(c("concMol", "concMass") %in% coln))
-        stop("The calibration table must contain a concMol or concMass column", call. = FALSE)
-    
     for (col in c("name", "SMILES"))
         assertListVal(calibration, col, checkmate::assertCharacter, any.missing = FALSE, add = add)
-    for (col in c("rt", "intensity", "concMol", "concMass"))
+    for (col in c("rt", "intensity", "conc"))
     {
-        # NOTE: other mandatory columns are checked above
-        assertListVal(calibration, col, checkmate::assertNumeric, mustExist = col %in% c("rt", "intensity"),
+        assertListVal(calibration, col, checkmate::assertNumeric, mustExist = TRUE,
                       lower = if (col != "rt") 0 else -Inf, finite = TRUE, add = add)
     }
     
     checkmate::reportAssertions(ac)
     
-    if (!"concMol" %in% coln && "concMass" %in% coln)
-    {
-        calibration[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
-        calibration[, concMol := (concMass * massConcUnitBase(massConcUnit)) / MW]
-    }
+    calibration[, conc := mapply(convertConc, conc, babelConvert(SMILES, "smi", "MW", mustWork = TRUE),
+                                 MoreArgs = list(unitFrom = concUnit, unitTo = "M"))]
     
     return(calibration[])
 }

@@ -7,7 +7,8 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
-    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz")
+    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz", "RF_SMILES",
+                "LC50_SMILES")
     
     renameDupCols <- function(si, suf, all)
     {
@@ -392,6 +393,15 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- syncScreeningSetObjects(obj)
     
+    return(obj)
+    
+})
+
+#' @export
+setMethod("predictTox", "featureGroupsScreeningSet", function(obj, ...)
+{
+    obj@setObjects <- lapply(setObjects(obj), predictTox, ...)
+    obj <- syncScreeningSetObjects(obj)
     return(obj)
     
 })

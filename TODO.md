@@ -30,8 +30,7 @@
         - would make sense, but might break eg suspect annotation ranks
     - update compoundsScorings for sysdata.rda
     - only consider unique SIRIUS results with calcTox/calcConcs
-    - fGroupsScrSet methods: also update setObjects(?)
-    - are the new slots copied with eg screenSuspects?
+    - copy new slots screenSuspects/unset() --> when accessor methods are there
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong
@@ -48,7 +47,7 @@
     - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
     - concentrations & toxicities slot
-    - clarify that intrnsity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
+    - clarify that intensity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

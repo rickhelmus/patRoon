@@ -275,7 +275,7 @@ calcFeatureConcs <- function(fGroups, resp, areas)
 
 finalizeFeaturePredTab <- function(pred)
 {
-    co <- intersect(c("group", "type", "candidate", "candidate_name", "set"), names(pred))
+    co <- intersect(c("group", "type", "candidate", "candidate_name", "sets"), names(pred))
     setcolorder(pred, co)
     setorderv(pred, c("group", "type", "candidate"))
     return(pred)
@@ -357,17 +357,17 @@ doCalcToxSets <- function(fGroups, featureAnn)
     if (length(usFGroups) == 1)
     {
         fGroups@toxicities <- copy(toxicities(usFGroups[[1]]))
-        fGroups@toxicities[, set := names(usFGroups)]
+        fGroups@toxicities[, sets := names(usFGroups)]
     }
     else
     {
         allTox <- sapply(usFGroups, toxicities, simplify = FALSE)
         
-        allToxTab <- rbindlist(allTox, idcol = "set")
+        allToxTab <- rbindlist(allTox, idcol = "sets")
         
         # NOTE: only for SIRIUS_FP it makes sense to split sets data, the rest we can merge
-        allToxTab[type != "SIRIUS_FP", set := paste0(unique(set), collapse = ","), by = c("group", "candidate", "type")]
-        allToxTab <- unique(allToxTab, by = c("group", "type", "candidate", "set"))
+        allToxTab[type != "SIRIUS_FP", sets := paste0(unique(sets), collapse = ","), by = c("group", "candidate", "type")]
+        allToxTab <- unique(allToxTab, by = c("group", "type", "candidate", "sets"))
         
         fGroups@toxicities <- finalizeFeaturePredTab(allToxTab)
     }

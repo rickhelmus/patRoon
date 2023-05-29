@@ -317,6 +317,7 @@ doCalcConcSets <- function(fGroups, featureAnn, areas)
             cols <- intersect(c("group", "type", "candidate", "candidate_name"), c(names(left), names(right)))
             return(merge(left, right, by = cols, all = TRUE))
         })
+        fGroups@concentrations <- finalizeFeaturePredTab(fGroups@concentrations)
     }
     
     # add missing analyses

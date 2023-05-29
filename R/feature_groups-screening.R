@@ -264,13 +264,12 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
     if (is.null(scr[["RF_SMILES"]]))
     {
         cat("Screening results lacks predicted response factors and will not be used for quantitation.",
-            "You can use predictRespFactors() to add suspect response factors\n")
+            "You can use predictRespFactors() to add suspect response factors.\n")
         return(fGroups)
     }
     
     resp <- scr[, c("group", "SMILES", "RF_SMILES"), with = FALSE]
     resp[, type := "suspect"]
-    resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
     setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
     
     concs <- calcFeatureConcs(fGroups, resp, areas)

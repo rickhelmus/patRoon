@@ -1414,7 +1414,6 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     {
         resp <- annTab[!is.na(RF_SMILES), c("group", "SMILES", "RF_SMILES"), with = FALSE]
         resp[, type := "compound"]
-        resp[, candidate_MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)] # UNDONE: make mustWork configurable?
         setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
         if (!is.null(annTab[["compoundName"]]))
             resp[, candidate_name := annTab$compoundName]
@@ -1425,7 +1424,6 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     {
         resp <- annTab[!is.na(RF_SIRFP), c("group", "neutral_formula", "RF_SIRFP"), with = FALSE]
         resp[, type := "SIRIUS_FP"]
-        resp[, candidate_MW := sapply(neutral_formula, formulaMW)]
         setnames(resp, c("neutral_formula", "RF_SIRFP"), c("candidate", "RF"))
         if (!is.null(annTab[["compoundName"]]))
             resp[, candidate_name := annTab$compoundName]

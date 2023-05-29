@@ -268,6 +268,7 @@ calcFeatureConcs <- function(fGroups, resp, areas)
     
     concs <- copy(resp)
     concs[, (analyses(fGroups)) := lapply(gt, function(ints) ints / RF)]
+    concs[, RF := NULL]
 
     return(concs[])
 }
@@ -311,21 +312,10 @@ doCalcConcSets <- function(fGroups, featureAnn, areas)
         fGroups@concentrations <- copy(usFGroups[[1]]@concentrations)
     else
     {
-        fGroups@concentrations <- Reduce(usFGroups, f = function(left, right)
+        fGroups@concentrations <- Reduce(lapply(usFGroups, slot, "concentrations"), f = function(left, right)
         {
             cols <- intersect(c("group", "type", "candidate", "candidate_name"), c(names(left), names(right)))
-            ret <- merge(left@concentrations, right@concentrations, by = cols, all = TRUE)
-            
-            pat <- "\\.x$"
-            dupCols <- grep(pat, names(ret), value = TRUE)
-            dupCols <- sub(pat, "", dupCols)
-            for (col in dupCols)
-            {
-                # assume values in duplicate cols are either unique for a set or the same for both
-                l <- ret[[paste0(col, ".x")]]; r <- ret[[paste0(col, ".y")]]
-                ret[, (col) := fifelse(!is.na(l), l, r)]
-            }
-            return(ret)
+            return(merge(left, right, by = cols, all = TRUE))
         })
     }
     

@@ -1425,8 +1425,10 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
         resp <- annTab[!is.na(RF_SIRFP), c("group", "neutral_formula", "RF_SIRFP"), with = FALSE]
         resp[, type := "SIRIUS_FP"]
         setnames(resp, c("neutral_formula", "RF_SIRFP"), c("candidate", "RF"))
-        if (!is.null(annTab[["compoundName"]]))
-            resp[, candidate_name := annTab$compoundName]
+        # UNDONE: collapse compoundName? Results mostly in very long columns.
+        # if (!is.null(annTab[["compoundName"]]))
+        #     resp[, candidate_name := annTab$compoundName]
+        resp <- unique(resp, by = c("group", "candidate"))
         concs <- rbind(concs, calcFeatureConcs(fGroups, resp, areas))
     }
 
@@ -1478,8 +1480,10 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
         LC50Tab <- annTab[!is.na(LC50_SIRFP), c("group", "neutral_formula", "LC50_SIRFP"), with = FALSE]
         LC50Tab[, type := "SIRIUS_FP"]
         setnames(LC50Tab, c("neutral_formula", "LC50_SIRFP"), c("candidate", "LC50"))
-        if (!is.null(annTab[["compoundName"]]))
-            LC50Tab[, candidate_name := annTab$compoundName]
+        # UNDONE: collapse compoundName? Results mostly in very long columns.
+        # if (!is.null(annTab[["compoundName"]]))
+        #     LC50Tab[, candidate_name := annTab$compoundName]
+        LC50Tab <- unique(LC50Tab, by = c("group", "candidate"))
         toxicities <- rbind(toxicities, LC50Tab)
     }
     

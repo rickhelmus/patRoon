@@ -453,6 +453,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             obj@ftindex <- obj@ftindex[-ainds]
         }
         obj@analysisInfo <- obj@analysisInfo[-ainds, , drop = FALSE]
+        if (length(obj@concentrations) > 0)
+            obj@concentrations <- obj@concentrations[, setdiff(names(obj@concentrations), removedAnas), with = FALSE]
     }
     
     # remove deleted and empty groups
@@ -482,6 +484,10 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             obj@ISTDs <- obj@ISTDs[group %in% names(obj@groups)]
             obj@ISTDAssignments <- internalStandardAssignments(obj)[names(obj@ISTDAssignments) %chin% names(obj@groups)]
         }
+        if (nrow(obj@concentrations) > 0)
+            obj@concentrations <- obj@concentrations[group %in% names(obj@groups)]
+        if (nrow(obj@toxicities) > 0)
+            obj@toxicities <- obj@toxicities[group %in% names(obj@groups)]
     }
     
     if (!isAnaSubSet)
@@ -1394,8 +1400,6 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 #' @export
 setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas = FALSE)
 {
-    # UNDONE: cache results --> cache per SMILES/FP
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(featureAnn, "featureAnnotations", add = ac)
     checkmate::assertFlag(areas, add = ac)

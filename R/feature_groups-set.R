@@ -148,12 +148,12 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
         obj@annotations <- ann[set %in% sets(obj) & group %in% names(obj)]
     if (length(ISTDAssign) > 0)
         obj@ISTDAssignments <- lapply(ISTDAssign, function(ia) ia[names(ia) %chin% names(obj)])
-    
+
+    mySets <- sets(obj)
     if (nrow(internalStandards(obj)) > 0)
-    {
-        mySets <- sets(obj)
         obj@ISTDs <- obj@ISTDs[sapply(sets, function(s) any(mySets %chin% unlist(strsplit(s, ",", fixed = TRUE))))]
-    }
+    if (nrow(toxicities(obj)) > 0)
+        obj@toxicities <- obj@toxicities[sapply(sets, function(s) any(mySets %chin% unlist(strsplit(s, ",", fixed = TRUE))))]
     
     return(obj)
 })
@@ -579,6 +579,10 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     if (nrow(ISTDs) > 0)
         ISTDs <- ISTDs[, -"sets"]
     ISTDAssign <- if (length(internalStandardAssignments(obj)) > 0) internalStandardAssignments(obj, set) else list()
+
+    tox <- copy(toxicities(obj))
+    if (nrow(tox) > 0)
+        tox <- tox[, -"sets"]
     
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
@@ -586,5 +590,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
                               annotations = ann, ISTDs = ISTDs, ISTDAssignments = ISTDAssign,
+                              concentrations = copy(concentrations(obj)), toxicities = tox,
                               algorithm = paste0(algorithm(obj), "_unset")))
 })

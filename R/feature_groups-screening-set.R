@@ -449,7 +449,9 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                      groupQualities = copy(groupQualities(fGroups)),
                                      groupScores = copy(groupScores(fGroups)), ISTDs = copy(internalStandards(fGroups)),
                                      ISTDAssignments = internalStandardAssignments(fGroups),
-                                     annotations = copy(annotations(fGroups))))
+                                     annotations = copy(annotations(fGroups)),
+                                     concentrations = copy(concentrations(fGroups)),
+                                     toxicities = copy(toxicities(fGroups))))
 })
 
 #' @rdname suspect-screening
@@ -509,7 +511,8 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
                                           features = getFeatures(uobj), ftindex = groupFeatIndex(uobj),
                                           annotations = annotations(uobj), groupQualities = groupQualities(uobj),
                                           groupScores = groupScores(uobj), ISTDs = internalStandards(uobj),
-                                          ISTDAssignments = internalStandardAssignments(uobj))
+                                          ISTDAssignments = internalStandardAssignments(uobj),
+                                          concentrations = concentrations(uobj), toxicities = toxicities(uobj))
     # override after constructing: parent constructor already sets algorithm,
     # which results in error about double assignment
     ret@algorithm <- paste0(algorithm(obj), "_unset")

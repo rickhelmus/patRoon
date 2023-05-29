@@ -29,7 +29,6 @@
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
     - update compoundsScorings for sysdata.rda
-    - copy new slots screenSuspects/unset() --> when accessor methods are there
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong

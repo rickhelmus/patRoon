@@ -41,8 +41,6 @@
     - calculateTox()
         - sort by fGroup
     - which default unit?
-    - sets methods
-        - SIRIUS results: average? report each set?
 - docs
     - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc

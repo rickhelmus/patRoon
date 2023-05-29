@@ -278,7 +278,38 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
                                              group == get("group", envir = parent.env(environment()))]$name), collapse = ","),
           by = c("candidate", "group")]
 
-    fGroups@concentrations <- finalizeFeatureConcsTab(rbind(fGroups@concentrations, concs, fill = TRUE))
+    fGroups@concentrations <- finalizeFeaturePredTab(rbind(fGroups@concentrations, concs, fill = TRUE))
+    
+    return(fGroups)
+})
+
+#' @export
+setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
+{
+    if (!is.null(featureAnn) && length(featureAnn) > 0)
+        fGroups <- callNextMethod()
+    else
+        fGroups@toxicities <- data.table()
+    
+    scr <- screenInfo(fGroups)
+    
+    if (is.null(scr[["LC50_SMILES"]]))
+    {
+        cat("Screening results lacks predicted toxicity values and will not be used.",
+            "You can use predictTox() to add suspect toxicity values.\n")
+        return(fGroups)
+    }
+    
+    LC50s <- scr[, c("group", "SMILES", "LC50_SMILES"), with = FALSE]
+    LC50s[, type := "suspect"]
+    setnames(LC50s, c("SMILES", "LC50_SMILES"), c("candidate", "LC50"))
+    
+    # assign and collapse candidate names
+    LC50s[, candidate_name := paste0(unique(scr[SMILES == candidate &
+                                                    group == get("group", envir = parent.env(environment()))]$name), collapse = ","),
+          by = c("candidate", "group")]
+    
+    fGroups@toxicities <- finalizeFeaturePredTab(rbind(fGroups@toxicities, LC50s, fill = TRUE))
     
     return(fGroups)
 })

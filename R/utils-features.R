@@ -273,12 +273,12 @@ calcFeatureConcs <- function(fGroups, resp, areas)
     return(concs[])
 }
 
-finalizeFeatureConcsTab <- function(concs)
+finalizeFeaturePredTab <- function(pred)
 {
-    co <- intersect(c("group", "type", "candidate", "candidate_name", "candidate_MW"), names(concs))
-    setcolorder(concs, co)
-    setorderv(concs, c("group", "type"))
-    return(concs)
+    co <- intersect(c("group", "type", "candidate", "candidate_name", "set"), names(pred))
+    setcolorder(pred, co)
+    setorderv(pred, c("group", "type", "candidate"))
+    return(pred)
 }
 
 doCalcConcSets <- function(fGroups, featureAnn, areas)
@@ -323,6 +323,54 @@ doCalcConcSets <- function(fGroups, featureAnn, areas)
     missingAnaCols <- setdiff(analyses(fGroups), names(fGroups@concentrations))
     if (length(missingAnaCols) > 0)
         fGroups@concentrations[, (missingAnaCols) := NA_real_][]
+    
+    return(fGroups)
+}
+
+doCalcToxSets <- function(fGroups, featureAnn)
+{
+    if (is.null(featureAnn))
+    {
+        # just from screening info
+        usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+        usFGroups <- sapply(usFGroups, calculateTox, simplify = FALSE)
+    }
+    else
+    {
+        usFeatAnns <- checkAndUnSetOther(sets(fGroups), featureAnn, "featureAnn")
+        usFeatAnns <- usFeatAnns[lengths(usFeatAnns) > 0]
+        
+        if (length(usFeatAnns) == 0)
+        {
+            cat("No feature annotations, nothing to do...\n")
+            return(fGroups)
+        }
+        
+        usFGroups <- sapply(names(usFeatAnns), unset, obj = fGroups, simplify = FALSE)
+        usFGroups <- Map(usFGroups, usFeatAnns, f = calculateTox)
+    }
+    
+    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@toxicities) > 0)]
+    if (length(usFGroups) == 0)
+        return(fGroups)
+    
+    if (length(usFGroups) == 1)
+    {
+        fGroups@toxicities <- copy(usFGroups[[1]]@toxicities)
+        fGroups@toxicities[, set := names(usFGroups)]
+    }
+    else
+    {
+        allTox <- sapply(usFGroups, slot, "toxicities", simplify = FALSE)
+        
+        allToxTab <- rbindlist(allTox, idcol = "set")
+        
+        # NOTE: only for SIRIUS_FP it makes sense to split sets data, the rest we can merge
+        allToxTab[type != "SIRIUS_FP", set := paste0(unique(set), collapse = ","), by = c("group", "candidate", "type")]
+        allToxTab <- unique(allToxTab, by = c("group", "type", "candidate", "set"))
+        
+        fGroups@toxicities <- finalizeFeaturePredTab(allToxTab)
+    }
     
     return(fGroups)
 }

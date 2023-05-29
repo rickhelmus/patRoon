@@ -413,6 +413,13 @@ setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featu
     callNextMethod(fGroups, featureAnn, areas)
 })
 
+#' @export
+setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
+{
+    # dummy method so that featureAnn can default to NULL
+    callNextMethod(fGroups, featureAnn)
+})
+
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,

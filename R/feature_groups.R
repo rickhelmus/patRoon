@@ -1431,7 +1431,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     }
 
     if (nrow(concs) > 0)
-        concs <- finalizeFeatureConcsTab(concs)
+        concs <- finalizeFeaturePredTab(concs)
     
     fGroups@concentrations <- concs
     
@@ -1470,7 +1470,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
         setnames(LC50Tab, c("SMILES", "LC50_SMILES"), c("candidate", "LC50"))
         if (!is.null(annTab[["compoundName"]]))
             LC50Tab[, candidate_name := annTab$compoundName]
-        toxicities <- LC50Tab # UNDONE
+        toxicities <- LC50Tab
     }
     
     if (!is.null(annTab[["LC50_SIRFP"]]) && any(!is.na(annTab$LC50_SIRFP)))
@@ -1480,8 +1480,11 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
         setnames(LC50Tab, c("neutral_formula", "LC50_SIRFP"), c("candidate", "LC50"))
         if (!is.null(annTab[["compoundName"]]))
             LC50Tab[, candidate_name := annTab$compoundName]
-        toxicities <- rbind(toxicities, LC50Tab) # UNDONE
+        toxicities <- rbind(toxicities, LC50Tab)
     }
+    
+    if (nrow(toxicities) > 0)
+        toxicities <- finalizeFeaturePredTab(toxicities)
     
     fGroups@toxicities <- toxicities
     

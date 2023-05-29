@@ -393,6 +393,16 @@ setMethod("calculateConcs", "featureGroupsSet", function(fGroups, featureAnn, ar
     return(doCalcConcSets(fGroups, featureAnn, areas))
 })
 
+#' @export
+setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
+{
+    # set null.ok to TRUE here to allow calculations from screening results. The non-sets methods called by
+    # doCalcToxSets will assert !NULL if needed.
+    checkmate::assertClass(featureAnn, c("featureAnnotations", "workflowStepSet"), null.ok = TRUE)
+    
+    return(doCalcToxSets(fGroups, featureAnn))
+})
+
 #' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
 #'   \code{\link{featureGroupsSet}} object.
 #' @rdname groupFeatures

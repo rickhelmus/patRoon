@@ -308,6 +308,16 @@ setReplaceMethod("adducts", "featureGroups", function(obj, value)
     return(obj)
 })
 
+#' @describeIn featureGroups Accessor for \code{concentrations} slot.
+#' @aliases concentrations
+#' @export
+setMethod("concentrations", "featureGroups", function(fGroups) fGroups@concentrations)
+
+#' @describeIn featureGroups Accessor for \code{toxicities} slot.
+#' @aliases toxicities
+#' @export
+setMethod("toxicities", "featureGroups", function(fGroups) fGroups@toxicities)
+
 #' @describeIn featureGroups Subset on analyses/feature groups.
 #' @param results Optional argument. If specified only feature groups with results in the specified object are kept. The
 #'   class of \code{results} should be \code{\link{featureAnnotations}} or \code{\link{components}}. Multiple objects

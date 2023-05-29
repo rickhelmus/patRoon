@@ -304,15 +304,15 @@ doCalcConcSets <- function(fGroups, featureAnn, areas)
         usFGroups <- Map(usFGroups, usFeatAnns, f = calculateConcs, MoreArgs = list(areas = areas))
     }
     
-    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@concentrations) > 0)]
+    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(concentrations(ufg)) > 0)]
     if (length(usFGroups) == 0)
         return(fGroups)
     
     if (length(usFGroups) == 1)
-        fGroups@concentrations <- copy(usFGroups[[1]]@concentrations)
+        fGroups@concentrations <- copy(concentrations(usFGroups[[1]]))
     else
     {
-        fGroups@concentrations <- Reduce(lapply(usFGroups, slot, "concentrations"), f = function(left, right)
+        fGroups@concentrations <- Reduce(lapply(usFGroups, concentrations), f = function(left, right)
         {
             cols <- intersect(c("group", "type", "candidate", "candidate_name"), c(names(left), names(right)))
             return(merge(left, right, by = cols, all = TRUE))
@@ -350,18 +350,18 @@ doCalcToxSets <- function(fGroups, featureAnn)
         usFGroups <- Map(usFGroups, usFeatAnns, f = calculateTox)
     }
     
-    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(ufg@toxicities) > 0)]
+    usFGroups <- usFGroups[sapply(usFGroups, function(ufg) nrow(toxicities(ufg)) > 0)]
     if (length(usFGroups) == 0)
         return(fGroups)
     
     if (length(usFGroups) == 1)
     {
-        fGroups@toxicities <- copy(usFGroups[[1]]@toxicities)
+        fGroups@toxicities <- copy(toxicities(usFGroups[[1]]))
         fGroups@toxicities[, set := names(usFGroups)]
     }
     else
     {
-        allTox <- sapply(usFGroups, slot, "toxicities", simplify = FALSE)
+        allTox <- sapply(usFGroups, toxicities, simplify = FALSE)
         
         allToxTab <- rbindlist(allTox, idcol = "set")
         

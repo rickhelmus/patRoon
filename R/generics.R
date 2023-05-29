@@ -75,7 +75,9 @@ setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric
 #' @rdname featureGroups-class
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
+setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))
 setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateConcs"))
+setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
 #' @rdname kpic2-conv

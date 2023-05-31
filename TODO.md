@@ -40,6 +40,7 @@
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
     - concentrations & toxicities slot
     - clarify that intensity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
+    - getDefPredArrgParams() and new as.data.table() args that use it
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

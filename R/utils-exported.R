@@ -395,6 +395,19 @@ getDefEICParams <- function(...)
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 
+#' @export
+getDefPredAggrParams <- function(...)
+{
+    def <- list(
+        typeFunc = mean,
+        groupFunc = mean,
+        setsFunc = mean,
+        preferType = "suspect" # UNDONE?
+    )
+    
+    return(modifyList(def, list(...)))
+}
+
 #' Obtains a SIRIUS refresh token
 #'
 #' This function is used to obtain a \command{SIRIUS} refresh token with your login details, which allows

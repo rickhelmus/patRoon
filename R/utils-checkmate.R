@@ -457,6 +457,20 @@ assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::v
     assertListVal(x, "PVAdjFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
 }
 
+assertPredAggrParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(NULL)
+    
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertListVal(x, "typeFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
+    assertListVal(x, "groupFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
+    assertListVal(x, "setsFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
+    assertListVal(x, "preferType", checkmate::assertChoice, choices = c("suspect", "compound", "SIRIUS_FP"),
+                  .var.name = .var.name, add = add)
+}
+
 assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail

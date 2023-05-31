@@ -615,7 +615,8 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                     normalized = FALSE, FCParams = NULL)
+                                                     normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
+                                                     toxAggrParams = NULL)
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
     
@@ -623,6 +624,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     aapply(checkmate::assertFlag, . ~ average + areas + features + regression + normalized, fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
     assertFCParams(FCParams, x, null.ok = TRUE, add = ac)
+    aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     checkmate::assert(checkmate::checkFALSE(qualities),
@@ -818,6 +820,60 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     
     if (nrow(ret) > 0 && length(internalStandardAssignments(x)) > 0)
         ret[, ISTD_assigned := sapply(internalStandardAssignments(x)[group], function(ia) paste0(ia, collapse = ","))]
+
+    if (!is.null(concAggrParams) && nrow(concentrations(x)) > 0)
+    {
+        concs <- subsetDTColumnsIfPresent(concentrations(x), c("group", "type", anaInfo$analysis))
+        if (nzchar(concAggrParams$preferType))
+        {
+            concs[, keep := !concAggrParams$preferType %in% type | type == concAggrParams$preferType, by = "group"]
+            concs <- concs[keep == TRUE][, keep := NULL]
+        }
+        concs[, (anaInfo$analysis) := lapply(.SD, aggrVec, concAggrParams$typeFunc), .SDcols = anaInfo$analysis,
+              by = c("group", "type")]
+        concs[, (anaInfo$analysis) := lapply(.SD, aggrVec, concAggrParams$groupFunc), .SDcols = anaInfo$analysis,
+              by = "group"]
+        concs[, type := paste0(unique(type), collapse = ","), by = "group"]
+        setnames(concs, "type", "conc_types")
+        concs <- unique(concs, by = "group")
+
+        if (features)
+            concs <- melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
+        else if (average)
+        {
+            for (rg in replicateGroups(x))
+            {
+                anas <- anaInfo[anaInfo$group == rg, "analysis"]
+                concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
+            }
+            concs[, (anaInfo$analysis) := NULL]
+        }
+        else
+            setnames(concs, anaInfo$analysis, paste0(anaInfo$analysis, "_conc"))
+        
+        setcolorder(concs, setdiff(names(concs), "conc_types")) # move to end
+        
+        mby <- if (features) c("group", "analysis") else "group"
+        ret <- merge(ret, concs, by = mby, all.x = TRUE, sort = FALSE)
+    }
+    
+    if (!is.null(toxAggrParams) && nrow(toxicities(x)) > 0)
+    {
+        tox <- subsetDTColumnsIfPresent(toxicities(x), c("group", "type", "LC50"))
+        if (nzchar(toxAggrParams$preferType))
+        {
+            tox[, keep := !toxAggrParams$preferType %in% type | type == toxAggrParams$preferType, by = "group"]
+            tox <- tox[keep == TRUE][, keep := NULL]
+        }
+        
+        tox[, LC50 := aggrVec(LC50, toxAggrParams$typeFunc), by = c("group", "type")]
+        tox[, LC50 := aggrVec(LC50, toxAggrParams$typeFunc), by = "group"]
+        tox[, type := paste0(unique(type), collapse = ","), by = "group"]
+        setnames(tox, "type", "LC50_types")
+        tox <- unique(tox, by = "group")
+        setcolorder(tox, setdiff(names(tox), "LC50_types")) # move to end
+        ret <- merge(ret, tox, by = "group", all.x = TRUE, sort = FALSE)
+    }
     
     return(ret[])
 })

@@ -666,3 +666,13 @@ getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, 
     
     return(RFs[])
 }
+
+aggrVec <- function(x, f)
+{
+    x <- x[!is.na(x)]
+    if (length(x) == 0)
+        is.na(x) <- TRUE # use is.na()<- to retain class of x
+    else
+        x <- f(x)
+    return(x)
+}

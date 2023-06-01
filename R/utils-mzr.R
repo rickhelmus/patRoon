@@ -252,6 +252,9 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
 
 verifyDataCentroided <- function(anaInfo)
 {
+    if (!isTRUE(getOption("patRoon.checkCentroided", default = TRUE)))
+        return(invisible(NULL))
+    
     cacheDB <- openCacheDB()
     
     printf("Verifying if your data is centroided... ")

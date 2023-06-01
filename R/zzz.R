@@ -1,6 +1,7 @@
 defaultPkgOpts <- function(pkgname)
 {
     ret <- list(cache.mode = "both",
+                checkCentroided = TRUE,
                 cache.fileName = "cache.sqlite",
                 MP.method = "classic",
                 # backwards compat

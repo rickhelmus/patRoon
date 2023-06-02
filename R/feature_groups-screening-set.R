@@ -222,7 +222,10 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
 {
     # UNDONE: document that collapseSuspect!=NULL && features==TRUE will give lots of rows (per feature and per suspect)
     
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyHits, add = ac)
+    checkmate::reportAssertions(ac)
     
     ret <- callNextMethod(x, ...)
     if (nrow(ret) > 0)

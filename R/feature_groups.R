@@ -816,7 +816,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
     annTable <- annotations(x)
     if (nrow(ret) > 0 && nrow(annTable) > 0)
-        ret <- merge(ret, annTable, sort = FALSE)
+        ret <- merge(ret, annTable, by = "group", sort = FALSE)
     
     if (nrow(ret) > 0 && length(internalStandardAssignments(x)) > 0)
         ret[, ISTD_assigned := sapply(internalStandardAssignments(x)[group], function(ia) paste0(ia, collapse = ","))]

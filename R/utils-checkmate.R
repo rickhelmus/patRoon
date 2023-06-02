@@ -410,6 +410,21 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
     return(x)
 }
 
+assertFGAsDataTableArgs <- function(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+                                    concAggrParams, toxAggrParams)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ average + areas + features + regression + normalized, fixed = list(add = ac))
+    checkmate::assertFunction(averageFunc, add = ac)
+    assertFCParams(FCParams, x, null.ok = TRUE, add = ac)
+    aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    checkmate::assert(checkmate::checkFALSE(qualities),
+                      checkmate::checkChoice(qualities, c("quality", "score", "both")),
+                      .var.name = "qualities")
+}
+
 assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate::vname(x), add = NULL)
 {
     ch <- c("max", "minmax")

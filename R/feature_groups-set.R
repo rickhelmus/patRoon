@@ -195,32 +195,24 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
 {
     # NOTE keep args in sync with featureGroupsScreeningSet
     
+    assertFGAsDataTableArgs(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+                            concAggrParams, toxAggrParams)
+    
+    if (length(x) == 0)
+        return(data.table(mz = numeric(), ret = numeric(), group = character()))
+    
+    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+                           concAggrParams)
+    
     anaInfo <- analysisInfo(x)
     
-    # HACK: add annotations and ISTD assignments later as format with sets is different
-    
-    # HACK HACK HACK: since we clear out annotations, which are needed in unset() called by normInts(), do
-    # this separately here...
-    if (!features && normalized)
-        x <- maybeAutoNormalizeFGroups(x)
-    
-    ann <- x@annotations
-    if (nrow(ann) > 0)
-        x@annotations <- data.table()
-    ISTDAssign <- internalStandardAssignments(x)
-    if (length(ISTDAssign) > 0)
-        x@ISTDAssignments <- list()
-    
-    ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
-                          regression = regression, averageFunc = averageFunc, normalized = normalized,
-                          FCParams = FCParams, concAggrParams = concAggrParams, toxAggrParams = toxAggrParams)
-    
-    if (!is.null(ret[["analysis"]])) # add set column if feature data is present
+    if (features) # add set column if feature data is present
     {
         ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
         setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
     }
     
+    ann <- annotations(x)
     if (nrow(ann) > 0)
     {
         if (features && !average)
@@ -235,6 +227,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
         }
     }
     
+    ISTDAssign <- internalStandardAssignments(x)
     if (length(ISTDAssign) > 0 && nrow(ret) > 0)
     {
         colISTDs <- function(ia) paste0(ia, collapse = ",")
@@ -244,7 +237,6 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
         {
             for (s in sets(x))
                 set(ret, j = paste0("ISTD_assigned-", s), value = sapply(ISTDAssign[[s]][ret$group], colISTDs))
-            # ret[, ISTD_assigned := sapply(group, function(gn) colISTDs(unique(unlist(lapply(ISTDAssign, "[[", gn)))))]
         }
     }
     

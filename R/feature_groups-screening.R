@@ -175,31 +175,7 @@ setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, 
 #'   enabled.
 #'
 #' @export
-setMethod("as.data.table", "featureGroupsScreening", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                              qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                              normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
-                                                              toxAggrParams = NULL, collapseSuspects = ",",
-                                                              onlyHits = FALSE)
-{
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(onlyHits, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (length(x) == 0)
-        return(data.table(mz = numeric(), ret = numeric(), group = character()))
-    
-    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams)
-    
-    if (nrow(ret) > 0)
-        ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)
-
-    return(ret)
-})
+setMethod("as.data.table", "featureGroupsScreening", doFGScrAsDataTable)
 
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,

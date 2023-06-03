@@ -215,35 +215,10 @@ setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NUL
     return(obj)
 })
 
+# UNDONE: document that collapseSuspect!=NULL && features==TRUE will give lots of rows (per feature and per suspect)
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("as.data.table", "featureGroupsScreeningSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                                 qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                                 normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
-                                                                 toxAggrParams = NULL, collapseSuspects = ",",
-                                                                 onlyHits = FALSE)
-{
-    # UNDONE: document that collapseSuspect!=NULL && features==TRUE will give lots of rows (per feature and per suspect)
-    
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(onlyHits, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (length(x) == 0)
-        return(data.table(mz = numeric(), ret = numeric(), group = character()))
-    
-    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams)
-    
-    if (nrow(ret) > 0)
-        ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)
-    
-    return(ret)
-})
+setMethod("as.data.table", "featureGroupsScreeningSet", doFGScrAsDataTable)
 
 #' @rdname featureGroupsScreening-class
 #' @export

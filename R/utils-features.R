@@ -431,15 +431,6 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EICs, checkEmptyElements = TRUE))
 }
 
-massConcUnitBase <- function(mcu)
-{
-    return(switch(mcu,
-                  gL = 1,
-                  mgL = 1E-3,
-                  ugL = 1E-6,
-                  ngL = 1E-9))
-}
-
 convertConc <- function(conc, unitFrom, unitTo, MW)
 {
     parseUnit <- function(unit)

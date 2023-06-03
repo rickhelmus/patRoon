@@ -612,11 +612,9 @@ doFGScrAsDataTable <- function(x, average = FALSE, areas = FALSE, features = FAL
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(x) == 0)
-        return(data.table(mz = numeric(), ret = numeric(), group = character()))
-    
-    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams)
+    ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
+                          regression = regression, averageFunc = averageFunc, normalized = normalized,
+                          FCParams = FCParams, concAggrParams = concAggrParams, toxAggrParams = toxAggrParams)
     
     if (nrow(ret) > 0)
         ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)

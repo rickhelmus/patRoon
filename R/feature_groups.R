@@ -620,7 +620,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 {
     # NOTE: keep args in sync with as.data.table() method for all derived classes
     
-    assertFGAsDataTableArgs(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams)
     
     if (length(x) == 0)

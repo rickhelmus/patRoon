@@ -195,7 +195,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
 {
     # NOTE keep args in sync with featureGroupsScreeningSet
     
-    assertFGAsDataTableArgs(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams)
     
     if (length(x) == 0)

@@ -225,7 +225,7 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, average = FA
 {
     # UNDONE: document that collapseSuspect!=NULL && features==TRUE will give lots of rows (per feature and per suspect)
     
-    assertFGAsDataTableArgs(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams)
     
     ac <- checkmate::makeAssertCollection()

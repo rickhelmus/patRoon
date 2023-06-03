@@ -181,7 +181,7 @@ setMethod("as.data.table", "featureGroupsScreening", function(x, average = FALSE
                                                               toxAggrParams = NULL, collapseSuspects = ",",
                                                               onlyHits = FALSE)
 {
-    assertFGAsDataTableArgs(average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams)
     
     ac <- checkmate::makeAssertCollection()

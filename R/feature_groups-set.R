@@ -188,63 +188,6 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(uns
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                        qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                        normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
-                                                        toxAggrParams = NULL)
-{
-    # NOTE keep args in sync with featureGroupsScreeningSet
-    
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams)
-    
-    if (length(x) == 0)
-        return(data.table(mz = numeric(), ret = numeric(), group = character()))
-    
-    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams)
-    
-    anaInfo <- analysisInfo(x)
-    
-    if (features) # add set column if feature data is present
-    {
-        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
-        setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
-    }
-    
-    ann <- annotations(x)
-    if (nrow(ann) > 0)
-    {
-        if (features && !average)
-            ret <- merge(ret, ann, by = c("group", "set"), sort = FALSE)
-        else
-        {
-            # collapse annotation info for each group
-            ann <- copy(ann)
-            ann[, adduct := paste0(adduct, collapse = ","), by = "group"]
-            ann <- unique(ann, by = "group")[, -"set"]
-            ret <- merge(ret, ann, by = "group", sort = FALSE)
-        }
-    }
-    
-    ISTDAssign <- internalStandardAssignments(x)
-    if (length(ISTDAssign) > 0 && nrow(ret) > 0)
-    {
-        colISTDs <- function(ia) paste0(ia, collapse = ",")
-        if (!is.null(ret[["set"]]))
-            ret[, ISTD_assigned := sapply(ISTDAssign[[set[1]]][group], colISTDs), by = "set"]
-        else
-        {
-            for (s in sets(x))
-                set(ret, j = paste0("ISTD_assigned-", s), value = sapply(ISTDAssign[[s]][ret$group], colISTDs))
-        }
-    }
-    
-    return(ret[])
-})
-
-#' @rdname featureGroups-class
-#' @export
 setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 {
     checkmate::assertFlag(sets)

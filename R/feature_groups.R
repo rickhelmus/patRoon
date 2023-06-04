@@ -618,45 +618,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                                                      normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
                                                      toxAggrParams = NULL)
 {
-    # NOTE: keep args in sync with as.data.table() method for all derived classes
-    
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams)
-    
-    if (length(x) == 0)
-        return(data.table(mz = numeric(), ret = numeric(), group = character()))
-
-    ret <- prepFGDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams)
-    
-    anaInfo <- analysisInfo(x)
-
-    annTable <- annotations(x)
-    if (nrow(ret) > 0 && nrow(annTable) > 0)
-        ret <- merge(ret, annTable, by = "group", sort = FALSE)
-    
-    if (nrow(ret) > 0 && length(internalStandardAssignments(x)) > 0)
-        ret[, ISTD_assigned := sapply(internalStandardAssignments(x)[group], function(ia) paste0(ia, collapse = ","))]
-
-    if (!is.null(toxAggrParams) && nrow(toxicities(x)) > 0)
-    {
-        tox <- subsetDTColumnsIfPresent(toxicities(x), c("group", "type", "LC50"))
-        if (nzchar(toxAggrParams$preferType))
-        {
-            tox[, keep := !toxAggrParams$preferType %in% type | type == toxAggrParams$preferType, by = "group"]
-            tox <- tox[keep == TRUE][, keep := NULL]
-        }
-        
-        tox[, LC50 := aggrVec(LC50, toxAggrParams$typeFunc), by = c("group", "type")]
-        tox[, LC50 := aggrVec(LC50, toxAggrParams$typeFunc), by = "group"]
-        tox[, type := paste0(unique(type), collapse = ","), by = "group"]
-        setnames(tox, "type", "LC50_types")
-        tox <- unique(tox, by = "group")
-        setcolorder(tox, setdiff(names(tox), "LC50_types")) # move to end
-        ret <- merge(ret, tox, by = "group", all.x = TRUE, sort = FALSE)
-    }
-    
-    return(ret[])
+    return(doFGAsDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+                           concAggrParams, toxAggrParams))
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

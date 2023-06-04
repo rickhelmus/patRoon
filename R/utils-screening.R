@@ -600,26 +600,9 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
 }
 
 # method definition for as.data.table, both non-sets and sets
-doFGScrAsDataTable <- function(x, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
-                               regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
-                               concAggrParams = NULL, toxAggrParams = NULL, collapseSuspects = ",", onlyHits = FALSE)
+doFGScrAsDataTable <- function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 {
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(onlyHits, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
-                          regression = regression, averageFunc = averageFunc, normalized = normalized,
-                          FCParams = FCParams, concAggrParams = concAggrParams, toxAggrParams = toxAggrParams)
-    
-    if (nrow(ret) > 0)
-        ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)
-    
-    return(ret)
+    return(doFGAsDataTable(x, ..., collapseSuspects = collapseSuspects, onlyHits = onlyHits))
 }
 
 mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)

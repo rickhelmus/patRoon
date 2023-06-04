@@ -90,14 +90,21 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     return(ret)
 }
 
-# this does most of the featureGroups method for as.data.table(), minus a few things that are specific to sets
-prepFGDataTable <- function(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams)
+# this combines all functionality from all fGroup as.data.table methods, a not so pretty but pragmatic solution...
+doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
+                            regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
+                            concAggrParams = NULL, toxAggrParams = NULL, collapseSuspects = ",", onlyHits = FALSE)
 {
+    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+                            concAggrParams, toxAggrParams, collapseSuspects, onlyHits)
+    
     if (features && average && regression)
         stop("Cannot add regression data for averaged features.")
     if (features && !is.null(FCParams))
         stop("Cannot calculate fold-changes with features=TRUE")
+
+    if (length(fGroups) == 0)
+        return(data.table(mz = numeric(), ret = numeric(), group = character()))
     
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
@@ -273,22 +280,61 @@ prepFGDataTable <- function(fGroups, average, areas, features, qualities, regres
         if (addScores)
             ret <- cbind(ret, groupScores(fGroups)[match(ret$group, group), -"group"])
     }
+
+    if (features && !average) # add set column if feature data is present
+    {
+        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+        setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
+    }
     
+    annTable <- annotations(fGroups)
+    if (nrow(ret) > 0 && nrow(annTable) > 0)
+    {
+        if (isFGSet(fGroups))
+        {
+            if (features && !average)
+                ret <- merge(ret, annTable, by = c("group", "set"), sort = FALSE)
+            else
+            {
+                # collapse annotation info for each group
+                annTable <- copy(annTable)
+                annTable[, adduct := paste0(adduct, collapse = ","), by = "group"]
+                annTable <- unique(annTable, by = "group")[, -"set"]
+                ret <- merge(ret, annTable, by = "group", sort = FALSE)
+            }
+        }
+        else
+            ret <- merge(ret, annTable, by = "group", sort = FALSE)
+    }
+    
+    ISTDAssign <- internalStandardAssignments(fGroups)
+    if (length(ISTDAssign) > 0 && nrow(ret) > 0)
+    {
+        colISTDs <- function(ia) paste0(ia, collapse = ",")
+        
+        if (isFGSet(fGroups))
+        {
+            if (!is.null(ret[["set"]]))
+                ret[, ISTD_assigned := sapply(ISTDAssign[[set[1]]][group], colISTDs), by = "set"]
+            else
+            {
+                for (s in sets(fGroups))
+                    set(ret, j = paste0("ISTD_assigned-", s), value = sapply(ISTDAssign[[s]][ret$group], colISTDs))
+            }
+        }
+        else
+            ret[, ISTD_assigned := sapply(ISTDAssign[group], function(ia) paste0(ia, collapse = ","))]
+    }
+
+    # NOTE: do this _before_ adding concs/tox
+    if (isScreening(fGroups))
+        ret <- mergeScreenInfoWithDT(ret, screenInfo(fGroups), collapseSuspects, onlyHits)
+    
+    splitSusps <- isScreening(fGroups) && is.null(collapseSuspects)
     if (!is.null(concAggrParams) && nrow(concentrations(fGroups)) > 0)
     {
-        concs <- subsetDTColumnsIfPresent(concentrations(fGroups), c("group", "type", anaInfo$analysis))
-        if (nzchar(concAggrParams$preferType))
-        {
-            concs[, keep := !concAggrParams$preferType %in% type | type == concAggrParams$preferType, by = "group"]
-            concs <- concs[keep == TRUE][, keep := NULL]
-        }
-        concs[, (anaInfo$analysis) := lapply(.SD, aggrVec, concAggrParams$typeFunc), .SDcols = anaInfo$analysis,
-              by = c("group", "type")]
-        concs[, (anaInfo$analysis) := lapply(.SD, aggrVec, concAggrParams$groupFunc), .SDcols = anaInfo$analysis,
-              by = "group"]
-        concs[, type := paste0(unique(type), collapse = ","), by = "group"]
+        concs <- aggregateConcs(concentrations(fGroups), anaInfo, concAggrParams, splitSusps)
         setnames(concs, "type", "conc_types")
-        concs <- unique(concs, by = "group")
         
         if (features)
             concs <- melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
@@ -297,7 +343,8 @@ prepFGDataTable <- function(fGroups, average, areas, features, qualities, regres
             for (rg in replicateGroups(fGroups))
             {
                 anas <- anaInfo[anaInfo$group == rg, "analysis"]
-                concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
+                concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas,
+                      by = seq_len(nrow(concs))]
             }
             concs[, (anaInfo$analysis) := NULL]
         }
@@ -306,8 +353,30 @@ prepFGDataTable <- function(fGroups, average, areas, features, qualities, regres
         
         setcolorder(concs, setdiff(names(concs), "conc_types")) # move to end
         
-        mby <- if (features) c("group", "analysis") else "group"
-        ret <- merge(ret, concs, by = mby, all.x = TRUE, sort = FALSE)
+        mby.x <- if (features) c("group", "analysis") else "group"
+        mby.y <- NULL
+        if (splitSusps && !is.null(concs[["candidate_name"]]))
+        {
+            mby.y <- c(mby.x, "candidate_name")
+            mby.x <- c(mby.x, "susp_name")
+        }
+        ret <- merge(ret, concs, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
+    }
+
+    if (!is.null(toxAggrParams) && nrow(toxicities(fGroups)) > 0)
+    {
+        tox <- aggregateTox(toxicities(fGroups), toxAggrParams, splitSusps)
+        setnames(tox, "type", "LC50_types")
+        setcolorder(tox, setdiff(names(tox), "LC50_types")) # move to end
+        
+        mby.x <- "group"
+        mby.y <- NULL
+        if (splitSusps && !is.null(tox[["candidate_name"]]))
+        {
+            mby.y <- c(mby.x, "candidate_name")
+            mby.x <- c(mby.x, "susp_name")
+        }
+        ret <- merge(ret, tox, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
     }
     
     return(ret[])
@@ -588,4 +657,78 @@ doCalcToxSets <- function(fGroups, featureAnn)
     }
     
     return(fGroups)
+}
+
+aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
+{
+    concs <- copy(concs)
+    concs <- subsetDTColumnsIfPresent(concs, c("group", "type", "candidate_name", anaInfo$analysis))
+    
+    if (splitSuspects && !any(concs$type == "suspect"))
+        splitSuspects <- FALSE # no suspects, nothing to split
+    
+    if (nzchar(aggrParams$preferType))
+    {
+        concs[, keep := !aggrParams$preferType %in% type | type == aggrParams$preferType, by = "group"]
+        concs <- concs[keep == TRUE][, keep := NULL]
+    }
+    
+    ignoreFGs <- character()
+    if (splitSuspects)
+    {
+        # fgs with suspect results will be reported for each suspect per row and results from other types will be
+        # ignored
+        fgsWithSuspect <- unique(concs[type == "suspect"]$group)
+        concs <- concs[!group %chin% fgsWithSuspect | type == "suspect"] # remove all others
+        ignoreFGs <- fgsWithSuspect # no further aggregation needed
+    }
+    else if (!is.null(concs[["candidate_name"]]))
+        concs[, candidate_name := NULL]
+    
+    concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, aggrParams$typeFunc),
+          .SDcols = anaInfo$analysis, by = c("group", "type")]
+    concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, aggrParams$groupFunc),
+          .SDcols = anaInfo$analysis, by = "group"]
+    
+    mby <- if (splitSuspects) c("group", "candidate_name") else "group"
+    concs[, type := paste0(unique(type), collapse = ","), by = mby]
+    concs <- unique(concs, by = mby)
+    
+    return(concs[])
+}
+
+aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
+{
+    tox <- copy(tox)
+    tox <- subsetDTColumnsIfPresent(toxicities(fGroups), c("group", "type", "candidate_name", "LC50"))
+    
+    if (splitSuspects && !any(tox$type == "suspect"))
+        splitSuspects <- FALSE # no suspects, nothing to split
+    
+    if (nzchar(aggrParams$preferType))
+    {
+        tox[, keep := !aggrParams$preferType %in% type | type == aggrParams$preferType, by = "group"]
+        tox <- tox[keep == TRUE][, keep := NULL]
+    }
+    
+    ignoreFGs <- character()
+    if (splitSuspects)
+    {
+        # fgs with suspect results will be reported for each suspect per row and results from other types will be
+        # ignored
+        fgsWithSuspect <- unique(tox[type == "suspect"]$group)
+        tox <- tox[!group %chin% fgsWithSuspect | type == "suspect"] # remove all others
+        ignoreFGs <- fgsWithSuspect # no further aggregation needed
+    }
+    else if (!is.null(tox[["candidate_name"]]))
+        tox[, candidate_name := NULL]
+
+    tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, aggrParams$typeFunc), by = c("group", "type")]
+    tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, aggrParams$typeFunc), by = "group"]
+    
+    mby <- if (splitSuspects) c("group", "candidate_name") else "group"
+    tox[, type := paste0(unique(type), collapse = ","), by = mby]
+    tox <- unique(tox, by = mby)
+    
+    return(tox[])
 }

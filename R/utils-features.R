@@ -95,7 +95,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                             regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
                             concAggrParams = NULL, toxAggrParams = NULL, collapseSuspects = ",", onlyHits = FALSE)
 {
-    assertFGAsDataTableArgs(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams, collapseSuspects, onlyHits)
     
     if (features && average && regression)
@@ -281,7 +281,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             ret <- cbind(ret, groupScores(fGroups)[match(ret$group, group), -"group"])
     }
 
-    if (features && !average) # add set column if feature data is present
+    if (isFGSet(fGroups) && features && !average) # add set column if feature data is present
     {
         ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
         setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))

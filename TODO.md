@@ -31,8 +31,6 @@
     - update compoundsScorings for sysdata.rda
     - as.data.table()
         - concs: handle features&&average == TRUE
-        - utils that aggregates concs/tox
-            - tox: first collapse sets
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong
@@ -45,6 +43,7 @@
     - concentrations & toxicities slot
     - clarify that intensity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
     - getDefPredArrgParams() and new as.data.table() args that use it
+        - candidateFunc: only used currently with tox, SIRIUS_FP and in >1 sets
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

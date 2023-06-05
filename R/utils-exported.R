@@ -401,7 +401,7 @@ getDefPredAggrParams <- function(...)
     def <- list(
         typeFunc = mean,
         groupFunc = mean,
-        setsFunc = mean,
+        candidateFunc = mean,
         preferType = "suspect" # UNDONE?
     )
     

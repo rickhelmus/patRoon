@@ -662,7 +662,7 @@ doCalcToxSets <- function(fGroups, featureAnn)
 aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
 {
     concs <- copy(concs)
-    concs <- subsetDTColumnsIfPresent(concs, c("group", "type", "candidate_name", anaInfo$analysis))
+    concs <- subsetDTColumnsIfPresent(concs, c("group", "type", "candidate", "candidate_name", anaInfo$analysis))
     
     if (splitSuspects && !any(concs$type == "suspect"))
         splitSuspects <- FALSE # no suspects, nothing to split
@@ -684,15 +684,22 @@ aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
     }
     else if (!is.null(concs[["candidate_name"]]))
         concs[, candidate_name := NULL]
-    
-    concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, aggrParams$typeFunc),
-          .SDcols = anaInfo$analysis, by = c("group", "type")]
-    concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, aggrParams$groupFunc),
-          .SDcols = anaInfo$analysis, by = "group"]
+
+    doAggr <- function(func, by)
+    {
+        concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, func),
+              .SDcols = anaInfo$analysis, by = by]
+        return(unique(concs, by = by))
+    }
+    concs <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
+    concs <- doAggr(aggrParams$typeFunc, c("group", "type"))
+    concs <- doAggr(aggrParams$groupFunc, "group")
     
     mby <- if (splitSuspects) c("group", "candidate_name") else "group"
     concs[, type := paste0(unique(type), collapse = ","), by = mby]
     concs <- unique(concs, by = mby)
+    
+    concs[, candidate := NULL]
     
     return(concs[])
 }
@@ -700,11 +707,11 @@ aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
 aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
 {
     tox <- copy(tox)
-    tox <- subsetDTColumnsIfPresent(toxicities(fGroups), c("group", "type", "candidate_name", "LC50"))
+    tox <- subsetDTColumnsIfPresent(tox, c("group", "type", "candidate", "candidate_name", "LC50"))
     
     if (splitSuspects && !any(tox$type == "suspect"))
         splitSuspects <- FALSE # no suspects, nothing to split
-    
+
     if (nzchar(aggrParams$preferType))
     {
         tox[, keep := !aggrParams$preferType %in% type | type == aggrParams$preferType, by = "group"]
@@ -723,12 +730,20 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     else if (!is.null(tox[["candidate_name"]]))
         tox[, candidate_name := NULL]
 
-    tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, aggrParams$typeFunc), by = c("group", "type")]
-    tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, aggrParams$typeFunc), by = "group"]
-    
+    doAggr <- function(func, by)
+    {
+        tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, func), by = by]
+        return(unique(tox, by = by))
+    }
+    tox <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
+    tox <- doAggr(aggrParams$typeFunc, c("group", "type"))
+    tox <- doAggr(aggrParams$groupFunc, "group")
+
     mby <- if (splitSuspects) c("group", "candidate_name") else "group"
     tox[, type := paste0(unique(type), collapse = ","), by = mby]
     tox <- unique(tox, by = mby)
+    
+    tox[, candidate := NULL]
     
     return(tox[])
 }

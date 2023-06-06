@@ -149,8 +149,8 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         if (average)
         {
-            ret <- ret[, -c("isocount", "analysis", "ID")]
-            numCols <- setdiff(names(ret), c("group", "replicate_group"))
+            ret <- removeDTColumnsIfPresent(ret, c("isocount", "analysis", "ID"))
+            numCols <- names(which(sapply(ret, is.numeric)))
             ret[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = "group"]
             ret <- unique(ret, by = "group")
         }
@@ -336,29 +336,39 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         concs <- aggregateConcs(concentrations(fGroups), anaInfo, concAggrParams, splitSusps)
         setnames(concs, "type", "conc_types")
         
-        if (features)
-            concs <- melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
-        else if (average)
+        if (average)
         {
             for (rg in replicateGroups(fGroups))
             {
                 anas <- anaInfo[anaInfo$group == rg, "analysis"]
-                concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas,
-                      by = seq_len(nrow(concs))]
+                concs[, (rg) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
             }
             concs[, (anaInfo$analysis) := NULL]
         }
+        
+        if (features)
+        {
+            concs <- if (average) 
+                melt(concs, measure.vars = replicateGroups(fGroups), variable.name = "replicate_group",
+                     value.name = "conc")
+            else
+                melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
+        }
+        else if (average)
+            setnames(concs, replicateGroups(fGroups), paste0(replicateGroups(fGroups), "_conc"))
         else
             setnames(concs, anaInfo$analysis, paste0(anaInfo$analysis, "_conc"))
         
         setcolorder(concs, setdiff(names(concs), "conc_types")) # move to end
         
-        mby.x <- if (features) c("group", "analysis") else "group"
-        mby.y <- NULL
+        mby.x <- "group"
+        if (features)
+            mby.x <- c(mby.x, if (average) "replicate_group" else "analysis")
+        mby.y <- mby.x
         if (splitSusps && !is.null(concs[["candidate_name"]]))
         {
-            mby.y <- c(mby.x, "candidate_name")
             mby.x <- c(mby.x, "susp_name")
+            mby.y <- c(mby.y, "candidate_name")
         }
         ret <- merge(ret, concs, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
     }
@@ -370,11 +380,11 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         setcolorder(tox, setdiff(names(tox), "LC50_types")) # move to end
         
         mby.x <- "group"
-        mby.y <- NULL
+        mby.y <- mby.x
         if (splitSusps && !is.null(tox[["candidate_name"]]))
         {
-            mby.y <- c(mby.x, "candidate_name")
             mby.x <- c(mby.x, "susp_name")
+            mby.y <- c(mby.y, "candidate_name")
         }
         ret <- merge(ret, tox, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
     }
@@ -689,7 +699,8 @@ aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
     {
         concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, func),
               .SDcols = anaInfo$analysis, by = by]
-        return(unique(concs, by = by))
+        dups <- duplicated(concs, by = by)
+        return(concs[group %chin% ignoreFGs | dups == FALSE])
     }
     concs <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
     concs <- doAggr(aggrParams$typeFunc, c("group", "type"))
@@ -733,7 +744,8 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     doAggr <- function(func, by)
     {
         tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, func), by = by]
-        return(unique(tox, by = by))
+        dups <- duplicated(tox, by = by)
+        return(tox[group %chin% ignoreFGs | dups == FALSE])
     }
     tox <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
     tox <- doAggr(aggrParams$typeFunc, c("group", "type"))

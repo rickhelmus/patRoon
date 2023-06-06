@@ -88,6 +88,7 @@ reportHTMLUtils$methods(
     hasSuspAnn = function() isSuspAnnotated(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
     hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
     hasSets = function() isFGSet(objects$fGroups),
+    hasConcs = function() nrow(concentrations(objects$fGroups)) > 0,
     hasFQualities = function() hasFGroupScores(objects$fGroups),
     hasObj = function(name) !is.null(objects[[name]]) && length(intersect(names(objects$fGroups), groupNames(objects[[name]]))) > 0,
     hasComponents = function() hasObj("components") && !inherits(objects$components, "componentsTPs"),

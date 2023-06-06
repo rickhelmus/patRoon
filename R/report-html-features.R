@@ -14,12 +14,14 @@ roundFGTab <- function(ftab, fGroups)
 
 getFGTable <- function(fGroups, colSusp, retMin)
 {
-    tab <- if (isScreening(fGroups))
-        as.data.table(fGroups, qualities = "score", average = TRUE, collapseSuspects = colSusp)
-    else
-        as.data.table(fGroups, qualities = "score", average = TRUE)
-    
+    # UNDONE: aggr params
+    adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = getDefPredAggrParams(),
+                    toxAggrParams = getDefPredAggrParams())
+    if (isScreening(fGroups))
+        adtArgs <- c(adtArgs, list(collapseSuspects = colSusp))
+    tab <- do.call(as.data.table, adtArgs)
     tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", replicateGroups(fGroups), "adduct", "neutralMass",
+                                           paste0(replicateGroups(fGroups), "_conc"), "conc_types", "LC50", "LC50_types",
                                            paste0("susp_", c("name", "estIDLevel", "d_rt", "d_mz", "sets", "InChIKey")),
                                            featureQualityNames(scores = TRUE),
                                            grep("^ISTD_assigned", names(tab), value = TRUE)))
@@ -95,13 +97,10 @@ getFeatGroupColDefs <- function(tab)
     setCD("susp_InChIKey", "show", FALSE)
     
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
-    if (length(featScoreNames) > 0)
+    for (col in featScoreNames)
     {
-        for (col in featScoreNames)
-        {
-            setCD(col, "name", sub("Score$", "", col))
-            setCD(col, "show", FALSE) # hidden by default, controlled by checkbox
-        }
+        setCD(col, "name", sub("Score$", "", col))
+        setCD(col, "show", FALSE) # hidden by default, controlled by checkbox
     }
     
     return(colDefs)
@@ -113,6 +112,7 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
     hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
+    concCols <- intersect(c(paste0(rgs, "_conc"), "conc_types"), names(tab))
     
     return(pruneList(list(
         # NOTE: the first group doesn't have a headerStyle (left border)
@@ -129,6 +129,9 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
         # may still be suspects, but collapsed
         else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
         reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle),
+        if (length(concCols) > 0) reactable::colGroup("concentrations", columns = concCols, headerStyle = colSepStyle) else NULL,
+        if (!is.null(tab[["LC50"]])) reactable::colGroup("toxicity", columns = c("LC50", "LC50_types"),
+                                                         headerStyle = colSepStyle) else NULL,
         if (length(featScoreNames) > 0) reactable::colGroup("feature quality scores", columns = featScoreNames,
                                                             headerStyle = colSepStyle) else NULL
     )))
@@ -148,7 +151,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         }
         return(gd)
     }
-    
+
     # sync column order
     tab <- copy(tab)
     setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
@@ -267,6 +270,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     colToggles <- list(
         group = setdiff(as.vector(groupCols$feature), c("group", "chrom_small", "chrom_large")), # don't toggle group and chroms
         intensities = as.vector(groupCols$intensity),
+        concentrations = as.vector(groupCols[["concentrations"]]),
         qualities = as.vector(groupCols[["feature quality scores"]]),
         chrom_large = "chrom_large"
     )

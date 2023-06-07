@@ -566,6 +566,62 @@ reportHTMLUtils$methods(
                       meta = list(featQualCols = fqn, CSVCols = CSVCols), pagination = TRUE)
     },
     
+    genConcsTable = function()
+    {
+        concs <- data.table::copy(concentrations(objects$fGroups))
+        
+        imgTag <- function(IK, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK], cand)
+        
+        concs[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
+        concs[type == "suspect", candidate := imgTag(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey,
+                                                     candidate)]
+        if (!is.null(objects[["compounds"]]))
+        {
+            cTab <- as.data.table(objects$compounds)
+            concs[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$InChIKey, candidate)]
+        }
+        
+        colDefs <- list(
+            group = reactable::colDef(show = FALSE),
+            candidate = reactable::colDef(html = TRUE)
+        )
+        if (!is.null(concs[["candidate_name"]]))
+            colDefs$candidate_name <- reactable::colDef("candidate name")
+        colDefs[analyses(objects$fGroups)] <- list(reactable::colDef(format = reactable::colFormat(digits = 2)))
+        colDefs$type <- setReactSelRangeFilter("concsTab", reactable::colDef())
+        colDefs <- setReactNumRangeFilters("concsTab", concs, colDefs)
+        
+        makeReactable(concs, "concsTab", columns = colDefs, pagination = TRUE, filterable = FALSE)
+    },
+
+    genToxTable = function()
+    {
+        tox <- data.table::copy(toxicities(objects$fGroups))
+        
+        imgTag <- function(IK, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK], cand)
+        
+        tox[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
+        tox[type == "suspect", candidate := imgTag(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey,
+                                                     candidate)]
+        if (!is.null(objects[["compounds"]]))
+        {
+            cTab <- as.data.table(objects$compounds)
+            tox[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$InChIKey, candidate)]
+        }
+        
+        colDefs <- list(
+            group = reactable::colDef(show = FALSE),
+            candidate = reactable::colDef(html = TRUE),
+            LC50 = reactable::colDef(format = reactable::colFormat(digits = 2))
+        )
+        if (!is.null(tox[["candidate_name"]]))
+            colDefs$candidate_name <- reactable::colDef("candidate name")
+        colDefs$type <- setReactSelRangeFilter("toxTab", reactable::colDef())
+        colDefs <- setReactNumRangeFilters("toxTab", tox, colDefs)
+        
+        makeReactable(tox, "toxTab", columns = colDefs, pagination = TRUE, filterable = FALSE)
+    },
+    
     genSuspAnnTable = function()
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)

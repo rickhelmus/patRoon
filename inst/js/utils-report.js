@@ -114,6 +114,11 @@ function updateFeatTabRowSel(rowValues, rowIndex)
 
     Reactable.setFilter('featuresTab', 'group', grp);
     
+    if (document.getElementById('concsTab'))
+        Reactable.setFilter('concsTab', 'group', grp);
+    if (document.getElementById('toxTab'))
+        Reactable.setFilter('toxTab', 'group', grp);
+    
     let intEl = document.getElementById('int_plot');
     if (intEl)
         intEl.src = reportPlots.intPlots[grp];
@@ -391,6 +396,30 @@ function toggleFeatFilters(e)
     })
     
     applyFilterToggle("featuresTab", "group", true);
+}
+
+function toggleConcsFilters(e)
+{
+    // as above, for feature table
+    Reactable.getInstance("concsTab").allColumns.forEach(function(col)
+    {
+        if (col.name !== "group") // UNDONE: do this more elegantly?
+            col.filterable = e;
+    })
+    
+    applyFilterToggle("concsTab", "group", true);
+}
+
+function toggleToxFilters(e)
+{
+    // as above, for feature table
+    Reactable.getInstance("toxTab").allColumns.forEach(function(col)
+    {
+        if (col.name !== "group") // UNDONE: do this more elegantly?
+            col.filterable = e;
+    })
+    
+    applyFilterToggle("toxTab", "group", true);
 }
 
 function toggleFormFilters(e)

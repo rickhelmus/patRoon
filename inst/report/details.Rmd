@@ -244,6 +244,36 @@ bslib::layout_column_wrap(
                 ),
                 bslib::card_body_fill(utils$genFeaturesTable())
             ),
+            maybeIncl(utils$hasConcs(), bslib::nav(
+                "Concentrations",
+                bsCardBodyNoFill(
+                    class = "mt-2",
+                    htmltools::withTags({
+                        div(class = "pb-1",
+                            input(type = "checkbox", id = "concs-filter", onChange = 'toggleConcsFilters(this.checked)'),
+                            label("for" = "concs-filter", style = list("margin-right" = "10px"), "Filters"),
+                            button(type = "button", class = "btn btn-primary btn-sm",
+                                   onClick = "downloadCSV('concsTab', 'concentrations.csv')", "Download CSV")
+                        )
+                    })
+                ),
+                bslib::card_body_fill(utils$genConcsTable())
+            )),
+            maybeIncl(utils$hasTox(), bslib::nav(
+                "Toxicities",
+                bsCardBodyNoFill(
+                    class = "mt-2",
+                    htmltools::withTags({
+                        div(class = "pb-1",
+                            input(type = "checkbox", id = "tox-filter", onChange = 'toggleToxFilters(this.checked)'),
+                            label("for" = "tox-filter", style = list("margin-right" = "10px"), "Filters"),
+                            button(type = "button", class = "btn btn-primary btn-sm",
+                                   onClick = "downloadCSV('toxTab', 'toxicities.csv')", "Download CSV")
+                        )
+                    })
+                ),
+                bslib::card_body_fill(utils$genToxTable())
+            )),
             maybeIncl(settings$features$intensityPlots, bslib::nav(
                 "Intensities",
                 class = "mt-2",

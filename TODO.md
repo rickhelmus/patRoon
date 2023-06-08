@@ -43,6 +43,7 @@
     - clarify that intensity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
     - getDefPredArrgParams() and new as.data.table() args that use it
         - candidateFunc: only used currently with tox, SIRIUS_FP and in >1 sets
+    - minRF/maxLC50 susp filters
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

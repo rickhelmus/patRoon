@@ -328,21 +328,23 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                           minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
                                                           absMinFragMatches = NULL, relMinFragMatches = NULL,
-                                                          negate = FALSE)
+                                                          minRF = NULL, maxLC50 = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + minRF + maxLC50, null.ok = TRUE,
+           fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     oldsi <- screenInfo(obj)
     # NOTE: we do onlyHits later, as otherwise doSuspectFilter() might cause set synchronization (via delete()) whereas
     # the setObjects are not updated yet
     obj <- doSuspectFilter(obj, onlyHits = NULL, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
+                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
+                           maxLC50, negate)
     newsi <- screenInfo(obj)
     suspFiltered <- !isTRUE(all.equal(oldsi, screenInfo(obj)))
     
@@ -362,8 +364,8 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     if (!is.null(onlyHits))
         obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy = NULL, selectBestFGroups = FALSE, maxLevel = NULL,
                                maxFormRank = NULL, maxCompRank = NULL, minAnnSimForm = NULL, minAnnSimComp = NULL,
-                               minAnnSimBoth = NULL, absMinFragMatches = NULL, relMinFragMatches = NULL,
-                               negate = negate)
+                               minAnnSimBoth = NULL, absMinFragMatches = NULL, relMinFragMatches = NULL, minRF = NULL,
+                               maxLC50 = NULL, negate = negate)
     
     # filter functionality from fGroupsSet
     if (...length() > 0)

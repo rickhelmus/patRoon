@@ -544,7 +544,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
-                                                       absMinFragMatches = NULL, relMinFragMatches = NULL, negate = FALSE)
+                                                       absMinFragMatches = NULL, relMinFragMatches = NULL,
+                                                       minRF = NULL, maxLC50 = NULL, negate = FALSE)
 {
     # NOTE: keep args and method in sync with featureGroupsScreeningSet method
     
@@ -553,11 +554,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + minRF + maxLC50, null.ok = TRUE,
+           fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     obj <- doSuspectFilter(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
+                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
+                           maxLC50, negate)
 
     if (...length() > 0)
         obj <- callNextMethod(obj, ..., negate = negate)

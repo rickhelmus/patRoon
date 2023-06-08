@@ -217,11 +217,12 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 }
 
 doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, negate)
+                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
+                            maxLC50, negate)
 {
     if (nrow(screenInfo(obj)) > 0)
     {
-        colFilter <- function(pred, what, col, ac = TRUE)
+        colFilter <- function(pred, what, col, dataWhich, funcToRun, ac = TRUE)
         {
             val <- get(what)
             if (!is.null(val))
@@ -232,7 +233,8 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
                     intersect(col, names(screenInfo(obj)))
                 
                 if (length(allCols) == 0)
-                    warning(sprintf("Cannot apply %s filter: no annotation data available (did you run annotateSuspects()?).", what))
+                    warning(sprintf("Cannot apply %s filter: no %s data available (did you run %s()?).", what,
+                                    dataWhich, funcToRun), call. = FALSE)
                 else
                 {
                     if (negate)
@@ -246,18 +248,22 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
             }
             return(obj)
         }
+        colFilterAnn <- function(...) colFilter(dataWhich = "annotation", funcToRun = "annotateSuspects", ...)
         minPred <- function(x, v) x >= v
         maxPred <- function(x, v) x <= v
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
         
-        obj <- colFilter(levPred, "maxLevel", "estIDLevel", ac = FALSE)
-        obj <- colFilter(maxPred, "maxFormRank", "formRank", ac = FALSE)
-        obj <- colFilter(maxPred, "maxCompRank", "compRank", ac = FALSE)
-        obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
-        obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
-        obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")
-        obj <- colFilter(minPred, "absMinFragMatches", "maxFragMatches")
-        obj <- colFilter(minPred, "relMinFragMatches", "maxFragMatchesRel")
+        obj <- colFilterAnn(levPred, "maxLevel", "estIDLevel", ac = FALSE)
+        obj <- colFilterAnn(maxPred, "maxFormRank", "formRank", ac = FALSE)
+        obj <- colFilterAnn(maxPred, "maxCompRank", "compRank", ac = FALSE)
+        obj <- colFilterAnn(minPred, "minAnnSimForm", "annSimForm")
+        obj <- colFilterAnn(minPred, "minAnnSimComp", "annSimComp")
+        obj <- colFilterAnn(minPred, "minAnnSimBoth", "annSimBoth")
+        obj <- colFilterAnn(minPred, "absMinFragMatches", "maxFragMatches")
+        obj <- colFilterAnn(minPred, "relMinFragMatches", "maxFragMatchesRel")
+        
+        obj <- colFilter(minPred, "minRF", "RF_SMILES", dataWhich = "response factor", funcToRun = "predictRespFactors")
+        obj <- colFilter(maxPred, "maxLC50", "LC50_SMILES", dataWhich = "LC50", funcToRun = "predictTox")
         
         # do here so that only duplicates not yet filtered out in previous steps are considered
         # NOTE for sets: for ID levels only the regular (non-set) estIDLevel column is used

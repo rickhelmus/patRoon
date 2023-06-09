@@ -506,6 +506,16 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
         obj@groups[, (affectedGrps) := Map(.SD, affectedGrps, f = function(x, g) fifelse(ftind[[g]] == 0, 0, x)),
                    by = rep(1, nrow(obj@groups)), .SDcols = affectedGrps]
+        if (nrow(concentrations(obj)) > 0)
+        {
+            obj@concentrations <- copy(obj@concentrations)
+            anas <- analyses(obj) # update var
+            obj@concentrations[group %chin% affectedGrps, (anas) := {
+                vals <- mget(anas)
+                vals[ftind[[group]] == 0] <- 0
+                vals
+            }, by = seq_len(nrow(obj@concentrations))]
+        }
     }
     
     return(obj)

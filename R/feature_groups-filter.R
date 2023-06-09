@@ -140,6 +140,34 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
     }, "minReplicates", verbose))
 }
 
+minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, negate = FALSE)
+{
+    concs <- concentrations(fGroups)
+    if (length(fGroups) == 0 || nrow(concs) == 0)
+        return(fGroups)
+    
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
+    if (threshold == 0)
+        return(fGroups)
+    
+    return(doFGroupsFilter(fGroups, "concentration", c(threshold, negate), function(fGroups)
+    {
+        aggrConcs <- aggregateConcs(concs, analysisInfo(fGroups), aggrParams, FALSE)
+        aggrConcs <- aggrConcs[, c("group", analyses(fGroups)), with = FALSE]
+        aggrConcs <- transpose(aggrConcs, make.names = "group")
+        
+        compF <- if (negate)
+            function(x) (removeNA & !is.na(x)) | (!removeNA & !is.na(x) & x >= threshold)
+        else
+            function(x) (removeNA & is.na(x)) | (!removeNA & !is.na(x) & x < threshold)
+        
+        delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                              names(fGroups))
+        delGroups[, (names(aggrConcs)) := lapply(aggrConcs, compF), by = rep(1, nrow(delGroups))]
+        return(delete(fGroups, j = delGroups))
+    }))
+}
+
 replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE)
 {
     if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxIntRSD) == 0)
@@ -426,7 +454,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \item Replicate abundance filters (2nd time, only if previous filters affected results).
 #'
 #'   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
-#'   \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
+#'   \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc} and \code{relMinConc}.
 #'
 #'   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
 #'   analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).
@@ -445,11 +473,13 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinReplicates = NULL, relMinReplicates = NULL,
                                               absMinFeatures = NULL, relMinFeatures = NULL,
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
+                                              absMinConc = NULL, relMinConc = NULL,
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
                                               rGroups = NULL, results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
-                                              checkFeaturesSession = NULL, negate = FALSE)
+                                              checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
+                                              removeNA = FALSE, negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -457,7 +487,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
-               absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateIntRSD +
+               absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + maxReplicateIntRSD +
                blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
@@ -472,9 +502,10 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                       checkmate::checkList(results, c("featureAnnotations", "components"), any.missing = FALSE,
                                            min.len = 1),
                       .var.name = "results")
-    aapply(checkmate::assertFlag, . ~ removeBlanks + removeISTDs + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
+    assertPredAggrParams(predAggrParams, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -514,6 +545,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(minAnalysesFilter, absMinAnalyses, relMinAnalyses)
     obj <- maybeDoFilter(minReplicatesFilter, absMinReplicates, relMinReplicates)
     obj <- maybeDoFilter(minFeaturesFilter, absMinFeatures, relMinFeatures)
+    obj <- maybeDoFilter(minConcFilter, absMinConc, relMinConc, otherArgs = list(aggrParams = predAggrParams,
+                                                                                 removeNA = removeNA))
 
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(resultsFilter, results)

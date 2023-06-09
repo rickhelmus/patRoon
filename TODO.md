@@ -44,6 +44,9 @@
     - getDefPredArrgParams() and new as.data.table() args that use it
         - candidateFunc: only used currently with tox, SIRIUS_FP and in >1 sets
     - minRF/maxLC50 susp filters
+    - minConc filter
+        - also predAggrParams and removeNA args
+        - also allow somehow with suspect splitting, eg to remove specific suspect hits with low conc (as alternative to minRF)?
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

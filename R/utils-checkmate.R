@@ -474,7 +474,7 @@ assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::v
     assertListVal(x, "PVAdjFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
 }
 
-assertPredAggrParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+assertPredAggrParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
         return(NULL)

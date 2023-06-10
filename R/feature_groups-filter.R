@@ -168,6 +168,29 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
     }))
 }
 
+maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, negate = FALSE)
+{
+    tox <- toxicities(fGroups)
+    if (length(fGroups) == 0 || nrow(tox) == 0)
+        return(fGroups)
+    
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
+    if (threshold == 0)
+        return(fGroups)
+    
+    return(doFGroupsFilter(fGroups, "toxicity", c(threshold, aggrParams, removeNA, negate), function(fGroups)
+    {
+        aggrTox <- aggregateTox(tox, aggrParams, FALSE)
+        
+        compF <- if (negate)
+            function(x) (removeNA & !is.na(x)) | (!removeNA & !is.na(x) & x <= threshold)
+        else
+            function(x) (removeNA & is.na(x)) | (!removeNA & !is.na(x) & x > threshold)
+        
+        return(delete(fGroups, j = aggrTox[compF(LC50) == TRUE]$group))
+    }))
+}
+
 replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE)
 {
     if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxIntRSD) == 0)
@@ -473,7 +496,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinReplicates = NULL, relMinReplicates = NULL,
                                               absMinFeatures = NULL, relMinFeatures = NULL,
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
-                                              absMinConc = NULL, relMinConc = NULL,
+                                              absMinConc = NULL, relMinConc = NULL, absMaxTox = NULL, relMaxTox = NULL,
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
@@ -487,8 +510,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
-               absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + maxReplicateIntRSD +
-               blankThreshold,
+               absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox +
+               maxReplicateIntRSD + blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
@@ -547,7 +570,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(minFeaturesFilter, absMinFeatures, relMinFeatures)
     obj <- maybeDoFilter(minConcFilter, absMinConc, relMinConc, otherArgs = list(aggrParams = predAggrParams,
                                                                                  removeNA = removeNA))
-
+    obj <- maybeDoFilter(maxToxFilter, absMaxTox, relMaxTox, otherArgs = list(aggrParams = predAggrParams,
+                                                                              removeNA = removeNA))
+    
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(resultsFilter, results)
     if (removeBlanks)

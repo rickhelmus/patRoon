@@ -604,6 +604,13 @@ assertAndPrepareReportSettings <- function(settings)
         # yaml package always returns empty sequences as lists --> convert to empty vector
         return(if (is.list(val) && length(val) == 0) evec else val)
     }
+    assertAndToFunc <- function(x, .var.name = checkmate::vname(val))
+    {
+        checkmate::assertString(x, .var.name = .var.name)
+        x <- get(x)
+        checkmate::assertFunction(x, .var.name = .var.name)
+        return(x)
+    }
     
     checkmate::assertList(settings, any.missing = FALSE)
     assertHasNames(settings, c("general", "summary", "features", "MSPeakLists", "formulas", "compounds", "TPs",
@@ -633,6 +640,8 @@ assertAndPrepareReportSettings <- function(settings)
     )
     checkmate::assertChoice(settings$features$chromatograms$intMax, c("eic", "feature"), add = ac)
     checkmate::assertFlag(settings$features$intensityPlots, add = ac)
+    settings$features$aggregateConcs <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateConcs))
+    settings$features$aggregateTox <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateTox))
     
     checkmate::assertList(settings$MSPeakLists)
     checkmate::assertFlag(settings$MSPeakLists$spectra, add = ac)

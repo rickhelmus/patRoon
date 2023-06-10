@@ -12,11 +12,10 @@ roundFGTab <- function(ftab, fGroups)
     return(ftab)    
 }
 
-getFGTable <- function(fGroups, colSusp, retMin)
+getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
 {
-    # UNDONE: aggr params
-    adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = getDefPredAggrParams(),
-                    toxAggrParams = getDefPredAggrParams())
+    adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = concAggrParams,
+                    toxAggrParams = toxAggrParams)
     if (isScreening(fGroups))
         adtArgs <- c(adtArgs, list(collapseSuspects = colSusp))
     tab <- do.call(as.data.table, adtArgs)
@@ -403,7 +402,8 @@ reportHTMLUtils$methods(
     genFGTablePlain = function()
     {
         mdprintf("Feature groups... ")
-        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
+        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
+                          settings$features$aggregateTox)
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
@@ -411,7 +411,8 @@ reportHTMLUtils$methods(
     },
     genFGTableSuspects = function()
     {
-        tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin)[!is.na(susp_name)]
+        tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin, settings$features$aggregateConcs,
+                          settings$features$aggregateTox)[!is.na(susp_name)]
         groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
@@ -429,7 +430,8 @@ reportHTMLUtils$methods(
         rncols <- setdiff(names(istds), "group")
         setnames(istds, rncols, paste0("susp_", rncols))
         
-        ftab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
+        ftab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
+                           settings$features$aggregateTox)
         ftab <- removeDTColumnsIfPresent(ftab, c("susp_name", "susp_sets", grep("^ISTD_assigned",
                                                                                 names(ftab), value = TRUE)))
         tab <- merge(ftab, istds, by = "group")

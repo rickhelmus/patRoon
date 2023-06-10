@@ -1,4 +1,5 @@
 general:
+    version: 2
     format: html
     path: report
     keepUnusedPlots: 7
@@ -13,6 +14,8 @@ features:
         features: false
         intMax: eic
     intensityPlots: false
+    aggregateConcs: mean
+    aggregateTox: mean
 MSPeakLists:
     spectra: true
 formulas:

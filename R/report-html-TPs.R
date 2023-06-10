@@ -73,7 +73,8 @@ reportHTMLUtils$methods(
     {
         fromTPs <- objects$components@fromTPs
         
-        tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin)
+        tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin,
+                                 settings$features$aggregateConcs, settings$features$aggregateTox)
         
         tabCompon <- as.data.table(objects$components)
         tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]

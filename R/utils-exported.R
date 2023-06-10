@@ -396,12 +396,12 @@ getDefEICParams <- function(...)
 }
 
 #' @export
-getDefPredAggrParams <- function(...)
+getDefPredAggrParams <- function(all = mean, ...)
 {
     def <- list(
-        typeFunc = mean,
-        groupFunc = mean,
-        candidateFunc = mean,
+        typeFunc = all,
+        groupFunc = all,
+        candidateFunc = all,
         preferType = "suspect" # UNDONE?
     )
     

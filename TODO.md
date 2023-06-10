@@ -31,7 +31,6 @@
     - update compoundsScorings for sysdata.rda
     - as.data.table(): always add data, ie aggrParams != NULL, by default?
     - report(): pred aggr params
-        - add in yml
         - add versioning to yml and update function 
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()

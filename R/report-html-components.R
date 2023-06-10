@@ -59,7 +59,8 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
 reportHTMLUtils$methods(
     genFGTableComponents = function()
     {
-        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin)
+        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
+                          settings$features$aggregateTox)
         groupDefs <- getFGGroupDefs(tab, "component", replicateGroups(objects$fGroups))
         colDefs <- getFeatGroupColDefs(tab)
         

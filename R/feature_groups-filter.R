@@ -150,7 +150,7 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
     if (threshold == 0)
         return(fGroups)
     
-    return(doFGroupsFilter(fGroups, "concentration", c(threshold, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "concentration", c(threshold, aggrParams, removeNA, negate), function(fGroups)
     {
         aggrConcs <- aggregateConcs(concs, analysisInfo(fGroups), aggrParams, FALSE)
         aggrConcs <- aggrConcs[, c("group", analyses(fGroups)), with = FALSE]

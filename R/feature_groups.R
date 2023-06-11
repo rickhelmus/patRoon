@@ -625,8 +625,9 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                     normalized = FALSE, FCParams = NULL, concAggrParams = NULL,
-                                                     toxAggrParams = NULL)
+                                                     normalized = FALSE, FCParams = NULL,
+                                                     concAggrParams = getDefPredAggrParams(),
+                                                     toxAggrParams = getDefPredAggrParams())
 {
     return(doFGAsDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                            concAggrParams, toxAggrParams))

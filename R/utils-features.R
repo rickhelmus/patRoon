@@ -93,7 +93,8 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
 # this combines all functionality from all fGroup as.data.table methods, a not so pretty but pragmatic solution...
 doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
                             regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
-                            concAggrParams = NULL, toxAggrParams = NULL, collapseSuspects = ",", onlyHits = FALSE)
+                            concAggrParams = getDefPredAggrParams(), toxAggrParams = getDefPredAggrParams(),
+                            collapseSuspects = ",", onlyHits = FALSE)
 {
     assertFGAsDataTableArgs(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams, collapseSuspects, onlyHits)

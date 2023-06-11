@@ -179,6 +179,19 @@ setMethod("show", "featureGroups", function(object)
         else
             printf("%s (%d assigned total)\n", getStrListWithMax(unique(internalStandards(object)$name), 6, ", "),
                    nrow(internalStandards(object)))
+        printf("Predicted concentrations: ")
+        concs <- concentrations(object)
+        if (nrow(concs) == 0)
+            printf("none\n")
+        else
+            printf("%d feature groups (%.2f%%)\n", uniqueN(concs$group), uniqueN(concs$group) / gCount * 100)
+        printf("Predicted toxicities: ")
+        tox <- toxicities(object)
+        if (nrow(tox) == 0)
+            printf("none\n")
+        else
+            printf("%d feature groups (%.2f%%)\n", uniqueN(tox$group), uniqueN(tox$group) / gCount * 100)
+            
     }
     showAnaInfo(analysisInfo(object))
 })

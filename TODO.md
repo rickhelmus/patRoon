@@ -21,7 +21,6 @@
 ## Predict
 
 - general
-    - show() for annotation classes with predictions?
     - also score formulas?
         - general score mechanism currently not there
     - don't allow update scoring for SIRIUS compounds?

@@ -738,11 +738,20 @@ assertAndPrepareQuantCalib <- function(calibration, concUnit)
     return(calibration[])
 }
 
-checkQuantEluent <- function(x)
+checkQuantEluent <- function(x, fGroups)
 {
     ret <- checkmate::checkDataFrame(x, any.missing = FALSE, ncols = 2, types = "numeric")
     if (isTRUE(ret))
         ret <- checkHasNames(x, c("time", "B"))
+    if (isTRUE(ret))
+        ret <- checkmate::checkNumeric(x$time, lower = 0, finite = TRUE)
+    if (isTRUE(ret))
+        ret <- checkmate::checkNumeric(x$B, lower = 0, upper = 100, finite = TRUE)
+    
+    if (isTRUE(ret) && max(x$time) < max(groupInfo(fGroups)$rts))
+        ret <- paste("The highest retention time in the eluent table is less than the highest feature retention time.",
+                     "Make sure retention times are specified in seconds")
+        
     return(ret)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)

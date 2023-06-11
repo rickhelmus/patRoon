@@ -575,7 +575,7 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    assertQuantEluent(eluent, add = ac)
+    assertQuantEluent(eluent, fGroups, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
     aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))

@@ -30,8 +30,6 @@
         - would make sense, but might break eg suspect annotation ranks
     - update compoundsScorings for sysdata.rda
     - as.data.table(): always add data, ie aggrParams != NULL, by default?
-    - report(): pred aggr params
-        - add versioning to yml and update function 
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - somehow verify eluents variable? gives strange errors if eg time unit is wrong
@@ -49,6 +47,7 @@
     - minRF/maxLC50 susp filters
     - minConc filter
         - also predAggrParams and removeNA args
+    - baseFrom param of genReportSettingsFile()
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

@@ -597,7 +597,7 @@ assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, ad
     checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
 }
 
-assertAndPrepareReportSettings <- function(settings)
+assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
 {
     emptyListToVec <- function(val, evec)
     {
@@ -615,10 +615,25 @@ assertAndPrepareReportSettings <- function(settings)
     checkmate::assertList(settings, any.missing = FALSE)
     assertHasNames(settings, c("general", "summary", "features", "MSPeakLists", "formulas", "compounds", "TPs",
                                "internalStandards"))
-    
+
     ac <- checkmate::makeAssertCollection()
     
     checkmate::assertList(settings$general)
+    # NOTE: version 1 wasn't specified, so might be absent
+    checkmate::assertCount(settings$general[["version"]], positive = TRUE, null.ok = TRUE) # don't add!
+    
+    # check version first: if file is older we silently update it so subsequent checks won't fail
+    defSettings <- readYAML(system.file("report", "settings.yml", package = "patRoon"))
+    if (is.null(settings$general[["version"]]) || settings$general$version < defSettings$general$version)
+    {
+        warning("Report settings file is older than current and might be incomplete. ",
+                "Use genReportSettingsFile() to update the file.", call. = FALSE)
+        settings <- adjustReportSettings(defSettings, settings)
+    }
+    else if (settings$general$version > defSettings$general$version)
+        warning("Report settings file is newer than current! ",
+                "Update patRoon to support all settings", call. = FALSE)
+    
     checkmate::assertSubset(settings$general$format, choices = "html", add = ac)
     checkmate::assertPathForOutput(settings$general$path, overwrite = TRUE, add = ac)
     checkmate::assertCount(settings$general$keepUnusedPlots, positive = FALSE, add = ac)
@@ -640,8 +655,11 @@ assertAndPrepareReportSettings <- function(settings)
     )
     checkmate::assertChoice(settings$features$chromatograms$intMax, c("eic", "feature"), add = ac)
     checkmate::assertFlag(settings$features$intensityPlots, add = ac)
-    settings$features$aggregateConcs <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateConcs))
-    settings$features$aggregateTox <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateTox))
+    if (setAggr)
+    {
+        settings$features$aggregateConcs <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateConcs))
+        settings$features$aggregateTox <- getDefPredAggrParams(assertAndToFunc(settings$features$aggregateTox))
+    }
     
     checkmate::assertList(settings$MSPeakLists)
     checkmate::assertFlag(settings$MSPeakLists$spectra, add = ac)

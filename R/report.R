@@ -11,6 +11,7 @@ NULL
 #' @name reporting
 NULL
 
+adjustReportSettings <- function(settings, adjSettings) return(modifyList(settings, adjSettings, keep.null = TRUE))
 
 #' @details \code{report} reports all workflow data in an interactive \acronym{HTML} file. The reports include both
 #'   tabular data (\emph{e.g.} retention times, annotation properties, screening results) and varios plots (\emph{e.g.}
@@ -166,7 +167,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
     
     settings <- readYAML(settingsFile)
-    settings <- modifyList(settings, overrideSettings, keep.null = TRUE)
+    settings <- adjustReportSettings(settings, overrideSettings)
     settings <- assertAndPrepareReportSettings(settings)
     
     if (is.null(path))
@@ -195,10 +196,25 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
 #'
 #' @rdname reporting
 #' @export
-genReportSettingsFile <- function(out = "report.yml")
+genReportSettingsFile <- function(out = "report.yml", baseFrom = NULL)
 {
     checkmate::assertPathForOutput(out, overwrite = TRUE)
+    if (!is.null(baseFrom))
+    {
+        checkmate::assertFileExists(baseFrom, "r")
+    }
+    
     defFile <- system.file("report", "settings.yml", package = "patRoon")
-    file.copy(defFile, out, overwrite = TRUE)
+    
+    if (is.null(baseFrom))
+        file.copy(defFile, out, overwrite = TRUE)
+    else
+    {
+        settings <- readYAML(baseFrom)
+        settings <- adjustReportSettings(readYAML(defFile), settings)
+        settings <- assertAndPrepareReportSettings(settings, setAggr = FALSE)
+        writeYAML(settings, out)
+    }
+
     invisible(NULL)
 }

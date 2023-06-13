@@ -401,11 +401,17 @@ getMS2QTFPs <- function(featAnnSIR)
 
 predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq, concUnit)
 {
-    # UNDONE: MS2Quant only checks for M+H/M+, otherwise assumes neg mode --> just default all pos adducts to M+H?
-    
     featAnnSIR <- featAnnSIR[rownames(gInfo)]
     
     allFPs <- getMS2QTFPs(featAnnSIR)
+    
+    if (any(!allFPs$ionization %chin% c("[M+H]+", "[M]+")))
+    {
+        warning("One or more features are with adducts other than [M+H]+/[M]+. ",
+                "These are not (yet) supported by MS2Quant and will be ignored.", call. = FALSE)
+        allFPs <- allFPs[ionization %chin% c("[M+H]+", "[M]+")]
+    }
+    
     if (nrow(allFPs) == 0)
         return(data.table())
     
@@ -465,7 +471,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
 
 predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
 {
-    # UNDONE: check supported adducts
+    # UNDONE: check supported adducts?
     
     allFPs <- getMS2QTFPs(featAnnSIR)
     if (nrow(allFPs) == 0)

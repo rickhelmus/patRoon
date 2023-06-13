@@ -32,7 +32,7 @@
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs
 - tox
-    - predictRespFactorsSIRFPs(): verify adduct/polarity, change to M+H for eg M+Na?
+    - predictRespFactorsSIRFPs(): need to check adduct?
     - which default unit?
 - docs
     - SIRIUS formulas/compound class
@@ -45,6 +45,9 @@
     - minConc filter
         - also predAggrParams and removeNA args
     - baseFrom param of genReportSettingsFile()
+    - MS2Quant only supports M/M+H
+    - sets specifics
+        - calibrants as list
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

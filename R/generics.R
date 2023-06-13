@@ -198,7 +198,7 @@ setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("gene
 ### Formulas
 
 #' @rdname generateFormulas
-setGeneric("generateFormulas", function(fGroups, algorithm, ...) standardGeneric("generateFormulas"))
+setGeneric("generateFormulas", function(fGroups, MSPeakLists, algorithm, ...) standardGeneric("generateFormulas"))
 
 #' @rdname generateFormulasGenForm
 setGeneric("generateFormulasGenForm", function(fGroups, ...) standardGeneric("generateFormulasGenForm"))

@@ -102,6 +102,7 @@ if (testWithSets())
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
 
+    getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjFormFPs", c("-pos", "-neg")))
     getSIRCompProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjComp", c("-pos", "-neg")))
     
     doScreen <- function(fg, susp, ...)
@@ -149,6 +150,7 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
+    getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), "SIRProjFormFPs")
     getSIRCompProjPath <- function() file.path(getTestDataPath(), "SIRProjComp")
     
     doScreen <- function(fg, susp, ...)
@@ -234,25 +236,41 @@ makeMZXMLs <- function(anaInfo)
     return(anaInfo)
 }
 
-updateSIRIUSCompsProj <- function(fGroups, mslists)
+updateSIRIUSAnnProj <- function(SIRPath, clearEmptyFI)
 {
-    unlink(getSIRCompProjPath(), recursive = TRUE)
-    withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRCompProjPath()))
-    for (pp in normalizePath(getSIRCompProjPath()))
+    for (pp in normalizePath(SIRPath))
     {
         if (!dir.exists(pp))
             next
         
-        # remove directories without FingerID results, as these will trigger new online searches even with dryRun=TRUE
-        allDirs <- dirname(Sys.glob(file.path(pp, "*", "spectrum.ms")))
-        dirsWithFI <- dirname(Sys.glob(file.path(pp, "*", "fingerid")))
-        unlink(setdiff(allDirs, dirsWithFI), recursive = TRUE)
+        if (clearEmptyFI)
+        {
+            # remove directories without FingerID results, as these will trigger new online searches even with dryRun=TRUE
+            allDirs <- dirname(Sys.glob(file.path(pp, "*", "spectrum.ms")))
+            dirsWithFI <- dirname(Sys.glob(file.path(pp, "*", "fingerid")))
+            unlink(setdiff(allDirs, dirsWithFI), recursive = TRUE)
+        }
         
         # zip to save space, .sirius extension seems to be needed. Change dir to fix the root.
         zipf <- paste0(pp, ".sirius")
         unlink(zipf)
         withr::with_dir(pp, zip(zipf, Sys.glob("*")))
     }
+}
+
+updateSIRIUSFormFPsProj <- function(...)
+{
+    unlink(getSIRFormFPsProjPath(), recursive = TRUE)
+    withOpt(cache.mode = "none", doGenForms(..., algorithm = "sirius", projectPath = getSIRFormFPsProjPath(),
+                                            calculateFeatures = FALSE, getFingerprints = TRUE))
+    updateSIRIUSAnnProj(getSIRFormFPsProjPath(), clearEmptyFI = FALSE)
+}
+
+updateSIRIUSCompProj <- function(...)
+{
+    unlink(getSIRCompProjPath(), recursive = TRUE)
+    withOpt(cache.mode = "none", doGenComps(..., algorithm = "sirius", projectPath = getSIRCompProjPath()))
+    updateSIRIUSAnnProj(getSIRCompProjPath(), clearEmptyFI = TRUE)
 }
 
 expect_file <- function(object, file, removeIfExists = TRUE)

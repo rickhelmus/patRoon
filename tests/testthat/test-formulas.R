@@ -26,6 +26,12 @@ if (doSIRIUS)
     formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius")
     formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius")
     formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius")
+    
+    if (FALSE)
+        updateSIRIUSFormFPsProj(fGroups, plists)
+    
+    formsSIRFPs <- doGenForms(fGroups, plists, "sirius", dryRun = TRUE, calculateFeatures = FALSE,
+                              getFingerprints = TRUE, projectPath = paste0(getSIRFormFPsProjPath(), ".sirius"))
 }
 
 if (doDATests())

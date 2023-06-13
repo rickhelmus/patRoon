@@ -23,7 +23,7 @@ if (doSIRIUS)
     if (FALSE)
         updateSIRIUSCompsProj(fGroups, plists)
     
-    compsSIR <- doGenComps(fGroups, plists, "sirius", dryRun = TRUE, projectPath = paste0(getSIRProjPath(), ".sirius"))
+    compsSIR <- doGenComps(fGroups, plists, "sirius", dryRun = TRUE, projectPath = paste0(getSIRCompProjPath(), ".sirius"))
     compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius")
     compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
 }

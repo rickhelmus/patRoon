@@ -102,7 +102,7 @@ if (testWithSets())
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
     getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
 
-    getSIRProjPath <- function() file.path(getTestDataPath(), paste0("SIRProj", c("-pos", "-neg")))
+    getSIRCompProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjComp", c("-pos", "-neg")))
     
     doScreen <- function(fg, susp, ...)
     {
@@ -149,7 +149,7 @@ if (testWithSets())
     getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
-    getSIRProjPath <- function() file.path(getTestDataPath(), "SIRProj")
+    getSIRCompProjPath <- function() file.path(getTestDataPath(), "SIRProjComp")
     
     doScreen <- function(fg, susp, ...)
     {
@@ -236,9 +236,9 @@ makeMZXMLs <- function(anaInfo)
 
 updateSIRIUSCompsProj <- function(fGroups, mslists)
 {
-    unlink(getSIRProjPath(), recursive = TRUE)
-    withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRProjPath()))
-    for (pp in normalizePath(getSIRProjPath()))
+    unlink(getSIRCompProjPath(), recursive = TRUE)
+    withOpt(cache.mode = "none", doGenComps(fGroups, mslists, "sirius", projectPath = getSIRCompProjPath()))
+    for (pp in normalizePath(getSIRCompProjPath()))
     {
         if (!dir.exists(pp))
             next

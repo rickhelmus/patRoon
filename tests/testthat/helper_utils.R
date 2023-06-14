@@ -258,6 +258,12 @@ updateSIRIUSAnnProj <- function(SIRPath, clearEmptyFI)
     }
 }
 
+doGenFormsSIRFPs <- function(fGroups, plists) doGenForms(fGroups, plists, "sirius", dryRun = TRUE, calculateFeatures = FALSE,
+                                                         getFingerprints = TRUE,
+                                                         projectPath = paste0(getSIRFormFPsProjPath(), ".sirius"))
+doGenCompsSIR <- function(fGroups, plists) doGenComps(fGroups, plists, "sirius", dryRun = TRUE,
+                                                      projectPath = paste0(getSIRCompProjPath(), ".sirius"))
+
 updateSIRIUSFormFPsProj <- function(...)
 {
     unlink(getSIRFormFPsProjPath(), recursive = TRUE)

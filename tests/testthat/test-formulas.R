@@ -30,8 +30,7 @@ if (doSIRIUS)
     if (FALSE)
         updateSIRIUSFormFPsProj(fGroups, plists)
     
-    formsSIRFPs <- doGenForms(fGroups, plists, "sirius", dryRun = TRUE, calculateFeatures = FALSE,
-                              getFingerprints = TRUE, projectPath = paste0(getSIRFormFPsProjPath(), ".sirius"))
+    formsSIRFPs <- doGenFormsSIRFPs(fGroups, plists)
 }
 
 if (doDATests())
@@ -57,12 +56,14 @@ test_that("verify formula generation", {
     expect_length(formsSIREmpty, 0)
     expect_length(formsSIREmptyPL, 0)
     expect_length(formsSIREmptyPLMS, 0)
+    expect_known_value(formsSIRFPs, testFile("formulas-sir-fps"))
 })
 
 test_that("verify formula show output", {
     expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
     skip_if_not(doSIRIUS)
     expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
+    expect_known_show(formsSIRFPs, testFile("formulas-sir-fps", text = TRUE))
 })
 
 # extra separate block: can't have >1 skip statements...
@@ -70,6 +71,11 @@ test_that("verify DA formula generation", {
     skip_if_not(doDATests())
     expect_known_value(formsDA, testFile("formulas-DA"))
     expect_known_show(formsDA, testFile("formulas-DA", text = TRUE))
+})
+
+test_that("verify fingerprints", {
+    skip_if(!doSIRIUS || testWithSets())
+    expect_gt(length(formsSIRFPs), 0)
 })
 
 test_that("basic subsetting", {
@@ -319,4 +325,9 @@ test_that("sets functionality", {
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = FALSE))
     expect_doppel("form-spec-set-mirror", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = TRUE))
+    
+    skip_if_not(doSIRIUS)
+    
+    expect_gt(length(setObjects(formsSIRFPs)[[1]]@fingerprints), 0)
+    expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
 })

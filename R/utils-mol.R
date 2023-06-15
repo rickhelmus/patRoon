@@ -357,7 +357,7 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     fgSMILESTab[, area := 1] # NOTE: we set the area to one to easily get the response factor
     fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 
     
-    cachedData <- loadCacheData("RF_SMILES", fgSMILESTab$hash)
+    cachedData <- loadCacheData("RF_SMILES", fgSMILESTab$hash, simplify = FALSE)
     fgSMILESTabTODO <- if (!is.null(cachedData)) fgSMILESTab[!hash %in% names(cachedData)] else fgSMILESTab
     
     RFs <- NULL 
@@ -413,7 +413,7 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
         return(data.table(SMILES = character(), LC50_SMILES = character()))
     
     hashes <- sapply(inp$SMILES, makeHash, LC50Mode)
-    cachedData <- loadCacheData("LC50_SMILES", hashes)
+    cachedData <- loadCacheData("LC50_SMILES", hashes, simplify = FALSE)
     indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
     hashesTODO <- hashes[indsTODO]
     

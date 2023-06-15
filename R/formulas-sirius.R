@@ -132,7 +132,7 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     assertQuantEluent(eluent, fGroups, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
-    aapply(assertConcUnit, concUnit + calibConcUnit, fixed = list(add = ac))
+    aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
@@ -141,13 +141,15 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {
+        ann <- copy(ann)
         if (nrow(resp) == 0)
         {
-            ann <- copy(ann)
             ann[, RF_SIRFP := NA_real_]
             return(ann)
         }
-        
+     
+        if (!is.null(ann[["RF_SIRFP"]]))
+            ann[, RF_SIRFP := NULL] # clearout for merge below    
         return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
                      sort = FALSE, all.x = TRUE))
     })
@@ -170,13 +172,15 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {
+        ann <- copy(ann)
         if (nrow(LC50Tab) == 0)
         {
-            ann <- copy(ann)
             ann[, LC50_SIRFP := NA_real_]
             return(ann)
         }
-        
+
+        if (!is.null(ann[["LC50_SIRFP"]]))
+            ann[, LC50_SIRFP := NULL] # clearout for merge below    
         return(merge(ann, LC50Tab[group == grp, c("neutral_formula", "LC50_SIRFP"), with = FALSE],
                      by = "neutral_formula", sort = FALSE, all.x = TRUE))
     })

@@ -203,6 +203,9 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     # avoid duplicate calculations if there happen to be suspects with the same SMILES
     inp <- unique(inp, by = c("group", "SMILES"))
     resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq, concUnit)
+    
+    if (!is.null(scr[["RF_SMILES"]]))
+        scr[, RF_SMILES := NULL] # clearout for merge below
     scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE,
                  all.x = TRUE)
     
@@ -230,6 +233,9 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
     inpSMILES <- inpSMILES[!is.na(inpSMILES)]
     
     pr <- predictLC50SMILES(inpSMILES, LC50Mode, concUnit)
+    
+    if (!is.null(scr[["LC50_SMILES"]]))
+        scr[, LC50_SMILES := NULL] # clearout for merge below
     scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
     
     obj@screenInfo <- scr

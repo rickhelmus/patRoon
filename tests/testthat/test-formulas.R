@@ -1,9 +1,6 @@
 context("formulas")
 
-fGroups <- getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 2E4) # lower intensity threshold a bit to get benzotriazole in both polarities with sets
-# convert to screening results to simplify things a bit
-fGroups <- doScreen(fGroups, patRoonData::suspectsPos[c(1:7, 33, 34, 36), ], onlyHits = TRUE) # focus on some +/- suspects and one with a non C fragment
-
+fGroups <- getFormFGroups()
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- plists[FALSE, reAverage = TRUE]

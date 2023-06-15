@@ -423,7 +423,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     splFPs <- split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs)))
     hashes <- sapply(seq_len(nrow(allFPs)), function(i) makeHash(splFPs[[i]], unknowns$retention_time[i]))
     
-    cachedData <- loadCacheData("RF_SIRFP", hashes)
+    cachedData <- loadCacheData("RF_SIRFP", hashes, simplify = FALSE)
     indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
     hashesTODO <- hashes[indsTODO]
     
@@ -480,7 +480,7 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
     baseHash <- makeHash(LC50Mode)
     hashes <- sapply(split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs))), makeHash)
     
-    cachedData <- loadCacheData("LC50_SIRFP", hashes)
+    cachedData <- loadCacheData("LC50_SIRFP", hashes, simplify = FALSE)
     indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
     hashesTODO <- hashes[indsTODO]
     

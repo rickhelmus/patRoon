@@ -102,10 +102,12 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDT
             }
         }
         
-        if (!is.null(ret))
+        if (!is.null(ret) && length(ret) == 1)
         {
-            if (simplify && length(ret) == 1)
+            if (simplify)
                 ret <- ret[[1]]
+            else if (length(hashes) == 1)
+                names(ret) <- hashes
         }
     }
 

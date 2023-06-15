@@ -136,13 +136,15 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
+            ann <- copy(ann)
             if (nrow(resp) == 0)
             {
-                ann <- copy(ann)
                 ann[, RF_SIRFP := NA_real_]
                 return(ann)
             }
-            
+        
+            if (!is.null(ann[["RF_SIRFP"]]))
+                ann[, RF_SIRFP := NULL] # clearout for merge below    
             return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
                          sort = FALSE, all.x = TRUE))
         })
@@ -173,13 +175,15 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
+            ann <- copy(ann)
             if (nrow(LC50Tab) == 0)
             {
-                ann <- copy(ann)
                 ann[, LC50_SIRFP := NA_real_]
                 return(ann)
             }
-            
+
+            if (!is.null(ann[["LC50_SIRFP"]]))
+                ann[, LC50_SIRFP := NULL] # clearout for merge below    
             return(merge(ann, LC50Tab[group == grp, c("neutral_formula", "LC50_SIRFP"), with = FALSE],
                          by = "neutral_formula", sort = FALSE, all.x = TRUE))
         })

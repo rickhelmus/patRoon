@@ -7,6 +7,16 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTes
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaInfo)[, "none"]
 
+getFormFGroups <- function()
+{
+    # lower intensity threshold a bit to get benzotriazole in both polarities with sets
+    fGroups <- getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 2E4)
+    # convert to screening results to simplify things a bit
+    # focus on some +/- suspects and one with a non C fragment
+    return(doScreen(fGroups, patRoonData::suspectsPos[c(1:7, 33, 34, 36), ], onlyHits = TRUE))
+    
+}
+
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
 {

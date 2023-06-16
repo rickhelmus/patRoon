@@ -262,15 +262,11 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
         return(fGroups)
     }
     
-    resp <- scr[, c("group", "SMILES", "RF_SMILES"), with = FALSE]
+    resp <- scr[, c("group", "name", "SMILES", "RF_SMILES"), with = FALSE]
     resp[, type := "suspect"]
-    setnames(resp, c("SMILES", "RF_SMILES"), c("candidate", "RF"))
+    setnames(resp, c("SMILES", "name", "RF_SMILES"), c("candidate", "candidate_name", "RF"))
     
     concs <- calcFeatureConcs(fGroups, resp, areas)
-    # assign and collapse candidate names
-    concs[, candidate_name := paste0(unique(scr[SMILES == candidate &
-                                             group == get("group", envir = parent.env(environment()))]$name), collapse = ","),
-          by = c("candidate", "group")]
 
     fGroups@concentrations <- finalizeFeaturePredTab(rbind(fGroups@concentrations, concs, fill = TRUE))
     
@@ -294,14 +290,9 @@ setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn
         return(fGroups)
     }
     
-    LC50s <- scr[, c("group", "SMILES", "LC50_SMILES"), with = FALSE]
+    LC50s <- scr[, c("group", "name", "SMILES", "LC50_SMILES"), with = FALSE]
     LC50s[, type := "suspect"]
-    setnames(LC50s, c("SMILES", "LC50_SMILES"), c("candidate", "LC50"))
-    
-    # assign and collapse candidate names
-    LC50s[, candidate_name := paste0(unique(scr[SMILES == candidate &
-                                                    group == get("group", envir = parent.env(environment()))]$name), collapse = ","),
-          by = c("candidate", "group")]
+    setnames(LC50s, c("SMILES", "name", "LC50_SMILES"), c("candidate", "candidate_name", "LC50"))
     
     fGroups@toxicities <- finalizeFeaturePredTab(rbind(fGroups@toxicities, LC50s, fill = TRUE))
     

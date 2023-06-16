@@ -484,7 +484,7 @@ assertPredAggrParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     assertListVal(x, "typeFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
     assertListVal(x, "groupFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
     assertListVal(x, "candidateFunc", checkmate::assertFunction, .var.name = .var.name, add = add)
-    assertListVal(x, "preferType", checkmate::assertChoice, choices = c("suspect", "compound", "SIRIUS_FP"),
+    assertListVal(x, "preferType", checkmate::assertChoice, choices = c("suspect", "compound", "SIRIUS_FP", "none"),
                   .var.name = .var.name, add = add)
 }
 

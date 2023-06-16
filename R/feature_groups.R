@@ -1267,7 +1267,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
         # if (!is.null(annTab[["compoundName"]]))
         #     resp[, candidate_name := annTab$compoundName]
         resp <- unique(resp, by = c("group", "candidate"))
-        concs <- rbind(concs, calcFeatureConcs(fGroups, resp, areas))
+        concs <- rbind(concs, calcFeatureConcs(fGroups, resp, areas), fill = TRUE)
     }
 
     if (nrow(concs) > 0)
@@ -1322,7 +1322,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
         # if (!is.null(annTab[["compoundName"]]))
         #     LC50Tab[, candidate_name := annTab$compoundName]
         LC50Tab <- unique(LC50Tab, by = c("group", "candidate"))
-        toxicities <- rbind(toxicities, LC50Tab)
+        toxicities <- rbind(toxicities, LC50Tab, fill = TRUE)
     }
     
     if (nrow(toxicities) > 0)

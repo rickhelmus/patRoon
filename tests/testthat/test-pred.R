@@ -1,5 +1,7 @@
 context("prediction")
 
+# UNDONE: test empties
+
 # NOTE: fGroups, peak lists, annotations should all be in sync with test-formulas/test-compounds
 
 # use example data from MS2Quant: the calibrants/eluent are completely unapplicable to patRoonData, but at least we can
@@ -23,6 +25,9 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 if (doSIRIUS)
 {
     fGroupsForms <- getFormFGroups()
+    fGroupsForms <- predictRespFactors(fGroupsForms, calib, eluent, organicModifier = "MeOH", pHAq = 4,
+                                       calibConcUnit = "M")
+    fGroupsForms <- predictTox(fGroupsForms)
     
     plistsForms <- generateMSPeakLists(fGroupsForms, "mzr")
     plistsComps <- generateMSPeakLists(fGroupsComps, "mzr")
@@ -56,5 +61,41 @@ test_that("Basics for prediction", {
     expect_length(grep("^(RF|LC50)_", names(formsTab)), if (testWithSets()) 4 else 2)
     expect_length(grep("^(RF|LC50)_", names(compsTab)), if (testWithSets()) 6 else 3)
     expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), if (testWithSets()) 6 else 3)
+})
+
+if (doSIRIUS)
+{
+    fGroupsFormsC <- calculateConcs(fGroupsForms, formsSIR)
+    fGroupsFormsC <- calculateTox(fGroupsFormsC, formsSIR)
+    fGroupsCompsC <- calculateConcs(fGroupsComps, compsSIR)
+    fGroupsCompsC <- calculateTox(fGroupsCompsC, compsSIR)
+    calcTab <- as.data.table(fGroupsCompsC)
+    calcTabNoPref <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(preferType = "none"),
+                                   toxAggrParams = getDefPredAggrParams(preferType = "none"))
+    calcTabMax <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(max, preferType = "none"),
+                                toxAggrParams = getDefPredAggrParams(max, preferType = "none"))
+}
+
+test_that("Basics for calculation", {
+    skip_if_not(doSIRIUS)
     
+    expect_known_value(list(concentrations(fGroupsFormsC), toxicities(fGroupsFormsC)), testFile("calc-forms"))
+    expect_known_value(list(concentrations(fGroupsCompsC), toxicities(fGroupsCompsC)), testFile("calc-comps"))
+    checkmate::expect_data_table(concentrations(fGroupsFormsC), min.rows = 1)
+    checkmate::expect_data_table(toxicities(fGroupsFormsC), min.rows = 1)
+    checkmate::expect_data_table(concentrations(fGroupsCompsC), min.rows = 1)
+    checkmate::expect_data_table(toxicities(fGroupsCompsC), min.rows = 1)
+    checkmate::expect_subset(c("suspect", "SIRIUS_FP"), concentrations(fGroupsFormsC)$type)
+    checkmate::expect_subset(c("suspect", "SIRIUS_FP"), toxicities(fGroupsFormsC)$type)
+    checkmate::expect_subset(c("suspect", "SIRIUS_FP", "compound"), concentrations(fGroupsCompsC)$type)
+    checkmate::expect_subset(c("suspect", "SIRIUS_FP", "compound"), toxicities(fGroupsCompsC)$type)
+    
+    expect_setequal("suspect", calcTab$conc_types) # default preferType == "suspect and all suspects should have results
+    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$conc_types, ",")))
+    expect_lt(mean(calcTabNoPref[["standard-pos-2_conc"]], na.rm = TRUE),
+               mean(calcTabMax[["standard-pos-2_conc"]], na.rm = TRUE))
+    
+    expect_setequal("suspect", calcTab$LC50_types)
+    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$LC50_types, ",")))
+    expect_lt(mean(calcTabNoPref$LC50, na.rm = TRUE), mean(calcTabMax$LC50, na.rm = TRUE))
 })

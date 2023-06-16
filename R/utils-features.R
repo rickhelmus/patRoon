@@ -678,7 +678,7 @@ aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
     if (splitSuspects && !any(concs$type == "suspect"))
         splitSuspects <- FALSE # no suspects, nothing to split
     
-    if (nzchar(aggrParams$preferType))
+    if (aggrParams$preferType != "none")
     {
         concs[, keep := !aggrParams$preferType %in% type | type == aggrParams$preferType, by = "group"]
         concs <- concs[keep == TRUE][, keep := NULL]
@@ -696,19 +696,20 @@ aggregateConcs <- function(concs, anaInfo, aggrParams, splitSuspects = FALSE)
     else if (!is.null(concs[["candidate_name"]]))
         concs[, candidate_name := NULL]
 
-    doAggr <- function(func, by)
+    doAggr <- function(func, by, combineTypes = FALSE)
     {
         concs[!group %chin% ignoreFGs, (anaInfo$analysis) := lapply(.SD, aggrVec, func),
               .SDcols = anaInfo$analysis, by = by]
         dups <- duplicated(concs, by = by)
+        if (combineTypes)
+            concs[, type := paste0(unique(type), collapse = ","), by = by]            
         return(concs[group %chin% ignoreFGs | dups == FALSE])
     }
     concs <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
     concs <- doAggr(aggrParams$typeFunc, c("group", "type"))
-    concs <- doAggr(aggrParams$groupFunc, "group")
+    concs <- doAggr(aggrParams$groupFunc, "group", combineTypes = TRUE)
     
     mby <- if (splitSuspects) c("group", "candidate_name") else "group"
-    concs[, type := paste0(unique(type), collapse = ","), by = mby]
     concs <- unique(concs, by = mby)
     
     concs[, candidate := NULL]
@@ -724,7 +725,7 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     if (splitSuspects && !any(tox$type == "suspect"))
         splitSuspects <- FALSE # no suspects, nothing to split
 
-    if (nzchar(aggrParams$preferType))
+    if (aggrParams$preferType != "none")
     {
         tox[, keep := !aggrParams$preferType %in% type | type == aggrParams$preferType, by = "group"]
         tox <- tox[keep == TRUE][, keep := NULL]
@@ -742,18 +743,19 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     else if (!is.null(tox[["candidate_name"]]))
         tox[, candidate_name := NULL]
 
-    doAggr <- function(func, by)
+    doAggr <- function(func, by, combineTypes = FALSE)
     {
         tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, func), by = by]
         dups <- duplicated(tox, by = by)
+        if (combineTypes)
+            tox[, type := paste0(unique(type), collapse = ","), by = by]            
         return(tox[group %chin% ignoreFGs | dups == FALSE])
     }
     tox <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))
     tox <- doAggr(aggrParams$typeFunc, c("group", "type"))
-    tox <- doAggr(aggrParams$groupFunc, "group")
+    tox <- doAggr(aggrParams$groupFunc, "group", combineTypes = TRUE)
 
     mby <- if (splitSuspects) c("group", "candidate_name") else "group"
-    tox[, type := paste0(unique(type), collapse = ","), by = mby]
     tox <- unique(tox, by = mby)
     
     tox[, candidate := NULL]

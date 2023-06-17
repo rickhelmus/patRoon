@@ -42,7 +42,7 @@
     - getDefPredArrgParams() and new as.data.table() args that use it
         - candidateFunc: only used currently with tox, SIRIUS_FP and in >1 sets
     - minRF/maxLC50 susp filters
-    - minConc filter
+    - minConc/maxTox filter
         - also predAggrParams and removeNA args
     - baseFrom param of genReportSettingsFile()
     - MS2Quant only supports M/M+H

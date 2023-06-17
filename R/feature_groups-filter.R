@@ -146,7 +146,8 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
     if (length(fGroups) == 0 || nrow(concs) == 0)
         return(fGroups)
     
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
+    allConcs <- concs[, analyses(fGroups), with = FALSE]
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(allConcs, na.rm = TRUE))
     if (threshold == 0)
         return(fGroups)
     
@@ -157,9 +158,9 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
         aggrConcs <- transpose(aggrConcs, make.names = "group")
         
         compF <- if (negate)
-            function(x) (removeNA & !is.na(x)) | (!removeNA & !is.na(x) & x >= threshold)
+            function(x) (removeNA & !is.na(x)) | (!is.na(x) & x >= threshold)
         else
-            function(x) (removeNA & is.na(x)) | (!removeNA & !is.na(x) & x < threshold)
+            function(x) (removeNA & is.na(x)) | (!is.na(x) & x < threshold)
         
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
@@ -174,7 +175,7 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
     if (length(fGroups) == 0 || nrow(tox) == 0)
         return(fGroups)
     
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(toxicities(fGroups)$LC50, na.rm = TRUE))
     if (threshold == 0)
         return(fGroups)
     
@@ -183,9 +184,9 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
         aggrTox <- aggregateTox(tox, aggrParams, FALSE)
         
         compF <- if (negate)
-            function(x) (removeNA & !is.na(x)) | (!removeNA & !is.na(x) & x <= threshold)
+            function(x) (removeNA & !is.na(x)) | (!is.na(x) & x <= threshold)
         else
-            function(x) (removeNA & is.na(x)) | (!removeNA & !is.na(x) & x > threshold)
+            function(x) (removeNA & is.na(x)) | (!is.na(x) & x > threshold)
         
         return(delete(fGroups, j = aggrTox[compF(LC50) == TRUE]$group))
     }))

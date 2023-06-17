@@ -78,6 +78,8 @@ if (doSIRIUS)
     fGroupsFormsC <- calculateTox(fGroupsFormsC, formsSIR)
     fGroupsCompsC <- calculateConcs(fGroupsComps, compsSIR)
     fGroupsCompsC <- calculateTox(fGroupsCompsC, compsSIR)
+    fGroupsOnlyCompsC <- calculateConcs(getCompFGroups(), compsSIR)
+    fGroupsOnlyCompsC <- calculateTox(fGroupsOnlyCompsC, compsSIR)
     calcTab <- as.data.table(fGroupsCompsC)
     calcTabNoPref <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(preferType = "none"),
                                    toxAggrParams = getDefPredAggrParams(preferType = "none"))
@@ -112,4 +114,21 @@ test_that("Basics for calculation", {
     expect_setequal("suspect", calcTab$LC50_types)
     expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$LC50_types, ",")))
     expect_lt(mean(calcTabNoPref$LC50, na.rm = TRUE), mean(calcTabMax$LC50, na.rm = TRUE))
+    
+    # NOTE: use as.data.table here instead of slot data, as these like the filters use aggregated data
+    expect_gte(min(as.data.table(filter(fGroupsCompsC, absMinConc = 0.2))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
+                   na.rm = TRUE), 0.2)
+    expect_lt(min(as.data.table(filter(fGroupsCompsC, absMinConc = 0.2, negate = TRUE))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
+                   na.rm = TRUE), 0.2)
+    expect_lte(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4))$LC50, na.rm = TRUE), 6E4)
+    expect_gt(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4, negate = TRUE))$LC50, na.rm = TRUE), 6E4)
+    
+    # NOTE: use fGroupsOnlyCompsC as fGroupsCompsC has suspect results and therefore results for everything
+    expect_gt(length(getFeatures(fGroupsOnlyCompsC)), length(getFeatures(filter(fGroupsOnlyCompsC, absMinConc = 0.2))))
+    expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMinConc = 0.2))),
+              length(getFeatures(filter(fGroupsOnlyCompsC, absMinConc = 0.2, removeNA = TRUE))))
+    expect_gt(length(getFeatures(fGroupsOnlyCompsC)), length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))))
+    # UNDONE: can we actually get NA tox values?
+    # expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))),
+    #           length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4, removeNA = TRUE))))
 })

@@ -525,9 +525,9 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             anas <- analyses(obj) # update var
             obj@concentrations[group %chin% affectedGrps, (anas) := {
                 vals <- mget(anas)
-                vals[ftind[[group]] == 0] <- 0
+                vals[ftind[[group]] == 0] <- NA_real_
                 vals
-            }, by = seq_len(nrow(obj@concentrations))]
+            }, by = seq_len(sum(obj@concentrations$group %chin% affectedGrps))]
         }
     }
     

@@ -192,6 +192,9 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
 
+    if (length(obj) == 0)
+        return(obj)
+    
     scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
         stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
@@ -221,6 +224,9 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
     
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     assertConcUnit(concUnit)
+    
+    if (length(obj) == 0)
+        return(obj)
     
     scr <- screenInfo(obj)
     if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))

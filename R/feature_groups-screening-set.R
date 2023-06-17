@@ -380,6 +380,9 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calibrants, ...)
 {
+    if (length(obj) == 0)
+        return(obj)
+    
     checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(sets(obj)))
     
     obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactors, MoreArgs = list(...))

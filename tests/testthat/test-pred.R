@@ -1,7 +1,5 @@
 context("prediction")
 
-# UNDONE: test empties
-
 # NOTE: fGroups, peak lists, annotations should all be in sync with test-formulas/test-compounds
 
 # use example data from MS2Quant: the calibrants/eluent are completely unapplicable to patRoonData, but at least we can
@@ -15,11 +13,15 @@ eluent <- fread(system.file("example_data", "eluent.csv", package = "MS2Quant"))
 eluent[, time := time * 60]
 
 fGroupsComps <- getCompFGroups()
-fGroupsEmpty <- getEmptyTestFGroups()
+fGroupsEmpty <- delete(fGroupsComps) # don't use getEmptyTestFGroups(): we want to have a screening object
 
 fGroupsComps <- predictRespFactors(fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
                                    calibConcUnit = "M")
 fGroupsComps <- predictTox(fGroupsComps)
+
+fGroupsEmpty <- predictRespFactors(fGroupsEmpty, list(), eluent, organicModifier = "MeOH", pHAq = 4,
+                                   calibConcUnit = "M")
+fGroupsEmpty <- predictTox(fGroupsEmpty)
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 if (doSIRIUS)
@@ -43,6 +45,8 @@ if (doSIRIUS)
                                    calibConcUnit = "M", type = "both")
     compsSIR <- predictTox(compsSIR, type = "both")
     compsTab <- as.data.table(compsSIR)
+    
+    compsEmpty <- delete(compsSIR)
 }
 
 test_that("Basics for prediction", {
@@ -52,6 +56,7 @@ test_that("Basics for prediction", {
                                  types = "numeric")
     checkmate::expect_numeric(screenInfo(filter(fGroupsComps, minRF = 1E6))$RF_SMILES, lower = 1E6)
     checkmate::expect_numeric(screenInfo(filter(fGroupsComps, maxLC50 = 1E5))$LC50_SMILES, upper = 1E5)
+    expect_equal(nrow(screenInfo(fGroupsEmpty)), 0)
     
     skip_if_not(doSIRIUS)
 
@@ -61,6 +66,10 @@ test_that("Basics for prediction", {
     expect_length(grep("^(RF|LC50)_", names(formsTab)), if (testWithSets()) 4 else 2)
     expect_length(grep("^(RF|LC50)_", names(compsTab)), if (testWithSets()) 6 else 3)
     expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), if (testWithSets()) 6 else 3)
+    
+    expect_error(predictRespFactors(compsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
+                                    calibConcUnit = "M", type = "both"), NA)
+    expect_error(predictTox(compsEmpty), NA)
 })
 
 if (doSIRIUS)
@@ -89,6 +98,11 @@ test_that("Basics for calculation", {
     checkmate::expect_subset(c("suspect", "SIRIUS_FP"), toxicities(fGroupsFormsC)$type)
     checkmate::expect_subset(c("suspect", "SIRIUS_FP", "compound"), concentrations(fGroupsCompsC)$type)
     checkmate::expect_subset(c("suspect", "SIRIUS_FP", "compound"), toxicities(fGroupsCompsC)$type)
+
+    expect_equal(calculateConcs(fGroupsComps, compsEmpty), fGroupsComps)
+    expect_equal(calculateConcs(fGroupsEmpty, compsEmpty), fGroupsEmpty)
+    expect_equal(calculateTox(fGroupsComps, compsEmpty), fGroupsComps)
+    expect_equal(calculateTox(fGroupsEmpty, compsEmpty), fGroupsEmpty)
     
     expect_setequal("suspect", calcTab$conc_types) # default preferType == "suspect and all suspects should have results
     expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$conc_types, ",")))

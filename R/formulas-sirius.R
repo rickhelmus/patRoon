@@ -117,8 +117,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 setMethod("delete", "formulasSIRIUS", function(obj, i = NULL, j = NULL, ...)
 {
     obj <- callNextMethod()
-    obj@fingerprints <- obj@fingerprints[names(obj@fingerprints) %chin% groupNames(obj)] # sync fingerprints
-    return(obj)
+    return(syncSIRFPs(obj))
 })
 
 #' @export
@@ -294,7 +293,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         else
         {
             formTable <- formTable[sapply(formTable, hasResults)]
-            fingerprints <- lapply(formTable, "[[", "fingerprints")
+            fingerprints <- pruneList(lapply(formTable, "[[", "fingerprints"), checkZeroRows = TRUE)
             groupFormulas <- lapply(formTable, "[[", "formtab")
             formTable <- list()
         }

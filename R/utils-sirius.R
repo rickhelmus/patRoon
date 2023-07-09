@@ -525,3 +525,16 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
 
     return(LC50s[])
 }
+
+syncSIRFPs <- function(obj)
+{
+    # sync fingerprints
+    obj@fingerprints <- obj@fingerprints[names(obj@fingerprints) %chin% groupNames(obj)]
+    obj@fingerprints <- pruneList(Map(obj@fingerprints, obj@groupAnnotations[names(obj@fingerprints)], f = function(fp, ann)
+    {
+        fpForms <- intersect(names(fp), ann$neutral_formula)
+        fp <- fp[, c(fpForms, "absoluteIndex"), with = FALSE]
+        return(if (ncol(fp) == 1) NULL else fp) # nullify if no candidates left
+    }))
+    return(obj)
+}

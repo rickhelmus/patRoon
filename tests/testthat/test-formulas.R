@@ -73,6 +73,7 @@ test_that("verify DA formula generation", {
 test_that("verify fingerprints", {
     skip_if(!doSIRIUS || testWithSets())
     expect_gt(length(formsSIRFPs), 0)
+    testSIRFPSubset(formsSIRFPs)
 })
 
 test_that("basic subsetting", {
@@ -327,4 +328,5 @@ test_that("sets functionality", {
     
     expect_gt(length(setObjects(formsSIRFPs)[[1]]@fingerprints), 0)
     expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
+    testSIRFPSubset(setObjects(formsSIRFPs)[[1]])
 })

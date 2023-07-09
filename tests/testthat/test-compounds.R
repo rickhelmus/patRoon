@@ -66,6 +66,12 @@ test_that("verify Library compound generation", {
     expect_true(all(!is.na(as.data.table(compsLib, fragments = TRUE)$frag_ion_formula))) # check presence annotations
 })
 
+test_that("verify fingerprints", {
+    skip_if(!doSIRIUS || testWithSets())
+    expect_gt(length(compsSIR), 0)
+    testSIRFPSubset(compsSIR)
+})
+
 hasCompounds <- doMetFrag || doSIRIUS
 
 if (doMetFrag)
@@ -434,4 +440,10 @@ test_that("sets functionality", {
                                                                       plotStruct = FALSE, perSet = TRUE, mirror = FALSE))
     expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,
                                                                       plotStruct = FALSE, perSet = TRUE, mirror = TRUE))
+    
+    skip_if_not(doSIRIUS)
+    
+    expect_gt(length(setObjects(compsSIR)[[1]]@fingerprints), 0)
+    expect_gt(length(setObjects(compsSIR)[[2]]@fingerprints), 0)
+    testSIRFPSubset(setObjects(compsSIR)[[1]])
 })

@@ -487,6 +487,22 @@ testFeatAnnADT <- function(obj)
     checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
 }
 
+testSIRFPSubset <- function(obj)
+{
+    grp <- names(which.max(sapply(obj@fingerprints, ncol)))[1] # get fg with FP results for multiple candidates
+    candidates <- intersect(names(obj@fingerprints[[grp]]), obj[[grp]]$neutral_formula)
+    delOne <- delete(obj, i = grp, j = function(ann, ...) ann$neutral_formula == candidates[1])
+    delAll <- delete(obj, i = grp)
+    if (length(candidates) == 1)
+        # UNDONE: unfortunately SIRIUS compounds test results have only one formula candidate for each group, so we
+        # cannot test this. But for formulas we do, and the code used should be the same so we stick with the current
+        # situation for now...
+        expect_null(delAll@fingerprints[[grp]])
+    else
+        checkmate::expect_names(names(delOne@fingerprints[[grp]]), disjunct.from = candidates[1])
+    expect_null(delAll@fingerprints[[grp]])
+}
+
 getOldNewRefs <- function(ref)
 {
     oldref <- tempfile(fileext = ".Rds")

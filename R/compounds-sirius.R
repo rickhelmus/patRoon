@@ -104,8 +104,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 setMethod("delete", "compoundsSIRIUS", function(obj, i = NULL, j = NULL, ...)
 {
     obj <- callNextMethod()
-    obj@fingerprints <- obj@fingerprints[names(obj@fingerprints) %chin% groupNames(obj)] # sync fingerprints
-    return(obj)
+    return(syncSIRFPs(obj))
 })
 
 #' @export
@@ -292,7 +291,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 
     return(compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
                            scoreRanges = lapply(results, "[[", "scRanges"),
-                           fingerprints = lapply(results, "[[", "fingerprints"), algorithm = "sirius"))
+                           fingerprints = pruneList(lapply(results, "[[", "fingerprints"), checkZeroRows = TRUE),
+                           algorithm = "sirius"))
 })
 
 #' @template featAnnSets-gen_args

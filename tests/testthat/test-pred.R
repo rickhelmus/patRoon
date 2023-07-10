@@ -72,6 +72,20 @@ test_that("Basics for prediction", {
     expect_error(predictTox(compsEmpty), NA)
 })
 
+calibConcs <- data.table(name = "Chloridazon", "standard-pos" = 100)
+calibScr <- getQuantCalibFromScreening(fGroupsComps, calibConcs)
+calibScrAvg <- getQuantCalibFromScreening(fGroupsComps, calibConcs, average = TRUE)
+calibScrAr <- getQuantCalibFromScreening(fGroupsComps, calibConcs, areas = TRUE)
+test_that("getQuantCalibFromScreening()", {
+    checkmate::expect_data_table(calibScr, nrows = 2)
+    checkmate::expect_names(names(calibScr), permutation.of = c("name", "SMILES", "rt", "conc", "intensity"))
+    checkmate::expect_data_table(calibScrAvg, nrows = 1)
+    expect_equal(mean(calibScr$intensity), calibScrAvg$intensity)
+    checkmate::expect_data_table(calibScrAr, nrows = 2)
+    expect_true(all(calibScrAr$intensity > calibScr$intensity))
+    expect_equal(calibScr[, -"intensity"], calibScrAr[, -"intensity"], check.attributes = FALSE)
+})
+
 if (doSIRIUS)
 {
     fGroupsFormsC <- calculateConcs(fGroupsForms, formsSIR)

@@ -408,6 +408,79 @@ getDefPredAggrParams <- function(all = mean, ...)
     return(modifyList(def, list(...)))
 }
 
+#' @export
+getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE)
+{
+    # UNDONE: mention that duplicate suspects (name.x) are ignored
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assert(
+        checkmate::checkClass(fGroups, "featureGroupsScreening"),
+        checkmate::checkClass(fGroups, "featureGroupsScreeningSet"),
+        .var.name = "fGroups", add = ac)
+    checkmate::assertDataFrame(concs, min.cols = 2, min.rows = 1, add = ac)
+    checkmate::assertNames(names(concs), must.include = "name", add = ac)
+    checkmate::assertCharacter(concs$name, any.missing = FALSE, min.chars = 1, unique = TRUE, add = ac)
+    concRGs <- setdiff(names(concs), "name")
+    concRGs <- intersect(concRGs, replicateGroups(fGroups))
+    if (length(concRGs) == 0)
+        stop("No concentration columns for (relevant) replicate groups found.", call. = FALSE)
+    for (col in concRGs)
+        checkmate::assertNumeric(concs[[col]], finite = TRUE, .var.name = paste0("concs[['", col, "']]"), add = ac)
+    aapply(checkmate::assertFlag, . ~ areas + average, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
+    anaInfo <- analysisInfo(fGroups)
+    
+    if (!is.data.table(concs))
+        concs <- as.data.table(concs)
+    
+    tab <- as.data.table(fGroups, areas = areas, average = average, collapseSuspects = NULL)
+    if (any(!concs$name %chin% tab$susp_name))
+    {
+        warning("Ignoring suspects not present in screening results: ",
+                paste0(setdiff(concs$name, tab$susp_name), collapse = ", "), call. = FALSE)
+        concs <- concs[name %chin% tab$susp_name]
+        if (nrow(concs) == 0)
+            stop("None of the suspects present in the screening results, aborting...", call. = FALSE)
+    }
+    
+    if (is.null(tab[["susp_SMILES"]]))
+        stop("Screening results lack SMILES data.", call. = FALSE)
+    
+    ret <- data.table(name = concs$name, SMILES = tab[match(concs$name, susp_name)]$susp_SMILES,
+                      group = tab[match(concs$name, susp_name)]$group)
+    ret[, rt := groupInfo(fGroups)[group, "rts"]]
+    
+    if (anyNA(ret$SMILES))
+    {
+        warning("Ignoring suspects without SMILES: ", paste0(ret[is.na(SMILES)]$name, collapse = ", "), call. = FALSE)
+        concs <- concs[!is.na(SMILES)]
+        if (nrow(concs) == 0)
+            stop("No suspects with SMILES present, aborting...", call. = FALSE)
+    }
+    
+    intCols <- if (average)
+        concRGs
+    else
+        unlist(lapply(concRGs, function(rg) anaInfo[anaInfo$group == rg, "analysis"]))
+    ret <- merge(ret, tab[, c("susp_name", intCols), with = FALSE], by.x = "name", by.y = "susp_name")
+    ret <- melt(ret, measure.vars = intCols, variable.name = if (average) "rGroup" else "analysis",
+                value.name = "intensity")
+    
+    if (!average)
+        ret[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
+    
+    mconcs <- melt(concs, measure.vars = concRGs, variable.name = "rGroup", value.name = "conc") 
+    
+    ret <- merge(ret, mconcs[, c("name", "rGroup", "conc"), with = FALSE], by = c("name", "rGroup"))
+    
+    ret <- removeDTColumnsIfPresent(ret, c("analysis", "rGroup", "group"))
+    setcolorder(ret, c("name", "SMILES", "rt", "conc", "intensity"))
+    
+    return(ret[])
+}
+
 #' Obtains a SIRIUS refresh token
 #'
 #' This function is used to obtain a \command{SIRIUS} refresh token with your login details, which allows

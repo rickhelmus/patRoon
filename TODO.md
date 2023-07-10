@@ -45,9 +45,10 @@
     - minConc/maxTox filter
         - also predAggrParams and removeNA args
     - baseFrom param of genReportSettingsFile()
-    - MS2Quant only supports M/M+H
+    - MS2Quant only supports M+/M+H
     - sets specifics
         - calibrants as list
+    - getQuantCalibFromScreening()
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

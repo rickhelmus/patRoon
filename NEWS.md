@@ -6,6 +6,7 @@
 * Fixed: `report()` now correctly handles SIRIUS compounds results and suspects without SMILES
 * `groupFeaturesOpenMS()`: workaround to avoid errors on Windows with large numbers of analyses (reported by Geert Franken, fix thanks to https://github.com/OpenMS/OpenMS/issues/6845).
 * Add package option `patRoon.checkCentroided` to control whether analyses files are verified to be centroided (suggested by Geert Franken).
+* Fixed: report layout is now compatible with `bslib 0.5.0` (reported by Alessia Ore)
 
 
 # patRoon 2.2

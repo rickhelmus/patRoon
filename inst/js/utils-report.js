@@ -48,7 +48,7 @@ function getNavTab(which)
 
     if (el != undefined)
     {
-        for (var i=0; i<6; i++)
+        while (!el.parentElement.classList.contains("bottomLayout"))
             el = el.parentElement;
     }
     

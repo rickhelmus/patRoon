@@ -81,8 +81,8 @@ build_script:
     - travis-tool.sh install_github cbroeckl/RAMClustR@73accadaded # temp workaround for buggy commit
     - travis-tool.sh install_github rickhelmus/KPIC2
     - travis-tool.sh install_github rickhelmus/cliqueMS
-    #- travis-tool.sh install_github souravc83/fastAdaboost # For Metaclean, removed from CRAN (9/22) --> crashes
-    - Rscript -e "install.packages('fastAdaboost', repos = 'https://mran.revolutionanalytics.com/snapshot/2022-07-01')"
+    - travis-tool.sh install_github souravc83/fastAdaboost # For Metaclean, removed from CRAN (9/22)
+    # - Rscript -e "install.packages('fastAdaboost', repos = 'https://mran.revolutionanalytics.com/snapshot/2022-07-01')"
     - travis-tool.sh install_github KelseyChetnik/MetaClean
     - travis-tool.sh install_github KelseyChetnik/MetaCleanData
     - travis-tool.sh install_github berlinguyinca/spectra-hash/splashR

@@ -35,7 +35,6 @@
     - predictRespFactorsSIRFPs(): need to check adduct?
     - which default unit?
 - docs
-    - SIRIUS formulas/compound class
     - refs to OpenBabel/RCDK for calculateConcs()/predictTox() etc
     - concentrations & toxicities slot
     - clarify that intensity column in calibrants can either be area or peak intensities --> need to properly set areas arg for calculateConcs()
@@ -49,6 +48,8 @@
     - sets specifics
         - calibrants as list
     - getQuantCalibFromScreening()
+- NEWS
+    - SIRIUS formulas/compound class
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

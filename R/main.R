@@ -473,3 +473,43 @@ NULL
 #' @name check-GUI
 NULL
 
+#' Functionality predict response factors and concentrations
+#'
+#' Functions to predict response factors from \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints using
+#' the \pkg{MS2Quant} package.
+#'
+#' The \href{https://github.com/kruvelab/MS2Quant}{MS2Quant} \R package predicts concentrations from \acronym{SMILES}
+#' and/or MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictRespFactor} method functions
+#' interface with this package to calculate response factors, which can then be used to predict feature concentrations
+#' with the \code{calculateConcs} method function.
+#'
+#' The response factors can be calculated from the following workflow data:
+#'
+#' \itemize{
+#'
+#' \item \link[=suspect-screening]{Suspect screening results}, using the \acronym{SMILES} from the suspect hits.
+#'
+#' \item Formula annotation data obtained with \code{\link{generateFormulasSIRIUS}}. In this case predictions are
+#' performed with \command{SIRIUS+CSI:FingerID} fingerprints, hence the  \code{getFingerprint} must be \code{TRUE}.
+#'
+#' \item Compound annotation data obtained with \code{\link{generateCompoundsSIRIUS}}. This allows predictions from both
+#' \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints.
+#'
+#' \item Compound annotation data (other algorithms than \code{"sirius"}): the \acronym{SMILES} candidate data is used
+#' for predictions.
+#'
+#' }
+#'
+#' When \acronym{SMILES} data is used then predictions of response factors are generally more accurate. However,
+#' calculations with \command{SIRIUS+CSI:FingerID} fingerprints are much faster and only requires the formula and MS/MS
+#' spectrum, \emph{i.e.} not the full structure. For annotation data the calculations are performed for \emph{all}
+#' candidates. This can especially lead to long running calculations when \acronym{SMILES} data is used. Hence, it is
+#' \strong{strongly} recommended to first prioritize the annotation results, \emph{e.g.} with the \code{topMost}
+#' argument to the \link[=filter,featureAnnotations-method]{filter method}. When formula annotations are used with
+#' calculations with \command{SIRIUS+CSI:FingerID} fingerprints then \emph{all} formula candidates are considered,
+#' whereas with compound annotation results only candidates with a structure are considered. Furthermore, in the latter
+#' case calculations are sill performed per candidate formula, thus, candidates with the same formula will have the same
+#' response factor assigned.
+#'
+#' 
+NULL

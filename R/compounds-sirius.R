@@ -123,6 +123,7 @@ setMethod("delete", "compoundsSIRIUS", function(obj, i = NULL, j = NULL, ...)
     return(syncSIRFPs(obj))
 })
 
+#' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
                                                             concUnit = "ugL", calibConcUnit = concUnit, type = "FP")

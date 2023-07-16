@@ -177,6 +177,7 @@ setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, 
 #' @export
 setMethod("as.data.table", "featureGroupsScreening", doFGScrAsDataTable)
 
+#' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,
                                                                    concUnit = "ugL", calibConcUnit = concUnit)

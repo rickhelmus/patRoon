@@ -473,43 +473,64 @@ NULL
 #' @name check-GUI
 NULL
 
-#' Functionality predict response factors and concentrations
+#' Functionality to predict quantitative data
 #'
 #' Functions to predict response factors from \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints using
 #' the \pkg{MS2Quant} package.
 #'
 #' The \href{https://github.com/kruvelab/MS2Quant}{MS2Quant} \R package predicts concentrations from \acronym{SMILES}
 #' and/or MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictRespFactor} method functions
-#' interface with this package to calculate response factors, which can then be used to predict feature concentrations
+#' interface with this package to calculate response factors, which can then be used to calculate feature concentrations
 #' with the \code{calculateConcs} method function.
 #'
-#' The response factors can be calculated from the following workflow data:
+#' @section Response factors: The response factors are predicted with the \code{predictRespFactor} generic functions,
+#'   which appects the following input:
 #'
 #' \itemize{
 #'
-#' \item \link[=suspect-screening]{Suspect screening results}, using the \acronym{SMILES} from the suspect hits.
+#' \item \link[=suspect-screening]{Suspect screening results}. The \acronym{SMILES} data is used to predict response
+#' factors for each suspect hit.
 #'
-#' \item Formula annotation data obtained with \code{\link{generateFormulasSIRIUS}}. In this case predictions are
-#' performed with \command{SIRIUS+CSI:FingerID} fingerprints, hence the  \code{getFingerprint} must be \code{TRUE}.
+#' \item Formula annotation data obtained with \code{"sirius"} algorithm (\code{\link{generateFormulasSIRIUS}}).
+#' Response factors are predicted for each formula candidate using \command{SIRIUS+CSI:FingerID} fingerprints. For this
+#' reason, the \code{getFingerprint} argument must be set to \code{TRUE}.
 #'
-#' \item Compound annotation data obtained with \code{\link{generateCompoundsSIRIUS}}. This allows predictions from both
-#' \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints.
+#' \item Compound annotation data obtained with the \code{"sirius"} algorithm (\code{\link{generateCompoundsSIRIUS}}).
+#' Response factors are calculated for each annotation candidate using its \acronym{SMILES} and/or
+#' \command{SIRIUS+CSI:FingerID} fingerprints. The predictions are performed on a per formula basis, hence, the response
+#' factors for isomers will be equal.
 #'
-#' \item Compound annotation data (other algorithms than \code{"sirius"}): the \acronym{SMILES} candidate data is used
-#' for predictions.
+#' \item Compound annotation data obtained with algorithms other than \code{"sirius"}. The response factor for each
+#' candidate is predicted from its \acronym{SMILES}.
 #'
 #' }
 #'
-#' When \acronym{SMILES} data is used then predictions of response factors are generally more accurate. However,
-#' calculations with \command{SIRIUS+CSI:FingerID} fingerprints are much faster and only requires the formula and MS/MS
-#' spectrum, \emph{i.e.} not the full structure. For annotation data the calculations are performed for \emph{all}
-#' candidates. This can especially lead to long running calculations when \acronym{SMILES} data is used. Hence, it is
-#' \strong{strongly} recommended to first prioritize the annotation results, \emph{e.g.} with the \code{topMost}
-#' argument to the \link[=filter,featureAnnotations-method]{filter method}. When formula annotations are used with
-#' calculations with \command{SIRIUS+CSI:FingerID} fingerprints then \emph{all} formula candidates are considered,
-#' whereas with compound annotation results only candidates with a structure are considered. Furthermore, in the latter
-#' case calculations are sill performed per candidate formula, thus, candidates with the same formula will have the same
-#' response factor assigned.
+#'   When \acronym{SMILES} data is used then predictions of response factors are generally more accurate. However,
+#'   calculations with \command{SIRIUS+CSI:FingerID} fingerprints are faster and only require the formula and MS/MS
+#'   spectrum, \emph{i.e.} not the full structure. Hence, calculations with \acronym{SMILES} are mostly useful in
+#'   suspect screening workflows, or with high confidence compound annotation data, whereas MS/MS fingeprints are
+#'   suitable for quantitation of unknowns.
 #'
-#' 
+#'   For annotation data the calculations are performed for \emph{all} candidates. This can especially lead to long
+#'   running calculations when \acronym{SMILES} data is used. Hence, it is \strong{strongly} recommended to first
+#'   prioritize the annotation results, \emph{e.g.} with the \code{topMost} argument to the
+#'   \link[=filter,featureAnnotations-method]{filter method}.
+#'
+#'   When response factors are predicted from \command{SIRIUS+CSI:FingerID} fingerprints then only formula and MS/MS
+#'   spectra are used, even if compound annotations are used for input. The major difference is that with formula
+#'   annotation input \emph{all} formula candidates for which a fingerprint could be generated are considered, whereas
+#'   with compound annotations only candidate formulae are considered for which also a structure could be assigned.
+#'   Hence, the formula annotation input could be more comprehensive, whereas structure annotation results could lead to
+#'   more representative results as only formulae are considered for which at least one structure could be assigned.
+#'
+#' @section Calculating concentrations: The \code{calculateConcs} generic function is used to calculate concentrations
+#'   for each feature using the response factors discussed in the previous section. The function takes response factors
+#'   from suspect screening results and/or feature annotation data. If multiple response factors were predicted for the
+#'   same feature, for instance when multiple annotation candidates or suspect hits for this feature are present, then
+#'   concentrations are calculated seoparately for each response factor. These values can later be easily aggregated
+#'   with \emph{e.g.} the \link[=as.data.table,featureGroups-method]{as.data.table} function.
+#'
+#'
+#'
+#' @name pred-quant
 NULL

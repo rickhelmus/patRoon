@@ -566,6 +566,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, mincex, xlim, ylim, ...))
 })
 
+#' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
                                                       concUnit = "ugL", calibConcUnit = concUnit, updateScore = FALSE,

@@ -48,6 +48,7 @@
     - sets specifics
         - calibrants as list
     - getQuantCalibFromScreening()
+    - ref to MS2Quant paper if its out
 - NEWS
     - SIRIUS formulas/compound class
 - MS2Quant

@@ -250,6 +250,7 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
     return(obj)
 })
 
+#' @rdname pred-quant
 #' @export
 setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE)
 {

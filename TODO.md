@@ -49,6 +49,7 @@
         - calibrants as list
     - getQuantCalibFromScreening()
     - ref to MS2Quant paper if its out
+    - calculateConcs/calculateTox: also doc as misc generic? Or otherwise alias
 - NEWS
     - SIRIUS formulas/compound class
 - MS2Quant

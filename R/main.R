@@ -483,8 +483,32 @@ NULL
 #' interface with this package to calculate response factors, which can then be used to calculate feature concentrations
 #' with the \code{calculateConcs} method function.
 #'
+#' @param obj The workflow object for which predictions should be performed, \emph{e.g.} feature groups with screening
+#'   results (\code{\link{featureGroupsScreening}}) or compound annotations (\code{\link{compounds}}).
+#' @param fGroups For \code{predictRespFactors} methods for feature annotations: The \code{\link{featureGroups}} object
+#'   for which the annotations were performed.
+#'
+#'   For \code{calculateConcs}: The \code{\link{featureGroups}} object for which concentrations should be calculated.
+#' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} and
+#'   \code{\link{compounds}}) that contains predicted response factors. Optional if \code{calculateConcs} is called on
+#'   suspect screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
+#' @param areas Set to \code{TRUE} to use peak areas instead of peak heights for calculations. Note: this should follow
+#'   what is in the \code{calibrants} table.
+#' @param calibrants description
+#' @param eluent description
+#' @param organicModifier The organic modifier of the mobile phase: either \code{"MeOH"} (methanol) or \code{"MeCN"}
+#'   (acetonitrile).
+#' @param pHAq The \acronym{pH} of the aqueous part of the mobile phase.
+#' @param concUnit,calibConcUnit The concentration unit used for calculated concentrations (\code{concUnit}) or those
+#'   specified in the \code{calibrants} table. Can be molar based (\code{"nM"}, \code{"uM"}, \code{"mM"}, \code{"M"}) or
+#'   mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be prefixed with \code{"log "}
+#'   for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
+#' @param updateScore,scoreWeight description
+#' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS-CSI:FingerID}
+#'   fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{compoundsSIRIUS}} method.
+#'
 #' @section Response factors: The response factors are predicted with the \code{predictRespFactor} generic functions,
-#'   which appects the following input:
+#'   which accepts the following input:
 #'
 #' \itemize{
 #'

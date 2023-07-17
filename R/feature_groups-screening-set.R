@@ -402,6 +402,7 @@ setMethod("predictTox", "featureGroupsScreeningSet", function(obj, ...)
     
 })
 
+#' @rdname pred-quant
 #' @export
 setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL, areas = FALSE)
 {

@@ -1221,6 +1221,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     return(fGroups)
 })
 
+#' @rdname pred-quant
 #' @export
 setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas = FALSE)
 {

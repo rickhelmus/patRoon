@@ -408,6 +408,7 @@ getDefPredAggrParams <- function(all = mean, ...)
     return(modifyList(def, list(...)))
 }
 
+#' @rdname pred-quant
 #' @export
 getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE)
 {

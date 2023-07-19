@@ -489,13 +489,17 @@ NULL
 #'   for which the annotations were performed.
 #'
 #'   For \code{calculateConcs}: The \code{\link{featureGroups}} object for which concentrations should be calculated.
+#'
+#'   For \code{getQuantCalibFromScreening}: A feature groups object screened for the calibrants with
+#'   \code{\link{screenSuspects}}.
 #' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} and
 #'   \code{\link{compounds}}) that contains predicted response factors. Optional if \code{calculateConcs} is called on
 #'   suspect screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
-#' @param areas Set to \code{TRUE} to use peak areas instead of peak heights for calculations. Note: this should follow
-#'   what is in the \code{calibrants} table.
+#' @param areas Set to \code{TRUE} to use peak areas instead of peak heights. Note: for \code{calculateConcs} this
+#'   should follow what is in the \code{calibrants} table.
 #' @param calibrants description
-#' @param eluent description
+#' @param eluent A \code{data.frame} that describes the LC gradient program. Should have a column \code{time} with the
+#'   retention time in seconds and a column \code{B} with the corresponding percentage of mobile phase B (\samp{0-100}).
 #' @param organicModifier The organic modifier of the mobile phase: either \code{"MeOH"} (methanol) or \code{"MeCN"}
 #'   (acetonitrile).
 #' @param pHAq The \acronym{pH} of the aqueous part of the mobile phase.
@@ -503,12 +507,58 @@ NULL
 #'   specified in the \code{calibrants} table. Can be molar based (\code{"nM"}, \code{"uM"}, \code{"mM"}, \code{"M"}) or
 #'   mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be prefixed with \code{"log "}
 #'   for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
-#' @param updateScore,scoreWeight description
 #' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS-CSI:FingerID}
 #'   fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{compoundsSIRIUS}} method.
+#' @param concs A \code{data.frame} with concentration data. See the \verb{Calibration} section below.
+#' @param average Set to \code{TRUE} to average intensity values within replicate groups.
 #'
-#' @section Response factors: The response factors are predicted with the \code{predictRespFactor} generic functions,
-#'   which accepts the following input:
+#' @templateVar scoreName response factor
+#' @templateVar scoreWeightName scoreWeight
+#' @template update_comp_score-args
+#'
+#' @section Calibration: The \pkg{MS2Quant} package requires calibration to convert predicted ionization efficiencies to
+#'   instrument/method specific response factors. The calibration data should be specified with the \code{calibrants}
+#'   argument to \code{predictRespFactors}. This should be a \code{data.frame} with intensity observations at different
+#'   concentrations for a set of calibrants. Each row specifies one intensity observation at one concentration. The
+#'   table should have the following columns:
+#'
+#'   \itemize{
+#'
+#'   \item \code{name} The name of the calibrant. Can be freely chosen.
+#'
+#'   \item \code{SMILES} The \acronym{SMILES} of the calibrant.
+#'
+#'   \item \code{rt} The retention time of the calibrant (in seconds).
+#'
+#'   \item \code{intensity} The peak intensity (or area, see the \code{areas} argument) of the calibrant.
+#'
+#'   \item \code{conc} The concentration of the calibrant (see the \code{calibConcUnit} argument for specifying the unit).
+#'
+#'   }
+#'
+#'   It is recommended to include multiple calibrants (\emph{e.g.} \samp{>=10}) at multiple concentrations (\emph{e.g.}
+#'   \samp{>=5}). The latter is achieved by adding multiple rows for the same calibrant (keeping the
+#'   \code{name}/\code{SMILES}/\code{rt} columns constant). It is also possible to follow the column naming used by
+#'   \pkg{MS2Quant} (however retention times should still be in seconds!). For more details and tips see
+#'   \url{https://github.com/kruvelab/MS2Quant}.
+#'
+#'   The \code{getQuantCalibFromScreening} function can be used to automatically generate a calibrants table from a
+#'   feature groups object with suspect screening results. Here, the idea is to perform a screening with
+#'   \code{\link{screenSuspects}} with a suspect list that contain the calibrants, which is then used to construct the
+#'   calibrant table. It is highly recommended to add retention times for the calibrants in the suspect list to ensure
+#'   the calibrant is assigned to the correct feature. Furthermore, it is possible to simply add the calibrants to the
+#'   'regular' suspect list in case a suspect screening was already part of the workflow. The
+#'   \code{getQuantCalibFromScreening} function still requires you to specify concentration data, which is achieved via
+#'   the \code{concs} argument. This should be a \code{data.frame} with a column \code{name} corresponding to the
+#'   calibrant name (\emph{i.e.} same as used by \code{screenSuspects} above) and columns with concentration data. The
+#'   latter columns specify the concentrations of a calibrant in different replicate groups (as defined in the
+#'   \link[=analysis-information]{analysis information}). The concentration columns should be named after the
+#'   corresponding replicate group. Only those replicate groups that should be used for calibration need to be included.
+#'   Furthermore, \code{NA} values can be used if a replicate group should be ignored for a specific calibrant.
+#'
+#'
+#' @section Predicting response factors: The response factors are predicted with the \code{predictRespFactor} generic
+#'   functions, which accepts the following input:
 #'
 #' \itemize{
 #'

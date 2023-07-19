@@ -155,13 +155,10 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 #'   \emph{zero} means no match with any formula candidates, and \emph{one}
 #'   means that the compound candidate's formula is the highest ranked.
 #'
-#' @param updateScore If set to \code{TRUE} then the \code{score} column is
-#'   updated by adding the normalized \option{formulaScore} (weighted by
-#'   \option{formulaScoreWeight}). Currently, this \strong{only} makes sense for
-#'   \command{MetFrag} results!
-#' @param formulaScoreWeight Weight used to update scoring (see
-#'   \code{updateScore} parameter).
-#'
+#' @templateVar scoreName formula score
+#' @templateVar scoreWeightName formulaScoreWeight
+#' @template update_comp_score-args
+#' 
 #' @return \code{addFormulaScoring} returns a \code{compounds} object updated
 #'   with formula scoring.
 #'

@@ -475,8 +475,8 @@ NULL
 
 #' Functionality to predict quantitative data
 #'
-#' Functions to predict response factors from \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints using
-#' the \pkg{MS2Quant} package.
+#' Functions to predict response factors and feature concentrations from \acronym{SMILES} and/or
+#' \command{SIRIUS+CSI:FingerID} fingerprints using the \pkg{MS2Quant} package.
 #'
 #' The \href{https://github.com/kruvelab/MS2Quant}{MS2Quant} \R package predicts concentrations from \acronym{SMILES}
 #' and/or MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictRespFactor} method functions
@@ -492,25 +492,29 @@ NULL
 #'
 #'   For \code{getQuantCalibFromScreening}: A feature groups object screened for the calibrants with
 #'   \code{\link{screenSuspects}}.
-#' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} and
+#' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} or
 #'   \code{\link{compounds}}) that contains predicted response factors. Optional if \code{calculateConcs} is called on
 #'   suspect screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
 #' @param areas Set to \code{TRUE} to use peak areas instead of peak heights. Note: for \code{calculateConcs} this
 #'   should follow what is in the \code{calibrants} table.
-#' @param calibrants description
+#' @param calibrants A \code{data.frame} with calibrants, see the \verb{Calibration} section below.
+#'
+#'   \setsWF Should be a \code{list} with the calibrants for each set.
 #' @param eluent A \code{data.frame} that describes the LC gradient program. Should have a column \code{time} with the
-#'   retention time in seconds and a column \code{B} with the corresponding percentage of mobile phase B (\samp{0-100}).
+#'   retention time in seconds and a column \code{B} with the corresponding percentage of the organic modifier
+#'   (\samp{0-100}).
 #' @param organicModifier The organic modifier of the mobile phase: either \code{"MeOH"} (methanol) or \code{"MeCN"}
 #'   (acetonitrile).
 #' @param pHAq The \acronym{pH} of the aqueous part of the mobile phase.
 #' @param concUnit,calibConcUnit The concentration unit used for calculated concentrations (\code{concUnit}) or those
-#'   specified in the \code{calibrants} table. Can be molar based (\code{"nM"}, \code{"uM"}, \code{"mM"}, \code{"M"}) or
-#'   mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be prefixed with \code{"log "}
-#'   for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
+#'   specified in the \code{calibrants} table (\code{calibConcUnit}. Can be molar based (\code{"nM"}, \code{"uM"},
+#'   \code{"mM"}, \code{"M"}) or mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be
+#'   prefixed with \code{"log "} for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
 #' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS-CSI:FingerID}
 #'   fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{compoundsSIRIUS}} method.
 #' @param concs A \code{data.frame} with concentration data. See the \verb{Calibration} section below.
 #' @param average Set to \code{TRUE} to average intensity values within replicate groups.
+#' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
 #'
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
@@ -556,55 +560,16 @@ NULL
 #'   corresponding replicate group. Only those replicate groups that should be used for calibration need to be included.
 #'   Furthermore, \code{NA} values can be used if a replicate group should be ignored for a specific calibrant.
 #'
-#'
-#' @section Predicting response factors: The response factors are predicted with the \code{predictRespFactor} generic
-#'   functions, which accepts the following input:
-#'
-#' \itemize{
-#'
-#' \item \link[=suspect-screening]{Suspect screening results}. The \acronym{SMILES} data is used to predict response
-#' factors for each suspect hit.
-#'
-#' \item Formula annotation data obtained with \code{"sirius"} algorithm (\code{\link{generateFormulasSIRIUS}}).
-#' Response factors are predicted for each formula candidate using \command{SIRIUS+CSI:FingerID} fingerprints. For this
-#' reason, the \code{getFingerprint} argument must be set to \code{TRUE}.
-#'
-#' \item Compound annotation data obtained with the \code{"sirius"} algorithm (\code{\link{generateCompoundsSIRIUS}}).
-#' Response factors are calculated for each annotation candidate using its \acronym{SMILES} and/or
-#' \command{SIRIUS+CSI:FingerID} fingerprints. The predictions are performed on a per formula basis, hence, the response
-#' factors for isomers will be equal.
-#'
-#' \item Compound annotation data obtained with algorithms other than \code{"sirius"}. The response factor for each
-#' candidate is predicted from its \acronym{SMILES}.
-#'
-#' }
-#'
-#'   When \acronym{SMILES} data is used then predictions of response factors are generally more accurate. However,
-#'   calculations with \command{SIRIUS+CSI:FingerID} fingerprints are faster and only require the formula and MS/MS
-#'   spectrum, \emph{i.e.} not the full structure. Hence, calculations with \acronym{SMILES} are mostly useful in
-#'   suspect screening workflows, or with high confidence compound annotation data, whereas MS/MS fingeprints are
-#'   suitable for quantitation of unknowns.
-#'
-#'   For annotation data the calculations are performed for \emph{all} candidates. This can especially lead to long
-#'   running calculations when \acronym{SMILES} data is used. Hence, it is \strong{strongly} recommended to first
-#'   prioritize the annotation results, \emph{e.g.} with the \code{topMost} argument to the
-#'   \link[=filter,featureAnnotations-method]{filter method}.
-#'
-#'   When response factors are predicted from \command{SIRIUS+CSI:FingerID} fingerprints then only formula and MS/MS
-#'   spectra are used, even if compound annotations are used for input. The major difference is that with formula
-#'   annotation input \emph{all} formula candidates for which a fingerprint could be generated are considered, whereas
-#'   with compound annotations only candidate formulae are considered for which also a structure could be assigned.
-#'   Hence, the formula annotation input could be more comprehensive, whereas structure annotation results could lead to
-#'   more representative results as only formulae are considered for which at least one structure could be assigned.
+#' @templateVar what response factors
+#' @templateVar predFunc predictRespFactors
+#' @template pred-desc
 #'
 #' @section Calculating concentrations: The \code{calculateConcs} generic function is used to calculate concentrations
 #'   for each feature using the response factors discussed in the previous section. The function takes response factors
 #'   from suspect screening results and/or feature annotation data. If multiple response factors were predicted for the
-#'   same feature, for instance when multiple annotation candidates or suspect hits for this feature are present, then
-#'   concentrations are calculated seoparately for each response factor. These values can later be easily aggregated
-#'   with \emph{e.g.} the \link[=as.data.table,featureGroups-method]{as.data.table} function.
-#'
-#'
+#'   same feature, for instance when multiple annotation candidates or suspect hits for this feature are present, then a
+#'   concentration is calculated for each response factor. These values can later be easily aggregated with \emph{e.g.}
+#'   the \link[=as.data.table,featureGroups-method]{as.data.table} function.
 #'
 #' @name pred-quant
 NULL

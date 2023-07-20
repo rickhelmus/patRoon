@@ -393,6 +393,7 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("predictTox", "featureGroupsScreeningSet", function(obj, ...)
 {
@@ -410,6 +411,7 @@ setMethod("calculateConcs", "featureGroupsScreeningSet", function(fGroups, featu
     callNextMethod(fGroups, featureAnn, areas)
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, featureAnn = NULL)
 {

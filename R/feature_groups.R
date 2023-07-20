@@ -1279,6 +1279,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     return(fGroups)
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 {

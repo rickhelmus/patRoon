@@ -171,6 +171,7 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
     return(obj)
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static", concUnit = "ugL")
 {

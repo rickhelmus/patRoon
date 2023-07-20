@@ -597,6 +597,7 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit = "ugL", updateScore = FALSE,
                                               scoreWeight = 1)

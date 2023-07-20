@@ -483,8 +483,6 @@ NULL
 #' interface with this package to calculate response factors, which can then be used to calculate feature concentrations
 #' with the \code{calculateConcs} method function.
 #'
-#' @param obj The workflow object for which predictions should be performed, \emph{e.g.} feature groups with screening
-#'   results (\code{\link{featureGroupsScreening}}) or compound annotations (\code{\link{compounds}}).
 #' @param fGroups For \code{predictRespFactors} methods for feature annotations: The \code{\link{featureGroups}} object
 #'   for which the annotations were performed.
 #'
@@ -492,9 +490,6 @@ NULL
 #'
 #'   For \code{getQuantCalibFromScreening}: A feature groups object screened for the calibrants with
 #'   \code{\link{screenSuspects}}.
-#' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} or
-#'   \code{\link{compounds}}) that contains predicted response factors. Optional if \code{calculateConcs} is called on
-#'   suspect screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
 #' @param areas Set to \code{TRUE} to use peak areas instead of peak heights. Note: for \code{calculateConcs} this
 #'   should follow what is in the \code{calibrants} table.
 #' @param calibrants A \code{data.frame} with calibrants, see the \verb{Calibration} section below.
@@ -506,15 +501,10 @@ NULL
 #' @param organicModifier The organic modifier of the mobile phase: either \code{"MeOH"} (methanol) or \code{"MeCN"}
 #'   (acetonitrile).
 #' @param pHAq The \acronym{pH} of the aqueous part of the mobile phase.
-#' @param concUnit,calibConcUnit The concentration unit used for calculated concentrations (\code{concUnit}) or those
-#'   specified in the \code{calibrants} table (\code{calibConcUnit}. Can be molar based (\code{"nM"}, \code{"uM"},
-#'   \code{"mM"}, \code{"M"}) or mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be
-#'   prefixed with \code{"log "} for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
-#' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS-CSI:FingerID}
-#'   fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{compoundsSIRIUS}} method.
+#' @param calibConcUnit The concentration unit used in the calibrants table. For possible values see the \code{concUnit}
+#'   argument.
 #' @param concs A \code{data.frame} with concentration data. See the \verb{Calibration} section below.
 #' @param average Set to \code{TRUE} to average intensity values within replicate groups.
-#' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
 #'
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
@@ -560,16 +550,40 @@ NULL
 #'   corresponding replicate group. Only those replicate groups that should be used for calibration need to be included.
 #'   Furthermore, \code{NA} values can be used if a replicate group should be ignored for a specific calibrant.
 #'
-#' @templateVar what response factors
+#' @templateVar whatPred response factors
 #' @templateVar predFunc predictRespFactors
+#' @templateVar whatCalc concentrations
+#' @templateVar calcFunc calculateConc
 #' @template pred-desc
 #'
-#' @section Calculating concentrations: The \code{calculateConcs} generic function is used to calculate concentrations
-#'   for each feature using the response factors discussed in the previous section. The function takes response factors
-#'   from suspect screening results and/or feature annotation data. If multiple response factors were predicted for the
-#'   same feature, for instance when multiple annotation candidates or suspect hits for this feature are present, then a
-#'   concentration is calculated for each response factor. These values can later be easily aggregated with \emph{e.g.}
-#'   the \link[=as.data.table,featureGroups-method]{as.data.table} function.
-#'
 #' @name pred-quant
+NULL
+
+#' Functionality to predict toxicities
+#'
+#' Functions to predict toxicities from \acronym{SMILES} and/or \command{SIRIUS+CSI:FingerID} fingerprints using the
+#' \pkg{MS2Tox} package.
+#'
+#' The \href{https://github.com/kruvelab/MS2Tox}{MS2Tox} \R package predicts toxicities from \acronym{SMILES} and/or
+#' MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictTox} method functions interface with
+#' this package to predict toxicities, which can then be assigned to feature groups with the \code{calculateTox} method
+#' function.
+#'
+#' @param fGroups For \code{predictTox} methods for feature annotations: The \code{\link{featureGroups}} object
+#'   for which the annotations were performed.
+#'
+#'   For \code{calculateTox}: The \code{\link{featureGroups}} object for which toxicities should be assigned.
+#' @param LC50Mode The mode used for predictions: should be \code{"static"} or \code{"flow"}.
+#'
+#' @templateVar scoreName response factor
+#' @templateVar scoreWeightName scoreWeight
+#' @template update_comp_score-args
+#'
+#' @templateVar whatPred toxicities
+#' @templateVar predFunc predictTox
+#' @templateVar whatCalc toxicities
+#' @templateVar calcFunc calculateTox
+#' @template pred-desc
+#'
+#' @name pred-tox
 NULL

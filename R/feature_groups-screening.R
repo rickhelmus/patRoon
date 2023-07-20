@@ -218,6 +218,7 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     return(obj)
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "static", concUnit = "ugL")
 {
@@ -281,6 +282,7 @@ setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureA
     return(fGroups)
 })
 
+#' @rdname pred-tox
 #' @export
 setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn = NULL)
 {

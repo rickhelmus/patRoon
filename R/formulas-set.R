@@ -202,7 +202,7 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
 #' @export
 setMethod("predictRespFactors", "formulasSet", doFeatAnnPredictRFSets)
 
-#' @rdname formulas-class
+#' @rdname pred-tox
 #' @export
 setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 

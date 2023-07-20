@@ -143,7 +143,7 @@ syncScreeningSetObjects <- function(obj)
 #'   there is a tie between sub-levels (\emph{e.g.} \samp{3a} and \samp{3b}), then the sub-level is stripped
 #'   (\emph{e.g.} \samp{3}).
 #'
-#'   \item \code{filter} All filters releated to estimated identification levels and formula/compound rankings  are
+#'   \item \code{filter} All filters related to estimated identification levels and formula/compound rankings  are
 #'   applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
 #'   are only removed if none of the set data confirms to the filter.
 #'

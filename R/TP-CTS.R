@@ -92,7 +92,7 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #'   \code{\link[httr:RETRY]{http::RETRY}} function.
 #' @param calcLogP A \code{character} specifying whether \code{Log P} values should be calculated with
 #'   \code{\link[rcdk:get.xlogp]{rcdk::get.xlogp}} (\code{calcLogP="rcdk"}),
-#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
+#'   \href{https://github.com/openbabel/openbabel}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
 #'   (\code{calcLogP="none"}). The \code{log P} values will be calculated of parent and TPs to predict their retention
 #'   order (\code{retDir}).
 #'

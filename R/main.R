@@ -553,8 +553,20 @@ NULL
 #' @templateVar whatPred response factors
 #' @templateVar predFunc predictRespFactors
 #' @templateVar whatCalc concentrations
-#' @templateVar calcFunc calculateConc
+#' @templateVar calcFunc calculateConcs
 #' @template pred-desc
+#'
+#' @return \code{predictRespFactor} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
+#'   columns).
+#'
+#'   \code{calculateConcs} returns a \code{\link{featureGroups}} based object amended with concentrations for each
+#'   feature group (accessed with the \code{\link{concentrations}} method).
+#'
+#' @note \pkg{MS2Quant} currently \emph{only} supports \samp{M+H} and \samp{M+} adducts when performing predictions with
+#'   \command{SIRIUS:FingerID} fingerprints. Predictions for candidates with other adducts, including \samp{M-H]}, are
+#'   skipped with a warning.
+#'
+#' @seealso \link[=pred-tox]{Toxicity prediction}
 #'
 #' @name pred-quant
 NULL
@@ -569,8 +581,8 @@ NULL
 #' this package to predict toxicities, which can then be assigned to feature groups with the \code{calculateTox} method
 #' function.
 #'
-#' @param fGroups For \code{predictTox} methods for feature annotations: The \code{\link{featureGroups}} object
-#'   for which the annotations were performed.
+#' @param fGroups For \code{predictTox} methods for feature annotations: The \code{\link{featureGroups}} object for
+#'   which the annotations were performed.
 #'
 #'   For \code{calculateTox}: The \code{\link{featureGroups}} object for which toxicities should be assigned.
 #' @param LC50Mode The mode used for predictions: should be \code{"static"} or \code{"flow"}.
@@ -585,5 +597,14 @@ NULL
 #' @templateVar calcFunc calculateTox
 #' @template pred-desc
 #'
+#' @return \code{predictTox} returns an object amended with LC 50 values (\code{LC50_SMILES}/\code{LC50_SIRFP} columns).
+#'
+#'   \code{calculateTox} returns a \code{\link{featureGroups}} based object amended with toxicity values for each
+#'   feature group (accessed with the \code{\link{toxicities}} method).
+#'
+#' @references \insertRef{Peets2022}{patRoon}
+#'
+#' @seealso \link[=pred-conc]{Concentration prediction}
+#' 
 #' @name pred-tox
 NULL

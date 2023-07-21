@@ -1,8 +1,8 @@
 #' @param obj The workflow object for which predictions should be performed, \emph{e.g.} feature groups with screening
 #'   results (\code{\link{featureGroupsScreening}}) or compound annotations (\code{\link{compounds}}).
 #' @param featureAnn A \code{\link{featureAnnotations}} object (\emph{e.g.} \code{\link{formulasSIRIUS}} or
-#'   \code{\link{compounds}}) which contains <%=whatPred%>. Optional if \code{<%=calcFunc%>} is called on
-#'   suspect screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
+#'   \code{\link{compounds}}) which contains <%=whatPred%>. Optional if \code{<%=calcFunc%>} is called on suspect
+#'   screening results (\emph{i.e.} \code{\link{featureGroupsScreening}} method).
 #' @param concUnit The concentration unit for calculated <%=whatCalc%>. Can be molar based (\code{"nM"}, \code{"uM"},
 #'   \code{"mM"}, \code{"M"}) or mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be
 #'   prefixed with \code{"log "} for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
@@ -57,3 +57,8 @@
 #'   group, for instance when multiple annotation candidates or suspect hits for this feature group are present, then a
 #'   <%=whatCalc%> is assigned for all <%=whatPred%>. These values can later be easily aggregated with \emph{e.g.} the
 #'   \link[=as.data.table,featureGroups-method]{as.data.table} function.
+#'
+#' @note The \CRANpkg{rcdk} package and \href{https://github.com/openbabel/openbabel}{OpenBabel} tool are used
+#'   internally to calculate molecular weights. Please make sure that \command{OpenBabel} is installed.
+#'
+#' @references \insertRef{OBoyle2011}{patRoon} \cr \cr \addCitations{rcdk}{1}

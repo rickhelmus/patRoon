@@ -497,12 +497,12 @@ compsClust <- treeCutDynamic(compsClust, minModuleSize = 3, groupName = "M109_R1
 
 For a complete overview see the reference manual (`?compoundsCluster`).
 
-## Basic quantitative and regression analysis
+## Feature regression analysis
 
-While `patRoon` is currently primarily focused on qualitative analyses, some _basic_ quantitative analysis can also be performed, for instance, to estimate concentrations of features. In fact, other types of data that may be useful for regression analysis can be set such as sample dilution factor or sampling time. The latter may, for instance, be used to isolate features with increasing or decreasing intensity. Regardless of what kind of regression analysis is performed, here we simply refer the values to be calculated as _concentrations_. In order to use this functionality, an extra column (`conc`) should be added to the [analysis information](#anaInfo), for instance:
+Some basic support in `patRoon` is available to perform simple linear regression on feature intensities vs given experimental conditions. Examples of such conditions are dilution factor, sampling time or initial concentration of a parent in a degradation experiment. By testing if there is a significant linearity, features of interest can be isolated in a relative easy way. Originally, this functionality was implemented as a very basic method to perform rough calculations of concentrations. However, the next sections describes a much better way by using the `MS2Quant` package. Regardless, this functionality still uses 'concentrations' as terminology for the experimental conditions of interest. The conditions are specified in the `conc` column of the [analysis information](#anaInfo), for instance:
 
 ```{r quantAnaInfo,eval=FALSE}
-# obtain analysis information as usual, but add some concentrations.
+# obtain analysis information as usual, but add some experimental parameters of interest (dilution, time etc).
 # The blanks are set to NA, whereas the standards are set to increasing levels.
 anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 groups = c(rep("solvent", 3), rep("standard", 3)),
@@ -510,13 +510,12 @@ anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 concs = c(NA, NA, NA, 1, 2, 3))
 ```
 
-For analyses with known concentrations (e.g. standards) the `conc` column should be set; for all others the value should be set to `NA`.
+If no experimental conditions are available for a particular analysis then the `conc` value should be `NA`. For these analyses the experimental condition will be calculated using the regression model obtained from the other analyses.
 
-The `as.data.table()` function (or `as.data.frame()`) can then be used to calculate regression data and estimate concentrations:
+The `as.data.table()` function (or `as.data.frame()`) can then be used to calculate regression data:
 
 ```{r quantDT,eval=FALSE}
 # use areas for quantitation and make sure that feature data is reported
-# (otherwise no concentrations are calculated)
 # (only relevant columns are shown for clarity)
 as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
 ```
@@ -525,13 +524,61 @@ as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
 as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)[, c("group", "conc", "RSQ", "intercept", "slope", "conc_reg")]
 ```
 
-Calculated concentrations are stored in the `conc_reg` column, alongside while other regression data (i.e. `RSQ`, `intercept`, `slope` columns). To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:
+The calculated experimental conditions are stored in the `conc_reg` column (this column is only present if `features=TRUE`). In addition, the table also contains other regression data such as `RSQ`, `intercept` and `slope`. To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:
 
 ```{r quantRSQ,eval=FALSE}
 fGroupsTab <- as.data.table(fGroups, areas = TRUE, features = FALSE, regression = TRUE)
 # subset fGroups with reasonable correlation
 increasingFGroups <- fGroups[, fGroupsTab[RSQ >= 0.8, group]]
 ```
+
+## Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)
+
+The [MS2Tox] and [MS2Quant] `R` packages predict toxicities and feature concentrations using a machine learning approach. The predictions are performed with either SMILES data or fingerprints calculated from MS/MS data with `SIRIUS+CSI:FingerID`. While using SMILES data is generally more accurate, using MS/MS fingerprints is generally faster and may be more suitable for features without know or suspected structure.
+
+In `patRoon` the predictions are done in two steps:
+
+1. The LC50 values (toxicity prediction) or response factors (concentration prediction) are calculated for given SMILES or MS/MS fingerprint data using `MS2Tox`/`MS2Quant`. This step is performed by the `predictTox()`/`predictConcs()` method function.
+2. The predicted LC50 values are used to assign toxicities/concentrations to feature data. This is performed by the `calculateTox()`/`calculateConcs()` method function.
+
+Various workflow data can be used to perform the predictions for step 1:
+
+a. Suspect hits that were obtained with `screenSuspects` [link].
+b. Formula annotations obtained with `SIRIUS+CSI:FingerID`.
+c. Compound annotations obtained with `SIRIUS+CSI:FingerID`.
+d. Compound annotations obtained with other algorithms, e.g. `MetFrag`.
+
+For _a_ and _d_ SMILES is used to perform the calculations, for _b_ MS/MS fingerprints are used and for _c_ either can be used.
+
+### Predicting toxicities
+
+An example workflow is shown below:
+
+```{r eval=runData}
+```
+
+### Predicting concentrations
+
+The workflow to predict concentrations is quite similar to predicting toxicities. However, before we can start we first have to specify the _calibrants_ and the LC gradient elution program.
+
+The calibrant data is used by `MS2Quant` to convert predicted ionization efficiencies to actual response factors, which are specific to the used LC instrument and methodology. For this purpose, several mixtures with known concentrations (i.e. standards) should be measured alongside your samples. The easiest way then to obtain the calibrant data is by perform a 'suspect screening' [link] with the calibrant compounds and subsequently using the `getQuantCalibFromScreening()` function to automatically extract the relevant data needed for calibration. This function requires you to give the concentration data for each calibrant in order to produce the final calibrant data. An example is shown below:
+
+```{r eval=runData}
+```
+
+The next step is to obtain the eluent information. This is simple a `data.frame` that describes the LC gradient program as time _versus_ percentage of B (i.e. the organic modifier).
+
+```{r eval=runData}
+```
+
+The following example shows an example workflow to use this data to predict response factors and subsequently calculate concentrations for all features.
+
+### Inspecting and using predicted values
+
+* as.data.table
+* reporting
+* filtering
+
 
 ## Fold changes {#FCCalc}
 

@@ -287,7 +287,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
         fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
 
     gCount <- length(fGroups)
-    printf("Processing %d feature groups with SIRIUS-CSI:FingerID...\n", gCount)
+    printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", gCount)
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, "structure", fingerIDDatabase, topMostFormulas, projectPath,

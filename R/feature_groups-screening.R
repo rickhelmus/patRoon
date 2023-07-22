@@ -504,47 +504,37 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     return(fGroups)
 })
 
-#' @describeIn featureGroupsScreening Performs rule based filtering. This method
-#'   builds on the comprehensive filter functionality from the base
-#'   \code{\link{filter,featureGroups-method}}. It adds several filters to
-#'   select \emph{e.g.} the best ranked suspects or those with a minimum
-#'   estimated identification level. \strong{NOTE}: most filters \emph{only}
-#'   affect suspect hits, not feature groups. Set \code{onlyHits=TRUE} to
-#'   subsequently remove any feature groups that lost any suspect matches due to
-#'   other filter steps.
+#' @describeIn featureGroupsScreening Performs rule based filtering. This method builds on the comprehensive filter
+#'   functionality from the base \code{\link{filter,featureGroups-method}}. It adds several filters to select
+#'   \emph{e.g.} the best ranked suspects or those with a minimum estimated identification level. \strong{NOTE}: most
+#'   filters \emph{only} affect suspect hits, not feature groups. Set \code{onlyHits=TRUE} to subsequently remove any
+#'   feature groups that lost any suspect matches due to other filter steps.
 #'
-#' @param selectHitsBy Should be \code{"intensity"} or \code{"level"}. For cases
-#'   where the same suspect is matched to multiple feature groups, only the
-#'   suspect to the feature group with highest mean intensity
-#'   (\code{selectHitsBy="intensity"}) or best identification level
-#'   (\code{selectHitsBy="level"}) is kept. In case of ties only the first hit
-#'   is kept. Set to \code{NULL} to ignore this filter. If \code{negate=TRUE}
-#'   then only those hits with lowest mean intensity/poorest identification
-#'   level are kept.
-#' @param selectBestFGroups If \code{TRUE} then for any cases where a single
-#'   feature group is matched to several suspects only the suspect assigned to
-#'   the feature group with best identification score is kept. In case of ties
+#' @param selectHitsBy Should be \code{"intensity"} or \code{"level"}. For cases where the same suspect is matched to
+#'   multiple feature groups, only the suspect to the feature group with highest mean intensity
+#'   (\code{selectHitsBy="intensity"}) or best identification level (\code{selectHitsBy="level"}) is kept. In case of
+#'   ties only the first hit is kept. Set to \code{NULL} to ignore this filter. If \code{negate=TRUE} then only those
+#'   hits with lowest mean intensity/poorest identification level are kept.
+#' @param selectBestFGroups If \code{TRUE} then for any cases where a single feature group is matched to several
+#'   suspects only the suspect assigned to the feature group with best identification score is kept. In case of ties
 #'   only the first is kept.
-#' @param
-#' maxLevel,maxFormRank,maxCompRank,minAnnSimForm,minAnnSimComp,minAnnSimBoth
-#' Filter suspects by maximum identification level (\emph{e.g.} \code{"3a"}),
-#' formula/compound rank or with minimum formula/compound/combined annotation
-#' similarity. Set to \code{NULL} to ignore.
-#' @param absMinFragMatches,relMinFragMatches Only retain suspects with this
-#'   minimum number MS/MS matches with the fragments specified in the suspect
-#'   list (\emph{i.e.} \code{fragments_mz}/\code{fragments_formula}).
-#'   \code{relMinFragMatches} sets the minimum that is relative (\samp{0-1}) to
-#'   the maximum number of MS/MS fragments specified in the \code{fragments_*}
-#'   columns of the suspect list. Set to \code{NULL} to ignore.
-#' @param negate If set to \code{TRUE} then filtering operations are performed
-#'   in opposite manner.
+#' @param maxLevel,maxFormRank,maxCompRank,minAnnSimForm,minAnnSimComp,minAnnSimBoth Filter suspects by maximum
+#'   identification level (\emph{e.g.} \code{"3a"}), formula/compound rank or with minimum formula/compound/combined
+#'   annotation similarity. Set to \code{NULL} to ignore.
+#' @param absMinFragMatches,relMinFragMatches Only retain suspects with this minimum number MS/MS matches with the
+#'   fragments specified in the suspect list (\emph{i.e.} \code{fragments_mz}/\code{fragments_formula}).
+#'   \code{relMinFragMatches} sets the minimum that is relative (\samp{0-1}) to the maximum number of MS/MS fragments
+#'   specified in the \code{fragments_*} columns of the suspect list. Set to \code{NULL} to ignore.
+#' @param minRF Filter suspect hits by the given minimum predicted response factor (as calculated by
+#'   \code{\link{predictRespFactor}}). Set to \code{NULL} to ignore.
+#' @param maxLC50 Filter suspect hits by the given maximum toxicity (LC50) (as calculated by \code{\link{predictTox}}).
+#'   Set to \code{NULL} to ignore.
+#' @param negate If set to \code{TRUE} then filtering operations are performed in opposite manner.
 #'
-#' @return \code{filter} returns a filtered \code{featureGroupsScreening}
-#'   object.
+#' @return \code{filter} returns a filtered \code{featureGroupsScreening} object.
 #'
-#' @note \code{filter} removes suspect hits with \code{NA} values when any of
-#'   the filters related to minimum or maximum values are applied (unless
-#'   \code{negate=TRUE}).
+#' @note \code{filter} removes suspect hits with \code{NA} values when any of the filters related to minimum or maximum
+#'   values are applied (unless \code{negate=TRUE}).
 #'
 #' @export
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL,

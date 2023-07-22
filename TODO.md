@@ -28,6 +28,8 @@
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
     - update compoundsScorings for sysdata.rda
+    - update NAMESPACE
+    - filters that relate conc/tox, ie conc >= (tox/10)
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs
@@ -35,17 +37,16 @@
     - predictRespFactorsSIRFPs(): need to check adduct?
     - which default unit?
 - docs
-    - concentrations & toxicities slot
-    - getDefPredArrgParams() and new as.data.table() args that use it
-        - candidateFunc: only used currently with tox, SIRIUS_FP and in >1 sets
-    - minRF/maxLC50 susp filters
-    - minConc/maxTox filter
-        - also predAggrParams and removeNA args
-    - baseFrom param of genReportSettingsFile()
     - ref to MS2Quant paper if its out
     - calculateConcs/calculateTox: also doc as misc generic? Or otherwise alias
 - NEWS
     - SIRIUS formulas/compound class
+    - concentrations & toxicities slot
+    - getDefPredArrgParams() and new as.data.table() args that use it
+    - minRF/maxLC50 susp filters
+    - minConc/maxTox filter
+        - also predAggrParams and removeNA args
+    - baseFrom param of genReportSettingsFile()
 - MS2Quant
     - PR to allow DFs in addition to CSVs
 

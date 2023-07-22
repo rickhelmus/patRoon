@@ -75,6 +75,9 @@ NULL
 #'   method).
 #' @slot ISTDAssignments A \code{list}, where each item is named by a feature group and consists of a vector with
 #'   feature group names of the internal standards assigned to it (filled in by the \code{normInts} method).
+#' @slot concentrations,toxicities A \code{data.table} with predicted concentrations/toxicities for each feature group.
+#'   Assigned by the \code{\link{calculateConcs}}/\code{\link{calculateTox}} methods. Use the
+#'   \code{concentratrions}/\code{toxicities} methods for access.
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -635,6 +638,9 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
 #'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
+#' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
+#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
+#'   parameters} for more information. Set to \code{NULL} to omit this data.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,

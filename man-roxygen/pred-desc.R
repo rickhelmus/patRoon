@@ -6,7 +6,7 @@
 #' @param concUnit The concentration unit for calculated <%=whatCalc%>. Can be molar based (\code{"nM"}, \code{"uM"},
 #'   \code{"mM"}, \code{"M"}) or mass based (\code{"ngL"}, \code{"ugL"}, \code{"mgL"}, \code{"gL"}). Furthermore, can be
 #'   prefixed with \code{"log "} for logarithmic concentrations (\emph{e.g.} \code{"log mM"}).
-#' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS-CSI:FingerID}
+#' @param type Which types of predictions should be performed: should be \code{"FP"} (\command{SIRIUS+CSI:FingerID}
 #'   fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{compoundsSIRIUS}} method.
 #' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
 #'

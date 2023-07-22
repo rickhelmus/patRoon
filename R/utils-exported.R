@@ -395,14 +395,53 @@ getDefEICParams <- function(...)
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 
+#' Parameters to aggregate concentrations/toxicity values assigned to feature groups
+#'
+#' Parameters that are used by method functions such \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to
+#' aggregate \link[=pred-conc]{predicted concentrations} or \link[=pred-tox]{toxicities}.
+#'
+#' Multiple concentration or toxicity values may be assigned to a single feature group. To ease the interpretation and
+#' data handling, several functions aggregate these values prior their use. Aggregation occurs by the following data:
+#'
+#' \itemize{
+#'
+#' \item The candidate (\emph{i.e.} suspect or annotation candidate). This is mainly relevant for sets workflows, where
+#' calculations among sets may yield different results for the same candidate.
+#'
+#' \item The prediction type, \emph{e.g.} all values that were obtained from suspect or compound annotation data.
+#'
+#' \item The feature group.
+#'
+#' }
+#'
+#' The aggregation of all data first occurs by the same candidate/type/feature group, then the same type/feature group
+#' and finally for each feature group. This ensures that \emph{e.g.} large numbers of data points for a prediction type
+#' do not bias results.
+#'
+#' The \code{candidateFunc}, \code{typeFunc} and \code{groupFunc} parameters specify the function that should be used to
+#' aggregate data. Commonly, functions such \code{\link{mean}}, \code{\link{min}} or \code{\link{max}} can be used here.
+#' Note that the function does not need to handle \code{NA} values, as these are removed in advance.
+#'
+#' The \code{preferType} parameters specifies the \emph{preferred} prediction type. Any values from other prediction
+#' types will be ignored unless the preferred type is not available for a feature group. Valid values are
+#' \code{"suspect"} (the default), \code{"compound"} (results from compound annotation by \acronym{SMILES}),
+#' \code{"SIRIUS_FP"} (results from formula/compound annotation with \command{SIRIUS+CSI:FingerID}) or \code{"none"}.
+#'
+#' These parameters should be stored inside a \code{list}. The \code{getDefPredAggrParams} function can be used to
+#' generate such parameter list with defaults.
+#'
+#' @param all The default aggregation function for all types, \emph{e.g.} \code{mean}.
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @name pred-aggr-params
 #' @export
 getDefPredAggrParams <- function(all = mean, ...)
 {
     def <- list(
+        candidateFunc = all,
         typeFunc = all,
         groupFunc = all,
-        candidateFunc = all,
-        preferType = "suspect" # UNDONE?
+        preferType = "suspect"
     )
     
     return(modifyList(def, list(...)))

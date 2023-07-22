@@ -193,6 +193,8 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
 #'   settings (see the next section).
 #'
 #' @param out The output file path.
+#' @param baseFrom An existing report file to which the report settings should be based from. This is primarily used to
+#'   update old settings files: the output settings file will be based on the old settings and amended with any missing.
 #'
 #' @rdname reporting
 #' @export
@@ -200,9 +202,7 @@ genReportSettingsFile <- function(out = "report.yml", baseFrom = NULL)
 {
     checkmate::assertPathForOutput(out, overwrite = TRUE)
     if (!is.null(baseFrom))
-    {
         checkmate::assertFileExists(baseFrom, "r")
-    }
     
     defFile <- system.file("report", "settings.yml", package = "patRoon")
     

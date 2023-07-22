@@ -425,6 +425,12 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
 #'   replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 #'   \code{NULL} to ignore.
+#' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculate by
+#'   \code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
+#'   controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
+#' @param absMaxTox,relMaxTox The maximum absolute/relative predicted toxicity (LC50) (calculate by
+#'   \code{\link{calculateTox}}) assigned to a feature group. The concentrations are first aggregated prior to
+#'   filtering, as controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
 #' @param results Only keep feature groups that have results in the object specified by \code{results}. Valid classes
 #'   are \code{\link{featureAnnotations}} (\emph{e.g.} formula/compound annotations) and \code{\link{components}}. Can
 #'   also be a \code{list} with multiple objects: in this case a feature group is kept if it has a result in \emph{any}
@@ -446,6 +452,11 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \code{\link{predictCheckFeaturesSession}} functions. The value of \code{checkFeaturesSession} should either by a
 #'   path to the session file or \code{TRUE}, in which case the default session file name is used. If \code{negate=TRUE}
 #'   then all non-selected features/feature groups are removed instead.
+#' @param predAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
+#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}) prior to filtering data. See \link[=pred-aggr-params]{prediction aggregation
+#'   parameters} for more information.
+#' @param removeNA Set to \code{TRUE} to remove \code{NA} values. Currently only applicable to the concentration and
+#'   toxicity filter.
 #'
 #' @templateVar feat FALSE
 #' @template feat-filter-args
@@ -478,7 +489,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \item Replicate abundance filters (2nd time, only if previous filters affected results).
 #'
 #'   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
-#'   \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc} and \code{relMinConc}.
+#'   \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc}, \code{relMinConc},
+#'   \code{absMaxTox} and \code{relMaxTox}.
 #'
 #'   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
 #'   analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).

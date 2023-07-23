@@ -30,6 +30,7 @@
     - update compoundsScorings for sysdata.rda
     - update NAMESPACE
     - filters that relate conc/tox, ie conc >= (tox/10)
+    - newProject() support?
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs

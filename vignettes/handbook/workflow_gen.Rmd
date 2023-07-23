@@ -811,21 +811,7 @@ An example of a custom _.csv_ database can be found [here][csvDB-ex].
 With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function (some columns omitted):
 
 ```{r compSc,echo=FALSE}
-dt <- compoundScorings()[, c("name", "metfrag", "database", "default")]
-if (knitr::is_html_output())
-{
-    k <- knitr::kable(dt, format = "html")
-    k <- kableExtra::kable_styling(k, font_size = 11)
-    k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
-} else
-{
-    k <- knitr::kable(dt, format = "latex", longtable = TRUE, booktabs = TRUE)
-    # k <- kableExtra::kable_styling(k, latex_options = "repeat_header", font_size = 7)
-    # UNDONE: repeat_header doesn't work anymore --> make bug report
-    k <- kableExtra::kable_styling(k, font_size = 7)
-}
-
-k
+makeTable(compoundScorings()[, c("name", "metfrag", "database", "default")])
 ```
 
 The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The _database_ column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the _default_ column), however, this behaviour can be customized by using the `scoreTypes` argument:
@@ -890,7 +876,7 @@ Ranking of candidate structures may further be improved by incorporating formula
 comps <- addFormulaScoring(coms, formulas, updateScore = TRUE)
 ```
 
-Here, corresponding formula and explained fragments will be used to calculate a _formulaScore_ for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensable unless scoring from another formula calculation algorithm is desired.
+Here, corresponding formula and explained fragments will be used to calculate a _formulaScore_ for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensible unless scoring from another formula calculation algorithm is desired.
 
 #### Further options and parameters
 

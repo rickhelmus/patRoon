@@ -14,6 +14,24 @@ plotGV <- function(gvCode, ...)
 # only change out.width for PDF
 PDFOutWidth <- function(w) if (knitr::is_html_output()) "100%" else w
 
+makeTable <- function(tab)
+{
+    if (knitr::is_html_output())
+    {
+        k <- knitr::kable(tab, format = "html")
+        k <- kableExtra::kable_styling(k, font_size = 11)
+        k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
+    }
+    else
+    {
+        k <- knitr::kable(tab, format = "latex", longtable = TRUE, booktabs = TRUE)
+        # k <- kableExtra::kable_styling(k, latex_options = "repeat_header", font_size = 7)
+        # UNDONE: repeat_header doesn't work anymore --> make bug report
+        k <- kableExtra::kable_styling(k, font_size = 7)
+    }
+    return(k)
+}
+
 # otherwise Linux will get into memory troubles...
 knitr::knit_meta("latex_dependency", clean = TRUE)
 

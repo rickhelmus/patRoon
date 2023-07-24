@@ -102,27 +102,8 @@ setMethod("initialize", "MSPeakLists", function(.Object, setIDs = TRUE, doAverag
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
     
     if (setIDs)
-    {
-        addIDs <- function(pl)
-        {
-            add <- function(p)
-            {
-                p <- copy(p)
-                p[, ID := seq_len(.N)]
-                setcolorder(p, "ID")
-                return(p)
-            }
-            if (!is.null(pl[["MS"]]))
-                pl$MS <- add(pl$MS)
-            if (!is.null(pl[["MSMS"]]))
-                pl$MSMS <- add(pl$MSMS)
-            
-            return(pl)
-        }
-        .Object@peakLists <- lapply(.Object@peakLists, function(pla) lapply(pla, addIDs))
-        .Object@averagedPeakLists <- lapply(.Object@averagedPeakLists, addIDs)
-    }
-    
+        .Object <- assignMSPLIDs(.Object)
+
     return(.Object)
 })
 
@@ -452,7 +433,10 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
     }
 
     if (reAverage)
+    {
         obj@averagedPeakLists <- averageMSPeakLists(obj)
+        obj <- assignMSPLIDs(obj) # re-generater as IDs are cleared by re-averaging
+    }
     
     return(obj)
 })
@@ -515,7 +499,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         return(obj)
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr, topMSPeaks, topMSMSPeaks, minMSMSPeaks,
-                     isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy, retainPrecursorMSMS, negate)
+                     isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy, retainPrecursorMSMS, reAverage,
+                     negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)

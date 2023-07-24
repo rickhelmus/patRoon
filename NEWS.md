@@ -9,6 +9,8 @@
 * Fixed: report layout is now compatible with `bslib 0.5.0` (reported by Alessia Ore)
 * Fixed: `annotatedBy` filter for `MSPeakLists` could remove precursor peaks in MS/MS data regardless if `retainPrecursorMSMS=TRUE`
 * Fixed: `report()`: The `suspect(s)` column for compound annotation results was always empty
+* Fixed: the `reAverage` argument was ignored by the `filter()` method of `MSPeakLists` when checking if cached data is available (issue #87)
+* Fixed: if `reAverage=TRUE` to the `filter()` method of `MSPeakLists` then the peak IDs were not regenerated (issue #87)
 
 
 # patRoon 2.2

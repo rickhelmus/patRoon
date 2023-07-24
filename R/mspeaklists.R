@@ -556,12 +556,13 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 else
                 {
                     if (negate)
-                        plF <- plF[!ID %in% allAnnPLIDs]
+                        plF[, keep := !ID %in% allAnnPLIDs]
                     else
-                        plF <- plF[ID %in% allAnnPLIDs]
+                        plF[, keep := ID %in% allAnnPLIDs]
                     
                     if (retainPrecursorMSMS)
                         plF[precursor == TRUE, keep := TRUE]
+                    plF <- plF[keep == TRUE][, keep := NULL]
                 }
             }
 

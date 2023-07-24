@@ -373,7 +373,7 @@ setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
 report(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
-       components = NULL, MSPeakLists = mslists, openReport = FALSE)
+       components = NULL, MSPeakLists = mslists, openReport = FALSE, parallel = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 # devtools::clean_source(tempScript, quiet = TRUE)
 callr::rscript(tempScript, show = FALSE)

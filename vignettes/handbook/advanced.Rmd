@@ -554,7 +554,7 @@ For _a_ and _d_ SMILES is used to perform the calculations, for _b_ MS/MS finger
 
 Some example workflows are shown below:
 
-```{r eval=runData}
+```{r eval=runData,results="hide"}
 # Calculate toxicity for suspect hits.
 fGroupsSuspTox <- predictTox(fGroupsSusp)
 fGroupsSuspTox <- calculateTox(fGroupsSuspTox)
@@ -578,6 +578,8 @@ compoundsSuspSIRTox <- predictTox(compoundsSuspSIR, type = "both")
 fGroupsSuspTox <- calculateTox(fGroupsSuspTox, compoundsSuspSIRTox)
 ```
 
+More details are in the reference manual: ``?`pred-tox` ``.
+
 ### Predicting concentrations
 
 The workflow to predict concentrations is quite similar to predicting toxicities. However, before we can start we first have to specify the _calibrants_ and the LC gradient elution program.
@@ -590,10 +592,11 @@ calibrants <- data.table(name = c("DEET", "1h-benzotriazole", "Caffeine", "Atraz
                          conc = rep(c(1, 2, 5, 10, 25, 50), each = 6))
 setorderv(calibrants, "name")
 calibrants[, SMILES := patRoonData::suspectsPos[match(name, patRoonData::suspectsPos$name), "SMILES"]]
+calibrants[, rt := patRoonData::suspectsPos[match(name, patRoonData::suspectsPos$name), "rt"]]
 fgScr <- screenSuspects(fGroups, calibrants, onlyHits = TRUE, adduct = "[M+H]+")
 fgTab <- as.data.table(fgScr, average = TRUE, collapseSuspects = NULL)
-calibrants <- merge(calibrants, fgTab[, c("susp_name", "susp_rt", "standard-pos"), with = FALSE], by.x = "name", by.y = "susp_name")
-setnames(calibrants, c("susp_rt", "standard-pos"), c("rt", "intensity"))
+calibrants <- merge(calibrants, fgTab[, c("susp_name", "standard-pos"), with = FALSE], by.x = "name", by.y = "susp_name")
+setnames(calibrants, "standard-pos", "intensity")
 withr::with_seed(1, calibrants[, intensity := round(runif(.N, 0.9, 1.1) * (intensity / 20 * conc))])
 setcolorder(calibrants, c("name", "SMILES", "intensity", "conc"))
 makeTable(calibrants)
@@ -626,7 +629,7 @@ concs <- data.frame(
 concs
 ```
 
-The concentrations are specified separately for each calibrant compound. The column names should follow the names of the [replicate groups assigned to the standards](#anaInfo).
+The concentrations are specified separately for each calibrant compound. The column names should follow the names of the [replicate groups assigned to the standards](#anaInfo). The concentration unit is &#x00B5;g/l by default. The next section describes how this can be changed. 
 
 The gradient elution program is also specified by a `data.frame`, which for every time point (in seconds!) describes the percentage of 'B'. In this case, 'B' represents the total amount of organic modifier.
 
@@ -641,26 +644,48 @@ eluent
 
 Then, the workflow to predict concentrations is very similar then predicting toxicities (previous section):
 
-```{r eval=runData}
+```{r eval=runData,results="hide"}
 # Calculate concentrations for suspect hits.
-fGroupsSuspTox <- predictRespFactors(
+fGroupsSuspConc <- predictRespFactors(
     fGroupsSusp,
     calibrants = calibrants, eluent = eluent,
     organicModifier = "MeCN", # organic modifier: MeOH or MeCN
     pHAq = 4 # pH of the aqueous part of the mobile phase
 )
 # set areas to TRUE if the calibrant table contains areas
-fGroupsSuspTox <- calculateConcs(fGroupsSuspTox, areas = FALSE)
+fGroupsSuspConc <- calculateConcs(fGroupsSuspConc, areas = FALSE)
 ```
 
 As was shown for toxicities it is possible to use different data sources (e.g. compound annotations, suspects) for predictions.
+
+More details are in the reference manual: ``?`pred-quant` ``.
+
+### Toxicity and concentration units
+
+The default unit for toxicity and concentration data is &#x00B5;g/l. However, this can be configured when calling the `predictTox()`/`predictRespFactors()` functions:
+
+```r{ eval=FALSE}
+fGroupsSuspTox <- predictTox(fGroupsSusp) # default unit: ug/l
+fGroupsSuspTox <- predictTox(fGroupsSusp, concUnit = "ug/l") # same as above
+fGroupsSuspTox <- predictTox(fGroupsSusp, concUnit = "mM") # millimolar
+fGroupsSuspTox <- predictTox(fGroupsSusp, concUnit = "log mM") # unit used by MS2Tox
+
+# calculated concentrations are ng/l, calibrants are specified in ug/l
+# (by default calibConcUnit=concUnit)
+fGroupsSuspConc <- predictRespFactors(
+    fGroupsSusp, calibrants = calibrants, eluent = eluent,
+    organicModifier = "MeCN", pHAq = 4,
+    concUnit = "ng/l", calibConcUnit = "ug/l"
+)
+```
+
+See the reference manuals (``?`pred-tox` ``/``?`pred-quant` ``) For more details on which units can be specified
 
 ### Inspecting and using predicted values
 
 * as.data.table
 * reporting
 * filtering
-* conc units
 
 
 ## Fold changes {#FCCalc}

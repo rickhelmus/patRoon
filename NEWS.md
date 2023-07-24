@@ -8,6 +8,7 @@
 * Add package option `patRoon.checkCentroided` to control whether analyses files are verified to be centroided (suggested by Geert Franken).
 * Fixed: report layout is now compatible with `bslib 0.5.0` (reported by Alessia Ore)
 * Fixed: `annotatedBy` filter for `MSPeakLists` could remove precursor peaks in MS/MS data regardless if `retainPrecursorMSMS=TRUE`
+* Fixed: `report()`: The `suspect(s)` column for compound annotation results was always empty
 
 
 # patRoon 2.2

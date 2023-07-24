@@ -466,7 +466,7 @@ reportHTMLUtils$methods(
             {
                 scr <- data.table::copy(scr)
                 scr[, IK1 := getIKBlock1(InChIKey)]
-                tab[UID %chin% scr$UID, suspect := {
+                tab[UID %chin% scr$IK1, suspect := {
                     paste0(unique(scr[IK1 == UID[1]]$name), collapse = ", ")
                 }, by = "UID"]
             }

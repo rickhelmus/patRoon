@@ -69,3 +69,5 @@
 [Handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
 [MassBank.eu]: https://massbank.eu/MassBank/
 [MoNA]: https://mona.fiehnlab.ucdavis.edu/
+[MS2Tox]: https://github.com/kruvelab/MS2Tox
+[MS2Quant]: https://github.com/kruvelab/MS2Quant

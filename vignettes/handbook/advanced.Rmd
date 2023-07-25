@@ -664,7 +664,7 @@ More details are in the reference manual: ``?`pred-quant` ``.
 
 The default unit for toxicity and concentration data is &#x00B5;g/l. However, this can be configured when calling the `predictTox()`/`predictRespFactors()` functions:
 
-```r{ eval=FALSE}
+```{r eval=FALSE}
 fGroupsSuspTox <- predictTox(fGroupsSusp) # default unit: ug/l
 fGroupsSuspTox <- predictTox(fGroupsSusp, concUnit = "ug/l") # same as above
 fGroupsSuspTox <- predictTox(fGroupsSusp, concUnit = "mM") # millimolar
@@ -681,11 +681,42 @@ fGroupsSuspConc <- predictRespFactors(
 
 See the reference manuals (``?`pred-tox` ``/``?`pred-quant` ``) For more details on which units can be specified
 
-### Inspecting and using predicted values
+### Inspecting predicted values
 
-* as.data.table
-* reporting
-* filtering
+The raw toxicity and concentration data assigned to feature groups can be retrieved with the `toxicities()` and `concentrations()` method functions, respectively.
+
+```{r eval=runData}
+toxicities(fGroupsSuspTox)
+concentrations(fGroupsSuspConc)
+```
+
+If there were multiple candidates for a single feature group then these are split over the table rows:
+
+```{r eval=runData}
+toxicities(fGroupsTox)
+```
+
+The `as.data.table()` method function, which [was discussed previously](#processing), can be used to summarize toxicity and concentration values.
+
+```{r eval=runData}
+# NOTE: NA values are filtered and columns are subset for readability
+as.data.table(fGroupsTox)[!is.na(LC50), c("group", "LC50", "LC50_types")]
+concCols <- c("group", paste0(analyses(fGroupsSuspConc), "_conc"), "conc_types")
+as.data.table(fGroupsSuspConc)[!is.na(conc_types), concCols, with = FALSE]
+```
+
+The `as.data.table()` method function _aggregates_ the data for a feature group in case multiple candidates were assigned to it. By default the values are mean averaged, but this be changed with the `toxAggrParams`/`concAggrParams` arguments, for instance:
+
+```{r eval=runData}
+# as above, but aggregate by taking maximum values
+as.data.table(fGroupsTox, toxAggrParams = getDefPredAggrParams(max))[!is.na(LC50), c("group", "LC50", "LC50_types")]
+```
+
+Finally, the [reporting functionality](#report) can be used to overview all predicted values, both aggregated and raw. 
+
+### Using predicted values to prioritize data
+
+* filtering RFs, LC50, concs
 
 
 ## Fold changes {#FCCalc}

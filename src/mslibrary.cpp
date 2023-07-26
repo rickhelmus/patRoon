@@ -162,7 +162,7 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                                 --numPeaks;
                             }
                             getMZ = !getMZ;
-                        } while (endPos != std::string::npos && (startPos + 1) < lineLen);
+                        } while (endPos != std::string::npos && (startPos + 1) <= lineLen);
                         // UNDONE: sort peaks?
                     }
 

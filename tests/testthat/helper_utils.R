@@ -347,7 +347,7 @@ makeReportHTML <- function(fGroups, path = getWorkPath(), overrideSettings = lis
         overrideSettings, keep.null = TRUE
     )
     
-    report(fGroups, path = path, openReport = FALSE, overrideSettings = overrideSettings, ...)
+    report(fGroups, path = path, openReport = FALSE, parallel = FALSE, overrideSettings = overrideSettings, ...)
 }
 
 expect_reportHTML <- function(object)

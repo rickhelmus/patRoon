@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-06-01" />
+<meta name="date" content="2023-07-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -61,7 +61,7 @@
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -360,37 +360,37 @@ div.csl-indent {
 <h3><span class="header-section-number">2.3.1</span> R prerequisites<a href="manual-installation.html#r-prerequisites" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>When installing <code>patRoon</code> Windows users have the option to install from a customized (<a href="https://github.com/andrie/miniCRAN">miniCRAN</a>) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
 <p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), the following will install the <code>R</code> dependencies.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="manual-installation.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</span>
-<span id="cb3-2"><a href="manual-installation.html#cb3-2" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;CAMERA&quot;</span>)</span>
-<span id="cb3-3"><a href="manual-installation.html#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="manual-installation.html#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for finding features with enviPick</span></span>
-<span id="cb3-5"><a href="manual-installation.html#cb3-5" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/enviPick&quot;</span>)</span>
-<span id="cb3-6"><a href="manual-installation.html#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="manual-installation.html#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for finding/grouping features with KPIC2</span></span>
-<span id="cb3-8"><a href="manual-installation.html#cb3-8" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;ropls&quot;</span>)</span>
-<span id="cb3-9"><a href="manual-installation.html#cb3-9" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/KPIC2&quot;</span>) </span>
-<span id="cb3-10"><a href="manual-installation.html#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="manual-installation.html#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for RAMClustR for componentization</span></span>
-<span id="cb3-12"><a href="manual-installation.html#cb3-12" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;InterpretMSSpectrum&quot;</span>)</span>
-<span id="cb3-13"><a href="manual-installation.html#cb3-13" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</span>
-<span id="cb3-14"><a href="manual-installation.html#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="manual-installation.html#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for nontarget for componentization</span></span>
-<span id="cb3-16"><a href="manual-installation.html#cb3-16" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/nontargetData&quot;</span>)</span>
-<span id="cb3-17"><a href="manual-installation.html#cb3-17" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/nontarget&quot;</span>)</span>
-<span id="cb3-18"><a href="manual-installation.html#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="manual-installation.html#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for cliqueMS for componentization</span></span>
-<span id="cb3-20"><a href="manual-installation.html#cb3-20" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/cliqueMS&quot;</span>) <span class="co"># note: repository is a fork with minor bug fixes</span></span>
-<span id="cb3-21"><a href="manual-installation.html#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="manual-installation.html#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
-<span id="cb3-23"><a href="manual-installation.html#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: a fork is installed that fixes some issues with the latest R versions</span></span>
-<span id="cb3-24"><a href="manual-installation.html#cb3-24" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;BSchamberger/RDCOMClient&quot;</span>)</span>
-<span id="cb3-25"><a href="manual-installation.html#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="manual-installation.html#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
-<span id="cb3-27"><a href="manual-installation.html#cb3-27" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span>
-<span id="cb3-28"><a href="manual-installation.html#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="manual-installation.html#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># needed for feature quality calculations with MetaClean</span></span>
-<span id="cb3-30"><a href="manual-installation.html#cb3-30" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">&quot;BiocStyle&quot;</span>, <span class="st">&quot;Rgraphviz&quot;</span>)) </span>
-<span id="cb3-31"><a href="manual-installation.html#cb3-31" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;KelseyChetnik/MetaClean&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="manual-installation.html#cb3-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</span>
+<span id="cb3-2"><a href="manual-installation.html#cb3-2" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;CAMERA&quot;</span>)</span>
+<span id="cb3-3"><a href="manual-installation.html#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="manual-installation.html#cb3-4" tabindex="-1"></a><span class="co"># needed for finding features with enviPick</span></span>
+<span id="cb3-5"><a href="manual-installation.html#cb3-5" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/enviPick&quot;</span>)</span>
+<span id="cb3-6"><a href="manual-installation.html#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="manual-installation.html#cb3-7" tabindex="-1"></a><span class="co"># needed for finding/grouping features with KPIC2</span></span>
+<span id="cb3-8"><a href="manual-installation.html#cb3-8" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;ropls&quot;</span>)</span>
+<span id="cb3-9"><a href="manual-installation.html#cb3-9" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/KPIC2&quot;</span>) </span>
+<span id="cb3-10"><a href="manual-installation.html#cb3-10" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="manual-installation.html#cb3-11" tabindex="-1"></a><span class="co"># needed for RAMClustR for componentization</span></span>
+<span id="cb3-12"><a href="manual-installation.html#cb3-12" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;InterpretMSSpectrum&quot;</span>)</span>
+<span id="cb3-13"><a href="manual-installation.html#cb3-13" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</span>
+<span id="cb3-14"><a href="manual-installation.html#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="manual-installation.html#cb3-15" tabindex="-1"></a><span class="co"># needed for nontarget for componentization</span></span>
+<span id="cb3-16"><a href="manual-installation.html#cb3-16" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/nontargetData&quot;</span>)</span>
+<span id="cb3-17"><a href="manual-installation.html#cb3-17" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;blosloos/nontarget&quot;</span>)</span>
+<span id="cb3-18"><a href="manual-installation.html#cb3-18" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="manual-installation.html#cb3-19" tabindex="-1"></a><span class="co"># needed for cliqueMS for componentization</span></span>
+<span id="cb3-20"><a href="manual-installation.html#cb3-20" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/cliqueMS&quot;</span>) <span class="co"># note: repository is a fork with minor bug fixes</span></span>
+<span id="cb3-21"><a href="manual-installation.html#cb3-21" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="manual-installation.html#cb3-22" tabindex="-1"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
+<span id="cb3-23"><a href="manual-installation.html#cb3-23" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: a fork is installed that fixes some issues with the latest R versions</span></span>
+<span id="cb3-24"><a href="manual-installation.html#cb3-24" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;BSchamberger/RDCOMClient&quot;</span>)</span>
+<span id="cb3-25"><a href="manual-installation.html#cb3-25" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="manual-installation.html#cb3-26" tabindex="-1"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
+<span id="cb3-27"><a href="manual-installation.html#cb3-27" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span>
+<span id="cb3-28"><a href="manual-installation.html#cb3-28" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="manual-installation.html#cb3-29" tabindex="-1"></a><span class="co"># needed for feature quality calculations with MetaClean</span></span>
+<span id="cb3-30"><a href="manual-installation.html#cb3-30" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">&quot;BiocStyle&quot;</span>, <span class="st">&quot;Rgraphviz&quot;</span>)) </span>
+<span id="cb3-31"><a href="manual-installation.html#cb3-31" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;KelseyChetnik/MetaClean&quot;</span>)</span></code></pre></div>
 <p>Note that only the <code>CAMERA</code> installation is mandatory, the rest involves installation of <em>optional</em> packages. If you are unsure which you need then you can always install the packages at a later stage.</p>
 </div>
 <div id="other-dependencies" class="section level3 hasAnchor" number="2.3.2">
@@ -464,30 +464,30 @@ div.csl-indent {
 </table>
 <p>Most of these dependencies are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage if needed.</p>
 <p>After installation of these dependencies you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the <code>options()</code> R function, for instance:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="manual-installation.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span></span>
-<span id="cb4-2"><a href="manual-installation.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span></span>
-<span id="cb4-3"><a href="manual-installation.html#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span></span>
-<span id="cb4-4"><a href="manual-installation.html#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span></span>
-<span id="cb4-5"><a href="manual-installation.html#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFragCommandLine-2.4.8.jar&quot;</span>) <span class="co"># full location to the jar file</span></span>
-<span id="cb4-6"><a href="manual-installation.html#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></span>
-<span id="cb4-7"><a href="manual-installation.html#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_exposomics_20220429.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span></span>
-<span id="cb4-8"><a href="manual-installation.html#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChem_OECDPFAS_largerPFASparts_20220324&quot;</span>) <span class="co"># full location to PFAS DB (</span><span class="al">NOTE</span><span class="co">: configured like PubChemLite)</span></span>
-<span id="cb4-9"><a href="manual-installation.html#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.BioTransformer =</span> <span class="st">&quot;~/biotransformer/biotransformer-3.0.1.jar&quot;</span>)</span>
-<span id="cb4-10"><a href="manual-installation.html#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="manual-installation.html#cb4-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span></span>
+<span id="cb4-2"><a href="manual-installation.html#cb4-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span></span>
+<span id="cb4-3"><a href="manual-installation.html#cb4-3" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span></span>
+<span id="cb4-4"><a href="manual-installation.html#cb4-4" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span></span>
+<span id="cb4-5"><a href="manual-installation.html#cb4-5" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFragCommandLine-2.4.8.jar&quot;</span>) <span class="co"># full location to the jar file</span></span>
+<span id="cb4-6"><a href="manual-installation.html#cb4-6" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></span>
+<span id="cb4-7"><a href="manual-installation.html#cb4-7" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_exposomics_20220429.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span></span>
+<span id="cb4-8"><a href="manual-installation.html#cb4-8" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChem_OECDPFAS_largerPFASparts_20220324&quot;</span>) <span class="co"># full location to PFAS DB (</span><span class="al">NOTE</span><span class="co">: configured like PubChemLite)</span></span>
+<span id="cb4-9"><a href="manual-installation.html#cb4-9" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.BioTransformer =</span> <span class="st">&quot;~/biotransformer/biotransformer-3.0.1.jar&quot;</span>)</span>
+<span id="cb4-10"><a href="manual-installation.html#cb4-10" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></span></code></pre></div>
 <p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don’t have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
 </div>
 <div id="patroon-installation" class="section level3 hasAnchor" number="2.3.3">
 <h3><span class="header-section-number">2.3.3</span> patRoon installation<a href="manual-installation.html#patroon-installation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Finally, it is time to install <code>patRoon</code> itself. As mentioned before, Windows users (who have the latest <code>R</code> version) can install <code>patRoon</code> and all its package dependencies from the <code>patRoonDeps</code> repository:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="manual-installation.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install from patRoonDeps (only Windows with latest R version)</span></span>
-<span id="cb5-2"><a href="manual-installation.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="at">type =</span> <span class="st">&quot;binary&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="manual-installation.html#cb5-1" tabindex="-1"></a><span class="co"># install from patRoonDeps (only Windows with latest R version)</span></span>
+<span id="cb5-2"><a href="manual-installation.html#cb5-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="at">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="at">type =</span> <span class="st">&quot;binary&quot;</span>)</span></code></pre></div>
 <p><strong>Otherwise</strong>, installation occurs directly from GitHub:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="manual-installation.html#cb6-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="manual-installation.html#cb6-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</span></code></pre></div>
 <p>Optional example data is installed via GitHub:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="manual-installation.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optional example data</span></span>
-<span id="cb7-2"><a href="manual-installation.html#cb7-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="manual-installation.html#cb7-1" tabindex="-1"></a><span class="co"># optional example data</span></span>
+<span id="cb7-2"><a href="manual-installation.html#cb7-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>)</span></code></pre></div>
 <p>Afterwards, you can run the <code>verifyDependencies()</code> function to see if <code>patRoon</code> can find all its dependencies (you may need to restart R beforehand):</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="manual-installation.html#cb8-1" aria-hidden="true" tabindex="-1"></a>patRoon<span class="sc">::</span><span class="fu">verifyDependencies</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="manual-installation.html#cb8-1" tabindex="-1"></a>patRoon<span class="sc">::</span><span class="fu">verifyDependencies</span>()</span></code></pre></div>
 
 </div>
 </div>

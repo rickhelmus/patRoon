@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-06-01" />
+<meta name="date" content="2023-07-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -61,7 +61,7 @@
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -390,22 +390,22 @@ div.csl-indent {
 </tbody>
 </table>
 <p>The <code>convertMSFiles()</code> function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> algorithm is used. For an overview of these functionalities see the <a href="http://proteowizard.sourceforge.net/tools/msconvert.html">MsConvert documentation</a>. Some examples:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="preparations.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Converts a single mzXML file to mzML format</span></span>
-<span id="cb10-2"><a href="preparations.html#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="at">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">algorithm =</span> <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb10-3"><a href="preparations.html#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="preparations.html#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span></span>
-<span id="cb10-5"><a href="preparations.html#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span></span>
-<span id="cb10-6"><a href="preparations.html#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># spectra are retained.</span></span>
-<span id="cb10-7"><a href="preparations.html#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="at">from =</span> <span class="st">&quot;thermo&quot;</span>,</span>
-<span id="cb10-8"><a href="preparations.html#cb10-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="at">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="preparations.html#cb10-1" tabindex="-1"></a><span class="co"># Converts a single mzXML file to mzML format</span></span>
+<span id="cb10-2"><a href="preparations.html#cb10-2" tabindex="-1"></a><span class="fu">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="at">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">algorithm =</span> <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb10-3"><a href="preparations.html#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="preparations.html#cb10-4" tabindex="-1"></a><span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span></span>
+<span id="cb10-5"><a href="preparations.html#cb10-5" tabindex="-1"></a><span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span></span>
+<span id="cb10-6"><a href="preparations.html#cb10-6" tabindex="-1"></a><span class="co"># spectra are retained.</span></span>
+<span id="cb10-7"><a href="preparations.html#cb10-7" tabindex="-1"></a><span class="fu">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="at">from =</span> <span class="st">&quot;thermo&quot;</span>,</span>
+<span id="cb10-8"><a href="preparations.html#cb10-8" tabindex="-1"></a>               <span class="at">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="at">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</span></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Most algorithms further down the workflow require the <em>mzML</em> or <em>mzXML</em> file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting <code>centroid="vendor"</code> as shown in the above example).</p>
 </blockquote>
 <p>When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the <code>setDAMethod()</code> function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The <code>recalibrarateDAFiles()</code> function performs the actual re-calibration. The <code>getDACalibrationError()</code> function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="preparations.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span></span>
-<span id="cb11-2"><a href="preparations.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span></span>
-<span id="cb11-3"><a href="preparations.html#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></span>
-<span id="cb11-4"><a href="preparations.html#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="preparations.html#cb11-1" tabindex="-1"></a><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span></span>
+<span id="cb11-2"><a href="preparations.html#cb11-2" tabindex="-1"></a><span class="fu">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span></span>
+<span id="cb11-3"><a href="preparations.html#cb11-3" tabindex="-1"></a><span class="fu">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></span>
+<span id="cb11-4"><a href="preparations.html#cb11-4" tabindex="-1"></a><span class="fu">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></span></code></pre></div>
 </div>
 <div id="anaInfo" class="section level3 hasAnchor" number="4.2.2">
 <h3><span class="header-section-number">4.2.2</span> Analysis information<a href="preparations.html#anaInfo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -418,10 +418,10 @@ div.csl-indent {
 <li><strong>conc</strong> (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the <code>as.data.table()</code> method function (see <code>?featureGroups</code> for more information).</li>
 </ul>
 <p>The <code>generateAnalysisInfo()</code> function can be used to (semi-)automatically generate a suitable <code>data.frame</code> that contains all the required information for a set of analysis. For, instance:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="preparations.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></span>
-<span id="cb12-2"><a href="preparations.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">paths =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
-<span id="cb12-3"><a href="preparations.html#cb12-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">groups =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
-<span id="cb12-4"><a href="preparations.html#cb12-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">blanks =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="preparations.html#cb12-1" tabindex="-1"></a><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></span>
+<span id="cb12-2"><a href="preparations.html#cb12-2" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">paths =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
+<span id="cb12-3"><a href="preparations.html#cb12-3" tabindex="-1"></a>                     <span class="at">groups =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb12-4"><a href="preparations.html#cb12-4" tabindex="-1"></a>                     <span class="at">blanks =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt;                                                    path       analysis        group       blank
 #&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-1  solvent-pos solvent-pos
 #&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata/pos  solvent-pos-2  solvent-pos solvent-pos

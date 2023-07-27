@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-06-01" />
+<meta name="date" content="2023-07-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -61,7 +61,7 @@
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -351,18 +351,18 @@ div.csl-indent {
 <div id="basic-quantitative-and-regression-analysis" class="section level2 hasAnchor" number="8.9">
 <h2><span class="header-section-number">8.9</span> Basic quantitative and regression analysis<a href="basic-quantitative-and-regression-analysis.html#basic-quantitative-and-regression-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>While <code>patRoon</code> is currently primarily focused on qualitative analyses, some <em>basic</em> quantitative analysis can also be performed, for instance, to estimate concentrations of features. In fact, other types of data that may be useful for regression analysis can be set such as sample dilution factor or sampling time. The latter may, for instance, be used to isolate features with increasing or decreasing intensity. Regardless of what kind of regression analysis is performed, here we simply refer the values to be calculated as <em>concentrations</em>. In order to use this functionality, an extra column (<code>conc</code>) should be added to the <a href="preparations.html#anaInfo">analysis information</a>, for instance:</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="basic-quantitative-and-regression-analysis.html#cb269-1" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain analysis information as usual, but add some concentrations.</span></span>
-<span id="cb269-2"><a href="basic-quantitative-and-regression-analysis.html#cb269-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The blanks are set to NA, whereas the standards are set to increasing levels.</span></span>
-<span id="cb269-3"><a href="basic-quantitative-and-regression-analysis.html#cb269-3" aria-hidden="true" tabindex="-1"></a>anaInfo <span class="ot">&lt;-</span> <span class="fu">generateAnalysisInfo</span>(<span class="at">paths =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
-<span id="cb269-4"><a href="basic-quantitative-and-regression-analysis.html#cb269-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">groups =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),</span>
-<span id="cb269-5"><a href="basic-quantitative-and-regression-analysis.html#cb269-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">blanks =</span> <span class="st">&quot;solvent&quot;</span>,</span>
-<span id="cb269-6"><a href="basic-quantitative-and-regression-analysis.html#cb269-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">concs =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="basic-quantitative-and-regression-analysis.html#cb269-1" tabindex="-1"></a><span class="co"># obtain analysis information as usual, but add some concentrations.</span></span>
+<span id="cb269-2"><a href="basic-quantitative-and-regression-analysis.html#cb269-2" tabindex="-1"></a><span class="co"># The blanks are set to NA, whereas the standards are set to increasing levels.</span></span>
+<span id="cb269-3"><a href="basic-quantitative-and-regression-analysis.html#cb269-3" tabindex="-1"></a>anaInfo <span class="ot">&lt;-</span> <span class="fu">generateAnalysisInfo</span>(<span class="at">paths =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
+<span id="cb269-4"><a href="basic-quantitative-and-regression-analysis.html#cb269-4" tabindex="-1"></a>                                <span class="at">groups =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb269-5"><a href="basic-quantitative-and-regression-analysis.html#cb269-5" tabindex="-1"></a>                                <span class="at">blanks =</span> <span class="st">&quot;solvent&quot;</span>,</span>
+<span id="cb269-6"><a href="basic-quantitative-and-regression-analysis.html#cb269-6" tabindex="-1"></a>                                <span class="at">concs =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div>
 <p>For analyses with known concentrations (e.g. standards) the <code>conc</code> column should be set; for all others the value should be set to <code>NA</code>.</p>
 <p>The <code>as.data.table()</code> function (or <code>as.data.frame()</code>) can then be used to calculate regression data and estimate concentrations:</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="basic-quantitative-and-regression-analysis.html#cb270-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use areas for quantitation and make sure that feature data is reported</span></span>
-<span id="cb270-2"><a href="basic-quantitative-and-regression-analysis.html#cb270-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (otherwise no concentrations are calculated)</span></span>
-<span id="cb270-3"><a href="basic-quantitative-and-regression-analysis.html#cb270-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (only relevant columns are shown for clarity)</span></span>
-<span id="cb270-4"><a href="basic-quantitative-and-regression-analysis.html#cb270-4" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">areas =</span> <span class="cn">TRUE</span>, <span class="at">features =</span> <span class="cn">TRUE</span>, <span class="at">regression =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="basic-quantitative-and-regression-analysis.html#cb270-1" tabindex="-1"></a><span class="co"># use areas for quantitation and make sure that feature data is reported</span></span>
+<span id="cb270-2"><a href="basic-quantitative-and-regression-analysis.html#cb270-2" tabindex="-1"></a><span class="co"># (otherwise no concentrations are calculated)</span></span>
+<span id="cb270-3"><a href="basic-quantitative-and-regression-analysis.html#cb270-3" tabindex="-1"></a><span class="co"># (only relevant columns are shown for clarity)</span></span>
+<span id="cb270-4"><a href="basic-quantitative-and-regression-analysis.html#cb270-4" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">areas =</span> <span class="cn">TRUE</span>, <span class="at">features =</span> <span class="cn">TRUE</span>, <span class="at">regression =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>#&gt;              group conc        RSQ intercept  slope   conc_reg
 #&gt;   1:  M109_R192_20    1 0.71446367 193338.67  -4928  1.3649892
 #&gt;   2:  M109_R192_20    2 0.71446367 193338.67  -4928  1.2700216
@@ -376,9 +376,9 @@ div.csl-indent {
 #&gt; 425: M425_R319_676    2 0.46488086 193198.67  10896  0.7611356
 #&gt; 426: M425_R319_676    3 0.46488086 193198.67  10896  3.6194322</code></pre>
 <p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="basic-quantitative-and-regression-analysis.html#cb272-1" aria-hidden="true" tabindex="-1"></a>fGroupsTab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">areas =</span> <span class="cn">TRUE</span>, <span class="at">features =</span> <span class="cn">FALSE</span>, <span class="at">regression =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb272-2"><a href="basic-quantitative-and-regression-analysis.html#cb272-2" aria-hidden="true" tabindex="-1"></a><span class="co"># subset fGroups with reasonable correlation</span></span>
-<span id="cb272-3"><a href="basic-quantitative-and-regression-analysis.html#cb272-3" aria-hidden="true" tabindex="-1"></a>increasingFGroups <span class="ot">&lt;-</span> fGroups[, fGroupsTab[RSQ <span class="sc">&gt;=</span> <span class="fl">0.8</span>, group]]</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="basic-quantitative-and-regression-analysis.html#cb272-1" tabindex="-1"></a>fGroupsTab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">areas =</span> <span class="cn">TRUE</span>, <span class="at">features =</span> <span class="cn">FALSE</span>, <span class="at">regression =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb272-2"><a href="basic-quantitative-and-regression-analysis.html#cb272-2" tabindex="-1"></a><span class="co"># subset fGroups with reasonable correlation</span></span>
+<span id="cb272-3"><a href="basic-quantitative-and-regression-analysis.html#cb272-3" tabindex="-1"></a>increasingFGroups <span class="ot">&lt;-</span> fGroups[, fGroupsTab[RSQ <span class="sc">&gt;=</span> <span class="fl">0.8</span>, group]]</span></code></pre></div>
 </div>
             </section>
 

@@ -23,6 +23,9 @@ NULL
 #'
 #' @templateVar class MSLibrary
 #' @template class-hierarchy
+#' 
+#' @references \insertRef{Wohlgemuth2016}{patRoon} \cr\cr
+#'   \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3}
 #'
 #' @export
 MSLibrary <- setClass("MSLibrary", slots = c(records = "data.table", spectra = "list"),
@@ -475,8 +478,6 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
 #'
 #' @note \code{export} does not split any \code{Synon} data that was merged when the library was loaded.
 #' 
-#' @references \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3}
-#'
 #' @export
 setMethod("export", "MSLibrary", function(obj, type = "msp", out)
 {
@@ -500,8 +501,6 @@ setMethod("export", "MSLibrary", function(obj, type = "msp", out)
 #' @param y The \code{MSLibrary} to be merged with \code{x}.
 #'
 #' @return \code{merge} returns a merged \code{MSLibrary} object.
-#'
-#' @references \insertRef{Wohlgemuth2016}{patRoon}
 #'
 #' @export
 setMethod("merge", c("MSLibrary", "MSLibrary"), function(x, y, ...)

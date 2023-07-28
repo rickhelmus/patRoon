@@ -23,12 +23,9 @@
 - general
     - also score formulas?
         - general score mechanism currently not there
-    - don't allow update scoring for SIRIUS compounds?
-        - currently not (why?)
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
     - filters that relate conc/tox, ie conc >= (tox/10)
-    - newProject() support?
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs
@@ -38,6 +35,7 @@
 - docs
     - ref to MS2Quant paper if its out
     - calculateConcs/calculateTox: also doc as misc generic? Or otherwise alias
+    - update Rd files
 - NEWS
     - SIRIUS formulas/compound class
     - concentrations & toxicities slot

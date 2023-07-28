@@ -371,7 +371,8 @@ utils <- setRefClass("utilsInst", methods = list(
         curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
         .libPaths(getLibPaths(instPath, pkgWhere))
         
-        optPackages <- packagesNotInstalled(c("KPIC", "RAMClustR", "nontarget", "cliqueMS", "MetaClean", "RDCOMClient"))
+        optPackages <- packagesNotInstalled(c("KPIC", "RAMClustR", "nontarget", "cliqueMS", "MetaClean", "RDCOMClient",
+                                              "MS2Tox", "MS2Quant"))
         
         choices <- character()
         if ("KPIC" %in% optPackages)
@@ -386,6 +387,11 @@ utils <- setRefClass("utilsInst", methods = list(
             choices <- c(choices, MetaClean = "MetaClean (to calculate chromatographic peak qualities)")
         if ("RDCOMClient" %in% optPackages)
             choices <- c(choices, RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)")
+        if ("MS2Tox" %in% optPackages)
+            choices <- c(choices, MS2Tox = "MS2Tox (to predict toxicities)")
+        if ("MS2Quant" %in% optPackages)
+            choices <- c(choices, MS2Quant = "MS2Tox (to predict concentrations)")
+        
         if (length(choices) > 1)
             choices <- c(choices, all = "All")
         else if (length(choices) == 0)
@@ -424,6 +430,10 @@ utils <- setRefClass("utilsInst", methods = list(
             }
             if (any(c("all", "RDCOMClient") %in% instWhat))
                 checkPackages("RDCOMClient", pkgWhere, ask = FALSE, type = "gh", repos = "BSchamberger")
+            if (any(c("all", "MS2Tox") %in% instWhat))
+                checkPackages("MS2Tox", pkgWhere, ask = FALSE, type = "gh", repos = "kruvelab")
+            if (any(c("all", "MS2Quant") %in% instWhat))
+                checkPackages("MS2Quant", pkgWhere, ask = FALSE, type = "gh", repos = "kruvelab")
         }
     },
     

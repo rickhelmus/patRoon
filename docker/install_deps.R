@@ -40,6 +40,9 @@ installDeps <- function(deps)
 
 installDeps(dependencies)
 
+# UNDONE: move to Rdeps.R
+remotes::install_github(c("kruvelab/MS2Tox", "kruvelab/MS2Quant"), upgrade = "never")
+
 getMissingPkgs <- function()
 {
     dp <- desc::desc_get_deps()

@@ -88,6 +88,8 @@ build_script:
     - travis-tool.sh install_github KelseyChetnik/MetaClean
     - travis-tool.sh install_github KelseyChetnik/MetaCleanData
     - travis-tool.sh install_github berlinguyinca/spectra-hash/splashR
+    - travis-tool.sh install_github kruvelab/MS2Tox
+    - travis-tool.sh install_github kruvelab/MS2Quant
     - travis-tool.sh install_r vdiffr
     - travis-tool.sh install_r covr
     - travis-tool.sh install_deps

@@ -27,7 +27,6 @@
         - currently not (why?)
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
-    - update compoundsScorings for sysdata.rda
     - update NAMESPACE
     - filters that relate conc/tox, ie conc >= (tox/10)
     - newProject() support?

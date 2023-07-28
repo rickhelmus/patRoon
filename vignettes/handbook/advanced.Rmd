@@ -716,8 +716,28 @@ Finally, the [reporting functionality](#report) can be used to overview all pred
 
 ### Using predicted values to prioritize data
 
-* filtering RFs, LC50, concs
+The `filter()` method function that was [introduced before](#filtering) can also be used to filter data based on predicted toxicities, response factors and concentrations. For instance, this allows you to remove annotation candidates which are unlikely to be toxic or sensitive enough to be detected or any features with very low concentrations. Some examples are shown below.
 
+```{r eval=FALSE}
+# compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate
+# we can use the common scoreLimits filter to select a range of allowed values (min/max)
+compoundsSuspSIRToxF <- filter(compoundsSuspSIRTox, scoreLimits = list(LC50_SMILES = c(0, 1E4)))
+
+# for suspects with predicted toxicities/response factors there are dedicated filters
+fGroupsSuspConcF <- filter(fGroupsSuspConc, minRF = 5E4) # remove suspect hits with response factor <5E4
+fGroupsSuspToxF <- filter(ffGroupsSuspTox, maxLC50 = 100) # remove suspect hits with LC50 values > 100
+
+# similarly, for feature data there are dedicated filters.
+# note that these aggregate data prior to filtering (see previous section)
+fGroupsConcF <- filter(fGroupsConc, absMinConc = 0.02)
+# also get rid of features without concentrations (these are ignored by default)
+fGroupsConcF <- filter(fGroupsConc, absMinConc = 0.02, removeNA = TRUE)
+# like as.data.table we can configure how values are aggregated
+# here the minimum is used instead of the default mean
+fGroupsToxF <- filter(fGroupsTox, absMaxTox = 5E3, predAggrParams = getDefPredAggrParams(min))
+```
+
+More details are found in the reference manual (``?`feature-filtering` ``).
 
 ## Fold changes {#FCCalc}
 

@@ -567,7 +567,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 #' @export
 setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,
                                                       concUnit = "ugL", calibConcUnit = concUnit, updateScore = FALSE,
-                                                      scoreWeight = 1)
+                                                      scoreWeight = 1, parallel = TRUE)
 {
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
@@ -577,13 +577,15 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
     aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))
-    checkmate::assertFlag(updateScore, add = ac)
+    aapply(checkmate::assertFlag, . ~ updateScore + parallel, fixed = list(add = ac))
     checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
     checkmate::reportAssertions(ac)
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
-    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    printf("Predicting response factors with MS2Quant for %d candidates...\n", length(obj))
+    
+    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {
         ann <- copy(ann)
         inp <- data.table(group = grp, SMILES = ann$SMILES)
@@ -591,33 +593,37 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
         if (!is.null(ann[["RF_SMILES"]]))
             ann[, RF_SMILES := NULL] # clearout for merge below
         ann <- merge(ann, resp[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE, all.x = TRUE)
+        doProgress()
         return(ann)
     })
-    
+
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
 })
 
 #' @rdname pred-tox
 #' @export
 setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit = "ugL", updateScore = FALSE,
-                                              scoreWeight = 1)
+                                              scoreWeight = 1, parallel = TRUE)
 {
     checkPackage("MS2Tox", "kruvelab/MS2Tox")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     assertConcUnit(concUnit, add = ac)
-    checkmate::assertFlag(updateScore, add = ac)
+    aapply(checkmate::assertFlag, . ~ updateScore + parallel, fixed = list(add = ac))
     checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
     checkmate::reportAssertions(ac)
     
-    obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
+    printf("Predicting LC50 values with MS2Tox for %d candidates...\n", length(obj))
+    
+    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {
         ann <- copy(ann)
         pr <- predictLC50SMILES(ann$SMILES, LC50Mode, concUnit)
         if (!is.null(ann[["LC50_SMILES"]]))
             ann[, LC50_SMILES := NULL] # clearout for merge below
         ann <- merge(ann, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
+        doProgress()
         return(ann)
     })
     

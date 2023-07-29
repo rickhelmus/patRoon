@@ -532,7 +532,7 @@ fGroupsTab <- as.data.table(fGroups, areas = TRUE, features = FALSE, regression 
 increasingFGroups <- fGroups[, fGroupsTab[RSQ >= 0.8, group]]
 ```
 
-## Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)
+## Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) {#pred}
 
 The [MS2Tox] and [MS2Quant] `R` packages predict toxicities and feature concentrations using a machine learning approach. The predictions are performed with either SMILES data or fingerprints calculated from MS/MS data with `SIRIUS+CSI:FingerID`. While using SMILES data is generally more accurate, using MS/MS fingerprints is generally faster and may be more suitable for features without know or suspected structure.
 
@@ -822,10 +822,13 @@ Several functions of `patRoon` support parallelization.
 
 Function                 | Purpose                             | Remarks
 ------------------------ | ----------------------------------- | ------------------------
-`findFeatures`           | Obtain feature data                 | Only `envipick` and `kpic2` algorithms
+`findFeatures`           | Obtain feature data                 | Only `envipick` and `kpic2` algorithms.
 `generateComponents`     | Generate components                 | Only `cliquems` algorithm.
+`report`                 | Reporting data                      |
+`generateTPs`            | Obtain transformation products      | Only `cts` algorithm.
 `optimizeFeatureFinding`, `optimizeFeatureGrouping` | Optimize feature finding/grouping parameters | Discussed [here](#fOpt).
 `calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here](#peakQual).
+`predictTox` / `predictRespFactor` | Prediction of toxicities/concentrations } | Only `compounds` methods. Discussed [here](#pred).
 
 The parallelization is achieved with the [future] and [future.apply] `R` packages. To enable parallelization of these functions the `parallel` argument must be set to `TRUE` and the future framework must be properly configured in advance. For example:
 

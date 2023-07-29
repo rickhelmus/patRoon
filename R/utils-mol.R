@@ -363,7 +363,6 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     RFs <- NULL 
     if (nrow(fgSMILESTabTODO) > 0)
     {
-        printf("Predicting response factors with MS2Quant for %d SMILES...\n-------------\n", nrow(fgSMILESTabTODO))
         RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, NULL)
         setnames(RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
         for (i in seq_len(nrow(RFs)))
@@ -421,7 +420,6 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
     LC50s <- NULL
     if (length(indsTODO) > 0)
     {
-        printf("Predicting LC50 values with MS2Tox for %d SMILES...\n-------------\n", length(indsTODO))
         LC50s <- suppressMessages(MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode))
         setDT(LC50s)
         setnames(LC50s, "LC50_predicted", "LC50_SMILES")

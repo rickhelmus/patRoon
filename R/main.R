@@ -509,6 +509,8 @@ NULL
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
 #' @template update_comp_score-args
+#' 
+#' @template parallel-arg
 #'
 #' @section Calibration: The \pkg{MS2Quant} package requires calibration to convert predicted ionization efficiencies to
 #'   instrument/method specific response factors. The calibration data should be specified with the \code{calibrants}
@@ -590,6 +592,8 @@ NULL
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
 #' @template update_comp_score-args
+#' 
+#' @template parallel-arg
 #'
 #' @templateVar whatPred toxicities
 #' @templateVar predFunc predictTox

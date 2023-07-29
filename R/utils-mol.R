@@ -363,6 +363,7 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     RFs <- NULL 
     if (nrow(fgSMILESTabTODO) > 0)
     {
+        printf("Predicting response factors with MS2Quant for %d SMILES...\n-------------\n", nrow(fgSMILESTabTODO))
         RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, NULL)
         setnames(RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
         for (i in seq_len(nrow(RFs)))
@@ -389,13 +390,13 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     RFs[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
     # NOTE: need to take the inverse before conversion
     RFs[, RF_SMILES := 1/convertConc(1/RF_SMILES[1], "M", concUnit, MW[1]), by = "SMILES"]
+    RFs[, MW := NULL]
     
     return(RFs[])
 }
 
 predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
 {
-    # UNDONE: RCDK references in ref docs
     inp <- data.table(SMILES = SMILES)
     
     smp <- rcdk::get.smiles.parser()
@@ -420,7 +421,8 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
     LC50s <- NULL
     if (length(indsTODO) > 0)
     {
-        LC50s <- MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode)
+        printf("Predicting LC50 values with MS2Tox for %d SMILES...\n-------------\n", length(indsTODO))
+        LC50s <- suppressMessages(MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode))
         setDT(LC50s)
         setnames(LC50s, "LC50_predicted", "LC50_SMILES")
         for (i in seq_len(nrow(LC50s)))
@@ -444,8 +446,8 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
 
     # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
     LC50s[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
-    # NOTE: need to take the inverse before conversion
     LC50s[, LC50_SMILES := convertConc(LC50_SMILES[1], "log mM", concUnit, MW[1]), by = "SMILES"]
+    LC50s[, MW := NULL]
     
     return(LC50s[])
 }

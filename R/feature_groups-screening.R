@@ -529,9 +529,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 #'   \code{relMinFragMatches} sets the minimum that is relative (\samp{0-1}) to the maximum number of MS/MS fragments
 #'   specified in the \code{fragments_*} columns of the suspect list. Set to \code{NULL} to ignore.
 #' @param minRF Filter suspect hits by the given minimum predicted response factor (as calculated by
-#'   \code{\link{predictRespFactor}}). Set to \code{NULL} to ignore.
-#' @param maxLC50 Filter suspect hits by the given maximum toxicity (LC50) (as calculated by \code{\link{predictTox}}).
-#'   Set to \code{NULL} to ignore.
+#'   \code{\link[=predictRespFactors]{predictRespFactors}}). Set to \code{NULL} to ignore.
+#' @param maxLC50 Filter suspect hits by the given maximum toxicity (LC50) (as calculated by
+#'   \code{\link[=predictTox]{predictTox}}). Set to \code{NULL} to ignore.
 #' @param negate If set to \code{TRUE} then filtering operations are performed in opposite manner.
 #'
 #' @return \code{filter} returns a filtered \code{featureGroupsScreening} object.

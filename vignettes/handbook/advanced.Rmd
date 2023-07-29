@@ -828,7 +828,7 @@ Function                 | Purpose                             | Remarks
 `generateTPs`            | Obtain transformation products      | Only `cts` algorithm.
 `optimizeFeatureFinding`, `optimizeFeatureGrouping` | Optimize feature finding/grouping parameters | Discussed [here](#fOpt).
 `calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here](#peakQual).
-`predictTox` / `predictRespFactor` | Prediction of toxicities/concentrations } | Only `compounds` methods. Discussed [here](#pred).
+`predictTox` / `predictRespFactors` | Prediction of toxicities/concentrations } | Only `compounds` methods. Discussed [here](#pred).
 
 The parallelization is achieved with the [future] and [future.apply] `R` packages. To enable parallelization of these functions the `parallel` argument must be set to `TRUE` and the future framework must be properly configured in advance. For example:
 

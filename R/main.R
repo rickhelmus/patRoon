@@ -479,7 +479,7 @@ NULL
 #' \command{SIRIUS+CSI:FingerID} fingerprints using the \pkg{MS2Quant} package.
 #'
 #' The \href{https://github.com/kruvelab/MS2Quant}{MS2Quant} \R package predicts concentrations from \acronym{SMILES}
-#' and/or MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictRespFactor} method functions
+#' and/or MS/MS fingerprints obtained with \command{SIRIUS+CSI:FingerID}. The \code{predictRespFactors} method functions
 #' interface with this package to calculate response factors, which can then be used to calculate feature concentrations
 #' with the \code{calculateConcs} method function.
 #'
@@ -558,7 +558,7 @@ NULL
 #' @templateVar calcFunc calculateConcs
 #' @template pred-desc
 #'
-#' @return \code{predictRespFactor} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
+#' @return \code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
 #'   columns).
 #'
 #'   \code{calculateConcs} returns a \code{\link{featureGroups}} based object amended with concentrations for each
@@ -608,7 +608,7 @@ NULL
 #'
 #' @references \insertRef{Peets2022}{patRoon}
 #'
-#' @seealso \link[=pred-conc]{Concentration prediction}
+#' @seealso \link[=pred-quant]{Concentration prediction}
 #' 
 #' @name pred-tox
 NULL

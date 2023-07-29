@@ -34,7 +34,6 @@
     - which default unit?
 - docs
     - ref to MS2Quant paper if its out
-    - calculateConcs/calculateTox: also doc as misc generic? Or otherwise alias
     - update Rd files
 - NEWS
     - SIRIUS formulas/compound class

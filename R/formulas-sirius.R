@@ -223,6 +223,10 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @details Similarity of measured and theoretical isotopic patterns will be used for scoring candidates. Note that
 #'   \command{SIRIUS} requires availability of MS/MS data.
 #'
+#' @param getFingerprints Set to \code{TRUE} to load \command{SIRIUS-CSI:FingerID} MS/MS fingerprints for the formula
+#'   candidates. This is currently only supported with \code{calculateFeatures=FALSE} to avoid heavy server traffic. The
+#'   fingerprints are stored in the \code{fingerprints} slot of the returned \code{\link{formulasSIRIUS}} object, and
+#'   are used by the \code{\link{predictTox}} and \code{\link{predictRespFactors}} methods.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @template sirius_form-args
@@ -231,11 +235,11 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @template adduct-arg
 #' @templateVar algo sirius
 #' @template form_algo-args
-#' 
+#'
 #' @inheritParams generateFormulas
 #'
 #' @return A \code{\link{formulasSIRIUS}} object.
-#' 
+#'
 #' @templateVar what \code{generateFormulasSIRIUS}
 #' @template uses-multiProc
 #'

@@ -398,7 +398,7 @@ getDefEICParams <- function(...)
 #' Parameters to aggregate concentrations/toxicity values assigned to feature groups
 #'
 #' Parameters that are used by method functions such \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to
-#' aggregate \link[=pred-conc]{predicted concentrations} or \link[=pred-tox]{toxicities}.
+#' aggregate \link[=pred-quant]{predicted concentrations} or \link[=pred-tox]{toxicities}.
 #'
 #' Multiple concentration or toxicity values may be assigned to a single feature group. To ease the interpretation and
 #' data handling, several functions aggregate these values prior their use. Aggregation occurs by the following data:

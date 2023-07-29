@@ -47,7 +47,7 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 #'
 #' @template plotGraph
 #' 
-#' @references \addCitations{igraph}{1}
+#' @references \addCitations{igraph}{2}
 #' 
 #' @export
 setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = NULL, height = NULL)

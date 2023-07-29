@@ -1227,6 +1227,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     return(fGroups)
 })
 
+#' @aliases calculateConcs
 #' @rdname pred-quant
 #' @export
 setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas = FALSE)
@@ -1285,6 +1286,7 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
     return(fGroups)
 })
 
+#' @aliases calculateTox
 #' @rdname pred-tox
 #' @export
 setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)

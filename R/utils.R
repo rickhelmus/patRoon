@@ -655,7 +655,9 @@ getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, 
     # UNDONE: would be nice if we could just pass table directly
     quantFile <- tempfile(fileext = ".csv"); fwrite(rbind(calibrants, unknowns, fill = TRUE), quantFile)
     eluentFile <- tempfile(fileext = ".csv"); fwrite(eluent, eluentFile)
-    pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile, organic_modifier = organicModifier, pHAq, allFPs)
+    suppressMessages(utils::capture.output(pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile,
+                                                                             organic_modifier = organicModifier,
+                                                                             pH_aq = pHAq, fingerprints = allFPs)))
     
     RFs <- as.data.table(pr$suspects_concentrations)
     

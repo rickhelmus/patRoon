@@ -583,7 +583,7 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
-    printf("Predicting response factors with MS2Quant for %d candidates...\n", length(obj))
+    printf("Predicting response factors from SMILES with MS2Quant for %d candidates...\n", length(obj))
     
     obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {
@@ -614,7 +614,7 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
     checkmate::reportAssertions(ac)
     
-    printf("Predicting LC50 values with MS2Tox for %d candidates...\n", length(obj))
+    printf("Predicting LC50 values from SMILES with MS2Tox for %d candidates...\n", length(obj))
     
     obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {

@@ -420,7 +420,7 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
     LC50s <- NULL
     if (length(indsTODO) > 0)
     {
-        LC50s <- suppressMessages(MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode))
+        suppressMessages(utils::capture.output(LC50s <- MS2Tox::LC50fromSMILES(inp[indsTODO], LC50Mode)))
         setDT(LC50s)
         setnames(LC50s, "LC50_predicted", "LC50_SMILES")
         for (i in seq_len(nrow(LC50s)))

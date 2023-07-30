@@ -154,6 +154,7 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
+    printf("Predicting response factors from fingerprints with MS2Quant for %d candidates...\n", length(obj))
     resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
@@ -186,6 +187,7 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     assertConcUnit(concUnit)
     
+    printf("Predicting LC50 values from fingerprints with MS2Tox for %d candidates...\n", length(obj))
     LC50Tab <- predictLC50SIRFPs(obj, LC50Mode, concUnit)
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)

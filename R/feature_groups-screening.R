@@ -207,7 +207,7 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     # avoid duplicate calculations if there happen to be suspects with the same SMILES
     inp <- unique(inp, by = c("group", "SMILES"))
     
-    printf("Predicting response factors with MS2Quant for %d candidates...\n-------------\n", nrow(inp))
+    printf("Predicting response factors from SMILES with MS2Quant for %d suspects...\n", nrow(inp))
     resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq, concUnit)
     
     if (!is.null(scr[["RF_SMILES"]]))
@@ -242,7 +242,7 @@ setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "stat
     inpSMILES <- unique(screenInfo(obj)$SMILES)
     inpSMILES <- inpSMILES[!is.na(inpSMILES)]
     
-    printf("Predicting LC50 values with MS2Tox for %d suspects...\n-------------\n", length(inpSMILES))
+    printf("Predicting LC50 values from SMILES with MS2Tox for %d suspects...\n", length(inpSMILES))
     pr <- predictLC50SMILES(inpSMILES, LC50Mode, concUnit)
     
     if (!is.null(scr[["LC50_SMILES"]]))

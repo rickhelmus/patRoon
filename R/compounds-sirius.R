@@ -148,6 +148,7 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
 
     if (type == "FP" || type == "both")
     {
+        printf("Predicting response factors from fingerprints with MS2Quant for %d candidates...\n", length(obj))
         resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
@@ -188,6 +189,7 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
     
     if (type == "FP" || type == "both")
     {
+        printf("Predicting LC50 values from fingerprints with MS2Tox for %d candidates...\n", length(obj))
         LC50Tab <- predictLC50SIRFPs(obj, LC50Mode, concUnit = concUnit)
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)

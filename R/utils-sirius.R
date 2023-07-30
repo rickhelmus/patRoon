@@ -489,7 +489,7 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
     {
         allFPsTODO <- allFPs[indsTODO]
         allFPsTODO[, exactMass := sapply(neutral_formula, getFormulaMass)]
-        LC50s <- MS2Tox::FishLC50Prediction(allFPsTODO, LC50Mode)
+        suppressMessages(utils::capture.output(LC50s <- MS2Tox::FishLC50Prediction(allFPsTODO, LC50Mode)))
     
         LC50s <- merge(allFPsTODO[, c("group", "neutral_formula", "id"), with = FALSE],
                        LC50s[, c("id", "LC50_predicted")], by = "id", sort = FALSE)

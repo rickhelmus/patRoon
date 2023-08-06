@@ -225,7 +225,7 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
     # add potential adducts later as OpenMSArgListToOpts() doesn't handle this currently...
     settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:potential_adducts", potentialAdducts)
     
-    return(list(command = getCommandWithOptPath("MetaboliteAdductDecharger", "OpenMS"),
+    return(list(command = getExtDepPath("openms", "MetaboliteAdductDecharger"),
                 args = c(settingsArgs, "-in", inFile, "-out_cm", outFile)))
 }
 

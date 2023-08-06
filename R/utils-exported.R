@@ -221,14 +221,14 @@ verifyDependencies <- function()
     }
     
     check("ProteoWizard", findPWizPath(), "patRoon.path.pwiz", isDir = TRUE)
-    check("OpenMS", getCommandWithOptPath("FeatureFinderMetabo", "OpenMS", verify = FALSE), "patRoon.path.OpenMS")
-    check("pngquant", getCommandWithOptPath("pngquant", "pngquant", verify = FALSE), "patRoon.path.pngquant")
-    check("SIRIUS", getCommandWithOptPath(getSiriusBin(), "SIRIUS", verify = FALSE), "patRoon.path.SIRIUS")
-    check("MetFrag CL", getOption("patRoon.path.MetFragCL"), "patRoon.path.MetFragCL")
-    check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
-    check("MetFrag PubChemLite Database", getOption("patRoon.path.MetFragPubChemLite"), "patRoon.path.MetFragPubChemLite")
-    check("OpenBabel", getCommandWithOptPath("obabel", "obabel", verify = FALSE), "patRoon.path.obabel")
-    check("BioTransformer", getOption("patRoon.path.BioTransformer"), "patRoon.path.BioTransformer")
+    check("OpenMS", getExtDepPath("openms", "FeatureFinderMetabo", verify = FALSE), "patRoon.path.OpenMS")
+    check("pngquant", getExtDepPath("pngquant", verify = FALSE), "patRoon.path.pngquant")
+    check("SIRIUS", getExtDepPath("sirius", verify = FALSE), "patRoon.path.SIRIUS")
+    check("MetFrag CL", getExtDepPath("metfragcl"), "patRoon.path.MetFragCL")
+    check("MetFrag CompTox Database", getExtDepPath("metfragct"), "patRoon.path.MetFragCompTox")
+    check("MetFrag PubChemLite Database", getExtDepPath("metfragpcl"), "patRoon.path.MetFragPubChemLite")
+    check("OpenBabel", getExtDepPath("openbabel"), "patRoon.path.obabel")
+    check("BioTransformer", getExtDepPath("biotransformer"), "patRoon.path.BioTransformer")
     
     if (!OK)
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",

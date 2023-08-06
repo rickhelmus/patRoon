@@ -236,7 +236,7 @@ getMetFragExtDB <- function(localDB, database)
 {
     extDB <- if (!is.null(localDB)) localDB else NULL
     if ((database == "comptox" || database == "pubchemlite") && is.null(extDB))
-        extDB <- getOption(if (database == "comptox") "patRoon.path.MetFragCompTox" else "patRoon.path.MetFragPubChemLite", NULL)
+        extDB <- getExtDepPath(if (database == "comptox") "metfragct" else "metfragpcl", NULL)
     
     if (!is.null(extDB))
         extDB <- normalizePath(extDB)
@@ -393,9 +393,7 @@ MFMPFinishHandler <- function(cmd)
 
 MFMPPrepareHandler <- function(cmd)
 {
-    mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
-    if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-        stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFragCommandLine-2.4.8.jar\")")
+    mfBin <- getExtDepPath("metfragcl")
     
     if (!nzchar(Sys.which("java")))
         stop("Please make sure that java is installed and its location is correctly set in PATH.")

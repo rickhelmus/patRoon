@@ -149,8 +149,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             args <- c(args, "--append", "logP")
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
-        return(modifyList(cmd, list(command = getCommandWithOptPath("obabel", "obabel"),
-                                    args = args, outFile = outFile)))
+        return(modifyList(cmd, list(command = getExtDepPath("openbabel"), args = args, outFile = outFile)))
     }, showProgress = FALSE, logSubDir = "obabel")
     
     ret <- rbindlist(resultsList)

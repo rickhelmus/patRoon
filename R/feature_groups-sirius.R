@@ -4,7 +4,7 @@ NULL
 
 doSIRIUSFGroups <- function(inputFiles, verbose)
 {
-    command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
+    command <- getExtDepPath("sirius")
     outPath <- tempfile("sirius_out")
     args <- c("-i", paste0(inputFiles, collapse = ","),
               "-o", outPath,

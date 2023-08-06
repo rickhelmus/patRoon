@@ -42,7 +42,7 @@ TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
 if (doCTS)
     TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
-doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
+doMetFrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
 if (doMetFrag)
 {

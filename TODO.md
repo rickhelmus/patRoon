@@ -1,5 +1,9 @@
 # Priority
 
+## Ext
+
+- update docs/messages: check all patRoon.path mentions
+
 ## General
 
 - add showProgress option for future MP

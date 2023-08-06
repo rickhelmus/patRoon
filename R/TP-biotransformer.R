@@ -85,9 +85,7 @@ BTMPFinishHandler <- function(cmd)
 
 BTMPPrepareHandler <- function(cmd)
 {
-    btBin <- path.expand(getOption("patRoon.path.BioTransformer", ""))
-    if (is.null(btBin) || !nzchar(btBin) || !file.exists(btBin))
-        stop("Please set the 'biotransformer' option with a (correct) path to the BioTransformer JAR file. Example: options(patRoon.path.BioTransformer = \"C:/biotransformerjar/biotransformer-2.0.3.jar\")")
+    btBin <- getExtDepPath("biotransformer")
     
     if (!nzchar(Sys.which("java")))
         stop("Please make sure that java is installed and its location is correctly set in PATH.")

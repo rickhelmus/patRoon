@@ -10,7 +10,7 @@ plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 
-doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
+doSIRIUS <- TRUE # !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 formsGF <- doGenForms(fGroups, plists, "genform")
 formsGFEmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "genform")

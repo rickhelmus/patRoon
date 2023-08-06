@@ -204,7 +204,7 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
 
     # figure out if we're running OpenMS version >= 2.5
     oldFFM <- TRUE
-    FFMHelp <- suppressWarnings(executeCommand(getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"), stdout = TRUE, stderr = TRUE))
+    FFMHelp <- suppressWarnings(executeCommand(getExtDepPath("openms", "FeatureFinderMetabo"), stdout = TRUE, stderr = TRUE))
     FFMHelp <- FFMHelp[grepl("Version:", FFMHelp, fixed = TRUE)]
     if (length(FFMHelp) == 1) # should be fine, but fallback to old version just in case...
     {
@@ -223,7 +223,7 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
     if (traceSNRFiltering)
         args <- c(args, "-algorithm:epd:masstrace_snr_filtering")
     
-    return(list(command = getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"),
+    return(list(command = getExtDepPath("openms", "FeatureFinderMetabo"),
                 args = c(args, "-in", datafile, "-out", out)))
 }
 

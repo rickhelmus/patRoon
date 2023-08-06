@@ -9,7 +9,7 @@ init:
 
 install:
     - ps: Bootstrap
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     # - ps: mkdir -Force c:\deps
     # - ps: >-
     #     if (-Not (Test-Path C:\deps\biotransformer)) {
@@ -43,7 +43,7 @@ install:
     #     C:\deps\openbabel311.exe /S
 
 cache:
-  - C:\RLibrary
+  #- C:\RLibrary
   #- C:\Program Files\Pandoc\
   #- C:\deps
 

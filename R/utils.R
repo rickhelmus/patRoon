@@ -119,6 +119,100 @@ getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
     return(cmd)
 }
 
+getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
+{
+    # NOTE: pwiz is handled by findPWizPath()
+    # NOTE: GenForm is handled by getGenFormBin()
+    
+    exts <- list(
+        openms = list(
+            name = "OpenMS",
+            bin = subTool,
+            opt = "OpenMS"
+        ),
+        sirius = list(
+            name = "SIRIUS",
+            bin = "sirius",
+            opt = "SIRIUS"
+        ),
+        pngquant = list(
+            name = "pngquant",
+            bin = "pngquant",
+            opt = "pngquant"
+        ),
+        openbabel = list(
+            name = "OpenBabel",
+            bin = "obabel",
+            opt = "obabel"
+        ),
+        metfragcl = list(
+            name = "MetFrag",
+            opt = "MetFragCL"
+        ),
+        metfragct = list(
+            name = "MetFrag CompTox DB",
+            opt = "MetFragCompTox"
+        ),
+        metfragpcl = list(
+            name = "MetFrag PubChemLite DB",
+            opt = "MetFragPubChemLite"
+        ),
+        biotransformer = list(
+            name = "BioTransformer",
+            opt = "BioTransformer"
+        )
+    )
+    
+    ext <- exts[[what]]
+    
+    hasBin <- !is.null(ext[["bin"]])
+    
+    if (hasBin && Sys.info()[["sysname"]] == "Windows")
+        ext$bin <- paste0(ext$bin, ".exe") # add file extension for Windows
+    
+    # order: options(), patRoonExt, PATH
+
+    ext$opt <- paste0("patRoon.path.", ext$opt)
+    path <- getOption(ext$opt)
+    if (!is.null(path) && nzchar(path))
+    {
+        path <- path.expand(path)
+        if (hasBin)
+            path <- file.path(path, ext$bin)
+        if (!file.exists(path))
+        {
+            if (verify)
+                stop(sprintf("Cannot find '%s'. Is the option '%s' set correctly?", path, ext$opt))
+            return(NULL)
+        }
+        
+        return(path)
+    }
+    
+    if (requireNamespace("patRoonExt", quietly = TRUE))
+    {
+        path <- patRoonExt::getExtPath(what, warn = FALSE)
+        if (!is.null(path))
+        {
+            if (hasBin)
+                path <- file.path(path, ext$bin)
+            return(path)
+        }
+    }
+    
+    # only check binaries for PATH
+    if (!hasBin || !nzchar(Sys.which(ext$bin)))
+    {
+        if (verify)
+            stop(sprintf("Cannot find '%s'. You may need to install patRoonExt, set '%s' with options() or add the correct file location to the PATH environment variable.",
+                         ext$name, ext$opt), call. = FALSE)
+        return(NULL)
+        
+    }
+
+    return(ext$bin) # if we're here it's a binary found in PATH
+}
+
 # convert to unnamed character vector where previous names are followed by set values
 OpenMSArgListToOpts <- function(args) as.vector(mapply(names(args), args, FUN = c, USE.NAMES = FALSE))
 

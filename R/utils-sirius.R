@@ -8,8 +8,7 @@ getSiriusBin <- function()
 
 isSIRIUS5 <- function()
 {
-    out <- executeCommand(patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS"), "--version",
-                          stdout = TRUE)
+    out <- executeCommand(patRoon:::getExtDepPath("sirius"), "--version", stdout = TRUE)
     return(any(grepl("^(SIRIUS 5\\.)", out)))
 }
 
@@ -111,7 +110,7 @@ SIRMPFinishHandler <- function(cmd)
 
 SIRMPPrepareHandler <- function(cmd)
 {
-    command <- patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS")
+    command <- patRoon:::getExtDepPath("sirius")
     
     # UNDONE: it seems we would only need to log in once per worker, is this adding a lot of overhead?
     if (!is.null(cmd[["token"]]))

@@ -46,7 +46,7 @@ SIRFeatMPFinishHandler <- function(cmd)
 
 SIRFeatMPPrepareHandler <- function(cmd)
 {
-    command <- patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS")
+    command <- patRoon:::getExtDepPath("sirius")
     outPath <- tempfile("sirius_out")
     args <- c("-i", cmd$dataFile, "-o", outPath, "lcms-align")
     return(utils::modifyList(cmd, list(command = command, args = args, outPath = outPath)))

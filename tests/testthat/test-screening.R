@@ -89,7 +89,7 @@ test_that("suspect screening is OK", {
 doAnnot <- function(...) annotateSuspects(..., logPath = NULL) # disable logging as it slow downs testing
 
 # NOTE: try keep this in sync with MF tests for caching purposes
-hasMF <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
+hasMF <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 if (hasMF)
 {
     plists <- generateMSPeakLists(fGroupsScrNoRT, "mzr")

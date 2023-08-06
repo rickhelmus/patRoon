@@ -133,7 +133,7 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
         
         ftNonEmpty <- sapply(fts, nrow) > 0
         
-        cmd <- getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS")
+        cmd <- getExtDepPath("openms", "MapAlignerPoseClustering")
         iniFile <- getIni(cmd, featFiles[ftNonEmpty], featFiles[ftNonEmpty])
         executeCommand(cmd, c(OpenMSArgListToOpts(settings), "-ini", iniFile),
                        stdout = if (verbose) "" else FALSE,
@@ -146,7 +146,7 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
     if (!is.null(extraOptsGroup))
         settings <- modifyList(settings, extraOptsGroup)
     
-    cmd <- getCommandWithOptPath(if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled", "OpenMS")
+    cmd <- getExtDepPath("openms", if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled")
     iniFile <- getIni(cmd, featFiles, character())
     executeCommand(cmd, c(OpenMSArgListToOpts(settings), "-ini", iniFile, "-out", out),
                    stdout = if (verbose) "" else FALSE,

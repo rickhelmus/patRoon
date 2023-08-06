@@ -64,7 +64,7 @@ optimizePngPlots <- function(plotFiles)
 {
     plotsPerBlock <- 50
     blocks <- ceiling(length(plotFiles) / plotsPerBlock)
-    pqcmd <- getCommandWithOptPath("pngquant", "pngquant")
+    pqcmd <- getExtDepPath("pngquant")
     mainArgs <- c("--skip-if-larger", "--force")
     
     # older pngquant versions may not support the --strip argument yet

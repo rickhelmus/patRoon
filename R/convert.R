@@ -175,7 +175,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts)
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
 
-    msc <- getCommandWithOptPath("FileConverter", "OpenMS")
+    msc <- getExtDepPath("openms", "FileConverter")
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))

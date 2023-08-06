@@ -8,7 +8,7 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-    - ps: Bootstrap
+    # - ps: Bootstrap
     # - ps: mkdir -Force c:\deps
     # - ps: >-
     #     if (-Not (Test-Path C:\deps\biotransformer)) {

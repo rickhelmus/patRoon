@@ -221,6 +221,8 @@ genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, settin
         
         ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
         {
+            if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+                return("")
             makeHTMLReportPlot("comp-spec", outPath, "plotSpectrum",
                                list(compounds, index, grp, MSPeakLists, formulas, FALSE, title = ""),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4, pointsize = 16)

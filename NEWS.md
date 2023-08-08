@@ -11,6 +11,7 @@
 * Fixed: `report()`: The `suspect(s)` column for compound annotation results was always empty
 * Fixed: the `reAverage` argument was ignored by the `filter()` method of `MSPeakLists` when checking if cached data is available (issue #87)
 * Fixed: if `reAverage=TRUE` to the `filter()` method of `MSPeakLists` then the peak IDs were not regenerated (issue #87)
+* Updated PubChem transformations to v0.1.7
 
 
 # patRoon 2.2

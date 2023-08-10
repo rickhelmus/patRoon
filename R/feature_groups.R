@@ -659,7 +659,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         if (average)
         {
             ret <- ret[, -c("isocount", "analysis", "ID")]
-            numCols <- setdiff(names(ret), c("group"))
+            numCols <- setdiff(names(ret), c("group", "replicate_group"))
             ret[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = "group"]
             ret <- unique(ret, by = "group")
         }

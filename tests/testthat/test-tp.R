@@ -52,9 +52,14 @@ if (doMetFrag)
     
     compsMF <- callMF(fGroups, plists)
     TPsLibComp <- generateTPs("library", compsMF)
+    TPsLibCompEmpty <- generateTPs("library", delete(compsMF))
     TPsBTComp <- generateTPs("biotransformer", compsMF)
+    TPsBTCompEmpty <- generateTPs("biotransformer", delete(compsMF))
     if (doCTS)
+    {
         TPsCTSComp <- generateTPs("cts", compsMF, "photolysis_unranked")
+        TPsCTSCompEmpty <- generateTPs("cts", delete(compsMF), "photolysis_unranked")
+    }
 }
 
 test_that("verify TP generation", {
@@ -111,6 +116,8 @@ test_that("verify TP generation", {
 
     checkmate::expect_names(parents(TPsLibComp)$name, subset.of = as.data.table(compsMF)$identifier)
     checkmate::expect_names(parents(TPsBTComp)$name, subset.of = as.data.table(compsMF)$identifier)
+    expect_length(TPsLibCompEmpty, 0)
+    expect_length(TPsBTCompEmpty, 0)
     
     skip_if_not(doCTS)
     expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
@@ -121,6 +128,7 @@ test_that("verify TP generation", {
     expect_known_value(TPsCTSComp, testFile("tp-cts_comp"))
     expect_known_show(TPsCTSComp, testFile("tp-cts_comp", text = TRUE))
     checkmate::expect_names(parents(TPsCTSComp)$name, subset.of = as.data.table(compsMF)$identifier)
+    expect_length(TPsCTSCompEmpty, 0)
 })
 
 assertSusp <- function(...) patRoon:::assertSuspectList(..., needsAdduct = FALSE, skipInvalid = FALSE)

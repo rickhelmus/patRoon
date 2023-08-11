@@ -425,7 +425,7 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
     # same for parents: combine tables, only keep columns not specific to screening, remove duplicates and re-order
     parCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
     allParentsTab <- rbindlist(lapply(allTPs, function(TPs) parents(TPs)[, intersect(parCols, names(parents(TPs))),
-                                                                         with = FALSE]), idcol = "mergedBy")
+                                                                         with = FALSE]), idcol = "mergedBy", fill = TRUE)
     allParentsTab[, mergedBy := paste0(unique(mergedBy), collapse = ","), by = "name"]
     allParentsTab <- unique(allParentsTab, by = "name")
     allParentsTab <- allParentsTab[match(name, names(mergedTPs))] # sync order

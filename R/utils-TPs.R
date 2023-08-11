@@ -1,5 +1,9 @@
 getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemProps, checkWhat = "SMILES")
 {
+    if ((is.data.frame(parents) && nrow(parents) == 0) || length(parents) == 0)
+        return(data.table(name = character(), SMILES = character(), InChI = character(), InChIKey = character(),
+                          formula = character(), neutralMass = numeric()))
+    
     if (is.data.frame(parents))
         parents <- prepareSuspectList(parents, NULL, skipInvalid, checkDesc = TRUE,
                                       prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,

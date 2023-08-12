@@ -79,7 +79,8 @@ build_script:
     - travis-tool.sh install_github blosloos/nontargetData
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github cran/InterpretMSSpectrum@1.3.3 # workaround for https://github.com/cbroeckl/RAMClustR/issues/48
-    - travis-tool.sh install_github cbroeckl/RAMClustR
+    - travis-tool.sh install_r RAMClustR
+    #- travis-tool.sh install_github cbroeckl/RAMClustR
     - travis-tool.sh install_github rickhelmus/KPIC2
     - travis-tool.sh install_github rickhelmus/cliqueMS
     - travis-tool.sh install_github souravc83/fastAdaboost # For Metaclean, removed from CRAN (9/22)

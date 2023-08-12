@@ -34,7 +34,7 @@ test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
     # For RC: don't check attributes as they seem irreproducible
     expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"),
-                       check.attributes = FALSE)
+                       check.attributes = FALSE, tolerance = 0.00001)
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsNT, testFile("components-nt"))
     expect_known_value(compsInt, testFile("components-int"))

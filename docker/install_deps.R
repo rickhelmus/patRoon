@@ -8,13 +8,15 @@ install.packages(c("circlize", "VennDiagram"),
 
 BiocManager::install(c("mzR", "xcms", "CAMERA",
                        "Rdisop", # need to install this dep manually (why??)
-                       "InterpretMSSpectrum", # for RAMClustR
+                       #"InterpretMSSpectrum", # for RAMClustR
                        "ropls", # for KPIC2
                        "BiocStyle", "Rgraphviz")) # for MetaClean
 
 remotes::install_github(c("rickhelmus/patRoonData",
                           "thomasp85/farver",
-                          "cbroeckl/RAMClustR@73accadaded", # temp workaround for buggy commit
+                          #"cbroeckl/RAMClustR@73accadaded", # temp workaround for buggy commit
+                          "cran/InterpretMSSpectrum@1.3.3",
+                          "cran/RAMClustR", # temp workaround for buggy commit
                           "blosloos/enviPick",
                           "blosloos/nontargetData",
                           "blosloos/nontarget",

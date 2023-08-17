@@ -13,7 +13,7 @@ jobs:
               id: download-artifact
               uses: dawidd6/action-download-artifact@v2
               with:
-                  github_token: ${{secrets.PAT}}
+                  github_token: ${{ secrets.PAT }}
                   workflow: build_packages.yml
                   workflow_conclusion: in_progress
                   branch: master

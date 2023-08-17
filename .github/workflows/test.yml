@@ -15,7 +15,7 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   workflow: build_packages.yml
-                  workflow_conclusion: in_progress
+                  #workflow_conclusion: in_progress
                   #branch: master
                   name: testarti
                   repo: rickhelmus/patRoonDeps

@@ -15,8 +15,8 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   workflow: build_packages.yml
-                  workflow_conclusion: ""
-                  branch: master
+                  workflow_conclusion: in_progress
+                  #branch: master
                   name: testarti
                   repo: rickhelmus/patRoonDeps
             - name: Check artifact

@@ -9,3 +9,15 @@ jobs:
         steps:
             - name: echo distinct ID ${{ github.event.inputs.distinct_id }}
               run: echo ${{ github.event.inputs.distinct_id }}
+            - name: Download artifact
+              id: download-artifact
+              uses: dawidd6/action-download-artifact@v2
+              with:
+                  github_token: ${{secrets.PAT}}
+                  workflow: build_packages.yml
+                  workflow_conclusion: in_progress
+                  branch: master
+                  name: testarti
+                  repo: rickhelmus/patRoonDeps
+            - name: Check artifact
+              run: cat testarti.txt

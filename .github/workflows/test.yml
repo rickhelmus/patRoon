@@ -12,12 +12,12 @@ jobs:
             - name: Download artifact
               id: download-artifact
               uses: dawidd6/action-download-artifact@v2
-                  with:
-                      github_token: ${{ secrets.PAT }}
-                      workflow: build_packages.yml
-                      workflow_conclusion: in_progress
-                      branch: master
-                      name: testarti
-                      repo: rickhelmus/patRoonDeps
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  workflow: build_packages.yml
+                  workflow_conclusion: in_progress
+                  branch: master
+                  name: testarti
+                  repo: rickhelmus/patRoonDeps
             - name: Check artifact
               run: cat testarti.txt

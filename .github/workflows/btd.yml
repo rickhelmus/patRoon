@@ -37,7 +37,11 @@ jobs:
             - name: Make repos
               run: Rscript make_repos.R
             - name: Get repos patch
-              run: git diff --binary > patRoonDeps.diff
+              run: |
+                  git config --global user.name "notimportant"
+                  git config --global user.email "notvalid@someemail.com"
+                  git add bin/
+                  git diff --binary --cached --full-index > patRoonDeps.diff
             - uses: actions/upload-artifact@v3
               name: Upload patch
               with:

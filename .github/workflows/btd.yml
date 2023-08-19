@@ -42,6 +42,8 @@ jobs:
                   git config --global user.email "notvalid@someemail.com"
                   git add bin/
                   git diff --binary --cached --full-index > patRoonDeps.diff
+                  choco install dos2unix
+                  dos2unix patRoonDeps.diff
             - uses: actions/upload-artifact@v3
               name: Upload patch
               with:

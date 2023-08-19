@@ -38,12 +38,77 @@ jobs:
               run: Rscript make_repos.R
             - name: Get repos patch
               run: git diff --binary > patRoonDeps.diff
+            - uses: actions/upload-artifact@v3
+              name: Upload patch
+              with:
+                  name: patch
+                  path: patRoonDeps.diff
             - name: Make bundle
               run: Rscript make_bundle.R
             - uses: actions/upload-artifact@v3
-              name: Upload artifacts
+              name: Upload bundle
               with:
-                  name: patRoonDeps-artifacts
-                  path: |
-                      patRoonDeps.diff
-                      patRoon-bundle-*.zip
+                  name: bundle
+                  path: patRoon-bundle-*.zip
+    test:
+        needs: build
+        runs-on: windows-latest
+        name: Run tests
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  path: patRoon
+            - name: Get bundle
+              uses: actions/download-artifact@v3
+              with:
+                  name: bundle
+                  path: bundle
+            - name: do tests
+              run: echo not yet
+    commit:
+        needs: test
+        runs-on: windows-latest
+        name: Update patRoonDeps
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  repository: rickhelmus/patRoonDeps
+                  token: ${{ secrets.PAT }}
+            - name: Get patch
+              uses: actions/download-artifact@v3
+              with:
+                  name: patch
+            - name: Apply patch
+              run: git apply patRoonDeps.diff
+            - name: Push changes
+              env: 
+                  CI_COMMIT_MESSAGE: Automated GHA update
+                  CI_COMMIT_AUTHOR: GHA
+              run: |
+                  git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+                  git config --global user.email "notvalid@someemail.com"
+                  git add bin/
+                  git status
+                  git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+                  #git push
+    release:
+        needs: test
+        runs-on: windows-latest
+        name: Make bundle pre-release
+        steps:
+            - name: Get bundle
+              uses: actions/download-artifact@v3
+              with:
+                  name: bundle
+            - name: Make pre-release
+              if: ${{ false }}
+              uses: andelf/nightly-release@main
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: prerelease
+                  name: 'Automated Pre-release $$'
+                  prerelease: true
+                  body: 'TODO: Add release notes'
+                  files: |
+                        patRoon-bundle-*.zip

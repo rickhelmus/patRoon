@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generate formula with Bruker DataAnalysis</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas-bruker.R" class="external-link"><code>R/formulas-bruker.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas-bruker.R" class="external-link"><code>R/formulas-bruker.R</code></a></small>
     <div class="hidden name"><code>generateFormulasDA.Rd</code></div>
     </div>
 
@@ -95,7 +95,9 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulasDA</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateFormulasDA</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -129,6 +131,10 @@
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which formulae should be generated. This should be the same or
 a subset of the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the
 remaining feature groups in the subset are considered.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>MSPeakLists</dt>
@@ -180,10 +186,6 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 <code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
 likely what you want as otherwise any processed data is lost.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>setThreshold</dt>

@@ -87,7 +87,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compound annotation with SIRIUS</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-sirius.R" class="external-link"><code>R/compounds-sirius.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-sirius.R" class="external-link"><code>R/compounds-sirius.R</code></a></small>
     <div class="hidden name"><code>generateCompoundsSIRIUS.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -140,6 +142,10 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>MSPeakLists</dt>
@@ -237,10 +243,6 @@ manual for more details. Set to <code>NULL</code> to ignore.</p></dd>
 <code class="command">SIRIUS</code> calls (which may be run in parallel depending on the <a href="patRoon-package.html">set package
 options</a>). If <code>splitBatches=FALSE</code> then all feature calculations are performed from a single <code class="command">SIRIUS</code>
 execution, which is often the fastest if calculations are performed on a single computer.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>setThreshold</dt>

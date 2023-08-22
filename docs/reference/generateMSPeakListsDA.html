@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generate peak lists with Bruker DataAnalysis</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/mspeaklists-bruker.R" class="external-link"><code>R/mspeaklists-bruker.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/mspeaklists-bruker.R" class="external-link"><code>R/mspeaklists-bruker.R</code></a></small>
     <div class="hidden name"><code>generateMSPeakListsDA.Rd</code></div>
     </div>
 
@@ -95,7 +95,9 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateMSPeakListsDA</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateMSPeakListsDA</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  bgsubtr <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -117,6 +119,10 @@
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object from which MS peak lists should be extracted.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>bgsubtr</dt>
@@ -154,10 +160,6 @@ broadband CID.</p></dd>
 <dt>avgFGroupParams</dt>
 <dd><p>A <code>list</code> with parameters used for averaging of peak lists for feature groups. See
 <code><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></code> for more details.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

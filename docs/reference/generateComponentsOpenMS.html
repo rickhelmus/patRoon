@@ -88,7 +88,7 @@ utility (see http://www.openms.de) to generate components."><!-- mathjax --><scr
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Componentization of adducts, isotopes etc. with OpenMS</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-openms.R" class="external-link"><code>R/components-openms.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-openms.R" class="external-link"><code>R/components-openms.R</code></a></small>
     <div class="hidden name"><code>generateComponentsOpenMS.Rd</code></div>
     </div>
 
@@ -99,7 +99,9 @@ utility (see <a href="http://www.openms.de" class="external-link">http://www.ope
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsOpenMS</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsOpenMS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -136,6 +138,10 @@ utility (see <a href="http://www.openms.de" class="external-link">http://www.ope
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>ionization</dt>
@@ -220,10 +226,6 @@ components</code> section for more details.</p></dd>
 <dt>extraOpts</dt>
 <dd><p>Named character vector with extra command line parameters directly passed to
 <code class="command">MetaboliteAdductDecharger</code>. Set to <code>NULL</code> to ignore.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

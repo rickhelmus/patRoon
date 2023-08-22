@@ -87,7 +87,7 @@ similar chromatographic retention profiles and annotate their relationships (e.g
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Componentization of adducts, isotopes etc. with RAMClustR</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-ramclustr.R" class="external-link"><code>R/components-ramclustr.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-ramclustr.R" class="external-link"><code>R/components-ramclustr.R</code></a></small>
     <div class="hidden name"><code>generateComponentsRAMClustR.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ similar chromatographic retention profiles and annotate their relationships (<em
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsRAMClustR</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsRAMClustR</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -124,6 +126,10 @@ similar chromatographic retention profiles and annotate their relationships (<em
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>ionization</dt>
@@ -168,10 +174,6 @@ These are used to construct the <code>ExpDes</code> argument passed to <code><a 
 <dt>extraOptsRC, extraOptsFM</dt>
 <dd><p>Named <code>list</code> with further arguments to be passed to
 <code><a href="https://rdrr.io/pkg/RAMClustR/man/ramclustR.html" class="external-link">ramclustR</a></code> and <code><a href="https://rdrr.io/pkg/RAMClustR/man/do.findmain.html" class="external-link">do.findmain</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -87,7 +87,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compound annotation with MetFrag</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-metfrag.R" class="external-link"><code>R/compounds-metfrag.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-metfrag.R" class="external-link"><code>R/compounds-metfrag.R</code></a></small>
     <div class="hidden name"><code>generateCompoundsMetFrag.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -148,6 +150,10 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>MSPeakLists</dt>
@@ -265,10 +271,6 @@ option.</p></dd>
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR</a> and
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag CL</a> homepages for all available options. Set
 to <code>NULL</code> to ignore.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>setThreshold</dt>

@@ -87,7 +87,7 @@ cliqueMS::getCliques function."><!-- mathjax --><script src="https://cdnjs.cloud
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Componentization of adducts, isotopes etc. with cliqueMS</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-cliquems.R" class="external-link"><code>R/components-cliquems.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-cliquems.R" class="external-link"><code>R/components-cliquems.R</code></a></small>
     <div class="hidden name"><code>generateComponentsCliqueMS.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ cliqueMS::getCliques function."><!-- mathjax --><script src="https://cdnjs.cloud
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsCliqueMS</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsCliqueMS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -125,6 +127,10 @@ cliqueMS::getCliques function."><!-- mathjax --><script src="https://cdnjs.cloud
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>ionization</dt>
@@ -187,10 +193,6 @@ and <code><a href="https://rdrr.io/pkg/cliqueMS/man/getAnnotation.html" class="e
 <dt>parallel</dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

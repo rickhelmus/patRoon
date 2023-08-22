@@ -87,7 +87,7 @@ components by unsupervised detection of homologous series."><!-- mathjax --><scr
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Componentization of homologous series with nontarget</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-nontarget.R" class="external-link"><code>R/components-nontarget.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-nontarget.R" class="external-link"><code>R/components-nontarget.R</code></a></small>
     <div class="hidden name"><code>generateComponentsNontarget.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ components by unsupervised detection of homologous series.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsNontarget</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsNontarget</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -119,6 +121,10 @@ components by unsupervised detection of homologous series.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>ionization</dt>
@@ -163,10 +169,6 @@ than <code>absMzDev</code> to ensure proper linkage.</p></dd>
 <dd><p>Currently <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> does not work with <span style="R">R</span> <samp>&gt;3.3.3</samp>. This flag, which is
 enabled by default on these R versions, implements a (messy) workaround
 (<a href="https://github.com/blosloos/nontarget/issues/6" class="external-link">more details here</a>).</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

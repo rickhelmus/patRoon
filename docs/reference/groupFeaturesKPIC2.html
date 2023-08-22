@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Group features using KPIC2</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-kpic2.R" class="external-link"><code>R/feature_groups-kpic2.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-kpic2.R" class="external-link"><code>R/feature_groups-kpic2.R</code></a></small>
     <div class="hidden name"><code>groupFeaturesKPIC2.Rd</code></div>
     </div>
 
@@ -95,7 +95,9 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for features</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">groupFeaturesKPIC2</span><span class="op">(</span><span class="va">feat</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for features</span></span>
 <span><span class="fu">groupFeaturesKPIC2</span><span class="op">(</span></span>
 <span>  <span class="va">feat</span>,</span>
 <span>  rtalign <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -117,6 +119,10 @@
     <h2>Arguments</h2>
     <dl><dt>feat</dt>
 <dd><p>The <code><a href="features-class.html">features</a></code> object with the features to be grouped.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Further parameters passed to the selected grouping algorithm.</p></dd>
 
 
 <dt>rtalign</dt>

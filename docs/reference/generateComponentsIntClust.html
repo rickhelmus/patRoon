@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generate components based on intensity profiles</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-intclust.R" class="external-link"><code>R/components-intclust.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-intclust.R" class="external-link"><code>R/components-intclust.R</code></a></small>
     <div class="hidden name"><code>generateComponentsIntClust.Rd</code></div>
     </div>
 
@@ -95,7 +95,9 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsIntClust</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsIntClust</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"complete"</span>,</span>
@@ -112,6 +114,10 @@
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Any parameters to be passed to the selected component generation algorithm.</p></dd>
 
 
 <dt>method</dt>

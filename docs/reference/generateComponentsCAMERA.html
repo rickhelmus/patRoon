@@ -87,7 +87,7 @@ from known adducts, isotopes and in-source fragments."><!-- mathjax --><script s
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Componentization of adducts, isotopes etc. with CAMERA</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-camera.R" class="external-link"><code>R/components-camera.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-camera.R" class="external-link"><code>R/components-camera.R</code></a></small>
     <div class="hidden name"><code>generateComponentsCAMERA.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ from known adducts, isotopes and in-source fragments.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for featureGroups</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsCAMERA</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateComponentsCAMERA</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -115,6 +117,10 @@ from known adducts, isotopes and in-source fragments.</p>
     <h2>Arguments</h2>
     <dl><dt>fGroups</dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which components should be generated.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt>ionization</dt>
@@ -144,10 +150,6 @@ within a component are not taken in to account. See note below.</p></dd>
 <dt>extraOpts</dt>
 <dd><p>Named character vector with extra arguments directly passed to
 <code><a href="https://rdrr.io/pkg/CAMERA/man/annotate-methods.html" class="external-link">CAMERA::annotate</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">

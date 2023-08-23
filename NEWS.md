@@ -13,6 +13,7 @@
 * Fixed: if `reAverage=TRUE` to the `filter()` method of `MSPeakLists` then the peak IDs were not regenerated (issue #87)
 * Updated PubChem transformations to v0.1.7
 * Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
+* Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
 
 
 # patRoon 2.2

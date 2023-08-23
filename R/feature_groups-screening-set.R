@@ -9,9 +9,12 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     rmCols <- c("mz", "fragments_mz")
     unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz")
     
-    renameDupCols <- function(si, suf)
+    renameDupCols <- function(si, suf, all)
     {
-        cols <- setdiff(names(si), c("name", "group", unCols))
+        except <- c("name", "group")
+        if (!all)
+            except <- c(except, unCols)
+        cols <- setdiff(names(si), except)
         if (length(cols) > 0)
         {
             si <- copy(si)
@@ -30,13 +33,16 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
             return(cols[sapply(cols, function(x) !is.null(scrInfo[[x]]))])
         }
         
-        scrInfo <- ReduceWithArgs(x = sInfos, paste0("-", names(setObjects)), f = function(l, r, sl, sr)
+        scrInfo <- ReduceWithArgs(x = sInfos, names(setObjects), f = function(l, r, sl, sr)
         {
             # suffix non-unique columns columns
             l <- copy(l); r <- copy(r)
+            ssl <- paste0("-", sl); ssr <- paste0("-", sr)
             
-            merge(renameDupCols(l, sl), renameDupCols(r, sr), suffixes = c(sl, sr), by = c("name", "group"),
-                  all = TRUE)
+            if (sr == names(setObjects)[2])
+                l <- renameDupCols(l, ssl, TRUE) # rename left only once (ie when right is the second set)
+            
+            merge(l, renameDupCols(r, ssr, TRUE), suffixes = c(ssl, ssr), by = c("name", "group"), all = TRUE)
         })
         
         for (col in unCols)
@@ -74,7 +80,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     else if (length(sInfos) == 1)
     {
         scrInfo <- copy(sInfos[[1]])
-        scrInfo <- renameDupCols(scrInfo, paste0("-", names(setObjects)[1]))
+        scrInfo <- renameDupCols(scrInfo, paste0("-", names(setObjects)[1]), FALSE)
         if (rmSetCols)
         {
             rmc <- intersect(rmCols, names(scrInfo))

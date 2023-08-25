@@ -26,12 +26,12 @@ jobs:
               with:
                   cache-version: 2
                   packages: |
-                      any::miniCRAN
-                      any::rversions
-                      any::remotes
-                      any::pkgbuild
-                      any::BiocManager
-                      any::withr
+                      miniCRAN
+                      rversions
+                      remotes
+                      pkgbuild
+                      BiocManager
+                      withr
             - name: Make repos
               run: Rscript make_repos.R
             - name: Get repos patch

@@ -47,7 +47,13 @@ jobs:
               with:
                   name: patch
                   path: patRoonDeps.diff
+            - name: Setting up patRoonExt cache
+              uses: actions/cache@v3
+              with:
+                  path: pExtCache
             - name: Make bundle
+              env:
+                  PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: Rscript make_bundle.R
             - uses: actions/upload-artifact@v3
               name: Upload bundle
@@ -94,7 +100,7 @@ jobs:
                   git add bin/
                   git status
                   git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-                  #git push
+                  git push
     release:
         needs: test
         runs-on: windows-latest

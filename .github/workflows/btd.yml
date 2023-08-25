@@ -22,18 +22,16 @@ jobs:
               with:
                   r-version: ${{ matrix.R }}
             - name: Pre-Install R deps
-              run: |
-                  install.packages(c("miniCRAN", "git2r", "devtools", "BiocManager", "rversions"))
-                  BiocManager::install(c("Rdisop", "GenomeInfoDbData")) # sometimes needed as dependency may not be picked up...
-                  BiocManager::install("ropls") # For KPIC2
-                  remotes::install_github("cran/InterpretMSSpectrum@1.3.3") # workaround for https://github.com/cbroeckl/RAMClustR/issues/48
-                  BiocManager::install(c("xcms", "qlcMatrix")) # for cliqueMS
-                  install.packages("RAMClustR")
-                  remotes::install_github(c("blosloos/nontargetData", "blosloos/nontarget"))
-                  remotes::install_github("rickhelmus/KPIC2")
-                  remotes::install_github("souravc83/fastAdaboost") # For Metaclean, removed from CRAN (9/22)
-                  remotes::install_github("KelseyChetnik/MetaClean")
-              shell: Rscript {0}
+              uses: r-lib/actions/setup-r-dependencies@v2
+              with:
+                  cache-version: 2
+                  packages: |
+                      any::miniCRAN
+                      any::rversions
+                      any::remotes
+                      any::pkgbuild
+                      any::BiocManager
+                      any::withr
             - name: Make repos
               run: Rscript make_repos.R
             - name: Get repos patch

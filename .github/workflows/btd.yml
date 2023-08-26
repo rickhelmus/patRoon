@@ -82,7 +82,7 @@ jobs:
             - name: set PATH
               run: Add-Content $env:GITHUB_PATH "${{ github.workspace }}\bundle\R\bin"
             - name: dump PATH
-              run: echo PATH: ${PATH}
+              run: "echo PATH: ${PATH}"
               shell: bash
             - name: Pre-Install R deps
               uses: r-lib/actions/setup-r-dependencies@v2

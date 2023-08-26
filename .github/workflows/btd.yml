@@ -76,9 +76,9 @@ jobs:
                   path: bundle
             - name: Extract bundle
               run: |
-                  cd bundle
                   7z x *.zip
-                  ls bundle
+                  ls
+              working-directory: bundle
             - name: set PATH
               run: Add-Content $env:GITHUB_PATH "${{ github.workspace }}\bundle\R\bin"
             - name: dump PATH

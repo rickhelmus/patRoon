@@ -75,7 +75,11 @@ jobs:
                   name: bundle
                   path: bundle
             - name: set PATH
-              run: echo "${GITHUB_WORKSPACE}/bundle/R/bin" >> $GITHUB_PATH
+              run: Add-Content $env:GITHUB_PATH ${{ github.workspace }}\bundle\R\bin"
+            - name: dump PATH
+              run: |
+                  echo PATH: ${PATH}
+                  ls ${{ github.workspace }}/bundle
               shell: bash
             - name: Pre-Install R deps
               uses: r-lib/actions/setup-r-dependencies@v2

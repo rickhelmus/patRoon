@@ -116,6 +116,7 @@ Suggests:
     enviPick,
     nontarget,
     RAMClustR,
+    cliqueMS,
     KPIC,
     MetaClean,
     MetaCleanData,
@@ -133,6 +134,16 @@ Suggests:
 LinkingTo:
     Rcpp,
     rapidjsonr
+Config/Needs/pdeps:
+    RDCOMClient,
+    enviPick,
+    nontarget,
+    RAMClustR,
+    KPIC,
+    cliqueMS,
+    MetaClean,
+    patRoonData,
+    splashR
 RdMacros:
     Rdpack
 Collate: 

@@ -96,7 +96,7 @@ jobs:
                   PATROON_METFRAG: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/MetFragCommandLine.jar
                   PATROON_SIRIUS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/sirius
                   PATROON_BIOTRANSFORMER: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/biotransformer/biotransformer-3.0.0.jar
-                  PATROON_OPENBABEL: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openbabel
+                  PATROON_OBABEL: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openbabel
                   PATROON_OPENMS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openms/bin
               with:
                   args: 'c("--no-manual")'

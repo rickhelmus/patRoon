@@ -100,7 +100,7 @@ jobs:
                   PATROON_OPENMS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openms/bin
               with:
                   args: 'c("--no-manual")'
-                  build_args: 'c("--no-build-vignettes")'
+                  build_args: 'c("--no-manual", "--no-build-vignettes")'
                   error-on: '"error"'
                   working-directory: patRoon
     commit:

@@ -142,7 +142,6 @@ Config/Needs/pdeps:
     KPIC,
     cliqueMS,
     MetaClean,
-    patRoonData,
     splashR
 RdMacros:
     Rdpack

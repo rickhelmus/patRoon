@@ -3,8 +3,8 @@ if (!nzchar(Sys.getenv("PATROON_NOTESTS")))
     library(testthat)
     library(patRoon)
     
-    envOpts <- Sys.getenv(c("PATROON_OPENMS", "PATROON_METFRAG", "PATROON_SIRIUS", "PATROON_BIOTRANSFORMER",
-                            "PATROON_PCLITE"))
+    envOpts <- Sys.getenv(c("PATROON_OPENMS", "PATROON_OBABEL", "PATROON_METFRAG", "PATROON_SIRIUS",
+                            "PATROON_BIOTRANSFORMER", "PATROON_PCLITE"))
     if (nzchar(envOpts[["PATROON_OPENMS"]]))
         options(patRoon.path.OpenMS = envOpts[["PATROON_OPENMS"]])
     if (nzchar(envOpts[["PATROON_OBABEL"]]))

@@ -138,6 +138,7 @@ Config/Needs/pdeps:
     RDCOMClient,
     enviPick,
     nontarget,
+    InterpretMSSpectrum,
     RAMClustR,
     KPIC,
     cliqueMS,

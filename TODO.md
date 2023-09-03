@@ -3,6 +3,17 @@
 ## Ext
 
 - update docs/messages: check all patRoon.path mentions
+- R bundle
+    - steps
+        - Download R, extract with innoextract, cleanup?
+        - Create etc/Renviron.site
+            - set HOME, R_USER, R_USER_DATA_DIR, R_USER_CONFIG_DIR, R_USER_CACHE_DIR, R_LIBS_USER, TMPDIR, R_ENVIRON_USER, R_PROFILE_USER
+            _ I guess also JAVA_HOME?
+            - ensure directories set here exist
+        - Create a shortcut/batch file?
+        - Download OpenJDK
+        - Install packages from patRoonDeps repos (local if on AppVeyor)
+        - Zip everything, push to GH
 
 ## General
 

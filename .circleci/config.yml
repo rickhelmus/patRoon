@@ -118,7 +118,7 @@ jobs:
                 no_output_timeout: 30m
                 command: |
                     echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
-                    docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 -e GIT_BRANCH="${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
+                    docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
             - run:
                 name: Push Docker image
                 command: |

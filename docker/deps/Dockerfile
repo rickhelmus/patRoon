@@ -39,6 +39,8 @@ RUN  mkdir deps && cd deps && \
     echo 'options(patRoon.path.BioTransformer = "/home/rstudio/deps/biotransformer/biotransformer-3.0.0.jar")' >> .Rprofile && \
     echo 'options(java.parameters = "-Djava.awt.headless=true")' >> .Rprofile
 
+ARG GIT_BRANCH=master
+ENV GIT_BRANCH=${GIT_BRANCH}
 RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
 
 RUN rm -rf /home/rstudio/.R/Makevars

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-FROM rocker/rstudio:4.3.0
+FROM rocker/rstudio:4.3
 
 ENV SETUPDIR=/usr/local/setup
 

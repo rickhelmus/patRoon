@@ -1,31 +1,44 @@
 options(Ncpus = 8)
 
-install.packages(c("devtools", "BiocManager",
-                   "dplyr", # missing dep(?)
-                   "vdiffr", "desc"))
-install.packages(c("circlize", "VennDiagram"),
-                 repos="http://cran.r-project.org") # get most recent version (rpm is too old)
+# pre-install some generally needed R packages
+install.packages(c("devtools", "BiocManager", "vdiffr", "desc"))
 
-BiocManager::install(c("mzR", "xcms", "CAMERA",
-                       "Rdisop", # need to install this dep manually (why??)
-                       #"InterpretMSSpectrum", # for RAMClustR
-                       "ropls", # for KPIC2
-                       "BiocStyle", "Rgraphviz")) # for MetaClean
+depFile <- tempfile(fileext = ".R")
+stopifnot(download.file("https://raw.githubusercontent.com/rickhelmus/patRoonDeps/master/Rdeps.R", depFile) == 0)
+source(depFile)
+dependencies <- getRDependencies(Sys.getenv("GH_BRANCH", "master"), "linux")
+dependencies <- dependencies[names(dependencies) != "patRoon"]
 
-remotes::install_github(c("rickhelmus/patRoonData",
-                          "thomasp85/farver",
-                          #"cbroeckl/RAMClustR@73accadaded", # temp workaround for buggy commit
-                          "cran/InterpretMSSpectrum@1.3.3",
-                          "cran/RAMClustR", # temp workaround for buggy commit
-                          "blosloos/enviPick",
-                          "blosloos/nontargetData",
-                          "blosloos/nontarget",
-                          "rickhelmus/KPIC2",
-                          "rickhelmus/cliqueMS",
-                          "souravc83/fastAdaboost", # For Metaclean, removed from CRAN (9/22)
-                          "KelseyChetnik/MetaClean", "KelseyChetnik/MetaCleanData",
-                          "berlinguyinca/spectra-hash/splashR"),
-                        upgrade = "never")
+installDeps <- function(deps)
+{
+    for (pkg in names(deps))
+    {
+        md <- deps[[pkg]]
+        
+        if (!is.null(md[["deps"]]))
+            installDeps(md$deps)
+        
+        if (md$type == "cran")
+            install.packages(pkg)
+        else if (md$type == "bioc")
+            BiocManager::install(pkg)
+        else # gh
+        {
+            repos <- if (!is.null(md[["repos"]])) md$repos else pkg
+            ref <- if (!is.null(md[["branch"]]))
+                md$branch
+            else if (!is.null(md[["tag"]]))
+                md$tag
+            else if (!is.null(md[["commit"]]))
+                md$commit
+            else
+                "master"
+            remotes::install_github(paste0(md$user, "/", repos), subdir = md[["pkgroot"]], upgrade = "never")
+        }
+    }
+}
+
+installDeps(dependencies)
 
 getMissingPkgs <- function()
 {
@@ -43,9 +56,9 @@ if (length(mp) > 0)
 }
 
 # workaround for sildist not found bug: https://github.com/hemberg-lab/SC3/issues/36
-install.packages("cluster")
+# install.packages("cluster")
 
-# check if antyhing failed (ie still not available)
+# check if anything failed (ie still not available)
 mp <- getMissingPkgs()
 if (length(mp) > 0)
 {

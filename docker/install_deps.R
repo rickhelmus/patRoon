@@ -33,7 +33,7 @@ installDeps <- function(deps)
                 md$commit
             else
                 "master"
-            remotes::install_github(paste0(md$user, "/", repos), subdir = md[["pkgroot"]], upgrade = "never")
+            remotes::install_github(paste0(md$user, "/", repos), ref = ref, subdir = md[["pkgroot"]], upgrade = "never")
         }
     }
 }

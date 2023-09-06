@@ -338,7 +338,10 @@ delete(obj, ...)</code></pre></div>
 
 
 <dt>which</dt>
-<dd><p>A character vector with replicate groups used for comparison.</p></dd>
+<dd><p>A character vector with replicate groups used for comparison.</p>
+<p>For <code>overlap</code>: can also be a <code>list</code> of <code>character</code> vectors with replicate groups to compare. For
+  instance, <code>which=list(c("samp1", "samp2"), c("samp3", "samp4"))</code> returns the overlap between
+  <code>"samp1"</code>+<code>"samp2"</code> and <code>"samp3"</code>+<code>"samp4"</code>.</p></dd>
 
 
 <dt>exclusive</dt>

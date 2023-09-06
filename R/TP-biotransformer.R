@@ -110,7 +110,8 @@ BTMPPrepareHandler <- function(cmd)
 #'
 #' @details In order to use this function the \file{.jar} command line utility should be installed and specified in the
 #'   \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
-#'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
+#'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}. Alternatively, the \pkg{patRoonExt} package can be
+#'   installed to automatically install/configure the necessary files.
 #'
 #' @param type The type of prediction. Valid values are: \code{"env"}, \code{"ecbased"}, \code{"cyp450"},
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.

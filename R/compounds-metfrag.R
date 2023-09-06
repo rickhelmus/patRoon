@@ -546,8 +546,9 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   \code{database} is set to \code{"pubchemlite"}, \code{"csv"} etc.) and \option{patRoon.MP.method="future"}, then
 #'   the database file must be present on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the location
 #'   for these databases can be configured on the host with the respective package options
-#'   (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}). Note that these files must
-#'   \emph{also} be present on the local host computer, even if it is not participating in computations.
+#'   (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}) or made available by installing
+#'   the \pkg{patRoonExt} package. Note that these files must \emph{also} be present on the local host computer, even if
+#'   it is not participating in computations.
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'

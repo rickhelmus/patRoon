@@ -205,7 +205,7 @@ verifyDependencies <- function()
         }
         else
         {
-            # NOTE: dirname point to current path if getCommandWithOptPath() found it in PATH
+            # NOTE: dirname point to current path if getExtDepPath() found it in PATH
             dn <- dirname(path)
             # if ((nzchar(dn) && dn != "." && !file.exists(path)) || !nzchar(Sys.which(path)))
             if (nzchar(dn) && dn != "." && !file.exists(path))
@@ -231,11 +231,14 @@ verifyDependencies <- function()
     check("BioTransformer", getExtDepPath("biotransformer"), "patRoon.path.BioTransformer")
     
     if (!OK)
+    {
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",
-            "For instance, run the following to set the location of MetFragCL:",
+            "Most dependencies can be easily installed and configured by installing the patRoonExt package.",
+            "Otherwise, options() can be set to configure file locations. For instance, run the following to set the location of MetFragCL:",
             sprintf("options(patRoon.path.MetFragCL = \"C:/MetFragCommandLine-2.4.8.jar\")"),
-            "\nPlease see ?patRoon for more information on how to configure patRoon options.",
+            "\nPlease see the installation chapter in the handbook and ?patRoon for more details.",
             sep = "\n")
+    }
     
     invisible(NULL)
 }
@@ -416,7 +419,7 @@ getSIRIUSToken <- function(user)
 {
     checkmate::assertString(user, min.chars = 1)
     
-    cmd <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
+    cmd <- getExtDepPath("sirius")
     pw <- getPass::getPass("SIRIUS password:", noblank = TRUE)
     
     gotRefHeader <- FALSE

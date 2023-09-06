@@ -87,38 +87,6 @@ executeCommand <- function(cmd, args = character(), ...)
     return(system2(cmd, sapply(args, shQuote), ...))
 }
 
-# NOTE: keep in sync with install-patRoon version
-getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
-{
-    if (Sys.info()[["sysname"]] == "Windows")
-        cmd <- paste0(cmd, ".exe") # add file extension for Windows
-
-    opt <- paste0("patRoon.path.", opt)
-    path <- getOption(opt)
-    if (!is.null(path) && nzchar(path))
-    {
-        ret <- file.path(path.expand(path), cmd)
-        if (!file.exists(ret))
-        {
-            if (verify)
-                stop(sprintf("Cannot find '%s'. Is the option '%s' set correctly?", ret, opt))
-            return(NULL)
-        }
-
-        return(ret)
-    }
-
-    # assume command is in PATH --> no need to add path
-    if (!nzchar(Sys.which(cmd)))
-    {
-        if (verify)
-            stop(sprintf("Cannot find '%s'. Either add the correct file location to the PATH environment variable or set '%s' with options().", cmd, opt))
-        return(NULL)
-    }
-
-    return(cmd)
-}
-
 getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
 {
     # NOTE: pwiz is handled by findPWizPath()

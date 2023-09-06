@@ -243,12 +243,9 @@ getMetFragExtDB <- function(localDB, database)
     
     if (is.null(extDB) || !file.exists(extDB))
     {
-        ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/CompTox_17March2019_SelectMetaData.csv\")"
-        if (database == "comptox" || database == "pubchemlite")
-            stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
-                       "options(patRoon.path.MetFragCompTox = \"C:/CompTox_17March2019_SelectMetaData.csv\") or", ex))
-        
-        stop(paste("No external database file set. This should be set", ex))
+        stop("No external database file set. This should be set as part of the extraOpts argument ",
+             "e.g. extraOpts = list(LocalDatabasePath = \"C:/CompTox_17March2019_SelectMetaData.csv\")",
+             call. = FALSE)
     }
     
     return(extDB)

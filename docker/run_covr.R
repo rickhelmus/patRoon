@@ -4,4 +4,4 @@ options(patRoon.progress.opts = list(style = 1))
 
 install.packages("covr")
 
-withr::with_envvar(NOT_CRAN = "true", covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE))
+withr::with_envvar(list(NOT_CRAN = "true"), covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE))

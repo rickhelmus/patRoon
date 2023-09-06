@@ -274,15 +274,16 @@ setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, set
     checkmate::assertFlag(sets)
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
-    checkmate::assertSubset(which, if (sets) mySets else replicateGroups(fGroups),
-                            empty.ok = FALSE, add = ac)
+    checkmate::assert(checkmate::checkSubset(which, if (sets) mySets else replicateGroups(fGroups), empty.ok = FALSE),
+                      checkmate::checkList(which, "character", any.missing = FALSE),
+                      .var.name = "which", add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
     
     if (sets)
     {
-        anaInfo <- analysisInfo(fGroups)
+        if (is.list(which))
+            stop("which cannot be a list when sets=TRUE", call. = FALSE)
         
         if (length(which) < 2 || length(fGroups) == 0)
             return(fGroups) # nothing to do...

@@ -36,6 +36,10 @@ NULL
 #'   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
 #'   then an automatic group normalization is performed.
 #' @param which A character vector with replicate groups used for comparison.
+#'
+#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicate groups to compare. For
+#'   instance, \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
+#'   \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 #'   \code{NULL} to not perform FC calculations.
 #'
@@ -864,25 +868,25 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 #' @export
 setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 {
+    rGroups <- replicateGroups(fGroups)
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
-    checkmate::assertSubset(which, replicateGroups(fGroups), empty.ok = FALSE, add = ac)
+    checkmate::assert(checkmate::checkSubset(which, rGroups, empty.ok = FALSE),
+                      checkmate::checkList(which, "character", any.missing = FALSE),
+                      .var.name = "which", add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
-
-    anaInfo <- analysisInfo(fGroups)
-    rGroups <- unique(anaInfo$group)
 
     if (length(which) < 2 || length(fGroups) == 0)
         return(fGroups) # nothing to do...
 
+    fGroupsList <- lapply(which, replicateGroupFilter, fGroups = fGroups, verbose = FALSE)
+    ov <- Reduce(intersect, lapply(fGroupsList, names))
+    ret <- fGroups[, ov]
+
     if (exclusive)
-        ret <- unique(fGroups, which = which)
-    else
-        ret <- replicateGroupFilter(fGroups, which, verbose = FALSE)
-
-    ret <- minReplicatesFilter(ret, relThreshold = 1, verbose = FALSE)
-
+        ret <- unique(ret, which = unlist(which))
+    
     return(ret)
 })
 

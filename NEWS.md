@@ -14,6 +14,7 @@
 * Updated PubChem transformations to v0.1.7
 * Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
 * Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
+* `overlap()`: the `which` param can now also be a `list` to compare groups of replicate groups (similar to `plotVenn()`)
 
 
 # patRoon 2.2

@@ -278,7 +278,11 @@ normInts(
 
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
-\item{which}{A character vector with replicate groups used for comparison.}
+\item{which}{A character vector with replicate groups used for comparison.
+
+  For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicate groups to compare. For
+  instance, \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
+  \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.}
 
 \item{exclusive}{If \code{TRUE} then all feature groups are removed that are
 not unique to the given replicate groups.}

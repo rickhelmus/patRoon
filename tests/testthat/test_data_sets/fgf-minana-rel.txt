@@ -1,1 +1,1 @@
-Applying minimum analyses filter... Done! Filtered 295 (50.34%) features and 110 (69.62%) feature groups. Remaining: 291 features in 48 groups.
+Applying minimum analyses filter... Done! Filtered 349 (59.56%) features and 133 (77.33%) feature groups. Remaining: 237 features in 39 groups.

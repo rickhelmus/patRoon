@@ -14,6 +14,7 @@
 * Updated PubChem transformations to v0.1.7
 * Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
 * Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
+* Fixed: in some specific conditions the plot() would throw an error ("cannot coerce type 'S4' to vector of type 'double'")
 
 
 # patRoon 2.2

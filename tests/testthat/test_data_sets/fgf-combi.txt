@@ -1,5 +1,5 @@
-Applying retention filter... Done! Filtered 113 (19.28%) features and 24 (15.19%) feature groups. Remaining: 473 features in 134 groups.
-Applying replicate abundance filter... Done! Filtered 71 (15.01%) features and 34 (25.37%) feature groups. Remaining: 402 features in 100 groups.
-Applying blank filter... Done! Filtered 219 (54.48%) features and 39 (39.00%) feature groups. Remaining: 183 features in 61 groups.
-Applying intensity filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 183 features in 61 groups.
-Applying replicate abundance filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 183 features in 61 groups.
+Applying retention filter... Done! Filtered 113 (19.28%) features and 26 (15.12%) feature groups. Remaining: 473 features in 146 groups.
+Applying replicate abundance filter... Done! Filtered 71 (15.01%) features and 39 (26.71%) feature groups. Remaining: 402 features in 107 groups.
+Applying blank filter... Done! Filtered 198 (49.25%) features and 39 (36.45%) feature groups. Remaining: 204 features in 68 groups.
+Applying intensity filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 204 features in 68 groups.
+Applying replicate abundance filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 204 features in 68 groups.

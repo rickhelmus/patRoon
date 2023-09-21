@@ -15,6 +15,7 @@
 * Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
 * Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
 * `overlap()`: the `which` param can now also be a `list` to compare groups of replicate groups (similar to `plotVenn()`)
+* Fixed: `plotSpectrum()` method for `formulas`/`compounds` didn't expand plot height for formula annotations with only one mass peak
 
 
 # patRoon 2.2

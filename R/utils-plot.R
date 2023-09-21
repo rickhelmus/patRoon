@@ -267,10 +267,11 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         }
         else
         {
-            if (nrow(plotData) > 1)
-                ylim <- range(plotData$intensity) * c(1, expand)
+            ylim <- if (nrow(plotData) > 1)
+                range(plotData$intensity)
             else
-                ylim <- c(0, max(plotData$intensity))
+                c(0, max(plotData$intensity))
+            ylim <- ylim * c(1, expand)
         }
     }
 

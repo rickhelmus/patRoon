@@ -51,16 +51,16 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpNzguNzJ8MzkwLjE4fDMuODR8MjA5LjI4)'>
-<line x1='117.18' y1='248.80' x2='117.18' y2='188.05' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='138.62' y1='248.80' x2='138.62' y2='166.33' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='143.90' y1='248.80' x2='143.90' y2='199.11' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='170.60' y1='248.80' x2='170.60' y2='196.86' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='175.97' y1='248.80' x2='175.97' y2='95.46' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='223.86' y1='248.80' x2='223.86' y2='183.60' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='234.41' y1='248.80' x2='234.41' y2='78.37' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='271.85' y1='248.80' x2='271.85' y2='184.43' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='282.40' y1='248.80' x2='282.40' y2='51.01' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='330.40' y1='248.80' x2='330.40' y2='201.67' style='stroke-width: 0.75; stroke: #BEBEBE;' />
+<line x1='117.18' y1='248.80' x2='117.18' y2='188.05' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='138.62' y1='248.80' x2='138.62' y2='166.33' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='143.90' y1='248.80' x2='143.90' y2='199.11' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='170.60' y1='248.80' x2='170.60' y2='196.86' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='175.97' y1='248.80' x2='175.97' y2='95.46' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='223.86' y1='248.80' x2='223.86' y2='183.60' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='234.41' y1='248.80' x2='234.41' y2='78.37' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='271.85' y1='248.80' x2='271.85' y2='184.43' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='282.40' y1='248.80' x2='282.40' y2='51.01' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='330.40' y1='248.80' x2='330.40' y2='201.67' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 </g>
 <g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwyODguMDA=)'>
 <line x1='78.72' y1='209.28' x2='78.72' y2='40.27' style='stroke-width: 0.75;' />
@@ -68,7 +68,7 @@
 <line x1='78.72' y1='40.27' x2='69.12' y2='40.27' style='stroke-width: 0.75;' />
 <text transform='translate(55.68,144.54) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='35.60px' lengthAdjust='spacingAndGlyphs'>5000</text>
 <text transform='translate(55.68,40.27) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='44.50px' lengthAdjust='spacingAndGlyphs'>10000</text>
-<line x1='400.98' y1='18.24' x2='422.58' y2='18.24' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<text x='433.38' y='22.61' style='font-size: 12.00px; font-weight: 0;fill: #BEBEBE; font-family: "Nimbus Sans";' textLength='61.38px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
+<line x1='400.98' y1='18.24' x2='422.58' y2='18.24' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<text x='433.38' y='22.61' style='font-size: 12.00px; font-weight: 0;fill: #A6CEE3; font-family: "Nimbus Sans";' textLength='61.38px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
 </g>
 </svg>

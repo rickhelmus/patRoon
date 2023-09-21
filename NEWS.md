@@ -16,6 +16,7 @@
 * Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
 * `overlap()`: the `which` param can now also be a `list` to compare groups of replicate groups (similar to `plotVenn()`)
 * Fixed: `plotSpectrum()` method for `formulas`/`compounds` didn't expand plot height for formula annotations with only one mass peak
+* Fixed: `annotatedPeakList()`/`plotSpectrum()` methods for `compounds` didn't label mass peaks with compounds algorithm if `formulas` were provided but no formula candidate was present.
 
 
 # patRoon 2.2

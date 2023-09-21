@@ -443,6 +443,8 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
                 }
             }
         }
+        else # no formula annotations
+            ret[annotated == TRUE, mergedBy := algorithm(obj)]
     }
     
     if (onlyAnnotated)

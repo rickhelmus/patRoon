@@ -48,7 +48,7 @@ jobs:
               run: |
                   git config --global user.name "notimportant"
                   git config --global user.email "notvalid@someemail.com"
-                  git add bin/
+                  git add bin/ patRoonDeps.tsv
                   git diff --binary --cached --full-index > patRoonDeps.diff
                   choco install dos2unix
                   dos2unix patRoonDeps.diff

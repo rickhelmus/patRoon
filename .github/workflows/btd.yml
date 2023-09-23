@@ -41,8 +41,9 @@ jobs:
                       pkgbuild
                       BiocManager
                       withr
+                      data.table
             - name: Make repos
-              run: Rscript make_repos.R
+              run: Rscript utils/make_repos.R
             - name: Get repos patch
               run: |
                   git config --global user.name "notimportant"
@@ -66,7 +67,7 @@ jobs:
               if:  ${{ inputs.makeBundle }}
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
-              run: Rscript make_bundle.R
+              run: Rscript utils/make_bundle.R
             - uses: actions/upload-artifact@v3
               name: Upload bundle
               if:  ${{ inputs.makeBundle }}

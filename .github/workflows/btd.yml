@@ -1,5 +1,15 @@
 name: btd
-on: workflow_dispatch
+on:
+    workflow_dispatch:
+        inputs:
+            makeBundle:
+                type: boolean
+                description: Make bundle (needed for tests)
+                default: true
+            doTests:
+                type: boolean
+                description: Perform tests
+                default: true
 jobs:
     build:
         runs-on: windows-latest
@@ -48,15 +58,18 @@ jobs:
                   path: patRoonDeps.diff
             - name: Setting up patRoonExt cache
               uses: actions/cache@v3
+              if:  ${{ inputs.makeBundle }}
               with:
                   path: pExtCache
                   key: patRoonExtCache
             - name: Make bundle
+              if:  ${{ inputs.makeBundle }}
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: Rscript make_bundle.R
             - uses: actions/upload-artifact@v3
               name: Upload bundle
+              if:  ${{ inputs.makeBundle }}
               with:
                   name: bundle
                   path: patRoon-bundle-*.zip
@@ -64,6 +77,7 @@ jobs:
         needs: build
         runs-on: windows-latest
         name: Run tests
+        if:  ${{ inputs.makeBundle && inputs.doTests }}
         steps:
             - uses: actions/checkout@v3
               with:
@@ -126,6 +140,7 @@ jobs:
                   git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
                   git config --global user.email "notvalid@someemail.com"
                   git add bin/
+                  git add patRoonDeps.tsv
                   git status
                   git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
                   git push
@@ -133,6 +148,7 @@ jobs:
         needs: test
         runs-on: windows-latest
         name: Make bundle pre-release
+        if:  ${{ inputs.makeBundle }}
         steps:
             - name: Get bundle
               uses: actions/download-artifact@v3

@@ -5,15 +5,21 @@
 - update docs/messages: check all patRoon.path mentions
 - R bundle
     - steps
-        - Download R, extract with innoextract, cleanup?
-        - Create etc/Renviron.site
-            - set HOME, R_USER, R_USER_DATA_DIR, R_USER_CONFIG_DIR, R_USER_CACHE_DIR, R_LIBS_USER, TMPDIR, R_ENVIRON_USER, R_PROFILE_USER
-            _ I guess also JAVA_HOME?
-            - ensure directories set here exist
         - Create a shortcut/batch file?
-        - Download OpenJDK
-        - Install packages from patRoonDeps repos (local if on AppVeyor)
-        - Zip everything, push to GH
+            - use R.utils::createWindowsShortcut() to link Rgui.exe
+        - tag zip with SHA instead of version
+    - maintenance
+        - update: util/instructions to just update from patRoonDeps
+        - doc consequences of running regular update.packages()
+- installPatRoon
+    - Deprecate script
+        - docs
+        - print warning in script and ask user for continuation
+    - Migrate
+        - add function (in patRoon? or patRoonExt?) to clearout old Rprofile (and other things?)
+- GHA
+    - do matrix for oldrel?
+    - input for testing from latest bundle?
 
 ## General
 

@@ -249,14 +249,17 @@ setMethod("plotChord", "featureGroupsComparison",
 #' @templateVar what feature groups
 #' @template consensus-common-args
 #'
+#' @param verifyAnaInfo If \code{FALSE} then the analysis information is not verified to be equal for all compared
+#'   objects. This is mainly only useful when the data is the same but stored in different formats (\emph{e.g.}
+#'   \code{mzXML}/\code{mzML}).
+#'
 #' @return \code{consensus} returns a \code{\link{featureGroups}} object with a consensus from the compared feature
 #'   groups.
 #'
 #' @rdname featureGroups-compare
 #' @export
-setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance = NULL,
-                                                           relMinAbundance = NULL,
-                                                           uniqueFrom = NULL, uniqueOuter = FALSE)
+setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance = NULL, relMinAbundance = NULL,
+                                                           uniqueFrom = NULL, uniqueOuter = FALSE, verifyAnaInfo = TRUE)
 {
     # available info:
     # - grouped feature groups --> these are the new consensus feature groups
@@ -265,13 +268,19 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
 
     ac <- checkmate::makeAssertCollection()
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, names(obj), add = ac)
+    checkmate::assertFlag(verifyAnaInfo, add = ac)
     checkmate::reportAssertions(ac)
 
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
 
     # UNDONE: is this a limitation?
     if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
-        stop("This function only works with feature groups with equal analyses")
+    {
+        msg <- "This function only works with feature groups with equal analyses"
+        if (verifyAnaInfo)
+            stop(msg, call. = FALSE)
+        warning(msg, call. = FALSE)
+    }
 
     anaInfo <- allAnaInfos[[1]]
 

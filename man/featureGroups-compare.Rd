@@ -37,7 +37,8 @@ comparison(..., groupAlgo, groupArgs = list(rtalign = FALSE))
   absMinAbundance = NULL,
   relMinAbundance = NULL,
   uniqueFrom = NULL,
-  uniqueOuter = FALSE
+  uniqueOuter = FALSE,
+  verifyAnaInfo = TRUE
 )
 
 \S4method{comparison}{featureGroupsSet}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
@@ -97,6 +98,10 @@ of the objects given for the consensus. Set to \code{NULL} to ignore.}
 \item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
 \code{uniqueOuter=TRUE}: only retain data that are also unique between
 objects specified in \code{uniqueFrom}.}
+
+\item{verifyAnaInfo}{If \code{FALSE} then the analysis information is not verified to be equal for all compared
+objects. This is mainly only useful when the data is the same but stored in different formats (\emph{e.g.}
+\code{mzXML}/\code{mzML}).}
 }
 \value{
 \code{comparison} returns a \code{\link{featureGroupsComparison}}

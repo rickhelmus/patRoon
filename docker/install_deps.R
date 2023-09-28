@@ -4,7 +4,7 @@ options(Ncpus = 8)
 install.packages(c("devtools", "BiocManager", "vdiffr", "desc"))
 
 depFile <- tempfile(fileext = ".R")
-stopifnot(download.file("https://raw.githubusercontent.com/rickhelmus/patRoonDeps/master/Rdeps.R", depFile) == 0)
+stopifnot(download.file("https://raw.githubusercontent.com/rickhelmus/patRoonDeps/master/utils/Rdeps.R", depFile) == 0)
 source(depFile)
 dependencies <- getRDependencies(Sys.getenv("GH_BRANCH", "master"), "linux")
 dependencies <- dependencies[names(dependencies) != "patRoon"]

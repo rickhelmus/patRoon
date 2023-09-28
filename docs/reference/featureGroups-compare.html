@@ -118,7 +118,8 @@
 <span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verifyAnaInfo <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for featureGroupsSet</span></span>
@@ -201,6 +202,12 @@ of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p><
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
+
+
+<dt>verifyAnaInfo</dt>
+<dd><p>If <code>FALSE</code> then the analysis information is not verified to be equal for all compared
+objects. This is mainly only useful when the data is the same but stored in different formats (<em>e.g.</em>
+<code>mzXML</code>/<code>mzML</code>).</p></dd>
 
 </dl></div>
     <div id="value">

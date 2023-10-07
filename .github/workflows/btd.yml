@@ -11,15 +11,12 @@ on:
                 description: Perform tests
                 default: true
 jobs:
-    # based on https://stackoverflow.com/a/75337311
-    build-test-matrix:
+    build-test-matrix: # based on https://stackoverflow.com/a/75337311
         runs-on: windows-latest
         strategy:
             fail-fast: true
             matrix:
                 R: [ 'release', 'oldrel' ]
-        env:
-            GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         name: Build ${{ matrix.R }}
         uses: ./.github/workflows/do_bt.yml
         with:

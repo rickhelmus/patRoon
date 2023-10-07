@@ -53,7 +53,7 @@ jobs:
                   git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
                   git config --global user.email "notvalid@someemail.com"
                   git add bin/
-                  git add patRoonDeps.tsv
+                  git add patRoonDeps*.tsv
                   git status
                   git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
                   git push

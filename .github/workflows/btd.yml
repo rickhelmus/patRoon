@@ -20,8 +20,8 @@ jobs:
         uses: ./.github/workflows/do_bt.yml
         with:
             R: ${{ matrix.R }}
-            makeBundle: ${{ input.makeBundle && matrix.R == 'release' }}
-            doTests: ${{ input.doTests }}
+            makeBundle: ${{ inputs.makeBundle && matrix.R == 'release' }}
+            doTests: ${{ inputs.doTests }}
         secrets: inherit
     commit:
         needs: build-test-matrix

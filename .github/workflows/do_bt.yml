@@ -1,0 +1,158 @@
+name: do_bt
+on:
+    workflow_call:
+        inputs:
+            R:
+                required: true
+                type: string
+            makeBundle:
+                required: true
+                type: boolean
+            doTests:
+                required: true
+                type: boolean
+jobs:
+    build:
+        runs-on: windows-latest
+        env:
+            GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        name: Build ${{ inputs.R }}
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  repository: rickhelmus/patRoonDeps
+                  token: ${{ secrets.PAT }}
+            - name: Setup R
+              uses: r-lib/actions/setup-r@v2
+              with:
+                  r-version: ${{ inputs.R }}
+            - name: Pre-Install R deps
+              uses: r-lib/actions/setup-r-dependencies@v2
+              with:
+                  packages: |
+                      miniCRAN
+                      rversions
+                      remotes
+                      pkgbuild
+                      BiocManager
+                      withr
+                      data.table
+            - name: Make repos
+              run: Rscript utils/make_repos.R
+            - name: Get repos patch
+              run: |
+                  git config --global user.name "notimportant"
+                  git config --global user.email "notvalid@someemail.com"
+                  git add bin/ patRoonDeps.tsv
+                  git diff --binary --cached --full-index > patRoonDeps.diff
+                  choco install dos2unix
+                  dos2unix patRoonDeps-${{ inputs.R }}.diff
+            - uses: actions/upload-artifact@v3
+              name: Upload patch
+              with:
+                  name: patch-${{ inputs.R }}
+                  path: patRoonDeps-${{ inputs.R }}.diff
+            - name: Setting up patRoonExt cache
+              uses: actions/cache@v3
+              if:  ${{ inputs.makeBundle }}
+              with:
+                  path: pExtCache
+                  key: patRoonExtCache
+            - name: Make bundle
+              if:  ${{ inputs.makeBundle }}
+              env:
+                  PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
+              run: Rscript utils/make_bundle.R
+            - uses: actions/upload-artifact@v3
+              name: Upload bundle
+              if:  ${{ inputs.makeBundle }}
+              with:
+                  name: bundle
+                  path: patRoon-bundle-*.zip
+    test:
+        needs: build
+        runs-on: windows-latest
+        name: Run tests directly
+        if:  ${{ !inputs.makeBundle && inputs.doTests }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup R
+              uses: r-lib/actions/setup-r@v2
+              with:
+                  r-version: ${{ inputs.R }}
+            - uses: r-lib/actions/setup-pandoc@v2
+            - name: Pre-Install R deps
+              uses: r-lib/actions/setup-r-dependencies@v2
+              with:
+                  packages: |
+                      rcmdcheck
+                      testthat
+                      vdiffr
+                      rickhelmus/patRoonInst
+            - name: Setting up patRoonExt cache
+              uses: actions/cache@v3
+              with:
+                  path: pExtCache
+                  key: patRoonExtCache
+            - name: Install patRoon
+              env:
+                  PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
+              run: |
+                  patRoonInst::sync(origin = "patRoonDeps")
+              shell: Rscript {0}
+            - uses: r-lib/actions/check-r-package@v2
+              env:
+                  PATROON_METFRAG: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/MetFragCommandLine.jar
+                  PATROON_SIRIUS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/sirius
+                  PATROON_BIOTRANSFORMER: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/biotransformer/biotransformer-3.0.0.jar
+                  PATROON_OBABEL: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openbabel
+                  PATROON_OPENMS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openms/bin
+              with:
+                  args: 'c("--no-manual")'
+                  build_args: 'c("--no-manual", "--no-build-vignettes")'
+                  error-on: '"error"'
+
+    test_bundle:
+        needs: build
+        runs-on: windows-latest
+        name: Run tests from bundle
+        if:  ${{ inputs.makeBundle && inputs.doTests }}
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  path: patRoon
+            - uses: r-lib/actions/setup-pandoc@v2
+            - name: Get bundle
+              uses: actions/download-artifact@v3
+              with:
+                  name: bundle
+                  path: bundle
+            - name: Extract bundle
+              run: |
+                  7z x *.zip
+                  ls
+              working-directory: bundle
+            - name: set PATH
+              run: Add-Content $env:GITHUB_PATH "${{ github.workspace }}\bundle\R\bin"
+            - name: dump PATH
+              run: "echo PATH: ${PATH}"
+              shell: bash
+            - name: Pre-Install R deps
+              uses: r-lib/actions/setup-r-dependencies@v2
+              with:
+                  packages: |
+                      rcmdcheck
+                      testthat
+                      vdiffr
+            - uses: r-lib/actions/check-r-package@v2
+              env:
+                  PATROON_METFRAG: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/MetFragCommandLine.jar
+                  PATROON_SIRIUS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/sirius
+                  PATROON_BIOTRANSFORMER: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/biotransformer/biotransformer-3.0.0.jar
+                  PATROON_OBABEL: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openbabel
+                  PATROON_OPENMS: ${{ github.workspace }}/bundle/R/library/patRoonExt/ext/openms/bin
+              with:
+                  args: 'c("--no-manual")'
+                  build_args: 'c("--no-manual", "--no-build-vignettes")'
+                  error-on: '"error"'
+                  working-directory: patRoon

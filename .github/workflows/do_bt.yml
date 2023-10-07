@@ -44,7 +44,7 @@ jobs:
               run: |
                   git config --global user.name "notimportant"
                   git config --global user.email "notvalid@someemail.com"
-                  git add bin/ patRoonDeps.tsv
+                  git add bin/ patRoonDeps*.tsv
                   git diff --binary --cached --full-index > patRoonDeps-${{ inputs.R }}.diff
                   choco install dos2unix
                   dos2unix patRoonDeps-${{ inputs.R }}.diff

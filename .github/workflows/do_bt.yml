@@ -37,6 +37,7 @@ jobs:
                       BiocManager
                       withr
                       data.table
+                      renv
             - name: Make repos
               run: Rscript utils/make_repos.R
             - name: Get repos patch

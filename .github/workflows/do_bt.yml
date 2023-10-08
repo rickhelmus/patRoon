@@ -87,6 +87,7 @@ jobs:
                   name: patch-oldrel
             - name: Apply patRoonDeps patch
               run: |
+                  cd patRoonDeps
                   git apply patRoonDeps-oldrel.diff
             - uses: actions/checkout@v3
               with:
@@ -119,6 +120,7 @@ jobs:
               run: |
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
                   patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE)
+                  print(.libPaths())
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               env:

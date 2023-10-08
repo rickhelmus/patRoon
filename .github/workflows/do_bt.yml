@@ -122,7 +122,7 @@ jobs:
               run: |
                   print(.libPaths())
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
-                  patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE)
+                  patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE, quiet = FALSE, ignorePkgs = "MetaCleanData")
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               env:

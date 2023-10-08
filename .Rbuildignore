@@ -28,4 +28,5 @@
 ^docker$
 ^install_patRoon.R$
 ^vignettes$
-^CITATION.cff
+^CITATION.cff$
+^\.github$

@@ -27,7 +27,6 @@ jobs:
         needs: build-test-matrix
         runs-on: windows-latest
         name: Update patRoonDeps
-        if: ${{ always() && !failure() && !cancelled() }}
         steps:
             - uses: actions/checkout@v3
               with:

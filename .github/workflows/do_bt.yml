@@ -89,6 +89,7 @@ jobs:
               run: |
                   git apply patRoonDeps-oldrel.diff
             - uses: actions/checkout@v3
+              with:
                   path: patRoon
             - uses: actions/setup-java@v3
               with:

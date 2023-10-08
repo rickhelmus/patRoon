@@ -73,6 +73,8 @@ jobs:
     test:
         needs: build
         runs-on: windows-latest
+        env:
+            GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         name: Run tests directly
         if:  ${{ !inputs.makeBundle && inputs.doTests }}
         steps:
@@ -118,9 +120,9 @@ jobs:
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: |
+                  print(.libPaths())
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
                   patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE)
-                  print(.libPaths())
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               env:

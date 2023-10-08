@@ -119,6 +119,8 @@ jobs:
             - name: Install patRoon
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
+                  PATROONEXT_NO_METFRAGCT: true
+                  PATROONEXT_NO_METFRAGPCL: true
               run: |
                   print(.libPaths())
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))

@@ -77,6 +77,19 @@ jobs:
         if:  ${{ !inputs.makeBundle && inputs.doTests }}
         steps:
             - uses: actions/checkout@v3
+              with:
+                  repository: rickhelmus/patRoonDeps
+                  token: ${{ secrets.PAT }}
+                  path: patRoonDeps
+            - name: Get patRoonDeps patch for oldrel
+              uses: actions/download-artifact@v3
+              with:
+                  name: patch-oldrel
+            - name: Apply patRoonDeps patch
+              run: |
+                  git apply patRoonDeps-oldrel.diff
+            - uses: actions/checkout@v3
+                  path: patRoon
             - uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
@@ -103,6 +116,7 @@ jobs:
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: |
+                  options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
                   patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE)
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
@@ -116,7 +130,7 @@ jobs:
                   args: 'c("--no-manual")'
                   build_args: 'c("--no-manual", "--no-build-vignettes")'
                   error-on: '"error"'
-
+                  working-directory: patRoon
     test_bundle:
         needs: build
         runs-on: windows-latest

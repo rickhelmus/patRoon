@@ -8,17 +8,16 @@
         - Create a shortcut/batch file?
             - use R.utils::createWindowsShortcut() to link Rgui.exe
         - tag zip with SHA instead of version
-    - maintenance
-        - update: util/instructions to just update from patRoonDeps
-        - doc consequences of running regular update.packages()
 - installPatRoon
     - Deprecate script
         - docs
         - print warning in script and ask user for continuation
     - Migrate
-        - add function (in patRoon? or patRoonExt?) to clearout old Rprofile (and other things?)
+        - add function (in patRoon? or patRoonInst?) to clearout
+            - optionally remove: ~/patRoon-install directory --> contains all packages and ext deps
+            - remove: ~/.Rprofile-patRoon --> sets up paths etc If removed then file won't be loaded via .Rprofile
+            - optionally edit: ~/.Rprofile --> remove 3 lines (comment, if, source), get path with normalizePath("~")
 - GHA
-    - do matrix for oldrel?
     - input for testing from latest bundle?
 
 ## General

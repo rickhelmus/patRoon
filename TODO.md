@@ -33,7 +33,6 @@
     - predictRespFactorsSIRFPs(): need to check adduct?
     - which default unit?
 - docs
-    - ref to MS2Quant paper if its out
     - update Rd files
 - NEWS
     - SIRIUS formulas/compound class

@@ -568,6 +568,8 @@ NULL
 #'   \command{SIRIUS:FingerID} fingerprints. Predictions for candidates with other adducts, including \samp{M-H]}, are
 #'   skipped with a warning.
 #'
+#' @references \insertRef{Sepman2023}{patRoon}
+#' 
 #' @seealso \link[=pred-tox]{Toxicity prediction}
 #'
 #' @name pred-quant

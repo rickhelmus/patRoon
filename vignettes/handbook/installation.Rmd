@@ -1,19 +1,37 @@
 # Installation
 
-`patRoon` depends on various other software tools to perform the non-target analysis workflow steps and to implement various other functionality. Most of these dependencies are automatically installed when you install the `patRoon` R package, however, some may need to be manually installed and/or configured.
+`patRoon` depends on various other software tools to perform the non-target analysis workflow steps and to implement various other functionality. The following installation strategies are discussed here:
 
-> **_NOTE_**  It is highly recommended to perform installation steps in a 'clean' `R` session to avoid errors when installing or upgrading packages. As such it is recommended to close all open (R Studio) sessions and open a plain R console to perform the installation. 
- 
-## Automatic installation (Windows only)
+1. The `patRoon` bundle, which contains all dependencies (including `R`), and is therefore very easy to setup (Windows only).
+2. Reproducible [Docker] images.
+3. Regular installations that integrate with the currently installed `R` environment.
 
-An installation script is provided that automatically installs and configures all dependencies and finally installs `patRoon` itself. At this moment, this script only works with Microsoft Windows. You don't have to install anything else to use it, simply open `R` and execute these commands:
+The first strategy is recommended if you are using Windows and are new to `R` or quickly want to try out the latest `patRoon` snapshot. Docker images are specifically for users who wish to run isolated containers and ensure high reproducibility. Finally, people already running `R` will most likely prefer the third strategy. Each strategy is discussed separately in the next sections.
+
+## patRoon Bundle
+
+The `patRoon` bundle contains an almost full `patRoon` installation, including `R`, all `R` package dependencies and external software dependencies such as Java JDK, [MetFrag] and various compound libraries etc. Currently, only [ProteoWizard] may need to be installed manually (see X.Y).
+
+The bundles are automatically generated and tested, and can be obtained from [GHRel] for released versions of `patRoon` and [GHPreRel] for the latest snapshot. 
+
+After downloading the bundle, simply extract the `.zip` file. Then, a classic `R` can be launched by executing `R/bin/x64/Rgui.exe` inside the directory where the bundle was extracted. However, it is probably more convenient to use it from [RStudio]: for this start RStudio, navigate to Tools --> Global options --> General tab and manually set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` directory in the bundle (see screenshot below).
+
+### Updating the bundle
+
+To update the bundle run either of the following functions:
 
 ```{r eval=FALSE}
-source("https://raw.githubusercontent.com/rickhelmus/patRoon/master/install_patRoon.R")
-installPatRoon()
+patRoonInst::sync(allDeps = TRUE) # synchronize all packages related to patRoon to the currently tested versions
+patRoonInst::update() # update all R packages related to patRoon
 ```
 
-A simple text based wizard will start and asks you what to install and how to do it. You can re-run this installer at any time, for instance, if something went wrong or you want to install additional dependencies.
+Both functions will update `patRoon` and related packages to their latest versions. However, they differ on handling their dependencies.
+
+In general, it is recommended to synchronize the package dependencies in the bundle, since this ensures that versions were tested with `patRoon`. If you installed any other packages and also want to update these, then _first_ do so with regular mechanisms (e.g. `update.packages()`, `BiocManager::install()`) and _then_ synchronize `patRoon` to ensure that all packages are with tested versions.
+
+However, if you prefer to install the latest version of all dependencies, then running `patRoon::update()` might be more appropriate. In this case, it is still recommended to first update any 'regular' `R` packages as described above, as `patRoonInst::update()` may install some dependencies with a specific version in case other versions are known to not work.
+
+More details on using `patRoonInst` to manage installations are discussed [later].
 
 ## Docker image
 
@@ -39,6 +57,58 @@ docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/ho
 
 Note that the first two commands run as the default user `rstudio`, while the last two as `root`. The last commands launch [RStudio] server. You can access it by browsing to `localhost:8787` and logging in with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). The last command also links a local volume in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
 
+## Regular R installation
+
+A 'regular' installation involves installing `patRoon` and its dependencies using the local installation of `R`. This section outlines available tools to do this mostly automatically using the auxiliary [patRoonInst] and [patRoonExt] `R` packages and instructions to perform the complete installation manually.
+
+> **_NOTE_**  It is highly recommended to perform installation steps in a 'clean' `R` session to avoid errors when installing or upgrading packages. As such it is recommended to close all open (R Studio) sessions and open a plain R console to perform the installation. 
+
+### Automatic installation
+
+The [patRoonInst] auxiliary package simplifies the installation process. This package automatically installs all `R` package dependencies, including those unavailable from regular repositories such as CRAN and BiocConductor. Furthermore, `patRoonInst` installs [patRoonExt], an `R` package that bundles most common dependencies outside the `R` environment (e.g. [MetFrag], [OpenMS] etc).
+
+The first step is to install `patRoonInst`:
+
+```{r eval=FALSE}
+install.packages("patRoonInst", repos = c('https://rickhelmus.r-universe.dev', 'https://cloud.r-project.org'))
+
+# or alternatively, from GitHub
+remotes::install_github("rickhelmus/patRoonInst")
+```
+
+Then to perform an installation or update:
+
+```{r eval=FALSE}
+patRoonInst::install() # install patRoon and any missing dependencies
+patRoonInst::update() # update patRoon and its dependencies
+```
+
+The installation can be customized in various ways. Firstly, the repositories used to download R packages can be customized through the `origin` argument. The following options are currently available:
+
+* `patRoonDeps`: contains `patRoon` and its dependencies (including their dependencies) with versions that were tested against the latest `patRoon` version. This repository is used for the [patRoon bundle], and only available for on Windows systems.
+* r-universe: contains a snapshot of the latest version of `patRoon` and its direct dependencies.
+* "regular": in this case packages will be sourced directly from CRAN/BioConductor or GitHub. This means that suitable compilers (e.g. [Rtools]) need to be available during installation.
+
+The default on Windows systems is `patRoonDeps`, and r-universe otherwise.
+
+Other installation customizations include which packages will be installed (or updated), and installing all packages to an isolated `R` library. Some examples:
+
+```{r eval=FALSE}
+patRoonInst::install(origin = "runiverse") # install from r-universe
+patRoonInst::install(origin = "regular", pkgs = "patRoon") # only install patRoon, without optional dependencies and directly from GitHub
+patRoonInst::install(ignorePkgs = c("nontarget", "MetaClean")) # full installation, except these two packages
+patRoonInst::install(ignorePkgs = "big") # full installation, but exclude 'big' optional dependencies such as example data (patRoonData)
+patRoonInst::install(lib.loc = "~/patRoon-lib") # install everything to an isolated R library (use .libPaths() to use it)
+```
+
+Besides installing and updating packages, it is also possible to _synchronize_ them with the selected repository using the `sync()` function. This is mostly the same as `update()`, but can also downgrade packages to ensure their versions exactly match that of the repository. This is primarily useful with the `patRoonDeps` repository (as all package versions are tested). Furthermore, as synchronization may involve downgrading it is primarily intended for environments that are primarily used for `patRoon`, such as the [bundle] and isolated `R` libraries. Synchronization can be performed for direct dependencies or all of them:
+
+```{r eval=FALSE}
+patRoonInst::sync() # synchronize only direct dependencies
+patRoonInst::sync(allDeps = TRUE) # synchronize all dependencies
+```
+
+More options are available to customize the installation, see the reference manual (`?patRoonInst::install`) for more details.
 
 ## Manual installation
 

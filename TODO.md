@@ -38,7 +38,7 @@
 - NEWS
     - SIRIUS formulas/compound class
     - concentrations & toxicities slot
-    - getDefPredArrgParams() and new as.data.table() args that use it
+    - getDefPredArgParams() and new as.data.table() args that use it
     - minRF/maxLC50 susp filters
     - minConc/maxTox filter
         - also predAggrParams and removeNA args

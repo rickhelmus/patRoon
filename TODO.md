@@ -7,6 +7,7 @@
     - steps
         - Create a shortcut/batch file?
             - use R.utils::createWindowsShortcut() to link Rgui.exe
+        - install patRoonInst
         - tag zip with SHA instead of version
 - installPatRoon
     - Deprecate script

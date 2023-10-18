@@ -15,6 +15,8 @@
         - print warning in script and ask user for continuation
 - GHA
     - input for testing from latest bundle?
+- check CAMERA on PD
+
 
 ## General
 

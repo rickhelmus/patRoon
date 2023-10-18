@@ -110,15 +110,69 @@ patRoonInst::sync(allDeps = TRUE) # synchronize all dependencies
 
 More options are available to customize the installation, see the reference manual (`?patRoonInst::install`) for more details.
 
-## Manual installation
+### Manual installation
 
-The manual installation is for users who don't use Windows or Docker, prefer to do a manual installation or simply want to know what happens behind the scenes. The manual installation consists of three phases:
+A manual installation starts with installing external dependencies, followed by `R` dependencies and `patRoon` itself.
 
-1. Installing some prerequisite `R` packages
-2. Install and configure (non-`R`) dependencies
-3. Install `patRoon`
+### External (non-R) dependencies
 
-### R prerequisites
+`patRoon` interfaces with various software tools that are external to `R`. A complete overview is given in the table below
+
+Dependency                          | Remarks
+----------------------------------- | -----------------------------------------------------
+[Java JDK][JavaJDK]                 | **Mandatory** for e.g. plotting structures and using MetFrag.
+[OpenBabel]                         | **Highly recommend** Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChIs and formulae. While optional, highly recommended.
+[Rtools]                            | May be necessary on Window when installing `patRoon` and its `R` dependencies (discussed later).
+[ProteoWizard]                      | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
+[OpenMS]                            | Recommended. Used for e.g. finding and grouping features.
+[MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
+[MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
+[MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag.
+[MetFrag PubChem OECD PFAS DB][PC-PFAS] | Database file to use the OECD PFAS database with MetFrag.
+[SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
+[BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar).
+[SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
+[pngquant]                          | Used to reduce size of HTML reports (only legacy interface), definitely optional.
+
+Most of these dependencies are optional and only needed if their algorithms are used during the workflow.
+
+#### Installation via `patRoonExt`
+
+The [patRoonExt] auxiliary package automatizes the installation of most common external dependencies. For installation, just run:
+
+```{r eval=FALSE}
+install.packages("remotes") # run this remotes is not already installed
+remotes::install_github("rickhelmus/patRoonExt")
+```
+
+Note that when you do an [automated patRoon installation] this package is automatically installed. See the [project page] for more details, including ways to customize which software tools will be installed.
+
+> **_NOTE_** Currently, `patRoonExt` does not install ProteoWizard due to license restrictions, and some tools, such as [OpenMS] and [OpenBabel], are only installed on Windows systems. See the next sections to install these tools.
+
+#### Manually installing and configuring external tools
+
+For a full manual installation, please download the tools manually from the linked sources shown in the table above. After installation, you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the `options()` R function, for instance:
+
+```{r, eval=FALSE}
+options(patRoon.path.pwiz = "C:/ProteoWizard") # location of ProteoWizard installation folder
+options(patRoon.path.SIRIUS = "C:/sirius-win64-3.5.1") # location where SIRIUS was extracted
+options(patRoon.path.OpenMS = "/usr/local/bin") # directory with the OpenMS binaries
+options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant binary
+options(patRoon.path.MetFragCL = "~/MetFragCommandLine-2.4.8.jar") # full location to the jar file
+options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
+options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv") # full location to desired PubChemLite CSV file
+options(patRoon.path.MetFragPubChemLite = "~/PubChem_OECDPFAS_largerPFASparts_20220324") # full location to PFAS DB (NOTE: configured like PubChemLite)
+options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
+options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
+```
+
+These commands have to be executed every time you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your `~/.Rprofile` file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. [this SO answer](https://stackoverflow.com/a/46819910)).
+
+> **_NOTE_** The tools that are configured through the `options()` described above will **_override_** any tools that were _also_ installed through `patRoonExt`. Hence, this mechanism can be used to use specific versions not available though `patRoonExt`. However, this also means that you need to ensure that options are unset when you prefer that tools are used through `patRoonExt`.
+
+### Installing patRoon and its R dependencies
+
+
 
 When installing `patRoon` Windows users have the option to install from a customized ([miniCRAN]) repository (`patRoonDeps`). This repository provides a central repository for `patRoon` and all its R packages. An advantage is that installation will be faster and you will not need to install [Rtools]. Note that you will need to have the latest `R` version installed in order to use this repository.
 
@@ -160,44 +214,6 @@ remotes::install_github("KelseyChetnik/MetaClean")
 
 Note that only the `CAMERA` installation is mandatory, the rest involves installation of _optional_ packages. If you are unsure which you need then you can always install the packages at a later stage.
 
-### Other dependencies
-
-Depending on which functionality is used, the following external dependencies may need to be installed:
-
-Dependency                          | Remarks
------------------------------------ | -----------------------------------------------------
-[Java JDK][JavaJDK]                 | **Mandatory** for e.g. plotting structures and using MetFrag.
-[Rtools]                            | Necessary on Window and when `patRoon` is _not_ installed from `patRoonDeps`.
-[ProteoWizard]                      | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
-[OpenMS]                            | Recommended. Used for e.g. finding and grouping features.
-[MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
-[MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
-[MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag.
-[MetFrag PubChem OECD PFAS DB][PC-PFAS] | Database file to use the OECD PFAS database with MetFrag.
-[SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
-[BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar).
-[SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
-[OpenBabel]                         | Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChI and formulae. While optional, highly recommended.
-[pngquant]                          | Used to reduce size of HTML reports (only legacy interface), definitely optional.
-
-Most of these dependencies are optional and only needed if their algorithms are used during the workflow. If you are unsure which are needed, simply skip them for now and install them at a later stage if needed.
-
-After installation of these dependencies you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the `options()` R function, for instance:
-
-```{r, eval=FALSE}
-options(patRoon.path.pwiz = "C:/ProteoWizard") # location of ProteoWizard installation folder
-options(patRoon.path.SIRIUS = "C:/sirius-win64-3.5.1") # location where SIRIUS was extracted
-options(patRoon.path.OpenMS = "/usr/local/bin") # directory with the OpenMS binaries
-options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant binary
-options(patRoon.path.MetFragCL = "~/MetFragCommandLine-2.4.8.jar") # full location to the jar file
-options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
-options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv") # full location to desired PubChemLite CSV file
-options(patRoon.path.MetFragPubChemLite = "~/PubChem_OECDPFAS_largerPFASparts_20220324") # full location to PFAS DB (NOTE: configured like PubChemLite)
-options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
-options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
-```
-
-These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your `~/.Rprofile` file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. [this SO answer](https://stackoverflow.com/a/46819910)).
 
 ### patRoon installation
 

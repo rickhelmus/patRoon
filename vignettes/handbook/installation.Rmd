@@ -8,11 +8,11 @@
 
 The first strategy is recommended if you are using Windows and are new to `R` or quickly want to try out the latest `patRoon` snapshot. Docker images are specifically for users who wish to run isolated containers and ensure high reproducibility. Finally, people already running `R` will most likely prefer the third strategy. Each strategy is discussed separately in the next sections.
 
-## patRoon Bundle
+## patRoon Bundle {#pBundle}
 
-The `patRoon` bundle contains an almost full `patRoon` installation, including `R`, all `R` package dependencies and external software dependencies such as Java JDK, [MetFrag] and various compound libraries etc. Currently, only [ProteoWizard] may need to be installed manually (see X.Y).
+The `patRoon` bundle contains an almost full `patRoon` installation, including `R`, all `R` package dependencies and external software dependencies such as Java JDK, [MetFrag] and various compound libraries etc. Currently, only [ProteoWizard] may need to be [installed manually](#inst_man_ext).
 
-The bundles are automatically generated and tested, and can be obtained from [GHRel] for released versions of `patRoon` and [GHPreRel] for the latest snapshot. 
+The bundles are automatically generated and tested, and can be obtained from [the release page on GitHub][GHRel] for released versions of `patRoon` and [the latest pre-release on GitHub][GHPreRel] for the latest snapshot. 
 
 After downloading the bundle, simply extract the `.zip` file. Then, a classic `R` can be launched by executing `R/bin/x64/Rgui.exe` inside the directory where the bundle was extracted. However, it is probably more convenient to use it from [RStudio]: for this start RStudio, navigate to Tools --> Global options --> General tab and manually set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` directory in the bundle (see screenshot below).
 
@@ -31,7 +31,7 @@ In general, it is recommended to synchronize the package dependencies in the bun
 
 However, if you prefer to install the latest version of all dependencies, then running `patRoon::update()` might be more appropriate. In this case, it is still recommended to first update any 'regular' `R` packages as described above, as `patRoonInst::update()` may install some dependencies with a specific version in case other versions are known to not work.
 
-More details on using `patRoonInst` to manage installations are discussed [later].
+More details on using `patRoonInst` to manage installations are discussed [later](#auto_inst).
 
 ## Docker image
 
@@ -63,7 +63,7 @@ A 'regular' installation involves installing `patRoon` and its dependencies usin
 
 > **_NOTE_**  It is highly recommended to perform installation steps in a 'clean' `R` session to avoid errors when installing or upgrading packages. As such it is recommended to close all open (R Studio) sessions and open a plain R console to perform the installation. 
 
-### Automatic installation
+### Automatic installation {#auto_inst}
 
 The [patRoonInst] auxiliary package simplifies the installation process. This package automatically installs all `R` package dependencies, including those unavailable from regular repositories such as CRAN and BiocConductor. Furthermore, `patRoonInst` installs [patRoonExt], an `R` package that bundles most common dependencies outside the `R` environment (e.g. [MetFrag], [OpenMS] etc).
 
@@ -85,11 +85,11 @@ patRoonInst::update() # update patRoon and its dependencies
 
 The installation can be customized in various ways. Firstly, the repositories used to download R packages can be customized through the `origin` argument. The following options are currently available:
 
-* `patRoonDeps`: contains `patRoon` and its dependencies (including their dependencies) with versions that were tested against the latest `patRoon` version. This repository is used for the [patRoon bundle], and only available for on Windows systems.
+* `patRoonDeps`: contains `patRoon` and its dependencies (including their dependencies) with versions that were tested against the latest `patRoon` version. This repository is used for the [patRoon bundle](#pBundle), and only available for on Windows systems.
 * r-universe: contains a snapshot of the latest version of `patRoon` and its direct dependencies.
 * "regular": in this case packages will be sourced directly from CRAN/BioConductor or GitHub. This means that suitable compilers (e.g. [Rtools]) need to be available during installation.
 
-The default on Windows systems is `patRoonDeps`, and r-universe otherwise.
+The default on Windows systems is `patRoonDeps`, and r-universe otherwise. Note that both repositories only provide packages for recent `R` versions.
 
 Other installation customizations include which packages will be installed (or updated), and installing all packages to an isolated `R` library. Some examples:
 
@@ -114,7 +114,7 @@ More options are available to customize the installation, see the reference manu
 
 A manual installation starts with installing external dependencies, followed by `R` dependencies and `patRoon` itself.
 
-### External (non-R) dependencies
+#### External (non-R) dependencies
 
 `patRoon` interfaces with various software tools that are external to `R`. A complete overview is given in the table below
 
@@ -136,7 +136,7 @@ Dependency                          | Remarks
 
 Most of these dependencies are optional and only needed if their algorithms are used during the workflow.
 
-#### Installation via `patRoonExt`
+##### Installation via `patRoonExt`
 
 The [patRoonExt] auxiliary package automatizes the installation of most common external dependencies. For installation, just run:
 
@@ -145,11 +145,11 @@ install.packages("remotes") # run this remotes is not already installed
 remotes::install_github("rickhelmus/patRoonExt")
 ```
 
-Note that when you do an [automated patRoon installation] this package is automatically installed. See the [project page] for more details, including ways to customize which software tools will be installed.
+Note that when you do an [automated patRoon installation](#auto_inst) this package is automatically installed. See the [project page][patRoonExt] for more details, including ways to customize which software tools will be installed.
 
-> **_NOTE_** Currently, `patRoonExt` does not install ProteoWizard due to license restrictions, and some tools, such as [OpenMS] and [OpenBabel], are only installed on Windows systems. See the next sections to install these tools.
+> **_NOTE_** Currently, `patRoonExt` does not install ProteoWizard due to license restrictions, and some tools, such as [OpenMS] and [OpenBabel], are only installed on Windows systems. See the next section to install these tools.
 
-#### Manually installing and configuring external tools
+##### Manually installing and configuring external tools {#inst_man_ext}
 
 For a full manual installation, please download the tools manually from the linked sources shown in the table above. After installation, you may need to configure their filepaths (OpenMS and ProteoWizard are usually found automatically). To configure the file locations you should set some global package options with the `options()` R function, for instance:
 
@@ -170,79 +170,72 @@ These commands have to be executed every time you start a new R session (e.g. as
 
 > **_NOTE_** The tools that are configured through the `options()` described above will **_override_** any tools that were _also_ installed through `patRoonExt`. Hence, this mechanism can be used to use specific versions not available though `patRoonExt`. However, this also means that you need to ensure that options are unset when you prefer that tools are used through `patRoonExt`.
 
-### Installing patRoon and its R dependencies
+#### Installing patRoon and its R dependencies
 
+The table below lists all the `R` packages that are involved in the installation of `patRoon`.
 
+```{r echo=FALSE}
+source("get_rdeps.R")
+tab <- getRDepsTab(if (knitr::is_html_output()) "html" else "latex")
 
-When installing `patRoon` Windows users have the option to install from a customized ([miniCRAN]) repository (`patRoonDeps`). This repository provides a central repository for `patRoon` and all its R packages. An advantage is that installation will be faster and you will not need to install [Rtools]. Note that you will need to have the latest `R` version installed in order to use this repository.
+if (knitr::is_html_output())
+{
+    k <- knitr::kable(tab, format = "html", escape = FALSE)
+    k <- kableExtra::kable_styling(k, font_size = 12)
+    k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
+} else
+{
+    k <- knitr::kable(dt, format = "latex", booktabs = TRUE, escape = FALSE)
+    k <- kableExtra::kable_styling(k, font_size = 7)
+}
 
-When you decide to use the `patRoonDeps` repository you can simply _skip_ this step. **Otherwise** (i.e. you will use regular repositories instead), the following will install the `R` dependencies.
-
-```{r eval=FALSE}
-install.packages(c("BiocManager", "remotes"))
-BiocManager::install("CAMERA")
-
-# needed for finding features with enviPick
-remotes::install_github("blosloos/enviPick")
-
-# needed for finding/grouping features with KPIC2
-BiocManager::install("ropls")
-remotes::install_github("rickhelmus/KPIC2") 
-
-# needed for RAMClustR for componentization
-BiocManager::install("InterpretMSSpectrum")
-remotes::install_github("cbroeckl/RAMClustR")
-
-# needed for nontarget for componentization
-remotes::install_github("blosloos/nontargetData")
-remotes::install_github("blosloos/nontarget")
-
-# needed for cliqueMS for componentization
-remotes::install_github("rickhelmus/cliqueMS") # note: repository is a fork with minor bug fixes
-
-# only needed for Bruker DataAnalysis integration
-# NOTE: a fork is installed that fixes some issues with the latest R versions
-remotes::install_github("BSchamberger/RDCOMClient")
-
-# only when using the R interface (not recommended by default)
-remotes::install_github("c-ruttkies/MetFragR/metfRag")
-
-# needed for feature quality calculations with MetaClean
-BiocManager::install(c("BiocStyle", "Rgraphviz")) 
-remotes::install_github("KelseyChetnik/MetaClean")
+k
 ```
 
 Note that only the `CAMERA` installation is mandatory, the rest involves installation of _optional_ packages. If you are unsure which you need then you can always install the packages at a later stage.
 
-
-### patRoon installation
-
-Finally, it is time to install `patRoon` itself. As mentioned before, Windows users (who have the latest `R` version) can install `patRoon` and all its package dependencies from the `patRoonDeps` repository:
+The last three columns of the table provide hints on how to perform the installation from the `patRoonDeps`, r-universe and original regular sources (the sources were [discussed previously](#auto_inst)). Note that you may need to install `remotes`, `BiocManager` and [Rtools] if packages are installed from their regular source. Some examples are shown below:
 
 ```{r eval=FALSE}
-# install from patRoonDeps (only Windows with latest R version)
-install.packages("patRoon", repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary")
-```
 
-**Otherwise**, installation occurs directly from GitHub:
+# Install patRoon (and its mandatory dependencies) from patRoonDeps
+install.packages("patRoon", repos = "https://rickhelmus.github.io/patRoonDeps", type = "binary")
 
-```{r eval=FALSE}
-remotes::install_github("rickhelmus/patRoon")
-```
+# Install KPIC2 from r-universe
+install.packages("KPIC", repos = 'https://rickhelmus.r-universe.dev')
 
-Optional example data is installed via GitHub:
+# Install the mandatory CAMERA package (only needed if not using patRoonDeps/r-universe)
+install.packages("BiocManager") # execute this if 'BiocManager' is not yet installed
+BiocManager::install("CAMERA")
 
-```{r eval=FALSE}
-# optional example data
+# Install patRoonData from GitHub
+install.packages("remotes") # execute this if 'remotes' is not yet installed
 remotes::install_github("rickhelmus/patRoonData")
 ```
 
+### Verifying the installation
 
-Afterwards, you can run the `verifyDependencies()` function to see if `patRoon` can find all its dependencies (you may need to restart R beforehand):
+After the installation is completed, you may need to restart `R`. Afterwards, the `verifyDependencies()` function can be used to see if `patRoon` can find all its dependencies:
 
 ```{r eval=FALSE}
 patRoon::verifyDependencies()
 ```
+
+
+## Managing legacy installations
+
+Previous `patRoon` versions (`<2.3`) could be installed via an installation script. This script is now deprecated and replaced by the previously discussed installation methods. If you used this script in the past, and would like to update `patRoon`, it is important to first disable or fully remove the legacy installation. This is easily accomplished by the `patRoonInst` package that [was discussed before](#auto_inst):
+
+```{r eval=FALSE}
+patRoonInst::toggleLegacy(FALSE) # disable legacy installation
+patRoonInst::removeLegacy() # remove all files part of the legacy installation
+patRoonInst::removeLegacy(restoreRProfile = TRUE) # as above, and remove any automatic changes that were made in ~/.Rprofile
+```
+
+> **_NOTE_** Restart `R` afterwards to ensure all changes are in effect. 
+
+For more details, please refer to the reference manual (`?patRoonInst::legacy`).
+
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```

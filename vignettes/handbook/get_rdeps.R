@@ -1,4 +1,4 @@
-getRDepsTab <- function()
+getRDepsTab <- function(format)
 {
     rdpath <- tempfile(fileext = ".R")
     download.file("https://rickhelmus.github.io/patRoonDeps/utils/Rdeps.R", rdpath)
@@ -23,7 +23,7 @@ getRDepsTab <- function()
         # parentDep, OS, mandatory, tag, branch, patRoonDeps
         ret <- character()
         add <- function(val, what) if (!is.null(dep[[val]])) ret <<- c(ret, what)
-        add("parentDep", paste("Needed by", dep$parentDep))
+        add("parentDep", paste("Dependency of", dep$parentDep))
         add("os", paste("Only for", dep$os))
         add("mandatory", "Mandatory")
         return(paste0(ret, collapse = "<br>"))
@@ -44,9 +44,9 @@ getRDepsTab <- function()
     depInstReg <- function(name, dep)
     {
         if (dep$type == "cran")
-            return(sprintf("install.packages('%s')", name))
+            return(sprintf("`install.packages('%s')`", name))
         if (dep$type == "bioc")
-            return(sprintf("BiocManager::install('%s')", name))
+            return(sprintf("`BiocManager::install('%s')`", name))
         
         # else GitHub
         
@@ -59,20 +59,26 @@ getRDepsTab <- function()
                 break
             }
         }
-        return(sprintf("remotes::install_github('%s')", repos))
+        return(sprintf("`remotes::install_github('%s')`", repos))
     }
     
     tab <- data.table::data.table(name = names(depsList), type = lapply(depsList, "[[", "type"))
     tab[, url := data.table::fcase(type == "cran", sprintf("https://cran.r-project.org/web/packages/%s/index.html", name),
                                    type == "bioc", sprintf("https://bioconductor.org/packages/release/bioc/html/%s.html", name),
                                    type == "gh", mapply(name, depsList[name], FUN = ghDepURL))]
-    tab[, package := sprintf("<a href='%s'>%s</a>", url, name)]
-    tab[, installPD := mapply(name, depsList[name], FUN = depInstPD)]
-    tab[, installRU := mapply(name, depsList[name], FUN = depInstRU)]
-    tab[, installReg := mapply(name, depsList[name], FUN = depInstReg)]
+    if (format == "html")
+        tab[, package := sprintf("<a href='%s'>%s</a>", url, name)]
+    else # latex
+        tab[, package := sprintf("\\href{%s}{%s}", url, name)]
     tab[, comments := sapply(depsList, depComments)]
+    # tab[, installPD := mapply(name, depsList[name], FUN = depInstPD)]
+    # tab[, installRU := mapply(name, depsList[name], FUN = depInstRU)]
+    tab[, patRoonDeps := data.table::fifelse(name %in% rownames(availPD), "yes", "no")]
+    tab[, `r-universe` := data.table::fifelse(name %in% rownames(availRU), "yes", "no")]
+    tab[, `regular installation` := mapply(name, depsList[name], FUN = depInstReg)]
     
-    browser()
+    tab[, c("name", "type", "url") := NULL]
+    
     return(tab)
 }
 

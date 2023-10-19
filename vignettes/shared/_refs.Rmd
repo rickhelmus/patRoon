@@ -1,4 +1,8 @@
-[patroonData]: https://github.com/rickhelmus/patRoonData
+[GHRel]: https://github.com/rickhelmus/patRoon/releases
+[GHPreRel]: https://github.com/rickhelmus/patRoonDeps/releases/tag/prerelease
+[patRoonData]: https://github.com/rickhelmus/patRoonData
+[patRoonInst]: https://github.com/rickhelmus/patRoonInst
+[patRoonExt]: https://github.com/rickhelmus/patRoonExt
 [readme]: https://rickhelmus.github.io/patRoon/
 [ProteoWizard]: http://proteowizard.sourceforge.net/
 [OpenMS]: http://openms.de/

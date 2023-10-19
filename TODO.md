@@ -9,13 +9,8 @@
             - use R.utils::createWindowsShortcut() to link Rgui.exe
         - install patRoonInst
         - tag zip with SHA instead of version
-- installPatRoon
-    - Deprecate script
-        - docs
-        - print warning in script and ask user for continuation
 - GHA
     - input for testing from latest bundle?
-- check CAMERA on PD
 - update GHPreRel ref in handbook
 
 ## Predict

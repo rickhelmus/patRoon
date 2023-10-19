@@ -643,6 +643,12 @@ installPatRoon <- function(what = c("mandatory_packages", "optional_packages", "
                            instPath = "~/patRoon-install", exampleData = TRUE,
                            force = FALSE)
 {
+    if (!utils$yesNo(paste("NOTE: This script is deprecated and is not maintained anymore, and will be removed in the future.",
+                           "Please see the installation chapter in the handbook for more information on how to install and update patRoon.",
+                           "Furthermore, refer to the 'Managing legacy installations' section if you already installed patRoon via this script.",
+                           "You can still continue now, but this is not supported. Do you still want to proceed?")))
+        return(invisible())
+    
     if (Sys.info()[["sysname"]] != "Windows" || Sys.info()[["machine"]] != "x86-64")
         stop("Sorry, this script only works on a 64 bit Windows system at the moment.")
     

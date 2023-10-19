@@ -7,8 +7,6 @@
     - steps
         - Create a shortcut/batch file?
             - use R.utils::createWindowsShortcut() to link Rgui.exe
-        - install patRoonInst
-        - tag zip with SHA instead of version
 - GHA
     - input for testing from latest bundle?
 - update GHPreRel ref in handbook
@@ -38,8 +36,6 @@
     - minConc/maxTox filter
         - also predAggrParams and removeNA args
     - baseFrom param of genReportSettingsFile()
-- MS2Quant
-    - PR to allow DFs in addition to CSVs
 
 ## General
 

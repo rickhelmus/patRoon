@@ -14,7 +14,19 @@ The `patRoon` bundle contains an almost full `patRoon` installation, including `
 
 The bundles are automatically generated and tested, and can be obtained from [the release page on GitHub][GHRel] for released versions of `patRoon` and [the latest pre-release on GitHub][GHPreRel] for the latest snapshot. 
 
-After downloading the bundle, simply extract the `.zip` file. Then, a classic `R` can be launched by executing `R/bin/x64/Rgui.exe` inside the directory where the bundle was extracted. However, it is probably more convenient to use it from [RStudio]: for this start RStudio, navigate to Tools --> Global options --> General tab and manually set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` directory in the bundle (see screenshot below).
+After downloading the bundle, simply extract the `.zip` file. Then, a classic `R` terminal can be launched by executing `R/bin/x64/Rgui.exe` inside the directory where the bundle was extracted. However, it is probably more convenient to use it from [RStudio]:
+
+Start RStudio --> Tools --> Global options --> General tab --> R version --> Change
+
+Manually set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` directory in the bundle (see screenshot below).
+
+```{r bundle_rstudio,echo=FALSE}
+if (knitr::is_html_output()) {
+    knitr::include_graphics(knitr::image_uri("bundle.png"), error = FALSE)
+} else
+    knitr::include_graphics("bundle.png")
+```
+
 
 ### Updating the bundle
 

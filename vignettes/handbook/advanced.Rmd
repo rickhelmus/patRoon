@@ -586,7 +586,7 @@ The workflow to predict concentrations is quite similar to predicting toxicities
 
 The calibrant data is used by `MS2Quant` to convert predicted ionization efficiencies to actual response factors, which are specific to the used LC instrument and methodology. For this purpose, several mixtures with known concentrations (i.e. standards) should be measured alongside your samples. The calibrants should be specified as a `data.frame`, for instance:
 
-```{r calibEx,echo=FALSE}
+```{r calibEx,echo=FALSE,eval=runData}
 # generate calibrants with some imaginary intensities/concentrations
 calibrants <- data.table(name = c("DEET", "1h-benzotriazole", "Caffeine", "Atrazine", "Carbamazepine", "Venlafaxine"),
                          conc = rep(c(1, 2, 5, 10, 25, 50), each = 6))

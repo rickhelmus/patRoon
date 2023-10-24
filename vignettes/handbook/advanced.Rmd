@@ -943,9 +943,8 @@ Some important notes when using the `future` parallelization method:
 
 * `GenForm` currently performs less optimal with future multiprocessing to the `classic` approach. Nevertheless, it may still be interesting to use the `future` method to move the computations to another system to free up resources on your local system.
 * Behind the scenes the [future.apply] package is used to schedule the tools to be executed. The `patRoon.MP.futureSched` option sets the value for the `future.scheduling` argument to the `future_lapply()` function, and therefore allows you to tweak the scheduling.
-* Make sure that `patRoon` and in case of multiprocessing that the tool to be executed (`MetFrag`, `SIRIUS` etc.) are exactly the _same_ version on all computing hosts.
-* Make sure that `patRoon` is properly configured on all hosts, _e.g._ set the `patRoon.path.XXX` options to ensure all tools can be found.
-* For `MetFrag` annotation: if a local database such as `PubChemLite` is used, it must be present on each computing node as well. Furthermore, the local computer (even if not used for the computations) _also_ must have this file present. Like the previous point, make sure that the `patRoon.path.XXX` options are set properly.
+* Make sure that `patRoon` is present and with the same version on all computing hosts.
+* Make sure that any external dependencies used by multiprocessing, such as `MetFrag` and `SIRIUS`, and local compound databases, such as as `PubChemLite`, are also with the same version and are configured properly. See the [Installation] section for more details.
 * If you encounter errors then it may be handy to switch to `future::plan("sequential")` and see if it works or you get more descriptive error messages.
 * In order to restart the nodes, for instance after re-configuring `patRoon`, updating `R` packages etc, simply re-execute `future::plan(...)`.
 * Setting the `future.debug` package option to `TRUE` may give you more insight what is happening to find problems.

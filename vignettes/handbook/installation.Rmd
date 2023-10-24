@@ -45,6 +45,21 @@ However, if you prefer to install the latest version of all dependencies, then r
 
 More details on using `patRoonInst` to manage installations are discussed [later](#auto_inst).
 
+### Details
+
+This section describes details on the contents and the configuration of the `patRoon` bundle, and is mainly intended for readers who want to know more details or perform customizations.
+
+The `patRoon` bundle consists of the following:
+
+* A complete installation of `R`.
+* An open java development kit (JDK) from [Adoptium]
+* `patRoon` and its mandatory and optional `R` packages dependencies, synchronized from `patRoonDeps` ([discussed later](#auto_inst)).
+* Most external dependencies _via_ [patRoonExt] (also [discussed later](#pExt))
+
+The `R` Windows installers are extracted with [innoextract] to obtain a 'portable' installation. The `Renviron.site` and `Rprofile.site` files are then generated to ensure that the bundled JDK will be used, `R` packages will be loaded and installed from the bundle and various other configurations are applied to ensure that the bundle will not conflict with a regular `R` installation.
+
+The bundles are automatically generated, and the relevant script can be [found here](https://github.com/rickhelmus/patRoonDeps/blob/master/utils/make_bundle.R). 
+
 ## Docker image {#Docker}
 
 Docker images are provided to easily install a reproducible environment with `R`, `patRoon` and nearly all of its dependencies. This section assumes you have a basic understanding of [Docker] and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of `patRoon` were originally only used for automated testing, however, since these contain a complete working environment of `patRoon` they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), `R` dependencies and `MetFrag` libraries. Furthermore, the Docker image also contains [RStudio] server, which makes using `patRoon` even easier.
@@ -154,7 +169,7 @@ Dependency                          | Remarks
 
 Most of these dependencies are optional and only needed if their algorithms are used during the workflow.
 
-##### Installation via `patRoonExt`
+##### Installation via `patRoonExt` {#pExt}
 
 The [patRoonExt] auxiliary package automatizes the installation of most common external dependencies. For installation, just run:
 

@@ -3,6 +3,8 @@
 [patRoonData]: https://github.com/rickhelmus/patRoonData
 [patRoonInst]: https://github.com/rickhelmus/patRoonInst
 [patRoonExt]: https://github.com/rickhelmus/patRoonExt
+[Adoptium]: https://adoptium.net/
+[innoextract]: https://constexpr.org/innoextract/
 [readme]: https://rickhelmus.github.io/patRoon/
 [ProteoWizard]: http://proteowizard.sourceforge.net/
 [OpenMS]: http://openms.de/

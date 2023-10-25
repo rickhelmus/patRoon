@@ -140,22 +140,33 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
     }, "minReplicates", verbose))
 }
 
-minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, negate = FALSE)
+minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, normToTox = FALSE, negate = FALSE)
 {
     concs <- concentrations(fGroups)
-    if (length(fGroups) == 0 || nrow(concs) == 0)
+    if (length(fGroups) == 0 || nrow(concs) == 0 ||
+        (normToTox && nrow(toxicities(fGroups)) == 0))
         return(fGroups)
     
-    allConcs <- concs[, analyses(fGroups), with = FALSE]
+    anas <- analyses(fGroups)
+    aggrConcs <- aggregateConcs(concs, analysisInfo(fGroups), aggrParams, FALSE)
+    aggrConcs <- aggrConcs[, c("group", anas), with = FALSE]
+    
+    if (normToTox)
+    {
+        tox <- toxicities(fGroups)[, c("group", "LC50"), with = FALSE]
+        aggrTox <- aggregateTox(toxicities(fGroups), aggrParams, FALSE)[, c("group", "LC50"), with = FALSE]
+        aggrConcs <- merge(aggrConcs, aggrTox, by = "group", sort = FALSE, all.x = TRUE)
+        aggrConcs[, (anas) := lapply(.SD, "/", LC50), .SDcols = anas][, LC50 := NULL]
+    }
+    
+    allConcs <- aggrConcs[, analyses(fGroups), with = FALSE]
     threshold <- getHighestAbsValue(absThreshold, relThreshold, max(allConcs, na.rm = TRUE))
     if (threshold == 0)
         return(fGroups)
     
     return(doFGroupsFilter(fGroups, "concentration", c(threshold, aggrParams, removeNA, negate), function(fGroups)
     {
-        aggrConcs <- aggregateConcs(concs, analysisInfo(fGroups), aggrParams, FALSE)
-        aggrConcs <- aggrConcs[, c("group", analyses(fGroups)), with = FALSE]
-        aggrConcs <- transpose(aggrConcs, make.names = "group")
+        aggrConcsT <- transpose(aggrConcs, make.names = "group")
         
         compF <- if (negate)
             function(x) (removeNA & !is.na(x)) | (!is.na(x) & x >= threshold)
@@ -164,7 +175,7 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
         
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
-        delGroups[, (names(aggrConcs)) := lapply(aggrConcs, compF), by = rep(1, nrow(delGroups))]
+        delGroups[, (names(aggrConcsT)) := lapply(aggrConcsT, compF), by = rep(1, nrow(delGroups))]
         return(delete(fGroups, j = delGroups))
     }))
 }
@@ -425,12 +436,15 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
 #'   replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 #'   \code{NULL} to ignore.
-#' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculate by
+#' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculated by
 #'   \code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
 #'   controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
-#' @param absMaxTox,relMaxTox The maximum absolute/relative predicted toxicity (LC50) (calculate by
+#' @param absMaxTox,relMaxTox The maximum absolute/relative predicted toxicity (LC50) (calculated by
 #'   \code{\link{calculateTox}}) assigned to a feature group. The concentrations are first aggregated prior to
 #'   filtering, as controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
+#' @param absMinConcTox,relMinConcTox Like \code{absMinConc}/\code{relMinConc}, but instead considers the ratio between
+#'   feature concentrations and the toxicity of the feature group. For instance, \code{absMinConcTox=0.1} means that the
+#'   calculated concentration of a feature should be at least \samp{10\%} of its toxicity.
 #' @param results Only keep feature groups that have results in the object specified by \code{results}. Valid classes
 #'   are \code{\link{featureAnnotations}} (\emph{e.g.} formula/compound annotations) and \code{\link{components}}. Can
 #'   also be a \code{list} with multiple objects: in this case a feature group is kept if it has a result in \emph{any}
@@ -456,7 +470,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}) prior to filtering data. See \link[=pred-aggr-params]{prediction aggregation
 #'   parameters} for more information.
 #' @param removeNA Set to \code{TRUE} to remove \code{NA} values. Currently only applicable to the concentration and
-#'   toxicity filter.
+#'   toxicity filters.
 #'
 #' @templateVar feat FALSE
 #' @template feat-filter-args
@@ -510,6 +524,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinFeatures = NULL, relMinFeatures = NULL,
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
                                               absMinConc = NULL, relMinConc = NULL, absMaxTox = NULL, relMaxTox = NULL,
+                                              absMinConcTox = NULL, relMinConcTox = NULL,
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
@@ -524,7 +539,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
                absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox +
-               maxReplicateIntRSD + blankThreshold,
+               absMinConcTox + relMinConcTox + maxReplicateIntRSD + blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
@@ -585,6 +600,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                                                                  removeNA = removeNA))
     obj <- maybeDoFilter(maxToxFilter, absMaxTox, relMaxTox, otherArgs = list(aggrParams = predAggrParams,
                                                                               removeNA = removeNA))
+    obj <- maybeDoFilter(minConcFilter, absMinConcTox, relMinConcTox, otherArgs = list(aggrParams = predAggrParams,
+                                                                                       removeNA = removeNA,
+                                                                                       normToTox = TRUE))
     
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(resultsFilter, results)

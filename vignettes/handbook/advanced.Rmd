@@ -730,6 +730,10 @@ fGroupsSuspToxF <- filter(ffGroupsSuspTox, maxLC50 = 100) # remove suspect hits 
 # similarly, for feature data there are dedicated filters.
 # note that these aggregate data prior to filtering (see previous section)
 fGroupsConcF <- filter(fGroupsConc, absMinConc = 0.02)
+# only keep features with concentrations that are at least 1% of their toxicity
+# note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()
+fGroupsConcToxF <- filter(fGroupsConcTox, absMinConcTox = 0.01)
+
 # also get rid of features without concentrations (these are ignored by default)
 fGroupsConcF <- filter(fGroupsConc, absMinConc = 0.02, removeNA = TRUE)
 # like as.data.table we can configure how values are aggregated

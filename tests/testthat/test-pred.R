@@ -134,6 +134,10 @@ test_that("Basics for calculation", {
                    na.rm = TRUE), 0.2)
     expect_lt(min(as.data.table(filter(fGroupsCompsC, absMinConc = 0.2, negate = TRUE))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
                    na.rm = TRUE), 0.2)
+    expect_gte(min(as.data.table(filter(fGroupsCompsC, absMinConcTox = 0.01))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
+                   na.rm = TRUE), 0.01)
+    expect_lt(min(as.data.table(filter(fGroupsCompsC, absMinConcTox = 0.01, negate = TRUE))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
+                  na.rm = TRUE), 0.01)
     expect_lte(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4))$LC50, na.rm = TRUE), 6E4)
     expect_gt(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4, negate = TRUE))$LC50, na.rm = TRUE), 6E4)
     
@@ -142,6 +146,9 @@ test_that("Basics for calculation", {
     expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMinConc = 0.2))),
               length(getFeatures(filter(fGroupsOnlyCompsC, absMinConc = 0.2, removeNA = TRUE))))
     expect_gt(length(getFeatures(fGroupsOnlyCompsC)), length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))))
+    expect_gt(length(getFeatures(fGroupsOnlyCompsC)), length(getFeatures(filter(fGroupsOnlyCompsC, absMinConcTox = 0.01))))
+    expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMinConcTox = 0.01))),
+              length(getFeatures(filter(fGroupsOnlyCompsC, absMinConcTox = 0.01, removeNA = TRUE))))
     # UNDONE: can we actually get NA tox values?
     # expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))),
     #           length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4, removeNA = TRUE))))

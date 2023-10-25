@@ -19,6 +19,7 @@
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
     - filters that relate conc/tox, ie conc >= (tox/10)
+        - finalize tests
     - update R/sysdata.rda
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()

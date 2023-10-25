@@ -20,6 +20,7 @@
 * `consensus()` method for `featureGroups`: new `verifyAnaInfo` flag to optionally skip if the analysis information are equal for all compared objects. This is mainly useful when the data is the same but in different formats.
 * Fixed: in some specific conditions the plot() would throw an error ("cannot coerce type 'S4' to vector of type 'double'")
 * Fixed: `generateFormulas()` generic definition had wrong argument order
+* Fixed: `getSIRIUSToken()` resulted in errors if the password input was cancelled.
 
 
 # patRoon 2.2

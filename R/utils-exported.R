@@ -536,7 +536,7 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
 #'
 #' @param user A \code{character} string with the user name/email.
 #'
-#' @return A \code{character} string with the (secret) refresh token.
+#' @return A \code{character} string with the (secret) refresh token or \code{NULL} if the input was cancelled.
 #'
 #' @references \insertRef{Dhrkop2019}{patRoon}
 #'
@@ -547,6 +547,12 @@ getSIRIUSToken <- function(user)
     
     cmd <- getExtDepPath("sirius")
     pw <- getPass::getPass("SIRIUS password:", noblank = TRUE)
+    
+    if (is.null(pw))
+    {
+        printf("Input cancelled, returning NULL...\n")
+        return(NULL)
+    }
     
     gotRefHeader <- FALSE
     ret <- NULL

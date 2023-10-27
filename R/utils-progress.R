@@ -5,7 +5,9 @@
 withProg <- function(end, parallel, expr)
 {
     prog <- 0
-    pb <- openProgBar(0, end, file = if (parallel) stderr() else stdout())
+    doProg <- end > 0 # to avoid errors with txtProgressBar
+    
+    pb <- if (doProg) openProgBar(0, end, file = if (parallel) stderr() else stdout()) else NULL
 
     # from https://stackoverflow.com/questions/56038299/in-r-how-do-i-evaluate-an-expression-in-a-specific-environment-within-a-functio
     ret <- withCallingHandlers(withVisible(expr), doProg = function(...)
@@ -13,12 +15,16 @@ withProg <- function(end, parallel, expr)
         if (prog < end)
         {
             prog <<- prog + 1
-            setTxtProgressBar(pb, prog)
+            if (doProg)
+                setTxtProgressBar(pb, prog)
         }
     })
 
-    setTxtProgressBar(pb, end)
-    close(pb)
+    if (doProg)
+    {
+        setTxtProgressBar(pb, end)
+        close(pb)
+    }
     
     if (ret$visible)
         return(ret$value)

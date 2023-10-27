@@ -641,12 +641,14 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
 #'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
 #'   parameters} for more information. Set to \code{NULL} to omit this data.
+#' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
+#'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, averageFunc = mean,
                                                      normalized = FALSE, FCParams = NULL,
                                                      concAggrParams = getDefPredAggrParams(),
-                                                     toxAggrParams = getDefPredAggrParams())
+                                                     toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE)
 {
     return(doFGAsDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                            concAggrParams, toxAggrParams))

@@ -94,10 +94,10 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
 doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
                             regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
                             concAggrParams = getDefPredAggrParams(), toxAggrParams = getDefPredAggrParams(),
-                            collapseSuspects = ",", onlyHits = FALSE)
+                            normConcToTox = FALSE, collapseSuspects = ",", onlyHits = FALSE)
 {
     assertFGAsDataTableArgs(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams, collapseSuspects, onlyHits)
+                            concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
     
     if (features && average && regression)
         stop("Cannot add regression data for averaged features.")
@@ -388,6 +388,12 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             mby.y <- c(mby.y, "candidate_name")
         }
         ret <- merge(ret, tox, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
+        
+        if (normConcToTox && !is.null(ret[["conc_types"]])) # conc_types should be present if concentration data is
+        {
+            cols <- grep("_conc$", names(ret), value = TRUE)
+            ret[, (cols) := lapply(.SD, "/", LC50), .SDcols = cols]
+        }
     }
     
     return(ret[])

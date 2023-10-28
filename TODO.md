@@ -18,15 +18,9 @@
         - general score mechanism currently not there
     - re-rank after addCompoundScore()
         - would make sense, but might break eg suspect annotation ranks
-    - filters that relate conc/tox, ie conc >= (tox/10)
-        - finalize tests
-    - update R/sysdata.rda
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs
-- tox
-    - predictRespFactorsSIRFPs(): need to check adduct?
-    - which default unit?
 - docs
     - update Rd files
 - NEWS
@@ -34,7 +28,7 @@
     - concentrations & toxicities slot
     - getDefPredArgParams() and new as.data.table() args that use it
     - minRF/maxLC50 susp filters
-    - minConc/maxTox filter
+    - minConc/maxTox/minConcTox filter
         - also predAggrParams and removeNA args
     - baseFrom param of genReportSettingsFile()
 

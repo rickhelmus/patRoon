@@ -209,8 +209,7 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
         chargeMin <- -abs(chargeMin); chargeMax <- -abs(chargeMax)
     }
     
-    settings <- list("-algorithm:MetaboliteFeatureDeconvolution:negative_mode" = boolToChr(ionization == "negative"),
-                     "-algorithm:MetaboliteFeatureDeconvolution:charge_min" = chargeMin,
+    settings <- list("-algorithm:MetaboliteFeatureDeconvolution:charge_min" = chargeMin,
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_max" = chargeMax,
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_span_max" = chargeSpan,
                      "-algorithm:MetaboliteFeatureDeconvolution:q_try" = qTry,
@@ -218,10 +217,19 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
                      "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = absMzDev,
                      "-algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap" = minRTOverlap)
     
+    recentMAD <- OpenMSVersionAtLeast("MetaboliteAdductDecharger", "3.0")
+    
+    if (!recentMAD) # negative_mode param usage was changed in OpenMS 3.0
+        settings <- c(settings, list("-algorithm:MetaboliteFeatureDeconvolution:negative_mode" = boolToChr(ionization == "negative")))
+    
     if (!is.null(extraOpts))
         settings <- modifyList(settings, extraOpts)
     
     settingsArgs <- OpenMSArgListToOpts(settings)
+    
+    if (recentMAD && ionization == "negative")
+        settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:negative_mode")
+    
     # add potential adducts later as OpenMSArgListToOpts() doesn't handle this currently...
     settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:potential_adducts", potentialAdducts)
     

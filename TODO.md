@@ -10,6 +10,9 @@
 - GHA
     - input for testing from latest bundle?
 - update GHPreRel ref in handbook
+- cleanup
+    - remove appveyor files/scripts from patRoon/patRoonDeps
+    - remove biotransformer jar from patRoonDeps
 
 ## Predict
 

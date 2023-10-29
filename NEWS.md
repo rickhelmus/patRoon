@@ -21,6 +21,7 @@
 * Fixed: in some specific conditions the plot() would throw an error ("cannot coerce type 'S4' to vector of type 'double'")
 * Fixed: `generateFormulas()` generic definition had wrong argument order
 * Fixed: `getSIRIUSToken()` resulted in errors if the password input was cancelled.
+* Compatibility with OpenMS 3.0
 
 
 # patRoon 2.2

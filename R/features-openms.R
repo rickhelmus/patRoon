@@ -204,16 +204,9 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
                      "-algorithm:ffm:report_convex_hulls" = "true")
 
     # figure out if we're running OpenMS version >= 2.5
-    oldFFM <- TRUE
-    FFMHelp <- suppressWarnings(executeCommand(getExtDepPath("openms", "FeatureFinderMetabo"), stdout = TRUE, stderr = TRUE))
-    FFMHelp <- FFMHelp[grepl("Version:", FFMHelp, fixed = TRUE)]
-    if (length(FFMHelp) == 1) # should be fine, but fallback to old version just in case...
-    {
-        FFMVer <- unlist(regmatches(FFMHelp, regexec("[0-9\\.]+", FFMHelp)))
-        oldFFM <- utils::compareVersion(FFMVer, "2.5") == -1
-    }
-    
-    if (oldFFM) # otherwise set below
+    recentFFM <- OpenMSVersionAtLeast("FeatureFinderMetabo", "2.5")
+
+    if (!recentFFM) # otherwise set below
         settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering))
     
     if (!is.null(extraOpts))
@@ -221,11 +214,10 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
 
     args <- OpenMSArgListToOpts(settings)
     
-    if (traceSNRFiltering)
+    if (recentFFM && traceSNRFiltering)
         args <- c(args, "-algorithm:epd:masstrace_snr_filtering")
     
-    return(list(command = getExtDepPath("openms", "FeatureFinderMetabo"),
-                args = c(args, "-in", datafile, "-out", out)))
+    return(list(command = getExtDepPath("openms", "FeatureFinderMetabo"), args = c(args, "-in", datafile, "-out", out)))
 }
 
 importFeatureXML <- function(ffile)

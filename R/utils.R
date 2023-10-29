@@ -184,6 +184,18 @@ getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
 # convert to unnamed character vector where previous names are followed by set values
 OpenMSArgListToOpts <- function(args) as.vector(mapply(names(args), args, FUN = c, USE.NAMES = FALSE))
 
+OpenMSVersionAtLeast <- function(tool, minVersion)
+{
+    toolHelp <- suppressWarnings(executeCommand(getExtDepPath("openms", tool), stdout = TRUE, stderr = TRUE))
+    ver <- grep("^Version\\:", toolHelp, value = TRUE)
+    if (length(ver) == 1)
+    {
+        ver <- unlist(regmatches(ver, regexec("[0-9\\.]+", ver)))
+        return(utils::compareVersion(ver, minVersion) >= 0)
+    }
+    NA
+}
+
 # NOTE: keep in sync with install-patRoon version
 findPWizPath <- function()
 {

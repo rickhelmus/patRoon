@@ -14,7 +14,7 @@ file.rename(origRmds, disabledRmds)
 # remotes::install_github("r-lib/pkgdown@v1.6.1")
 install.packages("pkgdown")
 
-install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
+install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex", "devtools"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()

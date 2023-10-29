@@ -3,6 +3,8 @@
 
 options(patRoon.progress.opts = list(style = 1))
 
+install.packages(c("devtools", "vdiffr"))
+
 # return failure exit code when tests fail: https://github.com/r-lib/testthat/issues/515
 tret <- as.data.frame(devtools::test(reporter = testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),
                                                                                  testthat::JunitReporter$new(file = "~/junit.xml")))))

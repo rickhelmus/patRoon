@@ -363,7 +363,7 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     RFs <- NULL 
     if (nrow(fgSMILESTabTODO) > 0)
     {
-        RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, NULL)
+        RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, "")
         setnames(RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
         for (i in seq_len(nrow(RFs)))
             saveCacheData("RF_SMILES", RFs$RF_SMILES[i], fgSMILESTabTODO$hash[i])

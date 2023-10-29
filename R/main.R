@@ -39,6 +39,8 @@ setOldClass(c("dissimilarity", "dist"))
 # this appears to fix the occasional error "cannot coerce type 'S4' to vector of type 'double'"
 setGeneric("plot")
 
+setGeneric("merge") # sometimes its not yet
+
 #### Generics
 
 #' @include generics.R

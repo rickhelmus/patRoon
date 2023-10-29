@@ -185,7 +185,7 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     checkPackage("MS2Quant", "kruvelab/MS2Quant")
     
     ac <- checkmate::makeAssertCollection()
-    assertQuantEluent(eluent, fGroups, add = ac)
+    assertQuantEluent(eluent, obj, add = ac)
     checkmate::assertChoice(organicModifier, c("MeOH", "MeCN"), add = ac)
     checkmate::assertNumber(pHAq, finite = TRUE, add = ac)
     aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))

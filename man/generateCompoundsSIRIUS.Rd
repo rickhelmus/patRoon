@@ -126,7 +126,7 @@ annotations for the feature group of the candidate.}
 averaged.}
 }
 \value{
-A \code{\link{compounds}} derived object containing all compound annotations.
+A \code{\link{compoundsSIRIUS}} object.
 }
 \description{
 Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} in combination with

@@ -80,7 +80,7 @@ as returned by \code{\link[nontarget]{homol.search}}}
 \references{
 \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
 
-\addCitations{igraph}{1}
+\addCitations{igraph}{2}
 }
 \seealso{
 \code{\link{components}} and \code{\link{generateComponents}}

@@ -19,7 +19,9 @@ generateFormulasSIRIUS(fGroups, ...)
   database = NULL,
   noise = NULL,
   cores = NULL,
+  getFingerprints = FALSE,
   topMost = 100,
+  token = NULL,
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
   calculateFeatures = TRUE,
@@ -87,8 +89,19 @@ commandline option.}
 \item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
 used.}
 
+\item{getFingerprints}{Set to \code{TRUE} to load \command{SIRIUS-CSI:FingerID} MS/MS fingerprints for the formula
+candidates. This is currently only supported with \code{calculateFeatures=FALSE} to avoid heavy server traffic. The
+fingerprints are stored in the \code{fingerprints} slot of the returned \code{\link{formulasSIRIUS}} object, and
+are used by the \code{\link{predictTox}} and \code{\link{predictRespFactors}} methods.}
+
 \item{topMost}{Only keep this number of candidates (per feature group) with highest
 score. Sets the \option{--candidates} command line option.}
+
+\item{token}{A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
+version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
+\command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
+\href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
+information. If \code{NULL} then the log in is skipped.}
 
 \item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any extra commandline parameters for
 \command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula
@@ -130,7 +143,7 @@ annotations for the feature group of the candidate.}
 averaged.}
 }
 \value{
-A \code{\link{formulas}} object containing all generated formulae.
+A \code{\link{formulasSIRIUS}} object.
 }
 \description{
 Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to generate chemical formulae candidates.

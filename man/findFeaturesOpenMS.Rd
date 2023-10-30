@@ -104,8 +104,9 @@ TOPP tool (see \url{http://www.openms.de}) to find features.
 This function uses OpenMS to automatically find features. This function is called when calling \code{findFeatures} with
   \code{algorithm="openms"}.
 
-This functionality has been tested with OpenMS version >= 2.0. Please make sure it is installed and its
-  binaries are added to the PATH environment variable or the \code{patRoon.path.OpenMS} option is set.
+This functionality has been tested with OpenMS version >= 2.0. Please make sure it is installed and
+  configured, e.g. by installing \code{patRoonExt} or configuring the path of the binaries with
+  the \code{patRoon.path.OpenMS} option or the system \option{PATH} variable.
 
   The file format of analyses must be \file{mzML}.
 

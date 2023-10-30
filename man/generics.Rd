@@ -33,6 +33,8 @@
 \alias{plotStructure}
 \alias{plotVenn}
 \alias{plotUpSet}
+\alias{predictRespFactors}
+\alias{predictTox}
 \alias{delete}
 \alias{plotVolcano}
 \alias{replicateGroups}
@@ -114,6 +116,10 @@ plotStructure(obj, ...)
 plotVenn(obj, ...)
 
 plotUpSet(obj, ...)
+
+predictRespFactors(obj, ...)
+
+predictTox(obj, ...)
 
 delete(obj, ...)
 
@@ -362,10 +368,22 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotUpSet,featureAnnotations-method]{featureAnnotations}}; \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}; \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=plotUpSet,transformationProductsStructure-method]{transformationProductsStructure}}.
 }
 
+\code{predictRespFactors} Prediction of response factors.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=predictRespFactors,compounds-method]{compounds}}; \code{\link[=predictRespFactors,compoundsSet-method]{compoundsSet}}; \code{\link[=predictRespFactors,compoundsSIRIUS-method]{compoundsSIRIUS}}; \code{\link[=predictRespFactors,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=predictRespFactors,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=predictRespFactors,formulasSet-method]{formulasSet}}; \code{\link[=predictRespFactors,formulasSIRIUS-method]{formulasSIRIUS}}.
+}
+
+\code{predictTox} Prediction of toxicity values.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=predictTox,compounds-method]{compounds}}; \code{\link[=predictTox,compoundsSet-method]{compoundsSet}}; \code{\link[=predictTox,compoundsSIRIUS-method]{compoundsSIRIUS}}; \code{\link[=predictTox,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=predictTox,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=predictTox,formulasSet-method]{formulasSet}}; \code{\link[=predictTox,formulasSIRIUS-method]{formulasSIRIUS}}.
+}
+
 \code{delete} Deletes results.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=delete,components-method]{components}}; \code{\link[=delete,componentsClust-method]{componentsClust}}; \code{\link[=delete,componentsSet-method]{componentsSet}}; \code{\link[=delete,compoundsSet-method]{compoundsSet}}; \code{\link[=delete,featureAnnotations-method]{featureAnnotations}}; \code{\link[=delete,featureGroups-method]{featureGroups}}; \code{\link[=delete,featureGroupsKPIC2-method]{featureGroupsKPIC2}}; \code{\link[=delete,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=delete,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=delete,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=delete,featureGroupsXCMS-method]{featureGroupsXCMS}}; \code{\link[=delete,featureGroupsXCMS3-method]{featureGroupsXCMS3}}; \code{\link[=delete,features-method]{features}}; \code{\link[=delete,featuresKPIC2-method]{featuresKPIC2}}; \code{\link[=delete,featuresXCMS-method]{featuresXCMS}}; \code{\link[=delete,featuresXCMS3-method]{featuresXCMS3}}; \code{\link[=delete,formulas-method]{formulas}}; \code{\link[=delete,formulasSet-method]{formulasSet}}; \code{\link[=delete,MSLibrary-method]{MSLibrary}}; \code{\link[=delete,MSPeakLists-method]{MSPeakLists}}; \code{\link[=delete,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=delete,transformationProducts-method]{transformationProducts}}.
+    \item Methods are defined for: \code{\link[=delete,components-method]{components}}; \code{\link[=delete,componentsClust-method]{componentsClust}}; \code{\link[=delete,componentsSet-method]{componentsSet}}; \code{\link[=delete,compoundsSet-method]{compoundsSet}}; \code{\link[=delete,compoundsSIRIUS-method]{compoundsSIRIUS}}; \code{\link[=delete,featureAnnotations-method]{featureAnnotations}}; \code{\link[=delete,featureGroups-method]{featureGroups}}; \code{\link[=delete,featureGroupsKPIC2-method]{featureGroupsKPIC2}}; \code{\link[=delete,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=delete,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=delete,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=delete,featureGroupsXCMS-method]{featureGroupsXCMS}}; \code{\link[=delete,featureGroupsXCMS3-method]{featureGroupsXCMS3}}; \code{\link[=delete,features-method]{features}}; \code{\link[=delete,featuresKPIC2-method]{featuresKPIC2}}; \code{\link[=delete,featuresXCMS-method]{featuresXCMS}}; \code{\link[=delete,featuresXCMS3-method]{featuresXCMS3}}; \code{\link[=delete,formulas-method]{formulas}}; \code{\link[=delete,formulasSet-method]{formulasSet}}; \code{\link[=delete,formulasSIRIUS-method]{formulasSIRIUS}}; \code{\link[=delete,MSLibrary-method]{MSLibrary}}; \code{\link[=delete,MSPeakLists-method]{MSPeakLists}}; \code{\link[=delete,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=delete,transformationProducts-method]{transformationProducts}}.
 }
 
 \code{plotVolcano} plots a volcano plot.
@@ -436,7 +454,7 @@ please refer to the linked method documentation for each generic.
  \code{as.data.table} Converts an object to a table (\code{\link{data.table}}).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=as.data.table,components-method]{components}}; \code{\link[=as.data.table,componentsTPs-method]{componentsTPs}}; \code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}}; \code{\link[=as.data.table,featureGroups-method]{featureGroups}}; \code{\link[=as.data.table,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=as.data.table,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=as.data.table,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=as.data.table,features-method]{features}}; \code{\link[=as.data.table,featuresSet-method]{featuresSet}}; \code{\link[=as.data.table,formulas-method]{formulas}}; \code{\link[=as.data.table,MSLibrary-method]{MSLibrary}}; \code{\link[=as.data.table,MSPeakLists-method]{MSPeakLists}}; \code{\link[=as.data.table,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=as.data.table,transformationProducts-method]{transformationProducts}}; \code{\link[=as.data.table,workflowStep-method]{workflowStep}}.
+    \item Methods are defined for: \code{\link[=as.data.table,components-method]{components}}; \code{\link[=as.data.table,componentsTPs-method]{componentsTPs}}; \code{\link[=as.data.table,featureAnnotations-method]{featureAnnotations}}; \code{\link[=as.data.table,featureGroups-method]{featureGroups}}; \code{\link[=as.data.table,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=as.data.table,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=as.data.table,features-method]{features}}; \code{\link[=as.data.table,featuresSet-method]{featuresSet}}; \code{\link[=as.data.table,formulas-method]{formulas}}; \code{\link[=as.data.table,MSLibrary-method]{MSLibrary}}; \code{\link[=as.data.table,MSPeakLists-method]{MSPeakLists}}; \code{\link[=as.data.table,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=as.data.table,transformationProducts-method]{transformationProducts}}; \code{\link[=as.data.table,workflowStep-method]{workflowStep}}.
 }
 
  \code{as.data.frame} Converts an object to a table (\code{data.frame}).

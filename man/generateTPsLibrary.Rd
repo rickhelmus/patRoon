@@ -144,8 +144,8 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
   Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
   deuterium (2H) elements.
 
-  This functionality relies heavily on \href{http://openbabel.org/wiki/Main_Page}{OpenBabel}, please make sure it is
-  installed.
+  This functionality relies heavily on \href{https://github.com/openbabel/openbabel}{OpenBabel}, please make sure it
+  is installed.
 }
 
 \references{

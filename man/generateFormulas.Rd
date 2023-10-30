@@ -5,7 +5,7 @@
 \alias{generateFormulas,featureGroups-method}
 \title{Automatic chemical formula generation}
 \usage{
-generateFormulas(fGroups, algorithm, ...)
+generateFormulas(fGroups, MSPeakLists, algorithm, ...)
 
 \S4method{generateFormulas}{featureGroups}(fGroups, MSPeakLists, algorithm, ...)
 }
@@ -14,12 +14,12 @@ generateFormulas(fGroups, algorithm, ...)
 a subset of the object that was used to create the specified \code{MSPeakLists}. In the case of a subset only the
 remaining feature groups in the subset are considered.}
 
+\item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
+
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
 
 \item{\dots}{Any parameters to be passed to the selected formula generation algorithm.}
-
-\item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.

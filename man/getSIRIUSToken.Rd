@@ -10,7 +10,7 @@ getSIRIUSToken(user)
 \item{user}{A \code{character} string with the user name/email.}
 }
 \value{
-A \code{character} string with the (secret) refresh token.
+A \code{character} string with the (secret) refresh token or \code{NULL} if the input was cancelled.
 }
 \description{
 This function is used to obtain a \command{SIRIUS} refresh token with your login details, which allows

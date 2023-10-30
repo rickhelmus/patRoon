@@ -82,7 +82,8 @@ This function uses BioTransformer to obtain transformation products. This functi
 
 In order to use this function the \file{.jar} command line utility should be installed and specified in the
   \code{\link[=patRoon-package]{patRoon.path.BioTransformer}} option. The \file{.jar} file can be obtained via
-  \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
+  \url{https://bitbucket.org/djoumbou/biotransformer/src/master}. Alternatively, the \pkg{patRoonExt} package can be
+  installed to automatically install/configure the necessary files.
 
 An important advantage of this algorithm is that it provides structural information for generated TPs.
   However, this also means that if the input is from a parent suspect list or screening then either \acronym{SMILES}
@@ -162,8 +163,8 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
   Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
   deuterium (2H) elements.
 
-  This functionality relies heavily on \href{http://openbabel.org/wiki/Main_Page}{OpenBabel}, please make sure it is
-  installed.
+  This functionality relies heavily on \href{https://github.com/openbabel/openbabel}{OpenBabel}, please make sure it
+  is installed.
 }
 
 \section{Parallelization}{

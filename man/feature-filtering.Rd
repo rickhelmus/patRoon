@@ -24,6 +24,12 @@ replicateGroupSubtract(fGroups, rGroups, threshold = 0)
   relMinFeatures = NULL,
   absMinReplicateAbundance = NULL,
   relMinReplicateAbundance = NULL,
+  absMinConc = NULL,
+  relMinConc = NULL,
+  absMaxTox = NULL,
+  relMaxTox = NULL,
+  absMinConcTox = NULL,
+  relMinConcTox = NULL,
   maxReplicateIntRSD = NULL,
   blankThreshold = NULL,
   retentionRange = NULL,
@@ -37,6 +43,8 @@ replicateGroupSubtract(fGroups, rGroups, threshold = 0)
   removeBlanks = FALSE,
   removeISTDs = FALSE,
   checkFeaturesSession = NULL,
+  predAggrParams = getDefPredAggrParams(),
+  removeNA = FALSE,
   negate = FALSE
 )
 
@@ -84,6 +92,18 @@ amount of features. Set to \code{NULL} to ignore.}
 should be present within a replicate group. If this minimum is not met all features within the replicate group are
 removed. Set to \code{NULL} to skip this step.}
 
+\item{absMinConc, relMinConc}{The minimum absolute/relative predicted concentration (calculated by
+\code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
+controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.}
+
+\item{absMaxTox, relMaxTox}{The maximum absolute/relative predicted toxicity (LC50) (calculated by
+\code{\link{calculateTox}}) assigned to a feature group. The concentrations are first aggregated prior to
+filtering, as controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.}
+
+\item{absMinConcTox, relMinConcTox}{Like \code{absMinConc}/\code{relMinConc}, but instead considers the ratio between
+feature concentrations and the toxicity of the feature group. For instance, \code{absMinConcTox=0.1} means that the
+calculated concentration of a feature should be at least \samp{10\%} of its toxicity.}
+
 \item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of intensity values for features within a
 replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 \code{NULL} to ignore.}
@@ -125,6 +145,13 @@ IS assignments done by \code{\link{normInts}}, see its documentation for more de
 \code{\link{predictCheckFeaturesSession}} functions. The value of \code{checkFeaturesSession} should either by a
 path to the session file or \code{TRUE}, in which case the default session file name is used. If \code{negate=TRUE}
 then all non-selected features/feature groups are removed instead.}
+
+\item{predAggrParams}{Parameters to aggregate calculated concentrations/toxicities (obtained with
+\code{\link{calculateConcs}}/\code{\link{calculateTox}}) prior to filtering data. See \link[=pred-aggr-params]{prediction aggregation
+parameters} for more information.}
+
+\item{removeNA}{Set to \code{TRUE} to remove \code{NA} values. Currently only applicable to the concentration and
+toxicity filters.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
@@ -189,7 +216,8 @@ Basic rule based filtering of feature groups.
   \item Replicate abundance filters (2nd time, only if previous filters affected results).
 
   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
-  \code{relMinReplicates}, \code{absMinFeatures} and \code{relMinFeatures}).
+  \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc}, \code{relMinConc},
+  \code{absMaxTox} and \code{relMaxTox}.
 
   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
   analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).

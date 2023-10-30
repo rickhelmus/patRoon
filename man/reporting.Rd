@@ -43,7 +43,7 @@ report(
   overrideSettings = list()
 )
 
-genReportSettingsFile(out = "report.yml")
+genReportSettingsFile(out = "report.yml", baseFrom = NULL)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for reporting data.}
@@ -75,6 +75,9 @@ see the parallelization section in the handbook for more details.}
 \code{overrideSettings=list(compounds=list(topMost=25))}.}
 
 \item{out}{The output file path.}
+
+\item{baseFrom}{An existing report file to which the report settings should be based from. This is primarily used to
+update old settings files: the output settings file will be based on the old settings and amended with any missing.}
 }
 \description{
 Functionality to report data produced by most workflow steps such as features, feature groups, formula and compound

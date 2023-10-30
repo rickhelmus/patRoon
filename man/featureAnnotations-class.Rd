@@ -247,7 +247,7 @@ normalization.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureAnnotations}}}}     \itemize{       \item{\code{\link{formulas}}}       \itemize{         \item{\code{\link{formulasConsensus}}}         \item{\code{\link{formulasSet}}}         \item{\code{\link{formulasUnset}}}       }       \item{\code{\link{compounds}}}       \itemize{         \item{\code{\link{compoundsConsensus}}}         \item{\code{\link{compoundsMF}}}         \item{\code{\link{compoundsSet}}}         \item{\code{\link{compoundsUnset}}}       }     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureAnnotations}}}}     \itemize{       \item{\code{\link{formulas}}}       \itemize{         \item{\code{\link{formulasConsensus}}}         \item{\code{\link{formulasSet}}}         \item{\code{\link{formulasUnset}}}         \item{\code{\link{formulasSIRIUS}}}       }       \item{\code{\link{compounds}}}       \itemize{         \item{\code{\link{compoundsConsensus}}}         \item{\code{\link{compoundsMF}}}         \item{\code{\link{compoundsSet}}}         \item{\code{\link{compoundsUnset}}}         \item{\code{\link{compoundsSIRIUS}}}       }     }   } }
 }
 
 \references{

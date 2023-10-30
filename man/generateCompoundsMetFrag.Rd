@@ -246,22 +246,14 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
  When \code{database="chemspider"} setting the \code{chemSpiderToken} argument is
   mandatory.
 
-  When a local database is set (\emph{i.e.} \code{sdf}, \code{psv}, \code{csv}, \code{comptox}, \code{pubchemlite})
-  the file location of the database should be set in the \code{LocalDatabasePath} value via the \code{extraOpts}
-  argument or using the \code{patRoon.path.MetFragCompTox}/\code{patRoon.path.MetFragPubChemLite} option (only when
-  \code{database="comptox"} or \code{database="pubchemlite"}).
+  If a local database is chosen via \code{sdf}, \code{psv}, or \code{csv} then its file location should be set with
+  the \code{LocalDatabasePath} value via the \code{extraOpts} argument. For example: \code{extraOpts =
+  list(LocalDatabasePath = "C:/myDB.csv")}.
 
-  Examples: \verb{options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv")}
-
-  \verb{extraOpts = list(LocalDatabasePath = "C:/myDB.csv")}.
-
-  For \code{database="comptox"} the files can be obtained from
-  \href{ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files}{here}.
-  Furthermore, the files with additions for \href{https://zenodo.org/record/3364464#.XnjM-XLvKUk}{smoking} and
-  \href{https://zenodo.org/record/3472781#.XnjMAHLvKUk}{wastewater} metadata are also supported. For
-  \code{database="pubchemlite"} the \file{.csv} database can be downloaded from
-  \href{https://zenodo.org/record/6503754}{here} or from \href{https://zenodo.org/record/6385954}{here} for the OECD
-  PFAS database. Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support these libraries.
+  If \code{database="pubchemlite"} or \code{database="comptox"} and \pkg{patRoonExt} is \emph{not} installed then the
+  file location must be specified as above or by setting the
+  \code{patRoon.path.MetFragPubChemLite}/\code{patRoon.path.MetFragCompTox} option. See the installation section in
+  the handbook for more details.
 }
 
 \section{Parallelization}{
@@ -274,8 +266,9 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   \code{database} is set to \code{"pubchemlite"}, \code{"csv"} etc.) and \option{patRoon.MP.method="future"}, then
   the database file must be present on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the location
   for these databases can be configured on the host with the respective package options
-  (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}). Note that these files must
-  \emph{also} be present on the local host computer, even if it is not participating in computations.
+  (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}) or made available by installing
+  the \pkg{patRoonExt} package. Note that these files must \emph{also} be present on the local host computer, even if
+  it is not participating in computations.
 }
 
 \references{

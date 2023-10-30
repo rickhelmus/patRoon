@@ -38,6 +38,10 @@
 \alias{internalStandardAssignments,featureGroups-method}
 \alias{adducts,featureGroups-method}
 \alias{adducts<-,featureGroups-method}
+\alias{concentrations,featureGroups-method}
+\alias{concentrations}
+\alias{toxicities,featureGroups-method}
+\alias{toxicities}
 \alias{[,featureGroups,ANY,ANY,missing-method}
 \alias{[[,featureGroups,ANY,ANY-method}
 \alias{$,featureGroups-method}
@@ -60,7 +64,6 @@
 \alias{featureTable,featureGroupsSet-method}
 \alias{[,featureGroupsSet,ANY,ANY,missing-method}
 \alias{export,featureGroupsSet-method}
-\alias{as.data.table,featureGroupsSet-method}
 \alias{unique,featureGroupsSet-method}
 \alias{overlap,featureGroupsSet-method}
 \alias{selectIons,featureGroupsSet-method}
@@ -157,6 +160,10 @@ normInts(
 
 \S4method{adducts}{featureGroups}(obj) <- value
 
+\S4method{concentrations}{featureGroups}(fGroups)
+
+\S4method{toxicities}{featureGroups}(fGroups)
+
 \S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups, results, drop = TRUE)
 
 \S4method{[[}{featureGroups,ANY,ANY}(x, i, j)
@@ -176,7 +183,10 @@ normInts(
   regression = FALSE,
   averageFunc = mean,
   normalized = FALSE,
-  FCParams = NULL
+  FCParams = NULL,
+  concAggrParams = getDefPredAggrParams(),
+  toxAggrParams = getDefPredAggrParams(),
+  normConcToTox = FALSE
 )
 
 \S4method{unique}{featureGroups}(x, which, relativeTo = NULL, outer = FALSE)
@@ -228,18 +238,6 @@ normInts(
 \S4method{[}{featureGroupsSet,ANY,ANY,missing}(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 
 \S4method{export}{featureGroupsSet}(obj, type, out, set)
-
-\S4method{as.data.table}{featureGroupsSet}(
-  x,
-  average = FALSE,
-  areas = FALSE,
-  features = FALSE,
-  qualities = FALSE,
-  regression = FALSE,
-  averageFunc = mean,
-  normalized = FALSE,
-  FCParams = NULL
-)
 
 \S4method{unique}{featureGroupsSet}(x, which, ..., sets = FALSE)
 
@@ -379,6 +377,13 @@ no \code{conc} column is present in the analysis information or when less than t
 \item{FCParams}{A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 \code{NULL} to not perform FC calculations.}
 
+\item{concAggrParams, toxAggrParams}{Parameters to aggregate calculated concentrations/toxicities (obtained with
+\code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
+parameters} for more information. Set to \code{NULL} to omit this data.}
+
+\item{normConcToTox}{Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
+present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).}
+
 \item{relativeTo}{A character vector with replicate groups that should be
 used for unique comparison. If \code{NULL} then all replicate groups are
 used for comparison. Replicate groups specified in \code{which} are
@@ -483,6 +488,10 @@ available).
 
 \item \code{adducts(featureGroups) <- value}: Sets adduct annotations for feature groups.
 
+\item \code{concentrations(featureGroups)}: Accessor for \code{concentrations} slot.
+
+\item \code{toxicities(featureGroups)}: Accessor for \code{toxicities} slot.
+
 \item \code{x[i}: Subset on analyses/feature groups.
 
 \item \code{x[[i}: Extract intensity values.
@@ -559,6 +568,10 @@ method).}
 
 \item{\code{ISTDAssignments}}{A \code{list}, where each item is named by a feature group and consists of a vector with
 feature group names of the internal standards assigned to it (filled in by the \code{normInts} method).}
+
+\item{\code{concentrations,toxicities}}{A \code{data.table} with predicted concentrations/toxicities for each feature group.
+Assigned by the \code{\link{calculateConcs}}/\code{\link{calculateTox}} methods. Use the
+\code{concentratrions}/\code{toxicities} methods for access.}
 
 \item{\code{groupAlgo,groupArgs,groupVerbose}}{\setsWF Grouping parameters that were used when this object was created. Used
 by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.}

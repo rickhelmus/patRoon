@@ -24,7 +24,7 @@ COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=250
 
-RUN  mkdir deps && cd deps && echo 'options(java.parameters = "-Djava.awt.headless=true")' >> .Rprofile
+RUN  echo 'options(java.parameters = "-Djava.awt.headless=true")' >> .Rprofile
 
 ARG GIT_BRANCH=master
 ENV GIT_BRANCH=${GIT_BRANCH}

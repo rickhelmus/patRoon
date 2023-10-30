@@ -2,13 +2,10 @@
 
 ## Ext
 
-- update docs/messages: check all patRoon.path mentions
 - R bundle
     - steps
         - Create a shortcut/batch file?
             - use R.utils::createWindowsShortcut() to link Rgui.exe
-- GHA
-    - input for testing from latest bundle?
 - update GHPreRel ref in handbook
 - cleanup
     - remove appveyor files/scripts from patRoon/patRoonDeps
@@ -24,16 +21,6 @@
 - quant
     - target RFs: those that are specified by user in a suspect list, to be used directly by calculateConcs()
     - filter suspects/annotations from conc results, ie to remove candidates with very low concs
-- docs
-    - update Rd files
-- NEWS
-    - SIRIUS formulas/compound class
-    - concentrations & toxicities slot
-    - getDefPredArgParams() and new as.data.table() args that use it
-    - minRF/maxLC50 susp filters
-    - minConc/maxTox/minConcTox filter
-        - also predAggrParams and removeNA args
-    - baseFrom param of genReportSettingsFile()
 
 ## General
 

@@ -22,7 +22,7 @@ For more information, please read the [updated installation chapter][hb-inst] in
 
 The second milestone of this release is the integration of the [MS2Tox] and [MS2Quant] `R` packages, which support machine learning approaches to predict the toxicity and concentration of features. The integration adds the following functionality to `patRoon`:
 
-* Automated prediction of toxicity (fish LC50) and response factors/concentrations for features from [SIRIUS+CSI:FingerID] fingerprints or `SMILES`.
+* Automated prediction of toxicity (fish LC50) and response factors/concentrations for features from [SIRIUS+CSI:FingerID][SIRIUS] fingerprints or `SMILES`.
 * The predictions can be made from suspect data and formula/compound annotation candidates. These can be combined and aggregated when calculating toxicities/concentrations for features.
 * The `as.data.table()` function and reporting interface were updated to inspect the predicted toxicities/concentrations.
 * Various new filters were added to prioritize data on calculated toxicities, response factors and concentrations.
@@ -42,6 +42,8 @@ Please see the [relevant section in the handbook](https://rickhelmus.github.io/p
 * `consensus()` method for `featureGroups`: new `verifyAnaInfo` flag to optionally skip if the analysis information are equal for all compared objects. This is mainly useful when the data is the same but in different formats.
 * Compatibility with OpenMS 3.0
 * Windows CI is now performed on GitHub actions instead of AppVeyor.
+* `genReportSettingsFile()`: `baseFrom` argument to update old report settings files.
+* `generateFormulasSIRIUS()`: new `getFingerprints` and `token` arguments to download CSI:FingerID fingerprints for formula candidates. This was primarily implemented to support calculating toxicities/concentrations from formula annotations.
 
 ## Fixes
 
@@ -1048,6 +1050,7 @@ Other changes
 [hb-inst]: https://rickhelmus.github.io/patRoon/handbook_bd/installation.html
 [MetFragCL]: http://ipb-halle.github.io/MetFrag/projects/metfragcl/
 [OpenMS]: http://openms.de/
+[SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
 [PCLite-dl]: https://zenodo.org/record/6503754
 [MS2Tox]: https://github.com/kruvelab/MS2Tox
 [MS2Quant]: https://github.com/kruvelab/MS2Quant

@@ -21,8 +21,8 @@ jobs:
         uses: ./.github/workflows/do_bt.yml
         with:
             R: ${{ matrix.R }}
-            makeBundle: ${{ (github.event_name == 'push' || inputs.makeBundle) && matrix.R == 'release' }}
-            doTests: ${{ inputs.doTests }}
+            makeBundle: ${{ (github.event_name == 'push' || github.event.inputs.makeBundle == 'true') && matrix.R == 'release' }}
+            doTests: ${{ github.event_name == 'push' || github.event.inputs.doTests == 'true' }}
         secrets: inherit
     commit:
         needs: build-test-matrix
@@ -62,7 +62,7 @@ jobs:
         needs: build-test-matrix
         runs-on: windows-latest
         name: Make bundle pre-release
-        if:  ${{ inputs.makeBundle && github.ref == 'refs/heads/master' }}
+        if:  ${{ (github.event_name == 'push' || github.event.inputs.makeBundle == 'true') && github.ref == 'refs/heads/master' }}
         steps:
             - name: Get bundle
               uses: actions/download-artifact@v3

@@ -1,8 +1,9 @@
-# patRoon
+# patRoon <img src="logo.png" height="150" align="right"></img>
 
 [![CircleCI](https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg)](https://circleci.com/gh/rickhelmus/patRoon)
-[![Build status](https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true)](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
+[![btd](https://github.com/rickhelmus/patRoon/actions/workflows/btd.yml/badge.svg)](https://github.com/rickhelmus/patRoon/actions/workflows/btd.yml)
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
+[![patRoon r-universe](https://rickhelmus.r-universe.dev/badges/patRoon)](https://rickhelmus.r-universe.dev/patRoon)
 [![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
 

@@ -10,6 +10,7 @@ on:
                 type: boolean
                 description: Perform tests
                 default: true
+    push
 jobs:
     build-test-matrix: # based on https://stackoverflow.com/a/75337311
         strategy:
@@ -27,6 +28,7 @@ jobs:
         needs: build-test-matrix
         runs-on: windows-latest
         name: Update patRoonDeps
+        if: github.ref == 'refs/heads/master'
         steps:
             - uses: actions/checkout@v3
               with:
@@ -60,7 +62,7 @@ jobs:
         needs: build-test-matrix
         runs-on: windows-latest
         name: Make bundle pre-release
-        if:  ${{ inputs.makeBundle }}
+        if:  ${{ inputs.makeBundle }} && github.ref == 'refs/heads/master'
         steps:
             - name: Get bundle
               uses: actions/download-artifact@v3
@@ -75,6 +77,6 @@ jobs:
                   tag_name: prerelease
                   name: 'Automated Pre-release $$'
                   prerelease: true
-                  body: 'TODO: Add release notes'
+                  body: 'This is an automated pre-release of the patRoon bundle. See the installation handbook for details.'
                   files: |
                         patRoon-bundle-*.zip

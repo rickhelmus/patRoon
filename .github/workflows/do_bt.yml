@@ -127,12 +127,6 @@ jobs:
                   patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE, quiet = FALSE, ignorePkgs = "MetaCleanData")
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
-              env:
-                  PATROON_METFRAG: D:/a/_temp/Library/patRoonExt/ext/MetFragCommandLine.jar
-                  PATROON_SIRIUS: D:/a/_temp/Library/patRoonExt/ext/sirius
-                  PATROON_BIOTRANSFORMER: D:/a/_temp/Library/patRoonExt/ext/biotransformer/biotransformer-3.0.0.jar
-                  PATROON_OBABEL: D:/a/_temp/Library/patRoonExt/ext/openbabel
-                  PATROON_OPENMS: D:/a/_temp/Library/patRoonExt/ext/openms/bin
               with:
                   args: 'c("--no-manual")'
                   build_args: 'c("--no-manual", "--no-build-vignettes")'

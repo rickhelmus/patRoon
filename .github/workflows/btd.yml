@@ -10,7 +10,7 @@ on:
                 type: boolean
                 description: Perform tests
                 default: true
-    push
+    push:
 jobs:
     build-test-matrix: # based on https://stackoverflow.com/a/75337311
         strategy:

@@ -13,7 +13,9 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
-**May 2023** `patRoon 2.2` is now released. This most significant change is the addition of a new reporting interface, which brings a much improved HTML interface, many optimizations and other important new functionality. Furthermore, `patRoon 2.2` introduces improved `SIRIUS 5` support, a new TP screening algorithm using formula libraries and many other improvements, of which many thanks to the great user feedback. Please see the [Project NEWS][NEWS] for details.
+**November 2023** `patRoon 2.3` is now released. The most significant changes include improved installation strategies and integration of [MS2Tox] and [MS2Quant] to predict feature toxicities and concentrations. Please see the [Project NEWS][NEWS] for more details and important notes on updating `patRoon`.
+
+**May 2023** `patRoon 2.2` is now released. The most significant change is the addition of a new reporting interface, which brings a much improved HTML interface, many optimizations and other important new functionality. Furthermore, `patRoon 2.2` introduces improved `SIRIUS 5` support, a new TP screening algorithm using formula libraries and many other improvements, of which many thanks to the great user feedback. Please see the [Project NEWS][NEWS] for details.
 
 **March 2023** The Docker images moved to a new host. Please see the see [installation details in the handbook][handbook-inst] to obtain the latest images.
 
@@ -157,3 +159,5 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [flexdashboard]: https://pkgs.rstudio.com/flexdashboard/
 [bslib]: https://rstudio.github.io/bslib/
 [reactable]: https://glin.github.io/reactable/
+[MS2Tox]: https://github.com/kruvelab/MS2Tox
+[MS2Quant]: https://github.com/kruvelab/MS2Quant

@@ -1,27 +1,63 @@
-# DEVEL
+# patRoon 2.3
+
+This release adds significant new functionality, several important changes and several bug fixes thanks to user feedback.
+
+Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next section. Furthermore, it **is important** to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+
+## Important new functionality and changes
+
+### Revamped installation of patRoon and its dependencies
+
+This release adds new way to install and update `patRoon` and its dependencies. The most important changes are
+
+* Introduction of `patRoon` bundles: these are standalone installations of `R`, `patRoon` and its `R` package dependencies, and all other external dependencies such as [MetFrag][MetFragCL], OpenJDK, [OpenMS] etc. This is primarily useful for users not familiar to `R` or wanting to quickly try a new `patRoon` release.
+* Semi automated installations with the [patRoonInst] auxiliary package. This package will install `patRoon` and its dependencies automatically, which prevents the need to manually install packages from different sources (BioConductor, GitHub etc). Furthermore, this package also installs `patRoonExt`, another axuliary package that bundles most external dependencies (e.g. [MetFrag][MetFragCL], [PubChemLite][PCLite-dl], [OpenMS]).
+* The old `patRoon_install` script is now replaced by the above installation methids, and is therefore considered deprecated, will be removed in the future and should therefore not be used anymore.
+
+For more information, please read the [updated installation chapter][hb-inst] in the handbook, and see the project pages of [patRoonInst] and [patRoonExt].
+
+> **_IMPORTANT_** If you installed `patRoon` via the legacy installation script, please read the [installation chapter][hb-inst] to disable/remove this installation prior to updating `patRoon`!
+
+### Prediction of feature toxicities and concentrations (MS2Tox/MS2Quant integration)
+
+The second milestone of this release is the integration of the [MS2Tox] and [MS2Quant] `R` packages, which support machine learning approaches to predict the toxicity and concentration of features. The integration adds the following functionality to `patRoon`:
+
+* Automated prediction of toxicity (fish LC50) and response factors/concentrations for features from [SIRIUS+CSI:FingerID] fingerprints or `SMILES`.
+* The predictions can be made from suspect data and formula/compound annotation candidates. These can be combined and aggregated when calculating toxicities/concentrations for features.
+* The `as.data.table()` function and reporting interface were updated to inspect the predicted toxicities/concentrations.
+* Various new filters were added to prioritize data on calculated toxicities, response factors and concentrations.
+* Various small usability improvements to simplify calibrations and concentration units.
+
+Please see the [relevant section in the handbook](https://rickhelmus.github.io/patRoon/handbook_bd/pred.html), and the project pages of [MS2Tox] and [MS2Quant] for more details.
+
+## Minor new functionality and changes
 
 * `loadMSLibrary()`: improve compatibility with more `.msp` flavors (issue #72).
 * `newProject()`: save/load parameters to reproduce subsequent project creations (issue #61)
+* `groupFeaturesOpenMS()`: now supports handling large numbers of analyses on Windows (reported by Geert Franken, fix thanks to https://github.com/OpenMS/OpenMS/issues/6845).
+* Add package option `patRoon.checkCentroided` to control whether analyses files are verified to be centroided (suggested by Geert Franken).
+* Updated PubChem transformations to v0.1.7
+* Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
+* `overlap()`: the `which` param can now also be a `list` to compare groups of replicate groups (similar to `plotVenn()`)
+* `consensus()` method for `featureGroups`: new `verifyAnaInfo` flag to optionally skip if the analysis information are equal for all compared objects. This is mainly useful when the data is the same but in different formats.
+* Compatibility with OpenMS 3.0
+* Windows CI is now performed on GitHub actions instead of AppVeyor.
+
+## Fixes
+
 * Fixed: in rare cases EICs were incorrectly loaded from cache
 * Fixed: `report()` now correctly handles SIRIUS compounds results and suspects without SMILES
-* `groupFeaturesOpenMS()`: workaround to avoid errors on Windows with large numbers of analyses (reported by Geert Franken, fix thanks to https://github.com/OpenMS/OpenMS/issues/6845).
-* Add package option `patRoon.checkCentroided` to control whether analyses files are verified to be centroided (suggested by Geert Franken).
 * Fixed: report layout is now compatible with `bslib 0.5.0` (reported by Alessia Ore)
 * Fixed: `annotatedBy` filter for `MSPeakLists` could remove precursor peaks in MS/MS data regardless if `retainPrecursorMSMS=TRUE`
 * Fixed: `report()`: The `suspect(s)` column for compound annotation results was always empty
 * Fixed: the `reAverage` argument was ignored by the `filter()` method of `MSPeakLists` when checking if cached data is available (issue #87)
 * Fixed: if `reAverage=TRUE` to the `filter()` method of `MSPeakLists` then the peak IDs were not regenerated (issue #87)
-* Updated PubChem transformations to v0.1.7
-* Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)
 * Fixed: Suspect screening results were incorrectly merged with >2 sets (issue #90)
-* `overlap()`: the `which` param can now also be a `list` to compare groups of replicate groups (similar to `plotVenn()`)
 * Fixed: `plotSpectrum()` method for `formulas`/`compounds` didn't expand plot height for formula annotations with only one mass peak
 * Fixed: `annotatedPeakList()`/`plotSpectrum()` methods for `compounds` didn't label mass peaks with compounds algorithm if `formulas` were provided but no formula candidate was present.
-* `consensus()` method for `featureGroups`: new `verifyAnaInfo` flag to optionally skip if the analysis information are equal for all compared objects. This is mainly useful when the data is the same but in different formats.
 * Fixed: in some specific conditions the plot() would throw an error ("cannot coerce type 'S4' to vector of type 'double'")
 * Fixed: `generateFormulas()` generic definition had wrong argument order
 * Fixed: `getSIRIUSToken()` resulted in errors if the password input was cancelled.
-* Compatibility with OpenMS 3.0
 
 
 # patRoon 2.2
@@ -1007,3 +1043,11 @@ Other changes
 [Codecov]: https://codecov.io/gh/rickhelmus/patRoon
 [DH]: https://hub.docker.com/r/patroonorg/patroon/
 [fastcluster]: https://cran.r-project.org/web/packages/fastcluster/index.html
+[patRoonInst]: https://github.com/rickhelmus/patRoonInst
+[patRoonExt]: https://github.com/rickhelmus/patRoonExt
+[hb-inst]: https://rickhelmus.github.io/patRoon/handbook_bd/installation.html
+[MetFragCL]: http://ipb-halle.github.io/MetFrag/projects/metfragcl/
+[OpenMS]: http://openms.de/
+[PCLite-dl]: https://zenodo.org/record/6503754
+[MS2Tox]: https://github.com/kruvelab/MS2Tox
+[MS2Quant]: https://github.com/kruvelab/MS2Quant

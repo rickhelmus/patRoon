@@ -163,7 +163,7 @@ Dependency                          | Remarks
 [MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag.
 [MetFrag PubChem OECD PFAS DB][PC-PFAS] | Database file to use the OECD PFAS database with MetFrag.
 [SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
-[BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonDeps/raw/master/ext/biotransformer-3.0.0.jar).
+[BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonExt/raw/master/tools/biotransformer-3.0.0.jar).
 [SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
 [pngquant]                          | Used to reduce size of HTML reports (only legacy interface), definitely optional.
 
@@ -197,7 +197,7 @@ options(patRoon.path.MetFragCL = "~/MetFragCommandLine-2.4.8.jar") # full locati
 options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
 options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv") # full location to desired PubChemLite CSV file
 options(patRoon.path.MetFragPubChemLite = "~/PubChem_OECDPFAS_largerPFASparts_20220324") # full location to PFAS DB (NOTE: configured like PubChemLite)
-options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.1.jar")
+options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.0.jar")
 options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
 ```
 

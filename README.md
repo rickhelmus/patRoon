@@ -63,7 +63,7 @@ workflow steps are optional, fully configurable and algorithms can easily be mix
 * Fully open-source (GPLv3).
 * Developed on Windows, Linux and macOS
 * S4 classes and generics are used to implement a consistent interface to all supported algorithms.
-* Continuous integration is used for automated unit testing, automatically updating the [Website][ghweb] and documentation and maintaining a [miniCRAN] [repository][patRoonDeps] and [Docker image][DockerImg] to simplify installation (see [the handbook][handbook-inst] for more details).
+* Continuous integration is used to automatically perform unit tests, update the [Website][ghweb] and documentation, and maintaining installation resources such as the [patRoonDeps repository][patRoonDeps], [Docker image][DockerImg] and `patRoon` bundle (see [the handbook][handbook-inst] for more details).
 * Supports all major instrument vendor input formats (through usage of [ProteoWizard] and [DataAnalysis]).
 * Optimizations
     * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
@@ -77,9 +77,7 @@ workflow steps are optional, fully configurable and algorithms can easily be mix
 
 ## Installation
 
-`patRoon` itself can be installed as any other `R` package, however, some additional installation steps are needed to
-install its dependencies. Alternatively, [R Studio][RStudio] based Docker images are available to easily deploy a
-complete `patRoon` environment. Please see the [installation section in the handbook][handbook-inst] for more
+`patRoon` and its dependencies can be installed in various ways. Please see the [installation section in the handbook][handbook-inst] for more
 information.
 
 

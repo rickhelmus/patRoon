@@ -1,4 +1,4 @@
-# patRoon <img src="https://raw.githubusercontent.com/rickhelmus/patRoon/master/logo.png" height="150" align="right"></img>
+# patRoon <img src="https://raw.githubusercontent.com/rickhelmus/patRoon/master/logo.png" style="width: 25%;" align="right"></img>
 
 [![CircleCI](https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg)](https://circleci.com/gh/rickhelmus/patRoon)
 [![btd](https://github.com/rickhelmus/patRoon/actions/workflows/btd.yml/badge.svg)](https://github.com/rickhelmus/patRoon/actions/workflows/btd.yml)

@@ -69,7 +69,12 @@ getRDepsTab <- function(format)
     if (format == "html")
         tab[, package := sprintf("<a href='%s'>%s</a>", url, name)]
     else # latex
-        tab[, package := sprintf("\\href{%s}{%s}", url, name)]
+    {
+        # BUG: this generates errors with knitr, just don't use URLs for now
+        # tab[, package := sprintf("\\href{%s}{%s}", url, name)]
+        tab[, package := name]
+    }
+        
     tab[, comments := sapply(depsList, depComments)]
     # tab[, installPD := mapply(name, depsList[name], FUN = depInstPD)]
     # tab[, installRU := mapply(name, depsList[name], FUN = depInstRU)]

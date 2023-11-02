@@ -6,7 +6,8 @@ jobs:
         name: Make bundle pre-release
         steps:
             - name: Get bundle
-              echo hi > bundle.txt
+              run: |
+                  echo hi > bundle.txt
             - name: Make pre-release
               uses: ncipollo/release-action@v1
               with:

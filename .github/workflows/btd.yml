@@ -69,7 +69,6 @@ jobs:
               with:
                   name: bundle
             - name: Make pre-release
-              if: ${{ false }}
               uses: andelf/nightly-release@main
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -483,16 +483,16 @@ For all arguments see the reference manual (`?makeHClust`).
 The resulting object is of type `compoundsCluster`. Several methods are defined to modify and inspect these results:
 
 ```{r cClustObj,eval=FALSE}
-# plot MCS of first cluster from candidates of M109_R116_61
-plotStructure(compsClust, groupName = "M109_R116_61", 1)
+# plot MCS of first cluster from candidates of M192_R355_191
+plotStructure(compsClust, groupName = "M192_R355_191", 1)
 
 # plot dendrogram
-plot(compsClust, groupName = "M109_R116_61")
+plot(compsClust, groupName = "M192_R355_191")
 
 # re-assign clusters for a feature group
-compsClust <- treeCut(compsClust, k = 5, groupName = "M109_R116_61")
+compsClust <- treeCut(compsClust, k = 5, groupName = "M192_R355_191")
 # ditto, but automatic cluster determination
-compsClust <- treeCutDynamic(compsClust, minModuleSize = 3, groupName = "M109_R116_61")
+compsClust <- treeCutDynamic(compsClust, minModuleSize = 3, groupName = "M192_R355_191")
 ```
 
 For a complete overview see the reference manual (`?compoundsCluster`).

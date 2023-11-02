@@ -52,4 +52,5 @@ options(datatable.print.nrows = 15)
 if (file.exists("~/.Rprofile"))
     source("~/.Rprofile")
 
+library(data.table)
 library(patRoon)

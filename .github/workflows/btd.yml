@@ -58,6 +58,8 @@ jobs:
                   git status
                   git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
                   git push
+                  git tag -f prerelease
+                  git push -f origin prerelease
     release:
         needs: build-test-matrix
         runs-on: windows-latest
@@ -69,13 +71,20 @@ jobs:
               with:
                   name: bundle
             - name: Make pre-release
-              uses: andelf/nightly-release@main
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: ncipollo/release-action@v1
               with:
-                  tag_name: prerelease
-                  name: 'Automated Pre-release $$'
+                  tag: prerelease
+                  name: 'Automated pre-release'
+                  allowUpdates: true
+                  artifactErrorsFailBuild: true
                   prerelease: true
+                  commit: master
+                  makeLatest: true
+                  owner: rickhelmus
+                  repo: patRoonDeps
                   body: 'This is an automated pre-release of the patRoon bundle. See the installation handbook for details.'
-                  files: |
+                  artifacts: |
                         patRoon-bundle-*.zip
+                  removeArtifacts: true
+                  replacesArtifacts: true
+                  token: ${{ secrets.PAT }}

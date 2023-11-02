@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>8.12 Parallelization | patRoon handbook</title>
-  <meta name="description" content="8.12 Parallelization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <title>8.13 Parallelization | patRoon handbook</title>
+  <meta name="description" content="8.13 Parallelization | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="8.12 Parallelization | patRoon handbook" />
+  <meta property="og:title" content="8.13 Parallelization | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="8.12 Parallelization | patRoon handbook" />
+  <meta name="twitter:title" content="8.13 Parallelization | patRoon handbook" />
   
   
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -348,12 +361,12 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="parallelization" class="section level2 hasAnchor" number="8.12">
-<h2><span class="header-section-number">8.12</span> Parallelization<a href="parallelization.html#parallelization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="parallelization" class="section level2 hasAnchor" number="8.13">
+<h2><span class="header-section-number">8.13</span> Parallelization<a href="parallelization.html#parallelization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Some steps in the non-target screening workflow are inherently computationally intensive. To reduce computational times <code>patRoon</code> is able to perform <em>parallelization</em> for most of the important functionality. This is especially useful if you have a modern system with multiple CPU cores and sufficient RAM.</p>
 <p>For various technical reasons several parallelization techniques are used, these can be categorized as <em>parallelization of <code>R</code> functions</em> and <em>multiprocessing</em>. The next sections describe both parallelization approaches in order to let you optimize the workflow.</p>
-<div id="parellization-of-r-functions" class="section level3 hasAnchor" number="8.12.1">
-<h3><span class="header-section-number">8.12.1</span> Parellization of R functions<a href="parallelization.html#parellization-of-r-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="parellization-of-r-functions" class="section level3 hasAnchor" number="8.13.1">
+<h3><span class="header-section-number">8.13.1</span> Parellization of R functions<a href="parallelization.html#parellization-of-r-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several functions of <code>patRoon</code> support parallelization.</p>
 <table>
 <colgroup>
@@ -372,12 +385,22 @@ div.csl-indent {
 <tr class="odd">
 <td><code>findFeatures</code></td>
 <td>Obtain feature data</td>
-<td>Only <code>envipick</code> and <code>kpic2</code> algorithms</td>
+<td>Only <code>envipick</code> and <code>kpic2</code> algorithms.</td>
 </tr>
 <tr class="even">
 <td><code>generateComponents</code></td>
 <td>Generate components</td>
 <td>Only <code>cliquems</code> algorithm.</td>
+</tr>
+<tr class="odd">
+<td><code>report</code></td>
+<td>Reporting data</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>generateTPs</code></td>
+<td>Obtain transformation products</td>
+<td>Only <code>cts</code> algorithm.</td>
 </tr>
 <tr class="odd">
 <td><code>optimizeFeatureFinding</code>, <code>optimizeFeatureGrouping</code></td>
@@ -389,18 +412,23 @@ div.csl-indent {
 <td>Calculate feature (group) qualities</td>
 <td>Discussed <a href="peakQual.html#peakQual">here</a>.</td>
 </tr>
+<tr class="odd">
+<td><code>predictTox</code> / <code>predictRespFactors</code></td>
+<td>Prediction of toxicities/concentrations }</td>
+<td>Only <code>compounds</code> methods. Discussed <a href="pred.html#pred">here</a>.</td>
+</tr>
 </tbody>
 </table>
 <p>The parallelization is achieved with the <a href="https://github.com/HenrikBengtsson/future">future</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools">future.apply</a> <code>R</code> packages. To enable parallelization of these functions the <code>parallel</code> argument must be set to <code>TRUE</code> and the future framework must be properly configured in advance. For example:</p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="parallelization.html#cb283-1" tabindex="-1"></a><span class="co"># setup three workers to run in parallel</span></span>
-<span id="cb283-2"><a href="parallelization.html#cb283-2" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;multisession&quot;</span>, <span class="at">workers =</span> <span class="dv">3</span>)</span>
-<span id="cb283-3"><a href="parallelization.html#cb283-3" tabindex="-1"></a></span>
-<span id="cb283-4"><a href="parallelization.html#cb283-4" tabindex="-1"></a><span class="co"># find features with enviPick in parallel</span></span>
-<span id="cb283-5"><a href="parallelization.html#cb283-5" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">parallel =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="parallelization.html#cb310-1" tabindex="-1"></a><span class="co"># setup three workers to run in parallel</span></span>
+<span id="cb310-2"><a href="parallelization.html#cb310-2" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;multisession&quot;</span>, <span class="at">workers =</span> <span class="dv">3</span>)</span>
+<span id="cb310-3"><a href="parallelization.html#cb310-3" tabindex="-1"></a></span>
+<span id="cb310-4"><a href="parallelization.html#cb310-4" tabindex="-1"></a><span class="co"># find features with enviPick in parallel</span></span>
+<span id="cb310-5"><a href="parallelization.html#cb310-5" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">parallel =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>It is important to properly configure the right future plan. Please see the documentation of the <a href="https://github.com/HenrikBengtsson/future">future</a> package for more details.</p>
 </div>
-<div id="multiprocessing" class="section level3 hasAnchor" number="8.12.2">
-<h3><span class="header-section-number">8.12.2</span> Multiprocessing<a href="parallelization.html#multiprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="multiprocessing" class="section level3 hasAnchor" number="8.13.2">
+<h3><span class="header-section-number">8.13.2</span> Multiprocessing<a href="parallelization.html#multiprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><code>patRoon</code> relies on several external (command-line) tools to generate workflow data. These commands may be executed in <em>parallel</em> to reduce computational times (‘multiprocessing’). The table below outlines the tools that are executed in parallel.</p>
 <table>
 <colgroup>
@@ -501,63 +529,62 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Which method is used is controlled by the <code>patRoon.MP.method</code> package option. Note that <code>reportHTML()</code> will always use the classic method for <code>pngquant</code>.</p>
-<div id="classic-multiprocessing-interface" class="section level4 hasAnchor" number="8.12.2.1">
-<h4><span class="header-section-number">8.12.2.1</span> Classic multiprocessing interface<a href="parallelization.html#classic-multiprocessing-interface" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="classic-multiprocessing-interface" class="section level4 hasAnchor" number="8.13.2.1">
+<h4><span class="header-section-number">8.13.2.1</span> Classic multiprocessing interface<a href="parallelization.html#classic-multiprocessing-interface" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The classic interface is the ‘original’ method implemented in <code>patRoon</code>, and is therefore well tested and optimized. It is easier to setup, works well with all tools, and is therefore the default method. It is enabled as follows:</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="parallelization.html#cb284-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;classic&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="parallelization.html#cb311-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;classic&quot;</span>)</span></code></pre></div>
 <p>The number of parallel processes is configured through the <code>patRoon.MP.maxProcs</code> option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, you may want to lower this, for instance, to keep your computer more responsive while processing or limit the RAM used by the data processing workflow.</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="parallelization.html#cb285-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>) <span class="co"># do not execute more than two tools in parallel. </span></span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="parallelization.html#cb312-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>) <span class="co"># do not execute more than two tools in parallel. </span></span></code></pre></div>
 <p>This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved with the <code>withOpt()</code> function.</p>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="parallelization.html#cb286-1" tabindex="-1"></a><span class="co"># do not execute more than two tools in parallel.</span></span>
-<span id="cb286-2"><a href="parallelization.html#cb286-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>)</span>
-<span id="cb286-3"><a href="parallelization.html#cb286-3" tabindex="-1"></a></span>
-<span id="cb286-4"><a href="parallelization.html#cb286-4" tabindex="-1"></a><span class="co"># ... but execute up to four GenForm processes</span></span>
-<span id="cb286-5"><a href="parallelization.html#cb286-5" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.maxProcs =</span> <span class="dv">4</span>, {</span>
-<span id="cb286-6"><a href="parallelization.html#cb286-6" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
-<span id="cb286-7"><a href="parallelization.html#cb286-7" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="parallelization.html#cb313-1" tabindex="-1"></a><span class="co"># do not execute more than two tools in parallel.</span></span>
+<span id="cb313-2"><a href="parallelization.html#cb313-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.maxProcs =</span> <span class="dv">2</span>)</span>
+<span id="cb313-3"><a href="parallelization.html#cb313-3" tabindex="-1"></a></span>
+<span id="cb313-4"><a href="parallelization.html#cb313-4" tabindex="-1"></a><span class="co"># ... but execute up to four GenForm processes</span></span>
+<span id="cb313-5"><a href="parallelization.html#cb313-5" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.maxProcs =</span> <span class="dv">4</span>, {</span>
+<span id="cb313-6"><a href="parallelization.html#cb313-6" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
+<span id="cb313-7"><a href="parallelization.html#cb313-7" tabindex="-1"></a>})</span></code></pre></div>
 <p>The <code>withOpt</code> function will temporarily change the given option(s) while executing a given code block and restore it afterwards (it is very similar to the <code>with_options()</code> function from the <a href="https://cran.r-project.org/web/packages/withr/index.html">withr</a> <code>R</code> package). Furthermore, notice how <code>withOpt()</code> does not require you to prefix the option names with <code>patRoon.</code>.</p>
 </div>
-<div id="multiprocessing-with-futures" class="section level4 hasAnchor" number="8.12.2.2">
-<h4><span class="header-section-number">8.12.2.2</span> Multiprocessing with futures<a href="parallelization.html#multiprocessing-with-futures" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="multiprocessing-with-futures" class="section level4 hasAnchor" number="8.13.2.2">
+<h4><span class="header-section-number">8.13.2.2</span> Multiprocessing with futures<a href="parallelization.html#multiprocessing-with-futures" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The primary goal of the “future” method is to allow parallel processing on one or more external computers. Since it uses the <a href="https://github.com/HenrikBengtsson/future">future</a> <code>R</code> package, many approaches are supported, such as local parallelization (similar to the <code>classic</code> method), cluster computing via multiple networked computers and more advanced HPC approaches such as <code>slurm</code> via the <a href="https://github.com/HenrikBengtsson/future.batchtools">future.batchtools</a> <code>R</code> package. This parallelization method can be activated as follows:</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="parallelization.html#cb287-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
-<span id="cb287-2"><a href="parallelization.html#cb287-2" tabindex="-1"></a></span>
-<span id="cb287-3"><a href="parallelization.html#cb287-3" tabindex="-1"></a><span class="co"># set a future plan</span></span>
-<span id="cb287-4"><a href="parallelization.html#cb287-4" tabindex="-1"></a></span>
-<span id="cb287-5"><a href="parallelization.html#cb287-5" tabindex="-1"></a><span class="co"># example 1: start a local cluster with four nodes</span></span>
-<span id="cb287-6"><a href="parallelization.html#cb287-6" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
-<span id="cb287-7"><a href="parallelization.html#cb287-7" tabindex="-1"></a></span>
-<span id="cb287-8"><a href="parallelization.html#cb287-8" tabindex="-1"></a><span class="co"># example 2: start a networked cluster with four nodes on PC with hostname &quot;otherpc&quot;</span></span>
-<span id="cb287-9"><a href="parallelization.html#cb287-9" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="fu">rep</span>(<span class="st">&quot;otherpc&quot;</span>, <span class="dv">4</span>)) </span></code></pre></div>
+<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="parallelization.html#cb314-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
+<span id="cb314-2"><a href="parallelization.html#cb314-2" tabindex="-1"></a></span>
+<span id="cb314-3"><a href="parallelization.html#cb314-3" tabindex="-1"></a><span class="co"># set a future plan</span></span>
+<span id="cb314-4"><a href="parallelization.html#cb314-4" tabindex="-1"></a></span>
+<span id="cb314-5"><a href="parallelization.html#cb314-5" tabindex="-1"></a><span class="co"># example 1: start a local cluster with four nodes</span></span>
+<span id="cb314-6"><a href="parallelization.html#cb314-6" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
+<span id="cb314-7"><a href="parallelization.html#cb314-7" tabindex="-1"></a></span>
+<span id="cb314-8"><a href="parallelization.html#cb314-8" tabindex="-1"></a><span class="co"># example 2: start a networked cluster with four nodes on PC with hostname &quot;otherpc&quot;</span></span>
+<span id="cb314-9"><a href="parallelization.html#cb314-9" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="fu">rep</span>(<span class="st">&quot;otherpc&quot;</span>, <span class="dv">4</span>)) </span></code></pre></div>
 <p>Please see the documentation of the respective packages (<em>e.g.</em> <a href="https://github.com/HenrikBengtsson/future">future</a> and <a href="https://github.com/HenrikBengtsson/future.batchtools">future.batchtools</a>) for more details on how to configure the workers.</p>
 <p>The <code>withOpt()</code> function introduced in the previous subsection can also be used to temporarily switch between parallelization approaches, for instance:</p>
-<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="parallelization.html#cb288-1" tabindex="-1"></a><span class="co"># default to future parallelization</span></span>
-<span id="cb288-2"><a href="parallelization.html#cb288-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
-<span id="cb288-3"><a href="parallelization.html#cb288-3" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
-<span id="cb288-4"><a href="parallelization.html#cb288-4" tabindex="-1"></a></span>
-<span id="cb288-5"><a href="parallelization.html#cb288-5" tabindex="-1"></a><span class="co"># ... do workflow</span></span>
-<span id="cb288-6"><a href="parallelization.html#cb288-6" tabindex="-1"></a></span>
-<span id="cb288-7"><a href="parallelization.html#cb288-7" tabindex="-1"></a><span class="co"># do classic parallelization for GenForm</span></span>
-<span id="cb288-8"><a href="parallelization.html#cb288-8" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.method =</span> <span class="st">&quot;classic&quot;</span>, {</span>
-<span id="cb288-9"><a href="parallelization.html#cb288-9" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
-<span id="cb288-10"><a href="parallelization.html#cb288-10" tabindex="-1"></a>})</span>
-<span id="cb288-11"><a href="parallelization.html#cb288-11" tabindex="-1"></a></span>
-<span id="cb288-12"><a href="parallelization.html#cb288-12" tabindex="-1"></a><span class="co"># .. do more workflow</span></span></code></pre></div>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="parallelization.html#cb315-1" tabindex="-1"></a><span class="co"># default to future parallelization</span></span>
+<span id="cb315-2"><a href="parallelization.html#cb315-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.MP.method =</span> <span class="st">&quot;future&quot;</span>)</span>
+<span id="cb315-3"><a href="parallelization.html#cb315-3" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">&quot;cluster&quot;</span>, <span class="at">workers =</span> <span class="dv">4</span>)</span>
+<span id="cb315-4"><a href="parallelization.html#cb315-4" tabindex="-1"></a></span>
+<span id="cb315-5"><a href="parallelization.html#cb315-5" tabindex="-1"></a><span class="co"># ... do workflow</span></span>
+<span id="cb315-6"><a href="parallelization.html#cb315-6" tabindex="-1"></a></span>
+<span id="cb315-7"><a href="parallelization.html#cb315-7" tabindex="-1"></a><span class="co"># do classic parallelization for GenForm</span></span>
+<span id="cb315-8"><a href="parallelization.html#cb315-8" tabindex="-1"></a><span class="fu">withOpt</span>(<span class="at">MP.method =</span> <span class="st">&quot;classic&quot;</span>, {</span>
+<span id="cb315-9"><a href="parallelization.html#cb315-9" tabindex="-1"></a>    formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, ...)</span>
+<span id="cb315-10"><a href="parallelization.html#cb315-10" tabindex="-1"></a>})</span>
+<span id="cb315-11"><a href="parallelization.html#cb315-11" tabindex="-1"></a></span>
+<span id="cb315-12"><a href="parallelization.html#cb315-12" tabindex="-1"></a><span class="co"># .. do more workflow</span></span></code></pre></div>
 </div>
-<div id="logging" class="section level4 hasAnchor" number="8.12.2.3">
-<h4><span class="header-section-number">8.12.2.3</span> Logging<a href="parallelization.html#logging" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="logging" class="section level4 hasAnchor" number="8.13.2.3">
+<h4><span class="header-section-number">8.13.2.3</span> Logging<a href="parallelization.html#logging" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Most tools that are executed in parallel will log their output to text files. These files may contain valuable information, for instance, when an error occurred. By default, the logfiles are stored in the <code>log</code> directory placed in the current working directory. However, you can change this location by setting the <code>patRoon.MP.logPath</code> option. If you set this option to <code>FALSE</code> then no logging occurs.</p>
 </div>
 </div>
-<div id="notes-when-using-parallelization-with-futures" class="section level3 hasAnchor" number="8.12.3">
-<h3><span class="header-section-number">8.12.3</span> Notes when using parallelization with futures<a href="parallelization.html#notes-when-using-parallelization-with-futures" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="notes-when-using-parallelization-with-futures" class="section level3 hasAnchor" number="8.13.3">
+<h3><span class="header-section-number">8.13.3</span> Notes when using parallelization with futures<a href="parallelization.html#notes-when-using-parallelization-with-futures" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Some important notes when using the <code>future</code> parallelization method:</p>
 <ul>
 <li><code>GenForm</code> currently performs less optimal with future multiprocessing to the <code>classic</code> approach. Nevertheless, it may still be interesting to use the <code>future</code> method to move the computations to another system to free up resources on your local system.</li>
 <li>Behind the scenes the <a href="https://github.com/HenrikBengtsson/future.batchtools">future.apply</a> package is used to schedule the tools to be executed. The <code>patRoon.MP.futureSched</code> option sets the value for the <code>future.scheduling</code> argument to the <code>future_lapply()</code> function, and therefore allows you to tweak the scheduling.</li>
-<li>Make sure that <code>patRoon</code> and in case of multiprocessing that the tool to be executed (<code>MetFrag</code>, <code>SIRIUS</code> etc.) are exactly the <em>same</em> version on all computing hosts.</li>
-<li>Make sure that <code>patRoon</code> is properly configured on all hosts, <em>e.g.</em> set the <code>patRoon.path.XXX</code> options to ensure all tools can be found.</li>
-<li>For <code>MetFrag</code> annotation: if a local database such as <code>PubChemLite</code> is used, it must be present on each computing node as well. Furthermore, the local computer (even if not used for the computations) <em>also</em> must have this file present. Like the previous point, make sure that the <code>patRoon.path.XXX</code> options are set properly.</li>
+<li>Make sure that <code>patRoon</code> is present and with the same version on all computing hosts.</li>
+<li>Make sure that any external dependencies used by multiprocessing, such as <code>MetFrag</code> and <code>SIRIUS</code>, and local compound databases, such as as <code>PubChemLite</code>, are also with the same version and are configured properly. See the <a href="installation.html#installation">Installation</a> section for more details.</li>
 <li>If you encounter errors then it may be handy to switch to <code>future::plan("sequential")</code> and see if it works or you get more descriptive error messages.</li>
 <li>In order to restart the nodes, for instance after re-configuring <code>patRoon</code>, updating <code>R</code> packages etc, simply re-execute <code>future::plan(...)</code>.</li>
 <li>Setting the <code>future.debug</code> package option to <code>TRUE</code> may give you more insight what is happening to find problems.</li>

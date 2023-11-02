@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -150,6 +150,8 @@ filter(
   minAnnSimBoth = NULL,
   absMinFragMatches = NULL,
   relMinFragMatches = NULL,
+  minRF = NULL,
+  maxLC50 = NULL,
   negate = FALSE
 )
 
@@ -198,6 +200,8 @@ filter(
   minAnnSimBoth = NULL,
   absMinFragMatches = NULL,
   relMinFragMatches = NULL,
+  minRF = NULL,
+  maxLC50 = NULL,
   negate = FALSE
 )
 
@@ -296,41 +300,44 @@ results were removed after they were generated (<em>e.g.</em> by use of
 
 
 <dt>selectHitsBy</dt>
-<dd><p>Should be <code>"intensity"</code> or <code>"level"</code>. For cases
-where the same suspect is matched to multiple feature groups, only the
-suspect to the feature group with highest mean intensity
-(<code>selectHitsBy="intensity"</code>) or best identification level
-(<code>selectHitsBy="level"</code>) is kept. In case of ties only the first hit
-is kept. Set to <code>NULL</code> to ignore this filter. If <code>negate=TRUE</code>
-then only those hits with lowest mean intensity/poorest identification
-level are kept.</p></dd>
+<dd><p>Should be <code>"intensity"</code> or <code>"level"</code>. For cases where the same suspect is matched to
+multiple feature groups, only the suspect to the feature group with highest mean intensity
+(<code>selectHitsBy="intensity"</code>) or best identification level (<code>selectHitsBy="level"</code>) is kept. In case of
+ties only the first hit is kept. Set to <code>NULL</code> to ignore this filter. If <code>negate=TRUE</code> then only those
+hits with lowest mean intensity/poorest identification level are kept.</p></dd>
 
 
 <dt>selectBestFGroups</dt>
-<dd><p>If <code>TRUE</code> then for any cases where a single
-feature group is matched to several suspects only the suspect assigned to
-the feature group with best identification score is kept. In case of ties
+<dd><p>If <code>TRUE</code> then for any cases where a single feature group is matched to several
+suspects only the suspect assigned to the feature group with best identification score is kept. In case of ties
 only the first is kept.</p></dd>
 
 
 <dt>maxLevel, maxFormRank, maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth</dt>
-<dd><p>Filter suspects by maximum identification level (<em>e.g.</em> <code>"3a"</code>),
-formula/compound rank or with minimum formula/compound/combined annotation
-similarity. Set to <code>NULL</code> to ignore.</p></dd>
+<dd><p>Filter suspects by maximum
+identification level (<em>e.g.</em> <code>"3a"</code>), formula/compound rank or with minimum formula/compound/combined
+annotation similarity. Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt>absMinFragMatches, relMinFragMatches</dt>
-<dd><p>Only retain suspects with this
-minimum number MS/MS matches with the fragments specified in the suspect
-list (<em>i.e.</em> <code>fragments_mz</code>/<code>fragments_formula</code>).
-<code>relMinFragMatches</code> sets the minimum that is relative (<samp>0-1</samp>) to
-the maximum number of MS/MS fragments specified in the <code>fragments_*</code>
-columns of the suspect list. Set to <code>NULL</code> to ignore.</p></dd>
+<dd><p>Only retain suspects with this minimum number MS/MS matches with the
+fragments specified in the suspect list (<em>i.e.</em> <code>fragments_mz</code>/<code>fragments_formula</code>).
+<code>relMinFragMatches</code> sets the minimum that is relative (<samp>0-1</samp>) to the maximum number of MS/MS fragments
+specified in the <code>fragments_*</code> columns of the suspect list. Set to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt>minRF</dt>
+<dd><p>Filter suspect hits by the given minimum predicted response factor (as calculated by
+<code><a href="generics.html">predictRespFactors</a></code>). Set to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt>maxLC50</dt>
+<dd><p>Filter suspect hits by the given maximum toxicity (LC50) (as calculated by
+<code><a href="generics.html">predictTox</a></code>). Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt>negate</dt>
-<dd><p>If set to <code>TRUE</code> then filtering operations are performed
-in opposite manner.</p></dd>
+<dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
 
 
 <dt>sets</dt>
@@ -350,10 +357,7 @@ in opposite manner.</p></dd>
 <p><code><a href="featureGroups-class.html">featureGroups</a></code> object amended with annotation data.</p>
 
 
-<p><code>filter</code> returns a filtered <code>featureGroupsScreening</code></p>
-
-
-<p>object.</p>
+<p><code>filter</code> returns a filtered <code>featureGroupsScreening</code> object.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
@@ -372,14 +376,11 @@ properties and annotation data.</p></li>
 with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
 the <code>Suspect annotation</code> section for more details. The estimation of identification levels for each suspect is
 logged in the <code>log/ident</code> directory.</p></li>
-<li><p><code>filter(featureGroupsScreening)</code>: Performs rule based filtering. This method
-builds on the comprehensive filter functionality from the base
-<code><a href="feature-filtering.html">filter,featureGroups-method</a></code>. It adds several filters to
-select <em>e.g.</em> the best ranked suspects or those with a minimum
-estimated identification level. <strong>NOTE</strong>: most filters <em>only</em>
-affect suspect hits, not feature groups. Set <code>onlyHits=TRUE</code> to
-subsequently remove any feature groups that lost any suspect matches due to
-other filter steps.</p></li>
+<li><p><code>filter(featureGroupsScreening)</code>: Performs rule based filtering. This method builds on the comprehensive filter
+functionality from the base <code><a href="feature-filtering.html">filter,featureGroups-method</a></code>. It adds several filters to select
+<em>e.g.</em> the best ranked suspects or those with a minimum estimated identification level. <strong>NOTE</strong>: most
+filters <em>only</em> affect suspect hits, not feature groups. Set <code>onlyHits=TRUE</code> to subsequently remove any
+feature groups that lost any suspect matches due to other filter steps.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -393,9 +394,8 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </dl></div>
     <div id="note">
     <h2>Note</h2>
-    <p><code>filter</code> removes suspect hits with <code>NA</code> values when any of
-  the filters related to minimum or maximum values are applied (unless
-  <code>negate=TRUE</code>).</p>
+    <p><code>filter</code> removes suspect hits with <code>NA</code> values when any of the filters related to minimum or maximum
+  values are applied (unless <code>negate=TRUE</code>).</p>
     </div>
     <div id="suspect-annotation">
     <h2>Suspect annotation</h2>
@@ -511,7 +511,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
   that is based on the 'best' estimated identification level among the sets data (<em>i.e.</em> the lowest). In case
   there is a tie between sub-levels (<em>e.g.</em> <samp>3a</samp> and <samp>3b</samp>), then the sub-level is stripped
   (<em>e.g.</em> <samp>3</samp>).</p></li>
-<li><p><code>filter</code> All filters releated to estimated identification levels and formula/compound rankings  are
+<li><p><code>filter</code> All filters related to estimated identification levels and formula/compound rankings  are
   applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
   are only removed if none of the set data confirms to the filter.</p></li>
 </ul><p>This class derives also from <code><a href="featureGroups-class.html">featureGroupsSet</a></code>. Please see its documentation for more relevant details

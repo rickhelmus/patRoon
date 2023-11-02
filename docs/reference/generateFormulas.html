@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulas</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulas</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">MSPeakLists</span>, <span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for featureGroups</span></span>
 <span><span class="fu">generateFormulas</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">MSPeakLists</span>, <span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -109,6 +109,10 @@ a subset of the object that was used to create the specified <code>MSPeakLists</
 remaining feature groups in the subset are considered.</p></dd>
 
 
+<dt>MSPeakLists</dt>
+<dd><p>An <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
 <dt>algorithm</dt>
 <dd><p>A character string describing the algorithm that should be
 used: <code>"bruker"</code>, <code>"genform"</code>, <code>"sirius"</code></p></dd>
@@ -116,10 +120,6 @@ used: <code>"bruker"</code>, <code>"genform"</code>, <code>"sirius"</code></p></
 
 <dt>...</dt>
 <dd><p>Any parameters to be passed to the selected formula generation algorithm.</p></dd>
-
-
-<dt>MSPeakLists</dt>
-<dd><p>An <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
 
 </dl></div>
     <div id="value">

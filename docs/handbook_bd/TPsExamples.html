@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>7.3 Example workflows | patRoon handbook</title>
   <meta name="description" content="7.3 Example workflows | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="7.3 Example workflows | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -355,18 +368,18 @@ div.csl-indent {
 <div id="TPsEx1" class="section level3 hasAnchor" number="7.3.1">
 <h3><span class="header-section-number">7.3.1</span> Screen predicted TPs for targets<a href="TPsExamples.html#TPsEx1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The first example is a simple workflow where TPs are predicted for a set of given parents with <a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a> and subsequently screened. A <a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a> compound database is generated and used for annotation.</p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="TPsExamples.html#cb193-1" tabindex="-1"></a><span class="co"># predict TPs for a fixed list of parents</span></span>
-<span id="cb193-2"><a href="TPsExamples.html#cb193-2" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;biotransformer&quot;</span>, <span class="at">parents =</span> patRoonData<span class="sc">::</span>suspectsPos)</span>
-<span id="cb193-3"><a href="TPsExamples.html#cb193-3" tabindex="-1"></a></span>
-<span id="cb193-4"><a href="TPsExamples.html#cb193-4" tabindex="-1"></a><span class="co"># screen for the TPs</span></span>
-<span id="cb193-5"><a href="TPsExamples.html#cb193-5" tabindex="-1"></a>suspectsTPs <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb193-6"><a href="TPsExamples.html#cb193-6" tabindex="-1"></a>fGroupsTPs <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspectsTPs, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb193-7"><a href="TPsExamples.html#cb193-7" tabindex="-1"></a></span>
-<span id="cb193-8"><a href="TPsExamples.html#cb193-8" tabindex="-1"></a><span class="co"># perform annotation of TPs</span></span>
-<span id="cb193-9"><a href="TPsExamples.html#cb193-9" tabindex="-1"></a>mslistsTPs <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroupsTPs, <span class="st">&quot;mzr&quot;</span>)</span>
-<span id="cb193-10"><a href="TPsExamples.html#cb193-10" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">FALSE</span>) <span class="co"># generate MetFrag database</span></span>
-<span id="cb193-11"><a href="TPsExamples.html#cb193-11" tabindex="-1"></a>compoundsTPs <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroupsTPs, mslistsTPs, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
-<span id="cb193-12"><a href="TPsExamples.html#cb193-12" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="TPsExamples.html#cb196-1" tabindex="-1"></a><span class="co"># predict TPs for a fixed list of parents</span></span>
+<span id="cb196-2"><a href="TPsExamples.html#cb196-2" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;biotransformer&quot;</span>, <span class="at">parents =</span> patRoonData<span class="sc">::</span>suspectsPos)</span>
+<span id="cb196-3"><a href="TPsExamples.html#cb196-3" tabindex="-1"></a></span>
+<span id="cb196-4"><a href="TPsExamples.html#cb196-4" tabindex="-1"></a><span class="co"># screen for the TPs</span></span>
+<span id="cb196-5"><a href="TPsExamples.html#cb196-5" tabindex="-1"></a>suspectsTPs <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs, <span class="at">includeParents =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb196-6"><a href="TPsExamples.html#cb196-6" tabindex="-1"></a>fGroupsTPs <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspectsTPs, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb196-7"><a href="TPsExamples.html#cb196-7" tabindex="-1"></a></span>
+<span id="cb196-8"><a href="TPsExamples.html#cb196-8" tabindex="-1"></a><span class="co"># perform annotation of TPs</span></span>
+<span id="cb196-9"><a href="TPsExamples.html#cb196-9" tabindex="-1"></a>mslistsTPs <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroupsTPs, <span class="st">&quot;mzr&quot;</span>)</span>
+<span id="cb196-10"><a href="TPsExamples.html#cb196-10" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">FALSE</span>) <span class="co"># generate MetFrag database</span></span>
+<span id="cb196-11"><a href="TPsExamples.html#cb196-11" tabindex="-1"></a>compoundsTPs <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroupsTPs, mslistsTPs, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
+<span id="cb196-12"><a href="TPsExamples.html#cb196-12" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span></code></pre></div>
 </div>
 <div id="TPsEx2" class="section level3 hasAnchor" number="7.3.2">
 <h3><span class="header-section-number">7.3.2</span> Screening TPs from a library for suspects<a href="TPsExamples.html#TPsEx2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -384,37 +397,37 @@ div.csl-indent {
 <li>The TP components are made and only feature groups with parent/TP assignments are kept.</li>
 <li>All results are reported.</li>
 </ol>
-<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="TPsExamples.html#cb194-1" tabindex="-1"></a><span class="co"># step 1</span></span>
-<span id="cb194-2"><a href="TPsExamples.html#cb194-2" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, patRoonData<span class="sc">::</span>suspectsPos, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb194-3"><a href="TPsExamples.html#cb194-3" tabindex="-1"></a><span class="co"># step 2</span></span>
-<span id="cb194-4"><a href="TPsExamples.html#cb194-4" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">parents =</span> fGroupsScr)</span>
-<span id="cb194-5"><a href="TPsExamples.html#cb194-5" tabindex="-1"></a></span>
-<span id="cb194-6"><a href="TPsExamples.html#cb194-6" tabindex="-1"></a><span class="co"># step 3</span></span>
-<span id="cb194-7"><a href="TPsExamples.html#cb194-7" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs)</span>
-<span id="cb194-8"><a href="TPsExamples.html#cb194-8" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsScr, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb194-9"><a href="TPsExamples.html#cb194-9" tabindex="-1"></a></span>
-<span id="cb194-10"><a href="TPsExamples.html#cb194-10" tabindex="-1"></a><span class="co"># step 4</span></span>
-<span id="cb194-11"><a href="TPsExamples.html#cb194-11" tabindex="-1"></a>mslistsScr <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroupsScr, <span class="st">&quot;mzr&quot;</span>)</span>
-<span id="cb194-12"><a href="TPsExamples.html#cb194-12" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb194-13"><a href="TPsExamples.html#cb194-13" tabindex="-1"></a>compoundsScr <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroupsScr, mslistsScr, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
-<span id="cb194-14"><a href="TPsExamples.html#cb194-14" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span>
-<span id="cb194-15"><a href="TPsExamples.html#cb194-15" tabindex="-1"></a></span>
-<span id="cb194-16"><a href="TPsExamples.html#cb194-16" tabindex="-1"></a><span class="co"># step 5a</span></span>
-<span id="cb194-17"><a href="TPsExamples.html#cb194-17" tabindex="-1"></a>compoundsScr <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsScr, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>)</span>
-<span id="cb194-18"><a href="TPsExamples.html#cb194-18" tabindex="-1"></a></span>
-<span id="cb194-19"><a href="TPsExamples.html#cb194-19" tabindex="-1"></a><span class="co"># step 5b</span></span>
-<span id="cb194-20"><a href="TPsExamples.html#cb194-20" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> <span class="fu">annotateSuspects</span>(fGroupsScr, <span class="at">MSPeakLists =</span> mslistsScr,</span>
-<span id="cb194-21"><a href="TPsExamples.html#cb194-21" tabindex="-1"></a>                                  <span class="at">compounds =</span> compoundsScr)</span>
-<span id="cb194-22"><a href="TPsExamples.html#cb194-22" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsScrAnn, <span class="at">maxLevel =</span> <span class="dv">3</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb194-23"><a href="TPsExamples.html#cb194-23" tabindex="-1"></a></span>
-<span id="cb194-24"><a href="TPsExamples.html#cb194-24" tabindex="-1"></a><span class="co"># step 6</span></span>
-<span id="cb194-25"><a href="TPsExamples.html#cb194-25" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroupsScrAnn, <span class="st">&quot;tp&quot;</span>, <span class="at">TPs =</span> TPs, <span class="at">MSPeakLists =</span> mslistsScr,</span>
-<span id="cb194-26"><a href="TPsExamples.html#cb194-26" tabindex="-1"></a>                               <span class="at">compounds =</span> compoundsScr)</span>
-<span id="cb194-27"><a href="TPsExamples.html#cb194-27" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> fGroupsScrAnn[results <span class="ot">=</span> componTP]</span>
-<span id="cb194-28"><a href="TPsExamples.html#cb194-28" tabindex="-1"></a></span>
-<span id="cb194-29"><a href="TPsExamples.html#cb194-29" tabindex="-1"></a><span class="co"># step 7</span></span>
-<span id="cb194-30"><a href="TPsExamples.html#cb194-30" tabindex="-1"></a><span class="fu">report</span>(fGroupsScrAnn, <span class="at">MSPeakLists =</span> mslistsScr, <span class="at">compounds =</span> compoundsScr,</span>
-<span id="cb194-31"><a href="TPsExamples.html#cb194-31" tabindex="-1"></a>       <span class="at">components =</span> componTP, <span class="at">TPs =</span> TPs)</span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="TPsExamples.html#cb197-1" tabindex="-1"></a><span class="co"># step 1</span></span>
+<span id="cb197-2"><a href="TPsExamples.html#cb197-2" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, patRoonData<span class="sc">::</span>suspectsPos, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb197-3"><a href="TPsExamples.html#cb197-3" tabindex="-1"></a><span class="co"># step 2</span></span>
+<span id="cb197-4"><a href="TPsExamples.html#cb197-4" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;library&quot;</span>, <span class="at">parents =</span> fGroupsScr)</span>
+<span id="cb197-5"><a href="TPsExamples.html#cb197-5" tabindex="-1"></a></span>
+<span id="cb197-6"><a href="TPsExamples.html#cb197-6" tabindex="-1"></a><span class="co"># step 3</span></span>
+<span id="cb197-7"><a href="TPsExamples.html#cb197-7" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs)</span>
+<span id="cb197-8"><a href="TPsExamples.html#cb197-8" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsScr, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb197-9"><a href="TPsExamples.html#cb197-9" tabindex="-1"></a></span>
+<span id="cb197-10"><a href="TPsExamples.html#cb197-10" tabindex="-1"></a><span class="co"># step 4</span></span>
+<span id="cb197-11"><a href="TPsExamples.html#cb197-11" tabindex="-1"></a>mslistsScr <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroupsScr, <span class="st">&quot;mzr&quot;</span>)</span>
+<span id="cb197-12"><a href="TPsExamples.html#cb197-12" tabindex="-1"></a><span class="fu">convertToMFDB</span>(TPs, <span class="st">&quot;TP-database.csv&quot;</span>, <span class="at">includeParents =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb197-13"><a href="TPsExamples.html#cb197-13" tabindex="-1"></a>compoundsScr <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroupsScr, mslistsScr, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;csv&quot;</span>,</span>
+<span id="cb197-14"><a href="TPsExamples.html#cb197-14" tabindex="-1"></a>                                  <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">LocalDatabasePath =</span> <span class="st">&quot;TP-database.csv&quot;</span>))</span>
+<span id="cb197-15"><a href="TPsExamples.html#cb197-15" tabindex="-1"></a></span>
+<span id="cb197-16"><a href="TPsExamples.html#cb197-16" tabindex="-1"></a><span class="co"># step 5a</span></span>
+<span id="cb197-17"><a href="TPsExamples.html#cb197-17" tabindex="-1"></a>compoundsScr <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsScr, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>)</span>
+<span id="cb197-18"><a href="TPsExamples.html#cb197-18" tabindex="-1"></a></span>
+<span id="cb197-19"><a href="TPsExamples.html#cb197-19" tabindex="-1"></a><span class="co"># step 5b</span></span>
+<span id="cb197-20"><a href="TPsExamples.html#cb197-20" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> <span class="fu">annotateSuspects</span>(fGroupsScr, <span class="at">MSPeakLists =</span> mslistsScr,</span>
+<span id="cb197-21"><a href="TPsExamples.html#cb197-21" tabindex="-1"></a>                                  <span class="at">compounds =</span> compoundsScr)</span>
+<span id="cb197-22"><a href="TPsExamples.html#cb197-22" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsScrAnn, <span class="at">maxLevel =</span> <span class="dv">3</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb197-23"><a href="TPsExamples.html#cb197-23" tabindex="-1"></a></span>
+<span id="cb197-24"><a href="TPsExamples.html#cb197-24" tabindex="-1"></a><span class="co"># step 6</span></span>
+<span id="cb197-25"><a href="TPsExamples.html#cb197-25" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroupsScrAnn, <span class="st">&quot;tp&quot;</span>, <span class="at">TPs =</span> TPs, <span class="at">MSPeakLists =</span> mslistsScr,</span>
+<span id="cb197-26"><a href="TPsExamples.html#cb197-26" tabindex="-1"></a>                               <span class="at">compounds =</span> compoundsScr)</span>
+<span id="cb197-27"><a href="TPsExamples.html#cb197-27" tabindex="-1"></a>fGroupsScrAnn <span class="ot">&lt;-</span> fGroupsScrAnn[results <span class="ot">=</span> componTP]</span>
+<span id="cb197-28"><a href="TPsExamples.html#cb197-28" tabindex="-1"></a></span>
+<span id="cb197-29"><a href="TPsExamples.html#cb197-29" tabindex="-1"></a><span class="co"># step 7</span></span>
+<span id="cb197-30"><a href="TPsExamples.html#cb197-30" tabindex="-1"></a><span class="fu">report</span>(fGroupsScrAnn, <span class="at">MSPeakLists =</span> mslistsScr, <span class="at">compounds =</span> compoundsScr,</span>
+<span id="cb197-31"><a href="TPsExamples.html#cb197-31" tabindex="-1"></a>       <span class="at">components =</span> componTP, <span class="at">TPs =</span> TPs)</span></code></pre></div>
 </div>
 <div id="TPsEx3" class="section level3 hasAnchor" number="7.3.3">
 <h3><span class="header-section-number">7.3.3</span> Non-target screening of predicted TPs<a href="TPsExamples.html#TPsEx3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -432,28 +445,28 @@ div.csl-indent {
 </ol></li>
 <li>Only feature groups are kept with parent/TP assignments and all results are reported.</li>
 </ol>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="TPsExamples.html#cb195-1" tabindex="-1"></a><span class="co"># steps 1-2</span></span>
-<span id="cb195-2"><a href="TPsExamples.html#cb195-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>)</span>
-<span id="cb195-3"><a href="TPsExamples.html#cb195-3" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb195-4"><a href="TPsExamples.html#cb195-4" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
-<span id="cb195-5"><a href="TPsExamples.html#cb195-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> formulas]</span>
-<span id="cb195-6"><a href="TPsExamples.html#cb195-6" tabindex="-1"></a></span>
-<span id="cb195-7"><a href="TPsExamples.html#cb195-7" tabindex="-1"></a><span class="co"># step 3</span></span>
-<span id="cb195-8"><a href="TPsExamples.html#cb195-8" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, <span class="at">fGroups =</span> fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb195-9"><a href="TPsExamples.html#cb195-9" tabindex="-1"></a></span>
-<span id="cb195-10"><a href="TPsExamples.html#cb195-10" tabindex="-1"></a><span class="co"># step 4</span></span>
-<span id="cb195-11"><a href="TPsExamples.html#cb195-11" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs)</span>
-<span id="cb195-12"><a href="TPsExamples.html#cb195-12" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb195-13"><a href="TPsExamples.html#cb195-13" tabindex="-1"></a></span>
-<span id="cb195-14"><a href="TPsExamples.html#cb195-14" tabindex="-1"></a><span class="co"># step 5</span></span>
-<span id="cb195-15"><a href="TPsExamples.html#cb195-15" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroupsScr, <span class="st">&quot;tp&quot;</span>, <span class="at">TPs =</span> TPs, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas)</span>
-<span id="cb195-16"><a href="TPsExamples.html#cb195-16" tabindex="-1"></a></span>
-<span id="cb195-17"><a href="TPsExamples.html#cb195-17" tabindex="-1"></a><span class="co"># step 6</span></span>
-<span id="cb195-18"><a href="TPsExamples.html#cb195-18" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">filter</span>(componTP, <span class="at">retDirMatch =</span> <span class="cn">TRUE</span>, <span class="at">formulas =</span> formulas)</span>
-<span id="cb195-19"><a href="TPsExamples.html#cb195-19" tabindex="-1"></a></span>
-<span id="cb195-20"><a href="TPsExamples.html#cb195-20" tabindex="-1"></a><span class="co"># step 7</span></span>
-<span id="cb195-21"><a href="TPsExamples.html#cb195-21" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> fGroupsScr[results <span class="ot">=</span> componTP]</span>
-<span id="cb195-22"><a href="TPsExamples.html#cb195-22" tabindex="-1"></a><span class="fu">report</span>(fGroupsScr, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">components =</span> componTP)</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="TPsExamples.html#cb198-1" tabindex="-1"></a><span class="co"># steps 1-2</span></span>
+<span id="cb198-2"><a href="TPsExamples.html#cb198-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>)</span>
+<span id="cb198-3"><a href="TPsExamples.html#cb198-3" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb198-4"><a href="TPsExamples.html#cb198-4" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
+<span id="cb198-5"><a href="TPsExamples.html#cb198-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> formulas]</span>
+<span id="cb198-6"><a href="TPsExamples.html#cb198-6" tabindex="-1"></a></span>
+<span id="cb198-7"><a href="TPsExamples.html#cb198-7" tabindex="-1"></a><span class="co"># step 3</span></span>
+<span id="cb198-8"><a href="TPsExamples.html#cb198-8" tabindex="-1"></a>TPs <span class="ot">&lt;-</span> <span class="fu">generateTPs</span>(<span class="st">&quot;logic&quot;</span>, <span class="at">fGroups =</span> fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb198-9"><a href="TPsExamples.html#cb198-9" tabindex="-1"></a></span>
+<span id="cb198-10"><a href="TPsExamples.html#cb198-10" tabindex="-1"></a><span class="co"># step 4</span></span>
+<span id="cb198-11"><a href="TPsExamples.html#cb198-11" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">convertToSuspects</span>(TPs)</span>
+<span id="cb198-12"><a href="TPsExamples.html#cb198-12" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb198-13"><a href="TPsExamples.html#cb198-13" tabindex="-1"></a></span>
+<span id="cb198-14"><a href="TPsExamples.html#cb198-14" tabindex="-1"></a><span class="co"># step 5</span></span>
+<span id="cb198-15"><a href="TPsExamples.html#cb198-15" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroupsScr, <span class="st">&quot;tp&quot;</span>, <span class="at">TPs =</span> TPs, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas)</span>
+<span id="cb198-16"><a href="TPsExamples.html#cb198-16" tabindex="-1"></a></span>
+<span id="cb198-17"><a href="TPsExamples.html#cb198-17" tabindex="-1"></a><span class="co"># step 6</span></span>
+<span id="cb198-18"><a href="TPsExamples.html#cb198-18" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">filter</span>(componTP, <span class="at">retDirMatch =</span> <span class="cn">TRUE</span>, <span class="at">formulas =</span> formulas)</span>
+<span id="cb198-19"><a href="TPsExamples.html#cb198-19" tabindex="-1"></a></span>
+<span id="cb198-20"><a href="TPsExamples.html#cb198-20" tabindex="-1"></a><span class="co"># step 7</span></span>
+<span id="cb198-21"><a href="TPsExamples.html#cb198-21" tabindex="-1"></a>fGroupsScr <span class="ot">&lt;-</span> fGroupsScr[results <span class="ot">=</span> componTP]</span>
+<span id="cb198-22"><a href="TPsExamples.html#cb198-22" tabindex="-1"></a><span class="fu">report</span>(fGroupsScr, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">components =</span> componTP)</span></code></pre></div>
 </div>
 <div id="TPsEx4" class="section level3 hasAnchor" number="7.3.4">
 <h3><span class="header-section-number">7.3.4</span> Non-target screening of TPs by annotation similarities<a href="TPsExamples.html#TPsEx4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -466,32 +479,32 @@ div.csl-indent {
 <li>Only TPs are kept that show a high MS/MS spectral similarity and share at least one fragment with their parent.</li>
 <li>Only feature groups are kept with parent/TP assignments and all results are reported.</li>
 </ol>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="TPsExamples.html#cb196-1" tabindex="-1"></a><span class="co"># step 1</span></span>
-<span id="cb196-2"><a href="TPsExamples.html#cb196-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;before&quot;</span>, <span class="st">&quot;after&quot;</span>)))</span>
-<span id="cb196-3"><a href="TPsExamples.html#cb196-3" tabindex="-1"></a>groupsParents <span class="ot">&lt;-</span> tab[classification <span class="sc">==</span> <span class="st">&quot;decrease&quot;</span>]<span class="sc">$</span>group</span>
-<span id="cb196-4"><a href="TPsExamples.html#cb196-4" tabindex="-1"></a>groupsTPs <span class="ot">&lt;-</span> tab[classification <span class="sc">==</span> <span class="st">&quot;increase&quot;</span>]<span class="sc">$</span>group</span>
-<span id="cb196-5"><a href="TPsExamples.html#cb196-5" tabindex="-1"></a></span>
-<span id="cb196-6"><a href="TPsExamples.html#cb196-6" tabindex="-1"></a><span class="co"># step 2</span></span>
-<span id="cb196-7"><a href="TPsExamples.html#cb196-7" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[, <span class="fu">union</span>(groupsParents, groupsTPs)]</span>
-<span id="cb196-8"><a href="TPsExamples.html#cb196-8" tabindex="-1"></a></span>
-<span id="cb196-9"><a href="TPsExamples.html#cb196-9" tabindex="-1"></a><span class="co"># step 3</span></span>
-<span id="cb196-10"><a href="TPsExamples.html#cb196-10" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>)</span>
-<span id="cb196-11"><a href="TPsExamples.html#cb196-11" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb196-12"><a href="TPsExamples.html#cb196-12" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
-<span id="cb196-13"><a href="TPsExamples.html#cb196-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> formulas]</span>
-<span id="cb196-14"><a href="TPsExamples.html#cb196-14" tabindex="-1"></a></span>
-<span id="cb196-15"><a href="TPsExamples.html#cb196-15" tabindex="-1"></a><span class="co"># step 4</span></span>
-<span id="cb196-16"><a href="TPsExamples.html#cb196-16" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
-<span id="cb196-17"><a href="TPsExamples.html#cb196-17" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[, groupsParents],</span>
-<span id="cb196-18"><a href="TPsExamples.html#cb196-18" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[, groupsTPs],</span>
-<span id="cb196-19"><a href="TPsExamples.html#cb196-19" tabindex="-1"></a>                               <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas)</span>
-<span id="cb196-20"><a href="TPsExamples.html#cb196-20" tabindex="-1"></a></span>
-<span id="cb196-21"><a href="TPsExamples.html#cb196-21" tabindex="-1"></a><span class="co"># step 5</span></span>
-<span id="cb196-22"><a href="TPsExamples.html#cb196-22" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">filter</span>(componTP, <span class="at">minSpecSimBoth =</span> <span class="fl">0.75</span>, <span class="at">minFragMatches =</span> <span class="dv">1</span>)</span>
-<span id="cb196-23"><a href="TPsExamples.html#cb196-23" tabindex="-1"></a></span>
-<span id="cb196-24"><a href="TPsExamples.html#cb196-24" tabindex="-1"></a><span class="co"># step 6</span></span>
-<span id="cb196-25"><a href="TPsExamples.html#cb196-25" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> componTP]</span>
-<span id="cb196-26"><a href="TPsExamples.html#cb196-26" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">components =</span> componTP)</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="TPsExamples.html#cb199-1" tabindex="-1"></a><span class="co"># step 1</span></span>
+<span id="cb199-2"><a href="TPsExamples.html#cb199-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;before&quot;</span>, <span class="st">&quot;after&quot;</span>)))</span>
+<span id="cb199-3"><a href="TPsExamples.html#cb199-3" tabindex="-1"></a>groupsParents <span class="ot">&lt;-</span> tab[classification <span class="sc">==</span> <span class="st">&quot;decrease&quot;</span>]<span class="sc">$</span>group</span>
+<span id="cb199-4"><a href="TPsExamples.html#cb199-4" tabindex="-1"></a>groupsTPs <span class="ot">&lt;-</span> tab[classification <span class="sc">==</span> <span class="st">&quot;increase&quot;</span>]<span class="sc">$</span>group</span>
+<span id="cb199-5"><a href="TPsExamples.html#cb199-5" tabindex="-1"></a></span>
+<span id="cb199-6"><a href="TPsExamples.html#cb199-6" tabindex="-1"></a><span class="co"># step 2</span></span>
+<span id="cb199-7"><a href="TPsExamples.html#cb199-7" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[, <span class="fu">union</span>(groupsParents, groupsTPs)]</span>
+<span id="cb199-8"><a href="TPsExamples.html#cb199-8" tabindex="-1"></a></span>
+<span id="cb199-9"><a href="TPsExamples.html#cb199-9" tabindex="-1"></a><span class="co"># step 3</span></span>
+<span id="cb199-10"><a href="TPsExamples.html#cb199-10" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>)</span>
+<span id="cb199-11"><a href="TPsExamples.html#cb199-11" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb199-12"><a href="TPsExamples.html#cb199-12" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
+<span id="cb199-13"><a href="TPsExamples.html#cb199-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> formulas]</span>
+<span id="cb199-14"><a href="TPsExamples.html#cb199-14" tabindex="-1"></a></span>
+<span id="cb199-15"><a href="TPsExamples.html#cb199-15" tabindex="-1"></a><span class="co"># step 4</span></span>
+<span id="cb199-16"><a href="TPsExamples.html#cb199-16" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(<span class="at">algorithm =</span> <span class="st">&quot;tp&quot;</span>,</span>
+<span id="cb199-17"><a href="TPsExamples.html#cb199-17" tabindex="-1"></a>                               <span class="at">fGroups =</span> fGroups[, groupsParents],</span>
+<span id="cb199-18"><a href="TPsExamples.html#cb199-18" tabindex="-1"></a>                               <span class="at">fGroupsTPs =</span> fGroups[, groupsTPs],</span>
+<span id="cb199-19"><a href="TPsExamples.html#cb199-19" tabindex="-1"></a>                               <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas)</span>
+<span id="cb199-20"><a href="TPsExamples.html#cb199-20" tabindex="-1"></a></span>
+<span id="cb199-21"><a href="TPsExamples.html#cb199-21" tabindex="-1"></a><span class="co"># step 5</span></span>
+<span id="cb199-22"><a href="TPsExamples.html#cb199-22" tabindex="-1"></a>componTP <span class="ot">&lt;-</span> <span class="fu">filter</span>(componTP, <span class="at">minSpecSimBoth =</span> <span class="fl">0.75</span>, <span class="at">minFragMatches =</span> <span class="dv">1</span>)</span>
+<span id="cb199-23"><a href="TPsExamples.html#cb199-23" tabindex="-1"></a></span>
+<span id="cb199-24"><a href="TPsExamples.html#cb199-24" tabindex="-1"></a><span class="co"># step 6</span></span>
+<span id="cb199-25"><a href="TPsExamples.html#cb199-25" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[results <span class="ot">=</span> componTP]</span>
+<span id="cb199-26"><a href="TPsExamples.html#cb199-26" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">components =</span> componTP)</span></code></pre></div>
 
 </div>
 </div>

@@ -18,7 +18,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -320,19 +320,13 @@ averaged.</p></dd>
     <h2>Usage of MetFrag databases</h2>
     <p>When <code>database="chemspider"</code> setting the <code>chemSpiderToken</code> argument is
   mandatory.</p>
-<p>When a local database is set (<em>i.e.</em> <code>sdf</code>, <code>psv</code>, <code>csv</code>, <code>comptox</code>, <code>pubchemlite</code>)
-  the file location of the database should be set in the <code>LocalDatabasePath</code> value via the <code>extraOpts</code>
-  argument or using the <code>patRoon.path.MetFragCompTox</code>/<code>patRoon.path.MetFragPubChemLite</code> option (only when
-  <code>database="comptox"</code> or <code>database="pubchemlite"</code>).</p>
-<p>Examples: <code>options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv")</code></p>
-<p><code>extraOpts = list(LocalDatabasePath = "C:/myDB.csv")</code>.</p>
-<p>For <code>database="comptox"</code> the files can be obtained from
-  <a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">here</a>.
-  Furthermore, the files with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk" class="external-link">smoking</a> and
-  <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk" class="external-link">wastewater</a> metadata are also supported. For
-  <code>database="pubchemlite"</code> the <code class="file">.csv</code> database can be downloaded from
-  <a href="https://zenodo.org/record/6503754" class="external-link">here</a> or from <a href="https://zenodo.org/record/6385954" class="external-link">here</a> for the OECD
-  PFAS database. Note that only recent <code class="command">MetFrag</code> versions (&gt;= <samp>2.4.5</samp>) support these libraries.</p>
+<p>If a local database is chosen via <code>sdf</code>, <code>psv</code>, or <code>csv</code> then its file location should be set with
+  the <code>LocalDatabasePath</code> value via the <code>extraOpts</code> argument. For example: <code>extraOpts =
+  list(LocalDatabasePath = "C:/myDB.csv")</code>.</p>
+<p>If <code>database="pubchemlite"</code> or <code>database="comptox"</code> and <span class="pkg">patRoonExt</span> is <em>not</em> installed then the
+  file location must be specified as above or by setting the
+  <code>patRoon.path.MetFragPubChemLite</code>/<code>patRoon.path.MetFragCompTox</code> option. See the installation section in
+  the handbook for more details.</p>
     </div>
     <div id="parallelization">
     <h2>Parallelization</h2>
@@ -344,8 +338,9 @@ averaged.</p></dd>
   <code>database</code> is set to <code>"pubchemlite"</code>, <code>"csv"</code> etc.) and <span class="option">patRoon.MP.method="future"</span>, then
   the database file must be present on all the nodes. When <code>pubchemlite</code> or <code>comptox</code> is used, the location
   for these databases can be configured on the host with the respective package options
-  (<span class="option">patRoon.path.MetFragPubChemLite</span> and <span class="option">patRoon.path.MetFragCompTox</span>). Note that these files must
-  <em>also</em> be present on the local host computer, even if it is not participating in computations.</p>
+  (<span class="option">patRoon.path.MetFragPubChemLite</span> and <span class="option">patRoon.path.MetFragCompTox</span>) or made available by installing
+  the <span class="pkg">patRoonExt</span> package. Note that these files must <em>also</em> be present on the local host computer, even if
+  it is not participating in computations.</p>
     </div>
     <div id="references">
     <h2>References</h2>

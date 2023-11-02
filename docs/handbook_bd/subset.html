@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.3 Subsetting | patRoon handbook</title>
   <meta name="description" content="5.3 Subsetting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.3 Subsetting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -406,13 +419,13 @@ div.csl-indent {
 </tbody>
 </table>
 <p>For objects that support two-dimensional subsetting (e.g. <code>featureGroups</code>, <code>MSPeakLists</code>), either the <code>i</code> or <code>j</code> argument is optional. Furthermore, unlike subsetting a <code>data.frame</code>, the position of <code>i</code> and <code>j</code> does not change when only one argument is specified:</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="subset.html#cb83-1" tabindex="-1"></a>df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></span>
-<span id="cb83-2"><a href="subset.html#cb83-2" tabindex="-1"></a>df[<span class="dv">1</span>] <span class="co"># subset by first column</span></span>
-<span id="cb83-3"><a href="subset.html#cb83-3" tabindex="-1"></a>df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></span>
-<span id="cb83-4"><a href="subset.html#cb83-4" tabindex="-1"></a></span>
-<span id="cb83-5"><a href="subset.html#cb83-5" tabindex="-1"></a>fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></span>
-<span id="cb83-6"><a href="subset.html#cb83-6" tabindex="-1"></a>fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></span>
-<span id="cb83-7"><a href="subset.html#cb83-7" tabindex="-1"></a>fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></span></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="subset.html#cb86-1" tabindex="-1"></a>df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></span>
+<span id="cb86-2"><a href="subset.html#cb86-2" tabindex="-1"></a>df[<span class="dv">1</span>] <span class="co"># subset by first column</span></span>
+<span id="cb86-3"><a href="subset.html#cb86-3" tabindex="-1"></a>df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></span>
+<span id="cb86-4"><a href="subset.html#cb86-4" tabindex="-1"></a></span>
+<span id="cb86-5"><a href="subset.html#cb86-5" tabindex="-1"></a>fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></span>
+<span id="cb86-6"><a href="subset.html#cb86-6" tabindex="-1"></a>fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></span>
+<span id="cb86-7"><a href="subset.html#cb86-7" tabindex="-1"></a>fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></span></code></pre></div>
 <p>The subset operator allows three types of input:</p>
 <ul>
 <li>A logical vector: elements are selected if corresponding values are <code>TRUE</code>.</li>
@@ -420,62 +433,62 @@ div.csl-indent {
 <li>A character vector: select elements by their name.</li>
 </ul>
 <p>When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="subset.html#cb84-1" tabindex="-1"></a>fGroups[<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="subset.html#cb87-1" tabindex="-1"></a>fGroups[<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)]</span></code></pre></div>
 <p>In order to select by a <code>character</code> you will need to know the names for each element. These can, for instance, be obtained by the <code>groupNames()</code> (feature group names), <code>analyses()</code> (analysis names) and <code>names()</code> (names for components or feature groups for <code>featureGroups</code> objects) generic functions.</p>
 <p>Some more examples of common subsetting operations are shown below.</p>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="subset.html#cb85-1" tabindex="-1"></a><span class="co"># select first three analyses</span></span>
-<span id="cb85-2"><a href="subset.html#cb85-2" tabindex="-1"></a>fList[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb85-3"><a href="subset.html#cb85-3" tabindex="-1"></a></span>
-<span id="cb85-4"><a href="subset.html#cb85-4" tabindex="-1"></a><span class="co"># select first three analyses and first 500 feature groups</span></span>
-<span id="cb85-5"><a href="subset.html#cb85-5" tabindex="-1"></a>fGroups[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">500</span>]</span>
-<span id="cb85-6"><a href="subset.html#cb85-6" tabindex="-1"></a></span>
-<span id="cb85-7"><a href="subset.html#cb85-7" tabindex="-1"></a><span class="co"># select all feature groups from first component</span></span>
-<span id="cb85-8"><a href="subset.html#cb85-8" tabindex="-1"></a>fGroupsNT <span class="ot">&lt;-</span> fGroups[, componNT[[<span class="dv">1</span>]]<span class="sc">$</span>group]</span>
-<span id="cb85-9"><a href="subset.html#cb85-9" tabindex="-1"></a></span>
-<span id="cb85-10"><a href="subset.html#cb85-10" tabindex="-1"></a><span class="co"># only keep feature groups with formula annotation results</span></span>
-<span id="cb85-11"><a href="subset.html#cb85-11" tabindex="-1"></a>fGroupsForms <span class="ot">&lt;-</span> fGroups[, <span class="fu">groupNames</span>(formulas)]</span>
-<span id="cb85-12"><a href="subset.html#cb85-12" tabindex="-1"></a></span>
-<span id="cb85-13"><a href="subset.html#cb85-13" tabindex="-1"></a><span class="co"># only keep feature groups with either formula or compound annotation results</span></span>
-<span id="cb85-14"><a href="subset.html#cb85-14" tabindex="-1"></a>fGroupsAnn <span class="ot">&lt;-</span> fGroups[, <span class="fu">union</span>(<span class="fu">groupNames</span>(formulas), <span class="fu">groupNames</span>(compounds))]</span>
-<span id="cb85-15"><a href="subset.html#cb85-15" tabindex="-1"></a></span>
-<span id="cb85-16"><a href="subset.html#cb85-16" tabindex="-1"></a><span class="co"># select first 15 components</span></span>
-<span id="cb85-17"><a href="subset.html#cb85-17" tabindex="-1"></a>components[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>]</span>
-<span id="cb85-18"><a href="subset.html#cb85-18" tabindex="-1"></a></span>
-<span id="cb85-19"><a href="subset.html#cb85-19" tabindex="-1"></a><span class="co"># select by name</span></span>
-<span id="cb85-20"><a href="subset.html#cb85-20" tabindex="-1"></a>components[<span class="fu">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</span>
-<span id="cb85-21"><a href="subset.html#cb85-21" tabindex="-1"></a></span>
-<span id="cb85-22"><a href="subset.html#cb85-22" tabindex="-1"></a><span class="co"># only retain feature groups in components for which compound annotations are</span></span>
-<span id="cb85-23"><a href="subset.html#cb85-23" tabindex="-1"></a><span class="co"># available</span></span>
-<span id="cb85-24"><a href="subset.html#cb85-24" tabindex="-1"></a>components[, <span class="fu">groupNames</span>(compounds)]</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="subset.html#cb88-1" tabindex="-1"></a><span class="co"># select first three analyses</span></span>
+<span id="cb88-2"><a href="subset.html#cb88-2" tabindex="-1"></a>fList[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb88-3"><a href="subset.html#cb88-3" tabindex="-1"></a></span>
+<span id="cb88-4"><a href="subset.html#cb88-4" tabindex="-1"></a><span class="co"># select first three analyses and first 500 feature groups</span></span>
+<span id="cb88-5"><a href="subset.html#cb88-5" tabindex="-1"></a>fGroups[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">500</span>]</span>
+<span id="cb88-6"><a href="subset.html#cb88-6" tabindex="-1"></a></span>
+<span id="cb88-7"><a href="subset.html#cb88-7" tabindex="-1"></a><span class="co"># select all feature groups from first component</span></span>
+<span id="cb88-8"><a href="subset.html#cb88-8" tabindex="-1"></a>fGroupsNT <span class="ot">&lt;-</span> fGroups[, componNT[[<span class="dv">1</span>]]<span class="sc">$</span>group]</span>
+<span id="cb88-9"><a href="subset.html#cb88-9" tabindex="-1"></a></span>
+<span id="cb88-10"><a href="subset.html#cb88-10" tabindex="-1"></a><span class="co"># only keep feature groups with formula annotation results</span></span>
+<span id="cb88-11"><a href="subset.html#cb88-11" tabindex="-1"></a>fGroupsForms <span class="ot">&lt;-</span> fGroups[, <span class="fu">groupNames</span>(formulas)]</span>
+<span id="cb88-12"><a href="subset.html#cb88-12" tabindex="-1"></a></span>
+<span id="cb88-13"><a href="subset.html#cb88-13" tabindex="-1"></a><span class="co"># only keep feature groups with either formula or compound annotation results</span></span>
+<span id="cb88-14"><a href="subset.html#cb88-14" tabindex="-1"></a>fGroupsAnn <span class="ot">&lt;-</span> fGroups[, <span class="fu">union</span>(<span class="fu">groupNames</span>(formulas), <span class="fu">groupNames</span>(compounds))]</span>
+<span id="cb88-15"><a href="subset.html#cb88-15" tabindex="-1"></a></span>
+<span id="cb88-16"><a href="subset.html#cb88-16" tabindex="-1"></a><span class="co"># select first 15 components</span></span>
+<span id="cb88-17"><a href="subset.html#cb88-17" tabindex="-1"></a>components[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>]</span>
+<span id="cb88-18"><a href="subset.html#cb88-18" tabindex="-1"></a></span>
+<span id="cb88-19"><a href="subset.html#cb88-19" tabindex="-1"></a><span class="co"># select by name</span></span>
+<span id="cb88-20"><a href="subset.html#cb88-20" tabindex="-1"></a>components[<span class="fu">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</span>
+<span id="cb88-21"><a href="subset.html#cb88-21" tabindex="-1"></a></span>
+<span id="cb88-22"><a href="subset.html#cb88-22" tabindex="-1"></a><span class="co"># only retain feature groups in components for which compound annotations are</span></span>
+<span id="cb88-23"><a href="subset.html#cb88-23" tabindex="-1"></a><span class="co"># available</span></span>
+<span id="cb88-24"><a href="subset.html#cb88-24" tabindex="-1"></a>components[, <span class="fu">groupNames</span>(compounds)]</span></code></pre></div>
 <p>In addition, feature groups can also be subset by given replicate groups or annotation/componentization results (similar to <code>filter()</code>). Similarly, suspect screening results can also be subset by given suspect names.</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="subset.html#cb86-1" tabindex="-1"></a><span class="co"># equal as filter(fGroups, rGroups = ...)</span></span>
-<span id="cb86-2"><a href="subset.html#cb86-2" tabindex="-1"></a>fGroups[rGroups <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>)]</span>
-<span id="cb86-3"><a href="subset.html#cb86-3" tabindex="-1"></a><span class="co"># equal as filter(fGroups, results = ...)</span></span>
-<span id="cb86-4"><a href="subset.html#cb86-4" tabindex="-1"></a>fGroups[results <span class="ot">=</span> compounds]</span>
-<span id="cb86-5"><a href="subset.html#cb86-5" tabindex="-1"></a><span class="co"># only keep feature groups assigned to given suspects</span></span>
-<span id="cb86-6"><a href="subset.html#cb86-6" tabindex="-1"></a>fGroupsSusp[suspects <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="subset.html#cb89-1" tabindex="-1"></a><span class="co"># equal as filter(fGroups, rGroups = ...)</span></span>
+<span id="cb89-2"><a href="subset.html#cb89-2" tabindex="-1"></a>fGroups[rGroups <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>)]</span>
+<span id="cb89-3"><a href="subset.html#cb89-3" tabindex="-1"></a><span class="co"># equal as filter(fGroups, results = ...)</span></span>
+<span id="cb89-4"><a href="subset.html#cb89-4" tabindex="-1"></a>fGroups[results <span class="ot">=</span> compounds]</span>
+<span id="cb89-5"><a href="subset.html#cb89-5" tabindex="-1"></a><span class="co"># only keep feature groups assigned to given suspects</span></span>
+<span id="cb89-6"><a href="subset.html#cb89-6" tabindex="-1"></a>fGroupsSusp[suspects <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>)]</span></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> As of <code>patRoon 2.0</code> MS peak lists are <strong>not</strong> re-generated after a subsetting operation (unless the <code>reAverage</code> parameter is explicity set to <code>TRUE</code>). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the subset operation.</p>
 </blockquote>
 <div id="prioritization-workflow" class="section level3 hasAnchor" number="5.3.1">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow<a href="subset.html#prioritization-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-279830e8b8d21ac70571" style="width:500px;height:120px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-279830e8b8d21ac70571">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-72baca5004df5b10378d" style="width:500px;height:120px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-72baca5004df5b10378d">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="subset.html#cb87-1" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb87-2"><a href="subset.html#cb87-2" tabindex="-1"></a></span>
-<span id="cb87-3"><a href="subset.html#cb87-3" tabindex="-1"></a><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></span>
-<span id="cb87-4"><a href="subset.html#cb87-4" tabindex="-1"></a><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></span>
-<span id="cb87-5"><a href="subset.html#cb87-5" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> featTab[<span class="fu">order</span>(featTab<span class="sc">$</span>standard, <span class="at">decreasing =</span> <span class="cn">TRUE</span>), ]</span>
-<span id="cb87-6"><a href="subset.html#cb87-6" tabindex="-1"></a>groupsOfInterest <span class="ot">&lt;-</span> featTab<span class="sc">$</span>group[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb87-7"><a href="subset.html#cb87-7" tabindex="-1"></a></span>
-<span id="cb87-8"><a href="subset.html#cb87-8" tabindex="-1"></a><span class="co"># subset the original data</span></span>
-<span id="cb87-9"><a href="subset.html#cb87-9" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[, groupsOfInterest]</span>
-<span id="cb87-10"><a href="subset.html#cb87-10" tabindex="-1"></a></span>
-<span id="cb87-11"><a href="subset.html#cb87-11" tabindex="-1"></a><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></span>
-<span id="cb87-12"><a href="subset.html#cb87-12" tabindex="-1"></a><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="subset.html#cb90-1" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb90-2"><a href="subset.html#cb90-2" tabindex="-1"></a></span>
+<span id="cb90-3"><a href="subset.html#cb90-3" tabindex="-1"></a><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></span>
+<span id="cb90-4"><a href="subset.html#cb90-4" tabindex="-1"></a><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></span>
+<span id="cb90-5"><a href="subset.html#cb90-5" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> featTab[<span class="fu">order</span>(featTab<span class="sc">$</span>standard, <span class="at">decreasing =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb90-6"><a href="subset.html#cb90-6" tabindex="-1"></a>groupsOfInterest <span class="ot">&lt;-</span> featTab<span class="sc">$</span>group[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb90-7"><a href="subset.html#cb90-7" tabindex="-1"></a></span>
+<span id="cb90-8"><a href="subset.html#cb90-8" tabindex="-1"></a><span class="co"># subset the original data</span></span>
+<span id="cb90-9"><a href="subset.html#cb90-9" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> fGroups[, groupsOfInterest]</span>
+<span id="cb90-10"><a href="subset.html#cb90-10" tabindex="-1"></a></span>
+<span id="cb90-11"><a href="subset.html#cb90-11" tabindex="-1"></a><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></span>
+<span id="cb90-12"><a href="subset.html#cb90-12" tabindex="-1"></a><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></span></code></pre></div>
 </div>
 </div>
             </section>

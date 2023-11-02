@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Formula annotations class</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas.R" class="external-link"><code>R/formulas.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas-set.R" class="external-link"><code>R/formulas-set.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas.R" class="external-link"><code>R/formulas.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas-set.R" class="external-link"><code>R/formulas-set.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/formulas-sirius.R" class="external-link"><code>R/formulas-sirius.R</code></a></small>
     <div class="hidden name"><code>formulas-class.Rd</code></div>
     </div>
 
@@ -225,7 +225,10 @@ consensus(
 unset(obj, set)
 
 # S4 method for formulasConsensusSet
-unset(obj, set)</code></pre></div>
+unset(obj, set)
+
+# S4 method for formulasSIRIUS
+delete(obj, i = NULL, j = NULL, ...)</code></pre></div>
     </div>
 
     <div id="arguments">
@@ -486,6 +489,7 @@ create this object.</p></dd>
 <li><p><code>formulasSet</code></p><ul><li><p><code>formulasConsensusSet</code></p></li>
 </ul></li>
 <li><p><code>formulasUnset</code></p></li>
+<li><p><code><a href="formulasSIRIUS-class.html">formulasSIRIUS</a></code></p></li>
 </ul></li>
 </ul></li>
 </ul></div>

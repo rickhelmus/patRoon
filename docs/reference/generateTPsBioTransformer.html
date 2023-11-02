@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -201,7 +201,8 @@ Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.</p></
   <code>algorithm="biotransformer"</code>.</p>
 <p>In order to use this function the <code class="file">.jar</code> command line utility should be installed and specified in the
   <code><a href="patRoon-package.html">patRoon.path.BioTransformer</a></code> option. The <code class="file">.jar</code> file can be obtained via
-  <a href="https://bitbucket.org/djoumbou/biotransformer/src/master" class="external-link">https://bitbucket.org/djoumbou/biotransformer/src/master</a>.</p>
+  <a href="https://bitbucket.org/djoumbou/biotransformer/src/master" class="external-link">https://bitbucket.org/djoumbou/biotransformer/src/master</a>. Alternatively, the <span class="pkg">patRoonExt</span> package can be
+  installed to automatically install/configure the necessary files.</p>
 <p>An important advantage of this algorithm is that it provides structural information for generated TPs.
   However, this also means that if the input is from a parent suspect list or screening then either <acronym>SMILES</acronym>
   or <acronym>InChI</acronym> information must be available for the parents.</p>
@@ -256,8 +257,8 @@ Furthermore, enabling multiprocessing can lead to very high CPU/RAM usage.</p></
   (<code>prefCalcChemProps=TRUE</code>).</p></li>
 </ul><p>Note that calculation of formulae for molecules that are isotopically labelled is currently only supported for
   deuterium (2H) elements.</p>
-<p>This functionality relies heavily on <a href="http://openbabel.org/wiki/Main_Page" class="external-link">OpenBabel</a>, please make sure it is
-  installed.</p>
+<p>This functionality relies heavily on <a href="https://github.com/openbabel/openbabel" class="external-link">OpenBabel</a>, please make sure it
+  is installed.</p>
     </div>
     <div id="parallelization">
     <h2>Parallelization</h2>

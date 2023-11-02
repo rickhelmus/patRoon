@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -89,6 +89,74 @@
       <small>Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.3" id="patroon-23">patRoon 2.3<a class="anchor" aria-label="anchor" href="#patroon-23"></a></h2>
+<p>This release adds significant new functionality, several important changes and several bug fixes thanks to user feedback.</p>
+<p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it <strong>is important</strong> to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
+<div class="section level3">
+<h3 id="important-new-functionality-and-changes-2-3">Important new functionality and changes<a class="anchor" aria-label="anchor" href="#important-new-functionality-and-changes-2-3"></a></h3>
+<div class="section level4">
+<h4 id="revamped-installation-of-patroon-and-its-dependencies-2-3">Revamped installation of patRoon and its dependencies<a class="anchor" aria-label="anchor" href="#revamped-installation-of-patroon-and-its-dependencies-2-3"></a></h4>
+<p>This release adds new way to install and update <code>patRoon</code> and its dependencies. The most important changes are</p>
+<ul><li>Introduction of <code>patRoon</code> bundles: these are standalone installations of <code>R</code>, <code>patRoon</code> and its <code>R</code> package dependencies, and all other external dependencies such as <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag</a>, OpenJDK, <a href="http://openms.de/" class="external-link">OpenMS</a> etc. This is primarily useful for users not familiar to <code>R</code> or wanting to quickly try a new <code>patRoon</code> release.</li>
+<li>Semi automated installations with the <a href="https://github.com/rickhelmus/patRoonInst" class="external-link">patRoonInst</a> auxiliary package. This package will install <code>patRoon</code> and its dependencies automatically, which prevents the need to manually install packages from different sources (BioConductor, GitHub etc). Furthermore, this package also installs <code>patRoonExt</code>, another axuliary package that bundles most external dependencies (e.g. <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag</a>, <a href="https://zenodo.org/record/6503754" class="external-link">PubChemLite</a>, <a href="http://openms.de/" class="external-link">OpenMS</a>).</li>
+<li>The old <code>patRoon_install</code> script is now replaced by the above installation methids, and is therefore considered deprecated, will be removed in the future and should therefore not be used anymore.</li>
+</ul><p>For more information, please read the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/installation.html">updated installation chapter</a> in the handbook, and see the project pages of <a href="https://github.com/rickhelmus/patRoonInst" class="external-link">patRoonInst</a> and <a href="https://github.com/rickhelmus/patRoonExt" class="external-link">patRoonExt</a>.</p>
+<blockquote>
+<p><strong><em>IMPORTANT</em></strong> If you installed <code>patRoon</code> via the legacy installation script, please read the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/installation.html">installation chapter</a> to disable/remove this installation prior to updating <code>patRoon</code>!</p>
+</blockquote>
+</div>
+<div class="section level4">
+<h4 id="prediction-of-feature-toxicities-and-concentrations-ms2toxms2quant-integration-2-3">Prediction of feature toxicities and concentrations (MS2Tox/MS2Quant integration)<a class="anchor" aria-label="anchor" href="#prediction-of-feature-toxicities-and-concentrations-ms2toxms2quant-integration-2-3"></a></h4>
+<p>The second milestone of this release is the integration of the <a href="https://github.com/kruvelab/MS2Tox" class="external-link">MS2Tox</a> and <a href="https://github.com/kruvelab/MS2Quant" class="external-link">MS2Quant</a> <code>R</code> packages, which support machine learning approaches to predict the toxicity and concentration of features. The integration adds the following functionality to <code>patRoon</code>:</p>
+<ul><li>Automated prediction of toxicity (fish LC50) and response factors/concentrations for features from <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS+CSI:FingerID</a> fingerprints or <code>SMILES</code>.</li>
+<li>The predictions can be made from suspect data and formula/compound annotation candidates. These can be combined and aggregated when calculating toxicities/concentrations for features.</li>
+<li>The <code><a href="../reference/generics.html">as.data.table()</a></code> function and reporting interface were updated to inspect the predicted toxicities/concentrations.</li>
+<li>Various new filters were added to prioritize data on calculated toxicities, response factors and concentrations.</li>
+<li>Various small usability improvements to simplify calibrations and concentration units.</li>
+</ul><p>Please see the <a href="https://rickhelmus.github.io/patRoon/handbook_bd/pred.html">relevant section in the handbook</a>, and the project pages of <a href="https://github.com/kruvelab/MS2Tox" class="external-link">MS2Tox</a> and <a href="https://github.com/kruvelab/MS2Quant" class="external-link">MS2Quant</a> for more details.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="minor-new-functionality-and-changes-2-3">Minor new functionality and changes<a class="anchor" aria-label="anchor" href="#minor-new-functionality-and-changes-2-3"></a></h3>
+<ul><li>
+<code><a href="../reference/loadMSLibrary.html">loadMSLibrary()</a></code>: improve compatibility with more <code>.msp</code> flavors (issue <a href="https://github.com/rickhelmus/patRoon/issues/72" class="external-link">#72</a>).</li>
+<li>
+<code><a href="../reference/newProject.html">newProject()</a></code>: save/load parameters to reproduce subsequent project creations (issue <a href="https://github.com/rickhelmus/patRoon/issues/61" class="external-link">#61</a>)</li>
+<li>
+<code><a href="../reference/groupFeaturesOpenMS.html">groupFeaturesOpenMS()</a></code>: now supports handling large numbers of analyses on Windows (reported by Geert Franken, fix thanks to <a href="https://github.com/OpenMS/OpenMS/issues/6845" class="external-link uri">https://github.com/OpenMS/OpenMS/issues/6845</a>).</li>
+<li>Add package option <code>patRoon.checkCentroided</code> to control whether analyses files are verified to be centroided (suggested by Geert Franken).</li>
+<li>Updated PubChem transformations to v0.1.7</li>
+<li>Reference documentation: all generics are now documented, mainly to ensure that default arguments are listed again in the function documentation (reported by Geert Franken)</li>
+<li>
+<code><a href="../reference/featureGroups-class.html">overlap()</a></code>: the <code>which</code> param can now also be a <code>list</code> to compare groups of replicate groups (similar to <code><a href="../reference/generics.html">plotVenn()</a></code>)</li>
+<li>
+<code><a href="../reference/generics.html">consensus()</a></code> method for <code>featureGroups</code>: new <code>verifyAnaInfo</code> flag to optionally skip if the analysis information are equal for all compared objects. This is mainly useful when the data is the same but in different formats.</li>
+<li>Compatibility with OpenMS 3.0</li>
+<li>Windows CI is now performed on GitHub actions instead of AppVeyor.</li>
+<li>
+<code><a href="../reference/reporting.html">genReportSettingsFile()</a></code>: <code>baseFrom</code> argument to update old report settings files.</li>
+<li>
+<code><a href="../reference/generateFormulasSIRIUS.html">generateFormulasSIRIUS()</a></code>: new <code>getFingerprints</code> and <code>token</code> arguments to download CSI:FingerID fingerprints for formula candidates. This was primarily implemented to support calculating toxicities/concentrations from formula annotations.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixes-2-3">Fixes<a class="anchor" aria-label="anchor" href="#fixes-2-3"></a></h3>
+<ul><li>Fixed: in rare cases EICs were incorrectly loaded from cache</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code> now correctly handles SIRIUS compounds results and suspects without SMILES</li>
+<li>Fixed: report layout is now compatible with <code>bslib 0.5.0</code> (reported by Alessia Ore)</li>
+<li>Fixed: <code>annotatedBy</code> filter for <code>MSPeakLists</code> could remove precursor peaks in MS/MS data regardless if <code>retainPrecursorMSMS=TRUE</code>
+</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: The <code>suspect(s)</code> column for compound annotation results was always empty</li>
+<li>Fixed: the <code>reAverage</code> argument was ignored by the <code><a href="../reference/generics.html">filter()</a></code> method of <code>MSPeakLists</code> when checking if cached data is available (issue <a href="https://github.com/rickhelmus/patRoon/issues/87" class="external-link">#87</a>)</li>
+<li>Fixed: if <code>reAverage=TRUE</code> to the <code><a href="../reference/generics.html">filter()</a></code> method of <code>MSPeakLists</code> then the peak IDs were not regenerated (issue <a href="https://github.com/rickhelmus/patRoon/issues/87" class="external-link">#87</a>)</li>
+<li>Fixed: Suspect screening results were incorrectly merged with &gt;2 sets (issue <a href="https://github.com/rickhelmus/patRoon/issues/90" class="external-link">#90</a>)</li>
+<li>Fixed: <code><a href="../reference/generics.html">plotSpectrum()</a></code> method for <code>formulas</code>/<code>compounds</code> didn’t expand plot height for formula annotations with only one mass peak</li>
+<li>Fixed: <code><a href="../reference/generics.html">annotatedPeakList()</a></code>/<code><a href="../reference/generics.html">plotSpectrum()</a></code> methods for <code>compounds</code> didn’t label mass peaks with compounds algorithm if <code>formulas</code> were provided but no formula candidate was present.</li>
+<li>Fixed: in some specific conditions the plot() would throw an error (“cannot coerce type ‘S4’ to vector of type ‘double’”)</li>
+<li>Fixed: <code><a href="../reference/generateFormulas.html">generateFormulas()</a></code> generic definition had wrong argument order</li>
+<li>Fixed: <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> resulted in errors if the password input was cancelled.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2" id="patroon-22">patRoon 2.2<a class="anchor" aria-label="anchor" href="#patroon-22"></a></h2>
 <p>This release adds significant new functionality, several important changes and many bug fixes thanks to user feedback.</p>

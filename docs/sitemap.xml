@@ -88,6 +88,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/compoundsMF-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/compoundsSIRIUS-class.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/convertMSFiles.html</loc>
   </url>
   <url>
@@ -161,6 +164,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/formulas-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/formulasSIRIUS-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/genFormulaTPLibrary.html</loc>
@@ -347,6 +353,15 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/pred-aggr-params.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/pred-quant.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/pred-tox.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/printPackageOpts.html</loc>

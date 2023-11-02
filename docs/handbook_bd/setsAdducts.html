@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.3 Selecting adducts to improve grouping | patRoon handbook</title>
   <meta name="description" content="6.3 Selecting adducts to improve grouping | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.3 Selecting adducts to improve grouping | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -352,33 +365,33 @@ div.csl-indent {
 <h2><span class="header-section-number">6.3</span> Selecting adducts to improve grouping<a href="setsAdducts.html#setsAdducts" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The <code>selectIons()</code> and <code>adduct()</code> functions <a href="incorpAdductIso.html#incorpAdductIso">discussed before</a> can also improve sets workflows. This is because the adduct annotations can be used to improve feature neutralization, which in turn will improve grouping features between positive and negative ionization data. Once adduct annotations are set the features will be re-neutralized and re-grouped.</p>
 <p>A typical workflow with <code>selectIons</code> looks like this:</p>
-<div id="htmlwidget-977193697a2889116313" style="width:250px;height:350px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-977193697a2889116313">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="setsAdducts.html#cb158-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
-<span id="cb158-2"><a href="setsAdducts.html#cb158-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb158-3"><a href="setsAdducts.html#cb158-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
-<span id="cb158-4"><a href="setsAdducts.html#cb158-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-5"><a href="setsAdducts.html#cb158-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-6"><a href="setsAdducts.html#cb158-6" tabindex="-1"></a></span>
-<span id="cb158-7"><a href="setsAdducts.html#cb158-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-8"><a href="setsAdducts.html#cb158-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-9"><a href="setsAdducts.html#cb158-9" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fListPos, fListNeg, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb158-10"><a href="setsAdducts.html#cb158-10" tabindex="-1"></a></span>
-<span id="cb158-11"><a href="setsAdducts.html#cb158-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-12"><a href="setsAdducts.html#cb158-12" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
-<span id="cb158-13"><a href="setsAdducts.html#cb158-13" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb158-14"><a href="setsAdducts.html#cb158-14" tabindex="-1"></a></span>
-<span id="cb158-15"><a href="setsAdducts.html#cb158-15" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb158-16"><a href="setsAdducts.html#cb158-16" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, components, <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb158-17"><a href="setsAdducts.html#cb158-17" tabindex="-1"></a></span>
-<span id="cb158-18"><a href="setsAdducts.html#cb158-18" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
+<div id="htmlwidget-9de05064ba626cc99294" style="width:250px;height:350px;" class="grViz html-widget "></div>
+<script type="application/json" data-for="htmlwidget-9de05064ba626cc99294">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="setsAdducts.html#cb161-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
+<span id="cb161-2"><a href="setsAdducts.html#cb161-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb161-3"><a href="setsAdducts.html#cb161-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
+<span id="cb161-4"><a href="setsAdducts.html#cb161-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-5"><a href="setsAdducts.html#cb161-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-6"><a href="setsAdducts.html#cb161-6" tabindex="-1"></a></span>
+<span id="cb161-7"><a href="setsAdducts.html#cb161-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-8"><a href="setsAdducts.html#cb161-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-9"><a href="setsAdducts.html#cb161-9" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fListPos, fListNeg, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
+<span id="cb161-10"><a href="setsAdducts.html#cb161-10" tabindex="-1"></a></span>
+<span id="cb161-11"><a href="setsAdducts.html#cb161-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-12"><a href="setsAdducts.html#cb161-12" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
+<span id="cb161-13"><a href="setsAdducts.html#cb161-13" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb161-14"><a href="setsAdducts.html#cb161-14" tabindex="-1"></a></span>
+<span id="cb161-15"><a href="setsAdducts.html#cb161-15" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb161-16"><a href="setsAdducts.html#cb161-16" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, components, <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
+<span id="cb161-17"><a href="setsAdducts.html#cb161-17" tabindex="-1"></a></span>
+<span id="cb161-18"><a href="setsAdducts.html#cb161-18" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
 <p>The first part of the workflow is exactly the same as was introduced in the beginning of this chapter. Furthermore, note that for sets workflows, <code>selectIons</code> needs a preferential adduct for each set.</p>
 <p>The <code>adducts</code> function can also be used to obtain and modify adduct annotations. For sets workflows, these functions operate <em>per set</em>:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="setsAdducts.html#cb159-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb159-2"><a href="setsAdducts.html#cb159-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="setsAdducts.html#cb162-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb162-2"><a href="setsAdducts.html#cb162-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span></code></pre></div>
 <p>If you want to modify annotations for multiple sets, it is best to delay the re-gouping step:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="setsAdducts.html#cb160-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">reGroup =</span> <span class="cn">FALSE</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span>
-<span id="cb160-2"><a href="setsAdducts.html#cb160-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;negative&quot;</span>, <span class="at">reGroup =</span> <span class="cn">TRUE</span>)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M-H2O]-&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="setsAdducts.html#cb163-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">reGroup =</span> <span class="cn">FALSE</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span>
+<span id="cb163-2"><a href="setsAdducts.html#cb163-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;negative&quot;</span>, <span class="at">reGroup =</span> <span class="cn">TRUE</span>)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M-H2O]-&quot;</span></span></code></pre></div>
 <p>Setting <code>reGroup=FALSE</code> will not perform any re-neutralization and re-grouping, which preserves feature group names and safes processing time. However, it is <strong>crucial</strong> that the re-grouping step is eventually performed at the end.</p>
 </div>
             </section>

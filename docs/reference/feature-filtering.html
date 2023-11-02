@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -112,6 +112,12 @@
 <span>  relMinFeatures <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  absMinReplicateAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinReplicateAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMinConc <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinConc <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMaxTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMaxTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMinConcTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinConcTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  maxReplicateIntRSD <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  blankThreshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -125,6 +131,8 @@
 <span>  removeBlanks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  removeISTDs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  checkFeaturesSession <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predAggrParams <span class="op">=</span> <span class="fu"><a href="pred-aggr-params.html">getDefPredAggrParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  removeNA <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -194,6 +202,24 @@ should be present within a replicate group. If this minimum is not met all featu
 removed. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
+<dt>absMinConc, relMinConc</dt>
+<dd><p>The minimum absolute/relative predicted concentration (calculated by
+<code><a href="pred-quant.html">calculateConcs</a></code>) assigned to a feature. The toxicities are first aggregated prior to filtering, as
+controlled by the <code>predAggrParams</code> argument. Also see the <code>removeNA</code> argument.</p></dd>
+
+
+<dt>absMaxTox, relMaxTox</dt>
+<dd><p>The maximum absolute/relative predicted toxicity (LC50) (calculated by
+<code><a href="pred-tox.html">calculateTox</a></code>) assigned to a feature group. The concentrations are first aggregated prior to
+filtering, as controlled by the <code>predAggrParams</code> argument. Also see the <code>removeNA</code> argument.</p></dd>
+
+
+<dt>absMinConcTox, relMinConcTox</dt>
+<dd><p>Like <code>absMinConc</code>/<code>relMinConc</code>, but instead considers the ratio between
+feature concentrations and the toxicity of the feature group. For instance, <code>absMinConcTox=0.1</code> means that the
+calculated concentration of a feature should be at least <samp>10%</samp> of its toxicity.</p></dd>
+
+
 <dt>maxReplicateIntRSD</dt>
 <dd><p>Maximum relative standard deviation (RSD) of intensity values for features within a
 replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
@@ -254,6 +280,17 @@ path to the session file or <code>TRUE</code>, in which case the default session
 then all non-selected features/feature groups are removed instead.</p></dd>
 
 
+<dt>predAggrParams</dt>
+<dd><p>Parameters to aggregate calculated concentrations/toxicities (obtained with
+<code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>) prior to filtering data. See <a href="pred-aggr-params.html">prediction aggregation
+parameters</a> for more information.</p></dd>
+
+
+<dt>removeNA</dt>
+<dd><p>Set to <code>TRUE</code> to remove <code>NA</code> values. Currently only applicable to the concentration and
+toxicity filters.</p></dd>
+
+
 <dt>negate</dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
 
@@ -311,7 +348,8 @@ or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></dd>
 <li><p>Intensity filters (<em>i.e.</em> <code>absMinIntensity</code> and <code>relMinIntensity</code>).</p></li>
 <li><p>Replicate abundance filters (2nd time, only if previous filters affected results).</p></li>
 <li><p>General abundance filters (<em>i.e.</em> <code>absMinAnalyses</code>, <code>relMinAnalyses</code>, <code>absMinReplicates</code>,
-  <code>relMinReplicates</code>, <code>absMinFeatures</code> and <code>relMinFeatures</code>).</p></li>
+  <code>relMinReplicates</code>, <code>absMinFeatures</code>, <code>relMinFeatures</code>), <code>absMinConc</code>, <code>relMinConc</code>,
+  <code>absMaxTox</code> and <code>relMaxTox</code>.</p></li>
 <li><p>Replicate group filter (<em>i.e.</em> <code>rGroups</code>), results filter (<em>i.e.</em> <code>results</code>) and blank
   analyses / internal standard removal (<em>i.e.</em> <code>removeBlanks=TRUE</code> / <code>removeISTDs=TRUE</code>).</p></li>
 </ol><p>If another filtering order is desired then <code>filter</code> should be called multiple times with only one filter

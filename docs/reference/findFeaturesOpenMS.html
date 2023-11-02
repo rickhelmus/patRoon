@@ -19,7 +19,7 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -235,8 +235,9 @@ may be less accurate and requires a recent version of <code class="command">Open
     <h2>Details</h2>
     <p>This function uses OpenMS to automatically find features. This function is called when calling <code>findFeatures</code> with
   <code>algorithm="openms"</code>.</p>
-<p>This functionality has been tested with OpenMS version &gt;= 2.0. Please make sure it is installed and its
-  binaries are added to the PATH environment variable or the <code>patRoon.path.OpenMS</code> option is set.</p>
+<p>This functionality has been tested with OpenMS version &gt;= 2.0. Please make sure it is installed and
+  configured, e.g. by installing <code>patRoonExt</code> or configuring the path of the binaries with
+  the <code>patRoon.path.OpenMS</code> option or the system <span class="option">PATH</span> variable.</p>
 <p>The file format of analyses must be <code class="file">mzML</code>.</p>
 <p>The input MS data files need to be centroided. The <code><a href="convertMSFiles.html">convertMSFiles</a></code> function can be used to
   centroid data.</p>

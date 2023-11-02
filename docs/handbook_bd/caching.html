@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>8.11 Caching | patRoon handbook</title>
-  <meta name="description" content="8.11 Caching | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <title>8.12 Caching | patRoon handbook</title>
+  <meta name="description" content="8.12 Caching | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="8.11 Caching | patRoon handbook" />
+  <meta property="og:title" content="8.12 Caching | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="8.11 Caching | patRoon handbook" />
+  <meta name="twitter:title" content="8.12 Caching | patRoon handbook" />
   
   
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -348,22 +361,24 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="caching" class="section level2 hasAnchor" number="8.11">
-<h2><span class="header-section-number">8.11</span> Caching<a href="caching.html#caching" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="caching" class="section level2 hasAnchor" number="8.12">
+<h2><span class="header-section-number">8.12</span> Caching<a href="caching.html#caching" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
 <p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="caching.html#cb279-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="caching.html#cb306-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn’t wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>
 <p>In order to figure what is in the cache you can run <code>clearCache()</code> without any arguments:</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="caching.html#cb280-1" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="caching.html#cb307-1" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
 <pre><code>#&gt; Please specify which cache you want to remove. Available are:
 #&gt; - EICData (3 rows)
+#&gt; - LC50_SMILES (23 rows)
 #&gt; - MSLibraryJSON (1 rows)
 #&gt; - MSLibraryMSP (1 rows)
 #&gt; - MSPeakListsAvg (4 rows)
 #&gt; - MSPeakListsMzR (97 rows)
 #&gt; - MSPeakListsSetAvg (2 rows)
+#&gt; - RF_SMILES (5 rows)
 #&gt; - TPsLib (1 rows)
 #&gt; - annotateSuspects (1 rows)
 #&gt; - calculatePeakQualities (3 rows)
@@ -378,7 +393,7 @@ div.csl-indent {
 #&gt; - filterFGroups_blank (4 rows)
 #&gt; - filterFGroups_intensity (11 rows)
 #&gt; - filterFGroups_minAnalyses (1 rows)
-#&gt; - filterFGroups_minReplicates (85 rows)
+#&gt; - filterFGroups_minReplicates (83 rows)
 #&gt; - filterFGroups_replicateAbundance (8 rows)
 #&gt; - filterFGroups_replicate_group (11 rows)
 #&gt; - filterFGroups_retention (3 rows)
@@ -388,18 +403,18 @@ div.csl-indent {
 #&gt; - formulasSIRIUS (5 rows)
 #&gt; - generateTPsBT (74 rows)
 #&gt; - loadIntensities (69 rows)
-#&gt; - mzREIC (3427 rows)
+#&gt; - mzREIC (3426 rows)
 #&gt; - reportHTMLCompounds (1 rows)
 #&gt; - reportHTMLFormulas (1 rows)
-#&gt; - screenSuspects (6 rows)
-#&gt; - screenSuspectsPrepList (7 rows)
+#&gt; - screenSuspects (7 rows)
+#&gt; - screenSuspectsPrepList (8 rows)
 #&gt; - specData (12 rows)
 #&gt; - all (removes complete cache database)</code></pre>
 <p>Using this output you can re-run the function again, for instance:</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="caching.html#cb282-1" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
-<span id="cb282-2"><a href="caching.html#cb282-2" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
-<span id="cb282-3"><a href="caching.html#cb282-3" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
-<span id="cb282-4"><a href="caching.html#cb282-4" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="caching.html#cb309-1" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
+<span id="cb309-2"><a href="caching.html#cb309-2" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
+<span id="cb309-3"><a href="caching.html#cb309-3" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
+<span id="cb309-4"><a href="caching.html#cb309-4" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
 </div>
             </section>
 

@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook</title>
+  <meta name="description" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
+  
+  
+  
+
+<meta name="author" content="Rick Helmus" />
+
+
+<meta name="date" content="2023-11-02" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="feature-regression-analysis.html"/>
+<link rel="next" href="FCCalc.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.10/grViz.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
+<li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="introduction-1.html"><a href="introduction-1.html"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="introduction-1.html"><a href="introduction-1.html#workflow-functions"><i class="fa fa-check"></i><b>4.1.1</b> Workflow functions</a></li>
+<li class="chapter" data-level="4.1.2" data-path="introduction-1.html"><a href="introduction-1.html#workflow-output"><i class="fa fa-check"></i><b>4.1.2</b> Workflow output</a></li>
+<li class="chapter" data-level="4.1.3" data-path="introduction-1.html"><a href="introduction-1.html#overview-of-all-functions-and-their-output"><i class="fa fa-check"></i><b>4.1.3</b> Overview of all functions and their output</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.2</b> Preparations</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.2.1</b> Data pre-treatment</a></li>
+<li class="chapter" data-level="4.2.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.2.2</b> Analysis information</a></li>
+<li class="chapter" data-level="4.2.3" data-path="preparations.html"><a href="preparations.html#newProject"><i class="fa fa-check"></i><b>4.2.3</b> Automatic project generation with newProject()</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.3</b> Features</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.3.1</b> Finding and grouping features</a></li>
+<li class="chapter" data-level="4.3.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.3.2</b> Suspect screening</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity and MS/MS similarity</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.5</b> Incorporating adduct and isotopic data</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.5.1</b> Selecting features with preferential adducts/isotopes</a></li>
+<li class="chapter" data-level="4.5.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.5.2</b> Setting adduct annotations for feature groups</a></li>
+<li class="chapter" data-level="4.5.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.5.3</b> Using adduct annotations in the workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.6</b> Annotation</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.6.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
+<li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#suspect-screening"><i class="fa fa-check"></i><b>5.2.2</b> Suspect screening</a></li>
+<li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.3</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.4</b> Components</a></li>
+<li class="chapter" data-level="5.2.5" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.5</b> Negation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="subset.html"><a href="subset.html"><i class="fa fa-check"></i><b>5.3</b> Subsetting</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="deleting-data.html"><a href="deleting-data.html"><i class="fa fa-check"></i><b>5.4</b> Deleting data</a></li>
+<li class="chapter" data-level="5.5" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.5</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.6" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.6</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.7</b> Visualization</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.7.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.7.2</b> Overlapping and unique data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.7.3</b> MS similarity</a></li>
+<li class="chapter" data-level="5.7.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.7.4</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
+<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a>
+<ul>
+<li class="chapter" data-level="5.9.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.9.1</b> Legacy interface</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="initiating-a-sets-workflow.html"><a href="initiating-a-sets-workflow.html"><i class="fa fa-check"></i><b>6.1</b> Initiating a sets workflow</a></li>
+<li class="chapter" data-level="6.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html"><i class="fa fa-check"></i><b>6.2</b> Generating sets workflow data</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#componentization-1"><i class="fa fa-check"></i><b>6.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="6.2.2" data-path="generating-sets-workflow-data.html"><a href="generating-sets-workflow-data.html#formula-and-compound-annotation"><i class="fa fa-check"></i><b>6.2.2</b> Formula and compound annotation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="setsAdducts.html"><a href="setsAdducts.html"><i class="fa fa-check"></i><b>6.3</b> Selecting adducts to improve grouping</a></li>
+<li class="chapter" data-level="6.4" data-path="processing-data.html"><a href="processing-data.html"><i class="fa fa-check"></i><b>6.4</b> Processing data</a></li>
+<li class="chapter" data-level="6.5" data-path="advanced.html"><a href="advanced.html"><i class="fa fa-check"></i><b>6.5</b> Advanced</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#initiating-a-sets-workflow-from-feature-groups"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
+<li class="chapter" data-level="6.5.2" data-path="advanced.html"><a href="advanced.html#inspecting-and-converting-set-objects"><i class="fa fa-check"></i><b>6.5.2</b> Inspecting and converting set objects</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="TPs.html"><a href="TPs.html"><i class="fa fa-check"></i><b>7</b> Transformation product screening</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="genTPs.html"><a href="genTPs.html"><i class="fa fa-check"></i><b>7.1</b> Obtaining transformation product data</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
+<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#componentization-2"><i class="fa fa-check"></i><b>7.2.1</b> Componentization</a></li>
+<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#omitting-transformation-product-input"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
+<li class="chapter" data-level="7.2.4" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#reporting-tp-components"><i class="fa fa-check"></i><b>7.2.4</b> Reporting TP components</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="TPsExamples.html"><a href="TPsExamples.html"><i class="fa fa-check"></i><b>7.3</b> Example workflows</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx1"><i class="fa fa-check"></i><b>7.3.1</b> Screen predicted TPs for targets</a></li>
+<li class="chapter" data-level="7.3.2" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx2"><i class="fa fa-check"></i><b>7.3.2</b> Screening TPs from a library for suspects</a></li>
+<li class="chapter" data-level="7.3.3" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx3"><i class="fa fa-check"></i><b>7.3.3</b> Non-target screening of predicted TPs</a></li>
+<li class="chapter" data-level="7.3.4" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx4"><i class="fa fa-check"></i><b>7.3.4</b> Non-target screening of TPs by annotation similarities</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>8</b> Advanced usage</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>8.1</b> Adducts</a></li>
+<li class="chapter" data-level="8.2" data-path="fNorm.html"><a href="fNorm.html"><i class="fa fa-check"></i><b>8.2</b> Feature intensity normalization</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="fNorm.html"><a href="fNorm.html#feature-normalization"><i class="fa fa-check"></i><b>8.2.1</b> Feature normalization</a></li>
+<li class="chapter" data-level="8.2.2" data-path="fNorm.html"><a href="fNorm.html#group-normalization"><i class="fa fa-check"></i><b>8.2.2</b> Group normalization</a></li>
+<li class="chapter" data-level="8.2.3" data-path="fNorm.html"><a href="fNorm.html#using-normalized-intensities"><i class="fa fa-check"></i><b>8.2.3</b> Using normalized intensities</a></li>
+<li class="chapter" data-level="8.2.4" data-path="fNorm.html"><a href="fNorm.html#default-normalization"><i class="fa fa-check"></i><b>8.2.4</b> Default normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>8.3</b> Feature parameter optimization</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>8.3.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="8.3.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>8.3.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>8.4</b> Chromatographic peak qualities</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>8.4.1</b> Applying machine learning with MetaClean</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>8.5</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
+<li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
+<ul>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">patRoon handbook</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="pred" class="section level2 hasAnchor" number="8.10">
+<h2><span class="header-section-number">8.10</span> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)<a href="pred.html#pred" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <a href="https://github.com/kruvelab/MS2Tox">MS2Tox</a> and <a href="https://github.com/kruvelab/MS2Quant">MS2Quant</a> <code>R</code> packages predict toxicities and feature concentrations using a machine learning approach. The predictions are performed with either SMILES data or fingerprints calculated from MS/MS data with <code>SIRIUS+CSI:FingerID</code>. While using SMILES data is generally more accurate, using MS/MS fingerprints is generally faster and may be more suitable for features without know or suspected structure.</p>
+<p>In <code>patRoon</code> the predictions are done in two steps:</p>
+<ol style="list-style-type: decimal">
+<li>The LC50 values (toxicity prediction) or response factors (concentration prediction) are calculated for given SMILES or MS/MS fingerprint data using <code>MS2Tox</code>/<code>MS2Quant</code>. This step is performed by the <code>predictTox()</code>/<code>predictConcs()</code> method function.</li>
+<li>The predicted LC50 values are used to assign toxicities/concentrations to feature data. This is performed by the <code>calculateTox()</code>/<code>calculateConcs()</code> method function.</li>
+</ol>
+<p>Various workflow data can be used to perform the predictions for step 1:</p>
+<ol style="list-style-type: lower-alpha">
+<li>Suspect hits that were obtained with <code>screenSuspects</code> [link].</li>
+<li>Formula annotations obtained with <code>SIRIUS+CSI:FingerID</code>.</li>
+<li>Compound annotations obtained with <code>SIRIUS+CSI:FingerID</code>.</li>
+<li>Compound annotations obtained with other algorithms, e.g. <code>MetFrag</code>.</li>
+</ol>
+<p>For <em>a</em> and <em>d</em> SMILES is used to perform the calculations, for <em>b</em> MS/MS fingerprints are used and for <em>c</em> either can be used.</p>
+<blockquote>
+<p><strong><em>NOTE</em></strong> For option <em>b</em>, make sure that <code>getFingerprints=TRUE</code> when running <code>generateFormulas()</code> in order to obtain fingerprints.</p>
+</blockquote>
+<div id="predicting-toxicities" class="section level3 hasAnchor" number="8.10.1">
+<h3><span class="header-section-number">8.10.1</span> Predicting toxicities<a href="pred.html#predicting-toxicities" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Some example workflows are shown below:</p>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="pred.html#cb276-1" tabindex="-1"></a><span class="co"># Calculate toxicity for suspect hits.</span></span>
+<span id="cb276-2"><a href="pred.html#cb276-2" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp)</span>
+<span id="cb276-3"><a href="pred.html#cb276-3" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">calculateTox</span>(fGroupsSuspTox)</span>
+<span id="cb276-4"><a href="pred.html#cb276-4" tabindex="-1"></a></span>
+<span id="cb276-5"><a href="pred.html#cb276-5" tabindex="-1"></a><span class="co"># Calculate toxicity for compound hits. Limit to the top 5 to limit calculation time.</span></span>
+<span id="cb276-6"><a href="pred.html#cb276-6" tabindex="-1"></a>compoundsTop5 <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
+<span id="cb276-7"><a href="pred.html#cb276-7" tabindex="-1"></a>compoundsTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(compoundsTop5)</span>
+<span id="cb276-8"><a href="pred.html#cb276-8" tabindex="-1"></a>fGroupsTox <span class="ot">&lt;-</span> <span class="fu">calculateTox</span>(fGroups, compoundsTox)</span></code></pre></div>
+<p>It is also possible to calculate toxicities from multiple workflow objects:</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="pred.html#cb277-1" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp) <span class="co"># as above</span></span>
+<span id="cb277-2"><a href="pred.html#cb277-2" tabindex="-1"></a></span>
+<span id="cb277-3"><a href="pred.html#cb277-3" tabindex="-1"></a><span class="co"># Predict toxicities from compound candidates, using both SMILES and MS/MS fingerprints</span></span>
+<span id="cb277-4"><a href="pred.html#cb277-4" tabindex="-1"></a><span class="co"># compoundsSuspSIR is an object produced with generateCompounds() with algorithm=&quot;sirius&quot;</span></span>
+<span id="cb277-5"><a href="pred.html#cb277-5" tabindex="-1"></a>compoundsSuspSIRTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(compoundsSuspSIR, <span class="at">type =</span> <span class="st">&quot;both&quot;</span>)</span>
+<span id="cb277-6"><a href="pred.html#cb277-6" tabindex="-1"></a></span>
+<span id="cb277-7"><a href="pred.html#cb277-7" tabindex="-1"></a><span class="co"># Assign toxicities to feature groups from both suspect hits and SIRIUS annotations</span></span>
+<span id="cb277-8"><a href="pred.html#cb277-8" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">calculateTox</span>(fGroupsSuspTox, compoundsSuspSIRTox)</span></code></pre></div>
+<p>More details are in the reference manual: <code>?`pred-tox`</code>.</p>
+</div>
+<div id="predicting-concentrations" class="section level3 hasAnchor" number="8.10.2">
+<h3><span class="header-section-number">8.10.2</span> Predicting concentrations<a href="pred.html#predicting-concentrations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The workflow to predict concentrations is quite similar to predicting toxicities. However, before we can start we first have to specify the <em>calibrants</em> and the LC gradient elution program.</p>
+<p>The calibrant data is used by <code>MS2Quant</code> to convert predicted ionization efficiencies to actual response factors, which are specific to the used LC instrument and methodology. For this purpose, several mixtures with known concentrations (i.e. standards) should be measured alongside your samples. The calibrants should be specified as a <code>data.frame</code>, for instance:</p>
+<pre><code>#&gt; Calculating/Validating chemical data... Done!
+#&gt; ================================================================================
+#&gt; Found 24/30 suspects (80.00%)</code></pre>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-y: auto; height: 350px;">
+<table class="table" style="font-size: 11px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:left;">
+SMILES
+</th>
+<th style="text-align:right;">
+intensity
+</th>
+<th style="text-align:right;">
+conc
+</th>
+<th style="text-align:right;">
+rt
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+32708
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+66880
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+174087
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+371192
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+806749
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Atrazine
+</td>
+<td style="text-align:left;">
+CCNc1nc(nc(n1)Cl)NC(C)C
+</td>
+<td style="text-align:right;">
+1852591
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+336.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+25231
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+47831
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+118843
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+211395
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+545192
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carbamazepine
+</td>
+<td style="text-align:left;">
+c1ccc2c(c1)C=Cc3ccccc3N2C(=N)O
+</td>
+<td style="text-align:right;">
+1083568
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+349.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+45061
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+84859
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+228902
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+434161
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+1133166
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEET
+</td>
+<td style="text-align:left;">
+CCN(CC)C(=O)c1cccc(c1)C
+</td>
+<td style="text-align:right;">
+2385472
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+355.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+41465
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+89684
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+230890
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+400385
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+1094329
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venlafaxine
+</td>
+<td style="text-align:left;">
+CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
+</td>
+<td style="text-align:right;">
+1965139
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+324.0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The intensity column should contain either the peak intensity (height) or area. Note that some feature detection algorithms can sometimes produce inaccurate peak areas, and the area determination methodology is often different among algorithms. For this reason, using peak intensities may be more reliable, however, it is worth testing this with your data.</p>
+<p>It is also possible to use the <code>getQuantCalibFromScreening()</code> function to automatically create the calibrant table from feature group data:</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="pred.html#cb279-1" tabindex="-1"></a>calibList <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># this should be a suspect list with your calibrants</span></span>
+<span id="cb279-2"><a href="pred.html#cb279-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, calibList) <span class="co"># screen for the calibrants</span></span>
+<span id="cb279-3"><a href="pred.html#cb279-3" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># concentration data for each calibrant compound, see below</span></span>
+<span id="cb279-4"><a href="pred.html#cb279-4" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs)</span>
+<span id="cb279-5"><a href="pred.html#cb279-5" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs, <span class="at">areas =</span> <span class="cn">TRUE</span>) <span class="co"># obtain feature areas instead of intensities</span></span></code></pre></div>
+<p>The first step is to perform a <a href="features.html#suspscr">screening</a> for the calibrant compounds. Please ensure that this list should contains SMILES data, and to ensure correct feature assignment it is highly recommended to include retention times. The second requirement for <code>getQuantCalibFromScreening()</code> is a table with concentrations for each calibrant compound, e.g.:</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="pred.html#cb280-1" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb280-2"><a href="pred.html#cb280-2" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;DEET&quot;</span>, <span class="st">&quot;1h-benzotriazole&quot;</span>, <span class="st">&quot;Caffeine&quot;</span>, <span class="st">&quot;Atrazine&quot;</span>, <span class="st">&quot;Carbamazepine&quot;</span>, <span class="st">&quot;Venlafaxine&quot;</span>),</span>
+<span id="cb280-3"><a href="pred.html#cb280-3" tabindex="-1"></a>    <span class="at">standard_1 =</span> <span class="fu">c</span>(<span class="fl">1.00</span>, <span class="fl">1.05</span>, <span class="fl">1.10</span>, <span class="fl">0.99</span>, <span class="fl">1.01</span>, <span class="fl">1.12</span>),</span>
+<span id="cb280-4"><a href="pred.html#cb280-4" tabindex="-1"></a>    <span class="at">standard_2 =</span> <span class="fu">c</span>(<span class="fl">2.00</span>, <span class="fl">2.15</span>, <span class="fl">2.20</span>, <span class="fl">1.98</span>, <span class="fl">2.02</span>, <span class="fl">1.82</span>),</span>
+<span id="cb280-5"><a href="pred.html#cb280-5" tabindex="-1"></a>    <span class="at">standard_5 =</span> <span class="fu">c</span>(<span class="fl">5.01</span>, <span class="fl">5.05</span>, <span class="fl">5.22</span>, <span class="fl">5.00</span>, <span class="fl">4.88</span>, <span class="fl">4.65</span>),</span>
+<span id="cb280-6"><a href="pred.html#cb280-6" tabindex="-1"></a>    <span class="at">standard_10 =</span> <span class="fu">c</span>(<span class="fl">10.2</span>, <span class="fl">10.11</span>, <span class="fl">10.23</span>, <span class="fl">11.77</span>, <span class="fl">11.75</span>, <span class="fl">12.13</span>),</span>
+<span id="cb280-7"><a href="pred.html#cb280-7" tabindex="-1"></a>    <span class="at">standard_25 =</span> <span class="fu">c</span>(<span class="fl">25.3</span>, <span class="fl">25.12</span>, <span class="fl">25.34</span>, <span class="fl">24.89</span>, <span class="fl">24.78</span>, <span class="fl">24.68</span>),</span>
+<span id="cb280-8"><a href="pred.html#cb280-8" tabindex="-1"></a>    <span class="at">standard_50 =</span> <span class="fu">c</span>(<span class="fl">50.34</span>, <span class="fl">50.05</span>, <span class="fl">50.10</span>, <span class="fl">49.97</span>, <span class="fl">49.71</span>, <span class="fl">50.52</span>)</span>
+<span id="cb280-9"><a href="pred.html#cb280-9" tabindex="-1"></a>)</span>
+<span id="cb280-10"><a href="pred.html#cb280-10" tabindex="-1"></a>concs</span></code></pre></div>
+<pre><code>#&gt;               name standard_1 standard_2 standard_5 standard_10 standard_25 standard_50
+#&gt; 1             DEET       1.00       2.00       5.01       10.20       25.30       50.34
+#&gt; 2 1h-benzotriazole       1.05       2.15       5.05       10.11       25.12       50.05
+#&gt; 3         Caffeine       1.10       2.20       5.22       10.23       25.34       50.10
+#&gt; 4         Atrazine       0.99       1.98       5.00       11.77       24.89       49.97
+#&gt; 5    Carbamazepine       1.01       2.02       4.88       11.75       24.78       49.71
+#&gt; 6      Venlafaxine       1.12       1.82       4.65       12.13       24.68       50.52</code></pre>
+<p>The concentrations are specified separately for each calibrant compound. The column names should follow the names of the <a href="preparations.html#anaInfo">replicate groups assigned to the standards</a>. The concentration unit is µg/l by default. The next section describes how this can be changed.</p>
+<p>The gradient elution program is also specified by a <code>data.frame</code>, which for every time point (in seconds!) describes the percentage of ‘B’. In this case, ‘B’ represents the total amount of organic modifier.</p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="pred.html#cb282-1" tabindex="-1"></a>eluent <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb282-2"><a href="pred.html#cb282-2" tabindex="-1"></a>    <span class="at">time =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">180</span>, <span class="dv">600</span>, <span class="dv">900</span>, <span class="dv">960</span>),</span>
+<span id="cb282-3"><a href="pred.html#cb282-3" tabindex="-1"></a>    <span class="at">B =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">10</span>)</span>
+<span id="cb282-4"><a href="pred.html#cb282-4" tabindex="-1"></a>)</span>
+<span id="cb282-5"><a href="pred.html#cb282-5" tabindex="-1"></a><span class="fu">plot</span>(eluent, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code></pre></div>
+<p><img src="handbook_files/figure-html/unnamed-chunk-54-1.png" width="50%" /></p>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="pred.html#cb283-1" tabindex="-1"></a>eluent</span></code></pre></div>
+<pre><code>#&gt;   time   B
+#&gt; 1    0  10
+#&gt; 2  180  30
+#&gt; 3  600 100
+#&gt; 4  900 100
+#&gt; 5  960  10</code></pre>
+<p>Then, the workflow to predict concentrations is very similar then predicting toxicities (previous section):</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="pred.html#cb285-1" tabindex="-1"></a><span class="co"># Calculate concentrations for suspect hits.</span></span>
+<span id="cb285-2"><a href="pred.html#cb285-2" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
+<span id="cb285-3"><a href="pred.html#cb285-3" tabindex="-1"></a>    fGroupsSusp,</span>
+<span id="cb285-4"><a href="pred.html#cb285-4" tabindex="-1"></a>    <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
+<span id="cb285-5"><a href="pred.html#cb285-5" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="co"># organic modifier: MeOH or MeCN</span></span>
+<span id="cb285-6"><a href="pred.html#cb285-6" tabindex="-1"></a>    <span class="at">pHAq =</span> <span class="dv">4</span> <span class="co"># pH of the aqueous part of the mobile phase</span></span>
+<span id="cb285-7"><a href="pred.html#cb285-7" tabindex="-1"></a>)</span>
+<span id="cb285-8"><a href="pred.html#cb285-8" tabindex="-1"></a><span class="co"># set areas to TRUE if the calibrant table contains areas</span></span>
+<span id="cb285-9"><a href="pred.html#cb285-9" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">calculateConcs</span>(fGroupsSuspConc, <span class="at">areas =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p>As was shown for toxicities it is possible to use different data sources (e.g. compound annotations, suspects) for predictions.</p>
+<p>More details are in the reference manual: <code>?`pred-quant`</code>.</p>
+</div>
+<div id="toxicity-and-concentration-units" class="section level3 hasAnchor" number="8.10.3">
+<h3><span class="header-section-number">8.10.3</span> Toxicity and concentration units<a href="pred.html#toxicity-and-concentration-units" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The default unit for toxicity and concentration data is µg/l. However, this can be configured when calling the <code>predictTox()</code>/<code>predictRespFactors()</code> functions:</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="pred.html#cb286-1" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp) <span class="co"># default unit: ug/l</span></span>
+<span id="cb286-2"><a href="pred.html#cb286-2" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;ug/l&quot;</span>) <span class="co"># same as above</span></span>
+<span id="cb286-3"><a href="pred.html#cb286-3" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;mM&quot;</span>) <span class="co"># millimolar</span></span>
+<span id="cb286-4"><a href="pred.html#cb286-4" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;log mM&quot;</span>) <span class="co"># unit used by MS2Tox</span></span>
+<span id="cb286-5"><a href="pred.html#cb286-5" tabindex="-1"></a></span>
+<span id="cb286-6"><a href="pred.html#cb286-6" tabindex="-1"></a><span class="co"># calculated concentrations are ng/l, calibrants are specified in ug/l</span></span>
+<span id="cb286-7"><a href="pred.html#cb286-7" tabindex="-1"></a><span class="co"># (by default calibConcUnit=concUnit)</span></span>
+<span id="cb286-8"><a href="pred.html#cb286-8" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
+<span id="cb286-9"><a href="pred.html#cb286-9" tabindex="-1"></a>    fGroupsSusp, <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
+<span id="cb286-10"><a href="pred.html#cb286-10" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="at">pHAq =</span> <span class="dv">4</span>,</span>
+<span id="cb286-11"><a href="pred.html#cb286-11" tabindex="-1"></a>    <span class="at">concUnit =</span> <span class="st">&quot;ng/l&quot;</span>, <span class="at">calibConcUnit =</span> <span class="st">&quot;ug/l&quot;</span></span>
+<span id="cb286-12"><a href="pred.html#cb286-12" tabindex="-1"></a>)</span></code></pre></div>
+<p>See the reference manuals (<code>?`pred-tox`</code>/<code>?`pred-quant`</code>) For more details on which units can be specified</p>
+</div>
+<div id="inspecting-predicted-values" class="section level3 hasAnchor" number="8.10.4">
+<h3><span class="header-section-number">8.10.4</span> Inspecting predicted values<a href="pred.html#inspecting-predicted-values" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The raw toxicity and concentration data assigned to feature groups can be retrieved with the <code>toxicities()</code> and <code>concentrations()</code> method functions, respectively.</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="pred.html#cb287-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsSuspTox)</span></code></pre></div>
+<pre><code>#&gt;           group    type        candidate     candidate_name      LC50
+#&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole  59755.77
+#&gt; 2: M137_R249_53 suspect  NC(=O)Nc1ccccc1      N-Phenyl urea 101025.89
+#&gt; 3: M146_R225_70 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62
+#&gt; 4: M146_R248_69 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62
+#&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62</code></pre>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="pred.html#cb289-1" tabindex="-1"></a><span class="fu">concentrations</span>(fGroupsSuspConc)</span></code></pre></div>
+<pre><code>#&gt;           group    type        candidate     candidate_name standard-pos-1 standard-pos-2 standard-pos-3
+#&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole      43.070773      39.905306       35.21956
+#&gt; 2: M137_R249_53 suspect  NC(=O)Nc1ccccc1      N-Phenyl urea      18.485430      19.864756       17.36268
+#&gt; 3: M146_R225_70 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline      15.700200      17.662215       18.49330
+#&gt; 4: M146_R248_69 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline      19.030263      20.207821       19.54181
+#&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline       7.978394       8.646156        8.67157</code></pre>
+<p>If there were multiple candidates for a single feature group then these are split over the table rows:</p>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="pred.html#cb291-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsTox)</span></code></pre></div>
+<pre><code>#&gt;             group     type                  candidate                     candidate_name      LC50
+#&gt;  1:  M120_R268_30 compound          C1=CC(=NC=C1N)C#N     5-aminopyridine-2-carbonitrile 132007.55
+#&gt;  2:  M120_R268_30 compound        C1=CC2=C(N=C1)N=CN2          1H-imidazo[4,5-b]pyridine 125872.29
+#&gt;  3:  M120_R268_30 compound          C1=CC2=NNN=C2C=C1                   2H-benzotriazole  65155.26
+#&gt;  4:  M120_R268_30 compound          C1=CN=CC(=C1N)C#N     4-aminopyridine-3-carbonitrile  83309.12
+#&gt;  5:  M120_R268_30 compound          C1=CNC2=CN=CN=C21        5H-pyrrolo[3,2-d]pyrimidine  88213.59
+#&gt; ---                                                                                               
+#&gt; 16: M192_R355_191 compound CCN(CC)C(=O)C1=CC=C(C=C1)C      N,N-diethyl-4-methylbenzamide  86651.19
+#&gt; 17: M192_R355_191 compound CCN(CC)C(=O)C1=CC=CC(=C1)C      N,N-diethyl-3-methylbenzamide 114064.57
+#&gt; 18: M192_R355_191 compound   CCN(CC)C(=O)C1=CC=CC=C1C      N,N-diethyl-2-methylbenzamide  81126.15
+#&gt; 19: M192_R355_191 compound   CCN(CC)C(=O)CC1=CC=CC=C1      N,N-diethyl-2-phenylacetamide  88445.02
+#&gt; 20: M192_R355_191 compound CCN(CC)C1=CC=C(C=C1)C(=O)C 1-[4-(diethylamino)phenyl]ethanone  96005.28</code></pre>
+<p>The <code>as.data.table()</code> method function, which <a href="processing.html#processing">was discussed previously</a>, can be used to summarize toxicity and concentration values.</p>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="pred.html#cb293-1" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: NA values are filtered and columns are subset for readability</span></span>
+<span id="cb293-2"><a href="pred.html#cb293-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox)[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
+<pre><code>#&gt;            group      LC50 LC50_types
+#&gt; 1:  M120_R268_30  98911.56   compound
+#&gt; 2:  M137_R249_53 149557.04   compound
+#&gt; 3:  M146_R309_68  41178.78   compound
+#&gt; 4: M192_R355_191  93258.44   compound</code></pre>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="pred.html#cb295-1" tabindex="-1"></a>concCols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="fu">paste0</span>(<span class="fu">analyses</span>(fGroupsSuspConc), <span class="st">&quot;_conc&quot;</span>), <span class="st">&quot;conc_types&quot;</span>)</span>
+<span id="cb295-2"><a href="pred.html#cb295-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspConc)[<span class="sc">!</span><span class="fu">is.na</span>(conc_types), concCols, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
+<pre><code>#&gt;           group standard-pos-1_conc standard-pos-2_conc standard-pos-3_conc conc_types
+#&gt; 1: M120_R268_30           43.070773           39.905306            35.21956    suspect
+#&gt; 2: M137_R249_53           18.485430           19.864756            17.36268    suspect
+#&gt; 3: M146_R309_68            7.978394            8.646156             8.67157    suspect
+#&gt; 4: M146_R248_69           19.030263           20.207821            19.54181    suspect
+#&gt; 5: M146_R225_70           15.700200           17.662215            18.49330    suspect</code></pre>
+<p>The <code>as.data.table()</code> method function <em>aggregates</em> the data for a feature group in case multiple candidates were assigned to it. By default the values are mean averaged, but this be changed with the <code>toxAggrParams</code>/<code>concAggrParams</code> arguments, for instance:</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="pred.html#cb297-1" tabindex="-1"></a><span class="co"># as above, but aggregate by taking maximum values</span></span>
+<span id="cb297-2"><a href="pred.html#cb297-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox, <span class="at">toxAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(max))[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
+<pre><code>#&gt;            group      LC50 LC50_types
+#&gt; 1:  M120_R268_30 132007.55   compound
+#&gt; 2:  M137_R249_53 314718.38   compound
+#&gt; 3:  M146_R309_68  49051.68   compound
+#&gt; 4: M192_R355_191 114064.57   compound</code></pre>
+<p>Finally, the <a href="report.html#report">reporting functionality</a> can be used to overview all predicted values, both aggregated and raw.</p>
+</div>
+<div id="using-predicted-values-to-prioritize-data" class="section level3 hasAnchor" number="8.10.5">
+<h3><span class="header-section-number">8.10.5</span> Using predicted values to prioritize data<a href="pred.html#using-predicted-values-to-prioritize-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>filter()</code> method function that was <a href="filtering.html#filtering">introduced before</a> can also be used to filter data based on predicted toxicities, response factors and concentrations. For instance, this allows you to remove annotation candidates which are unlikely to be toxic or sensitive enough to be detected or any features with very low concentrations. Some examples are shown below.</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="pred.html#cb299-1" tabindex="-1"></a><span class="co"># compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate</span></span>
+<span id="cb299-2"><a href="pred.html#cb299-2" tabindex="-1"></a><span class="co"># we can use the common scoreLimits filter to select a range of allowed values (min/max)</span></span>
+<span id="cb299-3"><a href="pred.html#cb299-3" tabindex="-1"></a>compoundsSuspSIRToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsSuspSIRTox, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">LC50_SMILES =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1E4</span>)))</span>
+<span id="cb299-4"><a href="pred.html#cb299-4" tabindex="-1"></a></span>
+<span id="cb299-5"><a href="pred.html#cb299-5" tabindex="-1"></a><span class="co"># for suspects with predicted toxicities/response factors there are dedicated filters</span></span>
+<span id="cb299-6"><a href="pred.html#cb299-6" tabindex="-1"></a>fGroupsSuspConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSuspConc, <span class="at">minRF =</span> <span class="fl">5E4</span>) <span class="co"># remove suspect hits with response factor &lt;5E4</span></span>
+<span id="cb299-7"><a href="pred.html#cb299-7" tabindex="-1"></a>fGroupsSuspToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(ffGroupsSuspTox, <span class="at">maxLC50 =</span> <span class="dv">100</span>) <span class="co"># remove suspect hits with LC50 values &gt; 100</span></span>
+<span id="cb299-8"><a href="pred.html#cb299-8" tabindex="-1"></a></span>
+<span id="cb299-9"><a href="pred.html#cb299-9" tabindex="-1"></a><span class="co"># similarly, for feature data there are dedicated filters.</span></span>
+<span id="cb299-10"><a href="pred.html#cb299-10" tabindex="-1"></a><span class="co"># note that these aggregate data prior to filtering (see previous section)</span></span>
+<span id="cb299-11"><a href="pred.html#cb299-11" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>)</span>
+<span id="cb299-12"><a href="pred.html#cb299-12" tabindex="-1"></a><span class="co"># only keep features with concentrations that are at least 1% of their toxicity</span></span>
+<span id="cb299-13"><a href="pred.html#cb299-13" tabindex="-1"></a><span class="co"># note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()</span></span>
+<span id="cb299-14"><a href="pred.html#cb299-14" tabindex="-1"></a>fGroupsConcToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConcTox, <span class="at">absMinConcTox =</span> <span class="fl">0.01</span>)</span>
+<span id="cb299-15"><a href="pred.html#cb299-15" tabindex="-1"></a></span>
+<span id="cb299-16"><a href="pred.html#cb299-16" tabindex="-1"></a><span class="co"># also get rid of features without concentrations (these are ignored by default)</span></span>
+<span id="cb299-17"><a href="pred.html#cb299-17" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>, <span class="at">removeNA =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb299-18"><a href="pred.html#cb299-18" tabindex="-1"></a><span class="co"># like as.data.table we can configure how values are aggregated</span></span>
+<span id="cb299-19"><a href="pred.html#cb299-19" tabindex="-1"></a><span class="co"># here the minimum is used instead of the default mean</span></span>
+<span id="cb299-20"><a href="pred.html#cb299-20" tabindex="-1"></a>fGroupsToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsTox, <span class="at">absMaxTox =</span> <span class="fl">5E3</span>, <span class="at">predAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(min))</span></code></pre></div>
+<p>More details are found in the reference manual (<code>?`feature-filtering`</code>).</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="feature-regression-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="FCCalc.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": false,
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": false
+}
+});
+});
+</script>
+
+</body>
+
+</html>

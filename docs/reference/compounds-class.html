@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compound annotations class</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds.R" class="external-link"><code>R/compounds.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-set.R" class="external-link"><code>R/compounds-set.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds.R" class="external-link"><code>R/compounds.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/compounds-set.R" class="external-link"><code>R/compounds-set.R</code></a>, and 1 more</small>
     <div class="hidden name"><code>compounds-class.Rd</code></div>
     </div>
 
@@ -249,7 +249,10 @@ consensus(
 unset(obj, set)
 
 # S4 method for compoundsConsensusSet
-unset(obj, set)</code></pre></div>
+unset(obj, set)
+
+# S4 method for compoundsSIRIUS
+delete(obj, i = NULL, j = NULL, ...)</code></pre></div>
     </div>
 
     <div id="arguments">
@@ -259,16 +262,10 @@ unset(obj, set)</code></pre></div>
 and <code>annotatedPeakList</code>: set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>updateScore</dt>
-<dd><p>If set to <code>TRUE</code> then the <code>score</code> column is
-updated by adding the normalized <span class="option">formulaScore</span> (weighted by
-<span class="option">formulaScoreWeight</span>). Currently, this <strong>only</strong> makes sense for
-<code class="command">MetFrag</code> results!</p></dd>
-
-
-<dt>formulaScoreWeight</dt>
-<dd><p>Weight used to update scoring (see
-<code>updateScore</code> parameter).</p></dd>
+<dt>updateScore, formulaScoreWeight</dt>
+<dd><p>If <code>updateScore=TRUE</code> then the annotation <code>score</code> column is updated
+by adding normalized values of the formula score (weighted by <span class="option">formulaScoreWeight</span>). Currently, this
+<strong>only</strong> makes sense for annotations performed with <code class="command">MetFrag</code>!</p></dd>
 
 
 <dt>obj, object, compounds, x</dt>
@@ -552,6 +549,7 @@ create this object.</p></dd>
 <li><p><code>compoundsSet</code></p><ul><li><p><code>compoundsConsensusSet</code></p></li>
 </ul></li>
 <li><p><code>compoundsUnset</code></p></li>
+<li><p><code><a href="compoundsSIRIUS-class.html">compoundsSIRIUS</a></code></p></li>
 </ul></li>
 </ul></li>
 </ul></div>

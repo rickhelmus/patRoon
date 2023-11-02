@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.4 Processing data | patRoon handbook</title>
   <meta name="description" content="6.4 Processing data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.35 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.4 Processing data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-09-28" />
+<meta name="date" content="2023-11-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,16 +52,16 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
-<script src="libs/kePrint-0.0.1/kePrint.js"></script>
-<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
@@ -177,14 +177,19 @@ div.csl-indent {
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
-<li class="chapter" data-level="2.2" data-path="docker-image.html"><a href="docker-image.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<li class="chapter" data-level="2.1" data-path="pBundle.html"><a href="pBundle.html"><i class="fa fa-check"></i><b>2.1</b> patRoon Bundle</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
-<li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
-<li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
+<li class="chapter" data-level="2.1.1" data-path="pBundle.html"><a href="pBundle.html#updating-the-bundle"><i class="fa fa-check"></i><b>2.1.1</b> Updating the bundle</a></li>
+<li class="chapter" data-level="2.1.2" data-path="pBundle.html"><a href="pBundle.html#details"><i class="fa fa-check"></i><b>2.1.2</b> Details</a></li>
 </ul></li>
+<li class="chapter" data-level="2.2" data-path="Docker.html"><a href="Docker.html"><i class="fa fa-check"></i><b>2.2</b> Docker image</a></li>
+<li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -320,14 +325,22 @@ div.csl-indent {
 <li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
 <li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Basic quantitative and regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.10</b> Fold changes</a></li>
-<li class="chapter" data-level="8.11" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.11</b> Caching</a></li>
-<li class="chapter" data-level="8.12" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.12</b> Parallelization</a>
+<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
 <ul>
-<li class="chapter" data-level="8.12.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.12.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.12.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.12.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.12.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.12.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
+<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
+<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
+<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -351,27 +364,27 @@ div.csl-indent {
 <div id="processing-data" class="section level2 hasAnchor" number="6.4">
 <h2><span class="header-section-number">6.4</span> Processing data<a href="processing-data.html#processing-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>All data objects that are generated during a sets workflow <em>inherit</em> from the classes from a ‘regular’ workflow. This means that, with some minor exceptions, <em>all</em> of the data processing functionality discussed in the <a href="processing.html#processing">previous chapter</a> (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the <code>as.data.table()</code> method can be used for general inspection:</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="processing-data.html#cb161-1" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="processing-data.html#cb164-1" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group score-positive score-negative                           compoundName               set
-#&gt; 1: M198_R317_272       3.368104       4.526321    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 2: M198_R317_272       1.782297       2.025304    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 3: M198_R317_272       1.688567       1.792079 2-amino-4-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 4: M198_R317_272       1.684356       1.855199 3-amino-5-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 5: M198_R317_272       1.772617       1.521663         1-(2-chlorophenyl)-3-ethylurea positive,negative</code></pre>
+#&gt; 1: M198_R317_273       3.386623       4.544840    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 2: M198_R317_273       1.783536       2.026543    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 3: M198_R317_273       1.775047       1.524093         1-(4-chlorophenyl)-3-ethylurea positive,negative
+#&gt; 4: M198_R317_273       1.688435       1.791947 2-amino-4-chloro-N,N-dimethylbenzamide positive,negative
+#&gt; 5: M198_R317_273       1.684356       1.855199 3-amino-5-chloro-N,N-dimethylbenzamide positive,negative</code></pre>
 <p>In addition, some the data processing functionality contains additional functionality for a sets workflow:</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="processing-data.html#cb163-1" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
-<span id="cb163-2"><a href="processing-data.html#cb163-2" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
-<span id="cb163-3"><a href="processing-data.html#cb163-3" tabindex="-1"></a><span class="co"># only keep feature groups that have feature data for all sets</span></span>
-<span id="cb163-4"><a href="processing-data.html#cb163-4" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span>
-<span id="cb163-5"><a href="processing-data.html#cb163-5" tabindex="-1"></a></span>
-<span id="cb163-6"><a href="processing-data.html#cb163-6" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
-<span id="cb163-7"><a href="processing-data.html#cb163-7" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">sets =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb163-8"><a href="processing-data.html#cb163-8" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
-<span id="cb163-9"><a href="processing-data.html#cb163-9" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">sets =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="processing-data.html#cb166-1" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
+<span id="cb166-2"><a href="processing-data.html#cb166-2" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
+<span id="cb166-3"><a href="processing-data.html#cb166-3" tabindex="-1"></a><span class="co"># only keep feature groups that have feature data for all sets</span></span>
+<span id="cb166-4"><a href="processing-data.html#cb166-4" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span>
+<span id="cb166-5"><a href="processing-data.html#cb166-5" tabindex="-1"></a></span>
+<span id="cb166-6"><a href="processing-data.html#cb166-6" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
+<span id="cb166-7"><a href="processing-data.html#cb166-7" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">sets =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb166-8"><a href="processing-data.html#cb166-8" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
+<span id="cb166-9"><a href="processing-data.html#cb166-9" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">sets =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>And plotting:</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="processing-data.html#cb164-1" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">sets =</span> <span class="cn">TRUE</span>) <span class="co"># compare positive/negative features</span></span>
-<span id="cb164-2"><a href="processing-data.html#cb164-2" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_272&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
-<span id="cb164-3"><a href="processing-data.html#cb164-3" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="processing-data.html#cb167-1" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">sets =</span> <span class="cn">TRUE</span>) <span class="co"># compare positive/negative features</span></span>
+<span id="cb167-2"><a href="processing-data.html#cb167-2" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_273&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
+<span id="cb167-3"><a href="processing-data.html#cb167-3" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="handbook_files/figure-html/setsProcDataExtraPlotting-1.png" width="50%" /><img src="handbook_files/figure-html/setsProcDataExtraPlotting-2.png" width="50%" /></p>
 <p>The reference manual for the workflow objects contains specific notes applicable to sets workflows (<code>?featureGroups</code>, <code>?compounds</code> etc).</p>
 </div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -184,6 +184,12 @@ adducts(obj)
 # S4 method for featureGroups
 adducts(obj) &lt;- value
 
+# S4 method for featureGroups
+concentrations(fGroups)
+
+# S4 method for featureGroups
+toxicities(fGroups)
+
 # S4 method for featureGroups,ANY,ANY,missing
 [(x, i, j, ..., rGroups, results, drop = TRUE)
 
@@ -209,7 +215,10 @@ as.data.table(
   regression = FALSE,
   averageFunc = mean,
   normalized = FALSE,
-  FCParams = NULL
+  FCParams = NULL,
+  concAggrParams = getDefPredAggrParams(),
+  toxAggrParams = getDefPredAggrParams(),
+  normConcToTox = FALSE
 )
 
 # S4 method for featureGroups
@@ -275,19 +284,6 @@ featureTable(obj)
 
 # S4 method for featureGroupsSet
 export(obj, type, out, set)
-
-# S4 method for featureGroupsSet
-as.data.table(
-  x,
-  average = FALSE,
-  areas = FALSE,
-  features = FALSE,
-  qualities = FALSE,
-  regression = FALSE,
-  averageFunc = mean,
-  normalized = FALSE,
-  FCParams = NULL
-)
 
 # S4 method for featureGroupsSet
 unique(x, which, ..., sets = FALSE)
@@ -484,6 +480,17 @@ no <code>conc</code> column is present in the analysis information or when less 
 <code>NULL</code> to not perform FC calculations.</p></dd>
 
 
+<dt>concAggrParams, toxAggrParams</dt>
+<dd><p>Parameters to aggregate calculated concentrations/toxicities (obtained with
+<code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>). See <a href="pred-aggr-params.html">prediction aggregation
+parameters</a> for more information. Set to <code>NULL</code> to omit this data.</p></dd>
+
+
+<dt>normConcToTox</dt>
+<dd><p>Set to <code>TRUE</code> to normalize concentrations to toxicities. Only relevant if this data is
+present (see <code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>).</p></dd>
+
+
 <dt>relativeTo</dt>
 <dd><p>A character vector with replicate groups that should be
 used for unique comparison. If <code>NULL</code> then all replicate groups are
@@ -596,6 +603,8 @@ replicate groups for which data is present in this object.</p></li>
 <li><p><code>adducts(featureGroups)</code>: Returns a named <code>character</code> with adduct annotations assigned to each feature group (if
 available).</p></li>
 <li><p><code>adducts(featureGroups) &lt;- value</code>: Sets adduct annotations for feature groups.</p></li>
+<li><p><code>concentrations(featureGroups)</code>: Accessor for <code>concentrations</code> slot.</p></li>
+<li><p><code>toxicities(featureGroups)</code>: Accessor for <code>toxicities</code> slot.</p></li>
 <li><p><code>x[i</code>: Subset on analyses/feature groups.</p></li>
 <li><p><code>x[[i</code>: Extract intensity values.</p></li>
 <li><p><code>$</code>: Extract intensity values for a feature group.</p></li>
@@ -677,6 +686,12 @@ method).</p></dd>
 <dt><code>ISTDAssignments</code></dt>
 <dd><p>A <code>list</code>, where each item is named by a feature group and consists of a vector with
 feature group names of the internal standards assigned to it (filled in by the <code>normInts</code> method).</p></dd>
+
+
+<dt><code>concentrations,toxicities</code></dt>
+<dd><p>A <code>data.table</code> with predicted concentrations/toxicities for each feature group.
+Assigned by the <code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code> methods. Use the
+<code>concentratrions</code>/<code>toxicities</code> methods for access.</p></dd>
 
 
 <dt><code>groupAlgo,groupArgs,groupVerbose</code></dt>

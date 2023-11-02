@@ -18,7 +18,7 @@ annotations, and TPs."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -134,7 +134,7 @@ annotations, and TPs.</p>
 <span>  overrideSettings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">genReportSettingsFile</span><span class="op">(</span>out <span class="op">=</span> <span class="st">"report.yml"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">genReportSettingsFile</span><span class="op">(</span>out <span class="op">=</span> <span class="st">"report.yml"</span>, baseFrom <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -189,6 +189,11 @@ see the parallelization section in the handbook for more details.</p></dd>
 
 <dt>out</dt>
 <dd><p>The output file path.</p></dd>
+
+
+<dt>baseFrom</dt>
+<dd><p>An existing report file to which the report settings should be based from. This is primarily used to
+update old settings files: the output settings file will be based on the old settings and amended with any missing.</p></dd>
 
 </dl></div>
     <div id="details">

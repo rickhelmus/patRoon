@@ -198,7 +198,7 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5,
 ```
 
 
-The following filterings steps will be performed:
+The following filtering steps will be performed:
 
 * Features are removed if their intensity is below a defined intensity threshold (set by `absMinIntensity`). This filter is an effective way to  not only remove 'noisy' data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.
 * If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate group. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.
@@ -329,9 +329,9 @@ as.data.table(compounds)[, 1:5] # only show first columns for clarity
 ```
 
 ```{r plotSpectrum,fig.width=6,fig.height=3.5,eval=doCompounds}
-plotSpectrum(mslists, "M215_R333_2275", MSLevel = 2)
-plotSpectrum(formulas, 1, "M109_R192_158", MSPeakLists = mslists)
-plotSpectrum(compounds, 1, "M120_R268_286", mslists, plotStruct = TRUE)
+plotSpectrum(mslists, "M186_R293_1568", MSLevel = 2)
+plotSpectrum(formulas, 1, "M109_R192_157", MSPeakLists = mslists)
+plotSpectrum(compounds, 1, "M120_R268_288", mslists, plotStruct = TRUE)
 ```
 
 # Reporting

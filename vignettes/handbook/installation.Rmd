@@ -220,7 +220,7 @@ if (knitr::is_html_output())
     k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
 } else
 {
-    k <- knitr::kable(dt, format = "latex", booktabs = TRUE, escape = FALSE)
+    k <- knitr::kable(tab, format = "latex", booktabs = TRUE, escape = FALSE)
     k <- kableExtra::kable_styling(k, font_size = 7)
 }
 

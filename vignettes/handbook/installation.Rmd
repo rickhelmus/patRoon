@@ -22,9 +22,9 @@ Then, set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` director
 
 ```{r bundle_rstudio,echo=FALSE}
 if (knitr::is_html_output()) {
-    knitr::include_graphics(knitr::image_uri("bundle.png"), error = FALSE)
+    knitr::include_graphics(knitr::image_uri(file.path(vignDir, "handbook", "bundle.png")), error = FALSE)
 } else
-    knitr::include_graphics("bundle.png")
+    knitr::include_graphics(file.path(vignDir, "handbook", "bundle.png"))
 ```
 
 

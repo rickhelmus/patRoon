@@ -201,6 +201,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calcAnnSims
+std::vector<double> calcAnnSims(Rcpp::DataFrame spectrum, Rcpp::List annotatedInds, const std::string& method, double mzWeight, double intWeight, double mzWindow);
+RcppExport SEXP _patRoon_calcAnnSims(SEXP spectrumSEXP, SEXP annotatedIndsSEXP, SEXP methodSEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type spectrum(spectrumSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type annotatedInds(annotatedIndsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWeight(mzWeightSEXP);
+    Rcpp::traits::input_parameter< double >::type intWeight(intWeightSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcAnnSims(spectrum, annotatedInds, method, mzWeight, intWeight, mzWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // addFilesToOpenMSIni
 void addFilesToOpenMSIni(const std::string& file, const std::vector<std::string>& inFiles, const std::vector<std::string>& outFiles);
 RcppExport SEXP _patRoon_addFilesToOpenMSIni(SEXP fileSEXP, SEXP inFilesSEXP, SEXP outFilesSEXP) {
@@ -229,6 +245,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},
     {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
+    {"_patRoon_calcAnnSims", (DL_FUNC) &_patRoon_calcAnnSims, 6},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
     {NULL, NULL, 0}
 };

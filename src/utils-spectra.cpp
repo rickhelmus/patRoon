@@ -353,14 +353,10 @@ Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::Chara
                                    Rcpp::Named("ID_2") = binnedSpec.IDsRight);
 }
 
-double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &method,
+double doCalcSpecSimilarity(const BinnedSpectrum &binnedSpec, const std::string &method,
                             const std::string &shift, double precDiff,
                             double mzWeight, double intWeight, double mzWindow)
 {
-    normalizeNums(sp1.intensities); normalizeNums(sp2.intensities);
-    
-    BinnedSpectrum binnedSpec = doBinSpectra(sp1, sp2, shift, precDiff, mzWindow);
-    
     // UNDONE: pearsons/spearman? needs sorting?
     if (method == "cosine")
     {
@@ -403,6 +399,15 @@ double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &metho
     return NA_REAL; // shouldn't be here
 }
 
+double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &method,
+                            const std::string &shift, double precDiff,
+                            double mzWeight, double intWeight, double mzWindow)
+{
+    normalizeNums(sp1.intensities); normalizeNums(sp2.intensities);
+    const BinnedSpectrum binnedSpec = doBinSpectra(sp1, sp2, shift, precDiff, mzWindow);
+    return doCalcSpecSimilarity(binnedSpec, method, shift, precDiff, mzWeight, intWeight, mzWindow);
+}
+
 // [[Rcpp::export]]
 Rcpp::NumericVector calcSpecSimilarity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector method,
                                        Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff,
@@ -414,4 +419,37 @@ Rcpp::NumericVector calcSpecSimilarity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2,
                                                             Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
                                                             Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight),
                                                             Rcpp::as<double>(mzWindow)));
+}
+
+// [[Rcpp::export]]
+std::vector<double> calcAnnSims(Rcpp::DataFrame spectrum, Rcpp::List annotatedInds, const std::string &method,
+                                double mzWeight, double intWeight, double mzWindow)
+{
+    // Create a dummy bin spectrum: the reference spectrum is compared to itself, minus the unannotated peaks. The right
+    // spectrum is the one with just the annotated peaks. The intensities of left/right are the same, but will only be
+    // set below if the peak was annotated.
+    BinnedSpectrum binsp;
+    binsp.mzs = Rcpp::as<std::vector<double>>(spectrum["mz"]);
+    binsp.intsLeft = Rcpp::as<std::vector<double>>(spectrum["intensity"]);
+    binsp.IDsLeft = binsp.IDsRight = Rcpp::as<std::vector<int>>(spectrum["ID"]);
+    
+    std::vector<double> ret(annotatedInds.size());
+    for (int i=0; i<annotatedInds.size(); ++i)
+    {
+        const Rcpp::IntegerVector ai = Rcpp::as<Rcpp::IntegerVector>(annotatedInds[i]);
+        const std::set<int> annInds(ai.begin(), ai.end());
+
+        binsp.intsRight.clear();        
+        for (size_t i=0; i<binsp.IDsLeft.size(); ++i)
+        {
+            if (annInds.find(binsp.IDsLeft[i]) != annInds.end())
+                binsp.intsRight.push_back(binsp.intsLeft[i]);
+            else
+                binsp.intsRight.push_back(0.0);
+        }
+        
+        ret[i] = doCalcSpecSimilarity(binsp, method, "none", 0.0, mzWeight, intWeight, mzWindow);
+    }
+    
+    return ret;
 }

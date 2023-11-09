@@ -21,10 +21,7 @@ Start RStudio --> Tools menu --> Global options --> General tab --> R version --
 Then, set the `R` version by selecting `Rterm.exe` from the `R/bin/x64` directory in the bundle (see screenshot below) and restart RStudio.
 
 ```{r bundle_rstudio,echo=FALSE}
-if (knitr::is_html_output()) {
-    knitr::include_graphics(knitr::image_uri(file.path(vignDir, "handbook", "bundle.png")), error = FALSE)
-} else
-    knitr::include_graphics(file.path(vignDir, "handbook", "bundle.png"))
+knitr::include_graphics(file.path(vignDir, "handbook", "bundle.png"))
 ```
 
 

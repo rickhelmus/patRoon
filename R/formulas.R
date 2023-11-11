@@ -418,8 +418,10 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
 #'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
-setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
-                                            uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
+setMethod("consensus", "formulas", function(obj, ..., MSPeakLists,
+                                            specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                            absMinAbundance = NULL, relMinAbundance = NULL, uniqueFrom = NULL,
+                                            uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
 {
     # NOTE: keep args in sync with formulasSet method
     
@@ -429,6 +431,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = any(lengths(allFormulas) > 0), .var.name = "...", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFormulas), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -443,7 +446,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
     
     ret <- formulasConsensus(groupAnnotations = cons, featureFormulas = list(),
                              algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ","),
-                             mergedConsensusNames = labels)
+                             mergedConsensusNames = labels, MSPeakLists = MSPeakLists, specSimParams = specSimParams)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
     
@@ -507,11 +510,12 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL, re
 #' @templateVar what generateFormulas
 #' @template main-rd-method
 #' @export
-setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
+setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, algorithm, specSimParams, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertChoice(algorithm, c("bruker", "genform", "sirius"))
+    assertSpecSimParams(specSimParams)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
@@ -519,5 +523,5 @@ setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, al
                 genform = generateFormulasGenForm,
                 sirius = generateFormulasSIRIUS)
     
-    f(fGroups, MSPeakLists, ...)
+    f(fGroups, MSPeakLists, specSimParams, ...)
 })

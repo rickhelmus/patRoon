@@ -674,10 +674,10 @@ setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 #'   \code{compounds} objects.
 #'
 #' @export
-setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
-                                             relMinAbundance = NULL,
-                                             uniqueFrom = NULL, uniqueOuter = FALSE,
-                                             rankWeights = 1, labels = NULL)
+setMethod("consensus", "compounds", function(obj, ..., MSPeakLists,
+                                             specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                             absMinAbundance = NULL, relMinAbundance = NULL, uniqueFrom = NULL,
+                                             uniqueOuter = FALSE, rankWeights = 1, labels = NULL)
 {
     # NOTE: keep args in sync with compoundsSet method
     
@@ -687,6 +687,8 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = any(lengths(allCompounds) > 0), .var.name = "...", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumeric(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -719,7 +721,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
     ret <- compoundsConsensus(groupAnnotations = cons, scoreTypes = scoreTypes, scoreRanges = scRanges,
                               algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ","),
-                              mergedConsensusNames = labels)
+                              mergedConsensusNames = labels, MSPeakLists = MSPeakLists, specSimParams = specSimParams)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, FALSE)
     
@@ -766,11 +768,12 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' @templateVar what generateCompounds
 #' @template main-rd-method
 #' @export
-setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
+setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, algorithm, specSimParams, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertChoice(algorithm, c("metfrag", "sirius", "library"), add = ac)
+    assertSpecSimParams(specSimParams)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
@@ -778,5 +781,5 @@ setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, a
                 sirius = generateCompoundsSIRIUS,
                 library = generateCompoundsLibrary)
 
-    f(fGroups, MSPeakLists, ...)
+    f(fGroups, MSPeakLists, specSimParams, ...)
 })

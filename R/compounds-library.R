@@ -88,23 +88,24 @@ unifyLibNames <- function(cTab)
 #' @templateVar what generateCompoundsLibrary
 #' @template main-rd-method
 #' @export
-setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
+setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists,
+                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                MSLibrary, minSim = 0.75,
                                                                 minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
                                                                 checkIons = "adduct", spectrumType = "MS2",
-                                                                specSimParams = getDefSpecSimParams(),
+                                                                specSimParamsMatch = getDefSpecSimParams(),
                                                                 specSimParamsLib = getDefSpecSimParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    aapply(assertSpecSimParams, . ~ specSimParams + specSimParamsMatch + specSimParamsLib, fixed = list(add = ac))
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
     aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
-    assertSpecSimParams(specSimParams, add = ac)
-    assertSpecSimParams(specSimParamsLib, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (specSimParams$shift != "none")
+    if (specSimParamsMatch$shift != "none")
         stop("Spectral shifting not supported", call. = FALSE)
     
     if (length(fGroups) == 0)
@@ -147,7 +148,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         libRecs <- libRecs[Spectrum_type %chin% spectrumType]
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams, specSimParamsLib)
+    baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParamsMatch, specSimParamsLib)
     setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)
     cachedSet <- loadCacheSet("compoundsLibrary", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
@@ -168,8 +169,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         
         precMZ <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
         
-        spec <- prepSpecSimilarityPL(spec, removePrecursor = specSimParams$removePrecursor,
-                                     relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
+        spec <- prepSpecSimilarityPL(spec, removePrecursor = specSimParamsMatch$removePrecursor,
+                                     relMinIntensity = specSimParamsMatch$relMinIntensity,
+                                     minPeaks = specSimParamsMatch$minPeaks)
         if (nrow(spec) == 0)
             return(NULL)
         
@@ -213,8 +215,8 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         if (nrow(cTab) == 0)
             return(NULL)
         
-        sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
-                             0, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
+        sims <- specDistRect(list(spec), lspecs, specSimParamsMatch$method, specSimParamsMatch$shift, 0,
+                             0, specSimParamsMatch$mzWeight, specSimParamsMatch$intWeight, specSimParamsMatch$absMzDev)
         
         cTab[, c("score", "libMatch") := sims[1, ]]
         
@@ -244,7 +246,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
         # fill in fragInfos
         cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey1, neutral_formula, f = function(ls, ik1, form)
         {
-            bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
+            bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParamsMatch$absMzDev))
             bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
             
             # NOTE: the mz values from the binned spectra could be slightly different --> take the original values
@@ -269,7 +271,7 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                         return(NULL)
                     
                     # find overlapping peaks
-                    bsp2 <- as.data.table(binSpectra(specMatched, lsp, "none", 0, specSimParams$absMzDev))
+                    bsp2 <- as.data.table(binSpectra(specMatched, lsp, "none", 0, specSimParamsMatch$absMzDev))
                     bsp2 <- bsp2[intensity_1 != 0 & intensity_2 != 0] # overlap
                     
                     if (nrow(bsp2) == 0)
@@ -314,20 +316,23 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     
     return(compounds(groupAnnotations = compList, scoreTypes = c("score", "libMatch"),
-                     scoreRanges = sapply(compList, function(ct) list(score = range(ct$score), libMatch = range(ct$libMatch)), simplify = FALSE),
-                     algorithm = "library"))
+                     scoreRanges = sapply(compList, function(ct) list(score = range(ct$score),
+                                                                      libMatch = range(ct$libMatch)), simplify = FALSE),
+                     algorithm = "library", MSPeakLists = MSPeakLists, specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
 #' @rdname generateCompoundsLibrary
 #' @export
-setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
+setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                   MSLibrary, minSim = 0.75,
                                                                    minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
-                                                                  ..., setThreshold = 0, setThresholdAnn = 0,
-                                                                  setAvgSpecificScores = FALSE)
+                                                                   ..., setThreshold = 0, setThresholdAnn = 0,
+                                                                   setAvgSpecificScores = FALSE)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsLibrary, MSLibrary = MSLibrary, minSim = minSim,
-                         minAnnSim = minAnnSim, absMzDev = absMzDev, ..., setThreshold = setThreshold,
+    generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsLibrary, MSLibrary = MSLibrary,
+                         minSim = minSim, minAnnSim = minAnnSim, absMzDev = absMzDev, ..., setThreshold = setThreshold,
                          setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores)
 })

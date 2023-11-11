@@ -197,29 +197,31 @@ test_that("as.data.table() works", {
 })
 
 if (doSIRIUS)
-    fCons <- doFormCons(formsGF, formsSIR)
+    fCons <- doFormCons(formsGF, formsSIR, MSPeakLists = plists)
 
 test_that("consensus works", {
-    expect_length(doFormCons(formsGF, formsGFEmpty), length(formsGF))
+    expect_length(doFormCons(formsGF, formsGFEmpty, MSPeakLists = plists), length(formsGF))
 
     skip_if_not(doSIRIUS)
     expect_known_value(fCons, testFile("formulas-cons"))
     expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
-    expect_setequal(groupNames(doFormCons(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
-    expect_lt(length(doFormCons(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
-    expect_length(doFormCons(formsGFEmpty, formsSIREmpty), 0)
+    expect_setequal(groupNames(doFormCons(formsGF, formsSIR, MSPeakLists = plists)),
+                    union(groupNames(formsGF), groupNames(formsSIR)))
+    expect_lt(length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)), length(fCons))
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, MSPeakLists = plists), 0)
 
-    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, uniqueFrom = 1),
-                                  doFormCons(formsGF, formsSIR, uniqueFrom = 2),
-                                  doFormCons(formsGF, formsSIR, relMinAbundance = 1)))),
+    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, MSPeakLists = plists, uniqueFrom = 1),
+                                  doFormCons(formsGF, formsSIR, MSPeakLists = plists, uniqueFrom = 2),
+                                  doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))),
                  length(fCons))
-    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE),
-                                  doFormCons(formsGF, formsSIR, relMinAbundance = 1)))),
+    expect_equal(sum(lengths(list(doFormCons(formsGF, formsSIR, MSPeakLists = plists, uniqueFrom = 1:2, uniqueOuter = TRUE),
+                                  doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))),
                  length(fCons))
-    expect_length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2), length(fCons))
-    expect_lt(length(doFormCons(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fCons))
-    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1), 0)
-    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
+    expect_length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, uniqueFrom = 1:2), length(fCons))
+    expect_lt(length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, uniqueFrom = 1:2, uniqueOuter = TRUE)),
+              length(fCons))
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, MSPeakLists = plists, uniqueFrom = 1), 0)
+    expect_length(doFormCons(formsGFEmpty, formsSIREmpty, MSPeakLists = plists, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
 anPLGroup <- screenInfo(fGroups)[name == "1H-benzotriazole"]$group
@@ -288,7 +290,7 @@ test_that("plotting works", {
     expect_error(plotUpSet(formsGF, formsSIREmpty))
 
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
-                 length(doFormCons(formsGF, formsSIR, relMinAbundance = 1)))
+                 length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))
 })
 
 if (testWithSets())

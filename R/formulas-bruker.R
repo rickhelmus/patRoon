@@ -62,13 +62,15 @@ getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = charac
 #' @templateVar what generateFormulasDA
 #' @template main-rd-method
 #' @export
-setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
-                                                          MSMode = "both", adduct = NULL, featThreshold = 0,
-                                                          featThresholdAnn = 0.75, absAlignMzDev = 0.002, save = TRUE,
-                                                          close = save)
+setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
+                                                          specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                          precursorMzSearchWindow = 0.002, MSMode = "both",
+                                                          adduct = NULL, featThreshold = 0, featThresholdAnn = 0.75,
+                                                          absAlignMzDev = 0.002, save = TRUE, close = save)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev, lower = 0, upper = 1,
@@ -300,17 +302,20 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists, 
     else
         groupFormulas <- list()
 
-    return(formulas(groupAnnotations = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
+    return(formulas(groupAnnotations = groupFormulas, featureFormulas = fTable, algorithm = "bruker",
+                    MSPeakLists = MSPeakLists, specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @rdname generateFormulasDA
 #' @export
-setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists, precursorMzSearchWindow = 0.002,
-                                                             MSMode = "both", adduct = NULL, ..., setThreshold = 0,
-                                                             setThresholdAnn = 0, setAvgSpecificScores = FALSE)
+setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                             specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                             precursorMzSearchWindow = 0.002, MSMode = "both",
+                                                             adduct = NULL, ..., setThreshold = 0, setThresholdAnn = 0,
+                                                             setAvgSpecificScores = FALSE)
 {
-    generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasDA,
+    generateFormulasSet(fGroups, MSPeakLists, specSimParams, adduct, generateFormulasDA,
                         precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores)

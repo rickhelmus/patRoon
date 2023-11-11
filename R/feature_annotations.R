@@ -65,10 +65,36 @@ featureAnnotations <- setClass("featureAnnotations",
                                slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
                                contains = c("workflowStep", "VIRTUAL"))
 
-setMethod("initialize", "featureAnnotations", function(.Object, ...)
+setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, MSPeakLists, ...)
 {
     .Object <- callNextMethod(.Object, ...)
     .Object@groupAnnotations <- makeEmptyListNamed(.Object@groupAnnotations)
+    
+    # NOTE: specSimParams is set to NULL to skip ann sim calculations (mainly for sets)
+    if (length(.Object) != 0 && !is.null(specSimParams))
+    {
+        printf("Calculating annotation similarities...")
+    
+        .Object@groupAnnotations <- Map(names(.Object@groupAnnotations), .Object@groupAnnotations, f = function(grp, ann)
+        {
+            ann <- copy(ann)
+            pl <- MSPeakLists[[grp]][["MSMS"]]
+            if (is.null(pl))
+                ann[, annSim := 0] # UNDONE: or NA?
+            else
+            {
+                pl <- prepSpecSimilarityPL(pl, specSimParams$removePrecursor, specSimParams$relMinIntensity,
+                                           specSimParams$minPeaks)
+                annInds <- lapply(ann$fragInfo, "[[", "PLID")
+                ann[, annSim := calcAnnSims(pl, annInds, specSimParams$method, specSimParams$mzWeight,
+                                            specSimParams$intWeight, specSimParams$absMzDev)]
+            }
+            return(ann)
+        })
+        
+        printf(" Done!\n")
+    }
+    
     return(.Object)
 })
 

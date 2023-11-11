@@ -555,9 +555,11 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #' @templateVar what generateCompoundsMetFrag
 #' @template main-rd-method
 #' @export
-setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists, method = "CL",
-                                                                timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
-                                                                dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct = NULL,
+setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists,
+                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                method = "CL", timeout = 300, timeoutRetries = 2,
+                                                                errorRetries = 2, topMost = 100, dbRelMzDev = 5,
+                                                                fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct = NULL,
                                                                 database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
                                                                 scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                                                 scoreWeights = 1.0,
@@ -571,6 +573,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(method, c("CL", "R"), add = ac)
     aapply(checkmate::assertNumber, . ~ timeout + dbRelMzDev + fragRelMzDev + fragAbsMzDev,
            lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -780,21 +783,24 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     scoreTypes <- if (length(scoreRanges) > 0) intersect(scoreTypes, unlist(lapply(scoreRanges, names))) else character()
 
     return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
-                       scoreRanges = scoreRanges, settings = mfSettings))
+                       scoreRanges = scoreRanges, settings = mfSettings, MSPeakLists = MSPeakLists,
+                       specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @rdname generateCompoundsMetFrag
 #' @export
-setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, method = "CL", timeout = 300,
+setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                   method = "CL", timeout = 300,
                                                                    timeoutRetries = 2, errorRetries = 2, topMost = 100,
                                                                    dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
                                                                    adduct = NULL, ..., setThreshold = 0,
                                                                    setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsMetFrag, method = method, timeout = timeout,
-                         timeoutRetries = timeoutRetries, errorRetries = errorRetries, topMost = topMost,
-                         dbRelMzDev = dbRelMzDev, fragRelMzDev = fragRelMzDev, fragAbsMzDev = fragAbsMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                         setAvgSpecificScores = setAvgSpecificScores)
+    generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsMetFrag, method = method,
+                         timeout = timeout, timeoutRetries = timeoutRetries, errorRetries = errorRetries,
+                         topMost = topMost, dbRelMzDev = dbRelMzDev, fragRelMzDev = fragRelMzDev,
+                         fragAbsMzDev = fragAbsMzDev, ..., setThreshold = setThreshold,
+                         setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores)
 })

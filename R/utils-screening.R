@@ -510,7 +510,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                 levelOK <- !is.null(suspectRTDev) && !is.na(suspectRTDev) && numLTE(abs(suspectRTDev), rtm)
                 if (!levelOK)
                 {
-                    if (is.null(suspectRTDev) && is.na(suspectRTDev))
+                    if (is.null(suspectRTDev) || is.na(suspectRTDev))
                         levelFailed <- "no retention time information available"
                     else
                         levelFailed <- sprintf("too high retention time deviation: %f/%f",

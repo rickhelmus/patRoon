@@ -332,7 +332,9 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @templateVar what generateFormulasGenForm
 #' @template main-rd-method
 #' @export
-setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists,
+                                                               specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                               relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE,
                                                                thrMS = NULL, thrMSMS = NULL, thrComb = NULL,
                                                                maxCandidates = Inf, extraOpts = NULL,
@@ -346,6 +348,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
@@ -457,17 +460,20 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     
     groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
-    return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
+    return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform",
+                    MSPeakLists = MSPeakLists, specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @rdname generateFormulasGenForm
 #' @export
-setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                  relMzDev = 5, adduct = NULL,
                                                                   ..., setThreshold = 0, setThresholdAnn = 0,
                                                                   setAvgSpecificScores = FALSE)
 {
-    generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasGenForm, relMzDev = relMzDev, ...,
+    generateFormulasSet(fGroups, MSPeakLists, specSimParams, adduct, generateFormulasGenForm, relMzDev = relMzDev, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores)
 })

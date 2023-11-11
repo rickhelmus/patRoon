@@ -243,7 +243,9 @@ setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 
 #' @rdname compounds-class
 #' @export
-setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
+setMethod("consensus", "compoundsSet", function(obj, ..., MSPeakLists,
+                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                absMinAbundance = NULL, relMinAbundance = NULL,
                                                 uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
                                                 filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0,
                                                 setAvgSpecificScores = FALSE)
@@ -253,6 +255,8 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allAnnObjs, types = "compoundsSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ filterSets + setAvgSpecificScores, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
@@ -262,7 +266,8 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores, rankWeights)
+    cons <- doFeatAnnConsensusSets(allAnnObjs, MSPeakLists, specSimParams, labels, setThreshold, setThresholdAnn,
+                                   setAvgSpecificScores, rankWeights)
     sc <- makeAnnSetScorings(cons$setObjects, setAvgSpecificScores, cons$origFGNames)
     
 
@@ -270,7 +275,7 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
                                  setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
                                  origFGNames = cons$origFGNames, groupAnnotations = cons$groupAnnotations,
                                  scoreTypes = sc$scTypes, scoreRanges = sc$scRanges, algorithm = cons$algorithm,
-                                 mergedConsensusNames = cons$mergedConsensusNames)
+                                 mergedConsensusNames = cons$mergedConsensusNames, specSimParams = NULL)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterSets)
     
@@ -278,8 +283,8 @@ setMethod("consensus", "compoundsSet", function(obj, ..., absMinAbundance = NULL
 })
 
 
-generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn,
-                                 setAvgSpecificScores, setArgs = list())
+generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, specSimParams, adduct, generator, ..., setThreshold,
+                                 setThresholdAnn, setAvgSpecificScores, setArgs = list())
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1.0, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
@@ -292,7 +297,9 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, 
         setArgs <- vector("list", length(unsetFGroupsList))
     
     setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
-                      f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...), sa)))
+                      f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]],
+                                                                           specSimParams = specSimParams, adduct = NULL,
+                                                                           ...), sa)))
     setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
 
     cons <- makeFeatAnnSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn, setAvgSpecificScores,
@@ -302,7 +309,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, 
     return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores, origFGNames = names(fGroupsSet),
                         groupAnnotations = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
-                        algorithm = makeSetAlgorithm(setObjects)))
+                        specSimParams = NULL, algorithm = makeSetAlgorithm(setObjects)))
 }
 
 
@@ -317,7 +324,8 @@ setMethod("unset", "compoundsSet", function(obj, set)
     assertSets(obj, set, FALSE)
     uann <- doFeatAnnUnset(obj, set)
     return(compoundsUnset(groupAnnotations = uann$annotations, scoreTypes = uann$scoreTypes,
-                          scoreRanges = uann$scoreRanges, algorithm = paste0(algorithm(obj), "_unset")))
+                          scoreRanges = uann$scoreRanges, algorithm = paste0(algorithm(obj), "_unset"),
+                          specSimParams = NULL))
 })
 
 #' @rdname compounds-class

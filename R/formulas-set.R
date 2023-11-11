@@ -208,16 +208,18 @@ setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 
 #' @rdname formulas-class
 #' @export
-setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL, relMinAbundance = NULL,
-                                               uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1, labels = NULL,
-                                               filterSets = FALSE, setThreshold = 0, setThresholdAnn = 0,
-                                               setAvgSpecificScores = FALSE)
+setMethod("consensus", "formulasSet", function(obj, ..., MSPeakLists,
+                                               specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                               absMinAbundance = NULL, relMinAbundance = NULL, uniqueFrom = NULL,
+                                               uniqueOuter = FALSE, rankWeights = 1, labels = NULL, filterSets = FALSE,
+                                               setThreshold = 0, setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     allAnnObjs <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allAnnObjs, types = "formulasSet", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allAnnObjs), null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ filterSets + setAvgSpecificScores, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
@@ -227,15 +229,15 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
     
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
     
-    cons <- doFeatAnnConsensusSets(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores,
-                                   rankWeights)
+    cons <- doFeatAnnConsensusSets(allAnnObjs, MSPeakLists, specSimParams, labels, setThreshold, setThresholdAnn,
+                                   setAvgSpecificScores, rankWeights)
     combFormulas <- Reduce(modifyList, lapply(cons$setObjects, annotations, features = TRUE))
     
     ret <- formulasConsensusSet(setObjects = cons$setObjects, setThreshold = setThreshold,
                                 setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
                                 origFGNames = cons$origFGNames, groupAnnotations = cons$groupAnnotations,
                                 featureFormulas = combFormulas, algorithm = cons$algorithm,
-                                mergedConsensusNames = cons$mergedConsensusNames)
+                                mergedConsensusNames = cons$mergedConsensusNames, specSimParams = NULL)
     
     ret <- filterFeatAnnConsensus(ret, absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, filterSets)
     
@@ -243,8 +245,8 @@ setMethod("consensus", "formulasSet", function(obj, ..., absMinAbundance = NULL,
 })
 
 
-generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, ..., setThreshold, setThresholdAnn,
-                                setAvgSpecificScores, setArgs = list())
+generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, specSimParams,  adduct, generator, ..., setThreshold,
+                                setThresholdAnn, setAvgSpecificScores, setArgs = list())
 {
     aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
@@ -257,7 +259,9 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, .
         setArgs <- vector("list", length(unsetFGroupsList))
     
     setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
-                      f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...), sa)))
+                      f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]],
+                                                                           specSimParams = specSimParams, adduct = NULL,
+                                                                           ...), sa)))
     setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))
@@ -268,7 +272,7 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, .
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores,
                        groupAnnotations = cons, featureFormulas = combFormulas,
-                       algorithm = makeSetAlgorithm(setObjects)))
+                       algorithm = makeSetAlgorithm(setObjects), specSimParams = NULL))
 }
 
 #' @rdname formulas-class
@@ -282,7 +286,7 @@ setMethod("unset", "formulasSet", function(obj, set)
     assertSets(obj, set, FALSE)
     uann <- doFeatAnnUnset(obj, set)
     return(formulasUnset(groupAnnotations = uann$annotations, featureFormulas = annotations(obj, features = TRUE),
-                         algorithm = paste0(algorithm(obj), "_unset")))
+                         algorithm = paste0(algorithm(obj), "_unset"), specSimParams = NULL))
 })
 
 #' @rdname formulas-class

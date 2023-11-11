@@ -259,7 +259,9 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @templateVar what generateCompoundsSIRIUS
 #' @template main-rd-method
 #' @export
-setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
+                                                               specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                               relMzDev = 5, adduct = NULL,
                                                                projectPath = NULL, elements = "CHNOP",
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL,
@@ -271,6 +273,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertString(projectPath, null.ok = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
@@ -319,19 +322,21 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     return(compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
                            scoreRanges = lapply(results, "[[", "scRanges"),
                            fingerprints = pruneList(lapply(results, "[[", "fingerprints"), checkZeroRows = TRUE),
-                           algorithm = "sirius"))
+                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @rdname generateCompoundsSIRIUS
 #' @export
-setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
+setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                  relMzDev = 5, adduct = NULL,
                                                                   projectPath = NULL, ..., setThreshold = 0,
                                                                   setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
     sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
-    generateCompoundsSet(fGroups, MSPeakLists, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
+    generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
                          setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                          setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })

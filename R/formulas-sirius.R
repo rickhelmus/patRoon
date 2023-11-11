@@ -256,11 +256,12 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @templateVar what generateFormulasSIRIUS
 #' @template main-rd-method
 #' @export
-setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
-                                                              adduct = NULL, projectPath = NULL, elements = "CHNOP",
-                                                              profile = "qtof", database = NULL, noise = NULL,
-                                                              cores = NULL, getFingerprints = FALSE, topMost = 100,
-                                                              token = NULL, extraOptsGeneral = NULL,
+setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
+                                                              specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                              relMzDev = 5, adduct = NULL, projectPath = NULL,
+                                                              elements = "CHNOP", profile = "qtof", database = NULL,
+                                                              noise = NULL, cores = NULL, getFingerprints = FALSE,
+                                                              topMost = 100, token = NULL, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
                                                               absAlignMzDev = 0.002, verbose = TRUE,
@@ -268,6 +269,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertString(projectPath, null.ok = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile, fixed = list(add = ac))
@@ -351,19 +353,21 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     }
     
     return(formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = formTable, fingerprints = fingerprints,
-                          algorithm = "sirius"))
+                          algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams))
 })
 
 #' @template featAnnSets-gen_args
 #' @rdname generateFormulasSIRIUS
 #' @export
-setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
-                                                                 projectPath = NULL, ..., setThreshold = 0,
-                                                                 setThresholdAnn = 0, setAvgSpecificScores = FALSE)
+setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                 specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                 relMzDev = 5, adduct = NULL, projectPath = NULL, ...,
+                                                                 setThreshold = 0, setThresholdAnn = 0,
+                                                                 setAvgSpecificScores = FALSE)
 {
     checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
     sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
-    generateFormulasSet(fGroups, MSPeakLists, adduct, generateFormulasSIRIUS, relMzDev = relMzDev, ...,
+    generateFormulasSet(fGroups, MSPeakLists, specSimParams, adduct, generateFormulasSIRIUS, relMzDev = relMzDev, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })

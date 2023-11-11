@@ -198,7 +198,8 @@ setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("gene
 ### Formulas
 
 #' @rdname generateFormulas
-setGeneric("generateFormulas", function(fGroups, MSPeakLists, algorithm, ...) standardGeneric("generateFormulas"))
+setGeneric("generateFormulas", function(fGroups, MSPeakLists, algorithm,
+                                        specSimParams = getDefSpecSimParams(removePrecursor = TRUE), ...) standardGeneric("generateFormulas"))
 
 #' @rdname generateFormulasGenForm
 setGeneric("generateFormulasGenForm", function(fGroups, ...) standardGeneric("generateFormulasGenForm"))
@@ -219,7 +220,8 @@ setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALS
 setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 #' @rdname generateCompounds
-setGeneric("generateCompounds", function(fGroups, MSPeakLists, algorithm, ...) standardGeneric("generateCompounds"))
+setGeneric("generateCompounds", function(fGroups, MSPeakLists, algorithm,
+                                         specSimParams = getDefSpecSimParams(removePrecursor = TRUE), ...) standardGeneric("generateCompounds"))
 
 #' @rdname generateCompoundsMetFrag
 setGeneric("generateCompoundsMetFrag", function(fGroups, ...) standardGeneric("generateCompoundsMetFrag"))

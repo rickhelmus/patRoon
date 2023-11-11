@@ -345,33 +345,23 @@ annotatedMSMSSimilarity <- function(annPL, specSimParams)
 
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, formTable, formRank, mFormNames, formScoreRanges,
-                                        formulasNormalizeScores, compTable, compRank, mCompNames, compScoreRanges,
-                                        compoundsNormalizeScores, absMzDev, IDLevelRules, logPath)
+                                        maxSuspFrags, maxFragMatches, formTable, formTableNorm, formRank, mFormNames,
+                                        compTable, compTableNorm, compRank, mCompNames, absMzDev, IDLevelRules, logPath)
 {
-    formScores <- formScoreNames(FALSE); formNormScores <- formScoreNames(TRUE)
-    compScores <- compScoreNames(FALSE); compNormScores <- compScoreNames(TRUE)
+    formScores <- formScoreNames(FALSE)
+    compScores <- compScoreNames(FALSE)
     fRow <- cRow <- NULL
     
-    if (!is.null(formTable) && !is.null(suspectFormula))
+    if (!is.null(formTable) && !is.null(suspectFormula) && !is.na(formRank))
     {
-        formTableNorm <- normalizeAnnScores(formTable, formNormScores, formScoreRanges, mFormNames,
-                                            formulasNormalizeScores == "minmax")
-        if (!is.na(formRank))
-        {
-            fRow <- formTable[formRank]
-            fRowNorm <- formTableNorm[formRank]
-        }
+        fRow <- formTable[formRank]
+        fRowNorm <- formTableNorm[formRank]
     }
     
-    if (!is.null(compTable) && !is.null(suspectInChIKey1))
+    if (!is.null(compTable) && !is.null(suspectInChIKey1) && !is.na(compRank))
     {
-        compTableNorm <- normalizeAnnScores(compTable, compNormScores, compScoreRanges, mCompNames, compoundsNormalizeScores == "minmax")
-        if (!is.na(compRank))
-        {
-            cRow <- compTable[compRank]
-            cRowNorm <- compTableNorm[compRank]
-        }
+        cRow <- compTable[compRank]
+        cRowNorm <- compTableNorm[compRank]
     }
     
     getValType <- function(val, IDType)

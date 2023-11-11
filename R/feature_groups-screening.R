@@ -427,11 +427,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             formRank <- which(si$formula[i] == fTable$neutral_formula)
             formRank <- if (length(formRank) > 0) formRank[1] else NA_integer_
             if (!is.na(formRank))
-                annSimForm <- annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
-                                                                                      index = formRank,
-                                                                                      groupName = gName,
-                                                                                      MSPeakLists = MSPeakLists),
-                                                                    specSimParams)
+                annSimForm <- annSimBoth <- formulas[[gName]]$annSim[formRank]
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
@@ -443,11 +439,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             
             if (!is.na(compRank) && !is.null(cTable[["fragInfo"]][[compRank]]))
             {
-                annSimComp <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
-                                                                        groupName = gName, MSPeakLists = MSPeakLists),
-                                                      specSimParams)
-                
-                if (!is.na(formRank))
+                annSimComp <-  compounds[[gName]]$annSim[compRank]
+
+                if (!is.na(formRank)) # UNDONE: remove?
                     annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
                                                                             groupName = gName, MSPeakLists = MSPeakLists,
                                                                             formulas = formulas),
@@ -487,13 +481,28 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         if (!is.na(maxFragMatches))
             maxFragMatchesRel <- maxFragMatches / maxSuspFrags
         
+        fTableNorm <- if (!is.null(fTable))
+        {
+            normalizeAnnScores(fTable, formScoreNames(TRUE), fScRanges, mergedConsensusNames(formulas),
+                               formulasNormalizeScores == "minmax")
+        }
+        else
+            NULL
+        cTableNorm <- if (!is.null(cTable))
+        {
+            normalizeAnnScores(cTable, compScoreNames(TRUE), cScRanges, mergedConsensusNames(compounds),
+                               compoundsNormalizeScores == "minmax")
+        }
+        else
+            NULL
+        
         estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
                                                   annSimForm, annSimComp, annSimBoth,
-                                                  maxSuspFrags, maxFragMatches, fTable, formRank,
+                                                  maxSuspFrags, maxFragMatches, fTable, fTableNorm, formRank,
                                                   mFormNames = if (!is.null(formulas)) mergedConsensusNames(formulas) else character(),
-                                                  fScRanges, formulasNormalizeScores, cTable, compRank,
+                                                  cTable, cTableNorm, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedConsensusNames(compounds) else character(),
-                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules, logPath)
+                                                  absMzDev, IDLevelRules, logPath)
         
         set(si, i,
             c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",

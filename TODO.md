@@ -9,12 +9,15 @@
 
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
+    - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
     
 - docs
     - specSimParamsMatch --> specSimParams
 
 - NEWS
     - specSimParamsMatch --> specSimParams
+    - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
+    
 
 ## Ext
 

@@ -48,8 +48,8 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             cols <- getAllMergedConsCols(c(
-                "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
-                "libPeaksCompared", "libPeaksTotal"
+                "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz",
+                "precursorType", "libPeaksCompared", "libPeaksTotal", "annSim"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
                 cols <- c(cols, getAllMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))
@@ -234,7 +234,8 @@ doUpdateSetConsensus <- function(obj)
     return(obj)
 }
 
-doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores, rankWeights)
+doFeatAnnConsensusSets <- function(allAnnObjs, MSPeakLists, specSimParams, labels, setThreshold, setThresholdAnn,
+                                   setAvgSpecificScores, rankWeights)
 {
     # make consensus of shared setObjects
     # add unique setObjects
@@ -250,11 +251,13 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
 
     # NOTE: filtering (thresholds, unique) is not performed here: this is done afterwards in the consensus methods, as
     # it makes more sense to filter the end result instead of those from set objects
-    consArgs <- list(rankWeights = rankWeights, labels = labels, absMinAbundance = NULL,
+    consArgs <- list(specSimParams = specSimParams, rankWeights = rankWeights, labels = labels, absMinAbundance = NULL,
                      relMinAbundance = NULL, uniqueFrom = NULL)
+    unsetMSPeakLists <- checkAndUnSetOther(sets(allAnnObjs[[1]]), MSPeakLists, "MSPeakLists")
     setObjects <- sapply(sets(allAnnObjs[[1]]), function(set)
     {
-        return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set), consArgs)))
+        return(do.call(consensus, c(lapply(lapply(allAnnObjs, setObjects), "[[", set),
+                                    list(MSPeakLists = unsetMSPeakLists[[set]]), consArgs)))
     }, simplify = FALSE)
 
     cons <- makeFeatAnnSetConsensus(setObjects, origFGNames, setThreshold, setThresholdAnn, setAvgSpecificScores,

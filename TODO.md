@@ -7,7 +7,21 @@
 - BUG: annotatedBy filter incorrectly filters feature level peak lists
     - record group IDs in feature tabs and use them to remove
     - or work with tolerances, so that reAveraged data can work (but may be less accurate)
+- better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
+    - check if ref docs are OK
+    - add to handbook
+    - add NEWS
 
+## TC
+
+- annSims
+    - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
+    
+- docs
+    - specSimParamsMatch --> specSimParams
+
+- NEWS
+    - specSimParamsMatch --> specSimParams
 
 ## Ext
 

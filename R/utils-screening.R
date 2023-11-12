@@ -10,12 +10,7 @@ suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "SMILES", "InC
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
 
-getAllSuspCols <- function(targetCols, allCols, mConsNames)
-{
-    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames),
-                                       USE.NAMES = FALSE))
-    return(intersect(targetCols, allCols))
-}
+getAllSuspCols <- function(targetCols, allCols, mConsNames) getAllMergedConsCols(targetCols, allCols, mConsNames)
 
 doScreeningShow <- function(obj)
 {

@@ -298,7 +298,7 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #' @export
 setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
                                                    fragElements = NULL, lossElements = NULL, topMost = NULL, OM = FALSE,
-                                                   negate = FALSE)
+                                                   maxLevel = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
@@ -307,6 +307,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
+    checkmate::assertCount(maxLevel, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     cat("Filtering annotations... ")
@@ -369,11 +370,21 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                          P <= 2 &
                          S <= 2 &
                          
-                         # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
+                         # rules from Koch & Dittmar 2006 (10.1002/rcm.2386)
                          sapply(DBE_AI, checkmate::checkInt) &
                          HC <= 2.2 &
                          OC <= 1.2 &
                          NC <= 0.5)]
+        }
+        
+        if (!is.null(maxLevel))
+        {
+            cols <- getAllMergedConsCols("estIDLevel", names(annTable), mConsNames)
+            if (length(cols) == 0)
+                stop("No estimated identification levels found. Please run estimateIDLevels() first.", call. = FALSE)
+            
+            annTable[keep == TRUE, keep := mark(do.call(pmin, c(lapply(.SD, numericIDLevel), list(na.rm = TRUE))) <= maxLevel),
+                     .SDcols = cols]
         }
         
         return(!annTable$keep)

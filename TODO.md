@@ -12,7 +12,9 @@
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
     
 - docs
-    - specSimParamsMatch --> specSimParams
+    - specSimParams --> specSimParamsMatch
+    - ES contributions for IDLs
+    
 
 - NEWS
     - specSimParamsMatch --> specSimParams

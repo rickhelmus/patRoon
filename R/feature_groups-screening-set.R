@@ -296,27 +296,8 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
             }
         }, by = seq_len(nrow(fGroups@screenInfo))][]
     }
-    
-    # add best ID Levels
-    cols <- getAllSuspCols("estIDLevel", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
-    if (length(cols) > 0)
-    {
-        fGroups@screenInfo[, estIDLevel := {
-            allIDs <- unlist(mget(cols))
-            allIDs <- allIDs[!is.na(allIDs)]
-            if (length(allIDs) == 0)
-                NA_character_
-            else
-            {
-                numIDs <- numericIDLevel(allIDs)
-                whMin <- which(numIDs == min(numIDs))
-                if (!allSame(allIDs[whMin]))
-                    as.character(numIDs[whMin[1]]) # strip sublevel if not all the same
-                else
-                    allIDs[whMin[1]]
-            }
-        }, by = seq_len(nrow(fGroups@screenInfo))][]
-    }
+
+    fGroups@screenInfo <- assignSetsIDLs(fGroups@screenInfo, mergedConsensusNames(fGroups))
 
     return(fGroups)
 })

@@ -45,7 +45,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             cols <- getAllMergedConsCols(c(
                 "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
-                "libPeaksCompared", "libPeaksTotal", "annSim"
+                "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
                 cols <- c(cols, getAllMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))

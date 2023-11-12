@@ -206,6 +206,22 @@ setMethod("predictRespFactors", "formulasSet", doFeatAnnPredictRFSets)
 #' @export
 setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 
+#' @export
+setMethod("estimateIDLevels", "formulasSet", function(obj, absMzDev = 0.005, normalizeScores = "max",
+                                                      IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                      logPath = NULL, parallel = TRUE)
+{
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    
+    obj@setObjects <- Map(setObjects(obj), logPath = logPath,
+                          f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev, normalizeScores = normalizeScores,
+                                                                IDFile = IDFile, parallel = parallel))
+    obj <- updateSetConsensus(obj)
+    obj@groupAnnotations <- lapply(annotations(obj), assignSetsIDLs, sets(obj))
+    
+    return(obj)
+})
+
 #' @rdname formulas-class
 #' @export
 setMethod("consensus", "formulasSet", function(obj, ..., MSPeakLists,

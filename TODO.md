@@ -10,11 +10,14 @@
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
+
+- tests
+    - IDL filter
     
 - docs
     - specSimParams --> specSimParamsMatch
     - ES contributions for IDLs
-    
+    - explicitly mentions annSim can be filtered with scoreLimits?
 
 - NEWS
     - specSimParamsMatch --> specSimParams

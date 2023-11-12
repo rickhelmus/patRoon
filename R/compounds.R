@@ -645,6 +645,72 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     return(addCompoundScore(obj, "LC50_SMILES", updateScore, scoreWeight))
 })
 
+#' @export
+setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formulas = NULL, 
+                                                   formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
+                                                   IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                   logPath = NULL, parallel = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
+           fixed = list(add = ac))
+    checkmate::assertFileExists(IDFile, "r", add = ac)
+    if (!is.null(logPath))
+        assertCanCreateDir(logPath, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    IDLevelRules <- readIDLRules(IDFile)
+    
+    mFormNames <- if (!is.null(formulas)) mergedConsensusNames(formulas) else NULL
+    mCompNames <- mergedConsensusNames(obj)
+    
+    # UNDONE: annSimBoth?
+    mainIDLArgs <- list(candidateRTDev = NULL, candidateAnnSimBoth = NA, maxSuspFrags = NA, maxFragMatches = 0,
+                        mFormNames = mFormNames, mCompNames = mCompNames, absMzDev = absMzDev,
+                        IDLevelRules = IDLevelRules, logPath = logPath)
+    
+    printf("Estimating identification levels for %d feature groups with a total of %d candidates...\n",
+           length(groupNames(obj)), length(obj))
+    
+    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        fTable <- if (!is.null(formulas)) formulas[[grp]] else NULL
+        fTableNorm <- if (!is.null(fTable))
+        {
+            normalizeAnnScores(formulas[[grp]], formScoreNames(TRUE), formulas@scoreRanges[[grp]], mFormNames,
+                               formulasNormalizeScores == "minmax")
+        }
+        else
+            NULL
+        annNorm <- normalizeAnnScores(ann, compScoreNames(TRUE), obj@scoreRanges[[grp]], mCompNames,
+                                      compoundsNormalizeScores == "minmax")
+        
+        ann <- copy(ann)
+        ann[, estIDLevel := {
+            cf <- neutral_formula
+            fRank <- if (!is.null(fTable)) fTable[neutral_formula == cf, which = TRUE] else NA_integer_
+            if (length(fRank) == 0)
+                fRank <- NA_integer_
+            annSimForm <- if (!is.na(fRank)) fTable$annSim[fRank] else NA_real_
+            do.call(estimateIdentificationLevel, c(mainIDLArgs, list(candidateName = compoundName,
+                                                                     candidateFGroup = grp,
+                                                                     candidateInChIKey1 = InChIKey1,
+                                                                     candidateFormula = if (!is.na(fRank)) neutral_formula else NULL,
+                                                                     candidateAnnSimForm = annSimForm,
+                                                                     candidateAnnSimComp = annSim,
+                                                                     formTable = fTable, formTableNorm = fTableNorm,
+                                                                     formRank = fRank, compTable = ann,
+                                                                     compTableNorm = annNorm, compRank = .I)))
+        }, by = seq_len(nrow(ann))]
+        doProgress()
+        return(ann)
+    })
+    
+    return(obj)
+})
 
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 {

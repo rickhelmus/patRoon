@@ -442,6 +442,11 @@ setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 #' @template generics
 setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNormScores"))
 
+#' @templateVar func estimateIDLevels
+#' @templateVar desc estimates identification confidence levels.
+#' @template generics
+setGeneric("estimateIDLevels", function(obj, ...) standardGeneric("estimateIDLevels"))
+
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.
 #' @template generics

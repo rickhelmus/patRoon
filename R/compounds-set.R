@@ -241,6 +241,29 @@ setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 #' @export
 setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 
+#' @export
+setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = 0.005, formulas = NULL, 
+                                                       formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
+                                                       IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                       logPath = NULL, parallel = TRUE)
+{
+    checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
+
+    unsetFormulas <- checkAndUnSetOther(sets(obj), formulas, "formulas", TRUE)
+    
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    
+    obj@setObjects <- Map(setObjects(obj), formulas = unsetFormulas, logPath = logPath,
+                          f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev,
+                                                                formulasNormalizeScores = formulasNormalizeScores,
+                                                                compoundsNormalizeScores = compoundsNormalizeScores,
+                                                                IDFile = IDFile, parallel = parallel))
+    obj <- updateSetConsensus(obj)
+    obj@groupAnnotations <- lapply(annotations(obj), assignSetsIDLs, sets(obj))
+
+    return(obj)
+})
+
 #' @rdname compounds-class
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., MSPeakLists,

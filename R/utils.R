@@ -691,3 +691,269 @@ aggrVec <- function(x, f)
         x <- f(x)
     return(x)
 }
+
+readIDLRules <- function(IDFile)
+{
+    ret <- readYAML(IDFile)
+    
+    if (!checkmate::test_named(ret))
+        stop("No valid rules could be loaded")
+    if (!all(grepl("^[[:digit:]]+[[:alpha:]]?$", names(ret))))
+        stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
+    
+    ret <- ret[order(names(ret))] # sort to ensure lowest levels will be tested first
+    
+    return(ret)
+}
+
+estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidateRTDev, candidateInChIKey1, candidateFormula,
+                                        candidateAnnSimForm, candidateAnnSimComp, candidateAnnSimBoth,
+                                        maxSuspFrags, maxFragMatches, formTable, formTableNorm, formRank, mFormNames,
+                                        compTable, compTableNorm, compRank, mCompNames, absMzDev, IDLevelRules, logPath)
+{
+    formScores <- formScoreNames(FALSE)
+    compScores <- compScoreNames(FALSE)
+    fRow <- cRow <- NULL
+    
+    if (!is.null(formTable) && !is.null(candidateFormula) && !is.na(formRank))
+    {
+        fRow <- formTable[formRank]
+        fRowNorm <- formTableNorm[formRank]
+    }
+    
+    if (!is.null(compTable) && !is.null(candidateInChIKey1) && !is.na(compRank))
+    {
+        cRow <- compTable[compRank]
+        cRowNorm <- compTableNorm[compRank]
+    }
+    
+    getValType <- function(val, IDType)
+    {
+        if (!is.list(val) || is.null(val[["type"]]) || !val[["type"]] %in% c("formula", "compound"))
+            stop(sprintf("Need to specify the type (formula/compound) for %s!", IDType))
+        return(val[["type"]])
+    }
+    
+    getVal <- function(val, IDType, valType)
+    {
+        if (is.list(val))
+        {
+            if (is.null(val[[valType]]))
+                stop(sprintf("Need to specify %s for %s!", valType, IDType))
+            return(val[[valType]])
+        }
+        return(val)
+    }
+    
+    getOptVal <- function(val, valType, default)
+    {
+        if (is.list(val) && !is.null(val[[valType]]))
+            return(val[[valType]])
+        return(default)
+    }
+    
+    checkAnnotationScore <- function(val, scType, rank, annRow, annTable, annRowNorm, annTableNorm, scCols)
+    {
+        scCols <- scCols[!is.na(unlist(annRow[, scCols, with = FALSE]))]
+        if (length(scCols) == 0)
+            return("score not available")
+        
+        minValue <- getVal(val, scType, "min")
+        
+        if (getOptVal(val, "relative", FALSE))
+        {
+            annRow <- annRowNorm
+            annTable <- annTableNorm
+        }
+        
+        scoreVal <- rowMeans(annRow[, scCols, with = FALSE], na.rm = TRUE)
+        if (is.infinite(scoreVal)) # only NA values
+            return("no value(s) available for this score")
+        if (scoreVal < minValue)
+            return(sprintf("(average) score too low: %f/%f", scoreVal, minValue))
+        
+        htn <- getOptVal(val, "higherThanNext", 0)
+        if (htn > 0 && nrow(annTable) > 1)
+        {
+            otherVals <- rowMeans(annTable[-rank, scCols, with = FALSE], na.rm = TRUE)
+            otherVals <- otherVals[is.finite(otherVals)] # remove results for NA rows
+            if (length(otherVals) > 0)
+            {
+                otherHighest <- max(otherVals)
+                if (is.infinite(htn)) # special case: should be highest
+                {
+                    if (otherHighest > 0)
+                        return("not the highest score")
+                }
+                else if ((scoreVal - otherHighest) < htn)
+                    return(sprintf("difference with highest score from other candidates too low: %f/%f", scoreVal - otherHighest, htn))
+            }
+        }
+        
+        return(TRUE)            
+    }
+    
+    if (!is.null(logPath))
+    {
+        logDir <- R.utils::getAbsolutePath(logPath) # take absolute path for length calculation below
+        logFile <- paste0(candidateName, "-", candidateFGroup, ".txt")
+        
+        # check if path would be too long for e.g Windows systems, which may happen with very long candidate names
+        pathLen <- nchar(logDir) + nchar(logFile) + 1 # +1: path separator
+        if (pathLen > 255)
+        {
+            # truncate end part of candidate name
+            logFile <- paste0(substr(candidateName, 1, nchar(candidateName) - (pathLen - 255)), "-", candidateFGroup, ".txt")
+        }
+        logOut <- file.path(logDir, logFile)
+        
+        mkdirp(dirname(logOut))
+        logFile <- withr::local_connection(file(logOut, "w"))
+        doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)
+    }
+    else
+        doLog <- function(...) NULL
+    
+    formCompScores <- intersect(formScores, compScores)
+    allScores <- union(formScores, compScores)
+    
+    checkLevelOK <- function(IDL, indent = 0)
+    {
+        indent <- indent + 1
+        for (type in names(IDL))
+        {
+            levelOK <- NULL
+            levelFailed <- NULL
+            val <- IDL[[type]]
+            
+            if (type %in% c("rank", "annMSMSSim", formCompScores))
+                doLog(indent, "Checking ID level type '%s' (for %s)\n", type,
+                      getValType(val, type))
+            else
+                doLog(indent, "Checking ID level type '%s'\n", type)
+            
+            if (type %in% c("or", "and"))
+            {
+                if (!is.list(val) || checkmate::testNamed(val))
+                    stop(sprintf("Specify a list with '%s'", type))
+                checkf <- if (type == "or") any else all
+                levelOK <- checkf(mapply(val, seq_along(val), FUN = function(IDL, i)
+                {
+                    doLog(indent + 1, "check %s condition %d/%d\n", toupper(type), i, length(val))
+                    return(checkLevelOK(IDL, indent + 2))
+                }))
+            }
+            else if (type == "all" && val == TRUE)
+                levelOK <- TRUE # special case: this level is always valid
+            else if (type == "suspectFragments")
+            {
+                minFrags <- min(val, maxSuspFrags, na.rm = TRUE)
+                levelOK <- !is.na(maxFragMatches) && maxFragMatches >= minFrags
+                if (!levelOK)
+                {
+                    if (is.na(maxFragMatches))
+                        levelFailed <- "no fragments to match"
+                    else
+                        levelFailed <- sprintf("not enough fragments: %d/%d", maxFragMatches, minFrags)
+                }
+            }
+            else if (type == "retention")
+            {
+                rtm <- getVal(val, type, "max")
+                levelOK <- !is.null(candidateRTDev) && !is.na(candidateRTDev) && numLTE(abs(candidateRTDev), rtm)
+                if (!levelOK)
+                {
+                    if (is.null(candidateRTDev) || is.na(candidateRTDev))
+                        levelFailed <- "no retention time information available"
+                    else
+                        levelFailed <- sprintf("too high retention time deviation: %f/%f",
+                                               abs(candidateRTDev), rtm)
+                }
+            }
+            else if (type == "rank")
+            {
+                r <- if (getValType(val, type) == "formula") formRank else compRank
+                maxR <- getVal(val, type, "max")
+                levelOK <- !is.na(r) && r <= maxR
+                if (!levelOK)
+                    levelFailed <- if (is.na(r)) "candidate not ranked" else sprintf("ranked too low: %d/%d", r, maxR)
+            }
+            else if (type == "annMSMSSim")
+            {
+                sim <- if (getValType(val, type) == "formula") candidateAnnSimForm else candidateAnnSimComp
+                minSim <- getVal(val, type, "min")
+                levelOK <- !is.na(sim) && numGTE(sim, minSim)
+                if (!levelOK)
+                    levelFailed <- if (is.na(sim)) "no calculated similarity" else sprintf("similarity too low: %f/%f", sim, minSim)
+            }
+            else if (type == "annMSMSSimBoth")
+            {
+                minSim <- getVal(val, type, "min")
+                levelOK <- !is.na(candidateAnnSimBoth) && numGTE(candidateAnnSimBoth, minSim)
+                if (!levelOK)
+                    levelFailed <- if (is.na(candidateAnnSimBoth)) "no calculated similarity" else
+                        sprintf("similarity too low: %f/%f", candidateAnnSimBoth, minSim)
+            }
+            else if (type %in% allScores)
+            {
+                if (type %in% formCompScores)
+                    isForm <- getValType(val, type) == "formula"
+                else
+                    isForm <- type %in% formScores
+                
+                if (isForm)
+                    levelOK <- checkAnnotationScore(val, type, formRank, fRow, formTable, fRowNorm, formTableNorm,
+                                                    getAllMergedConsCols(type, names(formTable), mFormNames))
+                else
+                    levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
+                                                    getAllMergedConsCols(type, names(compTable), mCompNames))
+                
+                if (!isTRUE(levelOK))
+                {
+                    levelFailed <- levelOK
+                    levelOK <- FALSE
+                }
+            }
+            else
+                stop(paste("Unknown ID level type:", type))
+            
+            if (!levelOK)
+            {
+                doLog(indent, "ID level failed: %s\n", levelFailed)
+                return(FALSE)
+            }
+            doLog(indent, "ID level type passed!\n")
+        }
+        
+        return(TRUE)
+    }
+    
+    doLog(0, "Estimating identification level for '%s' to feature group '%s'\n---\n", candidateName, candidateFGroup)
+    
+    if (is.null(fRow))
+    {
+        if (is.null(candidateFormula))
+            doLog(0, "NOTE: there is no formula data for available this candidate.\n")
+        else
+            doLog(0, "NOTE: the candidate formula could not be matched with the formula annotations.\n")
+    }
+    if (is.null(cRow))
+    {
+        if (is.null(candidateInChIKey1))
+            doLog(0, "NOTE: there is no compound data (eg InChIKey) available for this candidate.\n")
+        else
+            doLog(0, "NOTE: the candidate compound could not be matched with the compound annotations.\n")
+    }
+    
+    for (lvl in names(IDLevelRules))
+    {
+        doLog(0, "Checking level '%s'\n", lvl)
+        if (checkLevelOK(IDLevelRules[[lvl]]))
+        {
+            doLog(0, "assigned level '%s'!\n", lvl)
+            return(lvl)
+        }
+    }
+    
+    return(NA_character_)
+}

@@ -387,15 +387,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (!is.null(cd))
         return(cd)
     
-    IDLevelRules <- readYAML(IDFile)
+    IDLevelRules <- readIDLRules(IDFile)
     
-    if (!checkmate::test_named(IDLevelRules))
-        stop("No valid rules could be loaded")
-    if (!all(grepl("^[[:digit:]]+[[:alpha:]]?$", names(IDLevelRules))))
-        stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
-    
-    IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
-
     if (nrow(screenInfo(fGroups)) == 0)
     {
         cat("No suspect hits, nothing to annotate")

@@ -390,6 +390,57 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
     return(makeHash(index, annTable, normalizeScores, excludeNormScores))
 })
 
+#' @export
+setMethod("estimateIDLevels", "formulas", function(obj, absMzDev = 0.005, normalizeScores = "max",
+                                                   IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                   logPath = NULL, parallel = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    assertNormalizationMethod(normalizeScores, withNone = FALSE, add = ac)
+    checkmate::assertFileExists(IDFile, "r", add = ac)
+    if (!is.null(logPath))
+        assertCanCreateDir(logPath, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    IDLevelRules <- readIDLRules(IDFile)
+    
+    mFormNames <- mergedConsensusNames(obj)
+    
+    # UNDONE: annSimBoth?
+    mainIDLArgs <- list(candidateRTDev = NULL, candidateAnnSimBoth = NA, maxSuspFrags = NA, maxFragMatches = 0,
+                        mFormNames = mFormNames, mCompNames = NULL, absMzDev = absMzDev, IDLevelRules = IDLevelRules,
+                        logPath = logPath)
+    
+    printf("Estimating identification levels for %d feature groups with a total of %d candidates...\n",
+           length(groupNames(obj)), length(obj))
+    
+    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    {
+        annNorm <- normalizeAnnScores(obj[[grp]], formScoreNames(TRUE), obj@scoreRanges[[grp]], mFormNames,
+                                      normalizeScores == "minmax")
+        
+        ann <- copy(ann)
+        ann[, estIDLevel := {
+            cf <- neutral_formula
+            do.call(estimateIdentificationLevel, c(mainIDLArgs, list(candidateName = neutral_formula,
+                                                                     candidateFGroup = grp,
+                                                                     candidateInChIKey1 = NA_character_,
+                                                                     candidateFormula = neutral_formula,
+                                                                     candidateAnnSimForm = annSim,
+                                                                     candidateAnnSimComp = NA_real_,
+                                                                     formTable = ann, formTableNorm = annNorm,
+                                                                     formRank = .I, compTable = NULL,
+                                                                     compTableNorm = NULL, compRank = NULL)))
+        }, by = seq_len(nrow(ann))]
+        doProgress()
+        return(ann)
+    })
+    
+    return(obj)
+})
+
 #' @templateVar what formulas
 #' @template consensus-form_comp
 #'

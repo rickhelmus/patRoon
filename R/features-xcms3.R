@@ -60,7 +60,8 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., 
                     function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
                     USE.NAMES = FALSE)
 
-    hash <- makeHash(analysisInfo, do.call(makeFileHash, as.list(files)), param)
+    hash <- makeHash(analysisInfo[, c("analysis", "path", "group"), with = FALSE], do.call(makeFileHash, as.list(files)),
+                     param)
     cachef <- loadCacheData("featuresXCMS3", hash)
     if (!is.null(cachef))
         return(cachef)

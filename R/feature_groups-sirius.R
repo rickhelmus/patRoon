@@ -115,7 +115,7 @@ groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
     
     inputFiles <- mapply(analysisInfo$analysis, analysisInfo$path, FUN = getMzMLAnalysisPath)
     
-    hash <- makeHash(analysisInfo, lapply(inputFiles, makeFileHash))
+    hash <- makeHash(analysisInfo[, c("analysis", "path"), with = FALSE], lapply(inputFiles, makeFileHash))
     
     cachefg <- loadCacheData("featureGroupsSIRIUS", hash)
     if (!is.null(cachefg))

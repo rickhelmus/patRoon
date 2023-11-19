@@ -226,7 +226,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             gTable <- gTableAvg
             snames <- unique(anaInfo$group)
             if (doConc)
-                concs <- anaInfo[!duplicated(anaInfo$group), "conc"] # conc should be same for all replicates
+                concs <- anaInfo[!duplicated(group)]$conc # conc should be same for all replicates
         }
         else
         {
@@ -307,7 +307,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
 
     if (isFGSet(fGroups) && features && !average) # add set column if feature data is present
     {
-        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+        ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
         setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
     }
     
@@ -397,7 +397,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         {
             for (rg in replicateGroups(fGroups))
             {
-                anas <- anaInfo[anaInfo$group == rg, "analysis"]
+                anas <- anaInfo[group == rg]$analysis
                 concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
             }
             concs[, (anaInfo$analysis) := NULL]
@@ -463,8 +463,6 @@ updateAnnAdducts <- function(annTable, gInfo, adducts)
     return(annTable)
 }
 
-unSetAnaInfo <- function(anaInfo) anaInfo[, setdiff(names(anaInfo), "set")]
-
 maybeAutoNormalizeFGroups <- function(fGroups)
 {
     if (length(fGroups) == 0 || !is.null(featureTable(fGroups)[[1]][["intensity_rel"]]))
@@ -484,7 +482,7 @@ getAnnotationsFromSetFeatures <- function(fGroups)
         ret <- rbindlist(sapply(sets(fGroups), function(s)
         {
             anaInds <- which(anaInfo$set == s)
-            anas <- anaInfo[anaInds, "analysis"]
+            anas <- anaInfo$analysis[anaInds]
             grps <- names(fGroups)[sapply(ftind[anaInds], function(x) any(x != 0))]
             firstFeats <- rbindlist(lapply(ftind[anaInds, grps, with = FALSE], function(x)
             {
@@ -505,9 +503,8 @@ finishFGroupsForSets <- function(fGroups, ..., verbose)
     otherArgs <- list(...)
     feat <- getFeatures(fGroups) # may have been changed (eg in initialize())
     ret <- featureGroupsSet(groupAlgo = algorithm(fGroups), groupArgs = otherArgs, groupVerbose = verbose,
-                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
-                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
-                            algorithm = makeSetAlgorithm(list(fGroups)))
+                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups), features = feat,
+                            ftindex = groupFeatIndex(fGroups), algorithm = makeSetAlgorithm(list(fGroups)))
     ret@annotations <- getAnnotationsFromSetFeatures(ret)
     return(ret)
 }
@@ -542,7 +539,7 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
     if (!is.null(topMost))
     {
         gTable <- copy(groupTable(fGroups))
-        gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group")]]
+        gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group"), with = FALSE]]
         for (fg in names(fGroups))
         {
             anasWithFG <- Map(names(EICs), EICs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())

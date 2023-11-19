@@ -74,7 +74,7 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
     checkmate::reportAssertions(ac)
 
     if (length(feat) == 0)
-        return(featureGroupsOpenMS(analysisInfo = analysisInfo(feat), features = feat))
+        return(featureGroupsOpenMS(features = feat))
 
     hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, extraOptsRT, extraOptsGroup)
     cachefg <- loadCacheData("featureGroupsOpenMS", hash)
@@ -89,8 +89,7 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
                          extraOptsRT, extraOptsGroup, verbose)
     fgimp <- importConsensusXML(feat, cfile, verbose)
 
-    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, analysisInfo = analysisInfo(feat),
-                               features = feat, ftindex = fgimp$ftindex)
+    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, features = feat, ftindex = fgimp$ftindex)
 
     saveCacheData("featureGroupsOpenMS", ret, hash)
 
@@ -110,7 +109,7 @@ setMethod("groupFeaturesOpenMS", "featuresSet", function(feat, ..., verbose = TR
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                                  maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)
 {
-    sGroup <- analysisInfo(feat)
+    anas <- analysisInfo(feat)$analysis
     fts <- featureTable(feat)
 
     getIni <- function(cmd, inFiles, outFiles)
@@ -122,7 +121,7 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
     }
     
     featFiles <- character()
-    for (datafile in sGroup$analysis)
+    for (datafile in anas)
     {
         featFiles[datafile] <- tempfile(datafile, fileext = ".featureXML")
         writeFeatureXML(fts[[datafile]], datafile, featFiles[datafile], FALSE)

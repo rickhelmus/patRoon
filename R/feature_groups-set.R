@@ -200,7 +200,7 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
         mySets <- get("sets", pos = 2)(x)
         checkmate::assertSubset(which, mySets, empty.ok = FALSE, add = ac)
         ai <- analysisInfo(x)
-        which <- unique(ai[ai$set %in% which, "group"])
+        which <- unique(ai[set %in% which]$group)
     }
     callNextMethod(x, which = which, ...)
 })
@@ -458,9 +458,8 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     setcolorder(grpFeatInds, rownames(groupInfo(setGroups)))
     
     ret <- featureGroupsSet(groupAlgo = groupAlgo, groupArgs = groupArgs, groupVerbose = verbose,
-                            groups = grpInts, groupInfo = groupInfo(setGroups),
-                            analysisInfo = analysisInfo(featSet), features = featSet, ftindex = grpFeatInds,
-                            algorithm = paste0(groupAlgo, "-set"))
+                            groups = grpInts, groupInfo = groupInfo(setGroups), features = featSet,
+                            ftindex = grpFeatInds, algorithm = paste0(groupAlgo, "-set"))
     ret@annotations <- getAnnotationsFromSetFeatures(ret)
     
     return(ret)
@@ -506,7 +505,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
-                              analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
                               annotations = ann, ISTDs = ISTDs, ISTDAssignments = ISTDAssign,

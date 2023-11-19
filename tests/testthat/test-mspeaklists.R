@@ -34,7 +34,7 @@ plistsNoIM@metadata <- clearMD(plistsNoIM@metadata)
 if (testWithSets())
 {
     plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metadata <- clearMD(so@metadata); so })
-    plistsNoIM@analysisInfo <- data.frame() # remove as it is system dependent
+    plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 }
 
 test_that("verify generation of MS peak lists", {
@@ -359,7 +359,8 @@ if (testWithSets())
 test_that("sets functionality", {
     skip_if_not(testWithSets())
     
-    expect_equal(analysisInfo(plists[, sets = "positive"])[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()))
+    expect_equal(analysisInfo(plists[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()),
+                 check.attributes = FALSE)
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)
     expect_equal(sets(filter(plists, sets = "positive", negate = TRUE)), "negative")

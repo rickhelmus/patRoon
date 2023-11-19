@@ -285,7 +285,6 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     gNames <- names(fGroups)
     gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
     
     baseHash <- makeHash(method, topMost)
     if (!is.null(extDB))
@@ -609,7 +608,6 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     
     adduct <- checkAndToAdduct(adduct, fGroups)
 
-    anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groupTable(fGroups)
     gNames <- names(fGroups)

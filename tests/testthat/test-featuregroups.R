@@ -89,7 +89,7 @@ test_that("adducts setting", {
 })
 
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
-getAnaInfo <- function(fg) analysisInfo(fg)[, c("path", "analysis", "group", "blank")]
+getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path", "analysis", "group", "blank")]
 
 test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
@@ -343,7 +343,8 @@ test_that("replicate group subtraction", {
 })
 
 fgISTD <- fgOpenMS
-fgISTD@analysisInfo$norm_conc <- c(NA, NA, NA, 1, 2, 1)
+fgISTD@features@analysisInfo <- copy(fgISTD@features@analysisInfo)
+fgISTD@features@analysisInfo[, norm_conc := rep(c(NA, NA, NA, 1, 2, 1), length.out = nrow(analysisInfo(fgISTD)))]
 fgNormISTDMin1 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 1)
 fgNormISTDMin2 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 2)
 fgNormISTDEmpty <- doNormInts(fgOpenMSEmpty, "istd")
@@ -574,8 +575,8 @@ test_that("sets functionality", {
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mzs, as.adduct("[M+H]+"), "neutral"),
                  groupInfo(fgOpenMS[, sets = "positive"])$mzs)
-    expect_equal(analysisInfo(unset(fgOpenMS, "positive")), getTestAnaInfoPos())
-    expect_equal(analysisInfo(fgOpenMS[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
+    expect_equal(analysisInfo(unset(fgOpenMS, "positive"), TRUE), getTestAnaInfoPos())
+    expect_equal(analysisInfo(fgOpenMS[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
     expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
     expect_length(fgOpenMS[, sets = character()], 0)

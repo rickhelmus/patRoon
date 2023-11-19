@@ -123,27 +123,27 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
 
 assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
 {
-    if (!is.null(x))
-        x <- unFactorDF(x)
-
     if (!is.null(add))
         mc <- length(add$getMessages())
-
-    if (!is.null(x) && checkmate::testDataFrame(x) && is.null(x[["blank"]]) && !is.null(x[["ref"]]))
-    {
-        warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
-        setnames(x, "ref", "blank")
-    }
 
     assertAnalysisInfo(x, ..., add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
     {
+        x <- makeDT(x) # convert to DT or make a unique copy
+        x <- unFactorDT(x)
+
+        if (is.null(x[["blank"]]) && !is.null(x[["ref"]]))
+        {
+            warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
+            setnames(x, "ref", "blank")
+        }
+        
         if (!is.null(x[["conc"]]))
-            x[["conc"]] <- as.numeric(x[["conc"]])
+            x[, conc := as.numeric(conc)]
         if (!is.null(x[["norm_conc"]]))
-            x[["norm_conc"]] <- as.numeric(x[["norm_conc"]])
-        x$blank[is.na(x$blank)] <- ""
+            x[, norm_conc := as.numeric(norm_conc)]
+        x[is.na(blank), blank := ""]
     }
     
     return(x)

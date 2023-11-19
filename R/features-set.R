@@ -49,10 +49,10 @@ doMakeFeaturesSet <- function(featuresList, adducts)
                                       simplify = FALSE)
     
     # combine anaInfo and tag
-    combAnaInfo <- do.call(rbind, lapply(names(featuresList), function(set)
+    combAnaInfo <- rbindlist(lapply(names(featuresList), function(set)
     {
-        ret <- featuresList[[set]]@analysisInfo
-        ret$set <- if (nrow(ret) == 0) character() else set
+        ret <- copy(analysisInfo(featuresList[[set]]))
+        data.table::set(ret, j = "set", value = if (nrow(ret) == 0) character() else set)
         return(ret)
     }))
     
@@ -201,6 +201,7 @@ setMethod("unset", "featuresSet", function(obj, set)
         return(ft[])
     })
     
-    return(featuresUnset(features = ionizedFTable, analysisInfo = unSetAnaInfo(analysisInfo(obj)),
-                         algorithm = paste0(algorithm(obj), "_unset")))
+    anaInfo <- copy(analysisInfo(obj))
+    anaInfo[, set := NULL]
+    return(featuresUnset(features = ionizedFTable, analysisInfo = anaInfo, algorithm = paste0(algorithm(obj), "_unset")))
 })

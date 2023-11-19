@@ -44,7 +44,7 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 blankFilter <- function(fGroups, threshold, negate = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
-    rGroups <- unique(anaInfo$group)
+    rGroups <- replicateGroups(fGroups)
 
     # multiple groups may be specified separated by comma
     blankGroups <- sapply(anaInfo$blank, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
@@ -209,7 +209,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         return(fGroups) # all thresholds NULL/0
 
     gNames <- names(fGroups)
-    rGroupsAna <- fGroups@analysisInfo$group
+    rGroupsAna <- analysisInfo(fGroups)$group
     rGroups <- replicateGroups(fGroups)
     rGroupLens <- table(rGroupsAna)
     rGroupInds <- sapply(rGroups, function(rg) which(rGroupsAna == rg), simplify = FALSE)

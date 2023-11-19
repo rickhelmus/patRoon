@@ -138,6 +138,7 @@ checkFeaturesInterface$methods(
         
         if (rValues$settings$fGroupQuantity == "max")
         {
+            anaInfo <- analysisInfo(fGroups)
             gData[, max_intensity := rowSums(.SD) / nrow(anaInfo), .SDcols = anaInfo$analysis]
             gData <- gData[, (anaInfo$analysis) := NULL]
         }
@@ -179,7 +180,7 @@ checkFeaturesInterface$methods(
     secondaryTableData = function(rValues)
     {
         fti <- groupFeatIndex(fGroups)[[rValues$currentPrimSel]]
-        ft <- featureTable(fGroups)[fti != 0]; ai <- analysisInfo(fGroups)[fti != 0, ]; fti <- fti[fti != 0]
+        ft <- featureTable(fGroups)[fti != 0]; ai <- analysisInfo(fGroups)[fti != 0]; fti <- fti[fti != 0]
         feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
         
         divret <- if (rValues$settings$retUnit == "min") 60 else 1

@@ -88,7 +88,7 @@ doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, 
     anaInfo <- analysisInfo(feat)
     
     if (length(feat) == 0)
-        return(featureGroupsXCMS(analysisInfo = anaInfo, features = feat))
+        return(featureGroupsXCMS(features = feat))
     
     hash <- makeHash(feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)
@@ -159,7 +159,7 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     setnames(groups, gNames)
     groups[is.na(groups)] <- 0
 
-    ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
+    ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, features = feat,
                               ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames))
     
     # synchronize features: any that were without group have been removed

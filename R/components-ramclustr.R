@@ -101,11 +101,11 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
         return(cd)
 
     # RAMClustR needs csv for input
-    fGRoupsCVSTable <- as.data.frame(gTable)
-    rownames(fGRoupsCVSTable) <- anaInfo$analysis
-    colnames(fGRoupsCVSTable) <- paste(gInfo$mzs, gInfo$rts, sep = "_")
+    fGRoupsCSVTable <- as.data.frame(gTable)
+    rownames(fGRoupsCSVTable) <- anaInfo$analysis
+    colnames(fGRoupsCSVTable) <- paste(gInfo$mzs, gInfo$rts, sep = "_")
     csvFile <- tempfile("fGroups", fileext = ".csv")
-    write.table(fGRoupsCVSTable, csvFile, row.names = TRUE, col.names = NA, sep = ",")
+    write.table(fGRoupsCSVTable, csvFile, row.names = TRUE, col.names = NA, sep = ",")
 
     exp <- RAMClustR::defineExperiment(force.skip = TRUE)
     if (!is.null(RCExperimentVals$design))
@@ -131,7 +131,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
         names(presentFTIds) <- anaInfo$analysis[doAna]
 
         pWidths <- unlist(sapply(anaInfo$analysis[doAna],
-                            function(ana) fTable[[ana]][presentFTIds[[ana]], retmax - retmin]))
+                                 function(ana) fTable[[ana]][presentFTIds[[ana]], retmax - retmin]))
 
         RCMainArgs$st <- median(pWidths / 2)
     }

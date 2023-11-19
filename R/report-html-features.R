@@ -513,7 +513,7 @@ reportHTMLUtils$methods(
             {
                 mt <- data.table(analysis = setdiff(analyses(objects$fGroups), tab[group == grp]$analysis))
                 if (!is.null(tab[["set"]]))
-                    mt[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+                    mt[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
                 return(mt)
             }, simplify = FALSE), idcol = "group")
             if (nrow(missingTab) > 0)

@@ -214,8 +214,8 @@ test_that("Sets functionality", {
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(unset(ffOpenMS, "positive")[[1]]$mz, as.adduct("[M+H]+"), "neutral"),
                  ffOpenMS[[1]]$mz)
-    expect_equal(analysisInfo(unset(ffOpenMS, "positive")), getTestAnaInfoPos())
-    expect_equal(analysisInfo(ffOpenMS[, sets = "positive"])[, 1:4], getTestAnaInfoPos())
+    expect_equal(analysisInfo(unset(ffOpenMS, "positive"), TRUE), getTestAnaInfoPos())
+    expect_equal(analysisInfo(ffOpenMS[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos())
     expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
     expect_equal(sets(filter(ffOpenMS, sets = "positive", negate = TRUE)), "negative")
     expect_length(ffOpenMS[, sets = character()], 0)

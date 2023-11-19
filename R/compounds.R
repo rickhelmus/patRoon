@@ -489,7 +489,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (index > nrow(obj[[groupName]]))
             stop(sprintf("Specified candidate index out of range %d/%d", index, nrow(obj[[groupName]])), call. = FALSE)
                 
-        compr <- obj[[groupName]][index, ]
+        compr <- obj[[groupName]][index]
         mol <- NULL
         if (plotStruct)
         {
@@ -520,7 +520,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
 
         if (is.null(title))
         {
-            compr1 <- obj[[groupName[1]]][index[1], ]; compr2 <- obj[[groupName[2]]][index[2], ]
+            compr1 <- obj[[groupName[1]]][index[1]]; compr2 <- obj[[groupName[2]]][index[2]]
             title <- getCompoundsSpecPlotTitle(compr1$compoundName, compr1$neutral_formula,
                                                compr2$compoundName, compr2$neutral_formula)
         }

@@ -424,8 +424,8 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     return(featureGroupsScreeningSet(screenInfo = scr, setObjects = setObjects,
                                      groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
-                                     analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
-                                     features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
+                                     groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
+                                     ftindex = copy(groupFeatIndex(fGroups)),
                                      groupQualities = copy(groupQualities(fGroups)),
                                      groupScores = copy(groupScores(fGroups)), ISTDs = copy(internalStandards(fGroups)),
                                      ISTDAssignments = internalStandardAssignments(fGroups),
@@ -487,10 +487,10 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     }
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),
-                                          groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),
-                                          features = getFeatures(uobj), ftindex = groupFeatIndex(uobj),
-                                          annotations = annotations(uobj), groupQualities = groupQualities(uobj),
-                                          groupScores = groupScores(uobj), ISTDs = internalStandards(uobj),
+                                          groupInfo = groupInfo(uobj), features = getFeatures(uobj),
+                                          ftindex = groupFeatIndex(uobj), annotations = annotations(uobj),
+                                          groupQualities = groupQualities(uobj), groupScores = groupScores(uobj),
+                                          ISTDs = internalStandards(uobj),
                                           ISTDAssignments = internalStandardAssignments(uobj),
                                           concentrations = concentrations(uobj), toxicities = toxicities(uobj))
     # override after constructing: parent constructor already sets algorithm,

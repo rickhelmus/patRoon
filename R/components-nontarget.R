@@ -149,7 +149,6 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
     gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
 
     utils::data(isotopes, package = "enviPat")
 
@@ -157,7 +156,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
     # For now just stick with homologues as there is no easy way to do adduct/isotopes over multiple analyses
     # find homologous series for each replicate group
-    rGroups <- unique(anaInfo$group)
+    rGroups <- replicateGroups(fGroups)
     groupTablesRG <- sapply(rGroups, function(rg)
     {
         fGrpRep <- replicateGroupFilter(fGroups, rg, verbose = FALSE)

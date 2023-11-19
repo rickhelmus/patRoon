@@ -10,6 +10,8 @@
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
+- anaInfo
+    - update makeHash --> make util that excludes extra cols?
 
 - tests
     - IDL filter
@@ -17,11 +19,14 @@
 - docs
     - specSimParams --> specSimParamsMatch
     - ES contributions for IDLs
-    - explicitly mentions annSim can be filtered with scoreLimits?
+    - explicitly mention annSim can be filtered with scoreLimits?
+    - analysisInfo slot/accessor is now data.table()
 
 - NEWS
     - specSimParamsMatch --> specSimParams
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
+    - analysisInfo slot/accessor is now data.table()
+    - no analysisInfo slot in fGroups anymore
     
 
 ## Ext

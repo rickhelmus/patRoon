@@ -33,7 +33,7 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
     tExport <- loadTASQFile(TASQExportFile, analysisInfo)
     tAnalyses <- unique(tExport$analysis)
     tAnalyses <- tAnalyses[tAnalyses %in% analysisInfo$analysis]
-    analysisInfo <- analysisInfo[analysisInfo$analysis %in% tAnalyses, ]
+    analysisInfo <- analysisInfo[analysis %in% tAnalyses]
 
     ret <- featuresBrukerTASQ(analysisInfo = analysisInfo)
 

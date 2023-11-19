@@ -689,8 +689,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     if (onlyHits)
         fGroups <- fGroups[, scr$group]
     
-    ret <- featureGroupsScreening(screenInfo = scr, groups = copy(groupTable(fGroups)),
-                                  analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
+    ret <- featureGroupsScreening(screenInfo = scr, groups = copy(groupTable(fGroups)), groupInfo = groupInfo(fGroups),
                                   features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
                                   groupQualities = copy(groupQualities(fGroups)),
                                   groupScores = copy(groupScores(fGroups)), ISTDs = copy(internalStandards(fGroups)),

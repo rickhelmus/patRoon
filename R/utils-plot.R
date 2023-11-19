@@ -487,7 +487,7 @@ doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, ty
     if (doSets)
     {
         anaInfo <- analysisInfo(obj)
-        anaSets <- if (average) anaInfo[match(replicateGroups(obj), anaInfo$group), "set"] else anaInfo$set
+        anaSets <- if (average) anaInfo$set[match(replicateGroups(obj), anaInfo$group)] else anaInfo$set
     }
     
     if (is.null(col))

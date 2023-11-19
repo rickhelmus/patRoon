@@ -196,7 +196,7 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
         mySets <- get("sets", pos = 2)(x)
         checkmate::assertSubset(which, mySets, empty.ok = FALSE, add = ac)
         ai <- analysisInfo(x)
-        which <- unique(ai[ai$set %in% which, "group"])
+        which <- unique(ai[set %in% which]$group)
     }
     callNextMethod(x, which = which, ...)
 })
@@ -355,9 +355,8 @@ setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose 
     obj <- getFeatures(fGroups) # may have been changed (eg in initialize())
     
     ret <- featureGroupsSet(groupAlgo = algorithm, groupArgs = otherArgs, groupVerbose = verbose,
-                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
-                            analysisInfo = analysisInfo(fGroups), features = obj, ftindex = groupFeatIndex(fGroups),
-                            algorithm = makeSetAlgorithm(list(fGroups)))
+                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups), features = obj,
+                            ftindex = groupFeatIndex(fGroups), algorithm = makeSetAlgorithm(list(fGroups)))
     ret@annotations <- getAnnotationsFromSetFeatures(ret)
     
     return(ret)
@@ -476,9 +475,8 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     setcolorder(grpFeatInds, rownames(groupInfo(setGroups)))
     
     ret <- featureGroupsSet(groupAlgo = groupAlgo, groupArgs = groupArgs, groupVerbose = verbose,
-                            groups = grpInts, groupInfo = groupInfo(setGroups),
-                            analysisInfo = analysisInfo(featSet), features = featSet, ftindex = grpFeatInds,
-                            algorithm = paste0(groupAlgo, "-set"))
+                            groups = grpInts, groupInfo = groupInfo(setGroups), features = featSet,
+                            ftindex = grpFeatInds, algorithm = paste0(groupAlgo, "-set"))
     ret@annotations <- getAnnotationsFromSetFeatures(ret)
     
     return(ret)
@@ -524,7 +522,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     
     
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
-                              analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),
                               annotations = ann, ISTDs = ISTDs, ISTDAssignments = ISTDAssign,

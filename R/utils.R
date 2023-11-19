@@ -8,6 +8,8 @@ mdprintf <- function(...) cat(sprintf(...), sep = "", file = stderr()) # for rma
 if (!exists("hasName")) # should be defined in latest R versions
     hasName <- function(x, name) return(name %in% names(x))
 
+makeDT <- function(df) if (is.data.table(df)) copy(df) else as.data.table(df)
+
 # backslashes are converted to forwardslashes for *nix compat
 baseName <- function(...) basename(gsub("\\\\", "/", ...))
 
@@ -240,6 +242,15 @@ unFactorDF <- function(df)
     i <- sapply(df, is.factor)
     df[i] <- lapply(df[i], as.character)
     return(df)
+}
+
+# as above
+unFactorDT <- function(dt)
+{
+    cols <- names(which(sapply(dt, is.factor)))
+    if (length(cols) > 0)
+        dt[, (cols) := lapply(.SD, as.character), .SDcols = cols]
+    return(dt[])
 }
 
 # from http://stackoverflow.com/a/25455968

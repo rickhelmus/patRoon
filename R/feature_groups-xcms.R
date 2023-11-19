@@ -79,7 +79,7 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
 doGroupFeaturesXCMS <- function(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose)
 {
     if (length(feat) == 0)
-        return(featureGroupsXCMS(analysisInfo = analysisInfo(feat), features = feat))
+        return(featureGroupsXCMS(features = feat))
     
     hash <- makeHash(feat, rtalign, loadRawData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
@@ -150,7 +150,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
     setnames(groups, gNames)
     groups[is.na(groups)] <- 0
 
-    return(featureGroupsXCMS(xs = xs, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
+    return(featureGroupsXCMS(xs = xs, groups = groups, groupInfo = gInfo, features = feat,
                              ftindex = setnames(getFeatIndicesFromXS(xs), gNames)))
 }
 

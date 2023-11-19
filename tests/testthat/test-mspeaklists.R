@@ -25,7 +25,7 @@ if (doDATests())
 plistsNoIM <- plists
 plistsNoIM@metadata <- lapply(plistsNoIM@metadata, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), "ionMobilityDriftTime"), with = FALSE])))
 if (testWithSets())
-    plistsNoIM@analysisInfo <- data.frame() # remove as it is system dependent
+    plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
     expect_known_value(plistsNoIM, testFile("plists-mzr"))
@@ -345,7 +345,8 @@ if (testWithSets())
 test_that("sets functionality", {
     skip_if_not(testWithSets())
     
-    expect_equal(analysisInfo(plists[, sets = "positive"])[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()))
+    expect_equal(analysisInfo(plists[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()),
+                 check.attributes = FALSE)
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)
     expect_equal(sets(filter(plists, sets = "positive", negate = TRUE)), "negative")

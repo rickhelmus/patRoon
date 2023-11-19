@@ -161,7 +161,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
         flist[[fGNames[fgi]]] <- ft
     }
 
-    anaInfo <- data.frame(analysis = fGNames, group = fGNames, blank = "", path = ".", stringsAsFactors = FALSE)
+    anaInfo <- data.table(analysis = fGNames, group = fGNames, blank = "", path = ".")
 
     return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo))
 }
@@ -286,7 +286,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
         warning(msg, call. = FALSE)
     }
 
-    anaInfo <- allAnaInfos[[1]]
+    anaInfo <- copy(allAnaInfos[[1]])
 
     # synchronize analyses
     # allAnalyses <- lapply(obj@fGroupsList, function(fg) analysisInfo(fg)$analysis)
@@ -383,10 +383,8 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
                                      algorithm = allAlgos)
 
     if (nrow(compFeatInds) == 0) # all input were empty feature groups
-        return(featureGroupsConsensus(groups = data.table(), groupInfo = data.frame(),
-                                      analysisInfo = anaInfo, features = retFeatures,
-                                      ftindex = data.table(),
-                                      algorithm = allAlgos))
+        return(featureGroupsConsensus(groups = data.table(), groupInfo = data.frame(), features = retFeatures,
+                                      ftindex = data.table(), algorithm = allAlgos))
 
     # initialize new feature group tables
 
@@ -413,8 +411,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     setTxtProgressBar(prog, nrow(anaInfo))
     close(prog)
 
-    return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
-                                  groupInfo = groupInfo(comparedFGroups), features = retFeatures,
+    return(featureGroupsConsensus(groups = consGroups, groupInfo = groupInfo(comparedFGroups), features = retFeatures,
                                   ftindex = consFeatInds, algorithm = allAlgos))
 })
 

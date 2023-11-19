@@ -427,7 +427,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     gInfo <- groupInfo(obj)
     gCount <- length(groupName)
     anaInfo <- analysisInfo(obj)
-    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis & anaInfo$analysis %chin% names(EICs), ]
+    takeAnalysis <- analysis
+    anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     rGroups <- unique(anaInfo$group)
     
@@ -532,7 +533,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                 next
             
             if (colourBy == "rGroups")
-                colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
+                colInd <- anaInfo[match(ana, analysis)]$group
             else if (colourBy == "fGroups")
                 colInd <- grp
             else
@@ -615,8 +616,9 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
         EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
                            topMostByRGroup = FALSE, onlyPresent = FALSE)
     }
+    anas <- analysis
     makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
-             analysisInfo(obj)[analysisInfo(obj)$analysis %chin% analysis, ])
+             analysisInfo(obj)[analysis %chin% anas])
 })
 
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature
@@ -663,7 +665,7 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
         else
             checkmate::assertSubset(which, mySets)
         ai <- analysisInfo(obj)
-        which = sapply(which, function(s) ai[ai$set == s, "group"], simplify = FALSE)
+        which = sapply(which, function(s) ai[set == s]$group, simplify = FALSE)
     }
     callNextMethod(obj, which = which, ...)
 })

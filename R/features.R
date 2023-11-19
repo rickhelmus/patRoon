@@ -51,7 +51,7 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.frame"),
+                     slots = c(features = "list", analysisInfo = "data.table"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
@@ -99,12 +99,17 @@ setReplaceMethod("featureTable", "features", function(obj, value)
 })
 
 #' @describeIn features Get analysis information
-#' @return \code{analysisInfo}: A \code{data.frame} containing a column with
+#' @param df If \code{TRUE} then the returned value is a \code{data.frame}, otherwise a \code{data.table}.
+#' @return \code{analysisInfo}: A \code{data.table} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
 #'   such as replicate group name (\code{group}) and blank reference
 #'   (\code{blank}).
 #' @export
-setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
+setMethod("analysisInfo", "features", function(obj, df = FALSE)
+{
+    checkmate::assertFlag(df)
+    return(if (df) as.data.frame(obj@analysisInfo) else obj@analysisInfo)
+})
 
 #' @templateVar class features
 #' @templateVar what analyses
@@ -155,8 +160,6 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
         obj <- cache
     else
     {
-        anaInfo <- analysisInfo(obj)
-
         absIntPred <- if (!negate) function(x) x >= absMinIntensity else function(x) x < absMinIntensity
         relIntPred <- if (!negate) function(x, m) (x / m) >= relMinIntensity else function(x, m) (x / m) < relMinIntensity
         rangePred <- function(x, range) numGTE(x, range[1]) & numLTE(x, range[2])
@@ -288,7 +291,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
             return(ft[setdiff(seq_len(nrow(ft)), rm)])
         })
     }
-    obj@analysisInfo <- obj@analysisInfo[obj@analysisInfo$analysis %in% names(obj@features), ]
+    obj@analysisInfo <- obj@analysisInfo[analysis %in% names(obj@features)]
     
     return(obj)
 })

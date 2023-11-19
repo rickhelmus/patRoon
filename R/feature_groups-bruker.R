@@ -50,8 +50,6 @@ importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = 12, mzWindow = 0.
 
     cat("Importing ProfileAnalysis file...")
 
-    anaInfo <- analysisInfo(feat)
-
     # disable check.names: keep original names as much as possible
     f <- fread(path, check.names = F, sep = "\t", stringsAsFactors = FALSE, header = TRUE)
     setnames(f, make.unique(colnames(f))) # still make them unique
@@ -60,7 +58,7 @@ importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = 12, mzWindow = 0.
     setnames(f, 1, "file") # name it to make processing easier
 
     # filter & align samples with samples in features and remove file column
-    featgroups <- f[match(anaInfo$analysis, simplifyAnalysisNames(file), nomatch = 0)][, -"file"]
+    featgroups <- f[match(analysisInfo(feat)$analysis, simplifyAnalysisNames(file), nomatch = 0)][, -"file"]
 
     gInfo <- extractPAGroupInfo(featgroups)
 
@@ -69,8 +67,7 @@ importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = 12, mzWindow = 0.
     setnames(featgroups, gNames)
     rownames(gInfo) <- gNames
 
-    ret <- featureGroupsBruker(groups=featgroups, analysisInfo = anaInfo, groupInfo = gInfo,
-                               features = feat)
+    ret <- featureGroupsBruker(groups = featgroups, groupInfo = gInfo, features = feat)
     ret@ftindex <- getFeatIndicesFromPA(ret, rtWindow, mzWindow, intWindow, warn)
 
     saveCacheData("featureGroupsPA", ret, hash)

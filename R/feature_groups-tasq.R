@@ -95,8 +95,7 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
         set(ftindex, anai, grp, finds)
     }
 
-    ret <- featureGroupsBrukerTASQ(groups = groups, analysisInfo = analysisInfo, groupInfo = gInfo, ftindex = ftindex,
-                                   features = fts)
+    ret <- featureGroupsBrukerTASQ(groups = groups, groupInfo = gInfo, ftindex = ftindex, features = fts)
 
     return(ret)
 }

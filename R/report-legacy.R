@@ -313,7 +313,6 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
 
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
-    anaInfo <- analysisInfo(fGroups)
     compTable <- annotations(compounds)
     mcn <- mergedConsensusNames(compounds)
 
@@ -349,7 +348,6 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
 
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
 
     if (length(compounds) == 0)
@@ -484,7 +482,6 @@ reportComponentPlots <- function(fGroups, path, components, EICParams, retMin, E
     }
 
     gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
     cInfo <- componentInfo(components)
     cTable <- componentTable(components)
 

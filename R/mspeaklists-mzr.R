@@ -116,7 +116,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
             fti <- ftindex[[grpi]][anai]
             if (fti == 0)
                 next
-            ft <- fTable[[ana]][fti, ]
+            ft <- fTable[[ana]][fti]
 
             hash <- makeHash(baseHash, ft)
             resultHashCount <- resultHashCount + 1

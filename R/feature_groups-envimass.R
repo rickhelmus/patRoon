@@ -95,7 +95,7 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
     setTxtProgressBar(prog, gcount)
     close(prog)
 
-    ret <- featureGroupsEnviMass(groups = groups, groupInfo = gInfo, analysisInfo = anaInfo, features = feat, ftindex = ftind)
+    ret <- featureGroupsEnviMass(groups = groups, groupInfo = gInfo, features = feat, ftindex = ftind)
 
     saveCacheData("featureGroupsEnviMass", ret, hash)
 

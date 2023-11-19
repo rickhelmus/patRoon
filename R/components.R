@@ -539,10 +539,7 @@ setMethod("plotChromsHash", "components", function(obj, index, fGroups, EICParam
     comp <- componentTable(obj)[[index]]
     anas <- analyses(fGroups)
     if (!is.null(comp[["hsnr"]])) # homologues?
-    {
-        rGroups <- unique(comp$rGroup)
-        anas <- analysisInfo(fGroups)[analysisInfo(fGroups)$group %chin% rGroups, ]
-    }
+        anas <- analysisInfo(fGroups)[group %chin% comp$rGroup]$analysis
     makeHash(comp, plotChromsHash(fGroups, EICParams = EICParams, analyses = anas, groupName = comp$group, ...))
 })
 

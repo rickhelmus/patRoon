@@ -64,11 +64,10 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
         setnames(gTab, gNames)
         setnames(ftind, gNames)
 
-        return(featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, analysisInfo = anaInfo,
-                                   features = features, ftindex = ftind))
+        return(featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = features, ftindex = ftind))
     }
 
-    return(featureGroupsSIRIUS(groups = data.table(), groupInfo = data.frame(), analysisInfo = anaInfo,
+    return(featureGroupsSIRIUS(groups = data.table(), groupInfo = data.frame(),
                                features = featuresSIRIUS(analysisInfo = anaInfo, features = list()),
                                ftindex = data.table()))
 }

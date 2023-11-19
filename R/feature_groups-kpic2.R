@@ -81,7 +81,7 @@ setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(t
 doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose)
 {
     if (length(feat) == 0)
-        return(featureGroupsKPIC2(analysisInfo = analysisInfo(feat), features = feat))
+        return(featureGroupsKPIC2(features = feat))
     
     hash <- makeHash(feat, rtalign, loadRawData, groupArgs, alignArgs)
     cachefg <- loadCacheData("featureGroupsKPIC2", hash)
@@ -145,8 +145,7 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
     gInfo <- as.data.frame(gInfo[, -"group"])
     rownames(gInfo) <- gNames
     
-    return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo,
-                              analysisInfo = analysisInfo, features = feat,
+    return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo, features = feat,
                               ftindex = ftindex))
 }
 

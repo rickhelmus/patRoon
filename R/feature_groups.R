@@ -60,8 +60,7 @@ NULL
 #'
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
 #'   Access with \code{groups} method.
-#' @slot analysisInfo,features \link[=analysis-information]{Analysis info} and \code{\link{features}} class associated
-#'   with this object. Access with \code{analysisInfo} and \code{featureTable} methods, respectively.
+#' @slot features \code{\link{features}} class associated with this object. Access with\code{featureTable} methods.
 #' @slot groupInfo \code{data.frame} with retention time (\code{rts} column, in seconds) and \emph{m/z} (\code{mzs}
 #'   column) for each feature group. Access with \code{groupInfo} method.
 #' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each feature group (columns) per analysis
@@ -87,8 +86,8 @@ NULL
 #'
 #' @export
 featureGroups <- setClass("featureGroups",
-                          slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
-                                    features = "features", ftindex = "data.table", groupQualities = "data.table",
+                          slots = c(groups = "data.table", groupInfo = "data.frame", features = "features",
+                                    ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
                                     ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table",
                                     toxicities = "data.table"),
@@ -169,7 +168,6 @@ setMethod("length", "featureGroups", function(x) ncol(x@groups))
 setMethod("show", "featureGroups", function(object)
 {
     callNextMethod(object)
-    anaInfo <- analysisInfo(object)
     fCount <- length(getFeatures(object)); gCount <- length(object)
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), gCount)
     printf("Features: %d (%.1f per group)\n", fCount, if (gCount > 0) fCount / gCount)
@@ -241,8 +239,9 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
 })
 
 #' @describeIn featureGroups Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
+#' @inheritParams analysisInfo,features-method
 #' @export
-setMethod("analysisInfo", "featureGroups", function(obj) obj@analysisInfo)
+setMethod("analysisInfo", "featureGroups", function(obj, df) analysisInfo(getFeatures(obj), df))
 
 #' @describeIn featureGroups Accessor for \code{groupInfo} slot.
 #' @aliases groupInfo
@@ -468,7 +467,6 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             obj@groups <- obj@groups[-ainds]
             obj@ftindex <- obj@ftindex[-ainds]
         }
-        obj@analysisInfo <- obj@analysisInfo[-ainds, , drop = FALSE]
         if (length(obj@concentrations) > 0)
             obj@concentrations <- obj@concentrations[, setdiff(names(obj@concentrations), removedAnas), with = FALSE]
     }
@@ -590,7 +588,7 @@ setMethod("export", "featureGroups", function(obj, type, out)
     {
         # UNDONE: do we need this?
         #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
-        files <- obj@analysisInfo$analysis
+        files <- analysisInfo(obj)$analysis
 
         # col.names: if NA an empty initial column is added
         write.table(obj@groups, out, na = "", sep = "\t", quote = FALSE, row.names = files, col.names = NA)

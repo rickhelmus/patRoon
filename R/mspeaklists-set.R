@@ -18,8 +18,7 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
     else
         MSPeakListsSet@peakLists <- MSPeakListsSet@averagedPeakLists <- list()
     
-    MSPeakListsSet@analysisInfo <-
-        MSPeakListsSet@analysisInfo[MSPeakListsSet@analysisInfo$analysis %in% names(peakLists(MSPeakListsSet)), ]
+    MSPeakListsSet@analysisInfo <- MSPeakListsSet@analysisInfo[analysis %in% names(peakLists(MSPeakListsSet))]
     
     return(MSPeakListsSet)
 }
@@ -59,7 +58,7 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
 #' @rdname MSPeakLists-class
 #' @export
 MSPeakListsSet <- setClass("MSPeakListsSet",
-                           slots = c(analysisInfo = "data.frame"),
+                           slots = c(analysisInfo = "data.table"),
                            contains = c("MSPeakLists", "workflowStepSet"))
 
 setMethod("initialize", "MSPeakListsSet", function(.Object, ...) callNextMethod(.Object, ..., setIDs = FALSE))
@@ -96,7 +95,11 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 
 #' @rdname MSPeakLists-class
 #' @export
-setMethod("analysisInfo", "MSPeakListsSet", function(obj) obj@analysisInfo)
+setMethod("analysisInfo", "MSPeakListsSet", function(obj, df)
+{
+    checkmate::assertFlag(df)
+    return(if (df) as.data.frame(obj@analysisInfo) else obj@analysisInfo)
+})
 
 #' @rdname MSPeakLists-class
 #' @export
@@ -152,7 +155,7 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
     if (!averaged) # add set column
     {
         anaInfo <- analysisInfo(x)
-        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+        ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
         setcolorder(ret, "set")
     }
     
@@ -410,7 +413,7 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
 
     # UNDONE: set metadata?
     ret <- MSPeakListsSet(setObjects = setObjects,
-                          analysisInfo = analysisInfo(fGroupsSet),
+                          analysisInfo = copy(analysisInfo(fGroupsSet)),
                           peakLists = combPL, metadata = list(),
                           origFGNames = names(fGroupsSet),
                           algorithm = makeSetAlgorithm(setObjects))

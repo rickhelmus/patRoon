@@ -69,8 +69,9 @@ doGetEICs <- function(file, ranges, cacheDB = NULL)
 
 setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, EICParams)
 {
-    anaInfo <- analysisInfo(fGroups)
-    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+    takeAnalysis <- analysis # copy name to workaround DT access below
+    
+    anaInfo <- analysisInfo(fGroups)[analysis %chin% takeAnalysis]
     featTab <- as.data.table(getFeatures(fGroups))
     
     topMost <- if (!is.null(EICParams$topMost))
@@ -81,7 +82,7 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
     # subset relevant things in advance    
     featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
                        with = FALSE]
-    takeAnalysis <- analysis # copy name to workaround DT access below
+    
     return(sapply(groupName, function(fg)
     {
         ret <- featTab[group == fg][, -"group"]
@@ -143,7 +144,7 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, gr
             # feature group is always the same
             adductSets <- unique(featTabGrp[, c("adduct", "set"), with = FALSE])
             ranges[is.na(adduct), adduct := {
-                s <- anaInfo[match(analysis, anaInfo$analysis), "set"]
+                s <- anaInfo$set[match(analysis, anaInfo$analysis)]
                 adductSets[set == s]$adduct
             }, by = "analysis"]
             
@@ -184,15 +185,15 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
     if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
         return(list())
     
-    anaInfo <- analysisInfo(fGroups)
-    anaInfo <- anaInfo[anaInfo$analysis %chin% analysis, ]
+    takeAnalysis <- analysis # for DT subset below
+    anaInfo <- analysisInfo(fGroups)[analysis %chin% takeAnalysis]
 
     verifyDataCentroided(anaInfo)
 
     EICInfoTab <- getEICFGroupInfo(fGroups, analysis, groupName, EICParams)
     EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
     EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
-    anaInfoEICs <- anaInfo[anaInfo$analysis %in% names(EICInfo), ]
+    anaInfoEICs <- anaInfo[analysis %in% names(EICInfo)]
     anaPaths <- getMzMLOrMzXMLAnalysisPath(anaInfoEICs$analysis, anaInfoEICs$path, mustExist = TRUE)
 
     # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before

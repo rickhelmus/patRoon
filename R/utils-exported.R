@@ -509,7 +509,7 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
                 value.name = "intensity")
     
     if (!average)
-        ret[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
+        ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
     
     mconcs <- melt(concs, measure.vars = concRGs, variable.name = "rGroup", value.name = "conc") 
     

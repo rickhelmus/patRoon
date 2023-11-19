@@ -1,1 +1,2 @@
-#' @param analysisInfo A \code{data.frame} with \link[=analysis-information]{Analysis information}.
+#' @param analysisInfo A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+#'   information}.

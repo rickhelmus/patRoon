@@ -12,6 +12,17 @@
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
 - anaInfo
     - replace method
+        - if path is changed, make sure it's valid
+        - don't allow new/less rows, analysis column changes
+        - copy value if it's a DT
+        - doc that anaInfo shouldn't be changed by reference?
+        - also method for replicateGroups<-?
+    - fGroups/feat subset
+        - use subset i arg for reorder if reorder=T
+        - also ^ for reordering sets
+        - allow expressions for i and pass directly to anaInfo
+        - deprecate rGroups subset/filter param
+    - rename group col to replicate and warn for deprecation (like blank/ref column)
 
 - tests
     - IDL filter

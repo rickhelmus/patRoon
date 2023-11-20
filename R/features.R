@@ -98,6 +98,18 @@ setReplaceMethod("featureTable", "features", function(obj, value)
     return(obj)
 })
 
+setMethod("reorderAnalyses", "features", function(obj, anas)
+{
+    anaInfo <- analysisInfo(obj)
+    order <- match(anas, anaInfo$analysis)
+    stopifnot(length(order) == nrow(anaInfo) && !anyNA(order))
+    
+    obj@analysisInfo <- anaInfo[order]
+    featureTable(obj) <- featureTable(obj)[order]
+    
+    return(obj)
+})
+
 #' @describeIn features Get analysis information
 #' @param df If \code{TRUE} then the returned value is a \code{data.frame}, otherwise a \code{data.table}.
 #' @return \code{analysisInfo}: A \code{data.table} containing a column with

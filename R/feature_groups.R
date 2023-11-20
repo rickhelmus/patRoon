@@ -258,6 +258,27 @@ setReplaceMethod("featureTable", "featureGroups", function(obj, value)
     return(obj)
 })
 
+setMethod("reorderAnalyses", "featureGroups", function(obj, anas)
+{
+    if (length(obj) > 0)
+    {
+        order <- match(anas, analyses(obj))
+        obj@groups <- groupTable(obj)[order]
+        obj@ftindex <- groupFeatIndex(obj)[order]
+        if (nrow(concentrations(obj)) > 0)
+        {
+            concs <- copy(concentrations(obj))
+            otherCols <- setdiff(names(concs), anas)
+            setcolorder(concs, c(otherCols, anas))
+            obj@concentrations <- concs
+        }
+    }
+    
+    obj@features <- reorderAnalyses(getFeatures(obj), anas)
+    
+    return(obj)
+})
+
 #' @describeIn featureGroups Accessor for \code{features} slot.
 #' @export
 setMethod("getFeatures", "featureGroups", function(obj) obj@features)

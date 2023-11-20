@@ -1,6 +1,7 @@
 ### Non-exported generics
 
 setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
+setGeneric("reorderAnalyses", function(obj, anas) standardGeneric("reorderAnalyses"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
 setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE,
                                      func = mean) standardGeneric("averageGroups"))

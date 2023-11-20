@@ -23,6 +23,7 @@
         - allow expressions for i and pass directly to anaInfo
         - deprecate rGroups subset/filter param
     - rename group col to replicate and warn for deprecation (like blank/ref column)
+    - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
 
 - tests
     - IDL filter

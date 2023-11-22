@@ -10,7 +10,7 @@ if (doDATests())
     # compounds, forcing other calls (from features/formulas tests) to re-run
     # FMF
     fgDA <- getTestFGroupsDA(getDAAnaInfo("std2"))[, 1:25]
-browser()
+
     # NOTE: set bgsubtr to FALSE: subtraction might remove pecursor peaks of
     # (often wrong) low intensity features and result in warnings during
     # averaging

@@ -139,13 +139,13 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)
     checkmate::reportAssertions(ac)
     
-    calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
-    
     if (type == "SMILES" || type == "both")
         obj <- callNextMethod(obj, fGroups = fGroups, calibrants = calibrants, eluent = eluent,
                               organicModifier = organicModifier, pHAq = pHAq, concUnit = concUnit,
                               calibConcUnit = calibConcUnit, updateScore = FALSE, scoreWeight = 1)
 
+    calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
+    
     if (type == "FP" || type == "both")
     {
         printf("Predicting response factors from fingerprints with MS2Quant for %d candidates...\n", length(obj))

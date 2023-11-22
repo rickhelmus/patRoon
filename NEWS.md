@@ -1,3 +1,7 @@
+# DEVEL
+
+* Fixed: `predictRespFactors()` could incorrectly cache results and perform concentration convrsions twice for calibrants under some circumstances (reported by Drew Szabo)
+
 # patRoon 2.3
 
 This release adds significant new functionality, several important changes and several bug fixes thanks to user feedback.

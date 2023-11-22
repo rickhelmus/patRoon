@@ -23,7 +23,7 @@ fGroupsEmpty <- predictRespFactors(fGroupsEmpty, list(), eluent, organicModifier
                                    calibConcUnit = "M")
 fGroupsEmpty <- predictTox(fGroupsEmpty)
 
-doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
+doSIRIUS <- TRUE #!is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 if (doSIRIUS)
 {
     fGroupsForms <- getFormFGroups()

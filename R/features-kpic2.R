@@ -49,10 +49,20 @@ updatePICSet <- function(old, new, analyses)
 
 #' @rdname features-class
 #' @export
-featuresKPIC2 <- setClass("featuresKPIC2", slots = list(picsList = "ANY"), contains = "features")
+featuresKPIC2 <- setClass("featuresKPIC2", slots = list(picsList = "list"), contains = "features")
 
 setMethod("initialize", "featuresKPIC2",
           function(.Object, ...) callNextMethod(.Object, algorithm = "kpic2", ...))
+
+setMethod("reorderAnalyses", "featuresKPIC2", function(obj, anas)
+{
+    oldAnas <- analyses(obj)
+    obj <- callNextMethod()
+    order <- match(anas, oldAnas)
+    obj@picsList <- obj@picsList[order]
+    return(obj)
+})
+
 
 #' @rdname features-class
 #' @export

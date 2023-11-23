@@ -33,6 +33,7 @@
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - analysisInfo slot/accessor is now data.table()
+    - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
 
 - NEWS
     - specSimParamsMatch --> specSimParams

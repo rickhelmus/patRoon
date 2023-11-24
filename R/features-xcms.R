@@ -8,6 +8,13 @@ featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "ANY"), contains = "f
 setMethod("initialize", "featuresXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
 
+setMethod("reorderAnalyses", "featuresXCMS", function(obj, anas)
+{
+    obj <- callNextMethod()
+    obj@xs <- obj@xs[, anas]
+    return(obj)
+})
+
 #' @rdname features-class
 #' @export
 setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)

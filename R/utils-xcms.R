@@ -281,6 +281,10 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
 #' @export
 setMethod("getXCMSnExp", "featuresXCMS3", function(obj, ...)
 {
+    # first verify if we can just return the embedded xcms object
+    if (!all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == analysisInfo(obj)$analysis))
+        return(callNextMethod())
+    
     return(obj@xdata)
 })
 

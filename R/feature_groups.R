@@ -243,6 +243,25 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
 #' @export
 setMethod("analysisInfo", "featureGroups", function(obj, df) analysisInfo(getFeatures(obj), df))
 
+#' @describeIn featureGroups Modifies analysis information
+#' @export
+setReplaceMethod("analysisInfo", "featureGroups", function(obj, value)
+{
+    # to verify the new anaInfo it is easiest to rely on the checks to be done by the featurs method of
+    # analysisInfo()<-. However, the re-ordering of fGroup data needs to be done before the features are changed, as
+    # otherwise reorderAnalysis() doesn't know what has changed. So first do the anaInfo change on a copy of the
+    # features, then reorder the fGroup data and finally update the object features.
+    
+    feat <- getFeatures(obj)
+    analysisInfo(feat) <- value
+    
+    if (!checkmate::testNames(analysisInfo(feat)$analysis, identical.to = analysisInfo(obj)$analysis)) # re-ordered?
+        obj <- reorderAnalyses(obj, analysisInfo(feat)$analysis)
+    
+    obj@features <- feat
+    return(obj)
+})
+
 #' @describeIn featureGroups Accessor for \code{groupInfo} slot.
 #' @aliases groupInfo
 #' @export

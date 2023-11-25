@@ -123,6 +123,30 @@ setMethod("analysisInfo", "features", function(obj, df = FALSE)
     return(if (df) as.data.frame(obj@analysisInfo) else obj@analysisInfo)
 })
 
+#' @describeIn features Modifies analysis information
+#' @export
+setReplaceMethod("analysisInfo", "features", function(obj, value)
+{
+    oldAnaInfo <- analysisInfo(obj)
+    
+    if (nrow(oldAnaInfo) > nrow(value))
+    {
+        stop("Cannot remove analyses when changing the analysis information. Please subset the object instead.",
+             call. = FALSE)
+    }
+    if (nrow(oldAnaInfo) < nrow(value))
+        stop("Cannot add analyses.", call. = FALSE)
+    if (!setequal(oldAnaInfo$analysis, value$analysis))
+        stop("Cannot modify analysis column.", call. = FALSE)
+
+    if (!checkmate::testNames(value$analysis, identical.to = oldAnaInfo$analysis)) # re-ordered?
+        obj <- reorderAnalyses(obj, value$analysis)
+    
+    obj@analysisInfo <- assertAndPrepareAnaInfo(value)
+    
+    return(obj)
+})
+
 #' @templateVar class features
 #' @templateVar what analyses
 #' @template strmethod

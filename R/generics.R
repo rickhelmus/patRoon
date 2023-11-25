@@ -387,6 +387,11 @@ setGeneric("algorithm", function(obj) standardGeneric("algorithm"))
 #' @param df If \code{TRUE} then a \code{data.frame} is returned, otherwise a \code{data.table} is returned.
 setGeneric("analysisInfo", function(obj, df = FALSE) standardGeneric("analysisInfo"))
 
+#' @templateVar func analysisInfo<-
+#' @templateVar desc modifies the \link[=analysis-information]{analysis information} of an object.
+#' @template generics
+setGeneric("analysisInfo<-", function(obj, value) standardGeneric("analysisInfo<-"))
+
 #' @templateVar func analyses
 #' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
 #' @template generics

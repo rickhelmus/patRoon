@@ -17,6 +17,15 @@ setMethod("reorderAnalyses", "featuresXCMS", function(obj, anas)
 
 #' @rdname features-class
 #' @export
+setReplaceMethod("analysisInfo", "featuresXCMS", function(obj, value)
+{
+    obj <- callNextMethod()
+    xcms::sampclass(obj@xs) <- analysisInfo(obj)$group # sync
+    return(obj)
+})
+
+#' @rdname features-class
+#' @export
 setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
 {
     old <- obj

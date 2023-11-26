@@ -183,6 +183,15 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
 
 #' @rdname featureGroups-class
 #' @export
+setReplaceMethod("analysisInfo", "featureGroupsXCMS", function(obj, value)
+{
+    obj <- callNextMethod()
+    xcms::sampclass(obj@xs) <- analysisInfo(obj)$group # sync
+    return(obj)
+})
+
+#' @rdname featureGroups-class
+#' @export
 setMethod("delete", "featureGroupsXCMS", function(obj, ...)
 {
     # UNDONE: update individual features somehow too?

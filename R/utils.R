@@ -32,12 +32,23 @@ getMzMLOrMzXMLAnalysisPath <- function(file, path, mustExist = FALSE)
     return(ret)
 }
 
-mergeAnaSubsetArgWithSets <- function(i, sets, anaInfo)
+mergeAnaSubsetArgWithSets <- function(i, sets, anaInfo, reorder)
 {
     if (length(sets) == 0)
         return(character())
     
+    if (reorder)
+    {
+        if (!missing(i))
+            stop("Cannot simultaneously order by analyses and sets.", call. = FALSE)
+        anaInfo <- copy(anaInfo)[set %in% sets]
+        anaInfo[, ord := match(set, sets)]
+        setorderv(anaInfo, "ord")
+        anaInfo[set %in% sets]
+    }
+    
     setAna <- anaInfo$analysis[anaInfo$set %in% sets]
+    
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, anaInfo$analysis)

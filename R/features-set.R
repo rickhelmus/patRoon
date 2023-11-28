@@ -108,14 +108,15 @@ setMethod("as.data.table", "featuresSet", function(x)
 
 #' @rdname features-class
 #' @export
-setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
+setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., ni, sets = NULL, reorder = FALSE,
+                                                                       drop = TRUE)
 {
     assertSets(x, sets, TRUE)
     
     if (!is.null(sets))
-        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
+        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x), reorder)
         
-    x <- callNextMethod(x, i, ...)
+    x <- callNextMethod(x, i, ..., ni = ni, reorder = reorder)
     
     return(x)
 })

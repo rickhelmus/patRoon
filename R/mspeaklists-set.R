@@ -119,7 +119,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets))
-        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
+        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x), reorder = FALSE)
     
     if (!missing(i) || !missing(j))
     {

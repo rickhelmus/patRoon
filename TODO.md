@@ -15,7 +15,6 @@
         - xcms method to update groups
         - doc that anaInfo shouldn't be changed by reference?
     - fGroups/feat subset
-        - reordering sets
         - deprecate rGroups subset/filter param?
     - rename group col to replicate and warn for deprecation (like blank/ref column)
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
@@ -30,14 +29,15 @@
     - analysisInfo slot/accessor is now data.table()
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - analysisInfo<-() methods (eg add limitations)
-    - new subset args (ni, reorder)
+    - new subset args (ni, reorder, reorder sets)
 
 - NEWS
     - specSimParamsMatch --> specSimParams
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
     - analysisInfo slot/accessor is now data.table()
     - no analysisInfo slot in fGroups anymore
-    
+    - analysisInfo()<-
+    - feature subsetting: ni and reorder args (also reorder sets)
 
 ## Ext
 

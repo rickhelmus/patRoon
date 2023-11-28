@@ -379,19 +379,18 @@ setMethod("toxicities", "featureGroups", function(fGroups) fGroups@toxicities)
 #'   can be specified in a \code{list}: in this case a feature group is kept if it has a result in \emph{any} of the
 #'   objects (equivalent to the \code{results} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
-setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, results, drop = TRUE)
+setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, rGroups, results, reorder = FALSE,
+                                                                     drop = TRUE)
 {
+    checkmate::assertFlag(reorder)
+    
     if (!missing(rGroups))
         x <- filter(x, rGroups = rGroups)
     if (!missing(results))
         x <- filter(x, results = results)
     
-    if (!missing(i))
-    {
-        i <- assertSubsetArgAndToChr(i, analyses(x))
-        x <- delete(x, setdiff(analyses(x), i))
-    }
-
+    x <- doSubsetFeaturesByAna(x, i, ni, reorder)
+    
     if (!missing(j))
     {
         j <- assertSubsetArgAndToChr(j, names(x))

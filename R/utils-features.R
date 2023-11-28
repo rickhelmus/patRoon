@@ -9,6 +9,30 @@ showAnaInfo <- function(anaInfo)
     printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
+doSubsetFeaturesByAna <- function(obj, i, ni, reorder)
+{
+    if (!missing(ni))
+    {
+        if (!missing(i))
+            stop("Cannot simulatenously specify i and ni arguments.", call. = FALSE)
+        anaInfo <- analysisInfo(obj)
+        # From https://stackoverflow.com/a/62043225
+        # NOTE: set env=parent.frame() here, as ni is passed from another function (`[`) 
+        anaInfo <- eval(substitute(anaInfo[.i], list(.i = substitute(ni, env = parent.frame()))))
+        i <- anaInfo$analysis
+    }
+    
+    if (!missing(i))
+    {
+        i <- assertSubsetArgAndToChr(i, analyses(obj))
+        obj <- delete(obj, setdiff(analyses(obj), i))
+        if (reorder && !isTRUE(all.equal(i, analyses(obj), check.attributes = FALSE)))
+            obj <- reorderAnalyses(obj, i)
+    }
+    
+    return(obj)
+}
+
 reGenerateFTIndex <- function(fGroups)
 {
     gNames <- names(fGroups)

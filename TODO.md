@@ -11,9 +11,6 @@
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
 - anaInfo
-    - replace method
-        - xcms method to update groups
-        - doc that anaInfo shouldn't be changed by reference?
     - fGroups/feat subset
         - deprecate rGroups subset/filter param?
     - rename group col to replicate and warn for deprecation (like blank/ref column)
@@ -28,7 +25,9 @@
     - explicitly mention annSim can be filtered with scoreLimits?
     - analysisInfo slot/accessor is now data.table()
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - analysisInfo<-() methods (eg add limitations)
+    - analysisInfo<-()
+        - doc methods (eg add limitations)
+        - doc that anaInfo shouldn't be changed by reference?
     - new subset args (ni, reorder, reorder sets)
 
 - NEWS

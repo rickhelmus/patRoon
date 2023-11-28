@@ -54,7 +54,7 @@ doMakeFeaturesSet <- function(featuresList, adducts)
         ret <- copy(analysisInfo(featuresList[[set]]))
         data.table::set(ret, j = "set", value = if (nrow(ret) == 0) character() else set)
         return(ret)
-    }))
+    }), fill = TRUE)
     
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))

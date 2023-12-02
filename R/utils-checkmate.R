@@ -149,6 +149,20 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     return(x)
 }
 
+assertAndPrepareAnaInfoAverage <- function(x, anaInfo, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFlag(x),
+        checkmate::checkSubset(x, names(anaInfo), empty.ok = FALSE),
+        .var.name = .var.name, add = add
+    )
+    if (isTRUE(x))
+        x <- "group"
+    else if (isFALSE(x))
+        x <- "analysis"
+    return(x)
+}
+
 assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
 {
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
@@ -410,11 +424,11 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
     return(x)
 }
 
-assertFGAsDataTableArgs <- function(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                                     concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ average + areas + features + regression + normalized + normConcToTox,
+    aapply(checkmate::assertFlag, . ~ areas + features + regression + normalized + normConcToTox,
            fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
     assertFCParams(FCParams, fGroups, null.ok = TRUE, add = ac)

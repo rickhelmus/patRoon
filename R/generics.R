@@ -3,7 +3,7 @@
 setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
 setGeneric("reorderAnalyses", function(obj, anas) standardGeneric("reorderAnalyses"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
-setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE,
+setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE, by = "group",
                                      func = mean) standardGeneric("averageGroups"))
 setGeneric("averageMSPeakLists", function(obj) standardGeneric("averageMSPeakLists"))
 setGeneric("collapseComponents", function(obj) standardGeneric("collapseComponents"))

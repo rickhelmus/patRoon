@@ -120,10 +120,11 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                             concAggrParams = getDefPredAggrParams(), toxAggrParams = getDefPredAggrParams(),
                             normConcToTox = FALSE, collapseSuspects = ",", onlyHits = FALSE)
 {
-    assertFGAsDataTableArgs(fGroups, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
+    assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, averageFunc, normalized, FCParams,
                             concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
+    averageCol <- assertAndPrepareAnaInfoAverage(average, analysisInfo(fGroups))
     
-    if (features && average && regression)
+    if (features && !isFALSE(average) && regression)
         stop("Cannot add regression data for averaged features.")
     if (features && !is.null(FCParams))
         stop("Cannot calculate fold-changes with features=TRUE")
@@ -170,7 +171,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         else if (hasFGroupScores(fGroups))
             ret[, (intersect(featureQualityNames(group = FALSE, scores = TRUE), names(ret))) := NULL]
         
-        if (average)
+        if (isTRUE(average))
         {
             ret <- removeDTColumnsIfPresent(ret, c("isocount", "analysis", "ID"))
             numCols <- names(which(sapply(ret, is.numeric)))
@@ -219,15 +220,15 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         if (normalized)
             fGroups <- maybeAutoNormalizeFGroups(fGroups)
         
-        gTableAvg <- averageGroups(fGroups, areas, normalized, func = averageFunc)
-        gTableNonAvg <- groupTable(fGroups, areas, normalized)
+        gTable <- if (isFALSE(average))
+            groupTable(fGroups, areas, normalized)
+        else
+            averageGroups(fGroups, areas, normalized, by = averageCol, func = averageFunc)
         
-        if (average)
-        {
-            gTable <- gTableAvg
-            snames <- unique(anaInfo$group)
-            if (doConc)
-                concs <- anaInfo[!duplicated(group)]$conc # conc should be same for all replicates
+        snames <- unique(anaInfo[[averageCol]])
+        if (F) { # UNDONE
+        if (doConc)
+        {    concs <- anaInfo[!duplicated(get(averageCol))]$conc # conc should be same for all replicates
         }
         else
         {
@@ -236,7 +237,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             if (doConc)
                 concs <- anaInfo$conc
         }
-        
+        }
         ret <- transpose(gTable)
         setnames(ret, snames)
         

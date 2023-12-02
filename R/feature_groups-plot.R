@@ -627,17 +627,24 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 #' 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotVenn", "featureGroups", function(obj, which = NULL, ...)
+setMethod("plotVenn", "featureGroups", function(obj, which = NULL, average = TRUE, ...)
 {
-    rGroups <- replicateGroups(obj)
-    if (is.null(which))
-        which <- rGroups
+    anaInfo <- analysisInfo(obj)
     
-    checkmate::assert(checkmate::checkSubset(which, rGroups, empty.ok = FALSE),
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assert(checkmate::checkCharacter(which, min.chars = 1, min.len = 1, any.missing = FALSE),
                       checkmate::checkList(which, "character", any.missing = FALSE),
-                      .var.name = "which")
+                      checkmate::checkNull(which),
+                      .var.name = "which", add = ac)
+    average <- assertAndPrepareAnaInfoAverage(average, anaInfo, add = ac)
+    checkmate::reportAssertions(ac)
+
+    groups <- unique(anaInfo[[average]])
     
-    fGroupsList <- lapply(which, function(w) replicateGroupFilter(obj, w, verbose = FALSE))
+    if (is.null(which))
+        which <- groups
+
+    fGroupsList <- lapply(which, function(w) obj[anaInfo[get(average) %in% w]$analysis])
     
     if (is.list(which))
     {
@@ -682,30 +689,39 @@ setMethod("plotVennHash", "featureGroups", function(obj, ...)
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = length(which),
+setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, average = TRUE, nsets = NULL,
                                                  nintersects = NA, ...)
 {
-    rGroups <- replicateGroups(obj)
-    if (is.null(which))
-        which <- rGroups
+    anaInfo <- analysisInfo(obj)
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
-    checkmate::assertCount(nsets, positive = TRUE)
-    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::assert(checkmate::checkCharacter(which, min.chars = 1, min.len = 1, any.missing = FALSE),
+                      checkmate::checkList(which, "character", any.missing = FALSE),
+                      checkmate::checkNull(which),
+                      .var.name = "which", add = ac)
+    average <- assertAndPrepareAnaInfoAverage(average, anaInfo, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    groups <- unique(anaInfo[[average]])
+    if (is.null(which))
+        which <- groups
     
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
-    
-    obj <- replicateGroupFilter(obj, which, verbose = FALSE)
-    
-    gt <- as.data.table(obj, average = TRUE)
+
+    obj <- obj[anaInfo[get(average) %in% which]$analysis]
+
+    gt <- as.data.table(obj, average = average)
     gt <- gt[, which, with = FALSE] # isolate relevant columns
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0))]
     
     if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
-        stop("Need at least two replicate groups with non-zero intensities")
+        stop("Need at least two groups with non-zero intensities", call. = FALSE)
+    
+    if (is.null(nsets))
+        nsets <- length(which)
     
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })

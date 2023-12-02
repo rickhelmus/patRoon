@@ -588,7 +588,7 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
-setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized, func)
+setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized, by, func)
 {
     gTable <- copy(groupTable(fGroups, areas, normalized))
     if (nrow(gTable) == 0)
@@ -597,7 +597,7 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized,
     gNames <- names(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
-    gTable[, sgroup := anaInfo$group]
+    gTable[, sgroup := anaInfo[[by]]]
 
     gTable[, (gNames) := lapply(.SD, function(v) { if (any(v > 0)) func(v[v>0]) else 0 }), by = sgroup, .SDcols = gNames]
     gTable <- unique(gTable, by = "sgroup")

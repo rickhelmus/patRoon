@@ -15,6 +15,8 @@
         - deprecate rGroups subset/filter param?
     - rename group col to replicate and warn for deprecation (like blank/ref column)
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
+    - properly handle NA values for custom cols?
+    - plotVenn sets method: deprecate sets arg?
 
 - tests
     - IDL filter
@@ -29,6 +31,10 @@
         - doc methods (eg add limitations)
         - doc that anaInfo shouldn't be changed by reference?
     - new subset args (ni, reorder, reorder sets)
+    - plotVenn(): average arg
+    - plotUpSet()
+        - average arg
+        - nsets can be NULL
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -37,6 +43,10 @@
     - no analysisInfo slot in fGroups anymore
     - analysisInfo()<-
     - feature subsetting: ni and reorder args (also reorder sets)
+    - plotVenn(): average arg
+    - plotUpSet():
+        - average arg
+        - nsets can be/defaukts to NULL
 
 ## Ext
 

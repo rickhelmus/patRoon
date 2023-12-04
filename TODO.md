@@ -42,6 +42,8 @@
     - plotUpSet()
         - average arg
         - nsets can be NULL
+    - as.data.table()
+        - average arg
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -53,7 +55,10 @@
     - plotVenn(): average arg
     - plotUpSet():
         - average arg
-        - nsets can be/defaukts to NULL
+        - nsets can be/defaults to NULL
+    - as.data.table()
+        - average arg
+        - regression for features==F&&average==T: use average conc instead of first of each replicate
 
 ## Ext
 

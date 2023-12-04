@@ -224,23 +224,18 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             groupTable(fGroups, areas, normalized)
         else
             averageGroups(fGroups, areas, normalized, by = averageCol, func = averageFunc)
-        
         snames <- unique(anaInfo[[averageCol]])
-        if (F) { # UNDONE
-        if (doConc)
-        {    concs <- anaInfo[!duplicated(get(averageCol))]$conc # conc should be same for all replicates
-        }
-        else
-        {
-            gTable <- gTableNonAvg
-            snames <- anaInfo$analysis
-            if (doConc)
-                concs <- anaInfo$conc
-        }
-        }
+        
         ret <- transpose(gTable)
         setnames(ret, snames)
         
+        concs <- if (doConc)
+        {
+            # average concs per anaInfo group
+            anaInfo[, mean(conc), by = averageCol][[2]]
+        }
+        else
+            NULL
         doConc <- doConc && length(snames) > 1 && sum(!is.na(concs)) > 1
         if (doConc)
         {

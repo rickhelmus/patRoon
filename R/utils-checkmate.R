@@ -153,7 +153,7 @@ assertAndPrepareAnaInfoAverage <- function(x, anaInfo, .var.name = checkmate::vn
 {
     checkmate::assert(
         checkmate::checkFlag(x),
-        checkmate::checkSubset(x, names(anaInfo), empty.ok = FALSE),
+        checkmate::checkChoice(x, names(anaInfo)),
         .var.name = .var.name, add = add
     )
     if (isTRUE(x))
@@ -424,12 +424,14 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
     return(x)
 }
 
-assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                                    concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
+assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, regressionBy, averageFunc,
+                                    normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects,
+                                    onlyHits)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ areas + features + regression + normalized + normConcToTox,
            fixed = list(add = ac))
+    checkmate::assertString(regressionBy, na.ok = FALSE, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
     assertFCParams(FCParams, fGroups, null.ok = TRUE, add = ac)
     aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))

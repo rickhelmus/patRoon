@@ -116,23 +116,24 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
 
 # this combines all functionality from all fGroup as.data.table methods, a not so pretty but pragmatic solution...
 doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
-                            regression = FALSE, averageFunc = mean, normalized = FALSE, FCParams = NULL,
-                            concAggrParams = getDefPredAggrParams(), toxAggrParams = getDefPredAggrParams(),
-                            normConcToTox = FALSE, collapseSuspects = ",", onlyHits = FALSE)
+                            regression = FALSE, regressionBy = NULL, averageFunc = mean, normalized = FALSE,
+                            FCParams = NULL, concAggrParams = getDefPredAggrParams(),
+                            toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE, collapseSuspects = ",",
+                            onlyHits = FALSE)
 {
-    assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                            concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
-    averageCol <- assertAndPrepareAnaInfoAverage(average, analysisInfo(fGroups))
+    anaInfo <- analysisInfo(fGroups)
     
-    if (features && !isFALSE(average) && regression)
-        stop("Cannot add regression data for averaged features.")
+    assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
+                            FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
+    averageCol <- assertAndPrepareAnaInfoAverage(average, anaInfo)
+    checkmate::assertChoice(regressionBy, names(anaInfo), null.ok = TRUE)
+    
     if (features && !is.null(FCParams))
         stop("Cannot calculate fold-changes with features=TRUE")
 
     if (length(fGroups) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
     
-    anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
     doConc <- regression && !is.null(anaInfo[["conc"]]) && sum(!is.na(anaInfo[["conc"]]) > 1)
@@ -140,7 +141,10 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(fGroups)
     
     if (regression && is.null(anaInfo[["conc"]]))
-        warning("No concentration information specified in the analysis information (i.e. conc column, see ?`analysis-information`)")
+        warning("No concentration information specified in the analysis information (i.e. conc column, see ?`analysis-information`)",
+                call. = FALSE)
+    if (regression && !is.null(regressionBy) && !features)
+        warning("The regressionBy argument is currently only supported if features=TRUE", call. = FALSE)
     
     if (features)
     {
@@ -149,6 +153,9 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         ret <- rbindlist(fTable, idcol = "analysis")
         setorder(ret, "group")
+        
+        if (isFGSet(fGroups) && isFALSE(average)) # add set column if feature data is present
+            ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
         
         if (doConc)
             ret[, conc := anaInfo$conc[match(analysis, anaInfo$analysis)]]
@@ -171,49 +178,61 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         else if (hasFGroupScores(fGroups))
             ret[, (intersect(featureQualityNames(group = FALSE, scores = TRUE), names(ret))) := NULL]
         
-        if (isTRUE(average))
-        {
-            ret <- removeDTColumnsIfPresent(ret, c("isocount", "analysis", "ID"))
-            numCols <- names(which(sapply(ret, is.numeric)))
-            ret[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = "group"]
-            ret <- unique(ret, by = "group")
-        }
+        if (isFALSE(average))
+            ret[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
         else
         {
-            ret[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
-            
-            doConc <- doConc && nrow(anaInfo) > 1
-            if (doConc)
+            by <- "group"
+            if (is.character(average) && average != "group")
             {
-                ret[, c("RSQ", "intercept", "slope", "p") := {
-                    notna <- !is.na(conc)
-                    if (!any(notna))
+                by <- c("avgBy", by)
+                ret[, avgBy := anaInfo[[average]][match(analysis, anaInfo$analysis)]]
+            }
+            ret <- removeDTColumnsIfPresent(ret, c("isocount", "analysis", "ID"))
+            numCols <- setdiff(names(which(sapply(ret, is.numeric))), "avgBy")
+            ret[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = by]
+            ret <- unique(ret, by = by)
+            ret <- removeDTColumnsIfPresent(ret, "avgBy")
+        }
+        
+        doConc <- doConc && nrow(anaInfo) > 1
+        if (doConc)
+        {
+            rb <- "group"
+            if (!is.null(regressionBy))
+            {
+                ret[, regBy := anaInfo[[regressionBy]][match(analysis, anaInfo$analysis)]]
+                rb <- c(rb, "regBy")
+            }
+            ret[, c("RSQ", "intercept", "slope", "p") := {
+                notna <- !is.na(conc)
+                if (!any(notna) || .N == 1)
+                    NA_real_
+                else
+                {
+                    ints <- intensity[notna]
+                    ints[ints == 0] <- NA
+                    if (all(is.na(ints)))
                         NA_real_
                     else
                     {
-                        ints <- intensity[notna]
-                        ints[ints == 0] <- NA
-                        if (all(is.na(ints)))
-                            NA_real_
-                        else
+                        suppressWarnings(reg <- summary(lm(ints ~ conc[notna])))
+                        slope <- pv <- NA_real_
+                        if (nrow(reg[["coefficients"]]) > 1)
                         {
-                            suppressWarnings(reg <- summary(lm(ints ~ conc[notna])))
-                            slope <- pv <- NA_real_
-                            if (nrow(reg[["coefficients"]]) > 1)
-                            {
-                                slope <- reg[["coefficients"]][2, 1]
-                                pv <- reg[["coefficients"]][2, 4]
-                            }
-                            list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope, pv)
+                            slope <- reg[["coefficients"]][2, 1]
+                            pv <- reg[["coefficients"]][2, 4]
                         }
+                        list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope, pv)
                     }
-                }, by = group]
-                ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
-            }
+                }
+            }, by = rb]
+            ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
+            ret <- removeDTColumnsIfPresent(ret, "regBy")
         }
         
         ret[, c("group_ret", "group_mz") := gInfo[group, c("rts", "mzs")]]
-        setcolorder(ret, c("group", "group_ret", "group_mz"))
+        setcolorder(ret, intersect(c("group", "group_ret", "group_mz", "set", "analysis"), names(ret)))
     }
     else
     {
@@ -302,18 +321,12 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             ret <- cbind(ret, groupScores(fGroups)[match(ret$group, group), -"group"])
     }
 
-    if (isFGSet(fGroups) && features && !average) # add set column if feature data is present
-    {
-        ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
-        setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
-    }
-    
     annTable <- annotations(fGroups)
     if (nrow(ret) > 0 && nrow(annTable) > 0)
     {
         if (isFGSet(fGroups))
         {
-            if (features && !average)
+            if (features && isFALSE(average))
                 ret <- merge(ret, annTable, by = c("group", "set"), sort = FALSE)
             else
             {

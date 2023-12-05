@@ -688,13 +688,13 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE, averageFunc = mean,
-                                                     normalized = FALSE, FCParams = NULL,
+                                                     qualities = FALSE, regression = FALSE, regressionBy = NULL,
+                                                     averageFunc = mean, normalized = FALSE, FCParams = NULL,
                                                      concAggrParams = getDefPredAggrParams(),
                                                      toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE)
 {
-    return(doFGAsDataTable(x, average, areas, features, qualities, regression, averageFunc, normalized, FCParams,
-                           concAggrParams, toxAggrParams, normConcToTox))
+    return(doFGAsDataTable(x, average, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
+                           FCParams, concAggrParams, toxAggrParams, normConcToTox))
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

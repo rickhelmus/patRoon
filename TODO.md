@@ -17,6 +17,9 @@
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
+    - as.data.table()
+        - re-add condition that regression must be F if features==T&&average==T? If not, add to NEWS
+        - finish average changes and fix adding pred data for features==T&&average!=FALSE
 
 - tests
     - IDL filter
@@ -37,6 +40,7 @@
         - nsets can be NULL
     - as.data.table()
         - average arg
+        - regressionBy arg
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -51,6 +55,7 @@
         - nsets can be/defaults to NULL
     - as.data.table()
         - average arg
+        - regressionBy arg
         - regression for features==F&&average==T: use average conc instead of first of each replicate
 
 ## Ext

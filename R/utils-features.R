@@ -798,7 +798,7 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
         tox[!group %chin% ignoreFGs, LC50 := aggrVec(LC50, func), by = by]
         dups <- duplicated(tox, by = by)
         if (combineTypes)
-            tox[, type := paste0(unique(type), collapse = ","), by = by]            
+            tox[, type := paste0(unique(type), collapse = ","), by = by]
         return(tox[group %chin% ignoreFGs | dups == FALSE])
     }
     tox <- doAggr(aggrParams$candidateFunc, c("group", "type", "candidate"))

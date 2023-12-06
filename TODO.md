@@ -20,6 +20,9 @@
     - as.data.table()
         - re-add condition that regression must be F if features==T&&average==T? If not, add to NEWS
         - finish average changes and fix adding pred data for features==T&&average!=FALSE
+        - fix: properly merge in non-suspect pred results with collapseSuspects=NULL
+            - merge concs/tox with by="group"
+            - filter if collapseSuspects=NULL: is.na(susp_name) | is.na(candidate_name) | susp_name == candidate_name
 
 - tests
     - IDL filter
@@ -41,6 +44,7 @@
     - as.data.table()
         - average arg
         - regressionBy arg
+        - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
 
 - NEWS
     - specSimParamsMatch --> specSimParams

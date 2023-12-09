@@ -1,6 +1,7 @@
 # DEVEL
 
 * Fixed: `predictRespFactors()` could incorrectly cache results and perform concentration convrsions twice for calibrants under some circumstances (reported by Drew Szabo)
+* Fixed: `verifyDependencies()` could throw errors when external dependencies were not found.
 
 # patRoon 2.3
 

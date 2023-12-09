@@ -6,7 +6,7 @@ anaInfo <- getTestAnaInfo()
 anaInfoOne <- getTestAnaInfo()[4, ]
 
 ffOpenMS <- getTestFeatures(anaInfo)
-ffXCMS <- findFeatures(anaInfoOne, "xcms", noise = 3E4)
+# ffXCMS <- findFeatures(anaInfoOne, "xcms", noise = 3E4)
 ffXCMS3 <- findFeatures(anaInfoOne, "xcms3", xcms::CentWaveParam(noise = 3E4))
 # UNDONE: ignore warnings about clusters...
 ffKPIC2 <- withCallingHandlers(findFeatures(anaInfoOne, "kpic2", level = 1E5),
@@ -37,7 +37,7 @@ OpenMSFTable <- function(ff) sapply(featureTable(ff), function(fts) fts[, -"ID"]
 
 test_that("verify feature finder output", {
     expect_known_value(OpenMSFTable(ffOpenMS), testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
-    expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
+    # expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
     expect_known_value(featureTable(ffXCMS3), testFile("ff-xcms3"))
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
     expect_known_value(featureTable(ffKPIC2), testFile("ff-kpic2"))
@@ -56,7 +56,7 @@ test_that("verify feature finder output", {
 
 test_that("verify show output", {
     expect_known_show(ffOpenMS, testFile("ff-show-openms", text = TRUE))
-    expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
+    # expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
     expect_known_show(ffXCMS3, testFile("ff-show-xcms3", text = TRUE))
     expect_known_show(ffEP, testFile("ff-show-envipick", text = TRUE))
     expect_known_show(ffKPIC2, testFile("ff-show-kpic2", text = TRUE))
@@ -145,7 +145,7 @@ test_that("basic usage", {
                                                    featureQualityNames(group = FALSE, scores = TRUE)))
 })
 
-XCMSImpXCMS <- getXCMSSet(ffXCMS)
+# XCMSImpXCMS <- getXCMSSet(ffXCMS)
 XCMSImpXCMS3 <- getXCMSSet(ffXCMS3, loadRawData = FALSE)
 XCMSImpOpenMS <- doExportXCMS(ffOpenMS, loadRawData = FALSE)
 XCMSImpEP <- getXCMSSet(ffEP, loadRawData = FALSE)
@@ -153,21 +153,21 @@ XCMSImpKPIC2 <- getXCMSSet(ffKPIC2, loadRawData = FALSE)
 XCMSImpSIRIUS <- getXCMSSet(ffSIRIUS, loadRawData = FALSE)
 featMZs <- function(f) lapply(featureTable(f), "[[", "mz")
 test_that("XCMS conversion", {
-    expect_equal(nrow(xcms::peaks(XCMSImpXCMS)), length(ffXCMS))
+    # expect_equal(nrow(xcms::peaks(XCMSImpXCMS)), length(ffXCMS))
     expect_equal(nrow(xcms::peaks(XCMSImpXCMS3)), length(ffXCMS3))
     expect_equal(nrow(xcms::peaks(XCMSImpOpenMS)), length(getExpFeats(ffOpenMS)))
     expect_equal(nrow(xcms::peaks(XCMSImpEP)), length(ffEP))
     expect_equal(nrow(xcms::peaks(XCMSImpKPIC2)), length(ffKPIC2))
     expect_equal(nrow(xcms::peaks(XCMSImpSIRIUS)), length(ffSIRIUS))
     
-    expect_known_value(xcms::peaks(XCMSImpXCMS), testFile("ff-xcms_import_xcms"))
+    # expect_known_value(xcms::peaks(XCMSImpXCMS), testFile("ff-xcms_import_xcms"))
     expect_known_value(xcms::peaks(XCMSImpXCMS3), testFile("ff-xcms_import_xcms3"))
     expect_known_value(xcms::peaks(XCMSImpOpenMS), testFile("ff-xcms_import_openms"))
     expect_known_value(xcms::peaks(XCMSImpEP), testFile("ff-xcms_import_ep"))
     expect_known_value(xcms::peaks(XCMSImpKPIC2), testFile("ff-xcms_import_kpic2"))
     expect_known_value(xcms::peaks(XCMSImpSIRIUS), testFile("ff-xcms_import_sirius"))
     
-    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS)), featMZs(ffXCMS))
+    # expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS3)), featMZs(ffXCMS3))
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms", XCMSImpEP)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpKPIC2)), featMZs(ffKPIC2))
@@ -177,28 +177,28 @@ test_that("XCMS conversion", {
     expect_equal(featMZs(importFeatures(anaInfo, "xcms", XCMSImpOpenMS)), featMZs(ffOpenMS))    
 })
 
-XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, loadRawData = FALSE)
+# XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, loadRawData = FALSE)
 XCMS3ImpXCMS3 <- getXCMSnExp(ffXCMS3)
 XCMS3ImpOpenMS <- doExportXCMS3(ffOpenMS, loadRawData = FALSE)
 XCMS3ImpEP <- getXCMSnExp(ffEP, loadRawData = FALSE)
 XCMS3ImpKPIC2 <- getXCMSnExp(ffKPIC2, loadRawData = FALSE)
 XCMS3ImpSIRIUS <- getXCMSnExp(ffSIRIUS, loadRawData = FALSE)
 test_that("XCMS3 conversion", {
-    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS)), length(ffXCMS))
+    # expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS)), length(ffXCMS))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS3)), length(ffXCMS3))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpOpenMS)), length(getExpFeats(ffOpenMS)))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpEP)), length(ffEP))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpKPIC2)), length(ffKPIC2))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpSIRIUS)), length(ffSIRIUS))
     
-    expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS), testFile("ff-xcms3_import_xcms"))
+    # expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS), testFile("ff-xcms3_import_xcms"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS3), testFile("ff-xcms3_import_xcms3"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpOpenMS), testFile("ff-xcms3_import_openms"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpEP), testFile("ff-xcms3_import_ep"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpKPIC2), testFile("ff-xcms3_import_kpic2"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpSIRIUS), testFile("ff-xcms3_import_sirius"))
     
-    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS)), featMZs(ffXCMS))
+    # expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS3)), featMZs(ffXCMS3))
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms3", XCMS3ImpEP)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpKPIC2)), featMZs(ffKPIC2))

@@ -38,6 +38,8 @@ jobs:
                       withr
                       data.table
                       renv
+                  extra-packages: Matrix
+                  pak-version: devel
             - name: Make repos
               run: Rscript utils/make_repos.R
             - name: Get repos patch

@@ -659,7 +659,7 @@ doApply <- function(applyf, doPar, data, ...)
     withProg(length(data), doPar, do.call(applyf, list(data, ...)))
 }
 
-getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)
+getMS2QuantRes <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)
 {
     calibrants <- copy(calibrants)
     setnames(calibrants, c("name", "rt", "intensity", "conc"), c("identifier", "retention_time", "area", "conc_M"))
@@ -678,7 +678,8 @@ getRFsMS2Quant <- function(calibrants, unknowns, eluent, organicModifier, pHAq, 
     
     RFs <- RFs[, c("identifier", "SMILES", "RF_pred"), with = FALSE]
     
-    return(RFs[])
+    return(list(RFs = RFs[], MD = list(calibPlot = pr$logIE_logRF_calibration_plot,
+                                       linModel = pr$calibration_linear_model_summary)))
 }
 
 aggrVec <- function(x, f)

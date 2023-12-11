@@ -13,6 +13,7 @@ NULL
 #' @slot fingerprints A \code{list} with for each feature group result a \code{data.table} containing fingerprints
 #'   obtained with \command{CSI:FingerID}. Will be empty unless the \code{getFingerprints} argument to
 #'   \code{\link{generateFormulasSIRIUS}} was set to \code{TRUE}.
+#' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
 #'
 #' @templateVar class formulasSIRIUS
 #' @template class-hierarchy
@@ -22,7 +23,7 @@ NULL
 #' @inherit generateFormulasSIRIUS references
 #'
 #' @export
-formulasSIRIUS <- setClass("formulasSIRIUS", slots = c(fingerprints = "list"),
+formulasSIRIUS <- setClass("formulasSIRIUS", slots = c(fingerprints = "list", MS2QuantMeta = "list"),
                            contains = "formulas")
 
 # callback for executeMultiProcess()
@@ -37,7 +38,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     
     resultPath <- patRoon:::getSiriusResultPath(outPath, msFName)
     summary <- file.path(resultPath, "formula_candidates.tsv")
-    if (length(summary) == 0 || length(summary) == 0 || !file.exists(summary))
+    if (length(summary) == 0 || nrow(summary) == 0 || !file.exists(summary))
         forms <- noResult
     else
     {
@@ -154,13 +155,17 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
+    if (length(obj) == 0)
+        return(obj)
+    
     printf("Predicting response factors from fingerprints with MS2Quant for %d candidates...\n", length(obj))
-    resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+    res <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+    obj@MS2QuantMeta <- res$MD
     
     obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
     {
         ann <- copy(ann)
-        if (nrow(resp) == 0)
+        if (nrow(res$RFs) == 0)
         {
             ann[, RF_SIRFP := NA_real_]
             return(ann)
@@ -168,7 +173,7 @@ setMethod("predictRespFactors", "formulasSIRIUS", function(obj, fGroups, calibra
      
         if (!is.null(ann[["RF_SIRFP"]]))
             ann[, RF_SIRFP := NULL] # clearout for merge below    
-        return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
+        return(merge(ann, res$RFs[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
                      sort = FALSE, all.x = TRUE))
     })
 
@@ -186,6 +191,9 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
     
     checkmate::assertChoice(LC50Mode, c("static", "flow"))
     assertConcUnit(concUnit)
+
+    if (length(obj) == 0)
+        return(obj)
     
     printf("Predicting LC50 values from fingerprints with MS2Tox for %d candidates...\n", length(obj))
     LC50Tab <- predictLC50SIRFPs(obj, LC50Mode, concUnit)

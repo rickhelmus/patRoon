@@ -46,8 +46,11 @@ if (doSIRIUS)
     compsSIR <- predictTox(compsSIR, type = "both")
     compsTab <- as.data.table(compsSIR)
     
+    formsEmpty <- delete(formsSIR)
     compsEmpty <- delete(compsSIR)
 }
+
+getMS2QLM <- function(obj) if (testWithSets()) setObjects(obj)[[1]]@MS2QuantMeta$linModel else obj@MS2QuantMeta$linModel
 
 test_that("Basics for prediction", {
     expect_known_value(screenInfo(fGroupsComps)[, c("RF_SMILES", "LC50_SMILES"), with = FALSE], testFile("pred-scr"))
@@ -67,9 +70,17 @@ test_that("Basics for prediction", {
     expect_length(grep("^(RF|LC50)_", names(compsTab)), if (testWithSets()) 6 else 3)
     expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), if (testWithSets()) 6 else 3)
     
+    expect_error(predictRespFactors(formsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
+                                    calibConcUnit = "M", type = "both"), NA)
+    expect_error(predictTox(formsEmpty), NA)
     expect_error(predictRespFactors(compsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
                                     calibConcUnit = "M", type = "both"), NA)
     expect_error(predictTox(compsEmpty), NA)
+    
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(fGroupsComps))
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(formsSIR))
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(compsSIR))
+    
 })
 
 calibConcs <- data.table(name = "Chloridazon", "standard-pos" = 100)

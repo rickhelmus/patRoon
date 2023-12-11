@@ -36,6 +36,8 @@ NULL
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
+#' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
+#' 
 #' @note The values ranges in the \code{scoreLimits} slot, which are used for normalization of scores, are based on the
 #'   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
 #'   \code{\link{generateCompounds}}).
@@ -48,6 +50,7 @@ NULL
 #'
 #' @export
 compounds <- setClass("compounds",
+                      slots = c(MS2QuantMeta = "list"),
                       contains = "featureAnnotations")
 
 setMethod("initialize", "compounds", function(.Object, ...)
@@ -583,20 +586,29 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
+    if (length(obj) == 0)
+        return(obj)
+    
     printf("Predicting response factors from SMILES with MS2Quant for %d candidates...\n", length(obj))
+    
+    MS2QMD <- list()
     
     obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {
         ann <- copy(ann)
         inp <- data.table(group = grp, SMILES = ann$SMILES)
-        resp <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+        res <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+        if (length(MS2QMD) == 0)
+            MS2QMD <<- res$MD
         if (!is.null(ann[["RF_SMILES"]]))
             ann[, RF_SMILES := NULL] # clearout for merge below
-        ann <- merge(ann, resp[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE, all.x = TRUE)
+        ann <- merge(ann, res$RFs[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE, all.x = TRUE)
         doProgress()
         return(ann)
     })
 
+    obj@MS2QuantMeta <- MS2QMD
+    
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
 })
 
@@ -613,6 +625,9 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     aapply(checkmate::assertFlag, . ~ updateScore + parallel, fixed = list(add = ac))
     checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
     
     printf("Predicting LC50 values from SMILES with MS2Tox for %d candidates...\n", length(obj))
     

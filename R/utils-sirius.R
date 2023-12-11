@@ -413,7 +413,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     }
     
     if (nrow(allFPs) == 0)
-        return(data.table())
+        return(list(RFs = data.table(), MD = list()))
     
     # NOTE: we set the area to one to easily get the response factor below
     unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
@@ -427,17 +427,18 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
     hashesTODO <- hashes[indsTODO]
     
-    RFs <- NULL
+    MS2QRes <- NULL
     if (length(indsTODO) > 0)
     {
-        RFs <- getRFsMS2Quant(calibrants, unknowns[indsTODO], eluent, organicModifier, pHAq, allFPs[indsTODO])
-        RFs <- RFs[, c("identifier", "RF_pred"), with = FALSE]
-        setnames(RFs, "RF_pred", "RF_SIRFP")
-        for (i in seq_len(nrow(RFs)))
-            saveCacheData("RF_SIRFP", RFs$RF_SIRFP[i], hashesTODO[i])
+        MS2QRes <- getMS2QuantRes(calibrants, unknowns[indsTODO], eluent, organicModifier, pHAq, allFPs[indsTODO])
+        saveCacheData("MS2QMD", MS2QRes$MD, baseHash)
+        MS2QRes$RFs <- MS2QRes$RFs[, c("identifier", "RF_pred"), with = FALSE]
+        setnames(MS2QRes$RFs, "RF_pred", "RF_SIRFP")
+        for (i in seq_len(nrow(MS2QRes$RFs)))
+            saveCacheData("RF_SIRFP", MS2QRes$RFs$RF_SIRFP[i], hashesTODO[i])
         
-        RFs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], RFs, by.x = "id", by.y = "identifier",
-                     sort = FALSE)
+        RFs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], MS2QRes$RFs, by.x = "id",
+                     by.y = "identifier", sort = FALSE)
     }
     
     if (!is.null(cachedData))
@@ -447,26 +448,35 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
         cachedRFs[, group := allFPs$group[match(hash, hashes)]]
         cachedRFs[, hash := NULL]
         
-        if (is.null(RFs))
-            RFs <- cachedRFs
+        if (is.null(MS2QRes))
+        {
+            MD <- loadCacheData("MS2QMD", baseHash)
+            if (is.null(MD))
+            {
+                warning("Could not find cached calibration data! You may have an old cache file. ",
+                        "Please clear any cached data, eg by running: clearCache(\"RF_SMILES\")", call. = FALSE)
+                MD <- list()
+            }
+            MS2QRes <- list(RFs = cachedRFs, MD = MD)
+        }
         else
         {
-            RFs <- rbind(RFs, cachedRFs)
+            MS2QRes$RFs <- rbind(MS2QRes$RFs, cachedRFs)
             # restore order
             boundHashes <- c(hashesTODO, names(cachedData))
-            RFs <- RFs[match(hashes, boundHashes)]
+            MS2QRes$RFs <- MS2QRes$RFs[match(hashes, boundHashes)]
         }
     }
     
-    if (!is.null(RFs[["id"]]))
-        RFs[, id := NULL]
+    if (!is.null(MS2QRes$RFs[["id"]]))
+        MS2QRes$RFs[, id := NULL]
 
     # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
     # NOTE: need to take the inverse before conversion
-    RFs[, RF_SIRFP := 1/convertConc(1/RF_SIRFP[1], "M", concUnit, formulaMW(neutral_formula[1])),
-        by = "neutral_formula"]
+    MS2QRes$RFs[, RF_SIRFP := 1/convertConc(1/RF_SIRFP[1], "M", concUnit, formulaMW(neutral_formula[1])),
+                by = "neutral_formula"][]
     
-    return(RFs[])
+    return(MS2QRes)
 }
 
 predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)

@@ -360,13 +360,14 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     cachedData <- loadCacheData("RF_SMILES", fgSMILESTab$hash, simplify = FALSE)
     fgSMILESTabTODO <- if (!is.null(cachedData)) fgSMILESTab[!hash %in% names(cachedData)] else fgSMILESTab
     
-    RFs <- NULL 
+    MS2QRes <- NULL 
     if (nrow(fgSMILESTabTODO) > 0)
     {
-        RFs <- getRFsMS2Quant(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, "")
-        setnames(RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
-        for (i in seq_len(nrow(RFs)))
-            saveCacheData("RF_SMILES", RFs$RF_SMILES[i], fgSMILESTabTODO$hash[i])
+        MS2QRes <- getMS2QuantRes(calibrants, fgSMILESTabTODO, eluent, organicModifier, pHAq, "")
+        saveCacheData("MS2QMD", MS2QRes$MD, baseHash)
+        setnames(MS2QRes$RFs, c("identifier", "RF_pred"), c("group", "RF_SMILES"))
+        for (i in seq_len(nrow(MS2QRes$RFs)))
+            saveCacheData("RF_SMILES", MS2QRes$RFs$RF_SMILES[i], fgSMILESTabTODO$hash[i])
     }
     
     if (!is.null(cachedData))
@@ -376,22 +377,31 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
         cachedRFs[, group := fgSMILESTab$group[match(hash, fgSMILESTab$hash)]]
         cachedRFs[, hash := NULL]
         
-        if (is.null(RFs))
-            RFs <- cachedRFs
+        if (is.null(MS2QRes))
+        {
+            MD <- loadCacheData("MS2QMD", baseHash)
+            if (is.null(MD))
+            {
+                warning("Could not find cached calibration data! You may have an old cache file. ",
+                        "Please clear any cached data, eg by running: clearCache(\"RF_SMILES\")", call. = FALSE)
+                MD <- list()
+            }
+            MS2QRes <- list(RFs = cachedRFs, MD = MD)
+        }
         else
         {
-            RFs <- rbind(RFs, cachedRFs)
-            RFs <- RFs[match(fgSMILESTab$SMILES, SMILES)] # sync order
+            MS2QRes$RFs <- rbind(MS2QRes$RFs, cachedRFs)
+            MS2QRes$RFs <- MS2QRes$RFs[match(fgSMILESTab$SMILES, SMILES)] # sync order
         }
     }
 
     # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
-    RFs[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
+    MS2QRes$RFs[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
     # NOTE: need to take the inverse before conversion
-    RFs[, RF_SMILES := 1/convertConc(1/RF_SMILES[1], "M", concUnit, MW[1]), by = "SMILES"]
-    RFs[, MW := NULL]
+    MS2QRes$RFs[, RF_SMILES := 1/convertConc(1/RF_SMILES[1], "M", concUnit, MW[1]), by = "SMILES"]
+    MS2QRes$RFs[, MW := NULL][]
     
-    return(RFs[])
+    return(MS2QRes)
 }
 
 predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)

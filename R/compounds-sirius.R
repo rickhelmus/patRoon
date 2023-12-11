@@ -146,15 +146,19 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
 
     calibrants <- assertAndPrepareQuantCalib(calibrants, calibConcUnit)
     
+    if (length(obj) == 0)
+        return(obj)
+    
     if (type == "FP" || type == "both")
     {
         printf("Predicting response factors from fingerprints with MS2Quant for %d candidates...\n", length(obj))
-        resp <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+        res <- predictRespFactorsSIRFPs(obj, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
+        obj@MS2QuantMeta <- res$MD
         
         obj@groupAnnotations <- Map(groupNames(obj), annotations(obj), f = function(grp, ann)
         {
             ann <- copy(ann)
-            if (nrow(resp) == 0)
+            if (nrow(res$RFs) == 0)
             {
                 ann[, RF_SIRFP := NA_real_]
                 return(ann)
@@ -162,8 +166,8 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
         
             if (!is.null(ann[["RF_SIRFP"]]))
                 ann[, RF_SIRFP := NULL] # clearout for merge below    
-            return(merge(ann, resp[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE], by = "neutral_formula",
-                         sort = FALSE, all.x = TRUE))
+            return(merge(ann, res$RFs[group == grp, c("neutral_formula", "RF_SIRFP"), with = FALSE],
+                         by = "neutral_formula", sort = FALSE, all.x = TRUE))
         })
         
         obj <- addCompoundScore(obj, "RF_SIRFP", FALSE, 1)
@@ -186,6 +190,9 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
     
     if (type == "SMILES" || type == "both")
         obj <- callNextMethod(obj, LC50Mode = LC50Mode, concUnit = concUnit, updateScore = FALSE, scoreWeight = 1)
+    
+    if (length(obj) == 0)
+        return(obj)
     
     if (type == "FP" || type == "both")
     {

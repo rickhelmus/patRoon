@@ -25,6 +25,7 @@ NULL
 #'
 #' @slot screenInfo A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
 #'   annotation data when \code{annotateSuspects} is run.
+#' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
 #'
 #' @section Suspect annotation: The \code{annotateSuspects} method is used to annotate suspects after
 #'   \code{\link{screenSuspects}} was used to collect suspect screening results and other workflow steps such as formula
@@ -106,7 +107,7 @@ NULL
 #'
 #' @export
 featureGroupsScreening <- setClass("featureGroupsScreening",
-                                   slots = c(screenInfo = "data.table"),
+                                   slots = c(screenInfo = "data.table", MS2QuantMeta = "list"),
                                    contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsScreening",
@@ -206,14 +207,15 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     inp <- unique(inp, by = c("group", "SMILES"))
     
     printf("Predicting response factors from SMILES with MS2Quant for %d suspects...\n", nrow(inp))
-    resp <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq, concUnit)
+    res <- predictRespFactorsSMILES(inp, groupInfo(obj), calibrants, eluent, organicModifier, pHAq, concUnit)
     
     if (!is.null(scr[["RF_SMILES"]]))
         scr[, RF_SMILES := NULL] # clearout for merge below
-    scr <- merge(scr, resp[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"), sort = FALSE,
-                 all.x = TRUE)
+    scr <- merge(scr, res$RFs[, c("group", "SMILES", "RF_SMILES"), with = FALSE], by = c("group", "SMILES"),
+                 sort = FALSE, all.x = TRUE)
     
     obj@screenInfo <- scr
+    obj@MS2QuantMeta <- res$MD
     
     return(obj)
 })

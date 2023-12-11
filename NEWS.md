@@ -2,6 +2,9 @@
 
 * Fixed: `predictRespFactors()` could incorrectly cache results and perform concentration convrsions twice for calibrants under some circumstances (reported by Drew Szabo)
 * Fixed: `verifyDependencies()` could throw errors when external dependencies were not found.
+* Fixed: `predictRespFactors()`/`predictTox()`: better handle objects without results
+* Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
+
 
 # patRoon 2.3
 

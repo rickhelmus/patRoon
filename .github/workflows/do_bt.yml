@@ -38,6 +38,9 @@ jobs:
                       withr
                       data.table
                       renv
+                      slam
+                      sparsesvd
+                      docopt
                   extra-packages: Matrix
                   pak-version: devel
             - name: Make repos

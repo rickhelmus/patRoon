@@ -38,7 +38,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     
     resultPath <- patRoon:::getSiriusResultPath(outPath, msFName)
     summary <- file.path(resultPath, "formula_candidates.tsv")
-    if (length(summary) == 0 || nrow(summary) == 0 || !file.exists(summary))
+    if (length(summary) == 0 || !file.exists(summary))
         forms <- noResult
     else
     {

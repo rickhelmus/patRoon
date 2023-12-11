@@ -4,8 +4,6 @@
 #' @include utils-screening.R
 NULL
 
-screeningSlots <- c(screenInfo = "data.table")
-
 #' Class for suspect screened feature groups.
 #'
 #' This class derives from \code{\link{featureGroups}} and adds suspect screening information.

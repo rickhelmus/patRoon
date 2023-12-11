@@ -387,6 +387,8 @@ the \code{rank} columns.
 \section{Slots}{
 
 \describe{
+\item{\code{MS2QuantMeta}}{Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.}
+
 \item{\code{setThreshold,setThresholdAnn,setAvgSpecificScores}}{\setsWF A copy of the equally named arguments that were
 passed when this object was created by \code{\link{generateCompounds}}.}
 

@@ -266,6 +266,8 @@ feature groups that lost any suspect matches due to other filter steps.
 \describe{
 \item{\code{screenInfo}}{A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
 annotation data when \code{annotateSuspects} is run.}
+
+\item{\code{MS2QuantMeta}}{Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.}
 }}
 
 \note{

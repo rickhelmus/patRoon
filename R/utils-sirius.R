@@ -437,8 +437,8 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
         for (i in seq_len(nrow(MS2QRes$RFs)))
             saveCacheData("RF_SIRFP", MS2QRes$RFs$RF_SIRFP[i], hashesTODO[i])
         
-        RFs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], MS2QRes$RFs, by.x = "id",
-                     by.y = "identifier", sort = FALSE)
+        MS2QRes$RFs <- merge(allFPs[, c("group", "neutral_formula", "id"), with = FALSE], MS2QRes$RFs, by.x = "id",
+                             by.y = "identifier", sort = FALSE)
     }
     
     if (!is.null(cachedData))

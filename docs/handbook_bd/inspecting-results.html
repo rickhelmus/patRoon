@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-12-13" />
+<meta name="date" content="2023-12-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,7 +54,7 @@
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
@@ -63,8 +63,8 @@
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
 <script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 <link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
 <script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 
@@ -498,17 +498,17 @@ div.csl-indent {
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="inspecting-results.html#cb60-1" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb60-2"><a href="inspecting-results.html#cb60-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
-#&gt;    1:  solvent-pos-1  f_8770406293942409300  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1   f_641640672115058537   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_7247597396150879990 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1  f_6025614603634756843  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1  f_6562298773709088576   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_14672020028657231786  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1  f_3780240294070558882   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1 f_16762480256415469980 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1 f_16038316234685114817  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1 f_12845784645525557403   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_3008934522894516199 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3  f_2744715789865030126   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3 f_17366811144399960097 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3  f_1064498430460672360 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3  f_7625660863277634280   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3 f_12443600647286837866 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_5142265639107356920   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_12688007180564460416 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3  f_3138936746544831241 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_6167872821594172179   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="inspecting-results.html#cb62-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb62-2"><a href="inspecting-results.html#cb62-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos

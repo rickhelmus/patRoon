@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-12-13" />
+<meta name="date" content="2023-12-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,7 +54,7 @@
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.10/grViz.js"></script>
@@ -63,8 +63,8 @@
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
 <script src="libs/plotly-binding-4.10.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 <link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
 <script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 
@@ -391,8 +391,8 @@ div.csl-indent {
 <span id="cb169-8"><a href="advanced.html#cb169-8" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
 <span id="cb169-9"><a href="advanced.html#cb169-9" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span></code></pre></div>
 <p>Visually, this workflow looks like this:</p>
-<div id="htmlwidget-66874d98267da69a2364" style="width:250px;height:300px;" class="grViz html-widget "></div>
-<script type="application/json" data-for="htmlwidget-66874d98267da69a2364">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ac52869e013f47f21778" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ac52869e013f47f21778">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Of course, any other processing steps on the feature groups data such as subsetting and <a href="intReview.html#intReview">visually checking features</a> are also possible before the sets workflow is initiated. Furthermore, it is also possible to perform <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> prior to grouping, which is an alternative way to improve neutralization to what <a href="setsAdducts.html#setsAdducts">was discussed before</a>.</p>
 </div>
 <div id="inspecting-and-converting-set-objects" class="section level3 hasAnchor" number="6.5.2">

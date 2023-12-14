@@ -106,6 +106,10 @@ jobs:
         machine:
             image: ubuntu-2004:202111-02
         resource_class: large
+        parameters:
+            use_cache:
+                type: boolean
+                default: true
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
@@ -114,11 +118,24 @@ jobs:
         steps:
             - checkout
             - run:
-                name: Build Docker image
-                no_output_timeout: 30m
+                name: docker login
                 command: |
                     echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
-                    docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
+            - when:
+                condition: << parameters.use_cache >>
+                steps:
+                    - run:
+                        name: Build Docker image
+                        no_output_timeout: 30m
+                        command: |
+                            docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
+            - unless:
+                steps:
+                    - run:
+                        name: Build Docker image w/out cache
+                        no_output_timeout: 30m
+                        command: |
+                            docker build --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
             - run:
                 name: Push Docker image
                 command: |

@@ -106,10 +106,6 @@ jobs:
         machine:
             image: ubuntu-2004:202111-02
         resource_class: large
-        parameters:
-            use_cache:
-                type: boolean
-                default: true
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
@@ -122,7 +118,7 @@ jobs:
                 command: |
                     echo "$GL_PASS" | docker login uva-hva.gitlab.host:4567 -u "$GL_USER" --password-stdin
             - when:
-                condition: << parameters.use_cache >>
+                condition: << pipeline.parameters.use_deps_cache >>
                 steps:
                     - run:
                         name: Build Docker image
@@ -130,7 +126,7 @@ jobs:
                         command: |
                             docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
             - unless:
-                condition: << parameters.use_cache >>
+                condition: << pipeline.parameters.use_deps_cache >>
                 steps:
                     - run:
                         name: Build Docker image w/out cache
@@ -154,7 +150,9 @@ parameters:
     do_trigger_deps:
         type: boolean
         default: false
-
+    use_deps_cache:
+        type: boolean
+        default: true
 
 workflows:
     version: 2.1

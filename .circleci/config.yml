@@ -130,6 +130,7 @@ jobs:
                         command: |
                             docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg="GIT_BRANCH=${CIRCLE_BRANCH}" --file ./docker/deps/Dockerfile .
             - unless:
+                condition: << parameters.use_cache >>
                 steps:
                     - run:
                         name: Build Docker image w/out cache

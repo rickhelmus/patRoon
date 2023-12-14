@@ -71,7 +71,7 @@ test_that("Basics for prediction", {
     expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), if (testWithSets()) 6 else 3)
     
     expect_error(predictRespFactors(formsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
-                                    calibConcUnit = "M", type = "both"), NA)
+                                    calibConcUnit = "M"), NA)
     expect_error(predictTox(formsEmpty), NA)
     expect_error(predictRespFactors(compsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
                                     calibConcUnit = "M", type = "both"), NA)

@@ -4,6 +4,7 @@
 * Fixed: `verifyDependencies()` could throw errors when external dependencies were not found.
 * Fixed: `predictRespFactors()`/`predictTox()`: better handle objects without results
 * Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
+* Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
 
 
 # patRoon 2.3

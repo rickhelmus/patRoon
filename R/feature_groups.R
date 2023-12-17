@@ -1244,9 +1244,12 @@ setMethod("calculateConcs", "featureGroups", function(fGroups, featureAnn, areas
         cat("No feature groups, nothing to do...\n")
         return(fGroups)
     }
+    
+    featureAnn <- featureAnn[names(fGroups)]
+    
     if (length(featureAnn) == 0)
     {
-        cat("No feature annotations, nothing to do...\n")
+        cat("No (relevant) feature annotations, nothing to do...\n")
         fGroups@concentrations <- data.table()
         return(fGroups)
     }
@@ -1302,9 +1305,12 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
         cat("No feature groups, nothing to do...\n")
         return(fGroups)
     }
+    
+    featureAnn <- featureAnn[names(fGroups)]
+    
     if (length(featureAnn) == 0)
     {
-        cat("No feature annotations, nothing to do...\n")
+        cat("No (relevant) feature annotations, nothing to do...\n")
         fGroups@toxicities <- data.table()
         return(fGroups)
     }

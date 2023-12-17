@@ -23,6 +23,12 @@ fGroupsEmpty <- predictRespFactors(fGroupsEmpty, list(), eluent, organicModifier
                                    calibConcUnit = "M")
 fGroupsEmpty <- predictTox(fGroupsEmpty)
 
+fGroupsSuspDupl <- doScreen(getTestFGroups(), patRoonData::suspectsPos)
+fGroupsSuspDupl <- fGroupsSuspDupl[, screenInfo(fGroupsSuspDupl)[duplicated(group)]$group]
+fGroupsSuspDupl <- predictRespFactors(fGroupsSuspDupl, calib, eluent, organicModifier = "MeOH", pHAq = 4,
+                                      calibConcUnit = "M")
+fGroupsSuspDupl <- predictTox(fGroupsSuspDupl)
+
 doSIRIUS <- TRUE #!is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 if (doSIRIUS)
 {
@@ -80,7 +86,6 @@ test_that("Basics for prediction", {
     expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(fGroupsComps))
     expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(formsSIR))
     expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(compsSIR))
-    
 })
 
 calibConcs <- data.table(name = "Chloridazon", "standard-pos" = 100)
@@ -105,12 +110,16 @@ if (doSIRIUS)
     fGroupsCompsC <- calculateTox(fGroupsCompsC, compsSIR)
     fGroupsOnlyCompsC <- calculateConcs(getCompFGroups(), compsSIR)
     fGroupsOnlyCompsC <- calculateTox(fGroupsOnlyCompsC, compsSIR)
-    calcTab <- as.data.table(fGroupsCompsC)
-    calcTabNoPref <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(preferType = "none"),
-                                   toxAggrParams = getDefPredAggrParams(preferType = "none"))
-    calcTabMax <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(max, preferType = "none"),
-                                toxAggrParams = getDefPredAggrParams(max, preferType = "none"))
-}
+    fGroupsSuspDuplC <- calculateConcs(fGroupsSuspDupl, compsSIR)
+    fGroupsSuspDuplC <- calculateTox(fGroupsSuspDuplC, compsSIR)
+
+    # HACK: pretend there's a suspect w/out predictions (eg can happen when screening results are amended)
+    rmSusp <- "DEET"
+    rmSuspGrp <- screenInfo(fGroupsCompsC)[name == rmSusp]$group
+    fGroupsCompsNoSuspC <- fGroupsCompsC
+    fGroupsCompsNoSuspC@toxicities <- toxicities(fGroupsCompsC)[group != rmSuspGrp | type != "suspect"]
+    fGroupsCompsNoSuspC@concentrations <- concentrations(fGroupsCompsC)[group != rmSuspGrp | type != "suspect"]
+}    
 
 test_that("Basics for calculation", {
     skip_if_not(doSIRIUS)
@@ -130,15 +139,6 @@ test_that("Basics for calculation", {
     expect_equal(calculateConcs(fGroupsEmpty, compsEmpty), fGroupsEmpty)
     expect_equal(calculateTox(fGroupsComps, compsEmpty), fGroupsComps)
     expect_equal(calculateTox(fGroupsEmpty, compsEmpty), fGroupsEmpty)
-    
-    expect_setequal("suspect", calcTab$conc_types) # default preferType == "suspect and all suspects should have results
-    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$conc_types, ",")))
-    expect_lt(mean(calcTabNoPref[["standard-pos-2_conc"]], na.rm = TRUE),
-               mean(calcTabMax[["standard-pos-2_conc"]], na.rm = TRUE))
-    
-    expect_setequal("suspect", calcTab$LC50_types)
-    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$LC50_types, ",")))
-    expect_lt(mean(calcTabNoPref$LC50, na.rm = TRUE), mean(calcTabMax$LC50, na.rm = TRUE))
     
     # NOTE: use as.data.table here instead of slot data, as these like the filters use aggregated data
     expect_gte(min(as.data.table(filter(fGroupsCompsC, absMinConc = 0.2))[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
@@ -163,4 +163,72 @@ test_that("Basics for calculation", {
     # UNDONE: can we actually get NA tox values?
     # expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))),
     #           length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4, removeNA = TRUE))))
+})
+
+if (doSIRIUS)
+{
+    calcTab <- as.data.table(fGroupsCompsC)
+    calcTabNoPref <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(preferType = "none"),
+                                   toxAggrParams = getDefPredAggrParams(preferType = "none"))
+    calcTabMax <- as.data.table(fGroupsCompsC, concAggrParams = getDefPredAggrParams(max, preferType = "none"),
+                                toxAggrParams = getDefPredAggrParams(max, preferType = "none"))
+    calcTabSuspDupl <- as.data.table(fGroupsSuspDuplC)
+    calcTabSuspDuplNoColl <- as.data.table(fGroupsSuspDuplC, collapseSuspects = NULL)
+    calcTabSuspNoColl <- as.data.table(fGroupsCompsC, collapseSuspects = NULL)
+    calcTabNoSusp <- as.data.table(fGroupsCompsNoSuspC)
+    calcTabNoSuspNoColl <- as.data.table(fGroupsCompsNoSuspC, collapseSuspects = NULL)
+    
+    calcTabFeats <- as.data.table(fGroupsCompsC, features = TRUE)
+    calcTabFeatsNoColl <- as.data.table(fGroupsSuspDuplC, features = TRUE, collapseSuspects = NULL)
+}
+browser()
+test_that("as.data.table functionality", {
+    skip_if_not(doSIRIUS)
+    
+    # check if all groups from slots are present
+    # check if all groups from fGroups are present
+    # check if groups from slots have no NA concs/tox
+    # checks for features==T
+    # not collapsed
+    #   check if all susps are present
+    #   check if all susps are with type=="suspect"
+
+    expect_setequal("suspect", calcTab$conc_types) # default preferType == "suspect" and all suspects should have results
+    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$conc_types, ",")))
+    expect_lt(mean(calcTabNoPref[["standard-pos-2_conc"]], na.rm = TRUE),
+              mean(calcTabMax[["standard-pos-2_conc"]], na.rm = TRUE))
+    
+    expect_setequal("suspect", calcTab$LC50_types)
+    expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$LC50_types, ",")))
+    expect_lt(mean(calcTabNoPref$LC50, na.rm = TRUE), mean(calcTabMax$LC50, na.rm = TRUE))
+    
+    # verify suspects are properly aggregated
+    expect_length(fGroupsSuspDuplC, nrow(calcTabSuspDupl))
+    expect_setequal(names(fGroupsSuspDuplC), calcTabSuspDupl$group)
+    expect_equal(toxicities(fGroupsSuspDuplC)[type == "suspect"][, .(LC50 = mean(LC50)), by = "group"],
+                 calcTabSuspDupl[, .(group, LC50)])
+    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(`standard-pos-2` = mean(`standard-pos-2`, na.rm = TRUE)), by = "group"],
+                 calcTabSuspDupl[, .(group, `standard-pos-2_conc`)])
+    
+    # verify suspects are properly split
+    expect_setequal(screenInfo(fGroupsSuspDuplC)$name, calcTabSuspDuplNoColl$susp_name)
+    expect_equal(toxicities(fGroupsSuspDuplC)[type == "suspect"][, .(group, LC50)],
+                 calcTabSuspDuplNoColl[, .(group, LC50)])
+    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(group, `standard-pos-2`)],
+                 calcTabSuspDuplNoColl[, .(group, `standard-pos-2_conc`)])
+
+    # shouldn't be suspect values in it anymore
+    expect_false(grepl("suspect", calcTabNoSusp[group == rmSuspGrp]$conc_types))
+    expect_false(grepl("suspect", calcTabNoSusp[group == rmSuspGrp]$LC50_types))
+    
+    # but groups should still be reported
+    expect_setequal(names(fGroupsCompsNoSuspC), calcTabNoSuspNoColl$group)
+    expect_setequal(toxicities(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
+    expect_setequal(concentrations(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
+    expect_false(anyNA(calcTabNoSuspNoColl[group == rmSuspGrp]$LC50))
+    
+    expect_equal(calcTabFeats[susp_name=="Chloridazon"][order(analysis), .(group, analysis, conc)],
+                 melt(concentrations(fGroupsCompsC)[candidate_name=="Chloridazon"],
+                      measure.vars = analyses(fGroupsCompsC), variable.name = "analysis",
+                      value.name = "conc", variable.factor = FALSE)[order(analysis), .(group, analysis, conc)])
 })

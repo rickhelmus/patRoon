@@ -6,6 +6,7 @@
 * Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
 * Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
 * Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
+* Fixed: `as.data.table()` methods for `featureGroupsScreening`: avoid errors with `features==TRUE` and `collapseSuspects=NULL`
 
 # patRoon 2.3
 

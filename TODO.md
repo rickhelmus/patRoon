@@ -1,5 +1,10 @@
 # Priority
 
+- better explain behavior of collapseSuspects=NULL and merging of predicted concs
+    - check if ref docs are OK
+    - add to handbook
+    - add NEWS
+
 ## Ext
 
 - R bundle

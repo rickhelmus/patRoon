@@ -144,12 +144,12 @@ these suspects.}
 
 \item{drop}{Ignored.}
 
-\item{collapseSuspects}{If a \code{character} then any suspects that were
-matched to the same feature group are collapsed to a single row and suspect
-names are separated by the value of \code{collapseSuspects}. If \code{NULL}
-then no collapsing occurs, and each suspect match is reported on a single
-row. Note that some columns will not be reported when collapsing is
-enabled.}
+\item{collapseSuspects}{If a \code{character} then any suspects that were matched to the same feature group are
+collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
+then no collapsing occurs, and each suspect match is reported on a single row. If \code{collapseSuspects=NULL} and
+calculated concentrations/toxicities are available (obtained with
+\code{\link{calculateConcs}}/\code{\link{calculateTox}}) then only specific values for a suspect are reported (if
+available). Note that some columns will not be reported when collapsing is enabled.}
 
 \item{onlyHits}{For \code{as.data.table}: if \code{TRUE} then only feature groups with suspect hits are reported.
 
@@ -243,11 +243,9 @@ This class derives from \code{\link{featureGroups}} and adds suspect screening i
 \item \code{x[i}: Subset on analyses, feature groups and/or
 suspects.
 
-\item \code{as.data.table(featureGroupsScreening)}: Obtain a summary table (a
-\code{\link{data.table}}) with retention, \emph{m/z}, intensity and
-optionally other feature data. Furthermore, the output table will be merged
-with information from \code{screenInfo}, such as suspect names and other
-properties and annotation data.
+\item \code{as.data.table(featureGroupsScreening)}: Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z},
+intensity and optionally other feature data. Furthermore, the output table will be merged with information from
+\code{screenInfo}, such as suspect names and other properties and annotation data.
 
 \item \code{annotateSuspects(featureGroupsScreening)}: Incorporates annotation data obtained during the workflow to annotate suspects
 with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See

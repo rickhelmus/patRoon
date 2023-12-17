@@ -160,18 +160,16 @@ setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, 
     return(obj)
 })
 
-#' @describeIn featureGroupsScreening Obtain a summary table (a
-#'   \code{\link{data.table}}) with retention, \emph{m/z}, intensity and
-#'   optionally other feature data. Furthermore, the output table will be merged
-#'   with information from \code{screenInfo}, such as suspect names and other
-#'   properties and annotation data.
+#' @describeIn featureGroupsScreening Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z},
+#'   intensity and optionally other feature data. Furthermore, the output table will be merged with information from
+#'   \code{screenInfo}, such as suspect names and other properties and annotation data.
 #'
-#' @param collapseSuspects If a \code{character} then any suspects that were
-#'   matched to the same feature group are collapsed to a single row and suspect
-#'   names are separated by the value of \code{collapseSuspects}. If \code{NULL}
-#'   then no collapsing occurs, and each suspect match is reported on a single
-#'   row. Note that some columns will not be reported when collapsing is
-#'   enabled.
+#' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
+#'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
+#'   then no collapsing occurs, and each suspect match is reported on a single row. If \code{collapseSuspects=NULL} and
+#'   calculated concentrations/toxicities are available (obtained with
+#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}) then only specific values for a suspect are reported (if
+#'   available). Note that some columns will not be reported when collapsing is enabled.
 #'
 #' @export
 setMethod("as.data.table", "featureGroupsScreening", doFGScrAsDataTable)

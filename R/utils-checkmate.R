@@ -749,7 +749,7 @@ checkQuantEluent <- function(x, fGroups)
     if (isTRUE(ret))
         ret <- checkmate::checkNumeric(x$B, lower = 0, upper = 100, finite = TRUE)
     
-    if (isTRUE(ret) && max(x$time) < max(groupInfo(fGroups)$rts))
+    if (isTRUE(ret) && length(fGroups) > 0 && max(x$time) < max(groupInfo(fGroups)$rts))
         ret <- paste("The highest retention time in the eluent table is less than the highest feature retention time.",
                      "Make sure retention times are specified in seconds")
         

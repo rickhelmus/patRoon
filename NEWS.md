@@ -5,7 +5,7 @@
 * Fixed: `predictRespFactors()`/`predictTox()`: better handle objects without results
 * Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
 * Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
-
+* Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
 
 # patRoon 2.3
 

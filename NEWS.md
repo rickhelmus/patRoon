@@ -7,6 +7,7 @@
 * Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
 * Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
 * Fixed: `as.data.table()` methods for `featureGroupsScreening`: avoid errors with `features==TRUE` and `collapseSuspects=NULL`
+* Fixed: `as.data.table()` methods for `featureGroups`: several fixes when merging predicted concentrations/toxicities if `features==TRUE` and/or `collapseSuspects=NULL`
 
 # patRoon 2.3
 

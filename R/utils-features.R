@@ -332,8 +332,31 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         ret <- mergeScreenInfoWithDT(ret, screenInfo(fGroups), collapseSuspects, onlyHits)
     
     splitSusps <- isScreening(fGroups) && is.null(collapseSuspects)
+    mergePred <- function(tab, pred, mby, typesCol)
+    {
+        if (splitSusps && !is.null(pred[["candidate_name"]]))
+        {
+            # UNDONE: until incomparables arg becomes available for data.table::merge(), we use a dummy column so merges
+            # between suspects/suspects and non-suspects/non-suspects can be done in one go.
+            tab <- copy(tab); pred <- copy(pred)
+            pred[, susp_merge := fifelse(get(typesCol) == "suspect", candidate_name, "nosusp")]
+            tab[, susp_merge := fifelse(!is.na(susp_name) & susp_name %in% pred[get(typesCol) == "suspect"]$candidate_name,
+                                        susp_name, "nosusp")]
+            tab <- merge(tab, pred, by = c(mby, "susp_merge"), all.x = TRUE, sort = FALSE)
+            tab[, susp_merge := NULL]
+        }
+        else
+            tab <- merge(tab, pred, by = mby, all.x = TRUE, sort = FALSE)
+        return(tab)
+    }
+    
     if (!is.null(concAggrParams) && nrow(concentrations(fGroups)) > 0)
     {
+        # merge concentrations:
+        #   - if suspects are collapsed or concs are not from suspect data, then merging should be done by fGroup
+        #   - else concs from suspect data should be merged by group/suspect in ret
+        #   - if features==T then take care to melt the concs to the same format as ret, and then merge by group/analysis or group/suspect/analysis
+        
         concs <- aggregateConcs(concentrations(fGroups), anaInfo, concAggrParams, splitSusps)
         setnames(concs, "type", "conc_types")
         
@@ -361,33 +384,24 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             setnames(concs, anaInfo$analysis, paste0(anaInfo$analysis, "_conc"))
         
         setcolorder(concs, setdiff(names(concs), "conc_types")) # move to end
-        
-        mby.x <- "group"
+
+        mby <- "group"
         if (features)
-            mby.x <- c(mby.x, if (average) "replicate_group" else "analysis")
-        mby.y <- mby.x
-        if (splitSusps && !is.null(concs[["candidate_name"]]))
-        {
-            mby.x <- c(mby.x, "susp_name")
-            mby.y <- c(mby.y, "candidate_name")
-        }
-        ret <- merge(ret, concs, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
+            mby <- c(mby, if (average) "replicate_group" else "analysis")
+        ret <- mergePred(ret, concs, mby, "conc_types")
+        ret <- removeDTColumnsIfPresent(ret, "candidate_name")
     }
 
     if (!is.null(toxAggrParams) && nrow(toxicities(fGroups)) > 0)
     {
+        # merge like concs, but a bit simpler since toxicities are assigned per fGroup instead of feature
+        
         tox <- aggregateTox(toxicities(fGroups), toxAggrParams, splitSusps)
         setnames(tox, "type", "LC50_types")
         setcolorder(tox, setdiff(names(tox), "LC50_types")) # move to end
-        
-        mby.x <- "group"
-        mby.y <- mby.x
-        if (splitSusps && !is.null(tox[["candidate_name"]]))
-        {
-            mby.x <- c(mby.x, "susp_name")
-            mby.y <- c(mby.y, "candidate_name")
-        }
-        ret <- merge(ret, tox, by.x = mby.x, by.y = mby.y, all.x = TRUE, sort = FALSE)
+
+        ret <- mergePred(ret, tox, "group", "LC50_types")
+        ret <- removeDTColumnsIfPresent(ret, "candidate_name")
         
         if (normConcToTox && !is.null(ret[["conc_types"]])) # conc_types should be present if concentration data is
         {

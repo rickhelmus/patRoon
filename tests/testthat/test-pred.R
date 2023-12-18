@@ -185,14 +185,6 @@ if (doSIRIUS)
 test_that("as.data.table functionality", {
     skip_if_not(doSIRIUS)
     
-    # check if all groups from slots are present
-    # check if all groups from fGroups are present
-    # check if groups from slots have no NA concs/tox
-    # checks for features==T
-    # not collapsed
-    #   check if all susps are present
-    #   check if all susps are with type=="suspect"
-
     expect_setequal("suspect", calcTab$conc_types) # default preferType == "suspect" and all suspects should have results
     expect_setequal(c("suspect", "SIRIUS_FP", "compound"), unlist(strsplit(calcTabNoPref$conc_types, ",")))
     expect_lt(mean(calcTabNoPref[["standard-pos-2_conc"]], na.rm = TRUE),
@@ -216,7 +208,10 @@ test_that("as.data.table functionality", {
                  calcTabSuspDuplNoColl[, .(group, LC50)])
     expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(group, `standard-pos-2_conc` = `standard-pos-2`)],
                  calcTabSuspDuplNoColl[, .(group, `standard-pos-2_conc`)])
-
+    expect_equal(calcTabFeats[susp_name == "Chloridazon"][order(analysis), .(group, analysis, conc)],
+                 melt(concentrations(fGroupsCompsC)[candidate_name == "Chloridazon"],
+                      measure.vars = analyses(fGroupsCompsC), variable.name = "analysis",
+                      value.name = "conc", variable.factor = FALSE)[order(analysis), .(group, analysis, conc)])
     # shouldn't be suspect values in it anymore
     expect_false(grepl("suspect", calcTabNoSusp[group == rmSuspGrp]$conc_types))
     expect_false(grepl("suspect", calcTabNoSusp[group == rmSuspGrp]$LC50_types))
@@ -226,9 +221,4 @@ test_that("as.data.table functionality", {
     expect_setequal(toxicities(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
     expect_setequal(concentrations(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
     expect_false(anyNA(calcTabNoSuspNoColl[group == rmSuspGrp]$LC50))
-    
-    expect_equal(calcTabFeats[susp_name=="Chloridazon"][order(analysis), .(group, analysis, conc)],
-                 melt(concentrations(fGroupsCompsC)[candidate_name=="Chloridazon"],
-                      measure.vars = analyses(fGroupsCompsC), variable.name = "analysis",
-                      value.name = "conc", variable.factor = FALSE)[order(analysis), .(group, analysis, conc)])
 })

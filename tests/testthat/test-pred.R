@@ -181,7 +181,7 @@ if (doSIRIUS)
     calcTabFeats <- as.data.table(fGroupsCompsC, features = TRUE)
     calcTabFeatsNoColl <- as.data.table(fGroupsSuspDuplC, features = TRUE, collapseSuspects = NULL)
 }
-browser()
+
 test_that("as.data.table functionality", {
     skip_if_not(doSIRIUS)
     
@@ -207,14 +207,14 @@ test_that("as.data.table functionality", {
     expect_setequal(names(fGroupsSuspDuplC), calcTabSuspDupl$group)
     expect_equal(toxicities(fGroupsSuspDuplC)[type == "suspect"][, .(LC50 = mean(LC50)), by = "group"],
                  calcTabSuspDupl[, .(group, LC50)])
-    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(`standard-pos-2` = mean(`standard-pos-2`, na.rm = TRUE)), by = "group"],
+    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(`standard-pos-2_conc` = mean(`standard-pos-2`, na.rm = TRUE)), by = "group"],
                  calcTabSuspDupl[, .(group, `standard-pos-2_conc`)])
     
     # verify suspects are properly split
     expect_setequal(screenInfo(fGroupsSuspDuplC)$name, calcTabSuspDuplNoColl$susp_name)
     expect_equal(toxicities(fGroupsSuspDuplC)[type == "suspect"][, .(group, LC50)],
                  calcTabSuspDuplNoColl[, .(group, LC50)])
-    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(group, `standard-pos-2`)],
+    expect_equal(concentrations(fGroupsSuspDuplC)[type == "suspect"][, .(group, `standard-pos-2_conc` = `standard-pos-2`)],
                  calcTabSuspDuplNoColl[, .(group, `standard-pos-2_conc`)])
 
     # shouldn't be suspect values in it anymore

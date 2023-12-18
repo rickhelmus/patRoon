@@ -241,12 +241,12 @@ these suspects.</p></dd>
 
 
 <dt>collapseSuspects</dt>
-<dd><p>If a <code>character</code> then any suspects that were
-matched to the same feature group are collapsed to a single row and suspect
-names are separated by the value of <code>collapseSuspects</code>. If <code>NULL</code>
-then no collapsing occurs, and each suspect match is reported on a single
-row. Note that some columns will not be reported when collapsing is
-enabled.</p></dd>
+<dd><p>If a <code>character</code> then any suspects that were matched to the same feature group are
+collapsed to a single row and suspect names are separated by the value of <code>collapseSuspects</code>. If <code>NULL</code>
+then no collapsing occurs, and each suspect match is reported on a single row. If <code>collapseSuspects=NULL</code> and
+calculated concentrations/toxicities are available (obtained with
+<code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>) then only specific values for a suspect are reported (if
+available). Note that some columns will not be reported when collapsing is enabled.</p></dd>
 
 
 <dt>onlyHits</dt>
@@ -367,11 +367,9 @@ specified in the <code>fragments_*</code> columns of the suspect list. Set to <c
 <li><p><code>show(featureGroupsScreening)</code>: Shows summary information for this object.</p></li>
 <li><p><code>x[i</code>: Subset on analyses, feature groups and/or
 suspects.</p></li>
-<li><p><code>as.data.table(featureGroupsScreening)</code>: Obtain a summary table (a
-<code>data.table</code>) with retention, <em>m/z</em>, intensity and
-optionally other feature data. Furthermore, the output table will be merged
-with information from <code>screenInfo</code>, such as suspect names and other
-properties and annotation data.</p></li>
+<li><p><code>as.data.table(featureGroupsScreening)</code>: Obtain a summary table (a <code>data.table</code>) with retention, <em>m/z</em>,
+intensity and optionally other feature data. Furthermore, the output table will be merged with information from
+<code>screenInfo</code>, such as suspect names and other properties and annotation data.</p></li>
 <li><p><code>annotateSuspects(featureGroupsScreening)</code>: Incorporates annotation data obtained during the workflow to annotate suspects
 with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
 the <code>Suspect annotation</code> section for more details. The estimation of identification levels for each suspect is

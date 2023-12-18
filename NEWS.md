@@ -8,6 +8,8 @@
 * Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
 * Fixed: `as.data.table()` methods for `featureGroupsScreening`: avoid errors with `features==TRUE` and `collapseSuspects=NULL`
 * Fixed: `as.data.table()` methods for `featureGroups`: several fixes when merging predicted concentrations/toxicities if `features==TRUE` and/or `collapseSuspects=NULL`
+* Updated PubChem transformations to 0.1.8
+
 
 # patRoon 2.3
 

@@ -626,6 +626,5 @@ mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
     
     ret <- merge(tab, scrInfo, by.x = "group", by.y = "susp_group", all.x = !onlyHits, sort = FALSE,
                  allow.cartesian = is.null(collapseSuspects))
-    setorderv(ret, intersect(c("group", "susp_name", "analysis"), names(ret)))
     return(ret)
 }

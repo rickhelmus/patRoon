@@ -6,8 +6,11 @@
 * Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
 * Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
 * Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
-* Fixed: `as.data.table()` methods for `featureGroupsScreening`: avoid errors with `features==TRUE` and `collapseSuspects=NULL`
-* Fixed: `as.data.table()` methods for `featureGroups`: several fixes when merging predicted concentrations/toxicities if `features==TRUE` and/or `collapseSuspects=NULL`
+* `as.data.table()` methods for `featureGroups`/`featureGroupsScreening`:
+    * Fixed: avoid errors with `features==TRUE` and `collapseSuspects=NULL`
+    * Fixed: several fixes when merging predicted concentrations/toxicities if `features==TRUE` and/or `collapseSuspects=NULL`
+    * Fixed: `replicate_groups` with incorrect data was included with `features==TRUE` and `average==TRUE`
+    * Fixed: predicted concentrations are now properly averaged with `features==TRUE` and `average==TRUE`
 * Updated PubChem transformations to 0.1.8
 
 

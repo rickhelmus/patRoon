@@ -180,6 +180,7 @@ if (doSIRIUS)
     
     calcTabFeats <- as.data.table(fGroupsCompsC, features = TRUE)
     calcTabFeatsNoColl <- as.data.table(fGroupsSuspDuplC, features = TRUE, collapseSuspects = NULL)
+    calcTabFeatsAvg <- as.data.table(fGroupsCompsC, features = TRUE, average = TRUE)
 }
 
 test_that("as.data.table functionality", {
@@ -221,4 +222,6 @@ test_that("as.data.table functionality", {
     expect_setequal(toxicities(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
     expect_setequal(concentrations(fGroupsCompsNoSuspC)$group, calcTabNoSuspNoColl$group)
     expect_false(anyNA(calcTabNoSuspNoColl[group == rmSuspGrp]$LC50))
+    
+    expect_equal(nrow(calcTab), nrow(calcTabFeatsAvg))
 })

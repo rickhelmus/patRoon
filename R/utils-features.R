@@ -125,8 +125,6 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         ret <- rbindlist(fTable, idcol = "analysis")
         setorder(ret, "group")
         
-        ret[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
-        
         if (doConc)
             ret[, conc := anaInfo$conc[match(analysis, anaInfo$analysis)]]
         
@@ -157,6 +155,8 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         }
         else
         {
+            ret[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
+            
             doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
@@ -359,35 +359,34 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         concs <- aggregateConcs(concentrations(fGroups), anaInfo, concAggrParams, splitSusps)
         setnames(concs, "type", "conc_types")
-        
-        if (average)
+
+        if (features)
+        {
+            concs <- melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
+            if (average)
+            {
+                concs[, conc := if (all(is.na(conc))) NA_real_ else averageFunc(conc[!is.na(conc)]), by = "group"]
+                concs[, analysis := NULL]
+                concs <- unique(concs, by = "group")
+            }
+        }
+        else if (average)
         {
             for (rg in replicateGroups(fGroups))
             {
                 anas <- anaInfo[anaInfo$group == rg, "analysis"]
-                concs[, (rg) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
+                concs[, (paste0(rg, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
             }
             concs[, (anaInfo$analysis) := NULL]
         }
-        
-        if (features)
-        {
-            concs <- if (average) 
-                melt(concs, measure.vars = replicateGroups(fGroups), variable.name = "replicate_group",
-                     value.name = "conc")
-            else
-                melt(concs, measure.vars = anaInfo$analysis, variable.name = "analysis", value.name = "conc")
-        }
-        else if (average)
-            setnames(concs, replicateGroups(fGroups), paste0(replicateGroups(fGroups), "_conc"))
         else
             setnames(concs, anaInfo$analysis, paste0(anaInfo$analysis, "_conc"))
         
         setcolorder(concs, setdiff(names(concs), "conc_types")) # move to end
 
         mby <- "group"
-        if (features)
-            mby <- c(mby, if (average) "replicate_group" else "analysis")
+        if (features && !average)
+            mby <- c(mby, "analysis")
         ret <- mergePred(ret, concs, mby, "conc_types")
         ret <- removeDTColumnsIfPresent(ret, "candidate_name")
     }

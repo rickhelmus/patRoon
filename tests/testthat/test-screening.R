@@ -37,6 +37,17 @@ suspsFrag[name == "1H-benzotriazole", fragments_mz := "92.0495"] # UNDONE: add q
 suspsFragForm <- copy(susps)
 suspsFragForm[name == "1H-benzotriazole", fragments_formula := "C6H6N"] # UNDONE: add qualifiers to patRoonData?
 
+# it's tricky to get suspect data with duplicate fGroups, just inject some fake for now
+fakedSusp <- "DEET"; fakeDupGroup <- screenInfo(fGroupsScrNoRT)[name == fakedSusp]$group; fakeReplSusp <- "1H-benzotriazole"
+makeFakeHit <- function(obj)
+{
+    ret <- obj
+    ret@screenInfo <- copy(ret@screenInfo)
+    ret@screenInfo[name == fakeReplSusp, group := fakeDupGroup]
+    return(ret)
+}
+fGroupsScrNoRTDup <- makeFakeHit(fGroupsScrNoRT)
+
 test_that("suspect screening is OK", {
     checkmate::expect_subset(scr$name, susps$name)
     expect_known_value(scr, testFile("screening"))
@@ -73,6 +84,12 @@ test_that("suspect screening is OK", {
     expect_equal(nrow(as.data.table(fGroupsScr, collapseSuspects = ",")), length(fGroupsScr))
     expect_gt(nrow(as.data.table(fGroupsScrNoRT, collapseSuspects = ",")),
               nrow(as.data.table(fGroupsScr, collapseSuspects = ",")))
+    expect_setequal(as.data.table(fGroupsScrNoRTDup, collapseSuspects = NULL)[group == fakeDupGroup]$susp_name,
+                    c(fakedSusp, fakeReplSusp))
+    expect_setequal(as.data.table(fGroupsScrNoRTDup, collapseSuspects = NULL, features = TRUE)[group == fakeDupGroup]$susp_name,
+                    c(fakedSusp, fakeReplSusp))
+    expect_setequal(as.data.table(fGroupsScrNoRTDup, collapseSuspects = NULL, features = TRUE)[group == fakeDupGroup]$analysis,
+                    analyses(fGroupsScrNoRTDup)[1:2])
     
     skip_if(testWithSets())
 
@@ -154,15 +171,6 @@ if (hasMF)
     selectedHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = TRUE)
     selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
     
-    # for selectBestFGroups it's tricky to get good data, just inject some fake for now
-    fakeDupGroup <- screenInfo(fGroupsAnnNoRT)[name == "DEET"]$group; fakeReplSusp <- "1H-benzotriazole"
-    makeFakeHit <- function(obj)
-    {
-        ret <- obj
-        ret@screenInfo <- copy(ret@screenInfo)
-        ret@screenInfo[name == fakeReplSusp, group := fakeDupGroup]
-        return(ret)
-    }
     fGroupsAnnNoRTFake <- makeFakeHit(fGroupsAnnNoRT)
     if (testWithSets())
         fGroupsAnnNoRTFake@setObjects[[1]] <- makeFakeHit(fGroupsAnnNoRTFake@setObjects[[1]])

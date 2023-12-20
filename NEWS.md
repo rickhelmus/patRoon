@@ -1,9 +1,11 @@
-# DEVEL
+# patRoon 2.3.1
 
-* Fixed: `predictRespFactors()` could incorrectly cache results and perform concentration convrsions twice for calibrants under some circumstances (reported by Drew Szabo)
+When updating to this release, it **is important** to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+
+* Fixed: `predictRespFactors()` could incorrectly cache results and perform concentration conversions twice for calibrants under some circumstances (reported by Drew Szabo)
 * Fixed: `verifyDependencies()` could throw errors when external dependencies were not found.
 * Fixed: `predictRespFactors()`/`predictTox()`: better handle objects without results
-* Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
+* Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots (suggested by Drew Szabo)
 * Fixed: `calculateTox()`/`calculateConcs()`: only consider relevant feature annotations
 * Fixed: `calculateConcs()`: avoid warnings when there are no feature groups
 * `as.data.table()` methods for `featureGroups`/`featureGroupsScreening`:
@@ -12,6 +14,7 @@
     * Fixed: `replicate_groups` with incorrect data was included with `features==TRUE` and `average==TRUE`
     * Fixed: predicted concentrations are now properly averaged with `features==TRUE` and `average==TRUE`
 * Updated PubChem transformations to 0.1.8
+* Improved documentation for `collapseSuspects` argument for `as.data.table()` method for suspect screening results
 
 
 # patRoon 2.3

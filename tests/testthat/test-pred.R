@@ -47,6 +47,7 @@ if (doSIRIUS)
     formsTab <- as.data.table(formsSIR)
     
     compsSIR <- doGenCompsSIR(fGroupsComps, plistsComps)
+    compsSIR <- filter(compsSIR, topMost = 5)
     compsSIR <- predictRespFactors(compsSIR, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
                                    calibConcUnit = "M", type = "both")
     compsSIR <- predictTox(compsSIR, type = "both")

@@ -146,10 +146,8 @@ these suspects.}
 
 \item{collapseSuspects}{If a \code{character} then any suspects that were matched to the same feature group are
 collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
-then no collapsing occurs, and each suspect match is reported on a single row. If \code{collapseSuspects=NULL} and
-calculated concentrations/toxicities are available (obtained with
-\code{\link{calculateConcs}}/\code{\link{calculateTox}}) then only specific values for a suspect are reported (if
-available). Note that some columns will not be reported when collapsing is enabled.}
+then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
+section below for additional details.}
 
 \item{onlyHits}{For \code{as.data.table}: if \code{TRUE} then only feature groups with suspect hits are reported.
 
@@ -308,7 +306,7 @@ annotation data when \code{annotateSuspects} is run.}
 
   }
 
-  Note that only columns are present is sufficient data is available for their calculation.
+  Note that only columns are present if sufficient data is available for their calculation.
 }
 
 \section{Identification level rules}{
@@ -391,6 +389,22 @@ annotation data when \code{annotateSuspects} is run.}
 
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{featureGroups}}}   \itemize{     \item{\strong{\code{\link{featureGroupsScreening}}}}     \itemize{       \item{\code{\link{featureGroupsSetScreeningUnset}}}     }   } }
+}
+
+\section{{Suspect collapsing}}{
+ The \code{as.data.table} method fir \code{featureGroupsScreening} supports an
+  additional format where each suspect hit is reported on a separate row (enabled by setting
+  \code{collapseSuspects=NULL}). In this format the suspect
+  properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect
+  collapsing} is enabled (the default) then the regular \code{as.data.table} format is used, and amended with the
+  names of all suspects matched to a feature group (separated by the value of the \code{collapseSuspects} argument).
+
+  Suspect collapsing also influences how calculated feature concentrations/toxicities are reported (\emph{i.e.}
+  obtained with \code{\link{calculateConcs}}/\code{\link{calculateTox}}). If these values were directly predicted for
+  suspects, \emph{i.e.} by using \code{\link{predictRespFactors}}/\code{\link{predictTox}} on the feature groups
+  object, \emph{and} suspects are \emph{not} collapsed, then the calculated concentration/toxicity reported for each
+  suspect row is not aggregated and specific for that suspect (unless not available). Hence, this allows you to
+  obtain specific concentration/toxicity values for each suspect/feature group pair.
 }
 
 \section{Sets workflows}{

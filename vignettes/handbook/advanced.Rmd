@@ -543,7 +543,7 @@ In `patRoon` the predictions are done in two steps:
 
 Various workflow data can be used to perform the predictions for step 1:
 
-a. Suspect hits that were obtained with `screenSuspects` [link].
+a. Suspect hits that were obtained with `screenSuspects` (see [suspect screening](#suspscr)).
 b. Formula annotations obtained with `SIRIUS+CSI:FingerID`.
 c. Compound annotations obtained with `SIRIUS+CSI:FingerID`.
 d. Compound annotations obtained with other algorithms, e.g. `MetFrag`.
@@ -561,7 +561,7 @@ Some example workflows are shown below:
 fGroupsSuspTox <- predictTox(fGroupsSusp)
 fGroupsSuspTox <- calculateTox(fGroupsSuspTox)
 
-# Calculate toxicity for compound hits. Limit to the top 5 to limit calculation time.
+# Calculate toxicity for compound hits. Limit to the top 5 to reduce calculation time.
 compoundsTop5 <- filter(compounds, topMost = 5)
 compoundsTox <- predictTox(compoundsTop5)
 fGroupsTox <- calculateTox(fGroups, compoundsTox)
@@ -713,6 +713,15 @@ The `as.data.table()` method function _aggregates_ the data for a feature group 
 # as above, but aggregate by taking maximum values
 as.data.table(fGroupsTox, toxAggrParams = getDefPredAggrParams(max))[!is.na(LC50), c("group", "LC50", "LC50_types")]
 ```
+
+If the `as.data.table()` method is used on suspect screening results, and predictions were performed directly for suspect hits, then predicted values can be reported for individual suspect match instead of aggregating them per feature group:
+
+```{r eval=FALSE}
+# Reports predicted values for each suspect separately. If multiple suspects are assigned to a feature group,
+# then each suspect match is split into a different row. 
+as.data.table(fGroupsSuspTox, collapseSuspects = NULL)
+```
+
 
 Finally, the [reporting functionality](#report) can be used to overview all predicted values, both aggregated and raw. 
 

@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-12-18" />
+<meta name="date" content="2023-12-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -498,17 +498,17 @@ div.csl-indent {
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="inspecting-results.html#cb60-1" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb60-2"><a href="inspecting-results.html#cb60-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
-#&gt;    1:  solvent-pos-1  f_6079675793769414173  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1  f_6605768973428326993   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_3008017031834897121 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1 f_13743914838749903470  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1 f_15001287929424193558   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_17184766716602913592  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1 f_12591554802473812222   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1  f_5847275893830808787 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_9133219033212263321  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1 f_14471164199999918607   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_6720186551060371828 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3  f_7089175745374047148   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3  f_8870847923140912032 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3 f_13119696494316294902 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3 f_15581556054615541315   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3  f_7379081964796083004 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3 f_13639595304719566758   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_17985011939305271890 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3  f_2024432261161716337 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_2201341737882166129   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="inspecting-results.html#cb62-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb62-2"><a href="inspecting-results.html#cb62-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos
@@ -523,14 +523,16 @@ div.csl-indent {
 #&gt; 139: M352_R335_664 334.9403 352.2019     74986.67
 #&gt; 140: M407_R239_672 239.3567 407.2227    186568.00
 #&gt; 141: M425_R319_676 319.4944 425.1885    214990.67</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="inspecting-results.html#cb64-1" tabindex="-1"></a><span class="co"># As above, but with extra suspect screening information</span></span>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="inspecting-results.html#cb64-1" tabindex="-1"></a><span class="co"># As above, but with suspect matches on separate rows and additional screening information</span></span>
 <span id="cb64-2"><a href="inspecting-results.html#cb64-2" tabindex="-1"></a><span class="co"># (select some columns to simplify the output below)</span></span>
 <span id="cb64-3"><a href="inspecting-results.html#cb64-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSusp, <span class="at">average =</span> <span class="cn">TRUE</span>, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>,</span>
-<span id="cb64-4"><a href="inspecting-results.html#cb64-4" tabindex="-1"></a>              <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;susp_name&quot;</span>, <span class="st">&quot;susp_compRank&quot;</span>, <span class="st">&quot;susp_annSimBoth&quot;</span>, <span class="st">&quot;susp_estIDLevel&quot;</span>)]</span></code></pre></div>
+<span id="cb64-4"><a href="inspecting-results.html#cb64-4" tabindex="-1"></a>              <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;susp_name&quot;</span>, <span class="st">&quot;susp_compRank&quot;</span>, <span class="st">&quot;susp_annSimBoth&quot;</span>, <span class="st">&quot;susp_estIDLevel&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;           group          susp_name susp_compRank susp_annSimBoth susp_estIDLevel
 #&gt; 1: M120_R268_30   1H-benzotriazole             1       0.0000000              4b
 #&gt; 2: M137_R249_53      N-Phenyl urea             1       0.6443557               5
-#&gt; 3: M146_R309_68 2-Hydroxyquinoline             2       0.9896892              3c</code></pre>
+#&gt; 3: M146_R309_68 2-Hydroxyquinoline             2       0.9896892              3c
+#&gt; 4: M146_R248_69 2-Hydroxyquinoline            NA              NA               5
+#&gt; 5: M146_R225_70 2-Hydroxyquinoline            NA              NA               5</code></pre>
 <div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="inspecting-results.html#cb66-1" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
 <span id="cb66-2"><a href="inspecting-results.html#cb66-2" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists)</span></code></pre></div>
 <pre><code>#&gt;              group type ID       mz  intensity precursor

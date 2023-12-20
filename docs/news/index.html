@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1</span>
       </span>
     </div>
 
@@ -89,6 +89,29 @@
       <small>Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.3.1" id="patroon-231">patRoon 2.3.1<a class="anchor" aria-label="anchor" href="#patroon-231"></a></h2>
+<p>When updating to this release, it <strong>is important</strong> to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
+<ul><li>Fixed: <code><a href="../reference/generics.html">predictRespFactors()</a></code> could incorrectly cache results and perform concentration conversions twice for calibrants under some circumstances (reported by Drew Szabo)</li>
+<li>Fixed: <code><a href="../reference/verifyDependencies.html">verifyDependencies()</a></code> could throw errors when external dependencies were not found.</li>
+<li>Fixed: <code><a href="../reference/generics.html">predictRespFactors()</a></code>/<code><a href="../reference/generics.html">predictTox()</a></code>: better handle objects without results</li>
+<li>Metadata of <code>MS2Quant</code> is now stored in the <code>MS2QuantMeta</code> slots (suggested by Drew Szabo)</li>
+<li>Fixed: <code><a href="../reference/pred-tox.html">calculateTox()</a></code>/<code><a href="../reference/pred-quant.html">calculateConcs()</a></code>: only consider relevant feature annotations</li>
+<li>Fixed: <code><a href="../reference/pred-quant.html">calculateConcs()</a></code>: avoid warnings when there are no feature groups</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>/<code>featureGroupsScreening</code>:
+<ul><li>Fixed: avoid errors with <code>features==TRUE</code> and <code>collapseSuspects=NULL</code>
+</li>
+<li>Fixed: several fixes when merging predicted concentrations/toxicities if <code>features==TRUE</code> and/or <code>collapseSuspects=NULL</code>
+</li>
+<li>Fixed: <code>replicate_groups</code> with incorrect data was included with <code>features==TRUE</code> and <code>average==TRUE</code>
+</li>
+<li>Fixed: predicted concentrations are now properly averaged with <code>features==TRUE</code> and <code>average==TRUE</code>
+</li>
+</ul></li>
+<li>Updated PubChem transformations to 0.1.8</li>
+<li>Improved documentation for <code>collapseSuspects</code> argument for <code><a href="../reference/generics.html">as.data.table()</a></code> method for suspect screening results</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.3" id="patroon-23">patRoon 2.3<a class="anchor" aria-label="anchor" href="#patroon-23"></a></h2>
 <p>This release adds significant new functionality, several important changes and several bug fixes thanks to user feedback.</p>

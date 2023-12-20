@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2023-12-18" />
+<meta name="date" content="2023-12-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -371,7 +371,7 @@ div.csl-indent {
 </ol>
 <p>Various workflow data can be used to perform the predictions for step 1:</p>
 <ol style="list-style-type: lower-alpha">
-<li>Suspect hits that were obtained with <code>screenSuspects</code> [link].</li>
+<li>Suspect hits that were obtained with <code>screenSuspects</code> (see <a href="features.html#suspscr">suspect screening</a>).</li>
 <li>Formula annotations obtained with <code>SIRIUS+CSI:FingerID</code>.</li>
 <li>Compound annotations obtained with <code>SIRIUS+CSI:FingerID</code>.</li>
 <li>Compound annotations obtained with other algorithms, e.g. <code>MetFrag</code>.</li>
@@ -387,7 +387,7 @@ div.csl-indent {
 <span id="cb276-2"><a href="pred.html#cb276-2" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp)</span>
 <span id="cb276-3"><a href="pred.html#cb276-3" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">calculateTox</span>(fGroupsSuspTox)</span>
 <span id="cb276-4"><a href="pred.html#cb276-4" tabindex="-1"></a></span>
-<span id="cb276-5"><a href="pred.html#cb276-5" tabindex="-1"></a><span class="co"># Calculate toxicity for compound hits. Limit to the top 5 to limit calculation time.</span></span>
+<span id="cb276-5"><a href="pred.html#cb276-5" tabindex="-1"></a><span class="co"># Calculate toxicity for compound hits. Limit to the top 5 to reduce calculation time.</span></span>
 <span id="cb276-6"><a href="pred.html#cb276-6" tabindex="-1"></a>compoundsTop5 <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">topMost =</span> <span class="dv">5</span>)</span>
 <span id="cb276-7"><a href="pred.html#cb276-7" tabindex="-1"></a>compoundsTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(compoundsTop5)</span>
 <span id="cb276-8"><a href="pred.html#cb276-8" tabindex="-1"></a>fGroupsTox <span class="ot">&lt;-</span> <span class="fu">calculateTox</span>(fGroups, compoundsTox)</span></code></pre></div>
@@ -967,31 +967,35 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 2:  M137_R249_53 314718.38   compound
 #&gt; 3:  M146_R309_68  49051.68   compound
 #&gt; 4: M192_R355_191 114064.57   compound</code></pre>
+<p>If the <code>as.data.table()</code> method is used on suspect screening results, and predictions were performed directly for suspect hits, then predicted values can be reported for individual suspect match instead of aggregating them per feature group:</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="pred.html#cb299-1" tabindex="-1"></a><span class="co"># Reports predicted values for each suspect separately. If multiple suspects are assigned to a feature group,</span></span>
+<span id="cb299-2"><a href="pred.html#cb299-2" tabindex="-1"></a><span class="co"># then each suspect match is split into a different row. </span></span>
+<span id="cb299-3"><a href="pred.html#cb299-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspTox, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <p>Finally, the <a href="report.html#report">reporting functionality</a> can be used to overview all predicted values, both aggregated and raw.</p>
 </div>
 <div id="using-predicted-values-to-prioritize-data" class="section level3 hasAnchor" number="8.10.5">
 <h3><span class="header-section-number">8.10.5</span> Using predicted values to prioritize data<a href="pred.html#using-predicted-values-to-prioritize-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>filter()</code> method function that was <a href="filtering.html#filtering">introduced before</a> can also be used to filter data based on predicted toxicities, response factors and concentrations. For instance, this allows you to remove annotation candidates which are unlikely to be toxic or sensitive enough to be detected or any features with very low concentrations. Some examples are shown below.</p>
-<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="pred.html#cb299-1" tabindex="-1"></a><span class="co"># compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate</span></span>
-<span id="cb299-2"><a href="pred.html#cb299-2" tabindex="-1"></a><span class="co"># we can use the common scoreLimits filter to select a range of allowed values (min/max)</span></span>
-<span id="cb299-3"><a href="pred.html#cb299-3" tabindex="-1"></a>compoundsSuspSIRToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsSuspSIRTox, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">LC50_SMILES =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1E4</span>)))</span>
-<span id="cb299-4"><a href="pred.html#cb299-4" tabindex="-1"></a></span>
-<span id="cb299-5"><a href="pred.html#cb299-5" tabindex="-1"></a><span class="co"># for suspects with predicted toxicities/response factors there are dedicated filters</span></span>
-<span id="cb299-6"><a href="pred.html#cb299-6" tabindex="-1"></a>fGroupsSuspConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSuspConc, <span class="at">minRF =</span> <span class="fl">5E4</span>) <span class="co"># remove suspect hits with response factor &lt;5E4</span></span>
-<span id="cb299-7"><a href="pred.html#cb299-7" tabindex="-1"></a>fGroupsSuspToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(ffGroupsSuspTox, <span class="at">maxLC50 =</span> <span class="dv">100</span>) <span class="co"># remove suspect hits with LC50 values &gt; 100</span></span>
-<span id="cb299-8"><a href="pred.html#cb299-8" tabindex="-1"></a></span>
-<span id="cb299-9"><a href="pred.html#cb299-9" tabindex="-1"></a><span class="co"># similarly, for feature data there are dedicated filters.</span></span>
-<span id="cb299-10"><a href="pred.html#cb299-10" tabindex="-1"></a><span class="co"># note that these aggregate data prior to filtering (see previous section)</span></span>
-<span id="cb299-11"><a href="pred.html#cb299-11" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>)</span>
-<span id="cb299-12"><a href="pred.html#cb299-12" tabindex="-1"></a><span class="co"># only keep features with concentrations that are at least 1% of their toxicity</span></span>
-<span id="cb299-13"><a href="pred.html#cb299-13" tabindex="-1"></a><span class="co"># note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()</span></span>
-<span id="cb299-14"><a href="pred.html#cb299-14" tabindex="-1"></a>fGroupsConcToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConcTox, <span class="at">absMinConcTox =</span> <span class="fl">0.01</span>)</span>
-<span id="cb299-15"><a href="pred.html#cb299-15" tabindex="-1"></a></span>
-<span id="cb299-16"><a href="pred.html#cb299-16" tabindex="-1"></a><span class="co"># also get rid of features without concentrations (these are ignored by default)</span></span>
-<span id="cb299-17"><a href="pred.html#cb299-17" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>, <span class="at">removeNA =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb299-18"><a href="pred.html#cb299-18" tabindex="-1"></a><span class="co"># like as.data.table we can configure how values are aggregated</span></span>
-<span id="cb299-19"><a href="pred.html#cb299-19" tabindex="-1"></a><span class="co"># here the minimum is used instead of the default mean</span></span>
-<span id="cb299-20"><a href="pred.html#cb299-20" tabindex="-1"></a>fGroupsToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsTox, <span class="at">absMaxTox =</span> <span class="fl">5E3</span>, <span class="at">predAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(min))</span></code></pre></div>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="pred.html#cb300-1" tabindex="-1"></a><span class="co"># compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate</span></span>
+<span id="cb300-2"><a href="pred.html#cb300-2" tabindex="-1"></a><span class="co"># we can use the common scoreLimits filter to select a range of allowed values (min/max)</span></span>
+<span id="cb300-3"><a href="pred.html#cb300-3" tabindex="-1"></a>compoundsSuspSIRToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsSuspSIRTox, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">LC50_SMILES =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1E4</span>)))</span>
+<span id="cb300-4"><a href="pred.html#cb300-4" tabindex="-1"></a></span>
+<span id="cb300-5"><a href="pred.html#cb300-5" tabindex="-1"></a><span class="co"># for suspects with predicted toxicities/response factors there are dedicated filters</span></span>
+<span id="cb300-6"><a href="pred.html#cb300-6" tabindex="-1"></a>fGroupsSuspConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSuspConc, <span class="at">minRF =</span> <span class="fl">5E4</span>) <span class="co"># remove suspect hits with response factor &lt;5E4</span></span>
+<span id="cb300-7"><a href="pred.html#cb300-7" tabindex="-1"></a>fGroupsSuspToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(ffGroupsSuspTox, <span class="at">maxLC50 =</span> <span class="dv">100</span>) <span class="co"># remove suspect hits with LC50 values &gt; 100</span></span>
+<span id="cb300-8"><a href="pred.html#cb300-8" tabindex="-1"></a></span>
+<span id="cb300-9"><a href="pred.html#cb300-9" tabindex="-1"></a><span class="co"># similarly, for feature data there are dedicated filters.</span></span>
+<span id="cb300-10"><a href="pred.html#cb300-10" tabindex="-1"></a><span class="co"># note that these aggregate data prior to filtering (see previous section)</span></span>
+<span id="cb300-11"><a href="pred.html#cb300-11" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>)</span>
+<span id="cb300-12"><a href="pred.html#cb300-12" tabindex="-1"></a><span class="co"># only keep features with concentrations that are at least 1% of their toxicity</span></span>
+<span id="cb300-13"><a href="pred.html#cb300-13" tabindex="-1"></a><span class="co"># note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()</span></span>
+<span id="cb300-14"><a href="pred.html#cb300-14" tabindex="-1"></a>fGroupsConcToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConcTox, <span class="at">absMinConcTox =</span> <span class="fl">0.01</span>)</span>
+<span id="cb300-15"><a href="pred.html#cb300-15" tabindex="-1"></a></span>
+<span id="cb300-16"><a href="pred.html#cb300-16" tabindex="-1"></a><span class="co"># also get rid of features without concentrations (these are ignored by default)</span></span>
+<span id="cb300-17"><a href="pred.html#cb300-17" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>, <span class="at">removeNA =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb300-18"><a href="pred.html#cb300-18" tabindex="-1"></a><span class="co"># like as.data.table we can configure how values are aggregated</span></span>
+<span id="cb300-19"><a href="pred.html#cb300-19" tabindex="-1"></a><span class="co"># here the minimum is used instead of the default mean</span></span>
+<span id="cb300-20"><a href="pred.html#cb300-20" tabindex="-1"></a>fGroupsToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsTox, <span class="at">absMaxTox =</span> <span class="fl">5E3</span>, <span class="at">predAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(min))</span></code></pre></div>
 <p>More details are found in the reference manual (<code>?`feature-filtering`</code>).</p>
 </div>
 </div>

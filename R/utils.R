@@ -668,7 +668,7 @@ writeYAML <- function(...) yaml::write_yaml(..., indent = 4)
 getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
 {
     if (length(mConsNames) > 0)
-        targetCols <- c(targetCols, paste0(targetCols, "-", mConsNames))
+        targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames), USE.NAMES = FALSE))
     return(intersect(targetCols, allCols))
 }
 

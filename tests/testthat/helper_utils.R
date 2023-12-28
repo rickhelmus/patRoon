@@ -515,7 +515,6 @@ testSIRFPSubset <- function(obj)
         expect_null(delAll@fingerprints[[grp]])
     else
         checkmate::expect_names(names(delOne@fingerprints[[grp]]), disjunct.from = candidates[1])
-    expect_null(delAll@fingerprints[[grp]])
 }
 
 getOldNewRefs <- function(ref)

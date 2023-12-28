@@ -594,14 +594,20 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized,
     if (nrow(gTable) == 0)
         return()
 
+    doAvg <- function(v) { if (any(v > 0)) func(v[v > 0]) else 0 }
+    
     gNames <- names(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-
-    gTable[, sgroup := anaInfo[[by]]]
-
-    gTable[, (gNames) := lapply(.SD, function(v) { if (any(v > 0)) func(v[v>0]) else 0 }), by = sgroup, .SDcols = gNames]
-    gTable <- unique(gTable, by = "sgroup")
-    gTable[, sgroup := NULL]
+    
+    if (by == ".all")
+        gTable <- gTable[, lapply(.SD, doAvg)]
+    else
+    {
+        gTable[, sgroup := analysisInfo(fGroups)[[by]]]
+        gTable[, (gNames) := lapply(.SD, doAvg), by = sgroup, .SDcols = gNames]
+        gTable <- unique(gTable, by = "sgroup")
+        gTable[, sgroup := NULL]
+    }
+    
 
     return(gTable[])
 })

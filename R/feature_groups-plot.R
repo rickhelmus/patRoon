@@ -636,7 +636,7 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, average = TRU
                       checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
-    average <- assertAndPrepareAnaInfoAverage(average, anaInfo, add = ac)
+    average <- assertAndPrepareAnaInfoBy(average, anaInfo, FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
     groups <- unique(anaInfo[[average]])
@@ -699,7 +699,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, average = TR
                       checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
-    average <- assertAndPrepareAnaInfoAverage(average, anaInfo, add = ac)
+    average <- assertAndPrepareAnaInfoBy(average, anaInfo, FALSE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)

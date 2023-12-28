@@ -149,11 +149,15 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     return(x)
 }
 
-assertAndPrepareAnaInfoAverage <- function(x, anaInfo, .var.name = checkmate::vname(x), add = NULL)
+assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroup, .var.name = checkmate::vname(x), add = NULL)
 {
+    ch <- names(anaInfo)
+    if (withFGroup)
+        ch <- c(ch, ".all")
+    
     checkmate::assert(
         checkmate::checkFlag(x),
-        checkmate::checkChoice(x, names(anaInfo)),
+        checkmate::checkChoice(x, ch),
         .var.name = .var.name, add = add
     )
     if (isTRUE(x))

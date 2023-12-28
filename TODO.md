@@ -10,6 +10,7 @@
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
+        - either of these is preferred, as annSimBoth now needs separate specSimParams to annotateSuspects
 - anaInfo
     - fGroups/feat subset
         - deprecate rGroups subset/filter param?
@@ -18,14 +19,24 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - as.data.table()
-        - re-add condition that regression must be F if features==T&&average==T? If not, add to NEWS
-        - finish average changes and fix adding pred data for features==T&&average!=FALSE
-        - fix: properly merge in non-suspect pred results with collapseSuspects=NULL
-            - merge concs/tox with by="group"
-            - filter if collapseSuspects=NULL: is.na(susp_name) | is.na(candidate_name) | susp_name == candidate_name
+        - ensure that regressionBy/average combination works well: all rBy values should be assigned equally between average groups 
+        - avoid duplicate column names for intensities (eg if values from average_group clash)
+            - always prefix? will break quite a bit...
+            - auto prefix? bit inconsistent
+            - or check upfront and give error if there are clashes
+            - or let the user choose
+        - don't rename replicate_group from average_group?
+            - then don't add it separately for average==F
+        - also keep regression_group?
+        - features==T && average!=F: also collapse adduct? or just always take group adduct and rename column to group_adduct?
+        - include ion mz column for sets workflow?
+            - split columns per set if features==F?
+            - also if averaging with features==T? or only if average!="group"? or add ion_mz column in features?
+    - FC: select multiple groups and/or anaInfo cols?
 
 - tests
     - IDL filter
+    - annSim: jaccard (as was done for suspects)
     
 - docs
     - specSimParams --> specSimParamsMatch
@@ -43,7 +54,9 @@
         - nsets can be NULL
     - as.data.table()
         - average arg
+            - different for features==T&&average==T
         - regressionBy arg
+            - mention that "set" can be used for sets workflows
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
 
 - NEWS
@@ -59,8 +72,12 @@
         - nsets can be/defaults to NULL
     - as.data.table()
         - average arg
+            - .all replaces average==T if features==T and also supports features==F
         - regressionBy arg
         - regression for features==F&&average==T: use average conc instead of first of each replicate
+        - FC now possible with features==T
+        - adduct column now split for features
+    - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
 
 ## Ext
 

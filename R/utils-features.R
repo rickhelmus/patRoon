@@ -366,10 +366,9 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         featTab <- as.data.table(getFeatures(fGroups))
         
-        if (isFALSE(average))
-            ret <- removeDTColumnsIfPresent(ret, "adduct") # remove this and take feature specific adduct column
-        else
-            featTab <- removeDTColumnsIfPresent(featTab, "adduct") # vice versa if averaging 
+        # remove adduct column from sets data: the fGroup adduct is already present, and adducts are assigned per
+        # group/set anyway
+        featTab <- removeDTColumnsIfPresent(featTab, "adduct")
         
         # if feature qualities/scores are present, then they are already available in featTab. Hence
         # 1. remove them if they should _not_ be reported

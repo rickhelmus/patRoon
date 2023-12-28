@@ -28,7 +28,7 @@
         - don't rename replicate_group from average_group?
             - then don't add it separately for average==F
         - also keep regression_group?
-        - features==T && average!=F: also collapse adduct? or just always take group adduct and rename column to group_adduct?
+        - rename adduct column to group_adduct? other columns? or document somewhere what is feature (group) specific?
         - include ion mz column for sets workflow?
             - split columns per set if features==F?
             - also if averaging with features==T? or only if average!="group"? or add ion_mz column in features?

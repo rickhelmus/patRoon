@@ -27,7 +27,6 @@
             - or let the user choose
         - don't rename replicate_group from average_group?
             - then don't add it separately for average==F
-        - also keep regression_group?
         - rename adduct column to group_adduct? other columns? or document somewhere what is feature (group) specific?
         - include ion mz column for sets workflow?
             - split columns per set if features==F?
@@ -37,6 +36,8 @@
 - tests
     - IDL filter
     - annSim: jaccard (as was done for suspects)
+    - as.data.table()
+        - changed/new average, regression, regressionBy args
     
 - docs
     - specSimParams --> specSimParamsMatch
@@ -58,6 +59,7 @@
         - regressionBy arg
             - mention that "set" can be used for sets workflows
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
+        - updates for changed regression arg and conc_reg --> x_reg
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -77,6 +79,7 @@
         - regression for features==F&&average==T: use average conc instead of first of each replicate
         - FC now possible with features==T
         - adduct column now split for features
+        - updates for changed regression arg and conc_reg --> x_reg
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
 
 ## Ext

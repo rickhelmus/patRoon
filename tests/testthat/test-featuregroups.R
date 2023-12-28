@@ -196,14 +196,14 @@ test_that("as.data.table works", {
     
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
 
-    expect_warning(as.data.table(fgOpenMS, regression = TRUE)) # no conc specified
+    expect_error(as.data.table(fgOpenMS, regression = TRUE)) # no conc specified
     checkmate::expect_names(names(regr), must.include = "RSQ")
     checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, regression = TRUE)),
                             must.include = "RSQ")
     checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, average = TRUE,
                                                 regression = TRUE)), must.include = "RSQ")
-    expect_true(all(is.na(regr$conc) | is.na(regr$conc_reg) | is.na(regr$RSQ) | regr$RSQ < 0.9 |
-                        abs(regr$conc - regr$conc_reg) < 0.5)) # calculated concentrations should be somewhat close
+    expect_true(all(is.na(regr$x_reg) | is.na(regr$x_reg) | is.na(regr$RSQ) | regr$RSQ < 0.9 |
+                        abs(regr$x_reg - regr$x_reg) < 0.5)) # calculated x values should be somewhat close
 
     checkmate::expect_names(names(fctbl), must.include = c("FC", "FC_log", "PV", "PV_log", "classification"))
     checkmate::expect_subset(fctbl$classification, c("insignificant", "FC", "increase", "decrease", "significant"))

@@ -116,12 +116,12 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
 
 getFeatureRegressionCols <- function() c("RSQ", "intercept", "slope", "p")
 
-calcFeatureRegression <- function(concs, ints)
+calcFeatureRegression <- function(xvec, ints)
 {
     NARet <- setNames(as.list(rep(NA_real_, 4)), getFeatureRegressionCols())
     
-    notna <- !is.na(concs)
-    if (!any(notna) || length(concs) == 1)
+    notna <- !is.na(xvec)
+    if (!any(notna) || length(xvec) == 1)
         return(NARet)
     
     ints <- ints[notna]
@@ -129,7 +129,7 @@ calcFeatureRegression <- function(concs, ints)
     if (all(is.na(ints)))
         return(NARet)
     
-    suppressWarnings(reg <- summary(lm(ints ~ concs[notna])))
+    suppressWarnings(reg <- summary(lm(ints ~ xvec[notna])))
     slope <- pv <- NA_real_
     if (nrow(reg[["coefficients"]]) > 1)
     {
@@ -148,28 +148,26 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                             onlyHits = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
+    if (isTRUE(regression))
+        regression <- "conc" # legacy
     
     assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
                             FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
     averageBy <- assertAndPrepareAnaInfoBy(average, anaInfo, TRUE)
-    checkmate::assertChoice(regressionBy, names(anaInfo), null.ok = TRUE)
     
     if (length(fGroups) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
     
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
-    doConc <- regression && !is.null(anaInfo[["conc"]]) && sum(!is.na(anaInfo[["conc"]]) > 1) && averageBy != ".all"
+    doRegr <- !isFALSE(regression) && sum(!is.na(anaInfo[[regression]]) > 1) && averageBy != ".all"
     addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && hasFGroupScores(fGroups)
     addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(fGroups)
     
-    if (regression)
+    if (!isFALSE(regression))
     {
-        if (is.null(anaInfo[["conc"]]))
-            warning("No regression information specified in the analysis information (i.e. conc column, see ?`analysis-information`)",
-                    call. = FALSE)
         if (averageBy == ".all")
-            warning("Cannot perform regression if averageBy=\".all\"", call. = FALSE)
+            stop("Cannot perform regression if averageBy=\".all\"", call. = FALSE)
     }
     
     if (normalized)
@@ -183,13 +181,13 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     ret <- transpose(gTable)
     intColNames <- if (averageBy == ".all") "intensity" else unique(anaInfo[[averageBy]])
     setnames(ret, intColNames)
-    doConc <- doConc && length(intColNames) > 1
-    if (doConc)
+    doRegr <- doRegr && length(intColNames) > 1
+    if (doRegr)
     {
         if (is.null(regressionBy))
         {
-            concs <- anaInfo[, mean(conc), by = averageBy][[2]]
-            regr <- sapply(gTable, calcFeatureRegression, concs = concs, simplify = FALSE)
+            xvec <- anaInfo[, mean(get(regression)), by = averageBy][[2]]
+            regr <- sapply(gTable, calcFeatureRegression, xvec = xvec, simplify = FALSE)
             ret <- cbind(ret, rbindlist(regr))
         }
         else
@@ -197,11 +195,11 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             for (rb in unique(anaInfo[[regressionBy]]))
             {
                 rbAnaInfo <- anaInfo[get(regressionBy) == rb]
-                rbConcs <- rbAnaInfo[, mean(conc), by = averageBy][[2]] # average concs if needed
+                rbxvec <- rbAnaInfo[, mean(get(regression)), by = averageBy][[2]] # average concs if needed
                 rbIntCols <- unique(rbAnaInfo[[averageBy]])
                 rbRows <- match(rbIntCols, intColNames)
                 
-                regr <- sapply(gTable[rbRows], calcFeatureRegression, concs = rbConcs, simplify = FALSE)
+                regr <- sapply(gTable[rbRows], calcFeatureRegression, xvec = rbxvec, simplify = FALSE)
                 regr <- rbindlist(regr)
                 setnames(regr, paste0(names(regr), "_", rb))
                 ret <- cbind(ret, regr)
@@ -429,7 +427,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         # fixup merged table
 
-        if (doConc)
+        if (doRegr)
         {
             if (!is.null(regressionBy))
             {
@@ -445,7 +443,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                                   names(ret), value = TRUE)
                 ret[, (regByCols) := NULL]
             }
-            ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
+            ret[, x_reg := (intensity - intercept) / slope] # y = ax+b
         }
 
         # set nice column order
@@ -453,7 +451,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         colord <- c("group", "set", "average_group", "analysis", "replicate_group", "group_ret", "group_mz",
                     "ID", "ret", "mz", "intensity", "area", "intensity_rel", "area_rel")
         colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
-        colord <- c(colord, "adduct", "neutralMass", "conc_reg", getFeatureRegressionCols(), featureQualityNames(),
+        colord <- c(colord, "adduct", "neutralMass", "x_reg", getFeatureRegressionCols(), featureQualityNames(),
                     featureQualityNames(scores = TRUE))
         setcolorder(ret, intersect(colord, names(ret)))
         

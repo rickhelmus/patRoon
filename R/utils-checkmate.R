@@ -86,13 +86,6 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     assertListVal(x, "blank", checkmate::assertCharacter, any.missing = TRUE, .var.name = .var.name, add = add)
 
     checkmate::assert(
-        checkmate::checkNull(x[["conc"]]),
-        checkmate::checkCharacter(x[["conc"]]),
-        checkmate::checkNumeric(x[["conc"]]),
-        .var.name = sprintf("%s[[\"conc\"]]", .var.name)
-    )
-
-    checkmate::assert(
         checkmate::checkNull(x[["norm_conc"]]),
         checkmate::checkCharacter(x[["norm_conc"]]),
         checkmate::checkNumeric(x[["norm_conc"]]),
@@ -139,8 +132,6 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
             setnames(x, "ref", "blank")
         }
         
-        if (!is.null(x[["conc"]]))
-            x[, conc := as.numeric(conc)]
         if (!is.null(x[["norm_conc"]]))
             x[, norm_conc := as.numeric(norm_conc)]
         x[is.na(blank), blank := ""]
@@ -432,20 +423,33 @@ assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regress
                                     normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects,
                                     onlyHits)
 {
+    anaInfo <- analysisInfo(fGroups)
+    
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ areas + features + regression + normalized + normConcToTox,
+    aapply(checkmate::assertFlag, . ~ areas + features + normalized + normConcToTox,
            fixed = list(add = ac))
-    checkmate::assertString(regressionBy, na.ok = FALSE, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assert(
+        checkmate::checkFALSE(qualities),
+        checkmate::checkChoice(qualities, c("quality", "score", "both")),
+        .var.name = "qualities", add = ac
+    )
+    checkmate::assert(
+        checkmate::checkFALSE(regression),
+        checkmate::checkChoice(regression, names(anaInfo)),
+        .var.name = "regression", add = ac
+    )
+    if (is.character(regression))
+    {
+        checkmate::assertNumeric(anaInfo[[regression]],
+                                 .var.name = sprintf("analysisInfo(fGroups)[[\"%s\"]]", regression), add = ac)
+    }
+    checkmate::assertChoice(regressionBy, names(anaInfo), null.ok = TRUE, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
     assertFCParams(FCParams, fGroups, null.ok = TRUE, add = ac)
     aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
-    
-    checkmate::assert(checkmate::checkFALSE(qualities),
-                      checkmate::checkChoice(qualities, c("quality", "score", "both")),
-                      .var.name = "qualities")
 }
 
 assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate::vname(x), add = NULL)

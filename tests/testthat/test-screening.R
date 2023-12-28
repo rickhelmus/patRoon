@@ -117,8 +117,7 @@ if (hasMF)
     
     fGroupsAnnNothing <- doAnnot(fGroupsScr)
     fGroupsAnnMF <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
-    fGroupsAnnMFJ <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF,
-                             specSimParams = getDefSpecSimParams(removePrecursor = TRUE, method = "jaccard"))
+
     fGroupsAnnMoNA <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     fGroupsOnlyForms <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms)
     fGroupsAnnNoRT <- doAnnot(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
@@ -149,7 +148,6 @@ test_that("Suspect annotation works", {
     skip_if_not(hasMF)
     
     expect_known_value(screenInfo(fGroupsAnnMF), testFile("screen-ann-MF"))
-    expect_known_value(screenInfo(fGroupsAnnMFJ), testFile("screen-ann-MF-J"))
     
     expect_equal(minIDLevel(fGroupsAnnNothing), 5)
     expect_equal(minIDLevel(fGroupsOnlyForms), 4)

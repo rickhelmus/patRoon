@@ -144,15 +144,16 @@ calcFeatureRegression <- function(xvec, ints)
 doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = FALSE, qualities = FALSE,
                             regression = FALSE, regressionBy = NULL, averageFunc = mean, normalized = FALSE,
                             FCParams = NULL, concAggrParams = getDefPredAggrParams(),
-                            toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE, collapseSuspects = ",",
-                            onlyHits = FALSE)
+                            toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE, anaInfoCols = NULL,
+                            collapseSuspects = ",", onlyHits = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
     if (isTRUE(regression))
         regression <- "conc" # legacy
     
     assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
-                            FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects, onlyHits)
+                            FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols, collapseSuspects,
+                            onlyHits)
     averageBy <- assertAndPrepareAnaInfoBy(average, anaInfo, TRUE)
     
     if (length(fGroups) == 0)
@@ -180,6 +181,22 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                 }
             }
         }
+    }
+    
+    if (length(anaInfoCols) > 0)
+    {
+        if (!features)
+            warning("The anaInfoCols argument is only supported if features = TRUE", call. = FALSE)
+        else if (!isFALSE(average))
+        {
+            notNum <- which(!sapply(anaInfo[, anaInfoCols, with = FALSE], is.numeric))
+            if (length(notNum) > 0)
+            {
+                stop("Cannot average because the following columns from anaInfoCols are not numeric: ",
+                     paste0(names(notNum), collapse = ", "), call. = FALSE)
+            }
+        }
+            
     }
     
     if (normalized)
@@ -477,6 +494,17 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         else
             setorderv(ret, "gorder")
         ret <- removeDTColumnsIfPresent(ret, c("gorder", "aorder"))
+        
+        if (length(anaInfoCols) > 0)
+        {
+            ai <- anaInfo[, c(averageBy, anaInfoCols), with = FALSE]
+            if (!isFALSE(average))
+                ai[, (anaInfoCols) := lapply(.SD, averageFunc), .SDcols = anaInfoCols, by = averageBy]
+            ai <- unique(ai, by = averageBy)
+            ai <- ai[match(ret$average_group, get(averageBy))][, (averageBy) := NULL]
+            anaInfoCols <- paste0("anaInfo_", anaInfoCols)
+            ret[, (anaInfoCols) := ai]
+        }
         
         if (averageBy == "analysis") # no averaging
             ret[, average_group := NULL] # no need for this

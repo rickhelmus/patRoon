@@ -420,8 +420,8 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
 }
 
 assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, regressionBy, averageFunc,
-                                    normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, collapseSuspects,
-                                    onlyHits)
+                                    normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols,
+                                    collapseSuspects, onlyHits)
 {
     anaInfo <- analysisInfo(fGroups)
     
@@ -447,6 +447,7 @@ assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regress
     checkmate::assertFunction(averageFunc, add = ac)
     assertFCParams(FCParams, fGroups, null.ok = TRUE, add = ac)
     aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertSubset(anaInfoCols, names(anaInfo), empty.ok = TRUE, add = ac)
     checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)

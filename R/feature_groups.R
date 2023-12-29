@@ -697,10 +697,11 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                                                      qualities = FALSE, regression = FALSE, regressionBy = NULL,
                                                      averageFunc = mean, normalized = FALSE, FCParams = NULL,
                                                      concAggrParams = getDefPredAggrParams(),
-                                                     toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE)
+                                                     toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE,
+                                                     anaInfoCols = NULL)
 {
     return(doFGAsDataTable(x, average, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
-                           FCParams, concAggrParams, toxAggrParams, normConcToTox))
+                           FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols))
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

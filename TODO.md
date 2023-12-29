@@ -33,9 +33,6 @@
             - rename to group_adduct with features==T
             - split for sets instead of collapsing (to be consistent with ion_mz)?
             - add feature specific adducts if present
-        - add specific columns from anaInfo?
-            - prefix to avoid potential duplicates?
-            - only if average==F? Or check if numeric?
     - FC: select multiple groups and/or anaInfo cols?
 
 - tests
@@ -67,6 +64,8 @@
             - mention that regressionBy values for average groups should be equal
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
         - updates for changed regression arg and conc_reg --> x_reg
+        - anaInfoCols arg
+            - only works with features==T and cols must be numeric if average==T
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -87,6 +86,7 @@
         - FC now possible with features==T
         - adduct column now split for features
         - updates for changed regression arg and conc_reg --> x_reg
+        - anaInfoCols arg
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
 
 ## Ext

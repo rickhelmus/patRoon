@@ -432,10 +432,10 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             if (!is.null(regressionBy))
             {
                 # combine split regression columns
-                ret[, (getFeatureRegressionCols()) := {
+                ret[, (c(getFeatureRegressionCols(), "regressionBy")) := {
                     # get corresponding regressionBy value from average group
                     rb <- anaInfo[get(averageBy) == average_group][[regressionBy]][1]
-                    mget(paste0(getFeatureRegressionCols(), "_", rb))
+                    c(mget(paste0(getFeatureRegressionCols(), "_", rb)), rb)
                 }, by = "average_group"]
                 # remove specific regression columns
                 regByCols <- grep(sprintf("^(%s)_(%s)$", paste0(getFeatureRegressionCols(), collapse = "|"),
@@ -451,8 +451,8 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         colord <- c("group", "set", "average_group", "analysis", "replicate_group", "group_ret", "group_mz",
                     "ID", "ret", "mz", "intensity", "area", "intensity_rel", "area_rel")
         colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
-        colord <- c(colord, "adduct", "neutralMass", "x_reg", getFeatureRegressionCols(), featureQualityNames(),
-                    featureQualityNames(scores = TRUE))
+        colord <- c(colord, "adduct", "neutralMass", "x_reg", getFeatureRegressionCols(), "regressionBy",
+                    featureQualityNames(), featureQualityNames(scores = TRUE))
         setcolorder(ret, intersect(colord, names(ret)))
         
         # restore order

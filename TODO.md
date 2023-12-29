@@ -25,12 +25,17 @@
             - auto prefix? bit inconsistent
             - or check upfront and give error if there are clashes
             - or let the user choose
-        - don't rename replicate_group from average_group?
-            - then don't add it separately for average==F
-        - rename adduct column to group_adduct? other columns? or document somewhere what is feature (group) specific?
         - include ion mz column for sets workflow?
             - split columns per set if features==F?
             - also if averaging with features==T? or only if average!="group"? or add ion_mz column in features?
+            --> add ion_mz in features and set specific ion_mz columns in fGroups@annotations
+        - adduct column
+            - rename to group_adduct with features==T
+            - split for sets instead of collapsing (to be consistent with ion_mz)?
+            - add feature specific adducts if present
+        - add specific columns from anaInfo?
+            - prefix to avoid potential duplicates?
+            - only if average==F? Or check if numeric?
     - FC: select multiple groups and/or anaInfo cols?
 
 - tests

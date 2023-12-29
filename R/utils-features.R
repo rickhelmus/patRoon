@@ -460,7 +460,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
 
         # set nice column order
         qualCols <- c(featureQualityNames(), featureQualityNames(scores = TRUE))
-        colord <- c("group", "set", "average_group", "analysis", "replicate_group", "group_ret", "group_mz",
+        colord <- c("group", "set", "analysis", "average_group", "replicate_group", "group_ret", "group_mz",
                     "ID", "ret", "mz", "intensity", "area", "intensity_rel", "area_rel")
         colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
         colord <- c(colord, "adduct", "neutralMass", "x_reg", getFeatureRegressionCols(), "regression_group",
@@ -480,8 +480,6 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         
         if (averageBy == "analysis") # no averaging
             ret[, average_group := NULL] # no need for this
-        else if (averageBy == "group")
-            setnames(ret, "average_group", "replicate_group") # UNDONE: or keep?
     }
     
     return(ret[])

@@ -20,7 +20,6 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - as.data.table()
-        - ensure that regressionBy/average combination works well: all rBy values should be assigned equally between average groups 
         - avoid duplicate column names for intensities (eg if values from average_group clash)
             - always prefix? will break quite a bit...
             - auto prefix? bit inconsistent
@@ -60,6 +59,7 @@
         - regressionBy arg
             - mention that "set" can be used for sets workflows
             - regressionBy column with features=T
+            - mention that regressionBy values for average groups should be equal
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
         - updates for changed regression arg and conc_reg --> x_reg
 

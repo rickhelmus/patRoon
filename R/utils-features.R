@@ -168,6 +168,18 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     {
         if (averageBy == ".all")
             stop("Cannot perform regression if averageBy=\".all\"", call. = FALSE)
+        if (!is.null(regressionBy) && !isFALSE(average))
+        {
+            for (ag in unique(anaInfo[[averageBy]]))
+            {
+                rbs <- unique(anaInfo[group == ag][[regressionBy]])
+                if (!allSame(rbs))
+                {
+                    stop(sprintf("The regressionBy values for the average group '%s' are not all equal: %s", ag,
+                                 paste0(rbs, collapse = ", ")), call. = FALSE)
+                }
+            }
+        }
     }
     
     if (normalized)

@@ -7,6 +7,7 @@
 
 ## TC
 
+- annotations slot with sets workflows: update eg if features of one set are all removed
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
@@ -58,6 +59,7 @@
             - different for features==T&&average==T
         - regressionBy arg
             - mention that "set" can be used for sets workflows
+            - regressionBy column with features=T
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
         - updates for changed regression arg and conc_reg --> x_reg
 

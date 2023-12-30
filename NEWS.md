@@ -1,3 +1,7 @@
+# DEVEL
+
+* Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)
+
 # patRoon 2.3.1
 
 When updating to this release, it **is important** to remove any cached data, i.e. by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.

@@ -521,7 +521,7 @@ as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
 ```
 
 ```{r quantDTDo,echo=FALSE,eval=runData}
-as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)[, c("group", "conc", "RSQ", "intercept", "slope", "conc_reg")]
+as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)[, c("group", "RSQ", "intercept", "slope", "x_reg")]
 ```
 
 The calculated experimental conditions are stored in the `conc_reg` column (this column is only present if `features=TRUE`). In addition, the table also contains other regression data such as `RSQ`, `intercept` and `slope`. To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:
@@ -597,8 +597,8 @@ calibrants[, SMILES := patRoonData::suspectsPos[match(name, patRoonData::suspect
 calibrants[, rt := patRoonData::suspectsPos[match(name, patRoonData::suspectsPos$name), "rt"]]
 fgScr <- screenSuspects(fGroups, calibrants, onlyHits = TRUE, adduct = "[M+H]+")
 fgTab <- as.data.table(fgScr, average = TRUE, collapseSuspects = NULL)
-calibrants <- merge(calibrants, fgTab[, c("susp_name", "standard-pos"), with = FALSE], by.x = "name", by.y = "susp_name")
-setnames(calibrants, "standard-pos", "intensity")
+calibrants <- merge(calibrants, fgTab[, c("susp_name", patRoon:::getADTIntCols("standard-pos")), with = FALSE], by.x = "name", by.y = "susp_name")
+setnames(calibrants, getADTIntCols("standard-pos"), "intensity")
 withr::with_seed(1, calibrants[, intensity := round(runif(.N, 0.9, 1.1) * (intensity / 20 * conc))])
 setcolorder(calibrants, c("name", "SMILES", "intensity", "conc"))
 makeTable(calibrants)

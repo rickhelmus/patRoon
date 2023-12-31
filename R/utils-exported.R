@@ -503,10 +503,13 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     intCols <- if (average)
         concRGs
     else
-        unlist(lapply(concRGs, function(rg) anaInfo[anaInfo$group == rg, "analysis"]))
+        unlist(lapply(concRGs, function(rg) anaInfo[group == rg]$analysis))
+    intCols <- getADTIntCols(intCols)
     ret <- merge(ret, tab[, c("susp_name", intCols), with = FALSE], by.x = "name", by.y = "susp_name")
-    ret <- melt(ret, measure.vars = intCols, variable.name = if (average) "rGroup" else "analysis",
-                value.name = "intensity")
+    
+    vname <- if (average) "rGroup" else "analysis"
+    ret <- melt(ret, measure.vars = intCols, variable.name = vname, value.name = "intensity")
+    ret[, (vname) := stripADTIntSuffix(get(vname))]
     
     if (!average)
         ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]

@@ -186,12 +186,13 @@ fctbl <- as.data.table(fgOpenMS, FCParams = FCParams)
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
-    checkmate::expect_names(names(as.data.table(fgOpenMS, average = TRUE)), must.include = replicateGroups(fgOpenMS))
+    checkmate::expect_names(names(as.data.table(fgOpenMS, average = TRUE)),
+                            must.include = getADTIntCols(replicateGroups(fgOpenMS)))
     
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
     # check if area from first group of first analysis corresponds to its feature data
-    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[analyses(fgOpenMS)[1]]][11],
+    expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[getADTIntCols(analyses(fgOpenMS)[1])]][11],
                  featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(11, 1)]]])
     
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
@@ -253,7 +254,7 @@ minInt <- function(fg, rel)
 }
 featCounts <- function(fg, rel)
 {
-    counts <- unlist(as.data.table(fg)[, lapply(.SD, function(x) sum(x > 0)), .SDcols = analyses(fg)])
+    counts <- unlist(as.data.table(fg)[, lapply(.SD, function(x) sum(x > 0)), .SDcols = getADTIntCols(analyses(fg))])
     return(if (rel) counts / length(fg) else counts)
 }
 

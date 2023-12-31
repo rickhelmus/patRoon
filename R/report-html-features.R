@@ -8,7 +8,8 @@ roundFGTab <- function(ftab, fGroups)
     for (col in names(ftab)[(sapply(ftab, is.numeric))])
         set(ftab, j = col, value = round(ftab[[col]],
                                          if (col %in% c("mz", "neutralMass", "susp_d_mz")) 5 else 2))
-    ftab[, (replicateGroups(fGroups)) := lapply(.SD, round, 0), .SDcols = replicateGroups(fGroups)]
+    intCols <- getADTIntCols(replicateGroups(fGroups))
+    ftab[, (intCols) := lapply(.SD, round, 0), .SDcols = intCols]
     return(ftab)    
 }
 
@@ -19,8 +20,9 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
     if (isScreening(fGroups))
         adtArgs <- c(adtArgs, list(collapseSuspects = colSusp))
     tab <- do.call(as.data.table, adtArgs)
-    tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", replicateGroups(fGroups), "adduct", "neutralMass",
-                                           paste0(replicateGroups(fGroups), "_conc"), "conc_types", "LC50", "LC50_types",
+    tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", getADTIntCols(replicateGroups(fGroups)),
+                                           "adduct", "neutralMass", paste0(replicateGroups(fGroups), "_conc"),
+                                           "conc_types", "LC50", "LC50_types",
                                            paste0("susp_", c("name", "estIDLevel", "d_rt", "d_mz", "sets", "InChIKey")),
                                            featureQualityNames(scores = TRUE),
                                            grep("^ISTD_assigned", names(tab), value = TRUE)))
@@ -127,7 +129,7 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
                                          headerStyle = colSepStyle)
         # may still be suspects, but collapsed
         else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
-        reactable::colGroup("intensity", columns = rgs, headerStyle = colSepStyle),
+        reactable::colGroup("intensity", columns = getADTIntCols(rgs), headerStyle = colSepStyle),
         if (length(concCols) > 0) reactable::colGroup("concentrations", columns = concCols, headerStyle = colSepStyle) else NULL,
         if (!is.null(tab[["LC50"]])) reactable::colGroup("toxicity", columns = c("LC50", "LC50_types"),
                                                          headerStyle = colSepStyle) else NULL,

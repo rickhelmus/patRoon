@@ -114,7 +114,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
             names(labPch) <- labels
             
             # get averaged intensities for each rGroup and omit initial name/rt/mz columns
-            gTable <- as.data.table(x, average = TRUE)[, replicateGroups(x), with = FALSE]
+            gTable <- as.data.table(x, average = TRUE)[, getADTIntCols(replicateGroups(x)), with = FALSE]
             
             for (r in seq_len(nrow(gTable)))
             {
@@ -260,7 +260,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     {
         if (sn1 == sn2)
             return(0)
-        return(sum(groupTab[[sn1]] > 0 & groupTab[[sn2]] > 0))
+        return(sum(groupTab[[getADTIntCols(sn1)]] > 0 & groupTab[[getADTIntCols(sn2)]] > 0))
     }
     
     chordTable[, value := mapply(getLinkScore, from, to)]
@@ -330,7 +330,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     {
         retMz <- rbindlist(sapply(unique(cdf$rn), function(sn)
         {
-            ftgrps <- groupTab[get(sn) > 0]$group
+            ftgrps <- groupTab[get(getADTIntCols(sn)) > 0]$group
             return(gInfo[ftgrps, ])
         }, simplify = FALSE), idcol = "sname")
         retMz$rts <- retMz$rts / max(retMz$rts) # normalize
@@ -717,10 +717,10 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, average = TR
     obj <- obj[anaInfo[get(average) %in% which]$analysis]
 
     gt <- as.data.table(obj, average = average)
-    gt <- gt[, which, with = FALSE] # isolate relevant columns
-    gt[, (which) := lapply(.SD, function(x) as.integer(x > 0))]
+    gt <- gt[, getADTIntCols(which), with = FALSE] # isolate relevant columns
+    gt[, (names(gt)) := lapply(.SD, function(x) as.integer(x > 0))]
     
-    if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
+    if (sum(sapply(gt, function(x) any(x > 0))) < 2)
         stop("Need at least two groups with non-zero intensities", call. = FALSE)
     
     if (is.null(nsets))

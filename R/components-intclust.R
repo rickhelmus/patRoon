@@ -171,7 +171,8 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
 
     cat("Obtaining feature quantities... ")
     gTable <- as.data.table(fGroups, average = average, normalized = normalized)
-    clusterm <- as.matrix(gTable[, anas, with = FALSE])
+    clusterm <- as.matrix(gTable[, getADTIntCols(anas), with = FALSE])
+    colnames(clusterm) <- stripADTIntSuffix(anas)
     rownames(clusterm) <- names(fGroups)
     cat("Done!\n")
 

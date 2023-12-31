@@ -114,6 +114,8 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     return(ret)
 }
 
+getADTIntCols <- function(wh) paste0(wh, "_intensity")
+stripADTIntSuffix <- function(cols) sub("_intensity$", "", cols)
 getFeatureRegressionCols <- function() c("RSQ", "intercept", "slope", "p")
 
 calcFeatureRegression <- function(xvec, ints)
@@ -164,7 +166,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     doRegr <- !isFALSE(regression) && sum(!is.na(anaInfo[[regression]]) > 1) && averageBy != ".all"
     addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && hasFGroupScores(fGroups)
     addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(fGroups)
-    
+
     if (!isFALSE(regression))
     {
         if (averageBy == ".all")
@@ -208,7 +210,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         averageGroups(fGroups, areas, normalized, by = averageBy, func = averageFunc)
     
     ret <- transpose(gTable)
-    intColNames <- if (averageBy == ".all") "intensity" else unique(anaInfo[[averageBy]])
+    intColNames <- if (averageBy == ".all") "intensity" else getADTIntCols(unique(anaInfo[[averageBy]]))
     setnames(ret, intColNames)
     doRegr <- doRegr && length(intColNames) > 1
     if (doRegr)
@@ -224,8 +226,8 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             for (rb in unique(anaInfo[[regressionBy]]))
             {
                 rbAnaInfo <- anaInfo[get(regressionBy) == rb]
-                rbxvec <- rbAnaInfo[, mean(get(regression)), by = averageBy][[2]] # average concs if needed
-                rbIntCols <- unique(rbAnaInfo[[averageBy]])
+                rbxvec <- rbAnaInfo[, mean(get(regression)), by = averageBy][[2]] # average x values if needed
+                rbIntCols <- getADTIntCols(unique(rbAnaInfo[[averageBy]]))
                 rbRows <- match(rbIntCols, intColNames)
                 
                 regr <- sapply(gTable[rbRows], calcFeatureRegression, xvec = rbxvec, simplify = FALSE)
@@ -438,7 +440,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             # want the raw feature intensity data.
             mCols <- list(intensity = intColNames)
             if (!is.null(concAggrParams) && nrow(concentrations(fGroups)) > 0)
-                mCols <- c(mCols, list(conc = paste0(intColNames, "_conc")))
+                mCols <- c(mCols, list(conc = paste0(stripADTIntSuffix(intColNames), "_conc")))
             ret <- melt(ret, measure.vars = mCols, variable.name = "average_group", variable.factor = FALSE,
                         value.name = "intensity")
             ret <- ret[intensity != 0]
@@ -447,6 +449,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                 # DT changes the analyses names to (character) indices with >1 measure vars: https://github.com/Rdatatable/data.table/issues/4047
                 ret[, average_group := intColNames[as.integer(average_group)]]
             }
+            ret[, average_group := stripADTIntSuffix(average_group)]
         }
         ret <- removeDTColumnsIfPresent(ret, "intensity")
         setnames(ret, c("ret", "mz"), c("group_ret", "group_mz"))

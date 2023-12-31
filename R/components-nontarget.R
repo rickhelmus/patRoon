@@ -170,7 +170,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     
     homList <- sapply(rGroups, function(rg)
     {
-        gt <- groupTablesRG[[rg]][, c("mz", rg, "ret"), with = FALSE] # convert to nontarget peaklist format
+        gt <- groupTablesRG[[rg]][, c("mz", getADTIntCols(rg), "ret"), with = FALSE] # convert to nontarget peaklist format
         
         if (is.null(gt))
             return(NULL) # rep group doesn't have feature groups
@@ -335,7 +335,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
             if (!is.null(grp))
                 return(data.table(rt = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"], group = grp,
                                   hsnr = match(grp, allGroups), rGroup = rg,
-                                  intensity = groupTablesRG[[rg]][group %in% grp, get(rg)]))
+                                  intensity = groupTablesRG[[rg]][group %in% grp, get(getADTIntCols(rg))]))
             return(NULL)
         }), fill = TRUE)
         setorderv(ret, c("hsnr"))

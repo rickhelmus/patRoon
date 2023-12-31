@@ -482,7 +482,7 @@ doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, ty
     }
     
     snames <- if (average) replicateGroups(obj) else analyses(obj)
-    tab <- transpose(as.data.table(obj, average = average, normalized = normalized)[, snames, with = FALSE])
+    tab <- transpose(as.data.table(obj, average = average, normalized = normalized)[, getADTIntCols(snames), with = FALSE])
     
     if (doSets)
     {

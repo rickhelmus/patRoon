@@ -284,7 +284,7 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
                     
                     if (by == "intensity")
                     {
-                        gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
+                        gTab[, avgInts := rowMeans(.SD), .SDcol = getADTIntCols(analyses(obj))]
                         gTab <- gTab[, keep := doKeep(avgInts, !negate), by = byCol]
                     }
                     else # select by best hit

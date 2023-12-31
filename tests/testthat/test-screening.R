@@ -184,10 +184,10 @@ test_that("Screen filters", {
     
     # mean intensities should be increased when selecting a group for this suspect
     expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
-                                                                                    analyses(fGroupsAnnNoRT),
+                                                                                    getADTIntCols(analyses(fGroupsAnnNoRT)),
                                                                                     with = FALSE])),
               mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
-                                                                                     analyses(selectedHitsInt),
+                                                                                     getADTIntCols(analyses(selectedHitsInt)),
                                                                                      with = FALSE])))
     expect_gt(maxIDLevel(fGroupsAnnNoRT[, suspects = "2-Hydroxyquinoline"]),
               maxIDLevel(selectedHitsLev[, suspects = "2-Hydroxyquinoline"]))
@@ -225,10 +225,10 @@ test_that("Negated screen filters", {
     
     # as above, but opposite
     expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
-                                                                                    analyses(fGroupsAnnNoRT),
+                                                                                    getADTIntCols(analyses(fGroupsAnnNoRT)),
                                                                                     with = FALSE])),
               mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
-                                                                                        analyses(selectedNegHitsInt),
+                                                                                        getADTIntCols(analyses(selectedNegHitsInt)),
                                                                                         with = FALSE])))
     expect_lt(minIDLevel(fGroupsAnnNoRT[, suspects = "2-Hydroxyquinoline"]),
               minIDLevel(selectedNegHitsLev[, suspects = "2-Hydroxyquinoline"]))

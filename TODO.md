@@ -20,11 +20,6 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - as.data.table()
-        - avoid duplicate column names for intensities (eg if values from average_group clash)
-            - always prefix? will break quite a bit...
-            - auto prefix? bit inconsistent
-            - or check upfront and give error if there are clashes
-            - or let the user choose
         - include ion mz column for sets workflow?
             - split columns per set if features==F?
             - also if averaging with features==T? or only if average!="group"? or add ion_mz column in features?
@@ -87,6 +82,8 @@
         - adduct column now split for features
         - updates for changed regression arg and conc_reg --> x_reg
         - anaInfoCols arg
+        - intensity cols are suffixed
+            - clarify that same columns are used for areas?
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
 
 ## Ext

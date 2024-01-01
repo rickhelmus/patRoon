@@ -100,7 +100,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 
             forms <- patRoon:::addMiscFormulaInfo(forms, adduct)
             
-            forms[, rank := NULL]
+            forms <- removeDTColumnsIfPresent(forms, "rank")
             
             # Precursor is always present in MS/MS spectrum: it's added by SIRIUS if necessarily (with zero intensity).
             # Remove it and use its mz to get ion_formula_mz

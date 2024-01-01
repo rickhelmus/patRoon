@@ -8,8 +8,8 @@ getSiriusBin <- function()
 
 isSIRIUS5 <- function()
 {
-    out <- executeCommand(patRoon:::getExtDepPath("sirius"), "--version", stdout = TRUE)
-    return(any(grepl("^(SIRIUS 5\\.)", out)))
+    out <- executeCommand(patRoon:::getExtDepPath("sirius"), "--version", stdout = TRUE, stderr = TRUE)
+    return(any(grepl("SIRIUS 5\\.", out)))
 }
 
 getSIRIUSCmpName <- function() "unknownCompound"

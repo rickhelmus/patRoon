@@ -23,8 +23,6 @@ neutralizeFeatures <- function(feat, adduct)
         {
             if (!is.null(adduct))
                 fTab[, adduct := adductChar]
-            else
-                fTab[, adduct := fTab$adduct]
             
             nm <- calculateMasses(fTab$mz, if (!is.null(adduct)) adduct else allAdducts[fTab$adduct], type = "neutral")
             nmd <- fTab$mz - nm

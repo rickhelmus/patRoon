@@ -14,6 +14,7 @@
 * Updated PubChem Transformations to 0.2.0
 * Replaced the `featuresSets` method for `groupFeatures` with (updated) `featuresSets` algorithm specific `groupFeatures` methods (`groupFeaturesOpenMS` etc), so that the latter can be called directly in sets workflows (#128)
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
+* Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 
 
 # patRoon 2.3.3

@@ -15,6 +15,7 @@
     - added `getFeatureQualityNames()` generic to obtain the quality/score names for a `features`/`featureGroups` object
     - added `featureQualities` and `featureGroupQualities` arguments to `calculatePeakQualities()` methods to customize calculation.
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
+* Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 
 
 # patRoon 2.3.4

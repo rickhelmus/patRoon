@@ -3,6 +3,7 @@
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
 * Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
+* Fixed: `as.data.table()` method for `features`: properly handle empty objects
 
 
 # patRoon 2.3.2

@@ -100,6 +100,8 @@ setMethod("show", "featuresSet", function(object)
 setMethod("as.data.table", "featuresSet", function(x)
 {
     ret <- callNextMethod(x)
+    if (length(ret) == 0) # null table if no features
+        return(ret)
     anaInfo <- analysisInfo(x)
     ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
     setcolorder(ret, "set")

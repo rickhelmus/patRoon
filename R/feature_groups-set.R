@@ -148,11 +148,14 @@ setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
     {
         obj@annotations <- ann[set %in% sets(obj)]
 
-        # only keep group results that are still present within the set        
-        featSet <- split(as.data.table(getFeatures(obj)), by = "set")
-        featSet <- sapply(featSet, "[[", "group", simplify = FALSE)
-        for (s in sets(obj))
-            obj@annotations <- obj@annotations[set != s | group %chin% featSet[[s]]]
+        if (nrow(obj@annotations) > 0)
+        {
+            # only keep group results that are still present within the set        
+            featSet <- split(as.data.table(getFeatures(obj)), by = "set")
+            featSet <- sapply(featSet, "[[", "group", simplify = FALSE)
+            for (s in sets(obj))
+                obj@annotations <- obj@annotations[set != s | group %chin% featSet[[s]]]
+        }
     }
     if (length(ISTDAssign) > 0)
         obj@ISTDAssignments <- lapply(ISTDAssign, function(ia) ia[names(ia) %chin% names(obj)])

@@ -7,7 +7,6 @@
 
 ## TC
 
-- annotations slot with sets workflows: update eg if features of one set are all removed
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?

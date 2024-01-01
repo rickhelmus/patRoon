@@ -100,7 +100,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 
             forms <- patRoon:::addMiscFormulaInfo(forms, adduct)
             
-            forms[, rank := NULL]
+            forms <- removeDTColumnsIfPresent(forms, "rank")
             
             forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
             {

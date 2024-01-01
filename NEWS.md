@@ -12,6 +12,7 @@
 * Small fixes in example code from the Handbook (reported by Boris Droz and Jan Specker)
 * Changed cache for filtering of feature groups to reduce cache size (#98)
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
+* Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 
 
 # patRoon 2.3.3

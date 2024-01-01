@@ -205,7 +205,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         groupDefs <- addToGroupDefs(groupDefs, "feature", cols)
     }
     
-    if (any(c("MSPeakLists", "formulas", "compounds") %in% names(objects)))
+    if (any(c("MSPeakLists", "formulas", "compounds") %in% names(pruneList(objects))))
     {
         tab[, annotations := group]
         tab[, hasMSMS := sapply(group, function(g) !is.null(objects$MSPeakLists) &&

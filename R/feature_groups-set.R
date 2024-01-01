@@ -508,9 +508,8 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     ann <- copy(annotations(obj))
     if (nrow(gInfo) > 0)
     {
-        adducts <- sapply(unique(ann$adduct), as.adduct)
-        gInfo$mzs <- calculateMasses(gInfo$mzs, adducts[ann$adduct], type = "mz")
-        ann <- ann[, -"set"]
+        gInfo$mzs <- ann[match(rownames(gInfo), group)]$ion_mz
+        ann <- ann[, -c("set", "ion_mz")]
     }
     ISTDs <- copy(internalStandards(obj))
     if (nrow(ISTDs) > 0)

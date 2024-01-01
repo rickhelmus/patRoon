@@ -291,14 +291,19 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     {
         if (isFGSet(fGroups))
         {
-            # collapse annotation info for each group
-            annTable <- copy(annTable)
-            annTable[, adduct := paste0(adduct, collapse = ","), by = "group"]
-            annTable <- unique(annTable, by = "group")[, -"set"]
-            ret <- merge(ret, annTable, by = "group", sort = FALSE)
+            # split adduct/ion_mz into set specific columns
+            annTable <- dcast(annTable, group + neutralMass ~ set, value.var = c("adduct", "ion_mz"), sep = "-",
+                              drop = c(TRUE, FALSE))
+            
+            # in case a set doesn't have any features then it will have no columns --> add them manually
+            missingSets <- setdiff(sets(fGroups), annotations(fGroups)$set)
+            for (ms in missingSets)
+                set(annTable, j = c(paste0("adduct-", ms), paste0("ion_mz-", ms)), value = list(NA_character_, NA_real_))
+            
+            # fixup order
+            setcolorder(annTable, c("group", paste0("ion_mz-", sets(fGroups)), paste0("adduct-", sets(fGroups))))
         }
-        else
-            ret <- merge(ret, annTable, by = "group", sort = FALSE)
+        ret <- merge(ret, annTable, by = "group", sort = FALSE)
     }
     
     ISTDAssign <- internalStandardAssignments(fGroups)
@@ -453,6 +458,9 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         }
         ret <- removeDTColumnsIfPresent(ret, "intensity")
         setnames(ret, c("ret", "mz"), c("group_ret", "group_mz"))
+        annCols <- grep("^(neutralMass|ion_mz|adduct)", names(ret), value = TRUE)
+        if (length(annCols) > 0)
+            setnames(ret, annCols, paste0("group_", annCols))
         
         # merge
         ret <- merge(ret, featTab, by = by, sort = FALSE)
@@ -481,10 +489,11 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         # set nice column order
         qualCols <- c(featureQualityNames(), featureQualityNames(scores = TRUE))
         colord <- c("group", "set", "analysis", "average_group", "replicate_group", "group_ret", "group_mz",
-                    "ID", "ret", "mz", "intensity", "area", "intensity_rel", "area_rel")
+                    "ID", "ret", "mz", "ion_mz", "intensity", "area", "intensity_rel", "area_rel")
         colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
-        colord <- c(colord, "adduct", "neutralMass", "x_reg", getFeatureRegressionCols(), "regression_group",
-                    featureQualityNames(), featureQualityNames(scores = TRUE))
+        colord <- c(colord, grep("group_(ion_mz|adduct)", names(ret), value = TRUE), "neutralMass", "x_reg",
+                    getFeatureRegressionCols(), "regression_group", featureQualityNames(),
+                    featureQualityNames(scores = TRUE))
         setcolorder(ret, intersect(colord, names(ret)))
         
         # restore order
@@ -574,6 +583,8 @@ getAnnotationsFromSetFeatures <- function(fGroups)
             return(data.table(group = grps, adduct = firstFeats$adduct))
         }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
         ret[, neutralMass := groupInfo(fGroups)[ret$group, "mzs"]]
+        adducts <- sapply(unique(ret$adduct), as.adduct)
+        ret[, ion_mz := calculateMasses(neutralMass, adducts[adduct], type = "mz")]
     }
     else
         ret <- data.table()

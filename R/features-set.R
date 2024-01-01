@@ -18,7 +18,7 @@ neutralizeFeatures <- function(feat, adduct)
         fTab <- copy(fTab)
         
         if (nrow(fTab) == 0)
-            fTab[, adduct := character()]
+            fTab[, c("adduct", "ion_mz") := .(character(), numeric())]
         else
         {
             if (!is.null(adduct))
@@ -27,9 +27,11 @@ neutralizeFeatures <- function(feat, adduct)
             nm <- calculateMasses(fTab$mz, if (!is.null(adduct)) adduct else allAdducts[fTab$adduct], type = "neutral")
             nmd <- fTab$mz - nm
             
+            fTab[, ion_mz := mz]
             fTab[, mz := nm]
             fTab[, mzmin := mzmin - nmd]
             fTab[, mzmax := mzmax - nmd]
+            fTab <- moveDTColumn(fTab, "ion_mz", "mz")
         }
         
         return(fTab)
@@ -180,22 +182,19 @@ setMethod("unset", "featuresSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     
-    allAdductsChar <- unique(unlist(lapply(obj@features, "[[", "adduct")))
-    allAdducts <- sapply(allAdductsChar, as.adduct)
-    
     ionizedFTable <- lapply(featureTable(obj), function(ft)
     {
         ft <- copy(ft)
         
         if (nrow(ft) > 0)
         {
-            mzs <- calculateMasses(ft$mz, allAdducts[ft$adduct], type = "mz")
+            mzs <- ft$ion_mz
             nmd <- mzs - ft$mz
             set(ft, j = c("mz", "mzmin", "mzmax"),
                 value = list(mzs, ft$mzmin + nmd, ft$mzmax + nmd))
         }
         
-        ft[, adduct := NULL] # UNDONE: keep?
+        ft[, c("adduct", "ion_mz") := NULL]
         
         return(ft[])
     })

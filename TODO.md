@@ -20,14 +20,7 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - as.data.table()
-        - include ion mz column for sets workflow?
-            - split columns per set if features==F?
-            - also if averaging with features==T? or only if average!="group"? or add ion_mz column in features?
-            --> add ion_mz in features and set specific ion_mz columns in fGroups@annotations
-        - adduct column
-            - rename to group_adduct with features==T
-            - split for sets instead of collapsing (to be consistent with ion_mz)?
-            - add feature specific adducts if present
+        - move/split code
     - FC: select multiple groups and/or anaInfo cols?
 
 - tests
@@ -84,7 +77,10 @@
         - anaInfoCols arg
         - intensity cols are suffixed
             - clarify that same columns are used for areas?
+        - adduct column: now split per set and renamed to group_adduct
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
+    - sets features: ion_mz column
+    - sets fGroups: ion_mz column in @annotations
 
 ## Ext
 

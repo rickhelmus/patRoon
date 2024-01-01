@@ -66,15 +66,17 @@ mkdirp <- function(path)
     }
 }
 
-moveLastDTColumn <- function(dt, before)
+moveDTColumn <- function(dt, col, after)
 {
-    if (before < ncol(dt))
+    curcolind <- match(col, names(dt))
+    targetcolind <- match(after, names(dt)) + 1
+    if (targetcolind != curcolind)
     {
         dt <- copy(dt)
-        
-        ind <- if (before > 1) seq_len(before - 1) else NULL
-        ind <- append(ind, c(ncol(dt), seq(before, ncol(dt) - 1)))
-        setcolorder(dt, ind)
+        inds <- seq_len(targetcolind - 1)
+        inds <- setdiff(inds, curcolind)
+        inds <- append(inds, curcolind)
+        setcolorder(dt, inds)
     }
 
     return(dt)

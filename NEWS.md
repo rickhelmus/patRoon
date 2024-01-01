@@ -1,6 +1,7 @@
 # DEVEL
 
 * Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)
+* Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
 
 # patRoon 2.3.1
 

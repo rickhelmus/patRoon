@@ -7,7 +7,7 @@ roundFGTab <- function(ftab, fGroups)
     ftab <- copy(ftab)
     for (col in names(ftab)[(sapply(ftab, is.numeric))])
         set(ftab, j = col, value = round(ftab[[col]],
-                                         if (col %in% c("mz", "neutralMass", "susp_d_mz")) 5 else 2))
+                                         if (grepl("^(mz|neutralMass|ion_mz|susp_d_mz)", col)) 5 else 2))
     intCols <- getADTIntCols(replicateGroups(fGroups))
     ftab[, (intCols) := lapply(.SD, round, 0), .SDcols = intCols]
     return(ftab)    
@@ -21,7 +21,8 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
         adtArgs <- c(adtArgs, list(collapseSuspects = colSusp))
     tab <- do.call(as.data.table, adtArgs)
     tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", getADTIntCols(replicateGroups(fGroups)),
-                                           "adduct", "neutralMass", paste0(replicateGroups(fGroups), "_conc"),
+                                           grep("^(adduct|neutralMass|ion_mz)", names(tab), value = TRUE),
+                                           paste0(replicateGroups(fGroups), "_conc"),
                                            "conc_types", "LC50", "LC50_types",
                                            paste0("susp_", c("name", "estIDLevel", "d_rt", "d_mz", "sets", "InChIKey")),
                                            featureQualityNames(scores = TRUE),
@@ -51,6 +52,15 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
             tab[, ISTD_assigned := sapply(ISTD_assigned, wrapISTDs)]
     }
     
+    if (isFGSet(fGroups))
+    {
+        # collapse adduct and ion_mz columns
+        combCols <- function(x) { x <- x[!is.na(x)]; return(if (length(x) == 0) "" else paste0(x, collapse = ", ")) }
+        tab[, adduct := combCols(unlist(.SD)), .SDcols = paste0("adduct-", sets(fGroups)), by = seq_len(nrow(tab))]
+        tab[, ion_mz := combCols(unlist(.SD)), .SDcols = paste0("ion_mz-", sets(fGroups)), by = seq_len(nrow(tab))]
+        tab[, (grep("^(adduct|ion_mz)\\-", names(tab), value = TRUE)) := NULL]
+    }
+    
     return(tab)
 }
 
@@ -76,6 +86,7 @@ getFeatGroupColDefs <- function(tab)
     }
     
     setCD("mz", "name", "m/z")
+    setCD("ion_mz", "name", "ion m/z")
     if (featGroupTabHasSusps(tab))
         setCD("susp_name", "name", "suspect")
     else
@@ -119,7 +130,7 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
         # NOTE: the first group doesn't have a headerStyle (left border)
         # workaround for stickies: https://github.com/glin/reactable/issues/236#issuecomment-1107911895
         if (isGrouped) reactable::colGroup("", columns = groupBy, sticky = "left") else NULL,
-        reactable::colGroup("feature", columns = intersect(c("group", "ret", "mz", "adduct", "neutralMass",
+        reactable::colGroup("feature", columns = intersect(c("group", "ret", "mz", "ion_mz", "neutralMass", "adduct",
                                                              grep("^ISTD_assigned", names(tab), value = TRUE)),
                                                            names(tab)),
                             headerStyle = if (isGrouped) colSepStyle else NULL),
@@ -504,7 +515,7 @@ reportHTMLUtils$methods(
             tab[, c("ret", "retmin", "retmax") := .(ret / 60, retmin / 60, retmax / 60)]
         
         for (col in names(tab)[sapply(tab, is.numeric)])
-            set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax")) 5 else 2))
+            set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax", "ion_mz")) 5 else 2))
         
         anaInfo <- analysisInfo(objects$fGroups)
         

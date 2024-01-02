@@ -18,8 +18,6 @@
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
-    - as.data.table()
-        - split code
     - FC: select multiple groups and/or anaInfo cols?
 
 - tests

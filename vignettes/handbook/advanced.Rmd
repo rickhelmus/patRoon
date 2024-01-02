@@ -598,7 +598,7 @@ calibrants[, rt := patRoonData::suspectsPos[match(name, patRoonData::suspectsPos
 fgScr <- screenSuspects(fGroups, calibrants, onlyHits = TRUE, adduct = "[M+H]+")
 fgTab <- as.data.table(fgScr, average = TRUE, collapseSuspects = NULL)
 calibrants <- merge(calibrants, fgTab[, c("susp_name", patRoon:::getADTIntCols("standard-pos")), with = FALSE], by.x = "name", by.y = "susp_name")
-setnames(calibrants, getADTIntCols("standard-pos"), "intensity")
+setnames(calibrants, patRoon:::getADTIntCols("standard-pos"), "intensity")
 withr::with_seed(1, calibrants[, intensity := round(runif(.N, 0.9, 1.1) * (intensity / 20 * conc))])
 setcolorder(calibrants, c("name", "SMILES", "intensity", "conc"))
 makeTable(calibrants)

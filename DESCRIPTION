@@ -222,6 +222,7 @@ Collate:
     'feature_groups-optimize-xcms3.R'
     'feature_groups-plot.R'
     'feature_groups-sirius.R'
+    'feature_groups-table.R'
     'feature_groups-tasq.R'
     'feature_groups-xcms.R'
     'feature_groups-xcms3.R'

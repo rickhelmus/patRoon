@@ -673,37 +673,6 @@ setMethod("export", "featureGroups", function(obj, type, out)
     }
 })
 
-#' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
-#'   and optionally other feature data.
-#' @param features If \code{TRUE} then feature specific data will be added. If \code{average=TRUE} this data will be
-#'   averaged for each feature group.
-#' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
-#'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
-#'   \code{qualities=FALSE} then nothing is reported.
-#' @param regression Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
-#'   created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
-#'   (e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
-#'   information}. From this model the intercept, slope and R2 is added to the output. In addition, when
-#'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
-#'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
-#'   (\emph{i.e.} the minimum amount).
-#' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
-#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
-#'   parameters} for more information. Set to \code{NULL} to omit this data.
-#' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
-#'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
-#' @export
-setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE, regressionBy = NULL,
-                                                     averageFunc = mean, normalized = FALSE, FCParams = NULL,
-                                                     concAggrParams = getDefPredAggrParams(),
-                                                     toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE,
-                                                     anaInfoCols = NULL)
-{
-    return(doFGAsDataTable(x, average, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
-                           FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols))
-})
-
 #' @describeIn featureGroups Obtain a subset with unique feature groups
 #'   present in one or more specified replicate group(s).
 #' @param relativeTo A character vector with replicate groups that should be

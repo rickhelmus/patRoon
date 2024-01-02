@@ -215,11 +215,6 @@ setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NUL
     return(obj)
 })
 
-# UNDONE: document that collapseSuspect!=NULL && features==TRUE will give lots of rows (per feature and per suspect)
-#' @rdname featureGroupsScreening-class
-#' @export
-setMethod("as.data.table", "featureGroupsScreeningSet", doFGScrAsDataTable)
-
 #' @rdname featureGroupsScreening-class
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds,

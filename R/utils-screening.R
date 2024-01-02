@@ -338,26 +338,3 @@ annotatedMSMSSimilarity <- function(annPL, specSimParams)
     return(drop(specDistRect(list(annPLAnn), list(annPL), specSimParams$method, "none", 0, 0,
                              specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)))
 }
-
-# method definition for as.data.table, both non-sets and sets
-doFGScrAsDataTable <- function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
-{
-    return(doFGAsDataTable(x, ..., collapseSuspects = collapseSuspects, onlyHits = onlyHits))
-}
-
-mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
-{
-    scrInfo <- copy(scrInfo)
-    setnames(scrInfo, names(scrInfo), paste0("susp_", names(scrInfo))) # add susp_ column prefixes
-    
-    if (!is.null(collapseSuspects))
-    {
-        scrInfo[, susp_name := paste0(susp_name, collapse = collapseSuspects), by = "susp_group"]
-        # only keep unique and remove suspect specific columns
-        scrInfo <- unique(scrInfo[, c("susp_group", "susp_name"), with = FALSE], by = "susp_group")
-    }
-    
-    ret <- merge(tab, scrInfo, by.x = "group", by.y = "susp_group", all.x = !onlyHits, sort = FALSE,
-                 allow.cartesian = is.null(collapseSuspects))
-    return(ret)
-}

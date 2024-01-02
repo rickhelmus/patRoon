@@ -161,32 +161,6 @@ setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, 
     return(obj)
 })
 
-#' @describeIn featureGroupsScreening Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z},
-#'   intensity and optionally other feature data. Furthermore, the output table will be merged with information from
-#'   \code{screenInfo}, such as suspect names and other properties and annotation data.
-#'
-#' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
-#'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
-#'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
-#'   section below for additional details.
-#'
-#' @section {Suspect collapsing}: The \code{as.data.table} method fir \code{featureGroupsScreening} supports an
-#'   additional format where each suspect hit is reported on a separate row (enabled by setting
-#'   \code{collapseSuspects=NULL}). In this format the suspect
-#'   properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect
-#'   collapsing} is enabled (the default) then the regular \code{as.data.table} format is used, and amended with the
-#'   names of all suspects matched to a feature group (separated by the value of the \code{collapseSuspects} argument).
-#'
-#'   Suspect collapsing also influences how calculated feature concentrations/toxicities are reported (\emph{i.e.}
-#'   obtained with \code{\link{calculateConcs}}/\code{\link{calculateTox}}). If these values were directly predicted for
-#'   suspects, \emph{i.e.} by using \code{\link{predictRespFactors}}/\code{\link{predictTox}} on the feature groups
-#'   object, \emph{and} suspects are \emph{not} collapsed, then the calculated concentration/toxicity reported for each
-#'   suspect row is not aggregated and specific for that suspect (unless not available). Hence, this allows you to
-#'   obtain specific concentration/toxicity values for each suspect/feature group pair.
-#'
-#' @export
-setMethod("as.data.table", "featureGroupsScreening", doFGScrAsDataTable)
-
 #' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibrants, eluent, organicModifier, pHAq,

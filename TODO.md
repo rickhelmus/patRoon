@@ -26,7 +26,7 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - as.data.table()
-        - move/split code
+        - split code
     - FC: select multiple groups and/or anaInfo cols?
 
 - tests
@@ -60,6 +60,7 @@
         - updates for changed regression arg and conc_reg --> x_reg
         - anaInfoCols arg
             - only works with features==T and cols must be numeric if average==T
+        - make new page with all as.data.table() methods
 
 - NEWS
     - specSimParamsMatch --> specSimParams

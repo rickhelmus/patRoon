@@ -617,7 +617,6 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized,
         gTable <- unique(gTable, by = "sgroup")
         gTable[, sgroup := NULL]
     }
-    
 
     return(gTable[])
 })

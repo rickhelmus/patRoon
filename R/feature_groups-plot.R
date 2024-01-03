@@ -218,13 +218,16 @@ setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) ma
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, average = FALSE,
+setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, aggregate = FALSE,
                                                  outerGroups = NULL, addIntraOuterGroupLinks = FALSE, ...)
 {
+    anaInfo <- analysisInfo(obj)
+    
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + average + addIntraOuterGroupLinks,
+    aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + addIntraOuterGroupLinks,
            fixed = list(add = ac))
     checkmate::assertCharacter(outerGroups, min.chars = 1, min.len = 2, names = "unique", null.ok = TRUE)
+    aggregateBy <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -234,27 +237,27 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     
     obj <- removeEmptyAnalyses(obj)
     
-    anaInfo <- analysisInfo(obj)
     gInfo <- groupInfo(obj)
     
-    if (average)
-        snames <- unique(anaInfo$group)
-    else
-        snames <- anaInfo$analysis
+    snames <- unique(anaInfo[[aggregateBy]])
     
     if (length(snames) < 2)
-        stop(sprintf("Nothing to compare: need multiple (non-empty) %s!", if (average) "replicate groups" else "analyses"))
-    
+    {
+        stop(sprintf("There are no features to compare among the given %s.",
+                     if (isFALSE(aggregate)) "analyses" else "groups to aggregate"))
+    }
     if (hasOuter && !all(snames %in% names(outerGroups)))
-        stop(sprintf("The following %s have no outerGroups assigned: %s", if (average) "replicate groups" else "analyses",
+    {
+        stop(sprintf("The following are not assigned in outerGroups: %s",
                      paste0(setdiff(snames, names(outerGroups)), collapse = ", ")))
+    }
     
     nsamp <- length(snames)
     
     chordTable <- rbindlist(lapply(seq_along(snames),
                                    function(sni) data.table(from = snames[sni], to = snames[seq(sni, length(snames))])))
     
-    groupTab <- as.data.table(obj, average = average)
+    groupTab <- as.data.table(obj, average = aggregate)
     
     getLinkScore <- function(sn1, sn2)
     {
@@ -267,7 +270,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     
     if (addSelfLinks)
     {
-        gt <- if (average) averageGroups(obj) else groupTable(obj)
+        gt <- if (!isFALSE(aggregate)) averageGroups(obj, by = aggregateBy) else groupTable(obj)
         uniqueLinkCount <- sapply(seq_along(snames),
                                   function(sni) sum(sapply(gt, function(ints) ints[sni] > 0 && all(ints[-sni] == 0))))
         chordTable[from == to, value := uniqueLinkCount[.GRP], by = from]

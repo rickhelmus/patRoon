@@ -36,10 +36,12 @@
         - doc methods (eg add limitations)
         - doc that anaInfo shouldn't be changed by reference?
     - new subset args (ni, reorder, reorder sets)
-    - plotVenn(): average arg
+    - plotVenn(): aggregate arg
     - plotUpSet()
-        - average arg
+        - aggregate arg
         - nsets can be NULL
+    - plotChord()
+        - aggregate arg (replaces average)
     - as.data.table()
         - average arg
             - different for features==T&&average==T
@@ -60,10 +62,12 @@
     - no analysisInfo slot in fGroups anymore
     - analysisInfo()<-
     - feature subsetting: ni and reorder args (also reorder sets)
-    - plotVenn(): average arg
+    - plotVenn(): aggregate arg
     - plotUpSet():
-        - average arg
+        - aggregate arg
         - nsets can be/defaults to NULL
+    - plotChord()
+        - aggregate arg (replaces average)
     - as.data.table()
         - average arg
             - .all replaces average==T if features==T and also supports features==F

@@ -630,7 +630,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 #' 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotVenn", "featureGroups", function(obj, which = NULL, average = TRUE, ...)
+setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = TRUE, ...)
 {
     anaInfo <- analysisInfo(obj)
     
@@ -639,15 +639,15 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, average = TRU
                       checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
-    average <- assertAndPrepareAnaInfoBy(average, anaInfo, FALSE, add = ac)
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
-    groups <- unique(anaInfo[[average]])
+    groups <- unique(anaInfo[[aggregate]])
     
     if (is.null(which))
         which <- groups
 
-    fGroupsList <- lapply(which, function(w) obj[anaInfo[get(average) %in% w]$analysis])
+    fGroupsList <- lapply(which, function(w) obj[anaInfo[get(aggregate) %in% w]$analysis])
     
     if (is.list(which))
     {
@@ -692,7 +692,7 @@ setMethod("plotVennHash", "featureGroups", function(obj, ...)
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, average = TRUE, nsets = NULL,
+setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = TRUE, nsets = NULL,
                                                  nintersects = NA, ...)
 {
     anaInfo <- analysisInfo(obj)
@@ -702,21 +702,21 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, average = TR
                       checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
-    average <- assertAndPrepareAnaInfoBy(average, anaInfo, FALSE, add = ac)
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    groups <- unique(anaInfo[[average]])
+    groups <- unique(anaInfo[[aggregate]])
     if (is.null(which))
         which <- groups
     
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
 
-    obj <- obj[anaInfo[get(average) %in% which]$analysis]
+    obj <- obj[anaInfo[get(aggregate) %in% which]$analysis]
 
-    gt <- as.data.table(obj, average = average)
+    gt <- as.data.table(obj, average = aggregate)
     gt <- gt[, getADTIntCols(which), with = FALSE] # isolate relevant columns
     gt[, (names(gt)) := lapply(.SD, function(x) as.integer(x > 0))]
     

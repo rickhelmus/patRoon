@@ -19,6 +19,8 @@
     - properly handle NA values for custom cols?
     - plotVenn sets method: deprecate sets arg?
     - FC: select multiple groups and/or anaInfo cols?
+    - plotChord/report(): report sets as outer groups? make it optional?
+    - ".all" --> "fGroup"?
 
 - tests
     - IDL filter
@@ -42,6 +44,8 @@
         - nsets can be NULL
     - plotChord()
         - aggregate arg (replaces average)
+        - outerGroups now expects anaInfo column name
+            - also update (incorrect) example in handbook
     - as.data.table()
         - average arg
             - different for features==T&&average==T
@@ -68,6 +72,7 @@
         - nsets can be/defaults to NULL
     - plotChord()
         - aggregate arg (replaces average)
+        - outerGroups now expects anaInfo column name
     - as.data.table()
         - average arg
             - .all replaces average==T if features==T and also supports features==F

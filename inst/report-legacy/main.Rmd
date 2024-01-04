@@ -151,7 +151,7 @@ plot(rmdVars$fGroups, colourBy = "fGroups", showLegend = FALSE, retMin = rmdVars
 `r if (doPlotChord) "### Chord diagram\n"`
 ```{r fig.height=5.5, eval=doPlotChord,out.height="400px"}
 message("Creating chord diagram... ", appendLF = FALSE)
-plotChord(rmdVars$fGroups, average = TRUE)
+plotChord(rmdVars$fGroups, aggregate = TRUE)
 message("Done!")
 ```
 

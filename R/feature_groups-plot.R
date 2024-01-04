@@ -226,14 +226,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + addIntraOuterGroupLinks,
            fixed = list(add = ac))
-    checkmate::assertCharacter(outerGroups, min.chars = 1, min.len = 2, names = "unique", null.ok = TRUE)
     aggregateBy <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
+    checkmate::assertChoice(outerGroups, names(anaInfo), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
-    
-    hasOuter <- !is.null(outerGroups)
     
     obj <- removeEmptyAnalyses(obj)
     
@@ -245,11 +243,6 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     {
         stop(sprintf("There are no features to compare among the given %s.",
                      if (isFALSE(aggregate)) "analyses" else "groups to aggregate"))
-    }
-    if (hasOuter && !all(snames %in% names(outerGroups)))
-    {
-        stop(sprintf("The following are not assigned in outerGroups: %s",
-                     paste0(setdiff(snames, names(outerGroups)), collapse = ", ")))
     }
     
     nsamp <- length(snames)
@@ -276,18 +269,20 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         chordTable[from == to, value := uniqueLinkCount[.GRP], by = from]
     }
     
-    if (hasOuter)
+    if (!is.null(outerGroups))
     {
-        chordTable[, groupFrom := outerGroups[from]]
-        chordTable[, groupTo := outerGroups[to]]
+        getOG <- function(s) anaInfo[match(s, anaInfo[[aggregateBy]])][[outerGroups]]
+        ogLookup <- anaInfo[, .(get(outerGroups), get(aggregateBy))]
+        chordTable[, groupFrom := getOG(from)]
+        chordTable[, groupTo := getOG(to)]
         if (!addIntraOuterGroupLinks)
             chordTable[groupFrom == groupTo & from != to, value := 0] # clear links within same groups (except self links)
         setorder(chordTable, groupFrom)
         
         remainingSN <- unique(unlist(chordTable[value != 0, .(from, to)])) # assigned samples, others will be removed
-        og <- outerGroups[remainingSN] # outer groups assigned to each remaining sample
+        og <- getOG(remainingSN) # outer groups assigned to each remaining sample
         gaps <- rep(1, length(og)) # initialize gaps
-        gaps[cumsum(sapply(unique(og), function(x) length(og[og == x])))] <- 8 # make gap bigger after each outer group
+        gaps[cumsum(sapply(unique(og), function(x) sum(og == x)))] <- 8 # make gap bigger after each outer group
         circlize::circos.par(gap.after = gaps)
     }
     
@@ -295,17 +290,17 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         stop("Did not found any overlap! Nothing to plot.")
     
     tracks <- NULL
-    if (hasOuter)
+    if (!is.null(outerGroups))
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
     if (addRetMzPlots)
         tracks <- c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
     
-    maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
+    maxv <- max(if (!is.null(outerGroups)) chordTable[groupFrom != groupTo, value] else chordTable$value)
     colFunc <- circlize::colorRamp2(maxv * seq(0, 1, 0.25),
                                     c("blue4", "deepskyblue1", "green", "orange", "red"),
                                     transparency = 0.5)
     
-    if (hasOuter && addIntraOuterGroupLinks)
+    if (!is.null(outerGroups) && addIntraOuterGroupLinks)
     {
         colFuncWithin <- circlize::colorRamp2(range(chordTable[groupFrom == groupTo, value]),
                                               c("grey80", "grey60"), transparency = 0.7)
@@ -346,7 +341,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
                                })
     }
     
-    if (hasOuter)
+    if (!is.null(outerGroups))
     {
         finalChordTable <- chordTable[from %in% cdf$rn]
         finalOuterGroups <- unique(finalChordTable$groupFrom)

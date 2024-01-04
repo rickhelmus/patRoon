@@ -792,9 +792,9 @@ fGroups <- fGroupsRG
 ```{r plotComp,eval=runData}
 plotUpSet(fGroups) # compare replicate groups
 plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
-plotChord(fGroups, average = TRUE) # overlap between replicate groups
+plotChord(fGroups, aggregate = TRUE) # overlap between replicate groups
 # compare with custom made groups
-plotChord(fGroups, average = TRUE,
+plotChord(fGroups, aggregate = TRUE,
           outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
 
 # compare GenForm and SIRIUS results

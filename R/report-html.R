@@ -33,7 +33,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     {
         if ("chord" %in% settings$summary && rGroupLenNonEmpty > 2)
         {
-            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, average = TRUE),
+            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, aggregate = TRUE),
                                                      width = 7, height = 7)
         }
         if ("venn" %in% settings$summary && rGroupLen < 6)

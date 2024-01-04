@@ -241,7 +241,7 @@ setMethod("plotUpSet", "featureGroupsComparison", function(obj, which = NULL, ..
 #' @rdname featureGroups-compare
 #' @export
 setMethod("plotChord", "featureGroupsComparison",
-          function(obj, addSelfLinks, addRetMzPlots, ...) plotChord(obj@comparedFGroups, addSelfLinks, addRetMzPlots, average = TRUE, ...))
+          function(obj, addSelfLinks, addRetMzPlots, ...) plotChord(obj@comparedFGroups, addSelfLinks, addRetMzPlots, aggregate = TRUE, ...))
 
 #' @details \code{consensus} combines all compared feature groups and averages their retention, \emph{m/z} and intensity
 #'   data. Not yet supported for \link[=sets-workflow]{sets workflows}.

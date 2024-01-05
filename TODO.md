@@ -51,7 +51,7 @@
         - nsets can be NULL
     - plotChord()
         - aggregate arg (replaces average)
-        - outerGroups now expects anaInfo column name
+        - outerGroups --> groupBy and now expects anaInfo column name
             - also update (incorrect) example in handbook
     - as.data.table()
         - average arg
@@ -79,7 +79,7 @@
         - nsets can be/defaults to NULL
     - plotChord()
         - aggregate arg (replaces average)
-        - outerGroups now expects anaInfo column name
+        - outerGroups --> groupBy and now expects anaInfo column name
     - as.data.table()
         - average arg
             - .all replaces average==T if features==T and also supports features==F

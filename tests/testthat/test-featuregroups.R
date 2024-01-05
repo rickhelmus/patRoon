@@ -482,7 +482,7 @@ test_that("plotting works", {
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
-    expect_doppel("chord-outer", function() plotChord(fgOpenMS, outerGroups = "group"))
+    expect_doppel("chord-outer", function() plotChord(fgOpenMS, groupBy = "group"))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
     expect_error(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                            aggregate = TRUE)) # stops with nothing to plot: no overlap
@@ -625,7 +625,7 @@ test_that("sets functionality", {
     
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, sets = TRUE))
     
-    expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, outerGroups = "set"))
+    expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
     
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))

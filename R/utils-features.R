@@ -9,6 +9,19 @@ showAnaInfo <- function(anaInfo)
     printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
+checkAnaInfoAggrGrouping <- function(anaInfo, what, aggrBy, groupBy)
+{
+    for (ag in unique(anaInfo[[aggrBy]]))
+    {
+        ai <- anaInfo[get(aggrBy) == ag]
+        if (uniqueN(ai[[groupBy]]) > 1)
+        {
+            stop(sprintf("The following analyses will be %s but do not have the same value set for the '%s' column in the analysis information:\n%s",
+                         what, groupBy, paste0(sprintf("%s: %s", ai$analysis, ai[[groupBy]]), collapse = "\n")), call. = FALSE)
+        }
+    }
+}
+
 doSubsetFeaturesByAna <- function(obj, i, ni, reorder)
 {
     if (!missing(ni))

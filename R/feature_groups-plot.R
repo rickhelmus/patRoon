@@ -271,6 +271,8 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     
     if (!is.null(outerGroups))
     {
+        checkAnaInfoAggrGrouping(anaInfo, "aggregated", aggregateBy, outerGroups)
+        
         getOG <- function(s) anaInfo[match(s, anaInfo[[aggregateBy]])][[outerGroups]]
         ogLookup <- anaInfo[, .(get(outerGroups), get(aggregateBy))]
         chordTable[, groupFrom := getOG(from)]

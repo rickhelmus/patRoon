@@ -219,7 +219,7 @@ setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) ma
 #' @rdname feature-plotting
 #' @export
 setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, aggregate = FALSE,
-                                                 outerGroups = NULL, addIntraOuterGroupLinks = FALSE, ...)
+                                                 groupBy = NULL, addIntraOuterGroupLinks = FALSE, ...)
 {
     anaInfo <- analysisInfo(obj)
     
@@ -227,7 +227,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + addIntraOuterGroupLinks,
            fixed = list(add = ac))
     aggregateBy <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
-    checkmate::assertChoice(outerGroups, names(anaInfo), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupBy, names(anaInfo), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -269,12 +269,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         chordTable[from == to, value := uniqueLinkCount[.GRP], by = from]
     }
     
-    if (!is.null(outerGroups))
+    if (!is.null(groupBy))
     {
-        checkAnaInfoAggrGrouping(anaInfo, "aggregated", aggregateBy, outerGroups)
+        checkAnaInfoAggrGrouping(anaInfo, "aggregated", aggregateBy, groupBy)
         
-        getOG <- function(s) anaInfo[match(s, anaInfo[[aggregateBy]])][[outerGroups]]
-        ogLookup <- anaInfo[, .(get(outerGroups), get(aggregateBy))]
+        getOG <- function(s) anaInfo[match(s, anaInfo[[aggregateBy]])][[groupBy]]
+        ogLookup <- anaInfo[, .(get(groupBy), get(aggregateBy))]
         chordTable[, groupFrom := getOG(from)]
         chordTable[, groupTo := getOG(to)]
         if (!addIntraOuterGroupLinks)
@@ -292,17 +292,17 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         stop("Did not found any overlap! Nothing to plot.")
     
     tracks <- NULL
-    if (!is.null(outerGroups))
+    if (!is.null(groupBy))
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
     if (addRetMzPlots)
         tracks <- c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
     
-    maxv <- max(if (!is.null(outerGroups)) chordTable[groupFrom != groupTo, value] else chordTable$value)
+    maxv <- max(if (!is.null(groupBy)) chordTable[groupFrom != groupTo, value] else chordTable$value)
     colFunc <- circlize::colorRamp2(maxv * seq(0, 1, 0.25),
                                     c("blue4", "deepskyblue1", "green", "orange", "red"),
                                     transparency = 0.5)
     
-    if (!is.null(outerGroups) && addIntraOuterGroupLinks)
+    if (!is.null(groupBy) && addIntraOuterGroupLinks)
     {
         colFuncWithin <- circlize::colorRamp2(range(chordTable[groupFrom == groupTo, value]),
                                               c("grey80", "grey60"), transparency = 0.7)
@@ -343,7 +343,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
                                })
     }
     
-    if (!is.null(outerGroups))
+    if (!is.null(groupBy))
     {
         finalChordTable <- chordTable[from %in% cdf$rn]
         finalOuterGroups <- unique(finalChordTable$groupFrom)

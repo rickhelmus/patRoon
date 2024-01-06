@@ -241,7 +241,7 @@ head(groupInfo(fGroups))
 Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all feature groups:
 
 ```{r plotChroms,fig.width=7}
-plotChroms(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
+plotChroms(fGroups, groupBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
            EICParams = getDefEICParams(topMost = 1), showLegend = FALSE)
 ```
 

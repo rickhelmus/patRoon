@@ -14,7 +14,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                                    EICParams = modifyList(EICParams, list(topMost = 1,
                                                                                           topMostByRGroup = FALSE,
                                                                                           onlyPresent = TRUE)),
-                                                   showPeakArea = TRUE, showFGroupRect = FALSE, colourBy = "fGroups",
+                                                   showPeakArea = TRUE, showFGroupRect = FALSE, groupBy = "fGroups",
                                                    showLegend = FALSE, intMax = settings$features$chromatograms$intMax),
                                               parParams = list(mai = c(0.9, 0.8, 0.6, 0.1)), width = 10, height = 4)
     

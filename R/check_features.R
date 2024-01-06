@@ -262,7 +262,7 @@ checkFeaturesInterface$methods(
         ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
                               topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup")
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
-            plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
+            plotChroms(fg, EICs = EICs, groupBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
         })
     },

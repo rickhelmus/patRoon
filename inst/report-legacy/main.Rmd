@@ -86,7 +86,7 @@ allPlots <- sapply(seq_len(length(rmdVars$fGroups)), function(grpi)
     path <- file.path(plotPathFull, sprintf("chrom_%d.png", grpi))
     makeCachedPlot(path, "plotChroms",
                    list(rmdVars$fGroups, groupName = names(rmdVars$fGroups)[grpi], EICParams = rmdVars$EICParams,
-                        retMin = rmdVars$retMin, EICs = rmdVars$EICs, colourBy = "rGroup"),
+                        retMin = rmdVars$retMin, EICs = rmdVars$EICs, groupBy = "rGroup"),
                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     setTxtProgressBar(prog, grpi)
     return(path)
@@ -119,7 +119,7 @@ par(mai = c(0.9, 0.8, 0.6, 0.1))
 plotChroms(rmdVars$fGroups, EICParams = getDefEICParams(rtWindow = rmdVars$EICParams$rtWindow,
                                                         mzExpWindow = rmdVars$EICParams$mzExpWindow, topMost = 1),
            retMin = rmdVars$retMin, EICs = rmdVars$EICs, showPeakArea = TRUE, showFGroupRect = FALSE,
-           colourBy = "fGroups", showLegend = FALSE)
+           groupBy = "fGroups", showLegend = FALSE)
 ```
 
 

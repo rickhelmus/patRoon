@@ -398,18 +398,20 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 #' @export
 setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                   retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                  title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                  showLegend = TRUE, annotate = c("none", "ret", "mz"),
-                                                  intMax = "eic", EICParams = getDefEICParams(), showProgress = FALSE,
-                                                  xlim = NULL, ylim = NULL, EICs = NULL, ...)
+                                                  title = NULL, groupBy = NULL, showLegend = TRUE,
+                                                  annotate = c("none", "ret", "mz"), intMax = "eic",
+                                                  EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
+                                                  ylim = NULL, EICs = NULL, ...)
 {
+    anaInfo <- analysisInfo(obj)
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
            fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend + showProgress,
            fixed = list(add = ac))
     checkmate::assertString(title, null.ok = TRUE, add = ac)
-    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
+    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
     checkmate::assertChoice(intMax, c("eic", "feature"), add = ac)
     assertEICParams(EICParams, add = ac)
@@ -419,8 +421,11 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     if (intMax == "feature" && !EICParams$onlyPresent)
         stop("intMax must be 'eic' when EICParams$onlyPresent == FALSE", call. = FALSE)
     
-    if (showLegend && colourBy == "none")
+    if (showLegend && is.null(groupBy))
         showLegend <- FALSE
+    
+    if (!is.null(groupBy) && groupBy == "rGroups")
+        groupBy <- "group" # compat
     
     if (is.null(EICs))
         EICs <- getEICsForFGroups(obj, analysis, groupName, EICParams)
@@ -439,24 +444,24 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     
     gInfo <- groupInfo(obj)
     gCount <- length(groupName)
-    anaInfo <- analysisInfo(obj)
     takeAnalysis <- analysis
     anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     rGroups <- unique(anaInfo$group)
     
-    if (colourBy == "rGroups")
-    {
-        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(rGroups))
-        names(EICColors) <- rGroups
-    }
-    else if (colourBy == "fGroups")
+    if (is.null(groupBy))
+        EICColors <- "blue"
+    else if (groupBy == "fGroups")
     {
         EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(gCount)
         names(EICColors) <- groupName
     }
     else
-        EICColors <- "blue"
+    {
+        colgrps <- unique(anaInfo[[groupBy]])
+        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(colgrps))
+        names(EICColors) <- colgrps
+    }
     
     fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
     names(fillColors) <- names(EICColors)
@@ -509,10 +514,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     {
         makeLegend <- function(x, y, ...)
         {
-            texts <- if (colourBy == "rGroups") rGroups else groupName
-            return(legend(x, y, texts, col = EICColors[texts],
-                          text.col = EICColors[texts], lty = 1,
-                          xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+            return(legend(x, y, names(EICColors), col = EICColors, text.col = EICColors, lty = 1, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
         }
         
         plot.new()
@@ -545,13 +548,13 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
             if (EICParams$onlyPresent && nrow(featRow) == 0)
                 next
             
-            if (colourBy == "rGroups")
-                colInd <- anaInfo[match(ana, analysis)]$group
-            else if (colourBy == "fGroups")
-                colInd <- grp
+            colInd <- if (is.null(groupBy))
+                1
+            else if (groupBy == "fGroups")
+                grp
             else
-                colInd <- 1
-            
+                anaInfo[match(ana, analysis)][[groupBy]]
+
             points(if (retMin) EIC$time / 60 else EIC$time, EIC$intensity, type = "l", col = EICColors[colInd])
             
             if (showPeakArea && nrow(featRow) != 0)
@@ -611,12 +614,11 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
 
 setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                       retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                      title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                      showLegend = TRUE, annotate = c("none", "ret", "mz"),
+                                                      title = NULL, groupBy = NULL, showLegend = TRUE,
+                                                      annotate = c("none", "ret", "mz"),
                                                       intMax = "eic", EICParams = getDefEICParams(),
                                                       showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
-    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
     if ("none" %in% annotate)
         annotate <- "none"

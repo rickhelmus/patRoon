@@ -169,7 +169,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, EICParams, retMin, EICs)
         
         screen(scr[scrInd])
         plotChroms(fGroups, groupName = gNames[grpi], EICParams = EICParams, retMin = retMin, EICs = EICs,
-                   colourBy = "rGroups")
+                   groupBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 

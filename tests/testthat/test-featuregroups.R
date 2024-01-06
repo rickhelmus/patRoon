@@ -495,8 +495,8 @@ test_that("plotting works", {
     expect_doppel("eic-tm1rg", function() plotChroms(subFGroups,
                                                      EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE)))
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
-    expect_doppel("eic-cbr", function() plotChroms(subFGroups, colourBy = "rGroups"))
-    expect_doppel("eic-cbf", function() plotChroms(subFGroups, colourBy = "fGroups"))
+    expect_doppel("eic-cbr", function() plotChroms(subFGroups, groupBy = "rGroups"))
+    expect_doppel("eic-cbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures

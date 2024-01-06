@@ -335,7 +335,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
         makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin,
                                 intMax = settings$features$chromatograms$intMax, EICs = EICs,
-                                EICParams = EICParams, colourBy = "rGroups", title = "", bty = "l"),
+                                EICParams = EICParams, groupBy = "rGroups", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)

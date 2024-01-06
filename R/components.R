@@ -27,7 +27,7 @@ NULL
 #' 
 #'   For \code{plotChroms}: Further (optional) arguments passed to the
 #'   \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
-#'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
+#'   the \code{groupBy}, \code{showPeakArea}, \code{showFGroupRect} and
 #'   \code{topMost} arguments cannot be set as these are set by this method.
 #'
 #'   For \code{plotSpectrum}: Further arguments passed to
@@ -518,7 +518,7 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = 
 
     showPeakArea <- isHom
     showFGroupRect <- !isHom
-    colourBy = if (!isHom) "fGroups" else "rGroups"
+    groupBy = if (!isHom) "fGroups" else "rGroups"
 
     if (isHom)
     {
@@ -534,7 +534,7 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = 
     fGroups <- fGroups[, unique(comp$group)]
 
     if (length(fGroups) > 0)
-        plotChroms(fGroups, EICParams = EICParams, colourBy = colourBy, showPeakArea = showPeakArea,
+        plotChroms(fGroups, EICParams = EICParams, groupBy = groupBy, showPeakArea = showPeakArea,
                    showFGroupRect = showFGroupRect, ...)
 })
 

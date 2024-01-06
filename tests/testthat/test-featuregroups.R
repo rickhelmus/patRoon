@@ -471,10 +471,10 @@ if (testWithSets())
     chordGroups <- c(chordGroups, setNames(chordGroups, sub("pos", "neg", names(chordGroups))))
 
 test_that("plotting works", {
-    expect_doppel("retmz", function() plot(fgOpenMS, colourBy = "fGroups", showLegend = FALSE))
-    expect_doppel("retmz-singlec", function() plot(fgOpenMS, colourBy = "none", col = "blue"))
-    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, colourBy = "rGroups"))
-    expect_doppel("retmz-comp", function() plot(fGCompOpenMS, colourBy = "fGroups", showLegend = FALSE))
+    expect_doppel("retmz", function() plot(fgOpenMS, groupBy = "fGroups", showLegend = FALSE))
+    expect_doppel("retmz-singlec", function() plot(fgOpenMS, groupBy = "none", col = "blue"))
+    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, groupBy = "rGroups"))
+    expect_doppel("retmz-comp", function() plot(fGCompOpenMS, groupBy = "fGroups", showLegend = FALSE))
 
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))
     expect_doppel("intensity-avg", function() plotInt(fgOpenMS, TRUE))
@@ -530,7 +530,7 @@ test_that("plotting works", {
 
 test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
-    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, colourBy = "rGroups"))
+    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, groupBy = "rGroups"))
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
 
     expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))
@@ -549,7 +549,7 @@ test_that("plotting empty objects works", {
     
     skip_if(testWithSets())
     
-    expect_doppel("retmz", function() plot(fGConsOneEmpty, colourBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
+    expect_doppel("retmz", function() plot(fGConsOneEmpty, groupBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_ggplot(plotUpSet(fGConsOneEmpty))

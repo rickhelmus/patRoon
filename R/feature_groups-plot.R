@@ -55,42 +55,52 @@ NULL
 #' 
 #' @rdname feature-plotting
 #' @export
-setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = c("none", "rGroups", "fGroups"),
-                                                                  onlyUnique = FALSE, retMin = FALSE,
-                                                                  showLegend = TRUE, col = NULL,
+setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = NULL, onlyUnique = FALSE,
+                                                                  retMin = FALSE, showLegend = TRUE, col = NULL,
                                                                   pch = NULL, ...)
 {
-    rGroups <- replicateGroups(x)
-    
+    anaInfo <- analysisInfo(x)
+
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
-    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
+    # UNDONE: do this in assertAndPrepareAnaInfoBy()
+    checkmate::assertChoice(groupBy, c("none", "rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(x) == 0)
         noDataPlot()
     else
     {
-        if (colourBy == "fGroups" || colourBy == "none")
+        if (is.null(groupBy))
+        {
+            col <- "black"
+            if (is.null(pch))
+                pch <- 16
+            showLegend <- FALSE
+        }
+        if (is.null(groupBy) || groupBy == "fGroups")
         {
             if (is.null(col))
-                col <- if (colourBy == "fGroups") colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x)) else "black"
+                col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x))
             if (is.null(pch))
                 pch <- 16
             
-            if (colourBy == "fGroups" && showLegend)
+            if (showLegend)
             {
                 labels <- names(x)
                 labCol <- rep(col, length.out = length(labels))
                 labPch <- rep(pch, length.out = length(labels))
                 names(labCol) <- labels; names(labPch) <- labels
             }
-            else
-                showLegend <- FALSE
         }
-        else if (colourBy == "rGroups")
+        else
         {
-            labels <- c(replicateGroups(x), "overlap")
+            if (groupBy == "rGroups")
+                groupBy <- "group" # compat
+            
+            allGroups <- unique(anaInfo[[groupBy]])
+            
+            labels <- c(allGroups, "overlap")
             
             if (is.null(col))
                 labCol <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels))
@@ -114,7 +124,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, colourBy = 
             names(labPch) <- labels
             
             # get averaged intensities for each rGroup and omit initial name/rt/mz columns
-            gTable <- as.data.table(x, average = TRUE)[, getADTIntCols(replicateGroups(x)), with = FALSE]
+            gTable <- as.data.table(x, average = groupBy)[, getADTIntCols(allGroups), with = FALSE]
             
             for (r in seq_len(nrow(gTable)))
             {

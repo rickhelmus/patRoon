@@ -46,6 +46,10 @@
         - aggregate arg (replaces average)
         - outerGroups --> groupBy and now expects anaInfo column name
             - also update (incorrect) example in handbook
+    - plot()/plotChroms()
+        - colourBy --> groupBy
+            - "none" --> NULL
+            - anaInfo col possible
     - as.data.table()
         - average arg
             - different for features==T&&average==T
@@ -66,6 +70,10 @@
     - no analysisInfo slot in fGroups anymore
     - analysisInfo()<-
     - feature subsetting: ni and reorder args (also reorder sets)
+    - plot()/plotChroms()
+        - colourBy --> groupBy
+            - "none" --> NULL
+            - anaInfo col possible
     - plotVenn(): aggregate arg
     - plotUpSet():
         - aggregate arg

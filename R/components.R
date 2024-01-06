@@ -514,7 +514,7 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = 
 
     showPeakArea <- isHom
     showFGroupRect <- !isHom
-    colourBy = if (!isHom) "fGroup" else "rGroup"
+    colourBy = if (!isHom) "fGroups" else "rGroups"
 
     if (isHom)
     {

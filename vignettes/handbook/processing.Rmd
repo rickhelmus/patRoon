@@ -712,7 +712,7 @@ plot(fGroups) # simple scatter plot of retention and m/z values
 
 plotChroms(fGroups) # plot EICs for all features
 plotChroms(fGroups[, 1], # only plot all features of first group
-           colourBy = "rGroup") # and mark them individually per replicate group
+           colourBy = "rGroups") # and mark them individually per replicate group
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 
 plotSpectrum(mslists, "M120_R268_30") # non-annotated MS spectrum
@@ -759,7 +759,7 @@ plotChroms(fGroups[, 10], EICParams = getDefEICParams(onlyPresent = FALSE))
 
 # get overview of all feature groups
 plotChroms(fGroups,
-           colourBy = "fGroup", # unique colour for each group
+           colourBy = "fGroups", # unique colour for each group
            EICParams = getDefEICParams(topMost = 1), # only most intense feature in each group
            showPeakArea = TRUE, # show integrated areas
            showFGroupRect = FALSE,

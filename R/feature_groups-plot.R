@@ -64,7 +64,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
     # UNDONE: do this in assertAndPrepareAnaInfoBy()
-    checkmate::assertChoice(groupBy, c("none", "rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(x) == 0)

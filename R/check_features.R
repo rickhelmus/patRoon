@@ -268,7 +268,7 @@ checkFeaturesInterface$methods(
         
         bg <- if (rValues$currentPrimSel %in% rValues$removeFully) RColorBrewer::brewer.pal(9, "Reds")[[1]] else "white"
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
-            plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
+            plotChroms(fg, EICs = EICs, groupBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
         })
     },

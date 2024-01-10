@@ -21,6 +21,17 @@
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
     - ".all" --> "fGroup"?
+    
+- Misc
+    - minimum max intensity feature filter, eg `delete(fGroups, j = function(gt, ...) max(gt) < 5E3)`
+    - bg MS/MS subtraction
+    - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
+    - retain RTs of parents with convertToSuspects()
+    - MSPL filter to remove mass peaks with X Da higher m/z than precursor
+    - delete() for screenInfo
+        - `fGroups <- delete(fGroups, z = screenInfo(fGroups)$SMILES %in% rmSMILES)`
+        - `fGroups <- delete(fGroups, z = function(scr) scr$SMILES %in% rmSMILES)`
+    - export TPsLogicTransformations so it can be easily modified
 
 - tests
     - IDL filter

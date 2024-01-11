@@ -472,7 +472,7 @@ if (testWithSets())
 
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, groupBy = "fGroups", showLegend = FALSE))
-    expect_doppel("retmz-singlec", function() plot(fgOpenMS, groupBy = "none", col = "blue"))
+    expect_doppel("retmz-singlec", function() plot(fgOpenMS, groupBy = NULL, col = "blue"))
     expect_doppel("retmz-rgroups", function() plot(fgOpenMS, groupBy = "rGroups"))
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS, groupBy = "fGroups", showLegend = FALSE))
 

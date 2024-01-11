@@ -73,12 +73,13 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
     {
         if (is.null(groupBy))
         {
-            col <- "black"
+            if (is.null(col))
+                col <- "black"
             if (is.null(pch))
                 pch <- 16
             showLegend <- FALSE
         }
-        if (is.null(groupBy) || groupBy == "fGroups")
+        else if (groupBy == "fGroups")
         {
             if (is.null(col))
                 col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x))
@@ -112,7 +113,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
             {
                 # prefer closed symbols (15-25)
                 ll <- length(labels)
-                if (ll < (25-15))
+                if (ll < (25 - 15))
                     labPch <- seq_len(ll) + 14
                 else if (ll <= 25)
                     labPch <- seq_len(ll)

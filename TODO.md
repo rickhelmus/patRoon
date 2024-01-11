@@ -23,7 +23,6 @@
     - ".all" --> "fGroup"?
     
 - Misc
-    - minimum max intensity feature filter, eg `delete(fGroups, j = function(gt, ...) max(gt) < 5E3)`
     - bg MS/MS subtraction
     - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
     - retain RTs of parents with convertToSuspects()
@@ -73,6 +72,7 @@
         - anaInfoCols arg
             - only works with features==T and cols must be numeric if average==T
         - make new page with all as.data.table() methods
+    - minimum max intensity feature filter
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -107,6 +107,7 @@
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
     - sets features: ion_mz column
     - sets fGroups: ion_mz column in @annotations
+    - minimum max intensity feature filter
 
 ## Ext
 
